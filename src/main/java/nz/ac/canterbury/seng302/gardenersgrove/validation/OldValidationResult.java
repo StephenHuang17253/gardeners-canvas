@@ -6,17 +6,17 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation;
  * and a string to represent the error message if the validation was not
  * successful
  */
-public class ValidationResult {
+public class OldValidationResult {
     private boolean valid;
     private String errorMessage;
 
     /**
-     * Constructor for a ValidationResult
+     * Constructor for a OldValidationResult
      * 
      * @param valid
      * @param errorMessage
      */
-    public ValidationResult(boolean valid, String errorMessage) {
+    public OldValidationResult(boolean valid, String errorMessage) {
         this.valid = valid;
         this.errorMessage = valid ? "" : errorMessage;
     }

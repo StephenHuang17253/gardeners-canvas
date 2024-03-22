@@ -1,12 +1,11 @@
 package nz.ac.canterbury.seng302.gardenersgrove;
 
+import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-
 /**
- * Tests the ValidationResult class
+ * Tests the OldValidationResult class
  */
 public class ValidationResultTest {
 
@@ -15,7 +14,7 @@ public class ValidationResultTest {
      */
     @Test
     public void IsValid_GetErrorMessage_MessageBlank() {
-        ValidationResult result = new ValidationResult(true, "This is a test");
+        OldValidationResult result = new OldValidationResult(true, "This is a test");
         Assertions.assertTrue(result.getErrorMessage().equals(""));
     }
 
@@ -25,7 +24,7 @@ public class ValidationResultTest {
     @Test
     public void IsInvalid_GetErrorMessage_MessageNotBlank() {
         String errorMessage = "This is a test";
-        ValidationResult result = new ValidationResult(false, errorMessage);
+        OldValidationResult result = new OldValidationResult(false, errorMessage);
         Assertions.assertTrue(result.getErrorMessage().equals(errorMessage));
     }
 }

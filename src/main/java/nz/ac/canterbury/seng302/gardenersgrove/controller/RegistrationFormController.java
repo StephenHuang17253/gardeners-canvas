@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,11 +145,11 @@ public class RegistrationFormController {
             valid = false;
         }
 
-        ValidationResult firstNameValidation = validation.validateName(firstName, true);
-        ValidationResult lastNameValidation = validation.validateName(lastName, false);
-        ValidationResult passwordValidation = validation.validatePassword(password);
-        ValidationResult emailAddressValidation = validation.validateEmail(emailAddress, true);
-        ValidationResult dateOfBirthValidation = validation.validateDOB(dateOfBirth);
+        OldValidationResult firstNameValidation = validation.validateName(firstName, true);
+        OldValidationResult lastNameValidation = validation.validateName(lastName, false);
+        OldValidationResult passwordValidation = validation.validatePassword(password);
+        OldValidationResult emailAddressValidation = validation.validateEmail(emailAddress, true);
+        OldValidationResult dateOfBirthValidation = validation.validateDOB(dateOfBirth);
         if (Objects.equals(dateOfBirth, "")) {
             dateOfBirthValidation.setValid();
         }
@@ -207,27 +207,27 @@ public class RegistrationFormController {
     }
 
     /**
-     * Runs ValidationResult.isvalid() on all of the user's input
+     * Runs OldValidationResult.isvalid() on all of the user's input
      *
-     * @param firstNameValidation    - ValidationResult for user's first name
-     * @param lastNameValidation     - ValidationResult for user's last name
+     * @param firstNameValidation    - OldValidationResult for user's first name
+     * @param lastNameValidation     - OldValidationResult for user's last name
      * @param noLastName             - boolean checking if user has last name
-     * @param emailAddressValidation - ValidationResult for user's email address
-     * @param passwordValidation     - ValidationResult for user's password
-     * @param dateOfBirthValidation  - ValidationResult for user's DOB
+     * @param emailAddressValidation - OldValidationResult for user's email address
+     * @param passwordValidation     - OldValidationResult for user's password
+     * @param dateOfBirthValidation  - OldValidationResult for user's DOB
      * @param valid                  - Boolean for if user's input is valid
      * @param model                  - (map-like) representation of user's input
      *                               (above parameters)
      * @return valid
      */
-    public Boolean checkAllValid(ValidationResult firstNameValidation,
-            ValidationResult lastNameValidation,
-            String noLastName,
-            ValidationResult emailAddressValidation,
-            ValidationResult passwordValidation,
-            ValidationResult dateOfBirthValidation,
-            boolean valid,
-            Model model) {
+    public Boolean checkAllValid(OldValidationResult firstNameValidation,
+                                 OldValidationResult lastNameValidation,
+                                 String noLastName,
+                                 OldValidationResult emailAddressValidation,
+                                 OldValidationResult passwordValidation,
+                                 OldValidationResult dateOfBirthValidation,
+                                 boolean valid,
+                                 Model model) {
 
         if (!firstNameValidation.isValid()) {
             model.addAttribute("firstNameError", firstNameValidation.getErrorMessage());

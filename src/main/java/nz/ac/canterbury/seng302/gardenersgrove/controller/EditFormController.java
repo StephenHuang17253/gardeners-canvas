@@ -2,8 +2,8 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -143,13 +143,13 @@ public class EditFormController {
         String currentPrincipalName = authentication.getName();
         User currentUser = userService.getUserByEmail(currentPrincipalName);
 
-        ValidationResult firstNameValidation = validation.validateName(firstName, true);
-        ValidationResult lastNameValidation = validation.validateName(lastName, false);
-        ValidationResult emailAddressValidation = validation.validateEmail(emailAddress, true);
+        OldValidationResult firstNameValidation = validation.validateName(firstName, true);
+        OldValidationResult lastNameValidation = validation.validateName(lastName, false);
+        OldValidationResult emailAddressValidation = validation.validateEmail(emailAddress, true);
         if (emailAddress.equals(currentPrincipalName)) {
             emailAddressValidation.setValid();
         }
-        ValidationResult dateOfBirthValidation = validation.validateDOB(dateOfBirth);
+        OldValidationResult dateOfBirthValidation = validation.validateDOB(dateOfBirth);
         if (Objects.equals(dateOfBirth, "")) {
             dateOfBirthValidation.setValid();
         }
@@ -205,23 +205,23 @@ public class EditFormController {
     }
 
     /**
-     * Runs ValidationResult.isvalid() on all the user's input
+     * Runs OldValidationResult.isvalid() on all the user's input
      *
-     * @param firstNameValidation    - ValidationResult for user's first name
-     * @param lastNameValidation     - ValidationResult for user's last name
+     * @param firstNameValidation    - OldValidationResult for user's first name
+     * @param lastNameValidation     - OldValidationResult for user's last name
      * @param noLastName             - boolean checking if user has last name
-     * @param emailAddressValidation - ValidationResult for user's email address
-     * @param dateOfBirthValidation  - ValidationResult for user's DOB
+     * @param emailAddressValidation - OldValidationResult for user's email address
+     * @param dateOfBirthValidation  - OldValidationResult for user's DOB
      * @param model                  - (map-like) representation of user's input
      *                               (above parameters)
      * @return valid
      */
-    public Boolean checkAllValid(ValidationResult firstNameValidation,
-            ValidationResult lastNameValidation,
-            String noLastName,
-            ValidationResult emailAddressValidation,
-            ValidationResult dateOfBirthValidation,
-            Model model) {
+    public Boolean checkAllValid(OldValidationResult firstNameValidation,
+                                 OldValidationResult lastNameValidation,
+                                 String noLastName,
+                                 OldValidationResult emailAddressValidation,
+                                 OldValidationResult dateOfBirthValidation,
+                                 Model model) {
         boolean valid = true;
 
         if (!firstNameValidation.isValid()) {

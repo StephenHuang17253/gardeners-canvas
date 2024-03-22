@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 
 import org.springframework.ui.Model;
 
@@ -103,7 +103,7 @@ public class LoginPageController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        ValidationResult validEmail = validation.validateEmail(email, false);
+        OldValidationResult validEmail = validation.validateEmail(email, false);
 
         boolean validLogin = userService.getUserByEmailAndPassword(email, password) != null;
 
