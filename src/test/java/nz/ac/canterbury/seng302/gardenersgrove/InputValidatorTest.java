@@ -12,10 +12,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class InputValidatorTest {
 
 
-    @Test
-    public void InputValidator_compText_validString_return_OK()
+    @ParameterizedTest
+    @ValueSource(strings = {"Hello", "Hello World","àäèéëïĳöü","áêéèëïíîôóúû","êôúû","ÆØÅæøå","ÄÖäö",
+            "ÅÄÖåäö","ÄÖÕÜäöõü","ÄÖÜẞäöüß","ÇÊÎŞÛçêîşû","ĂÂÎȘȚăâîșț","ÂÊÎÔÛŴŶÁÉÍÏâêîôûŵŷáéíï","ĈĜĤĴŜŬĉĝĥĵŝŭ",
+            "ÇĞİÖŞÜçğıöşü","ÁÐÉÍÓÚÝÞÆÖáðéíóúýþæö","ÁÐÍÓÚÝÆØáðíóúýæø","ÁÉÍÓÖŐÚÜŰáéíóöőúüű","ÀÇÉÈÍÓÒÚÜÏàçéèíóòúüï",
+            "ÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸàâæçéèêëîïôœùûüÿ","ÁÀÇÉÈÍÓÒÚËÜÏáàçéèíóòúëüï","ÁÉÍÑÓÚÜáéíñóúü",
+            "ÀÉÈÌÒÙàéèìòù","ćęłńóśźż ","ćśůź ","ãéëòôù ","ČŠŽ",
+            "अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ऍ ऎ ए ऐ ","ਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜ","અ આ ઇ ઈ ઉ ઊ ઋ ઌ ઍ એ ઐ ","ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ",
+            "АБВГДЕЖЗИКЛМН","ЙЩЬЮЯ","ЁЫЭ","ЄꙂꙀЗІЇꙈОуꙊѠ","ΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ","字文化圈","いうえおの","アイウ","ㄈㄉㄊㄋㄌㄍㄎㄏ ",
+            "ㄪㄫㄬ"," Է Ը Թ Ժ "," ჱ თ ი კ ლ მ ","ⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎ"})
+    public void InputValidator_compText_validString_return_OK(String input)
     {
-        assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("Hello"));
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField(input));
     }
 
     @Test
