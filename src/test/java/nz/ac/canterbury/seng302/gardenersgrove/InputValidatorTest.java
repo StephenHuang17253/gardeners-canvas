@@ -319,7 +319,7 @@ public class InputValidatorTest {
      * @param email
      */
     @ParameterizedTest
-    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c","test@test.abcd", "test@.com", "@test.com" })
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c","test@test.abcdf", "test@.com", "@test.com" })
     public void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
@@ -370,10 +370,21 @@ public class InputValidatorTest {
      * @param dob
      */
     @ParameterizedTest
-    @ValueSource(strings = {"01/01/1904"})
+    @ValueSource(strings = {"01/01/1903","01/01/1850"})
     public void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
+    }
+
+    /**
+     * Test for invalid DOB format
+     * @param dob
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014"})
+    public void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
+        //Todo have changing dates so test doesn't fail in 2 years
+        Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
 
 
