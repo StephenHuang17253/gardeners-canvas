@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,12 +105,12 @@ public class LoginPageController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        OldValidationResult validEmail = validation.validateEmail(email, false);
+        ValidationResult validEmail = InputValidator.validateUniqueEmail(email);
 
         boolean validLogin = userService.getUserByEmailAndPassword(email, password) != null;
 
-        if (!validEmail.isValid() || !validLogin) {
-            model.addAttribute("emailError", validEmail.getErrorMessage());
+        if (!validEmail.valid() || !validLogin) {
+            model.addAttribute("emailError", validEmail);
             model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
 
             return "loginPage";

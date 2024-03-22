@@ -2,6 +2,8 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
 
@@ -143,15 +145,15 @@ public class EditFormController {
         String currentPrincipalName = authentication.getName();
         User currentUser = userService.getUserByEmail(currentPrincipalName);
 
-        OldValidationResult firstNameValidation = validation.validateName(firstName, true);
-        OldValidationResult lastNameValidation = validation.validateName(lastName, false);
-        OldValidationResult emailAddressValidation = validation.validateEmail(emailAddress, true);
+        ValidationResult firstNameValidation = InputValidator.validateName(firstName);
+        ValidationResult lastNameValidation = InputValidator.validateName(lastName);
+        ValidationResult emailAddressValidation = InputValidator.validateName(emailAddress);
         if (emailAddress.equals(currentPrincipalName)) {
-            emailAddressValidation.setValid();
+            emailAddressValidation = ValidationResult.OK;
         }
-        OldValidationResult dateOfBirthValidation = validation.validateDOB(dateOfBirth);
+        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
         if (Objects.equals(dateOfBirth, "")) {
-            dateOfBirthValidation.setValid();
+            dateOfBirthValidation = ValidationResult.OK;
         }
 
         boolean valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
@@ -216,28 +218,28 @@ public class EditFormController {
      *                               (above parameters)
      * @return valid
      */
-    public Boolean checkAllValid(OldValidationResult firstNameValidation,
-                                 OldValidationResult lastNameValidation,
+    public Boolean checkAllValid(ValidationResult firstNameValidation,
+                                 ValidationResult lastNameValidation,
                                  String noLastName,
-                                 OldValidationResult emailAddressValidation,
-                                 OldValidationResult dateOfBirthValidation,
+                                 ValidationResult emailAddressValidation,
+                                 ValidationResult dateOfBirthValidation,
                                  Model model) {
         boolean valid = true;
 
-        if (!firstNameValidation.isValid()) {
-            model.addAttribute("firstNameError", firstNameValidation.getErrorMessage());
+        if (!firstNameValidation.valid()) {
+            model.addAttribute("firstNameError", "First Name " +firstNameValidation);
             valid = false;
         }
-        if (!lastNameValidation.isValid() && !Boolean.parseBoolean(noLastName)) {
-            model.addAttribute("lastNameError", lastNameValidation.getErrorMessage());
+        if (!lastNameValidation.valid() && !Boolean.parseBoolean(noLastName)) {
+            model.addAttribute("lastNameError", "Last Name " + lastNameValidation);
             valid = false;
         }
-        if (!emailAddressValidation.isValid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation.getErrorMessage());
+        if (!emailAddressValidation.valid()) {
+            model.addAttribute("emailAddressError", emailAddressValidation);
             valid = false;
         }
-        if (!dateOfBirthValidation.isValid()) {
-            model.addAttribute("dateOfBirthError", dateOfBirthValidation.getErrorMessage());
+        if (!dateOfBirthValidation.valid()) {
+            model.addAttribute("dateOfBirthError", dateOfBirthValidation);
             valid = false;
         }
 
