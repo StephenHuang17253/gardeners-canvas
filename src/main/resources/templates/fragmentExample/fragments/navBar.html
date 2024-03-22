@@ -1,0 +1,40 @@
+<!--
+Fragment that runs the nav bar, to add the navbar to you page:
+insert into the head:
+"
+<link th:href="@{/css/navBar.css}" rel="stylesheet">
+"
+insert into the HTML body at the top:
+"
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar">
+"
+Editing content below will change the nav bar on all pages where it is implemented
+-->
+
+
+<nav th:fragment = "navBar(activeParam)" id="navbar">
+    <ul>
+        <li th:class="${activeParam == 'home' ? 'active' : ''}">
+            <a th:href="@{/landing}">Home</a>
+        </li>
+        <li th:class="${activeParam == 'create' ? 'active' : ''}">
+            <button id="createGardenBtn" onclick="createGarden()">
+                <a>Create Garden</a>
+            </button>
+        </li>
+        <li th:class="${activeParam == 'gardens' ? 'active' : ''}" id = "gardenDropDown">
+            <a th:href="@{/my-gardens}">My Gardens</a>
+            <ul>
+                <li th:each="garden : ${myGardens}">
+                    <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${garden.getGardenId}, gardenName=${garden.getGardenName})}">
+                        <span th:text="${garden.getGardenName}">Garden Name</span>
+                    </a>
+                </li>
+             </ul>
+         </li>
+
+
+     </ul>
+     <div id = "divider"></div>
+    <script src="/js/createButtonReturn.js"></script>
+ </nav>

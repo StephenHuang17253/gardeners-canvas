@@ -1,0 +1,101 @@
+body {
+    background: #ccdf92;
+    background: linear-gradient(#ccdf92,rgb(25,100,25)) no-repeat;
+    background-attachment: fixed;
+}
+
+.main-container
+{
+    padding: 4mm;
+    margin: auto;
+    width: 1200px;
+    background: white;
+    align-content: center;
+    box-shadow: 7px 7px;
+}
+
+
+.error
+{
+    font-family: monospace;
+    color: red;
+    font-weight: bold;
+}
+
+.noError
+{
+    font-family: monospace;
+    color: black;
+    font-weight: normal;
+}
+
+.errorBorder
+{
+    border-color: red;
+}
+
+.noErrorBorder
+{
+    border-color: black;
+}
+
+.ui-button
+{
+    display: block;
+    width: 60px;
+    height: 30px;
+    font-size: 16px;
+    font-style: normal;
+    text-decoration: none;
+    border: black 1px solid;
+    border-radius: 5px;
+    color: black;
+    background: lightgreen;
+    font-family: "Verdana", sans-serif;
+
+}
+
+.ui-button-3x
+{
+    display: block;
+    width: 180px;
+    height: 30px;
+    font-size: 16px;
+    font-style: normal;
+    text-decoration: none;
+    border: black 1px solid;
+    border-radius: 5px;
+    color: black;
+    background: lightgreen;
+    font-family: "Verdana", sans-serif;
+
+}
+
+.ui-button :hover
+{
+
+    background: green;
+}
+
+
+@media screen and (max-width: 1310px) {
+
+    body
+    {
+        margin: .4vw;
+        padding: .4vw;
+    }
+
+    .main-container
+    {
+        padding: 2mm;
+        margin: auto;
+        width: 95%;
+        background: white;
+        align-content: center;
+        box-shadow: .58vw .58vw;
+        font-family: "Verdana", sans-serif;
+    }
+
+
+}
