@@ -1,7 +1,11 @@
 package nz.ac.canterbury.seng302.gardenersgrove;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -272,5 +276,105 @@ public class InputValidatorTest {
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("1 ! 0"));
     }
+
+
+    /**
+     * Test for valid names
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "John Doe", "John-Doe", "John Doe's" })
+    public void InputValidator_validateName_ValidName_return_OK(String name) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateName(name));
+    }
+
+    /**
+     * Test for invalid names
+     * @param name
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "John1", "John>", "~John" })
+    public void InputValidator_validateName_InvalidName_return_INVALID_USERNAME(String name) {
+        Assertions.assertEquals(ValidationResult.INVALID_USERNAME, InputValidator.validateName(name));
+    }
+
+    /**
+     * Test for valid emails
+     * @param email
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "test-test@example.com", "user_123@gmail.co.nz", "john.doe@hotmail.com",
+            "phlddzoxuomhdkclzinbsqhutjqhzodonrbgyxibpkutddaovmxifypmeksvhkts@mwbmmvndbnvfdskmrmmropbvhdgegssqcengjnfj" +
+                    "oavhccefauucivfpthrucoyhlxfgkcdurlffpoacnhhysprommslgxmusevvpxdgkkifsgpbpiljrcxjwejestmgvnsevszck" +
+                    "ujiglsrihnpblwmiculgtxodopsthkdzzpgjhznkcsarvzvubnyhutxhyyecsvjjykzxhdqlaxooxqnfbuewmajwlmvhklhzy" +
+                    "wxuhsxwtnshoxuw.com" })
+    public void InputValidator_validateUniqueEmail_ValidEmail_return_OK(String email) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateUniqueEmail(email));
+    }
+
+    // Todo check if there is an email already in persistence <-- need to mock persistence for this.
+    // Todo add foreign scripts
+
+    /**
+     * Test for invalid emails
+     * @param email
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c","test@test.abcd", "test@.com", "@test.com" })
+    public void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
+        Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
+    }
+
+    /**
+     * Test for valid passwords
+     * @param password
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "aB0!bbba", "##aBB0hhhhhhhhhh", "Passw0rd!","Pass word1!" })
+    public void InputValidator_validatePassword_ValidPassword_return_OK(String password) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password));
+    };
+
+    /**
+     * Test for invalid passwords
+     * @param password
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!" })
+    public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
+        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password));
+    };
+
+    /**
+     * Test for valid DOB
+     * @param dob
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
+    public void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDOB(dob));
+    };
+
+    /**
+     * Test for invalid DOB age below 13
+     * @param dob
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"01/02/2023"})
+    public void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {
+        //Todo have changing dates so test doesn't fail in 2 years
+        Assertions.assertEquals(ValidationResult.AGE_BELOW_13, InputValidator.validateDOB(dob));
+    }
+
+    /**
+     * Test for invalid DOB age above 120
+     * @param dob
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"01/01/1904"})
+    public void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
+        //Todo have changing dates so test doesn't fail in 2 years
+        Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
+    }
+
 
 }
