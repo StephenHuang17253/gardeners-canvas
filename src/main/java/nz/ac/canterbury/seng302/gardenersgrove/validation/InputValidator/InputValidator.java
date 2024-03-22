@@ -23,6 +23,7 @@ public class InputValidator {
 
         return new InputValidator(text)
                 .blankHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
@@ -96,6 +97,7 @@ public class InputValidator {
         return new InputValidator(text)
                 .blankHelper()
                 .alphaPlusHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
@@ -109,6 +111,7 @@ public class InputValidator {
     {
         return new InputValidator(text)
                 .alphaPlusHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
