@@ -147,7 +147,7 @@ public class EditFormController {
 
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
-        ValidationResult emailAddressValidation = InputValidator.validateName(emailAddress);
+        ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
         if (emailAddress.equals(currentPrincipalName)) {
             emailAddressValidation = ValidationResult.OK;
         }

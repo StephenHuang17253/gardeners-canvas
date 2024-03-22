@@ -150,7 +150,7 @@ public class RegistrationFormController {
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
-        ValidationResult emailAddressValidation = InputValidator.validateName(emailAddress);
+        ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
         ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
         if (Objects.equals(dateOfBirth, "")) {
             dateOfBirthValidation = ValidationResult.OK;
