@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link th:href="@{/css/baseCss.css}" rel="stylesheet">
   <style>
     table td{
       vertical-align:top;
@@ -12,37 +13,39 @@
   </style>
 </head>
 <body>
+<div class = "main-container">
 <h1>Basic Thymeleaf Error Page (You may want to make something better)</h1>
 <table>
-  <tr>
-    <td>Date</td>
-    <td th:text="${timestamp}"/>
-  </tr>
-  <tr>
-    <td>Path</td>
-    <td th:text="${path}"/>
-  </tr>
-  <tr>
-    <td>Error</td>
-    <td th:text="${error}"/>
-  </tr>
-  <tr>
-    <td>Status</td>
-    <td th:text="${status}"/>
-  </tr>
-  <tr>
-    <td>Message</td>
-    <td th:text="${message}"/>
-  </tr>
-  <tr>
-    <td>Exception</td>
-    <td th:text="${exception}"/>
-  </tr>
-  <tr>
-    <td>Trace</td>
-    <td>
-      <pre th:text="${trace}"/>
-    </td>
-  </tr>
-</table>
+    <tr>
+      <td>Date</td>
+      <td th:text="${timestamp}"/>
+    </tr>
+    <tr>
+      <td>Path</td>
+      <td th:text="${path}"/>
+    </tr>
+    <tr>
+      <td>Error</td>
+      <td th:text="${error}"/>
+    </tr>
+    <tr>
+      <td>Status</td>
+      <td th:text="${status}"/>
+    </tr>
+    <tr>
+      <td>Message</td>
+      <td th:text="${message}"/>
+    </tr>
+    <tr>
+      <td>Exception</td>
+      <td th:text="${exception}"/>
+    </tr>
+    <tr>
+      <td>Trace</td>
+      <td>
+        <pre th:text="${trace}"/>
+      </td>
+    </tr>
+  </table>
+</div>
 </body>

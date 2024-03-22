@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
+    <title>Edit Garden</title>
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+    <link th:href="@{/css/form.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
+<div class = main-container>
+    <h1>Edit Garden</h1>
+    <br>
+    <div>
+        <form th:action="@{edit}" method="post">
+            <label for="gardenName"> Garden Name: </label>
+            <br>
+            <input type="text" class="form-control" th:class = "${GNErrorClass}" id="gardenName" placeholder="Username's Garden"
+                   th:name="gardenName" th:value="${gardenName}" data-cy="gardenName" autofocus>
+
+            <div th:if="${GNErrorText!=''}">
+                <h3 class = "error" th:text="${GNErrorText}"></h3>
+            </div>
+
+            <label for="gardenLocation"> Garden Location: </label>
+            <br>
+            <input type="text" class="form-control" th:class = "${GLErrorClass}" id="gardenLocation" placeholder="Username's Backyard"
+                   th:name="gardenLocation" th:value="${gardenLocation}" data-cy="gardenLocation"
+                   autofocus>
+
+            <div th:if="${GLErrorText!=''}">
+                <h3 class = "error" th:text="${GLErrorText}"></h3>
+            </div>
+
+            <label for="gardenSize"> Garden Size(m^2): </label>
+            <br>
+            <input type="text" class="form-control" th:class = "${GSErrorClass}" id="gardenSize" placeholder="7.5"
+                   th:name="gardenSize" th:value="${gardenSize}" data-cy="gardenSize"
+                   autofocus>
+            <div th:if="${GSErrorText!=''}">
+                <h3 class = "error" th:text="${GSErrorText}"></h3>
+            </div>
+            <br/>
+
+
+
+            <button type="submit" class = "submit-button">Submit</button>
+            <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${gardenId}, gardenName=${gardenName})}">
+                <button type="button" class="cancel-button" >Cancel</button>
+            </a>
+        </form>
+    </div>
+</div>
+<script src="/js/preventEnterSubmit.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+.submit-button
+{
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: "Verdana", sans-serif;
+}
+
+.submit-button:hover{
+    background-color: #18981e; /* Darker background color on hover */
+    /* Alternate colour, blue background-color: #1978b9; /* Darker background color on hover */
+}
+
+.cancel-button:hover{
+    background-color: #cc5965; /* Darker background color on hover */
+}
+.cancel-button
+{
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #eeeeee;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: "Verdana", sans-serif;
+}
+
+.form-description textarea
+{
+    width: 40.534vw;
+    height: 4.5vw;
+    resize: none; /* Disable resizing */
+    overflow: auto; /* Enable scrollbars when content exceeds the size */
+    border: 1px solid #ccc; /* Add a border for visual appeal */
+    padding: 5px; /* Add some padding for better readability */
+}

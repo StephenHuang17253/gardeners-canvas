@@ -1,0 +1,20 @@
+<div th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate)">
+    <div class="plantbox" id="plantbox">
+        <div class="plant-info">
+            <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
+            <img src="/images/default_plant.png" alt="Default Plant Image" class="plant-image">
+        </div>
+        <div class="plant-details">
+            <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>
+            <span th:if="${plantDate != null}" th:text="'Planted on: ' + ${plantDate}" class="plant-date"> Name </span>
+            <span th:text="${plantDescription}" class="plant-description"></span>
+        </div>
+    </div>
+
+    <div class="edit-button-container">
+        <a th:href="@{__${gardenId}__=__${gardenName}__/__${plantId}__=__${plantName}__/edit}">
+            <button class="rounded-button">Edit Plant</button>
+        </a>
+    </div>
+    <br>
+</div>
