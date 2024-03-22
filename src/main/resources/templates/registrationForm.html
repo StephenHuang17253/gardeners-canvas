@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8"/>
+    <title>Registration Form</title>
+    <link th:href="@{/css/registrationForm.css}" rel="stylesheet">
+    <script th:src="@{/js/registrationForm.js}"></script>
+</head>
+<body>
+<h1>Registration Form</h1>
+<div>
+    <form th:action="@{/register}" method="post">
+        <label for="firstName"> First Name: </label>
+        <input type="text" class="form-control" id="firstName" placeholder="First Name"
+               th:name="firstName" th:value="*{firstName}" data-cy="firstName" required autofocus>
+        <div th:if="${firstNameError}" class="error-message">
+            <span th:text="${firstNameError}"></span>
+        </div>
+
+        <label for="lastName" id="lastNameLabel"> Last Name: </label>
+        <input type="text" class="form-control" id="lastName" placeholder="Last Name"
+               th:name="lastName" th:value="*{lastName}" data-cy="lastName" autofocus>
+        <div class="check_box_container">
+            <label for="noLastName"> I have no Surname:</label>
+            <input type="checkbox" id="noLastName" name="noLastName" th:value="true" th:checked="${noLastName}" onchange="hideLastName(event)">    
+        </div>
+        <div th:if="${lastNameError}" class="error-message">
+            <span th:text="${lastNameError}"></span>
+        </div>
+        
+        <label for="dateOfBirth"> Date of Birth (Optional): </label>
+        <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY"
+               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth" required autofocus>
+        <div th:if="${dateOfBirthError}" class="error-message">
+            <span th:text="${dateOfBirthError}"></span>
+        </div>
+        <label for="emailAddress"> Email Address: </label>
+        <input type="text" class="form-control" id="emailAddress" placeholder="johndoe@gmail.com"
+               th:name="emailAddress" th:value="*{emailAddress}" data-cy="emailAddress" required autofocus>
+        <div th:if="${emailAddressError}" class="error-message">
+            <span th:text="${emailAddressError}"></span>
+        </div>
+        <label for="password"> Password: </label>
+        <input type="password" class="form-control" id="password" placeholder="********"
+               th:name="password" th:value="*{password}" data-cy="password" required autofocus>
+        <div th:if="${passwordError}" class="error-message">
+            <span th:text="${passwordError}"></span>
+        </div>
+
+        <label for="repeatPassword"> Repeat Password: </label>
+        <input type="password" class="form-control" id="repeatPassword" placeholder="********"
+               th:name="repeatPassword" th:value="*{repeatPassword}" data-cy="repeatPassword" required autofocus>
+        <div th:if="${passwordMatchingError}" class="error-message">
+            <span th:text="${passwordMatchingError}"></span>
+        </div>
+        <br><br>
+        <div class="buttons">
+            <button type="submit" formnovalidate >Sign Up!</button>
+            <a th:href = "@{/home}" ><button type="button">Cancel :(</button></a>
+        </div>
+    </form>
+    
+</div>
+
+</body>
+</html>

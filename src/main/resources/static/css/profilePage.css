@@ -1,0 +1,49 @@
+/**
+Stylises the profilePage.html webpage
+*/
+
+body {
+    font-family: sans-serif;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 0;
+}
+
+.form-container {
+    background-color: #ffffff;
+    margin: 50px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #306030;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 25%;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+button a {
+    text-decoration: none;
+    color: white;
+}
