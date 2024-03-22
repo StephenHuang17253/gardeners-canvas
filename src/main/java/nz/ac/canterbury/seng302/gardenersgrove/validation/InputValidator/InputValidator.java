@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
 
-import java.text.ParseException;
 
 /**
  * Tests inputs on a variety of rules to check if values are valid
@@ -127,6 +126,53 @@ public class InputValidator {
                 .numberCommaSingleHelper()
                 .getResult();
     }
+
+
+    /**
+     * Checks if the given name is valid
+     *
+     * @param name string input in text field
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateName(String name) {
+        return ValidationResult.OK;
+
+    }
+
+    /**
+     * Checks if the given email is valid
+     *
+     * @param email
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateUniqueEmail(String email) {
+        return ValidationResult.OK;
+    }
+
+    /**
+     * Checks if the given password is valid
+     *
+     * @param password
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validatePassword(String password) {
+        return ValidationResult.OK;
+    }
+
+    /**
+     * Checks if the given dob is valid
+     *
+     * @param dob
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateDOB(String dob) {
+        return ValidationResult.OK;
+    }
+
 
 
     /**
