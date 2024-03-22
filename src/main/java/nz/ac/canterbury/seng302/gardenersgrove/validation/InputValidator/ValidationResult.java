@@ -16,12 +16,10 @@ public enum ValidationResult {
 
 
     private String message;
-    private final boolean isValid;
 
-    ValidationResult(String inMessage,Boolean inIsValid)
+    ValidationResult(String inMessage)
     {
         this.message = inMessage;
-        this.isValid = inIsValid;
     }
 
     /**
@@ -30,7 +28,7 @@ public enum ValidationResult {
      */
     public boolean valid()
     {
-        return this.isValid;
+        return this == OK;
     }
 
     /**
