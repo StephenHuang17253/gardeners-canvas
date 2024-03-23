@@ -1,12 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
 
 
-import jakarta.annotation.PostConstruct;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

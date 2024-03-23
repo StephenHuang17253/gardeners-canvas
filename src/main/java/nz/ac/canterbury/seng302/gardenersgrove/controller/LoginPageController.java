@@ -19,8 +19,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
 
 import org.springframework.ui.Model;
 
@@ -34,7 +32,6 @@ public class LoginPageController {
     Logger logger = LoggerFactory.getLogger(LoginPageController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final Validation validation;
 
     /**
      * Constructor for the LoginPageController with {@link Autowired} to connect this
@@ -42,13 +39,11 @@ public class LoginPageController {
      * 
      * @param userService
      * @param authenticationManager
-     * @param validation
      */
     @Autowired
-    public LoginPageController(UserService userService, AuthenticationManager authenticationManager, Validation validation) {
+    public LoginPageController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.validation = validation;
     }
 
     /**

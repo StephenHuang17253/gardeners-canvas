@@ -4,8 +4,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,7 +37,6 @@ public class EditFormController {
 
     Logger logger = LoggerFactory.getLogger(EditFormController.class);
     private final UserService userService;
-    private final Validation validation;
     private final AuthenticationManager authenticationManager;
 
     /**
@@ -47,14 +44,12 @@ public class EditFormController {
      * controller with other services
      * 
      * @param userService
-     * @param validation
      * @param authenticationManager
      */
     @Autowired
-    public EditFormController(UserService userService, Validation validation,
+    public EditFormController(UserService userService,
             AuthenticationManager authenticationManager) {
         this.userService = userService;
-        this.validation = validation;
         this.authenticationManager = authenticationManager;
     }
 
