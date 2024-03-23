@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile Picture</title>
+    <link th:href="@{/css/profilePicture.css}" rel="stylesheet" type="text/css">
+    <script th:src="@{/js/profilePicture.js}"></script>
+</head>
+
+<body>
+
+    <form th:action="@{profile_picture}" method="post" enctype="multipart/form-data">
+
+        <div class="container">
+            <img id="profileImage" th:src="@{${profileImage}}" th:alt="${profileImage}">
+            <label for="imageFile">+</label>
+            <input id="imageFile" type="file" th:name="imageFile" accept="image/*" onChange="handleFileSelect(event)">
+        </div>
+
+        <button type="submit">Submit Image</button>
+    </form>
+
+    <form th:action="@{profile_picture}" method="get" >
+        <label for="filename">Enter a filename:</label>
+        <input type="text" name="filename">
+        <button type="submit">Submit</button>
+    </form>
+
+</body>
+
+</html>
