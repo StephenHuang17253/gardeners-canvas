@@ -247,6 +247,11 @@ public class RegistrationFormController {
             valid = false;
         }
 
+        if (!passwordValidation.valid()) {
+            model.addAttribute("passwordError", passwordValidation);
+            valid = false;
+        }
+
         return valid;
     }
 
