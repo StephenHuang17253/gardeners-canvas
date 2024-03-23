@@ -1,8 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
 
 
+import jakarta.annotation.PostConstruct;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,11 +19,35 @@ import java.util.Locale;
 /**
  * Tests inputs on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes and if not, why it failed
+ * Anotated with @Component such that an autowired method can be used to inject the user service in for email validation
  */
+@Component
 public class InputValidator {
     private ValidationResult validationResult;
     private boolean passState = true;
     String testedValue;
+
+    private static UserService userService;
+
+    /**
+     * Constructor for the Validation with {@link Autowired} to
+     * connect this
+     * controller with other services
+     *
+     * @param inputUserService
+     */
+    @Autowired
+    public void UserService(UserService inputUserService) {
+        userService = inputUserService;
+    }
+
+    /**
+     * Warning, constructor only for automated use, for manual use, use InputValidator(String)
+     * Empty constructor so that the spring framework can create an input validator object
+     * when injecting the above @Autowired UserService object.
+     * Creating an object of this type manually will have no effect and no use except when testing
+     */
+    public InputValidator(){}
 
     /**
      * Checks input against a criteria:
@@ -164,6 +193,7 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .emailUniquenessHelper()
                 .getResult();
     }
 
@@ -279,6 +309,33 @@ public class InputValidator {
         this.validationResult = ValidationResult.OK;
         return this;
     }
+
+    /**
+     * Checks if a string representing an email is unique
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator emailUniquenessHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+
+        if (userService.emailInUse(testedValue)) {
+            this.validationResult = ValidationResult.NON_UNIQUE_EMAIL;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+
+
+
 
     /**
      * Checks if a string matches proper password syntax
