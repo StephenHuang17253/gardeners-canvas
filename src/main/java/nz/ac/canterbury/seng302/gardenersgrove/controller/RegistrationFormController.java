@@ -6,8 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.OldValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,23 +36,19 @@ public class RegistrationFormController {
     Logger logger = LoggerFactory.getLogger(RegistrationFormController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final Validation validation;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
      * connect this
      * controller with other services
      * 
-     * @param userService
-     * @param authenticationManager
-     * @param validation
+     * @param userService to use for checking persistence to validate email and password
+     * @param authenticationManager to login user after registration
      */
     @Autowired
-    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager,
-            Validation validation) {
+    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.validation = validation;
     }
 
     /**
@@ -62,8 +56,8 @@ public class RegistrationFormController {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      * 
-     * @param email
-     * @param password
+     * @param email of user who is registering
+     * @param password of user who is registering
      * @param session http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
