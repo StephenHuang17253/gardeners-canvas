@@ -5,23 +5,34 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
  * also informs why input is invalid
  */
 public enum ValidationResult {
-    OK("valid", true),
-    BLANK("cannot be empty", false),
-    NOT_PARSABLE("cannot be parsed to a number",false),
-    NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes",false),
-    NON_NUMERIC_COMMA("must be a positive number",false),
-    LENGTH_OVER_LIMIT("must be less than limit characters", false);
+    OK("valid"),
+    BLANK("cannot be empty"),
+    NOT_PARSABLE("cannot be parsed to a number"),
+    NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
+
+    INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
+
+    INVALID_EMAIL("Email address must be in the form ‘jane@doe.nz"),
+
+    INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
+
+    AGE_BELOW_13("You must be 13 years or older to create an account"),
+
+    AGE_ABOVE_120("The maximum age allowed is 120 years"),
+    INVALID_DATE_FORMAT("Date in not in valid format, DD/MM/YYYY"),
+
+    NON_UNIQUE_EMAIL("This email address is already in use"),
+    NON_NUMERIC_COMMA("must be a positive number"),
+    LENGTH_OVER_LIMIT("must be less than limit characters");
 
 
 
 
     private String message;
-    private final boolean isValid;
 
-    ValidationResult(String inMessage,Boolean inIsValid)
+    ValidationResult(String inMessage)
     {
         this.message = inMessage;
-        this.isValid = inIsValid;
     }
 
     /**
@@ -30,7 +41,7 @@ public enum ValidationResult {
      */
     public boolean valid()
     {
-        return this.isValid;
+        return this == OK;
     }
 
     /**

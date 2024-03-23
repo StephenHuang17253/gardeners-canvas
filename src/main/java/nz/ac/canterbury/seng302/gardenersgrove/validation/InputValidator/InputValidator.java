@@ -1,15 +1,49 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
 
-import java.text.ParseException;
+
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Tests inputs on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes and if not, why it failed
+ * Anotated with @Component such that an autowired method can be used to inject the user service in for email validation
  */
+@Component
 public class InputValidator {
     private ValidationResult validationResult;
     private boolean passState = true;
     String testedValue;
+
+    private static UserService userService;
+
+    /**
+     * Constructor for the Validation with {@link Autowired} to
+     * connect this
+     * controller with other services
+     *
+     * @param inputUserService
+     */
+    @Autowired
+    public void UserService(UserService inputUserService) {
+        userService = inputUserService;
+    }
+
+    /**
+     * Warning, constructor only for automated use, for manual use, use InputValidator(String)
+     * Empty constructor so that the spring framework can create an input validator object
+     * when injecting the above @Autowired UserService object.
+     * Creating an object of this type manually will have no effect and no use except when testing
+     */
+    public InputValidator(){}
 
     /**
      * Checks input against a criteria:
@@ -23,6 +57,7 @@ public class InputValidator {
 
         return new InputValidator(text)
                 .blankHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
@@ -76,7 +111,7 @@ public class InputValidator {
         if (testedValue.length() > length)
         {
             this.validationResult = ValidationResult.LENGTH_OVER_LIMIT;
-            validationResult.updateMessage("must be less than " + length + " characters");
+            validationResult.updateMessage("must be less than or equal to  " + length + " characters");
             this.passState = false;
             return this;
         }
@@ -96,6 +131,7 @@ public class InputValidator {
         return new InputValidator(text)
                 .blankHelper()
                 .alphaPlusHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
@@ -109,6 +145,7 @@ public class InputValidator {
     {
         return new InputValidator(text)
                 .alphaPlusHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
@@ -124,6 +161,65 @@ public class InputValidator {
                 .numberCommaSingleHelper()
                 .getResult();
     }
+
+
+    /**
+     * Checks if the given name is valid
+     *
+     * @param name string input in text field
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateName(String name) {
+        return new InputValidator(name)
+                .nameHelper()
+                .lengthHelper(64)
+                .getResult();
+
+    }
+
+    /**
+     * Checks if the given email is valid
+     *
+     * @param email
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateUniqueEmail(String email) {
+
+        return new InputValidator(email)
+                .emailSyntaxHelper()
+                .emailUniquenessHelper()
+                .getResult();
+    }
+
+    /**
+     * Checks if the given password is valid
+     *
+     * @param password
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validatePassword(String password) {
+        return new InputValidator(password)
+                .passwordSyntaxHelper()
+                .getResult();
+    }
+
+    /**
+     * Checks if the given dob is valid
+     *
+     * @param dob
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateDOB(String dob) {
+        return new InputValidator(dob)
+                .dateFormatHelper()
+                .dateAgeHelper()
+                .getResult();
+    }
+
 
 
     /**
@@ -161,6 +257,181 @@ public class InputValidator {
         this.validationResult = ValidationResult.OK;
         return this;
     }
+
+    /**
+     * Checks if a string only contains letters, spaces, hyphens or apostrophes
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator nameHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+
+        if (!testedValue.matches("[a-zA-Z\\-\\s']+"))
+        {
+            this.validationResult = ValidationResult.INVALID_USERNAME;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string matches proper email syntax
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator emailSyntaxHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+
+        if (!testedValue.matches("^[a-zA-Z0-9._-]{1,64}@[a-zA-Z0-9.-]{1,255}\\.[a-zA-Z]{2,4}$"))
+        {
+            this.validationResult = ValidationResult.INVALID_EMAIL;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string representing an email is unique
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator emailUniquenessHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+
+        if (userService.emailInUse(testedValue)) {
+            this.validationResult = ValidationResult.NON_UNIQUE_EMAIL;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+
+
+
+
+    /**
+     * Checks if a string matches proper password syntax
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator passwordSyntaxHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+
+        if (!testedValue.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9\\s]).+$"))
+        {
+            this.validationResult = ValidationResult.INVALID_PASSWORD;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string matches proper date syntax
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator dateFormatHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+
+        List<String> dobList = Arrays.asList(testedValue.split("/"));
+
+        if (dobList.size() != 3) {
+            this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+            this.passState = false;
+            return this;
+        }
+
+        if (dobList.get(0).length() != 2 || dobList.get(1).length() != 2 || dobList.get(2).length() != 4) {
+            this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+            this.passState = false;
+            return this;
+        }
+
+        for (String s : dobList) {
+            if (!s.matches("[0-9]+")) {
+                this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+                this.passState = false;
+                return this;
+            }
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if an entered date is more than 120 years ago or less than 13 years ago
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     * @return the calling object
+     */
+    private InputValidator dateAgeHelper()
+    {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState)
+        {
+            return this;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        LocalDate inputtedDate = LocalDate.parse(testedValue,formatter);
+
+        long yearsDifference = ChronoUnit.YEARS.between(
+                inputtedDate,
+                LocalDate.now()
+        );
+        if (yearsDifference < 13) {
+            this.validationResult = ValidationResult.AGE_BELOW_13;
+            this.passState = false;
+            return this;
+        } else if (yearsDifference > 120) {
+            this.validationResult = ValidationResult.AGE_ABOVE_120;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+
 
     /**
      * Checks if a string contains any non ( alphanumeric plus allowed punctuation) characters

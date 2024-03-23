@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.Validation;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,23 +36,19 @@ public class RegistrationFormController {
     Logger logger = LoggerFactory.getLogger(RegistrationFormController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final Validation validation;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
      * connect this
      * controller with other services
      * 
-     * @param userService
-     * @param authenticationManager
-     * @param validation
+     * @param userService to use for checking persistence to validate email and password
+     * @param authenticationManager to login user after registration
      */
     @Autowired
-    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager,
-            Validation validation) {
+    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.validation = validation;
     }
 
     /**
@@ -60,8 +56,8 @@ public class RegistrationFormController {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      * 
-     * @param email
-     * @param password
+     * @param email of user who is registering
+     * @param password of user who is registering
      * @param session http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
@@ -145,13 +141,13 @@ public class RegistrationFormController {
             valid = false;
         }
 
-        ValidationResult firstNameValidation = validation.validateName(firstName, true);
-        ValidationResult lastNameValidation = validation.validateName(lastName, false);
-        ValidationResult passwordValidation = validation.validatePassword(password);
-        ValidationResult emailAddressValidation = validation.validateEmail(emailAddress, true);
-        ValidationResult dateOfBirthValidation = validation.validateDOB(dateOfBirth);
+        ValidationResult firstNameValidation = InputValidator.validateName(firstName);
+        ValidationResult lastNameValidation = InputValidator.validateName(lastName);
+        ValidationResult passwordValidation = InputValidator.validatePassword(password);
+        ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
+        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
         if (Objects.equals(dateOfBirth, "")) {
-            dateOfBirthValidation.setValid();
+            dateOfBirthValidation = ValidationResult.OK;
         }
 
         valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
@@ -207,46 +203,46 @@ public class RegistrationFormController {
     }
 
     /**
-     * Runs ValidationResult.isvalid() on all of the user's input
+     * Runs OldValidationResult.isvalid() on all of the user's input
      *
-     * @param firstNameValidation    - ValidationResult for user's first name
-     * @param lastNameValidation     - ValidationResult for user's last name
+     * @param firstNameValidation    - OldValidationResult for user's first name
+     * @param lastNameValidation     - OldValidationResult for user's last name
      * @param noLastName             - boolean checking if user has last name
-     * @param emailAddressValidation - ValidationResult for user's email address
-     * @param passwordValidation     - ValidationResult for user's password
-     * @param dateOfBirthValidation  - ValidationResult for user's DOB
+     * @param emailAddressValidation - OldValidationResult for user's email address
+     * @param passwordValidation     - OldValidationResult for user's password
+     * @param dateOfBirthValidation  - OldValidationResult for user's DOB
      * @param valid                  - Boolean for if user's input is valid
      * @param model                  - (map-like) representation of user's input
      *                               (above parameters)
      * @return valid
      */
     public Boolean checkAllValid(ValidationResult firstNameValidation,
-            ValidationResult lastNameValidation,
-            String noLastName,
-            ValidationResult emailAddressValidation,
-            ValidationResult passwordValidation,
-            ValidationResult dateOfBirthValidation,
-            boolean valid,
-            Model model) {
+                                 ValidationResult lastNameValidation,
+                                 String noLastName,
+                                 ValidationResult emailAddressValidation,
+                                 ValidationResult passwordValidation,
+                                 ValidationResult dateOfBirthValidation,
+                                 boolean valid,
+                                 Model model) {
+        if (!firstNameValidation.valid()) {
+            model.addAttribute("firstNameError", "First Name " +firstNameValidation);
+            valid = false;
+        }
+        if (!lastNameValidation.valid() && !Boolean.parseBoolean(noLastName)) {
+            model.addAttribute("lastNameError", "Last Name " + lastNameValidation);
+            valid = false;
+        }
+        if (!emailAddressValidation.valid()) {
+            model.addAttribute("emailAddressError", emailAddressValidation);
+            valid = false;
+        }
+        if (!dateOfBirthValidation.valid()) {
+            model.addAttribute("dateOfBirthError", dateOfBirthValidation);
+            valid = false;
+        }
 
-        if (!firstNameValidation.isValid()) {
-            model.addAttribute("firstNameError", firstNameValidation.getErrorMessage());
-            valid = false;
-        }
-        if (!lastNameValidation.isValid() && !Boolean.parseBoolean(noLastName)) {
-            model.addAttribute("lastNameError", lastNameValidation.getErrorMessage());
-            valid = false;
-        }
-        if (!emailAddressValidation.isValid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation.getErrorMessage());
-            valid = false;
-        }
-        if (!passwordValidation.isValid()) {
-            model.addAttribute("passwordError", passwordValidation.getErrorMessage());
-            valid = false;
-        }
-        if (!dateOfBirthValidation.isValid()) {
-            model.addAttribute("dateOfBirthError", dateOfBirthValidation.getErrorMessage());
+        if (!passwordValidation.valid()) {
+            model.addAttribute("passwordError", passwordValidation);
             valid = false;
         }
 

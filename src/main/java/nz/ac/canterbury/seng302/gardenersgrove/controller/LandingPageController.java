@@ -23,16 +23,6 @@ public class LandingPageController {
         this.gardenService = gardenService;
     }
 
-    /**
-     * Redirects GET default url '/' to '/landing'
-     * @return redirect to /landing
-     */
-
-    @GetMapping("/")
-    public String home() {
-        logger.info("GET /");
-        return "redirect:./landing";
-    }
 
     /**
      * sends users that get the /landing page to the landingPage.html
