@@ -40,6 +40,7 @@ public class UserService {
 
     /**
      * Returns a user found by id
+     * 
      * @param id
      * @return user if found, null otherwise
      */
@@ -124,6 +125,18 @@ public class UserService {
      */
     public boolean emailInUse(String email) {
         return userRepository.countDistinctByEmailAddress(email) > 0;
+    }
+
+    /**
+     * Update users profile picture filename
+     * 
+     * @param filename
+     * @param email
+     */
+    public void updateProfilePictureFilename(String filename, String email) {
+        User user = getUserByEmail(email);
+        user.setProfilePictureFilename(filename);
+        userRepository.save(user);
     }
 
 }

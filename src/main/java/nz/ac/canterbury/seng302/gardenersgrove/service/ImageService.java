@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
@@ -25,7 +26,7 @@ public class ImageService {
     @Autowired
     public ImageService() {
 
-        String uploadDir = "uploads";
+        String uploadDir = "./uploads";
 
         this.rootLocation = Paths.get(uploadDir);
     }
@@ -60,6 +61,26 @@ public class ImageService {
             throw new RuntimeException("Could not initialize storage", e);
         }
 
+    }
+
+    public String[] getAllImages() {
+        try {
+            return Files.walk(rootLocation, 1)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .toArray(String[]::new);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not list the files. Error: " + e.getMessage());
+        }
+    }
+
+    public void deleteImage(String fileName) {
+        try {
+            Path file = rootLocation.resolve(fileName);
+            Files.delete(file);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not delete the file. Error: " + e.getMessage());
+        }
     }
 
 }
