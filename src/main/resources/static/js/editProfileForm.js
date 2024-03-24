@@ -28,7 +28,7 @@ function handleFileSelect(event) {
         const reader = new FileReader();
 
         reader.onload = (e) => {
-            const previewImage = document.getElementById('profileImage');
+            const previewImage = document.getElementById('profilePicture');
             previewImage.src = e.target.result;
         };
         reader.readAsDataURL(file);

@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.ImageService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 
@@ -139,10 +140,10 @@ public class EditFormController {
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
-        String profileImage = getProfilePictureString(filename);
-        model.addAttribute("profileImage", profileImage);
+        String profilePicture = getProfilePictureString(filename);
+        model.addAttribute("profilePicture", profilePicture);
 
-        return "editForm";
+        return "editProfileForm";
     }
 
     /**
@@ -165,11 +166,11 @@ public class EditFormController {
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
             @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-            @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam("profilePictureInput") MultipartFile profilePicture,
             Model model) {
         logger.info("POST /edit");
 
-        addUserAttributes(firstName, lastName, noLastName, dateOfBirth, emailAddress, model);
+        addUserAttributes(firstName, lastName, noLastName, dateOfBirth, emailAddress, profilePicture, model);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -186,26 +187,23 @@ public class EditFormController {
             dateOfBirthValidation = ValidationResult.OK;
         }
 
+        ValidationResult profilePictureValidation = FileValidator.validateFile(profilePicture);
+        if (profilePicture.isEmpty()) {
+            profilePictureValidation = ValidationResult.OK;
+        }
+
         boolean valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
-                emailAddressValidation, dateOfBirthValidation, model);
+                emailAddressValidation, dateOfBirthValidation, profilePictureValidation, model);
 
         if (!valid) {
-            return "editForm";
+            return "editProfileForm";
         }
 
-        LocalDate date;
-        if (!Objects.equals(dateOfBirth, "")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            date = LocalDate.parse(dateOfBirth, formatter);
-        } else {
-            date = null;
-        }
-        User user = new User(firstName, lastName, emailAddress, date);
-        userService.updateUser(user, currentUser.getId());
+        // Update user
 
-        if (!imageFile.isEmpty()) {
+        if (!profilePicture.isEmpty()) {
 
-            String fileExtension = imageFile.getOriginalFilename().split("\\.")[1];
+            String fileExtension = profilePicture.getOriginalFilename().split("\\.")[1];
             try {
                 String[] allFiles = imageService.getAllImages();
                 // Delete past profile image/s
@@ -219,11 +217,21 @@ public class EditFormController {
 
                 userService.updateProfilePictureFilename(fileName, currentUser.getId());
 
-                imageService.saveImage(fileName, imageFile);
+                imageService.saveImage(fileName, profilePicture);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } 
+
+        LocalDate date;
+        if (!Objects.equals(dateOfBirth, "")) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+            date = LocalDate.parse(dateOfBirth, formatter);
+        } else {
+            date = null;
         }
+        User user = new User(firstName, lastName, emailAddress, date);
+        userService.updateUser(user, currentUser.getId());
 
         setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
 
@@ -247,12 +255,14 @@ public class EditFormController {
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
             @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+            @RequestParam("profilePicture") MultipartFile profilePicture,
             Model model) {
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
         model.addAttribute("noLastName", noLastName);
         model.addAttribute("dateOfBirth", dateOfBirth);
         model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("profilePicture", profilePicture);
     }
 
     /**
@@ -272,6 +282,7 @@ public class EditFormController {
             String noLastName,
             ValidationResult emailAddressValidation,
             ValidationResult dateOfBirthValidation,
+            ValidationResult profilePictureValidation,
             Model model) {
         boolean valid = true;
 
@@ -289,6 +300,10 @@ public class EditFormController {
         }
         if (!dateOfBirthValidation.valid()) {
             model.addAttribute("dateOfBirthError", dateOfBirthValidation);
+            valid = false;
+        }
+        if (!profilePictureValidation.valid()) {
+            model.addAttribute("profilePictureError", profilePictureValidation);
             valid = false;
         }
 

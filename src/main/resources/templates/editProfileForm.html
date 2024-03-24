@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
+    <title>Edit Profile</title>
+    <link th:href="@{/css/editProfileForm.css}" rel="stylesheet">
+    <script th:src="@{/js/editProfileForm.js}"></script>
+</head>
+
+<body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
+    <h1>Edit Profile Form</h1>
+    <div>
+        <form th:action="@{edit}" method="post" enctype="multipart/form-data">
+            <div>
+                <div class="container">
+                    <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+                    <label for="profilePictureInput">+</label>
+                    <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
+                        onChange="handleFileSelect(event)">
+                </div>
+                <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
+            </div>
+
+            <div>
+                <label for="firstName"> First Name: </label>
+                <input type="text" class="form-control" id="firstName" placeholder="First Name" th:name="firstName"
+                    th:value="*{firstName}" data-cy="firstName" required autofocus>
+                <span th:if="${firstNameError}" class="error-message" th:text="${firstNameError}"></span>
+            </div>
+
+
+            <label for="lastName" id="lastNameLabel"> Last Name: </label>
+            <input type="text" class="form-control" id="lastName" placeholder="Last Name" th:name="lastName"
+                th:value="*{lastName}" data-cy="lastName" autofocus>
+
+            <label for="noLastName"> I have no Surname.</label>
+            <input type="checkbox" id="noLastName" name="noLastName" th:value="true" th:checked="${noLastName}"
+                onchange="hideLastName(event)">
+
+            <div th:if="${lastNameError}" class="error-message">
+                <span th:text="${lastNameError}"></span>
+            </div>
+
+            <label for="dateOfBirth"> Date of Birth (Optional): </label>
+            <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY" th:name="dateOfBirth"
+                th:value="*{dateOfBirth}" data-cy="dateOfBirth" required autofocus>
+            <div th:if="${dateOfBirthError}" class="error-message">
+                <span th:text="${dateOfBirthError}"></span>
+            </div>
+
+            <label for="emailAddress"> Email Address: </label>
+            <input type="text" class="form-control" id="emailAddress" placeholder="johndoe@gmail.com"
+                th:name="emailAddress" th:value="*{emailAddress}" data-cy="emailAddress" required autofocus>
+            <div th:if="${emailAddressError}" class="error-message">
+                <span th:text="${emailAddressError}"></span>
+            </div>
+
+            <button type="submit" formnovalidate>Submit!</button>
+        </form>
+        <a th:href="@{/profile}" class="button">Cancel :(</a>
+    </div>
+
+</body>
+
+</html>

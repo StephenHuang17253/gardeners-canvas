@@ -28,12 +28,25 @@ public class FileValidator {
         return this.validationResult;
     }
 
+    /**
+     * Validates a file based on its size and type
+     * 
+     * @param file MultiPartFile to validate
+     * @return ValidationResult
+     */
     public static ValidationResult validateFile(MultipartFile file) {
-        String[] allowedFileTypes = new String[] { "png", "jpg", "svg", "jpeg" };
-        return new FileValidator(file).fileTypeHelper(allowedFileTypes).getResult();
+        String[] validFileTypes = new String[] { "png", "jpg", "svg", "jpeg" };
+        int maxSize = 10;
+        return new FileValidator(file).fileTypeHelper(validFileTypes).fileSizeHelper(maxSize).getResult();
     }
 
-    private FileValidator fileTypeHelper(String[] allowedFileTypes) {
+    /**
+     * Validates a file based on its type
+     * 
+     * @param validFileTypes valid file types as a list of strings
+     * @return the calling object
+     */
+    private FileValidator fileTypeHelper(String[] validFileTypes) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
@@ -41,27 +54,7 @@ public class FileValidator {
 
         String filename = file.getOriginalFilename();
 
-        String[] splitFilename = filename.split("\\.");
-
-        // Check has filename and extension
-        if (splitFilename.length < 2) {
-            this.validationResult = ValidationResult.INVALID_FILE_EXT;
-            this.passState = false;
-            return this;
-        }
-
-        String fileType = splitFilename[splitFilename.length - 1].toLowerCase();
-
-        boolean valid = false;
-
-        for (String allowedFileType : allowedFileTypes) {
-            if (allowedFileType.equals(fileType)) {
-                valid = true;
-                break;
-            }
-        }
-
-        if (!valid) {
+        if (filename == null || !filename.matches("^[^\\s]+\\.(" + String.join("|", validFileTypes) + ")$")) {
             this.validationResult = ValidationResult.INVALID_FILE_EXT;
             this.passState = false;
         } else {
@@ -72,14 +65,19 @@ public class FileValidator {
 
     }
 
-
+    /**
+     * Validates a file based on its size in MB
+     * 
+     * @param maxSize the maximum size of the file in MB
+     * @return the calling object
+     */
     private FileValidator fileSizeHelper(int maxSize) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
         }
 
-        if (file.getSize() > maxSize) {
+        if (file.getSize() > maxSize * Math.pow(10, 6)) {
             this.validationResult = ValidationResult.INVALID_FILE_SIZE;
             this.passState = false;
         } else {
@@ -88,4 +86,5 @@ public class FileValidator {
 
         return this;
     }
+
 }
