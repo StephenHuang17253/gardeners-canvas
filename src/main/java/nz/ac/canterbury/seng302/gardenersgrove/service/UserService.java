@@ -130,11 +130,11 @@ public class UserService {
     /**
      * Update users profile picture filename
      * 
-     * @param filename
-     * @param email
+     * @param filename filename of profile picture
+     * @param id      id of user to update
      */
-    public void updateProfilePictureFilename(String filename, String email) {
-        User user = getUserByEmail(email);
+    public void updateProfilePictureFilename(String filename, long id) {
+        User user = getUserById(id);
         user.setProfilePictureFilename(filename);
         userRepository.save(user);
     }

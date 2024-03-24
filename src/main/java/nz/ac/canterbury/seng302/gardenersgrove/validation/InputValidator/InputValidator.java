@@ -51,6 +51,17 @@ public class InputValidator {
     }
 
     /**
+     * A private constructor for the input validator,
+     * this is used to run the static methods for input validation
+     * 
+     * @param valueToTest the text undergoing validation
+     */
+    private InputValidator(String valueToTest) {
+        testedValue = valueToTest;
+        validationResult = ValidationResult.OK;
+    }
+
+    /**
      * Checks input against a criteria:
      * This function does not allow blank strings but otherwise the strings can
      * contain anything.
@@ -94,7 +105,6 @@ public class InputValidator {
      * @param length - int, the character limit of string
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-
     public static ValidationResult optionalTextFieldWithLengthLimit(String text, int length) {
         return new InputValidator(text)
                 .lengthHelper(length)
@@ -236,17 +246,6 @@ public class InputValidator {
                 .dateFormatHelper()
                 .dateAgeHelper()
                 .getResult();
-    }
-
-    /**
-     * A private constructor for the input validator,
-     * this is used to run the static methods for input validation
-     * 
-     * @param valueToTest the text undergoing validation
-     */
-    private InputValidator(String valueToTest) {
-        testedValue = valueToTest;
-        validationResult = ValidationResult.OK;
     }
 
     /**
@@ -535,6 +534,8 @@ public class InputValidator {
         }
         return this;
     }
+
+    
 
     /**
      * returns this objects validation result

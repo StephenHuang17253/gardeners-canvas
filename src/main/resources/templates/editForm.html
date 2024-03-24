@@ -9,7 +9,12 @@
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
 <h1>Edit Profile Form</h1>
 <div>
-    <form th:action="@{edit}" method="post">
+    <form th:action="@{edit}" method="post" enctype="multipart/form-data">
+        <div class="container">
+            <img id="profileImage" th:src="@{${profileImage}}" th:alt="${profileImage}">
+            <label for="imageFile">+</label>
+            <input id="imageFile" type="file" th:name="imageFile" accept="image/*" onChange="handleFileSelect(event)">
+        </div>
         <label for="firstName"> First Name: </label>
         <input type="text" class="form-control" id="firstName" placeholder="First Name"
                th:name="firstName" th:value="*{firstName}" data-cy="firstName" required autofocus>

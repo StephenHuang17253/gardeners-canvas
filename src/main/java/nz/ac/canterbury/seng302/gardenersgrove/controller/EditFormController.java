@@ -1,11 +1,15 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.ImageService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,11 +17,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.ui.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -38,6 +46,7 @@ public class EditFormController {
     Logger logger = LoggerFactory.getLogger(EditFormController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final ImageService imageService;
 
     /**
      * Constructor for the EditFormController with {@link Autowired} to connect this
@@ -48,9 +57,28 @@ public class EditFormController {
      */
     @Autowired
     public EditFormController(UserService userService,
-            AuthenticationManager authenticationManager) {
+            AuthenticationManager authenticationManager, ImageService imageService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.imageService = imageService;
+    }
+
+    /**
+     * Gets the resource url for the profile picture, or the default profile picture
+     * if the user does not have one
+     * 
+     * @param filename string filename
+     * @return string of the profile picture url
+     */
+    public String getProfilePictureString(String filename) {
+
+        String profilePictureString = "/Images/default_profile_picture.png";
+
+        if (filename != null && filename.length() != 0) {
+            profilePictureString = MvcUriComponentsBuilder.fromMethodName(EditFormController.class,
+                    "serveFile", filename).build().toUri().toString();
+        }
+        return profilePictureString;
     }
 
     /**
@@ -60,7 +88,7 @@ public class EditFormController {
      * 
      * @param email
      * @param password
-     * @param session http session to set the cookies with the context key
+     * @param session  http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
         logger.info(email);
@@ -93,21 +121,27 @@ public class EditFormController {
     public String editForm(Model model) {
         logger.info("GET /edit");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
-        User u = userService.getUserByEmail(currentPrincipalName);
-        model.addAttribute("firstName", u.getFirstName());
-        model.addAttribute("lastName", u.getLastName());
-        model.addAttribute("emailAddress", u.getEmailAddress());
+        String email = authentication.getName();
+
+        User user = userService.getUserByEmail(email);
+        model.addAttribute("firstName", user.getFirstName());
+        model.addAttribute("lastName", user.getLastName());
+        model.addAttribute("emailAddress", user.getEmailAddress());
         String formattedDateOfBirth = "";
-        LocalDate dateOfBirth = u.getDateOfBirth();
+        LocalDate dateOfBirth = user.getDateOfBirth();
         if (dateOfBirth != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             formattedDateOfBirth = dateOfBirth.format(formatter);
         }
 
         model.addAttribute("dateOfBirth", formattedDateOfBirth);
-        boolean noLastName = Objects.equals(u.getLastName(), "");
+        boolean noLastName = Objects.equals(user.getLastName(), "");
         model.addAttribute("noLastName", noLastName);
+
+        String filename = user.getProfilePictureFilename();
+        String profileImage = getProfilePictureString(filename);
+        model.addAttribute("profileImage", profileImage);
+
         return "editForm";
     }
 
@@ -131,19 +165,20 @@ public class EditFormController {
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
             @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+            @RequestParam("imageFile") MultipartFile imageFile,
             Model model) {
         logger.info("POST /edit");
 
         addUserAttributes(firstName, lastName, noLastName, dateOfBirth, emailAddress, model);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
-        User currentUser = userService.getUserByEmail(currentPrincipalName);
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email);
 
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
-        if (emailAddress.equals(currentPrincipalName)) {
+        if (emailAddress.equals(email)) {
             emailAddressValidation = ValidationResult.OK;
         }
         ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
@@ -156,25 +191,44 @@ public class EditFormController {
 
         if (!valid) {
             return "editForm";
-        } else {
-            LocalDate date;
-            if (!Objects.equals(dateOfBirth, "")) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-                date = LocalDate.parse(dateOfBirth, formatter);
-            } else {
-                date = null;
-            }
-            User user = new User(firstName, lastName, emailAddress, date);
-            userService.updateUser(user, currentUser.getId());
-
-            logger.info("got to setting context");
-            setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
-
-            System.out.println("User updated");
-            System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-
-            return "redirect:/profile";
         }
+
+        LocalDate date;
+        if (!Objects.equals(dateOfBirth, "")) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+            date = LocalDate.parse(dateOfBirth, formatter);
+        } else {
+            date = null;
+        }
+        User user = new User(firstName, lastName, emailAddress, date);
+        userService.updateUser(user, currentUser.getId());
+
+        if (!imageFile.isEmpty()) {
+
+            String fileExtension = imageFile.getOriginalFilename().split("\\.")[1];
+            try {
+                String[] allFiles = imageService.getAllImages();
+                // Delete past profile image/s
+                for (String file : allFiles) {
+                    if (file.contains("user_" + currentUser.getId() + "_profile_picture")) {
+                        imageService.deleteImage(file);
+                    }
+                }
+
+                String fileName = "user_" + currentUser.getId() + "_profile_picture." + fileExtension;
+
+                userService.updateProfilePictureFilename(fileName, currentUser.getId());
+
+                imageService.saveImage(fileName, imageFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
+
+        return "redirect:/profile";
+
     }
 
     /**
@@ -214,15 +268,15 @@ public class EditFormController {
      * @return valid
      */
     public Boolean checkAllValid(ValidationResult firstNameValidation,
-                                 ValidationResult lastNameValidation,
-                                 String noLastName,
-                                 ValidationResult emailAddressValidation,
-                                 ValidationResult dateOfBirthValidation,
-                                 Model model) {
+            ValidationResult lastNameValidation,
+            String noLastName,
+            ValidationResult emailAddressValidation,
+            ValidationResult dateOfBirthValidation,
+            Model model) {
         boolean valid = true;
 
         if (!firstNameValidation.valid()) {
-            model.addAttribute("firstNameError", "First Name " +firstNameValidation);
+            model.addAttribute("firstNameError", "First Name " + firstNameValidation);
             valid = false;
         }
         if (!lastNameValidation.valid() && !Boolean.parseBoolean(noLastName)) {
@@ -241,4 +295,27 @@ public class EditFormController {
         return valid;
     }
 
+    /**
+     * Serves the file from the image service
+     * 
+     * @param filename file to retrieve
+     * @return response with the file
+     */
+    @GetMapping("/files/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+        logger.info("GET /files/" + filename);
+
+        try {
+            Resource file = imageService.loadImage(filename);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                    .body(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
 }
