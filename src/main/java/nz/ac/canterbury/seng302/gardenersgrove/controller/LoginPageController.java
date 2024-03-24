@@ -100,7 +100,7 @@ public class LoginPageController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        ValidationResult validEmail = InputValidator.validateUniqueEmail(email);
+        ValidationResult validEmail = InputValidator.validateEmail(email);
 
         boolean validLogin = userService.getUserByEmailAndPassword(email, password) != null;
 
