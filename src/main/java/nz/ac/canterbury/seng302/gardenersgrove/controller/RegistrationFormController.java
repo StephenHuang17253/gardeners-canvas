@@ -94,7 +94,7 @@ public class RegistrationFormController {
     public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -125,7 +125,7 @@ public class RegistrationFormController {
             @RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -140,31 +140,32 @@ public class RegistrationFormController {
             model.addAttribute("passwordMatchingError", "Passwords do not match");
             valid = false;
         }
-
+        String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        logger.info(dateString);
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
+        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateString);
         if (Objects.equals(dateOfBirth, "")) {
             dateOfBirthValidation = ValidationResult.OK;
         }
 
         valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
-                emailAddressValidation, passwordValidation, dateOfBirthValidation, valid, model);
+                emailAddressValidation, passwordValidation,dateOfBirthValidation, valid, model);
 
         if (!valid) {
             return "registrationForm";
         } else {
-            LocalDate date;
-            if (!Objects.equals(dateOfBirth, "")) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-                date = LocalDate.parse(dateOfBirth, formatter);
-            } else {
-                date = null;
-            }
+//            LocalDate date;
+//            if (!Objects.equals(dateOfBirth, "")) {
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+//                date = LocalDate.parse(dateOfBirth, formatter);
+//            } else {
+//                date = null;
+//            }
 
-            User user = new User(firstName, lastName, emailAddress, date);
+            User user = new User(firstName, lastName, emailAddress, dateOfBirth);
             userService.addUser(user, password);
 
             setSecurityContext(user.getEmailAddress(), password, request.getSession());
@@ -188,7 +189,7 @@ public class RegistrationFormController {
     private void addUserAttributes(@RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
