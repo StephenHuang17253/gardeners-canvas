@@ -2,78 +2,71 @@
 Stylises the editForm.html webpage
 */
 
-html {
-    min-height: 100%;
-    display: grid;
-}
-
-body {
-    margin: auto;
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%
 }
 
 h1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: underline;
+    text-align: center;
+    color: #333;
 }
 
+form {
+    height: auto;
+    min-height: 250px;
+    width: 300px;
+    min-width: 200px;
 
-
-input[type=text] {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+    padding: 25px;
+    margin: auto;
+
+    background-color: #fff;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+form input[type=text] {
     box-sizing: border-box;
-}
-
-button,
-.button {
-    background-color: #ffffff;
-    border: 2px solid black;
-    color: black;
-    padding: 16px 32px;
-    text-decoration: none;
-    margin: 4px 2px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 16px;
-}
-
-a.cancel {
-    all: unset;
-}
-
-button:hover {
-    background-color: #45a049;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
 }
 
 .error-message {
     color: red;
 }
 
-/* css for profile picture */
-.container {
+
+/* profile picture styling */
+.profile_picture_container {
     position: relative;
     display: block;
     border-radius: 50%;
     transition: background-color 0.3s;
-    border: 3px solid rgba(0, 0, 0, 0.5);;
+    border: 3px solid rgba(0, 0, 0, 0.5);
     height: 200px;
     width: 200px;
 }
 
-.container img {
+.profile_picture_container img {
     display: block;
     width: 200px;
     height: 200px;
     border-radius: 50%;
 }
 
-.container input {
+.profile_picture_container input {
     position: absolute;
     top: 0;
     left: 0;
@@ -82,10 +75,9 @@ button:hover {
     opacity: 0;
     cursor: pointer;
     border-radius: 50%;
-
 }
 
-.container label {
+.profile_picture_container label {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -102,6 +94,30 @@ button:hover {
     cursor: pointer;
 }
 
-.container:hover label {
+.profile_picture_container:hover label {
     background-color: rgba(0, 0, 0, 0.7);
+}
+
+
+/* button styling */
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.buttons button a {
+    text-decoration: none;
+    color: white;
 }

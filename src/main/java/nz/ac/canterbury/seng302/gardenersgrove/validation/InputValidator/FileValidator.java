@@ -29,13 +29,13 @@ public class FileValidator {
     }
 
     /**
-     * Validates a file based on its size and type
+     * Validates a file based on its size (< 10MB) and type (one of png, jpg, svg)
      * 
      * @param file MultiPartFile to validate
      * @return ValidationResult
      */
     public static ValidationResult validateFile(MultipartFile file) {
-        String[] validFileTypes = new String[] { "png", "jpg", "svg", "jpeg" };
+        String[] validFileTypes = new String[] { "png", "jpg", "svg"};
         int maxSize = 10;
         return new FileValidator(file).fileTypeHelper(validFileTypes).fileSizeHelper(maxSize).getResult();
     }
@@ -55,7 +55,7 @@ public class FileValidator {
         String filename = file.getOriginalFilename();
 
         if (filename == null || !filename.matches("^[^\\s]+\\.(" + String.join("|", validFileTypes) + ")$")) {
-            this.validationResult = ValidationResult.INVALID_FILE_EXT;
+            this.validationResult = ValidationResult.INVALID_FILE_TYPE;
             this.passState = false;
         } else {
             this.validationResult = ValidationResult.OK;

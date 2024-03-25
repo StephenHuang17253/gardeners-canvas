@@ -42,9 +42,9 @@ import java.util.Objects;
  * This controller defines endpoints as functions with specific HTTP mappings
  */
 @Controller
-public class EditFormController {
+public class EditProfilePageController {
 
-    Logger logger = LoggerFactory.getLogger(EditFormController.class);
+    Logger logger = LoggerFactory.getLogger(EditProfilePageController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final ImageService imageService;
@@ -57,7 +57,7 @@ public class EditFormController {
      * @param authenticationManager
      */
     @Autowired
-    public EditFormController(UserService userService,
+    public EditProfilePageController(UserService userService,
             AuthenticationManager authenticationManager, ImageService imageService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
@@ -76,7 +76,7 @@ public class EditFormController {
         String profilePictureString = "/Images/default_profile_picture.png";
 
         if (filename != null && filename.length() != 0) {
-            profilePictureString = MvcUriComponentsBuilder.fromMethodName(EditFormController.class,
+            profilePictureString = MvcUriComponentsBuilder.fromMethodName(EditProfilePageController.class,
                     "serveFile", filename).build().toUri().toString();
         }
         return profilePictureString;
@@ -196,6 +196,10 @@ public class EditFormController {
                 emailAddressValidation, dateOfBirthValidation, profilePictureValidation, model);
 
         if (!valid) {
+            String filename = currentUser.getProfilePictureFilename();
+            String currentProfilePicture = getProfilePictureString(filename);
+            model.addAttribute("profilePicture", currentProfilePicture);
+
             return "editProfileForm";
         }
 

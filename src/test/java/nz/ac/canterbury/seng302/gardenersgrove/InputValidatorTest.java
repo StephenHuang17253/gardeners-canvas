@@ -24,7 +24,6 @@ public class InputValidatorTest {
         userServiceMock = Mockito.mock(UserService.class);
         InputValidator testValidator = new InputValidator();
         testValidator.UserService(userServiceMock);
-        Mockito.when(userServiceMock.emailInUse(Mockito.any())).thenReturn(false);
     }
 
     @BeforeEach
