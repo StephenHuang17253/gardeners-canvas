@@ -85,12 +85,11 @@ public class UserServiceTest {
      */
     @Test
     public void UpdateUserEmailAddress_SameNumberOfUsersInPersistence() {
-        User updatedUser = new User("John",
-                "Doe",
-                "john@email.com",
-                date);
+        String fName = "John";
+        String lName = "Doe";
+        String email = "john@email.com";
         long id = userRepository.findByEmailAddress("johnDoe@email.com")[0].getId();
-        userService.updateUser(updatedUser, id);
+        userService.updateUser(id, fName, lName, email, date);
         Assertions.assertEquals(userRepository.findAll().size(), 1);
     }
 
@@ -100,13 +99,12 @@ public class UserServiceTest {
      */
     @Test
     public void UpdateAllUserDetails_AllDetailsUpdatedForUser() {
+        String fName = "Jane";
+        String lName = "Ode";
+        String email = "janeOde@email.com";
         LocalDate newDate = LocalDate.parse("01/01/2000", formatter);
-        User updatedUser = new User("Jane",
-                "Ode",
-                "janeOde@email.com",
-                newDate);
         long id = userRepository.findByEmailAddress("johnDoe@email.com")[0].getId();
-        userService.updateUser(updatedUser, id);
+        userService.updateUser(id, fName, lName, email, newDate);
         List<User> allUsers = userRepository.findAll();
         Assertions.assertEquals(allUsers.get(0).getFirstName(), "Jane");
         Assertions.assertEquals(allUsers.get(0).getLastName(), "Ode");
