@@ -214,11 +214,16 @@ public class ProfileController {
         }
 
         if (!profilePictureValidation.valid()) {
+
+            
             model.addAttribute("profilePictureError", profilePictureValidation);
             String userName = user.getFirstName() + " " + user.getLastName();
             model.addAttribute("userName", userName);
             model.addAttribute("dateOfBirth", user.getDateOfBirth());
             model.addAttribute("emailAddress", user.getEmailAddress());
+            String filename = user.getProfilePictureFilename();
+            String currentProfilePicture = getProfilePictureString(filename);
+            model.addAttribute("profilePicture", currentProfilePicture);
             return "profilePage";
         }
 

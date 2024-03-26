@@ -21,8 +21,8 @@
                     <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
                         onChange="handleFileSelect(event); this.form.submit()">
                 </div>
-                <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
             </form>
+            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
             <p th:text="'Name: ' + ${userName}">Name: </p>
             <p th:if="${dateOfBirth}" th:text="'DoB: ' + ${dateOfBirth}"></p>
             <p th:text="'Email Address: ' + ${emailAddress}">Email: </p>
