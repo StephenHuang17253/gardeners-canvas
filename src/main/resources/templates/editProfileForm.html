@@ -5,16 +5,24 @@
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
     <title>Edit Profile</title>
     <link th:href="@{/css/editProfileForm.css}" rel="stylesheet">
-    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
     <script th:src="@{/js/editProfileForm.js}"></script>
+    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
+    <script th:src="@{/js/profilePicturePicker.js}"></script>
 </head>
 
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
     <div class="container">
         <h1>Edit Profile Form</h1>
-        <form th:action="@{edit}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
 
-            <div th:replace="~{fragmentExample/fragments/profilePicturePicker :: profilePicturePicker(subOnChange=true)}"></div>
+            <div class="profile_picture_container">
+                <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+                <label for="profilePictureInput">+</label>
+                <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
+                    onChange="handleFileSelect(event)">
+            </div>
+            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
+            
 
             <label for="firstName">First Name</label>
             <input type="text" class="form-control" id="firstName" placeholder="First Name" th:name="firstName"
@@ -43,7 +51,7 @@
 
             <div class="buttons">
                 <button type="submit" formnovalidate>Submit</button>
-                <a th:href="@{profile}"><button type="button">Cancel</button></a>
+                <a th:href="@{/profile}"><button type="button">Cancel</button></a>
             </div>
         </form>
     </div>

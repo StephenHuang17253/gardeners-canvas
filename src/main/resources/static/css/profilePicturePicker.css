@@ -1,4 +1,7 @@
-/* profile picture styling */
+/* 
+    profile picture picker and viewing styling 
+*/
+
 .profile_picture_container {
     position: relative;
     display: block;
@@ -50,4 +53,15 @@
 
 .error-message {
     color: red;
+}
+
+.small_pic {
+    width: 100px;
+    height: 100px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.small_pic img {
+    width: 100px;
+    height: 100px;
 }

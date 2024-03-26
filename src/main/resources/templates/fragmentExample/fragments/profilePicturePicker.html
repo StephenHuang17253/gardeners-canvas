@@ -23,7 +23,7 @@ Get end points using this fragment should have a String profilePicture parameter
         <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
         <label for="profilePictureInput">+</label>
         <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
-            th:onChange="${subOnChange? 'handleFileSelect(event) this.form.submit()' : 'handleFileSelect(event)'}">
+            th:onChange="'handleFileSelect(event) '+${subOnChange? ' this.form.submit()' : ''}">
     </div>
     <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
     <script th:src="@{/js/profilePicturePicker.js}"></script>
