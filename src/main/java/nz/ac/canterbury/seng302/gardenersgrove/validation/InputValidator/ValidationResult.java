@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
+package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator;
 
 /**
  * result returned by the input validator to inform if an input is valid or no.

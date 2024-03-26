@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
+package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator;
 
 
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
