@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.ValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
