@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 /**
  * Controller for creating a new Garden using a form page
  */
@@ -26,6 +29,8 @@ public class GardenFormController {
     Logger logger = LoggerFactory.getLogger(GardenFormController.class);
 
     private final GardenService gardenService;
+
+    Dotenv dotenv = Dotenv.load();
 
     @Autowired
     public GardenFormController(GardenService gardenService) {
@@ -44,6 +49,7 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
+        model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
         logger.info("GET /create-new-garden");
         return "createNewGardenForm";
     }
@@ -121,6 +127,7 @@ public class GardenFormController {
             Garden garden = optionalGarden.get();
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
+            model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
             Float gardenSize = garden.getGardenSize();
             if (Float.isNaN(gardenSize)) {
                 model.addAttribute("gardenSize", "");
@@ -167,6 +174,7 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
+        model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
         if(!gardenNameResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "editGardenForm";
 
