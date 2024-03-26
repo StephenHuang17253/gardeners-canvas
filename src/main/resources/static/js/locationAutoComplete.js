@@ -1,12 +1,17 @@
 
+
 let autocomplete;
+const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 function initAutocomplete() {
     // Create the autocomplete object, restricting the search to geographical
     // location types.
     autocomplete = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('gardenLocation')),
-        {types: ['geocode', 'establishment']});
+        {
+            types: ['geocode', 'establishment'],
+            apiKey: apiKey
+        });
 
     // When the user selects an address from the dropdown, populate the address
     // fields in the form.
