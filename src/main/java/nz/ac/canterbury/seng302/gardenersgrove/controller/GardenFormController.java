@@ -1,9 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

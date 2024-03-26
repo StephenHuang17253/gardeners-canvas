@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
+package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator;
 
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 /**
  * Tests inputs on a variety of rules to check if values are valid
@@ -534,8 +536,6 @@ public class InputValidator {
         }
         return this;
     }
-
-    
 
     /**
      * returns this objects validation result

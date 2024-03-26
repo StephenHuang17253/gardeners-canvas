@@ -1,7 +1,8 @@
-package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
+package nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 /**
  * Tests MultipartFiles on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes
@@ -14,10 +15,10 @@ public class FileValidator {
     MultipartFile file;
 
     /**
-     * A private constructor for the input validator,
-     * this is used to run the static methods for input validation
+     * A private constructor for the file validator,
+     * this is used to run the static methods for file validation
      * 
-     * @param valueToTest the text undergoing validation
+     * @param file the file undergoing validation
      */
     private FileValidator(MultipartFile file) {
         this.file = file;
@@ -34,15 +35,18 @@ public class FileValidator {
     }
 
     /**
-     * Validates a file based on its size (< 10MB) and type (one of png, jpg, svg)
+     * Validates a file based on its size given in MB and file type as a FileType enum value
      * 
-     * @param file MultiPartFile to validate
+     * @param file     MultiPartFile to validate
+     * @param maxSize  Maximum size allowed for file in MB
+     * @param fileType Enum value of FileType corresponding to the type of file to
+     *                 validate as
      * @return ValidationResult
      */
-    public static ValidationResult validateImage(MultipartFile file, int maxSize) {
-        String[] validFileTypes = new String[] { "png", "jpg", "svg", "jpeg" };
+    public static ValidationResult validateImage(MultipartFile file, int maxSize, FileType fileType) {
+
         return new FileValidator(file)
-                .fileTypeHelper(validFileTypes)
+                .fileTypeHelper(fileType.getExtensions())
                 .fileSizeHelper(maxSize)
                 .getResult();
     }

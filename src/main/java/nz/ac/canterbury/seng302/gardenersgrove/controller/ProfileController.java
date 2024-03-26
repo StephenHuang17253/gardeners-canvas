@@ -1,12 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +34,24 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.ImageService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
+/**
+ * Controller for the profile and edit profile pages, handles viewing and
+ * updating the profile
+ */
 @Controller
 public class ProfileController {
 
     Logger logger = LoggerFactory.getLogger(ProfileController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final ImageService imageService;
+    private final FileService fileService;
 
     /**
      * Constructor for the ProfileController with {@link Autowired} to connect this
@@ -54,14 +59,14 @@ public class ProfileController {
      * 
      * @param userService
      * @param authenticationManager
-     * @param imageService
+     * @param fileService
      */
     @Autowired
     public ProfileController(UserService userService,
-            AuthenticationManager authenticationManager, ImageService imageService) {
+            AuthenticationManager authenticationManager, FileService fileService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.imageService = imageService;
+        this.fileService = fileService;
     }
 
     /**
@@ -86,7 +91,7 @@ public class ProfileController {
     }
 
     /**
-     * Serves the file from the image service
+     * Serves the file from the file service
      * 
      * @param filename file to retrieve
      * @return response with the file
@@ -95,10 +100,8 @@ public class ProfileController {
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         logger.info("GET /files/" + filename);
-
         try {
-            Resource file = imageService.loadImage(filename);
-
+            Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
@@ -114,20 +117,15 @@ public class ProfileController {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      * 
-     * @param email
-     * @param password
+     * @param email    email of the user
+     * @param password password of the user
      * @param session  http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
-        logger.info(email);
         User user = userService.getUserByEmail(email);
-
-        logger.info(user.toString());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getEmailAddress(),
                 user.getEncodedPassword());
-
-        logger.info(token.toString());
 
         Authentication authentication = authenticationManager.authenticate(token);
         // Check if the authentication is actually authenticated (in this example any
@@ -142,27 +140,26 @@ public class ProfileController {
     /**
      * Update the user's profile picture
      * 
-     * @param user
-     * @param profilePicture
+     * @param user           user to update
+     * @param profilePicture new profile picture
      */
     public void updateProfilePicture(User user, MultipartFile profilePicture) {
         String fileExtension = profilePicture.getOriginalFilename().split("\\.")[1];
         try {
-            String[] allFiles = imageService.getAllImages();
+            String[] allFiles = fileService.getAllFiles();
             // Delete past profile image/s
             for (String file : allFiles) {
                 if (file.contains("user_" + user.getId() + "_profile_picture")) {
-                    imageService.deleteImage(file);
+                    fileService.deleteFile(file);
                 }
             }
 
             String fileName = "user_" + user.getId() + "_profile_picture." + fileExtension;
-
             userService.updateProfilePictureFilename(fileName, user.getId());
+            fileService.saveFile(fileName, profilePicture);
 
-            imageService.saveImage(fileName, profilePicture);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException error) {
+            error.printStackTrace();
         }
     }
 
@@ -186,23 +183,18 @@ public class ProfileController {
         String filename = user.getProfilePictureFilename();
         String profilePicture = getProfilePictureString(filename);
         model.addAttribute("profilePicture", profilePicture);
-
         model.addAttribute("userName", userName);
-
         model.addAttribute("dateOfBirth", user.getDateOfBirth());
-
         model.addAttribute("emailAddress", user.getEmailAddress());
 
         return "profilePage";
     }
 
-    // TODO - improve doc string
     /**
      * This function is called when a POST request is made to /profile
+     * Gets authenticated user and updates their profile picture
      * 
-    
-     * 
-     * @param profilePicture
+     * @param profilePicture user's profile picture
      * @param model
      * @return
      */
@@ -216,7 +208,7 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
-        ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10);
+        ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
         }
@@ -318,7 +310,7 @@ public class ProfileController {
             dateOfBirthValidation = ValidationResult.OK;
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
-        ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10);
+        ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
         }
@@ -328,9 +320,9 @@ public class ProfileController {
         boolean valid = true;
         for (Map.Entry<String, ValidationResult> entry : validationMap.entrySet()) {
             if (!entry.getValue().valid()) {
-                
+
                 String error = entry.getValue().toString();
-                
+
                 if (entry.getKey().equals("firstName")) {
                     error = "First name " + error;
                 } else if (entry.getKey().equals("lastName")) {
@@ -356,7 +348,6 @@ public class ProfileController {
         }
 
         // Update the user's profile
-
         if (!profilePicture.isEmpty()) {
             updateProfilePicture(currentUser, profilePicture);
         }

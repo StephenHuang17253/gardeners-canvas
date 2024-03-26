@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -46,9 +47,10 @@ public class HomePageController {
      * Redirects GET default url '/' to '/home'
      * 
      * @return redirect to /home
+     * @throws IOException
      */
     @GetMapping("/")
-    public String home() {
+    public String home() throws IOException {
         logger.info("GET /");
         return "redirect:./home";
     }
