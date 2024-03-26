@@ -2,6 +2,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
 
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Tests MultipartFiles on a variety of rules to check if values are valid
+ * Returns a type ValidationResult Enum which informs about if a field passes
+ * and if not, why it failed
+ */
 public class FileValidator {
 
     private ValidationResult validationResult;
@@ -34,10 +39,12 @@ public class FileValidator {
      * @param file MultiPartFile to validate
      * @return ValidationResult
      */
-    public static ValidationResult validateFile(MultipartFile file) {
-        String[] validFileTypes = new String[] { "png", "jpg", "svg"};
-        int maxSize = 10;
-        return new FileValidator(file).fileTypeHelper(validFileTypes).fileSizeHelper(maxSize).getResult();
+    public static ValidationResult validateImage(MultipartFile file, int maxSize) {
+        String[] validFileTypes = new String[] { "png", "jpg", "svg", "jpeg" };
+        return new FileValidator(file)
+                .fileTypeHelper(validFileTypes)
+                .fileSizeHelper(maxSize)
+                .getResult();
     }
 
     /**

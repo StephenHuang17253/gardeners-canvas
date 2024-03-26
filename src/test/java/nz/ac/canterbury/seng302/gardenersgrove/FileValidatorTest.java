@@ -39,21 +39,21 @@ public class FileValidatorTest {
 
     @Test
     public void validNameFile_return_OK() {
-        assertEquals(ValidationResult.OK, FileValidator.validateFile(validNameFile));
+        assertEquals(ValidationResult.OK, FileValidator.validateImage(validNameFile, 10));
     }
 
     @Test
     public void invalidNameFile_return_INVALID_FILE_TYPE() {
-        assertEquals(ValidationResult.INVALID_FILE_TYPE, FileValidator.validateFile(invalidNameFile));
+        assertEquals(ValidationResult.INVALID_FILE_TYPE, FileValidator.validateImage(invalidNameFile, 10));
     }
 
     @Test
     public void validDataFile_return_OK() {
-        assertEquals(ValidationResult.OK, FileValidator.validateFile(validSizeFile));
+        assertEquals(ValidationResult.OK, FileValidator.validateImage(validSizeFile, 10));
     }
 
     @Test
     public void invalidDataFile_return_INVALID_FILE_SIZE() {
-        assertEquals(ValidationResult.INVALID_FILE_SIZE, FileValidator.validateFile(invalidSizeFile));
+        assertEquals(ValidationResult.INVALID_FILE_SIZE, FileValidator.validateImage(invalidSizeFile, 10));
     }
 }

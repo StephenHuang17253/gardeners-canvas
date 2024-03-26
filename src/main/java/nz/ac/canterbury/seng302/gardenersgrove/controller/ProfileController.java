@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -75,8 +76,11 @@ public class ProfileController {
         String profilePictureString = "/Images/default_profile_picture.png";
 
         if (filename != null && filename.length() != 0) {
-            profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
-                    "serveFile", filename).build().toUri().toString();
+            profilePictureString = MvcUriComponentsBuilder
+                    .fromMethodName(ProfileController.class, "serveFile", filename)
+                    .build()
+                    .toUri()
+                    .toString();
         }
         return profilePictureString;
     }
@@ -98,8 +102,8 @@ public class ProfileController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (MalformedURLException error) {
+            error.printStackTrace();
         }
         return null;
 
@@ -192,6 +196,16 @@ public class ProfileController {
         return "profilePage";
     }
 
+    // TODO - improve doc string
+    /**
+     * This function is called when a POST request is made to /profile
+     * 
+    
+     * 
+     * @param profilePicture
+     * @param model
+     * @return
+     */
     @PostMapping("/profile")
     public String updateProfilePicture(
             @RequestParam("profilePictureInput") MultipartFile profilePicture,
@@ -202,7 +216,7 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
-        ValidationResult profilePictureValidation = FileValidator.validateFile(profilePicture);
+        ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
         }
@@ -232,20 +246,21 @@ public class ProfileController {
         logger.info("GET /profile/edit");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-
         User user = userService.getUserByEmail(email);
+
         model.addAttribute("firstName", user.getFirstName());
         model.addAttribute("lastName", user.getLastName());
         model.addAttribute("emailAddress", user.getEmailAddress());
+
         String formattedDateOfBirth = "";
         LocalDate dateOfBirth = user.getDateOfBirth();
         if (dateOfBirth != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             formattedDateOfBirth = dateOfBirth.format(formatter);
         }
-
         model.addAttribute("dateOfBirth", formattedDateOfBirth);
-        boolean noLastName = Objects.equals(user.getLastName(), "");
+
+        boolean noLastName = user.getLastName().equals("");
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
@@ -303,7 +318,7 @@ public class ProfileController {
             dateOfBirthValidation = ValidationResult.OK;
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
-        ValidationResult profilePictureValidation = FileValidator.validateFile(profilePicture);
+        ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
         }
@@ -313,12 +328,15 @@ public class ProfileController {
         boolean valid = true;
         for (Map.Entry<String, ValidationResult> entry : validationMap.entrySet()) {
             if (!entry.getValue().valid()) {
+                
                 String error = entry.getValue().toString();
+                
                 if (entry.getKey().equals("firstName")) {
                     error = "First name " + error;
                 } else if (entry.getKey().equals("lastName")) {
                     error = "First name " + error;
                 }
+
                 model.addAttribute(entry.getKey() + "Error", error);
                 valid = false;
             }

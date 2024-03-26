@@ -30,17 +30,14 @@ public class ImageService {
         this.rootLocation = Paths.get(uploadDir);
     }
 
-    public Resource loadImage(String fileName) throws Exception {
-        try {
-            Path file = rootLocation.resolve(fileName);
-            Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new Exception("Could not read the file!");
-            }
-        } catch (MalformedURLException e) {
-            throw new Exception("Error: ", e);
+    public Resource loadImage(String fileName) throws MalformedURLException {
+
+        Path file = rootLocation.resolve(fileName);
+        Resource resource = new UrlResource(file.toUri());
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        } else {
+            throw new MalformedURLException("Could not read the file!");
         }
     }
 
