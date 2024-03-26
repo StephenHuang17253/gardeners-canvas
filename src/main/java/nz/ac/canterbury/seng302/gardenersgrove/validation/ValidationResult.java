@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator;
+package nz.ac.canterbury.seng302.gardenersgrove.validation;
 
 /**
  * result returned by the input validator to inform if an input is valid or no.
@@ -23,9 +23,11 @@ public enum ValidationResult {
 
     NON_UNIQUE_EMAIL("This email address is already in use"),
     NON_NUMERIC_COMMA("must be a positive number"),
-    LENGTH_OVER_LIMIT("must be less than limit characters");
+    LENGTH_OVER_LIMIT("must be less than limit characters"),
 
-
+    INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
+    INVALID_FILE_SIZE("Image must be less than 10MB");
+    
 
 
     private String message;
