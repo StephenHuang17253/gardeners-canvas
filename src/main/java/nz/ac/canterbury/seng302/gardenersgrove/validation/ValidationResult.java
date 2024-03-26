@@ -12,7 +12,7 @@ public enum ValidationResult {
 
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
 
-    INVALID_EMAIL("Email address must be in the form ‘jane@doe.nz"),
+    INVALID_EMAIL("Email address must be in the form 'jane@doe.nz'"),
 
     INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
 
