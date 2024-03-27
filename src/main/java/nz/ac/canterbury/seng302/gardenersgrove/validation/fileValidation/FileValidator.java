@@ -1,7 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 /**
  * Tests MultipartFiles on a variety of rules to check if values are valid
@@ -9,6 +12,9 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
  * and if not, why it failed
  */
 public class FileValidator {
+
+
+    Logger logger = LoggerFactory.getLogger(FileValidator.class);
 
     private ValidationResult validationResult;
     private boolean passState = true;
@@ -64,8 +70,10 @@ public class FileValidator {
         }
 
         String filename = file.getOriginalFilename();
+        
+        String allFilenames = String.join("|", validFileTypes);
 
-        if (filename == null || !filename.matches("^[^\\s]+\\.(" + String.join("|", validFileTypes) + ")$")) {
+        if (filename == null || !filename.matches("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$")) {
             this.validationResult = ValidationResult.INVALID_FILE_TYPE;
             this.passState = false;
         } else {

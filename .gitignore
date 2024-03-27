@@ -36,8 +36,11 @@ out/
 ### VS Code ###
 .vscode/
 
-### Mac
+### Mac ###
 .DS_Store
 
-### Profile Pics
+### Profile Pics ###
 uploads/
+
+### Email Credentials ###
+email.properties

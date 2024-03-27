@@ -4,7 +4,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation;
  * Enum for file types, used to validate files based on their type
  */
 public enum FileType {
-    IMAGES(new String[] { "png", "jpg", "svg", "jpeg" }),
+    IMAGES(new String[] { "png", "jpg", "svg", "jpeg", "jfif", "pjpeg", "pjp" }),
     DOCUMENTS(new String[] { "pdf", "doc", "docx", "txt" }),
     VIDEOS(new String[] { "mp4", "avi", "mov", "wmv" });
 
