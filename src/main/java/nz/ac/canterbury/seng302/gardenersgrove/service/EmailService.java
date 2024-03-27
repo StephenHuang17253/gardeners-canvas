@@ -33,15 +33,15 @@ public class EmailService {
     private String senderEmail;
 
     /**
-     * Sends an email to the specified email address with the specified subject and
-     * body.
+     * Sends a plaintext email to the specified email address with the specified
+     * subject and body.
      * 
      * @param toEmail the email recipient
      * @param subject the email subject
      * @param body    the email body
      * @throws MailException if the email cannot be sent
      */
-    public void sendEmail(String toEmail, String subject, String body) throws MailException {
+    public void sendPlaintextEmail(String toEmail, String subject, String body) throws MailException {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
         message.setTo(toEmail);
@@ -51,8 +51,15 @@ public class EmailService {
         logger.info("Email sent to: " + toEmail);
     }
 
+    /**
+     * Sends an HTML email to the specified email address with the specified subject
+     * 
+     * @param toEmail
+     * @param subject
+     * @param body
+     * @throws MessagingException
+     */
     public void sendHTMLEmail(String toEmail, String subject, String body) throws MessagingException {
-
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
         helper.setFrom(senderEmail);
@@ -63,11 +70,16 @@ public class EmailService {
         logger.info("Email sent to: " + toEmail);
     }
 
+    /**
+     * Sends a registration email to the user with the token
+     * @param token the token to send
+     * @throws MessagingException
+     */
     public void sendRegistrationEmail(Token token) throws MessagingException {
         String subject = "Welcome to Gardeners Grove!";
         String body = "<html><body><p>Thank you for registering with Gardeners Grove!</p><p>Here is your signup code: "
                 + token.getTokenString() + "</p></body></html>";
-        String toEmail = token.getUser().getEmailAddress(); 
+        String toEmail = token.getUser().getEmailAddress();
         sendHTMLEmail(toEmail, subject, body);
     }
 

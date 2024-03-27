@@ -18,7 +18,7 @@ public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long tokenId;
+    private Long id;
 
     private String tokenString;
 
@@ -33,26 +33,26 @@ public class Token {
     /**
      * JPA required no-args constructor
      */
-    protected Token() {
-    }
+    // protected Token() {
+    // }
 
     /**
      * Creates a new token string for a RegistrationToken object
      * by getting a list of random bytes and converting them to
      * a base 36 integer then a string
      * 
+     * @param rnd the random number generator
      * @return the token string
      */
-    private static String generateTokenString() {
+    public String generateTokenString(Random rnd) {
 
+        // Generate a 6 byte number to ensure that a 9 character string is generated
         int numBytes = 6;
 
-        Random rnd = new Random();
         byte[] randomBytes = new byte[numBytes];
         rnd.nextBytes(randomBytes);
 
-        BigInteger largeRandomNumber = new BigInteger(randomBytes);
-        System.out.println("Large random number: " + largeRandomNumber);
+        BigInteger largeRandomNumber = new BigInteger(randomBytes).abs();
 
         return largeRandomNumber.toString(36);
     }
@@ -64,14 +64,16 @@ public class Token {
      * @param lifeTime the life time that the token should be valid for
      */
     public Token(User user, Duration lifeTime) {
-        this.tokenString = generateTokenString();
+
+        Random rnd = new Random();
+        this.tokenString = generateTokenString(rnd);
         this.creationDate = LocalDateTime.now();
         this.lifeTime = lifeTime;
         this.user = user;
     }
 
-    public Long getTokenId() {
-        return tokenId;
+    public Long getId() {
+        return id;
     }
 
     public String getTokenString() {
@@ -91,7 +93,9 @@ public class Token {
     }
 
     /**
-     * Checks if the creation date plus the duration of the token's life time has passed
+     * Checks if the creation date plus the duration of the token's life time has
+     * passed
+     * 
      * @return true if the token is expired, false otherwise
      */
     public boolean isExpired() {
@@ -101,7 +105,7 @@ public class Token {
     @Override
     public String toString() {
         return "RegistrationToken{" +
-                "tokenId=" + tokenId +
+                "id=" + id +
                 ", tokenString='" + tokenString + '\'' +
                 ", creationDate=" + creationDate +
                 ", lifeTime=" + lifeTime +
