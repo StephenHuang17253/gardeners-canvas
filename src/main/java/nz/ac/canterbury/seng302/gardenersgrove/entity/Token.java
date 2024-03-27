@@ -33,8 +33,16 @@ public class Token {
     /**
      * JPA required no-args constructor
      */
-    // protected Token() {
-    // }
+    protected Token() {
+    }
+
+    /**
+     * Creates a new token string for a RegistrationToken object
+     * @return 
+     */
+    public Random randomGenerator() {
+        return new Random();
+    }
 
     /**
      * Creates a new token string for a RegistrationToken object
@@ -44,7 +52,7 @@ public class Token {
      * @param rnd the random number generator
      * @return the token string
      */
-    public String generateTokenString(Random rnd) {
+    public String generateTokenString() {
 
         // Generate a 6 byte number to ensure that a 9 character string is generated
         int numBytes = 6;
