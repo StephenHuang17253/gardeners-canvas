@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.MailAuthenticationException;
-import org.springframework.mail.MailException;
-import org.springframework.mail.MailParseException;
-import org.springframework.mail.MailSendException;
+
+import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 /**
  * This class is a service class for sending emails
@@ -46,6 +46,24 @@ public class EmailService {
         message.setText(body);
         mailSender.send(message);
         logger.info("Email sent to: " + toEmail);
+    }
+
+    public void sendHTMLEmail(String toEmail, String subject, String body) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+        helper.setFrom(senderEmail);
+        helper.setTo(toEmail);
+        helper.setSubject(subject);
+        helper.setText(body, true); // Set the second parameter to true to indicate the text is HTML
+        mailSender.send(message);
+        logger.info("Email sent to: " + toEmail);
+    }
+
+    public void sendRegistrationEmail(RegistrationToken token) {
+        String subject = "Welcome to Gardeners Grove!";
+        String body = "<html><body><p>Thank you for registering with Gardeners Grove!</p><p>Here is your signup code: "
+                + token.getTokenString() + "</p></body></html>";
+        sendHTMLEmail(token.getEmail(), subject, body);
     }
 
 }
