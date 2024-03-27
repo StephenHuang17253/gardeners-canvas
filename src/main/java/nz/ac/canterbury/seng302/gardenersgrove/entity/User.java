@@ -1,7 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
-import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 
@@ -34,6 +40,9 @@ public class User {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfBirth;
 
+    @Column
+    private boolean verified;
+
     /**
      * JPA required no-args constructor
      */
@@ -54,6 +63,7 @@ public class User {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.dateOfBirth = dateOfBirth;
+        this.verified = false;
     }
 
     public void setFirstName(String firstName) {
@@ -76,10 +86,10 @@ public class User {
         this.password = password;
     }
 
-    public String getEncodedPassword() {
-        return password;
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
-
+    
     public Long getId() {
         return id;
     }
@@ -100,6 +110,14 @@ public class User {
         return dateOfBirth;
     }
 
+    public String getEncodedPassword() {
+        return password;
+    }
+    
+    public boolean isVerified() {
+        return verified;
+    }
+
     /**
      * Returns a string representation of the user
      */
@@ -110,6 +128,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
+                ", verified='" + verified + '\'' +
                 '}';
     }
 }

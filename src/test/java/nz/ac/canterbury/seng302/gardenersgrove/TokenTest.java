@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -14,7 +15,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
 public class TokenTest {
 
-    private User user;
+    private static User user;
 
     @BeforeAll
     public static void setUp() {
@@ -22,17 +23,38 @@ public class TokenTest {
     }
 
     @Test
-    void testTokenCreation_GetTokenString_ValidLength() {
+    public void tokenCreation_GetTokenString_ValidLength() {
         Duration lifeTime = Duration.ofHours(1);
         Token token = new Token(user, lifeTime);
         assertEquals(9, token.getTokenString().length());
     }
 
     @Test
-    void testTokenCreation_GetTokenString_ValidContainsChars() {
+    public void tokenCreation_GetTokenString_ValidContainsChars() {
         Duration lifeTime = Duration.ofHours(1);
         Token token = new Token(user, lifeTime);
-        assertEquals(token.getTokenString(), "");
         assertTrue(token.getTokenString().matches("[0-9a-z]+"));
+    }
+
+    @Test
+    public void tokenCreation_DelayPastLifetime_IsExpired() throws InterruptedException {
+
+        int lifetimeSeconds = 1;
+
+        Duration lifetime = Duration.ofSeconds(lifetimeSeconds);
+        Token token = new Token(user, lifetime);
+        Thread.sleep(lifetimeSeconds*1000);
+        assertTrue(token.isExpired());
+    }
+
+    @Test
+    public void tokenCreation_DelayLessThanLifetime_IsNotExpired() throws InterruptedException {
+
+        int lifetimeSeconds = 1;
+
+        Duration lifeTime = Duration.ofSeconds(lifetimeSeconds);
+        Token token = new Token(user, lifeTime);
+        Thread.sleep(lifetimeSeconds*1000-5);
+        assertFalse(token.isExpired());
     }
 }
