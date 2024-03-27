@@ -38,27 +38,19 @@ public class Token {
 
     /**
      * Creates a new token string for a RegistrationToken object
-     * @return 
-     */
-    public Random randomGenerator() {
-        return new Random();
-    }
-
-    /**
-     * Creates a new token string for a RegistrationToken object
      * by getting a list of random bytes and converting them to
      * a base 36 integer then a string
      * 
      * @param rnd the random number generator
      * @return the token string
      */
-    public String generateTokenString() {
+    private String generateTokenString() {
 
         // Generate a 6 byte number to ensure that a 9 character string is generated
         int numBytes = 6;
 
         byte[] randomBytes = new byte[numBytes];
-        rnd.nextBytes(randomBytes);
+        new Random().nextBytes(randomBytes);
 
         BigInteger largeRandomNumber = new BigInteger(randomBytes).abs();
 
@@ -73,8 +65,7 @@ public class Token {
      */
     public Token(User user, Duration lifeTime) {
 
-        Random rnd = new Random();
-        this.tokenString = generateTokenString(rnd);
+        this.tokenString = generateTokenString();
         this.creationDate = LocalDateTime.now();
         this.lifeTime = lifeTime;
         this.user = user;
