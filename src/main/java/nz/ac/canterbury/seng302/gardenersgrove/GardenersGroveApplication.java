@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
  */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class GardenersGroveApplication {
-
 	/**
 	 * Main entry point, runs the Spring application
 	 * @param args command line arguments

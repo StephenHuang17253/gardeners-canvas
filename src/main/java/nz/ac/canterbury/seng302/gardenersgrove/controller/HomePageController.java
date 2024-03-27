@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ import java.util.Locale;
 public class HomePageController {
     Logger logger = LoggerFactory.getLogger(HomePageController.class);
     private final UserService userService;
+    private final EmailService emailService;
 
     private boolean onStart = false;
 
@@ -37,9 +39,14 @@ public class HomePageController {
      * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager) {
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager, EmailService emailService) {
         this.userService = userService;
+        this.emailService = emailService;
     }
+
+    public void sendMail() {	
+		emailService.sendEmail("lst117@uclive.ac.nz", "Some subject again", "heres the body of the email");
+	}
 
     /**
      * Redirects GET default url '/' to '/home'
@@ -49,12 +56,13 @@ public class HomePageController {
     @GetMapping("/")
     public String home() {
         logger.info("GET /");
+        sendMail();
         return "redirect:./home";
     }
-
-
+    
     /**
      * This function is called when a GET request is made to /home
+     * 
      * @param model
      * @return The homePage html page
      */
@@ -67,9 +75,9 @@ public class HomePageController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
             LocalDate date = LocalDate.parse("01/01/2001", formatter);
             userService.addUser(new User("John",
-                            "Doe",
-                            "johndoe@email.com",
-                            date),
+                    "Doe",
+                    "johndoe@email.com",
+                    date),
                     "DefaultUser10!");
             onStart = true;
         }
