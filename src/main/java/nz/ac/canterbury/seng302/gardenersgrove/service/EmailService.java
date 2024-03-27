@@ -6,8 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -49,21 +52,23 @@ public class EmailService {
     }
 
     public void sendHTMLEmail(String toEmail, String subject, String body) throws MessagingException {
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
         helper.setFrom(senderEmail);
         helper.setTo(toEmail);
         helper.setSubject(subject);
-        helper.setText(body, true); // Set the second parameter to true to indicate the text is HTML
+        helper.setText(body, true);
         mailSender.send(message);
         logger.info("Email sent to: " + toEmail);
     }
 
-    public void sendRegistrationEmail(RegistrationToken token) {
+    public void sendRegistrationEmail(Token token) throws MessagingException {
         String subject = "Welcome to Gardeners Grove!";
         String body = "<html><body><p>Thank you for registering with Gardeners Grove!</p><p>Here is your signup code: "
                 + token.getTokenString() + "</p></body></html>";
-        sendHTMLEmail(token.getEmail(), subject, body);
+        String toEmail = token.getUser().getEmailAddress(); 
+        sendHTMLEmail(toEmail, subject, body);
     }
 
 }
