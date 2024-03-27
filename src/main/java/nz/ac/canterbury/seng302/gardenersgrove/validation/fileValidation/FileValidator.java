@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 /**
  * Tests MultipartFiles on a variety of rules to check if values are valid
@@ -72,6 +71,7 @@ public class FileValidator {
         String filename = file.getOriginalFilename();
         
         String allFilenames = String.join("|", validFileTypes);
+        logger.info("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$");
 
         if (filename == null || !filename.matches("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$")) {
             this.validationResult = ValidationResult.INVALID_FILE_TYPE;

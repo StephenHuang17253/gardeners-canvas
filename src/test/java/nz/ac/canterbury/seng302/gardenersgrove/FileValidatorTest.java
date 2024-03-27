@@ -23,7 +23,7 @@ public class FileValidatorTest {
     @BeforeAll
     private static void setUp() {
 
-        String validFilename = "filename.png";
+        String validFilename = "client_filename.png";
         String invalidFilename = "filename.txt";
 
         int validFileSize = 10000000;
@@ -32,10 +32,13 @@ public class FileValidatorTest {
         byte[] validData = new byte[validFileSize];
         byte[] invalidData = new byte[invalidFileSize];
 
-        validNameFile = new MockMultipartFile(validFilename, validData);
-        invalidNameFile = new MockMultipartFile(invalidFilename, validData);
-        validSizeFile = new MockMultipartFile(validFilename, validData);
-        invalidSizeFile = new MockMultipartFile(validFilename, invalidData);
+        String contentType = "image/png";
+        String filename = "local_filename.png";
+
+        validNameFile = new MockMultipartFile(filename, validFilename, contentType, validData);
+        invalidNameFile = new MockMultipartFile(filename, invalidFilename, contentType, validData);
+        validSizeFile = new MockMultipartFile(filename, validFilename, contentType, validData);
+        invalidSizeFile = new MockMultipartFile(filename, validFilename, contentType, invalidData);
     }
 
     @Test
