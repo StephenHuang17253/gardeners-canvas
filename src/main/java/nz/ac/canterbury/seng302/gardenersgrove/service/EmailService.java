@@ -23,8 +23,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 public class EmailService {
     Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     /**
      * The email address of the sender retrieved from the email.properties file.

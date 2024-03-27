@@ -18,7 +18,7 @@ public class TokenTest {
     private static User user;
 
     @BeforeAll
-    public static void setUp() {
+    public static void setup() {
         user = mock(User.class);
     }
 
@@ -38,23 +38,19 @@ public class TokenTest {
 
     @Test
     public void tokenCreation_DelayPastLifetime_IsExpired() throws InterruptedException {
-
         int lifetimeSeconds = 1;
-
         Duration lifetime = Duration.ofSeconds(lifetimeSeconds);
         Token token = new Token(user, lifetime);
-        Thread.sleep(lifetimeSeconds*1000);
+        Thread.sleep(lifetimeSeconds * 1000);
         assertTrue(token.isExpired());
     }
 
     @Test
     public void tokenCreation_DelayLessThanLifetime_IsNotExpired() throws InterruptedException {
-
         int lifetimeSeconds = 1;
-
         Duration lifeTime = Duration.ofSeconds(lifetimeSeconds);
         Token token = new Token(user, lifeTime);
-        Thread.sleep(lifetimeSeconds*1000-5);
+        Thread.sleep(lifetimeSeconds * 1000 - 5);
         assertFalse(token.isExpired());
     }
 }
