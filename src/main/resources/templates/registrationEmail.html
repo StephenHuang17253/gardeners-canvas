@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gardener's Grove</title>
+    <link th:href="@{${#httpServletRequest.requestURL.root}/css/registrationEmail.css}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <p th:text="|Welcome ${username}!|"></p>
+    <p>Thank you for registering with Gardener's Grove</p>
+    <p th:text="|Here is your signup code: ${tokenString}|"></p>
+    <p th:text="|You have ${lifetime} minutes to complete your registration|"></p>
+</body>
+
+</html>

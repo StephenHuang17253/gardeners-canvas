@@ -14,6 +14,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 /**
  * This class is a service class for sending emails
@@ -24,10 +26,12 @@ public class EmailService {
     Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     private JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     @Autowired
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
         this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
     }
 
     /**
@@ -63,28 +67,41 @@ public class EmailService {
      * @param body
      * @throws MessagingException
      */
-    public void sendHTMLEmail(String toEmail, String subject, String body) throws MessagingException {
+    public void sendHTMLEmail(String recipientEmail, String subject, String template, Context context)
+            throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+        String htmlContent = templateEngine.process(template, context);
+
         helper.setFrom(senderEmail);
-        helper.setTo(toEmail);
+        helper.setTo(recipientEmail);
         helper.setSubject(subject);
-        helper.setText(body, true);
+        helper.setText(htmlContent, true);
         mailSender.send(message);
-        logger.info("Email sent to: " + toEmail);
+        logger.info("Email sent to: " + recipientEmail);
     }
 
     /**
      * Sends a registration email to the user with the token
-     * @param token the token to send
+     * 
+     * @param token the token to send information about
      * @throws MessagingException
      */
     public void sendRegistrationEmail(Token token) throws MessagingException {
         String subject = "Welcome to Gardeners Grove!";
-        String body = "<html><body><p>Thank you for registering with Gardeners Grove!</p><p>Here is your signup code: "
-                + token.getTokenString() + "</p></body></html>";
+        String template = "registrationEmail";
+
+        String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
+        String tokenString = token.getTokenString();
+        int lifetime = (int) token.getLifetime().toMinutes();
+
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("tokenString", tokenString);
+        context.setVariable("lifetime", lifetime);
+
         String toEmail = token.getUser().getEmailAddress();
-        sendHTMLEmail(toEmail, subject, body);
+        sendHTMLEmail(toEmail, subject, template, context);
     }
 
 }

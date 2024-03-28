@@ -12,18 +12,24 @@ import jakarta.mail.internet.MimeMessage;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 class EmailServiceTest {
 
     private static EmailService emailService;
+    private static TemplateEngine templateEngine;
 
     private static JavaMailSender mailSender;
 
@@ -31,7 +37,11 @@ class EmailServiceTest {
     public static void setup() {
         mailSender = spy(JavaMailSender.class);
         doNothing().when(mailSender).send(Mockito.any(SimpleMailMessage.class));
-        emailService = new EmailService(mailSender);
+
+        templateEngine = mock(TemplateEngine.class);
+        when(templateEngine.process(Mockito.anyString(), Mockito.any(Context.class))).thenReturn("Test Body");
+
+        emailService = new EmailService(mailSender, templateEngine);
     }
 
     @Test
@@ -60,7 +70,9 @@ class EmailServiceTest {
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
 
-        emailService.sendHTMLEmail(toEmail, subject, body);
+        Context context = mock(Context.class);
+
+        emailService.sendHTMLEmail(toEmail, subject, body, context);
 
         verify(mailSender, times(1)).send(captor.capture());
 

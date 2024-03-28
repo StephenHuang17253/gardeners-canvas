@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
+import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
@@ -33,9 +33,10 @@ public class HomePageController {
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
-     * 
+     *
      * @param userService
      * @param authenticationManager
+     * @param emailService // Added email service
      */
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager) {
@@ -46,10 +47,12 @@ public class HomePageController {
      * Redirects GET default url '/' to '/home'
      * 
      * @return redirect to /home
+     * @throws MessagingException 
      */
     @GetMapping("/")
-    public String home() {
+    public String home() throws MessagingException {
         logger.info("GET /");
+
         return "redirect:./home";
     }
     

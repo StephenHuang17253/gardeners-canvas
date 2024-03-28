@@ -1,8 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import org.springframework.stereotype.Repository;
-
-import ch.qos.logback.core.subst.Token;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import org.springframework.data.repository.CrudRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
@@ -11,7 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
  * Extends {@link CrudRepository} to provide basic CRUD operations.
  */
 @Repository
-public interface TokenRepository extends CrudRepository<User, Long> {
+public interface TokenRepository extends CrudRepository<Token, Long> {
 
     /**
      * Returns a token found by id
