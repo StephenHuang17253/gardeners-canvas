@@ -38,7 +38,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 /**

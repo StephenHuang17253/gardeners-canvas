@@ -2,8 +2,8 @@ package nz.ac.canterbury.seng302.gardenersgrove;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

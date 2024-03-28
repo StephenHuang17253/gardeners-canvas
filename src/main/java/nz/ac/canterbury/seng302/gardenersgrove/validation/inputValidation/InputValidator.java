@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator;
+package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
