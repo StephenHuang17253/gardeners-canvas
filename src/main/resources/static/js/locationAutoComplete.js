@@ -5,7 +5,7 @@ function initAutocomplete() {
     // Create the autocomplete object, restricting the search to geographical
     // location types.
     autocomplete = new google.maps.places.Autocomplete(
-        /** @type {!HTMLInputElement} */(document.getElementById('gardenLocation')),
+        /** @type {!HTMLInputElement} */(document.getElementById('streetAddress')),
         {
             types: ['geocode', 'establishment'],
         });
@@ -54,8 +54,13 @@ function fillInAddress() {
 
     addr = `${streetNumber} ${route}, ${suburb}, ${city} ${postcode}, ${country}`;
 
-    document.getElementById('gardenLocation').value = addr;
+    document.getElementById('streetAddress').value = streetNumber + ' ' + route;
+    document.getElementById('suburb').value = suburb;
+    document.getElementById('city').value = city;
+    document.getElementById('postcode').value = postcode;
+    document.getElementById('country').value = country;
 
+    document.getElementById('gardenLocation').value = addr;
 }
 
 

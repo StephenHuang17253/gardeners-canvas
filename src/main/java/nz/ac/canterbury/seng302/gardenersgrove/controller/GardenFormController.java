@@ -65,7 +65,7 @@ public class GardenFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/create-new-garden")
-    public String submitNewGardenForm( @RequestParam(name="gardenName") String gardenName,
+    public String submitNewGardenForm(@RequestParam(name="gardenName") String gardenName,
                               @RequestParam(name = "gardenLocation") String gardenLocation,
                               @RequestParam(name = "gardenSize") String gardenSize,
                               Model model, RedirectAttributes redirectAttributes) {
