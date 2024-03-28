@@ -154,7 +154,7 @@ public class ProfileController {
                 }
             }
 
-            String fileName = "user_" + user.getId() + "_profile_picture." + fileExtension;
+            String fileName = "user_" + user.getId() + "_profile_picture." + fileExtension.toLowerCase();
             userService.updateProfilePictureFilename(fileName, user.getId());
             fileService.saveFile(fileName, profilePicture);
 

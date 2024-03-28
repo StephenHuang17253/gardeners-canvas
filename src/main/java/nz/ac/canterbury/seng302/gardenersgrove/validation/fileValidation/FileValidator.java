@@ -71,7 +71,6 @@ public class FileValidator {
         String filename = file.getOriginalFilename();
         
         String allFilenames = String.join("|", validFileTypes);
-        logger.info("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$");
 
         if (filename == null || !filename.matches("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$")) {
             this.validationResult = ValidationResult.INVALID_FILE_TYPE;

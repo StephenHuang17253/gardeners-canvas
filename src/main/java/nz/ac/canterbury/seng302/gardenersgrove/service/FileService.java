@@ -117,7 +117,6 @@ public class FileService {
             .map(Path::getFileName)
             .map(Path::toString)
             .toArray(String[]::new);
-            logger.info(thingy.toString());
             return thingy;
         } catch (IOException error) {
             throw new IOException("Could not list the files");
