@@ -1,7 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 import org.springframework.ui.Model;
 
@@ -100,7 +100,7 @@ public class LoginPageController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        ValidationResult validEmail = InputValidator.validateUniqueEmail(email);
+        ValidationResult validEmail = InputValidator.validateEmail(email);
 
         boolean validLogin = userService.getUserByEmailAndPassword(email, password) != null;
 
