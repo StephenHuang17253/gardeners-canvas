@@ -85,7 +85,30 @@ function updateGardenLocation() {
     const cityField = document.getElementById('city').value;
     const postcodeField = document.getElementById('postcode').value;
     const countryField = document.getElementById('country').value;
-    const fieldValues = `${streetAddressField}, ${suburbField}, ${cityField}, ${postcodeField} ${countryField}`;
+
+    //const fieldValues = `${streetAddressField}, ${suburbField}, ${cityField} ${postcodeField}, ${countryField}`;
+    let fieldValues = "";
+    if (streetAddressField) {
+        fieldValues += `${streetAddressField}, `
+    }
+    if (suburbField) {
+        fieldValues += `${suburbField}, `
+    }
+    if (cityField) {
+        fieldValues += `${cityField}`
+        if (!postcodeField) {
+            fieldValues += ", "
+        } else {
+            fieldValues += " "
+        }
+    }
+    if (postcodeField) {
+        fieldValues += `${postcodeField}, `
+    }
+    if (countryField) {
+        fieldValues += `${countryField}`
+    }
+
     document.getElementById('gardenLocation').value = fieldValues;
 }
 
