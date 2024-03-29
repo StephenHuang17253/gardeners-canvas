@@ -95,8 +95,8 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        if(!gardenNameResult.valid() || !cityResult.valid() || !countryResult.valid() || !gardenLocationResult.valid()
-                || !gardenSizeResult.valid()) {
+        if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
+                !countryResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
         }
 
@@ -195,7 +195,8 @@ public class GardenFormController {
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
         model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
-        if(!gardenNameResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
+        if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
+                !countryResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "editGardenForm";
 
         }
