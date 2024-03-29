@@ -20,6 +20,8 @@ body {
     font-family: monospace;
     color: red;
     font-weight: bold;
+    margin-top: 1px;
+    margin-bottom: 7.5px;
 }
 
 .noError

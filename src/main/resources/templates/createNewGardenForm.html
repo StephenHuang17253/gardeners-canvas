@@ -25,47 +25,47 @@
 
             <label for="streetAddress"> Street Address: </label>
             <br>
-            <input type="text" class="form-control" th:class="${NOT_IMPLEMENTED}" id="streetAddress" placeholder="20 Kirkwood Avenue"
+            <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress" placeholder="20 Kirkwood Avenue"
                    th:name="streetAddress" th:value="${streetAddress}" data-cy="streetAddress" autofocus>
 
-            <div th:if="${NOT_IMPLEMENTED!=''}">
-                <h3 class="error" th:text="${NOT_IMPLEMENTED}"></h3>
+            <div th:if="${AddressErrorText!=''}">
+                <h3 class="error" th:text="${AddressErrorText}"></h3>
             </div>
 
             <label for="suburb"> Suburb: </label>
             <br>
-            <input type="text" class="form-control" th:class="${NOT_IMPLEMENTED}" id="suburb" placeholder="Upper Riccarton"
+            <input type="text" class="form-control" th:class="${SuburbErrorClass}" id="suburb" placeholder="Upper Riccarton"
                    th:name="suburb" th:value="${suburb}" data-cy="suburb" autofocus>
 
-            <div th:if="${NOT_IMPLEMENTED!=''}">
-                <h3 class="error" th:text="${NOT_IMPLEMENTED}"></h3>
+            <div th:if="${SuburbErrorText!=''}">
+                <h3 class="error" th:text="${SuburbErrorText}"></h3>
             </div>
 
             <label for="city"> City: </label>
             <br>
-            <input type="text" class="form-control" th:class="${NOT_IMPLEMENTED}" id="city" placeholder="Christchurch"
+            <input type="text" class="form-control" th:class="${CityErrorClass}" id="city" placeholder="Christchurch"
                    th:name="city" th:value="${city}" data-cy="city" autofocus>
 
-            <div th:if="${NOT_IMPLEMENTED!=''}">
-                <h3 class="error" th:text="${NOT_IMPLEMENTED}"></h3>
+            <div th:if="${CityErrorText!=''}">
+                <h3 class="error" th:text="${CityErrorText}"></h3>
             </div>
 
             <label for="postcode"> Postcode: </label>
             <br>
-            <input type="text" class="form-control" th:class="${NOT_IMPLEMENTED}" id="postcode" placeholder="8041"
+            <input type="text" class="form-control" th:class="${PostCodeErrorClass}" id="postcode" placeholder="8041"
                    th:name="postcode" th:value="${postcode}" data-cy="postcode" autofocus>
 
-            <div th:if="${NOT_IMPLEMENTED!=''}">
-                <h3 class="error" th:text="${NOT_IMPLEMENTED}"></h3>
+            <div th:if="${PostCodeErrorText!=''}">
+                <h3 class="error" th:text="${PostCodeErrorText}"></h3>
             </div>
 
             <label for="country"> Country: </label>
             <br>
-            <input type="text" class="form-control" th:class="${NOT_IMPLEMENTED}" id="country" placeholder="New Zealand"
+            <input type="text" class="form-control" th:class="${CountryErrorClass}" id="country" placeholder="New Zealand"
                    th:name="country" th:value="${country}" data-cy="country" autofocus>
 
-            <div th:if="${NOT_IMPLEMENTED!=''}">
-                <h3 class="error" th:text="${NOT_IMPLEMENTED}"></h3>
+            <div th:if="${CountryErrorText!=''}">
+                <h3 class="error" th:text="${CountryErrorText}"></h3>
             </div>
 
             <label for="gardenSize"> Garden Size(m^2): </label>

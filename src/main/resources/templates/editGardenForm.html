@@ -23,11 +23,50 @@
                 <h3 class = "error" th:text="${GNErrorText}"></h3>
             </div>
 
-            <label for="gardenLocation"> Garden Location: </label>
+            <label for="streetAddress"> Street Address: </label>
             <br>
-            <input type="text" class="form-control" th:class = "${GLErrorClass}" id="gardenLocation" placeholder="Username's Backyard"
-                   th:name="gardenLocation" th:value="${gardenLocation}" data-cy="gardenLocation"
-                   autofocus>
+            <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress" placeholder="20 Kirkwood Avenue"
+                   th:name="streetAddress" th:value="${streetAddress}" data-cy="streetAddress" autofocus>
+
+            <div th:if="${AddressErrorText!=''}">
+                <h3 class="error" th:text="${AddressErrorText}"></h3>
+            </div>
+
+            <label for="suburb"> Suburb: </label>
+            <br>
+            <input type="text" class="form-control" th:class="${SuburbErrorClass}" id="suburb" placeholder="Upper Riccarton"
+                   th:name="suburb" th:value="${suburb}" data-cy="suburb" autofocus>
+
+            <div th:if="${SuburbErrorText!=''}">
+                <h3 class="error" th:text="${SuburbErrorText}"></h3>
+            </div>
+
+            <label for="city"> City: </label>
+            <br>
+            <input type="text" class="form-control" th:class="${CityErrorClass}" id="city" placeholder="Christchurch"
+                   th:name="city" th:value="${city}" data-cy="city" autofocus>
+
+            <div th:if="${CityErrorText!=''}">
+                <h3 class="error" th:text="${CityErrorText}"></h3>
+            </div>
+
+            <label for="postcode"> Postcode: </label>
+            <br>
+            <input type="text" class="form-control" th:class="${PostCodeErrorClass}" id="postcode" placeholder="8041"
+                   th:name="postcode" th:value="${postcode}" data-cy="postcode" autofocus>
+
+            <div th:if="${PostCodeErrorText!=''}">
+                <h3 class="error" th:text="${PostCodeErrorText}"></h3>
+            </div>
+
+            <label for="country"> Country: </label>
+            <br>
+            <input type="text" class="form-control" th:class="${CountryErrorClass}" id="country" placeholder="New Zealand"
+                   th:name="country" th:value="${country}" data-cy="country" autofocus>
+
+            <div th:if="${CountryErrorText!=''}">
+                <h3 class="error" th:text="${CountryErrorText}"></h3>
+            </div>
 
             <div th:if="${GLErrorText!=''}">
                 <h3 class = "error" th:text="${GLErrorText}"></h3>
@@ -43,7 +82,7 @@
             </div>
             <br/>
 
-
+            <input type="hidden" th:name="gardenLocation" id="gardenLocation" data-cy="gardenLocation">
 
             <button type="submit" class = "submit-button">Submit</button>
             <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${gardenId}, gardenName=${gardenName})}">

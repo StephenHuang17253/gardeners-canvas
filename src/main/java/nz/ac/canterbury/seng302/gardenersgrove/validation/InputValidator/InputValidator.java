@@ -151,6 +151,21 @@ public class InputValidator {
 
     /**
      * Checks input against a criteria:
+     * This function only allows alphanumeric characters and select punctuation.
+     * It also checks the input against a character limit.
+     * @param text text to validate
+     * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
+     */
+    public static ValidationResult optionalAlphaPlusTextFieldWithLengthLimit(String text, int length)
+    {
+        return new InputValidator(text)
+                .alphaPlusHelper()
+                .lengthHelper(length)
+                .getResult();
+    }
+
+    /**
+     * Checks input against a criteria:
      * This function only allows numeric values and up to 1 comma
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
@@ -162,6 +177,13 @@ public class InputValidator {
                 .getResult();
     }
 
+    public static ValidationResult numberCommaSingleTextFieldWithLengthLimit(String text, int length)
+    {
+        return new InputValidator(text)
+                .numberCommaSingleHelper()
+                .lengthHelper(length)
+                .getResult();
+    }
 
     /**
      * Checks if the given name is valid

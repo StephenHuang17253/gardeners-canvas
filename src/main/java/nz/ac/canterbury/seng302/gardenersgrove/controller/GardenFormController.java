@@ -7,7 +7,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,16 +65,26 @@ public class GardenFormController {
      */
     @PostMapping("/create-new-garden")
     public String submitNewGardenForm(@RequestParam(name="gardenName") String gardenName,
+                              @RequestParam(name = "streetAddress") String streetAddress,
+                              @RequestParam(name = "suburb") String suburb,
+                              @RequestParam(name = "city") String city,
+                              @RequestParam(name = "country") String country,
+                              @RequestParam(name = "postcode") String postcode,
                               @RequestParam(name = "gardenLocation") String gardenLocation,
                               @RequestParam(name = "gardenSize") String gardenSize,
                               Model model, RedirectAttributes redirectAttributes) {
         logger.info("POST /landingPage");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
+        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
+        ValidationResult postcodeResult = InputValidator.numberCommaSingleTextFieldWithLengthLimit(postcode,10);
         ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation);
         ValidationResult gardenSizeResult = InputValidator.numberCommaSingleTextField(gardenSize);
 
-        gardenFormErrorText(model,gardenNameResult,gardenLocationResult,gardenSizeResult);
+        gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenLocationResult,gardenSizeResult);
 
         if(gardenSize.isBlank())
         {
@@ -86,7 +95,8 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        if(!gardenNameResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
+        if(!gardenNameResult.valid() || !cityResult.valid() || !countryResult.valid() || !gardenLocationResult.valid()
+                || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
         }
 
@@ -153,17 +163,27 @@ public class GardenFormController {
      */
     @PostMapping("/my-gardens/{gardenId}={gardenName}/edit")
     public String submitEditedGardenForm( @RequestParam(name="gardenName") String gardenName,
+                                       @RequestParam(name = "streetAddress") String streetAddress,
+                                       @RequestParam(name = "suburb") String suburb,
+                                       @RequestParam(name = "city") String city,
+                                       @RequestParam(name = "country") String country,
+                                       @RequestParam(name = "postcode") String postcode,
                                        @RequestParam(name = "gardenLocation") String gardenLocation,
                                        @RequestParam(name = "gardenSize") String gardenSize,
-                                          @PathVariable("gardenId") String gardenIdString,
+                                       @PathVariable("gardenId") String gardenIdString,
                                        Model model) {
         logger.info("POST / edited garden");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
+        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
+        ValidationResult postcodeResult = InputValidator.numberCommaSingleTextFieldWithLengthLimit(postcode,10);
         ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation);
         ValidationResult gardenSizeResult = InputValidator.numberCommaSingleTextField(gardenSize);
 
-        gardenFormErrorText(model,gardenNameResult,gardenLocationResult,gardenSizeResult);
+        gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenLocationResult,gardenSizeResult);
 
         if(gardenSize.isBlank())
         {
@@ -195,8 +215,10 @@ public class GardenFormController {
     /**
      * takes as an input the result of validating the garden name, location and size parameters and prints the apropriate
      */
-    private void gardenFormErrorText(Model model, ValidationResult gardenNameResult,
-                                     ValidationResult gardenLocationResult, ValidationResult gardenSizeResult)
+    private void gardenFormErrorText(Model model, ValidationResult gardenNameResult, ValidationResult streetAddressResult,
+                                     ValidationResult suburbResult, ValidationResult cityResult,
+                                     ValidationResult countryResult, ValidationResult postcodeResult, ValidationResult gardenLocationResult,
+                                     ValidationResult gardenSizeResult)
     {
 
         // notifies the user that the garden Name is invalid (if applicable)
@@ -209,6 +231,77 @@ public class GardenFormController {
         else
         {
             model.addAttribute("GNErrorClass","noErrorBorder");
+        }
+
+        // notifies the user that the street address is invalid (if applicable)
+        if(!streetAddressResult.valid())
+        {
+            model.addAttribute("AddressErrorText","Address " + streetAddressResult);
+            model.addAttribute("AddressErrorClass","errorBorder");
+            logger.info("Garden Name failed validation");
+        }
+        else
+        {
+            model.addAttribute("AddressErrorClass","noErrorBorder");
+        }
+
+        // notifies the user that the suburb is invalid (if applicable)
+        if(!suburbResult.valid())
+        {
+            model.addAttribute("SuburbErrorText","Suburb " + suburbResult);
+            model.addAttribute("SuburbErrorClass","errorBorder");
+            logger.info("Garden Name failed validation");
+        }
+        else
+        {
+            model.addAttribute("SuburbErrorClass","noErrorBorder");
+        }
+
+        // notifies the user that the city input is invalid (if applicable)
+        if(!cityResult.valid())
+        {
+            if (cityResult == ValidationResult.BLANK) {
+                model.addAttribute("CityErrorText","City and Country are required");
+            }
+            if (cityResult == ValidationResult.NON_ALPHA_PLUS || cityResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                model.addAttribute("CityErrorText","City " + cityResult);
+            }
+            model.addAttribute("CityErrorClass","errorBorder");
+            logger.info("Garden City failed validation");
+        }
+        else
+        {
+            model.addAttribute("CountryErrorClass","noErrorBorder");
+        }
+
+        // notifies the user that the country input is invalid (if applicable)
+        if(!countryResult.valid())
+        {
+            if (countryResult == ValidationResult.BLANK) {
+                model.addAttribute("CountryErrorText","City and Country are required");
+            }
+            if (countryResult == ValidationResult.NON_ALPHA_PLUS || countryResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                model.addAttribute("CountryErrorText","Country " + countryResult);
+            }
+            model.addAttribute("CountryErrorClass","errorBorder");
+            logger.info("Garden Country failed validation");
+        }
+        else
+        {
+            model.addAttribute("CountryErrorClass","noErrorBorder");
+        }
+
+        // notifies the user that the postcode input is invalid (if applicable)
+        if(!postcodeResult.valid())
+        {
+
+            model.addAttribute("PostCodeErrorText","Postcode " + postcodeResult);
+            model.addAttribute("PostCodeErrorClass","errorBorder");
+            logger.info("Garden Postcode failed validation");
+        }
+        else
+        {
+            model.addAttribute("CountryErrorClass","noErrorBorder");
         }
 
         // notifies the user that the garden Location is invalid (if applicable)
