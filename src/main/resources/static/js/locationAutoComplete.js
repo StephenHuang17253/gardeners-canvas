@@ -2,18 +2,34 @@
 let autocomplete;
 
 function initAutocomplete() {
-    // Create the autocomplete object, restricting the search to geographical
-    // location types.
+    // Create the autocomplete object
     autocomplete = new google.maps.places.Autocomplete(
         /** @type {!HTMLInputElement} */(document.getElementById('streetAddress')),
         {
             types: ['geocode', 'establishment'],
         });
 
-    // When the user selects an address from the dropdown, populate the address
-    // fields in the form.
+    autocomplete.setFields(['address_components', 'geometry']);
+    // When the user selects an address from the dropdown, populate ALL fields in the form.
     autocomplete.addListener('place_changed', fillInAddress);
+
+    // The code below is for when the user manually fills out the fields instead of using autocomplete
+    // or for when they modify the autcompleted values
+    const streetAddressField = document.getElementById('streetAddress');
+    const suburbField = document.getElementById('suburb');
+    const cityField = document.getElementById('city');
+    const postcodeField = document.getElementById('postcode');
+    const countryField = document.getElementById('country');
+
+    streetAddressField.addEventListener('input', updateGardenLocation);
+    suburbField.addEventListener('input', updateGardenLocation);
+    cityField.addEventListener('input', updateGardenLocation);
+    postcodeField.addEventListener('input', updateGardenLocation);
+    countryField.addEventListener('input', updateGardenLocation);
+
 }
+
+
 function fillInAddress() {
     const place = autocomplete.getPlace();
     let addr = "";
@@ -52,7 +68,7 @@ function fillInAddress() {
         }
     }
 
-    addr = `${streetNumber} ${route}, ${suburb}, ${city} ${postcode}, ${country}`;
+    // addr = `${streetNumber} ${route}, ${suburb}, ${city} ${postcode}, ${country}`;
 
     document.getElementById('streetAddress').value = streetNumber + ' ' + route;
     document.getElementById('suburb').value = suburb;
@@ -60,8 +76,17 @@ function fillInAddress() {
     document.getElementById('postcode').value = postcode;
     document.getElementById('country').value = country;
 
-    document.getElementById('gardenLocation').value = addr;
+    updateGardenLocation();
 }
 
+function updateGardenLocation() {
+    const streetAddressField = document.getElementById('streetAddress').value;
+    const suburbField = document.getElementById('suburb').value;
+    const cityField = document.getElementById('city').value;
+    const postcodeField = document.getElementById('postcode').value;
+    const countryField = document.getElementById('country').value;
+    const fieldValues = `${streetAddressField}, ${suburbField}, ${cityField}, ${postcodeField} ${countryField}`;
+    document.getElementById('gardenLocation').value = fieldValues;
+}
 
 window.initAutocomplete = initAutocomplete;
