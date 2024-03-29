@@ -60,7 +60,6 @@ input[type=text] {
 .main-container {
     display: flex;
     align-items: center;
-    height: 80vh;
     flex-direction: column;
     justify-content: center;
     font-family: "Roboto", sans-serif;
