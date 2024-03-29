@@ -9,6 +9,9 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Verdana", sans-serif;
+    display: inline-block;
+    margin-top: -4px;
+
 }
 
 .submit-button:hover{
@@ -30,6 +33,8 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Verdana", sans-serif;
+    display: inline-block;
+    margin-top: -4px;
 }
 
 .form-description textarea
@@ -40,4 +45,32 @@
     overflow: auto; /* Enable scrollbars when content exceeds the size */
     border: 1px solid #ccc; /* Add a border for visual appeal */
     padding: 5px; /* Add some padding for better readability */
+}
+
+input[type=text] {
+    width: 25vw;
+    padding: 9px 15px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.main-container {
+    display: flex;
+    align-items: center;
+    height: 80vh;
+    flex-direction: column;
+    justify-content: center;
+    font-family: "Roboto", sans-serif;
+}
+
+h1 {
+    text-align: center;
+    padding-bottom: 1.5vh;
+}
+
+label {
+    text-align: left;
 }
