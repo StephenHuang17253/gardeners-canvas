@@ -4,13 +4,23 @@
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
     <title>Validate Gardener's Grove Account</title>
+    <link th:href="@{/css/validateProfile.css}" rel="stylesheet">
+    <script th:src="@{/js/validateProfile.js}"></script>
 </head>
 
 <body>
     <h1>Validate Account</h1>
-    <form th:action="@{/email}" method="post">
-
-        <button type="submit">Send Email</button>
-    </form>
-    <p th:if="${message}" th:text="${message}"></p>
+    <form onsubmit="onSubmit(event)" class="content-area">
+        <fieldset class='number-code'>
+          <div>
+            <input name='code' class='code-input' required/>
+            <input name='code' class='code-input' required/>
+            <input name='code' class='code-input' required/>
+            <input name='code' class='code-input' required/>
+            <input name='code' class='code-input' required/>
+            <input name='code' class='code-input' required/>
+          </div>
+        </fieldset>
+        <button type="submit" formnovalidate>Submit</button>
+      </form>
 </body>
