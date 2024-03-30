@@ -40,6 +40,9 @@ public class User {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfBirth;
 
+    @Column(length = 64)
+    private String profilePictureFilename;
+
     @Column
     private boolean verified;
 
@@ -86,6 +89,11 @@ public class User {
         this.password = password;
     }
 
+
+    public void setProfilePictureFilename(String profilePictureFilename) {
+        this.profilePictureFilename = profilePictureFilename;
+    }
+
     public void setVerified(boolean verified) {
         this.verified = verified;
     }
@@ -110,6 +118,10 @@ public class User {
         return dateOfBirth;
     }
 
+    public String getProfilePictureFilename() {
+        return profilePictureFilename;
+    }
+
     public String getEncodedPassword() {
         return password;
     }
@@ -128,6 +140,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
+                ", profilePictureFilename='" + profilePictureFilename + '\''+
                 ", verified='" + verified + '\'' +
                 '}';
     }
