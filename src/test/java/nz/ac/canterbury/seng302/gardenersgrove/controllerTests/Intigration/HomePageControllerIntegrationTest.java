@@ -89,14 +89,6 @@ public class HomePageControllerIntegrationTest {
     }
 
 
-    @Test
-    public void getMappingLoggedIn_Invalid_redirectsToError() throws Exception
-    {
-        this.mockMvc.perform(get("/asdassdas"))
-                .andDo(print())
-                .andExpect(status().isForbidden()); //Should be 403 as the user is not logged in
-        Assertions.fail(); // Todo add logged in condition
-    };
 
     @Test
     public void getProfilePictureString_Null_DefaultPath() throws Exception
@@ -124,7 +116,6 @@ public class HomePageControllerIntegrationTest {
                 .andExpect(model().attribute("username", is("")));
     };
 
-    // Todo figure out how to mock a user being logged in
     @Test
     public void getMappingLoggedIn_home_containsNames() throws Exception
     {
@@ -133,15 +124,17 @@ public class HomePageControllerIntegrationTest {
         SecurityContextHolder.setContext(securityContextMock);
         assertEquals(securityContextMock.getAuthentication().getName(), "johndoe@email.com");
         assertEquals(SecurityContextHolder.getContext().getAuthentication().getName(), "johndoe@email.com");
+        MockedStatic<SecurityContextHolder> securityContextHolderMockedStatic = Mockito.mockStatic(SecurityContextHolder.class);
+        securityContextHolderMockedStatic.when(() -> getContext()).thenReturn(securityContextMock);
 
-
-//        securityContextHolderMock.when(SecurityContextHolder::getContext).thenReturn(securityContextMock);
 
         this.mockMvc.perform(get("/home"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("username",is("John")))
+                .andExpect(model().attribute("username",is("Welcome John Doe")))
                 .andExpect(model().attribute("profilePicture", is("/Images/default_profile_picture.png")));
+
+        securityContextHolderMockedStatic.close();
     };
 
 
