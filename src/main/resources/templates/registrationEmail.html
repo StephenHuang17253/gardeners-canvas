@@ -3,7 +3,8 @@
 
 <head>
     <title>Gardener's Grove</title>
-    <link th:href="@{${#httpServletRequest.requestURL.root}/css/registrationEmail.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{${#httpServletRequest.requestURL.root}/css/registrationEmail.css}" rel="stylesheet"
+        type="text/css">
 </head>
 
 <body>
@@ -11,6 +12,7 @@
     <p>Thank you for registering with Gardener's Grove</p>
     <p th:text="|Here is your signup code: ${tokenString}|"></p>
     <p th:text="|You have ${lifetime} minutes to complete your registration|"></p>
+    <p>If this was not you, you can ignore this message and the account will be deleted after 10 minutes</p>
 </body>
 
 </html>

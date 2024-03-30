@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
+    <title>Validate Gardener's Grove Account</title>
+</head>
+
+<body>
+    <h1>Validate Account</h1>
+    <form th:action="@{/email}" method="post">
+
+        <button type="submit">Send Email</button>
+    </form>
+    <p th:if="${message}" th:text="${message}"></p>
+</body>
