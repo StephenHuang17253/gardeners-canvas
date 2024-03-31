@@ -36,7 +36,6 @@ public class HomePageControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-//    private static MockedStatic<SecurityContextHolder> securityContextHolderMock;
     private static SecurityContext securityContextMock;
     private static Authentication authenticationMock;
 
@@ -48,14 +47,7 @@ public class HomePageControllerIntegrationTest {
 
 
         SecurityContextHolder.setContext(securityContextMock);
-
-
     }
-//
-//    @AfterEach
-//    public void tearDown() {
-//        securityContextHolderMock.close();
-//    }
 
     @Test
     public void controllerLoads()
