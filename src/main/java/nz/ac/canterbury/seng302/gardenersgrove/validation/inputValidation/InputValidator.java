@@ -141,7 +141,7 @@ public class InputValidator {
      * Checks input against a criteria:
      * This function only allows non blank strings containing only alphanumeric
      * characters and select punctuation
-     * 
+     *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -149,7 +149,24 @@ public class InputValidator {
         return new InputValidator(text)
                 .blankHelper()
                 .alphaPlusHelper()
-                .lengthHelper(200)
+                .lengthHelper(255)
+                .getResult();
+    }
+
+    /**
+     * Checks input against a criteria:
+     * This function only allows non blank strings containing only alphanumeric
+     * characters and select punctuation
+     *
+     * @param text text to validate
+     * @param length max number of characters in text
+     * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
+     */
+    public static ValidationResult compulsoryAlphaPlusTextField(String text, int length) {
+        return new InputValidator(text)
+                .blankHelper()
+                .alphaPlusHelper()
+                .lengthHelper(length)
                 .getResult();
     }
 

@@ -66,8 +66,8 @@ public class GardenFormController {
                               Model model, RedirectAttributes redirectAttributes) {
         logger.info("POST /landingPage");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
-        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
-        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation);
+        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
+        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 64);
         ValidationResult gardenSizeResult = InputValidator.numberCommaSingleTextField(gardenSize);
 
         gardenFormErrorText(model,gardenNameResult,gardenLocationResult,gardenSizeResult);
@@ -153,8 +153,8 @@ public class GardenFormController {
                                        Model model) {
         logger.info("POST / edited garden");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
-        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
-        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation);
+        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
+        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 64);
         ValidationResult gardenSizeResult = InputValidator.numberCommaSingleTextField(gardenSize);
 
         gardenFormErrorText(model,gardenNameResult,gardenLocationResult,gardenSizeResult);
