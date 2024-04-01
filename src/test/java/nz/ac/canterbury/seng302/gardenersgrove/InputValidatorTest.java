@@ -275,6 +275,18 @@ public class InputValidatorTest {
     }
 
     @Test
+    public void InputValidator_compAlphaTestWithLengthLimit_return_OK()
+    {
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("12345", 5));
+    }
+
+    @Test
+    public void InputValidator_compAlphaTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
+    {
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryAlphaPlusTextField("123456789", 2));
+    }
+
+    @Test
     public void InputValidator_optTextWithLengthLimit_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("123", 4));
