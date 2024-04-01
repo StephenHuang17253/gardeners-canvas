@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,22 +51,21 @@ public class ProfileController {
 
     Logger logger = LoggerFactory.getLogger(ProfileController.class);
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
+    private final SecurityService securityService;
     private final FileService fileService;
 
     /**
      * Constructor for the ProfileController with {@link Autowired} to connect this
      * controller with services
      * 
-     * @param userService
-     * @param authenticationManager
-     * @param fileService
+     * @param userService to get current user
+     * @param securityService to login user again if profile changes
+     * @param fileService to get user profile image
      */
     @Autowired
-    public ProfileController(UserService userService,
-            AuthenticationManager authenticationManager, FileService fileService) {
+    public ProfileController(UserService userService, SecurityService securityService, FileService fileService) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
+        this.securityService = securityService;
         this.fileService = fileService;
     }
 
@@ -112,30 +112,6 @@ public class ProfileController {
 
     }
 
-    /**
-     * Set the security context for the user
-     * This method is shared functionality between the login and registration pages
-     * possibly should be moved to a different class? As not correct to be here
-     * 
-     * @param email    email of the user
-     * @param password password of the user
-     * @param session  http session to set the cookies with the context key
-     */
-    public void setSecurityContext(String email, String password, HttpSession session) {
-        User user = userService.getUserByEmail(email);
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getEmailAddress(),
-                user.getEncodedPassword());
-
-        Authentication authentication = authenticationManager.authenticate(token);
-        // Check if the authentication is actually authenticated (in this example any
-        // username/password is accepted so this should never be false)
-        if (authentication.isAuthenticated()) {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext());
-        }
-    }
 
     /**
      * Update the user's profile picture
@@ -311,7 +287,7 @@ public class ProfileController {
         }
         validationMap.put("emailAddress", emailAddressValidation);
         ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (dateOfBirth.equals("")) {
+        if (dateOfBirth.isEmpty()) {
             dateOfBirthValidation = ValidationResult.OK;
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
@@ -363,9 +339,9 @@ public class ProfileController {
             newDateOfBirth = LocalDate.parse(dateOfBirth, formatter);
         }
 
-        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, newDateOfBirth);
+        User updatedUser = userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, newDateOfBirth);
 
-        setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
+        securityService.setSecurityContext(updatedUser.getEmailAddress(), updatedUser.getEncodedPassword(), request.getSession());
 
         return "redirect:/profile";
     }

@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -10,11 +10,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +30,8 @@ import java.util.Locale;
 public class RegistrationFormController {
     Logger logger = LoggerFactory.getLogger(RegistrationFormController.class);
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
+
+    private final SecurityService securityService;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
@@ -43,38 +39,14 @@ public class RegistrationFormController {
      * controller with other services
      * 
      * @param userService to use for checking persistence to validate email and password
-     * @param authenticationManager to login user after registration
+     * @param securityService to login user after registration
      */
     @Autowired
-    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager) {
+    public RegistrationFormController(UserService userService, SecurityService securityService) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
+        this.securityService = securityService;
     }
 
-    /**
-     * Set the security context for the user
-     * This method is shared functionality between the login and registration pages
-     * possibly should be moved to a different class? As not correct to be here
-     * 
-     * @param email of user who is registering
-     * @param password of user who is registering
-     * @param session http session to set the cookies with the context key
-     */
-    public void setSecurityContext(String email, String password, HttpSession session) {
-        User user = userService.getUserByEmailAndPassword(email, password);
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getEmailAddress(),
-                password);
-
-        Authentication authentication = authenticationManager.authenticate(token);
-        // Check if the authentication is actually authenticated (in this example any
-        // username/password is accepted so this should never be false)
-        if (authentication.isAuthenticated()) {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext());
-        }
-    }
 
     /**
      * Redirects GET url '/register' to the registration form
@@ -167,8 +139,8 @@ public class RegistrationFormController {
             User user = new User(firstName, lastName, emailAddress, date);
             userService.addUser(user, password);
 
-            setSecurityContext(user.getEmailAddress(), password, request.getSession());
-            return "redirect:/profile"; // Placeholder for Profile Page
+            securityService.setSecurityContext(user.getEmailAddress(), password, request.getSession());
+            return "redirect:/profile";
         }
     }
 
