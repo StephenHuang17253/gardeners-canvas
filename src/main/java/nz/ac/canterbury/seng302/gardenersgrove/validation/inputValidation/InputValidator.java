@@ -194,7 +194,7 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(Float.MAX_VALUE, 1)
+                .areaHelper(Float.MAX_VALUE, 0.01F)
                 .getResult();
     }
 

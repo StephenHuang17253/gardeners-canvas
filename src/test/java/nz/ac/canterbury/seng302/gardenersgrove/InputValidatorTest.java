@@ -342,7 +342,7 @@ public class InputValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "0.0000001", "0.1", "0" })
+    @ValueSource(strings = { "0.0000001", "0.009", "0" })
     public void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input)
     {
         assertEquals(ValidationResult.AREA_TOO_SMALL,InputValidator.validateGardenAreaInput(input));
