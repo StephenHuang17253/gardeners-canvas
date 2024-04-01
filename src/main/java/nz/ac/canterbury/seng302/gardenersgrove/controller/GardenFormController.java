@@ -122,7 +122,7 @@ public class GardenFormController {
             Garden garden = optionalGarden.get();
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
-            Float gardenSize = garden.getGardenSize();
+            float gardenSize = garden.getGardenSize();
             if (Float.isNaN(gardenSize)) {
                 model.addAttribute("gardenSize", "");
             } else {
