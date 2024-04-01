@@ -191,9 +191,10 @@ public class InputValidator {
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult numberCommaSingleTextField(String text) {
+    public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
+                .areaHelper(Float.MAX_VALUE, 1)
                 .getResult();
     }
 
@@ -551,6 +552,41 @@ public class InputValidator {
             this.validationResult = ValidationResult.NON_NUMERIC_COMMA;
             this.passState = false;
         }
+        return this;
+    }
+
+    /**
+     * Checks if a garden area is a valid number
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator areaHelper(float maxLength, float minLength) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        float floatGardenSize;
+        if(testedValue.isBlank()){
+            this.validationResult = ValidationResult.OK;
+            return this;
+        } else{
+            floatGardenSize = Float.parseFloat(testedValue.replace(",","."));
+        }
+
+        if (floatGardenSize < minLength) {
+            this.validationResult = ValidationResult.AREA_TOO_SMALL;
+            this.passState = false;
+            return this;
+        }
+        if (floatGardenSize > maxLength) {
+            this.validationResult = ValidationResult.AREA_TOO_LARGE;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
         return this;
     }
 
