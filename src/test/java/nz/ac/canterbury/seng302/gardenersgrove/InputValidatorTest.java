@@ -334,6 +334,26 @@ public class InputValidatorTest {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("1 ! 0"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1" })
+    public void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input)
+    {
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "0.0000001", "0.1", "0" })
+    public void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input)
+    {
+        assertEquals(ValidationResult.AREA_TOO_SMALL,InputValidator.validateGardenAreaInput(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "10000000.001", "100000112333435239", "infinity" })
+    public void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE(String input)
+    {
+        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(input));
+    }
 
     /**
      * Test for valid names
