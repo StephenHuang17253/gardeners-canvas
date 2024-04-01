@@ -560,9 +560,11 @@ public class InputValidator {
      * updates local variables with results
      * ignored if string failed any previous validation
      *
+     * @param maxArea max area of garden
+     * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(float maxLength, float minLength) {
+    private InputValidator areaHelper(float maxArea, float minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
@@ -576,12 +578,12 @@ public class InputValidator {
             floatGardenSize = Float.parseFloat(testedValue.replace(",","."));
         }
 
-        if (floatGardenSize < minLength) {
+        if (floatGardenSize < minArea) {
             this.validationResult = ValidationResult.AREA_TOO_SMALL;
             this.passState = false;
             return this;
         }
-        if (floatGardenSize > maxLength) {
+        if (floatGardenSize > maxArea) {
             this.validationResult = ValidationResult.AREA_TOO_LARGE;
             this.passState = false;
             return this;
