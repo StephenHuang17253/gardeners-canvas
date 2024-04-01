@@ -4,15 +4,14 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,8 +37,8 @@ public class ProfileControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
-    private static UserService userServiceMock;
+    @MockBean
+    private UserService userServiceMock;
 
 
     @InjectMocks
@@ -58,10 +57,8 @@ public class ProfileControllerTest {
             return mockRequest;
         };
     }
-    @BeforeAll
-    public static void setup() {
-        userServiceMock = Mockito.mock(UserService.class);
-
+    @BeforeEach
+    public void setup() {
         //Setup an mock user
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate date = LocalDate.parse("12/12/2001", formatter);
@@ -93,15 +90,14 @@ public class ProfileControllerTest {
     {
         mockMvc.perform(get("/profile").with(userAuthenticated()))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName","Sally"))
-                .andExpect(model().attribute("lastName","Doe"))
+                .andExpect(model().attribute("userName","Sally Doe"))
                 .andExpect(model().attribute("dateOfBirth","12/12/2001"))
                 .andExpect(model().attribute("emailAddress","sally@email.com"));
     }
 
     @AfterAll
     public static void cleanup() {
-    // Clear the context after each test
+    // Clear the context tests
         SecurityContextHolder.clearContext();
     }
 }
