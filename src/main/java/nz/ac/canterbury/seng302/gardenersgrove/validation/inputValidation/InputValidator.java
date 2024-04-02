@@ -307,7 +307,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[\\p{L}\\p{M}\\p{N}._%+-]{1,64}@[a-zA-Z0-9.-]{1,255}\\.[a-zA-Z]{2,63}$")) {
+        if (!testedValue.matches("^[\\p{L}\\p{M}\\p{N}]{1,64}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,255}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$")) {
             this.validationResult = ValidationResult.INVALID_EMAIL;
             this.passState = false;
             return this;
