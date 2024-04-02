@@ -371,9 +371,9 @@ public class ProfileController {
     }
 
     @GetMapping("profile/editPassword")
-    public String getLanding()
+    public String gotoEditpage()
     {
-        logger.info("Get /landing");
+        logger.info("Get goto profile/editPassword");
         return "editPasswordForm";
     }
 
