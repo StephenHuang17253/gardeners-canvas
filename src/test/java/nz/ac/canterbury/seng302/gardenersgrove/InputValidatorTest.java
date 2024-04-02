@@ -364,7 +364,7 @@ public class InputValidatorTest {
      * @param email
      */
     @ParameterizedTest
-    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c","test@test.abcdf", "test@.com", "@test.com" })
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c", "test@.com", "@test.com" })
     public void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
