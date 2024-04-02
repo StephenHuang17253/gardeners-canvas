@@ -370,4 +370,11 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
+    @GetMapping("profile/editPassword")
+    public String getLanding()
+    {
+        logger.info("Get /landing");
+        return "editPasswordForm";
+    }
+
 }
