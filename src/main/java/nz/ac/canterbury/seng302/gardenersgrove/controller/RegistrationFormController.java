@@ -140,16 +140,18 @@ public class RegistrationFormController {
             model.addAttribute("passwordMatchingError", "Passwords do not match");
             valid = false;
         }
-        String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        logger.info(dateString);
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
+            dateOfBirthValidation = ValidationResult.OK;
+        } else{
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
+
+        }
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateString);
-        if (Objects.equals(dateOfBirth, "")) {
-            dateOfBirthValidation = ValidationResult.OK;
-        }
 
         valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
                 emailAddressValidation, passwordValidation,dateOfBirthValidation, valid, model);
