@@ -1,7 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,6 @@ public class InputValidatorTest {
         userServiceMock = Mockito.mock(UserService.class);
         InputValidator testValidator = new InputValidator();
         testValidator.UserService(userServiceMock);
-        Mockito.when(userServiceMock.emailInUse(Mockito.any())).thenReturn(false);
     }
 
     @BeforeEach
