@@ -140,4 +140,18 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Finds user by the id input then  encodes the NewPassword input using passwordEncoder
+     * then sets it as the users password
+     *
+     * @param id id of user to update
+     * @param NewPassword New password to set for user's account
+     */
+    public void updatePassword(long id, String NewPassword) {
+        User user = getUserById(id);
+        String encodedNewPassword = passwordEncoder.encode(NewPassword);
+        user.setPassword(encodedNewPassword);
+        userRepository.save(user);
+    }
+
 }

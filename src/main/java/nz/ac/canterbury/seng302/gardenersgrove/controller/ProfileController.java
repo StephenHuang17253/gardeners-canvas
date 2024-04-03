@@ -373,7 +373,7 @@ public class ProfileController {
     @GetMapping("profile/editPassword")
     public String gotoEditpage()
     {
-        logger.info("Goto profile/editPassword");
+        logger.info("GET profile/editPassword");
         return "editPasswordForm";
     }
 
@@ -394,10 +394,15 @@ public class ProfileController {
                               @RequestParam(name = "newPassword") String newPassword,
                               @RequestParam(name = "retypePassword") String retypePassword,
                               Model model) {
-        logger.info("GET /profile/edit");
-        logger.info(currentPassword);
-        logger.info(newPassword);
-        logger.info(retypePassword);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = authentication.getName();
+        User currentUser = userService.getUserByEmail(currentEmail);
+
+        // Put in Password Vailidation/logic here:
+
+        //Update user's password
+        userService.updatePassword(currentUser.getId(), newPassword);
         return "editPasswordForm";
     }
 
