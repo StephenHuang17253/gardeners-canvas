@@ -373,7 +373,31 @@ public class ProfileController {
     @GetMapping("profile/editPassword")
     public String gotoEditpage()
     {
-        logger.info("Get goto profile/editPassword");
+        logger.info("Goto profile/editPassword");
+        return "editPasswordForm";
+    }
+
+    /**
+     * Redirects POST url '/profile/editPassword' to the edit form if invalid input
+     * or to user's profile page '/profile' if edit completed
+     *
+     * @param currentPassword      - user's current password
+     * @param newPassword       - new password user would like to change to
+     * @param retypePassword     - retyped password to see if matches new password
+     * @param model          - (map-like) representation of user's input (above
+     *                       parameters)
+     * @return redirect to editpassword form or to profile page
+     */
+    @PostMapping("/profile/editPassword")
+    public String editProfile(HttpServletRequest request,
+                              @RequestParam(name = "currentPassword") String currentPassword,
+                              @RequestParam(name = "newPassword") String newPassword,
+                              @RequestParam(name = "retypePassword") String retypePassword,
+                              Model model) {
+        logger.info("GET /profile/edit");
+        logger.info(currentPassword);
+        logger.info(newPassword);
+        logger.info(retypePassword);
         return "editPasswordForm";
     }
 
