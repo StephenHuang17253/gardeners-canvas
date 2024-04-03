@@ -370,12 +370,23 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
+    /**
+     * This function is called when a GET request is made to /profile/editPassword and processes authentication
+     *
+     * @param model          - (map-like) representation of user's input
+     * @return redirect to editPasswordForm form
+     */
     @GetMapping("profile/editPassword")
-    public String gotoEditpage()
+    public String editPassword(Model model)
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email);
+
         logger.info("GET profile/editPassword");
         return "editPasswordForm";
     }
+
 
     /**
      * Redirects POST url '/profile/editPassword' to the edit form if invalid input
@@ -399,11 +410,33 @@ public class ProfileController {
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
 
-        // Put in Password Vailidation/logic here:
+        boolean valid = true;
+
+        if (!userService.checkPassword(currentUser.getId(), currentPassword)) {
+            model.addAttribute("currentPasswordError", "Your old password is incorrect");
+            valid = false;
+        }
+
+
+        if (!newPassword.equals(retypePassword)) {
+            model.addAttribute("passwordMatchingError", "The new passwords do not match");
+            valid = false;
+        }
+
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword);
+
+        if (!passwordValidation.valid()) {
+            model.addAttribute("passwordError", passwordValidation);
+            valid = false;
+        }
+
+        if (!valid) {
+            return "editPasswordForm";
+        }
 
         //Update user's password
         userService.updatePassword(currentUser.getId(), newPassword);
-        return "editPasswordForm";
+        return "redirect:/profile";
     }
 
 }

@@ -141,7 +141,7 @@ public class UserService {
     }
 
     /**
-     * Finds user by the id input then  encodes the NewPassword input using passwordEncoder
+     * Finds user by the id input then encodes the NewPassword input using passwordEncoder
      * then sets it as the users password
      *
      * @param id id of user to update
@@ -154,4 +154,18 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Returns true if input password matches user's password in database
+     *
+     * @param id id of user to match
+     * @param passwordToCheck Password to check if same in database
+     */
+    public boolean checkPassword(long id, String passwordToCheck) {
+        User user = getUserById(id);
+        String currentPassword = user.getEncodedPassword();
+        if (!passwordEncoder.matches(passwordToCheck, currentPassword)) {
+            return false;
+        }
+        return true;
+    }
 }
