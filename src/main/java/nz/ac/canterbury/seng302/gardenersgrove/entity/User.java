@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity class reflecting a registered user
@@ -16,6 +18,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, length = 64)
@@ -35,6 +38,10 @@ public class User {
 
     @Column(length = 64)
     private String profilePictureFilename;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private List<Garden> gardens =  new ArrayList<>();
 
     /**
      * JPA required no-args constructor
@@ -110,17 +117,21 @@ public class User {
         return profilePictureFilename;
     }
 
+    public List<Garden> getGardens() { return gardens; }
+
     /**
      * Returns a string representation of the user
      */
     @Override
     public String toString() {
         return "User{" +
+                "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
                 ", profilePictureFilename='" + profilePictureFilename + '\''+
+                ", gardens='" + gardens + '\''+
                 '}';
     }
 }

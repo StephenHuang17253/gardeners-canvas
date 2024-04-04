@@ -26,7 +26,7 @@ public class LandingPageController {
 
     /**
      * sends users that get the /landing page to the landingPage.html
-     * @return the html landing pahe
+     * @return the html landing page
      */
     @GetMapping("/landing")
     public String getLanding(Model model)

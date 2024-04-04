@@ -1,13 +1,19 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +33,14 @@ public class GardenFormController {
     Logger logger = LoggerFactory.getLogger(GardenFormController.class);
 
     private final GardenService gardenService;
+    private final UserService userService;
+    private final SecurityService securityService;
 
     @Autowired
-    public GardenFormController(GardenService gardenService) {
+    public GardenFormController(GardenService gardenService, UserService userService, SecurityService securityService) {
         this.gardenService = gardenService;
+        this.userService = userService;
+        this.securityService = securityService;
     }
     /**
      * Maps the createNewGardenForm html page to /create-new-garden url
@@ -91,7 +101,10 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        Garden garden = new Garden(gardenName, gardenLocation,floatGardenSize);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User owner = userService.getUserByEmail(authentication.getName());
+        Garden garden = new Garden(gardenName, gardenLocation,floatGardenSize,owner);
         gardenService.addGarden(garden);
 
         logger.info("Created Garden Page");
@@ -106,20 +119,25 @@ public class GardenFormController {
      * Maps the editGardenForm html page to /my-gardens/{gardenId}={gardenName}/edit url
      * @return thymeleaf editGardenForm
      */
+    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}/edit")
-    public String editGardenDetails(@PathVariable("gardenId") String gardenIdString,
+    public String editGardenDetails(@PathVariable("gardenId") Long gardenId,
                                     @PathVariable String gardenName,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenIdString, gardenName);
+        logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
 
         // Convert gardenIdString to Long
-        long gardenId = Long.parseLong(gardenIdString);
+        //long gardenId = Long.parseLong(gardenIdString);
 
         Optional<Garden> optionalGarden = gardenService.findById(gardenId);
         model.addAttribute("myGardens", gardenService.getGardens());
 
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();
+//            if (!Objects.equals(userHelper.getCurrentUser().getId(), garden.getOwner().getId())) {
+//                logger.info("User is not the owner of the garden. Redirecting to landing page.");
+//                return "redirect:/landing";
+//            }
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             Float gardenSize = garden.getGardenSize();
@@ -178,7 +196,9 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation,floatGardenSize));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User owner = userService.getUserByEmail(authentication.getName());
+        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation,floatGardenSize, owner));
         logger.info("edited garden");
 
         return "redirect:/my-gardens/{gardenId}={gardenName}";

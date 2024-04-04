@@ -14,6 +14,7 @@ import java.util.List;
 public class Garden {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "garden_id")
     private Long gardenId;
     @Column(nullable = false)
     private String gardenName;
@@ -21,10 +22,12 @@ public class Garden {
     private String gardenLocation;
     @Column
     private float gardenSize;
-
-    @OneToMany(mappedBy = "garden", cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "garden_id")
     private List<Plant> plants =  new ArrayList<>();
-
 
     /**
      * JPA required no-args constructor
@@ -36,10 +39,11 @@ public class Garden {
      * @param gardenLocation the location of the garden
      * @param gardenSize the size of the garden
      */
-    public Garden(String gardenName, String gardenLocation, float gardenSize) {
+    public Garden(String gardenName, String gardenLocation, float gardenSize, User owner) {
         this.gardenName = gardenName;
         this.gardenLocation = gardenLocation;
         this.gardenSize = gardenSize;
+        this.owner = owner;
     }
 
     public Long getGardenId() {
@@ -63,6 +67,7 @@ public class Garden {
     public void setGardenSize(float gardenSize) {
         this.gardenSize = gardenSize;
     }
+    public User getOwner() { return owner; }
     public List<Plant> getPlants(){
         return plants;
     }
@@ -73,6 +78,8 @@ public class Garden {
                 ", name='" + gardenName + '\'' +
                 ", location='" + gardenLocation + '\'' +
                 ", size='" + gardenSize + '\'' +
+                ", owner='" + owner + '\'' +
+                ", plants='" + plants + '\'' +
                 '}';
     }
 
