@@ -31,6 +31,8 @@ public class GardenFormController {
 
     Dotenv dotenv = Dotenv.load();
 
+    String locationIqAccessToken = dotenv.get("LOCATION_IQ_ACCESS_TOKEN");
+
     @Autowired
     public GardenFormController(GardenService gardenService) {
         this.gardenService = gardenService;
@@ -48,7 +50,7 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
+        model.addAttribute("locationIqAccessToken", locationIqAccessToken);
         logger.info("GET /create-new-garden");
         return "createNewGardenForm";
     }
@@ -95,6 +97,7 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
+        model.addAttribute("locationIqAccessToken", locationIqAccessToken);
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
@@ -137,7 +140,7 @@ public class GardenFormController {
             Garden garden = optionalGarden.get();
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
-            model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
+            model.addAttribute("locationIqAccessToken", locationIqAccessToken);
             Float gardenSize = garden.getGardenSize();
             if (Float.isNaN(gardenSize)) {
                 model.addAttribute("gardenSize", "");
@@ -194,7 +197,7 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("GOOGLE_MAPS_API_KEY", dotenv.get("GOOGLE_MAPS_API_KEY"));
+        model.addAttribute("locationIqAccessToken", locationIqAccessToken);
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "editGardenForm";

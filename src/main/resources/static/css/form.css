@@ -73,3 +73,38 @@ h1 {
 label {
     text-align: left;
 }
+
+/* For location autocomplete */
+.autocomplete-suggestions {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.autocomplete-suggestion {
+    padding: 8px 12px;
+    border-top: 1px solid #f1f1f1;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.autocomplete-suggestion:hover {
+    background-color: #d5f1f3;
+    border-color: #d5f1f3;
+}
+
+.autocomplete-selected,
+.autocomplete-selected:hover {
+    background-color: #b2e3e7;
+    border-color: #b2e3e7;
+}
