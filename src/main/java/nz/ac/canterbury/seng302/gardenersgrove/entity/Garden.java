@@ -17,6 +17,16 @@ public class Garden {
     private Long gardenId;
     @Column(nullable = false)
     private String gardenName;
+    @Column
+    private String gardenAddress;
+    @Column
+    private String gardenSuburb;
+    @Column
+    private String gardenPostcode;
+    @Column(nullable = false)
+    private String gardenCity;
+    @Column(nullable = false)
+    private String gardenCountry;
     @Column(nullable = false)
     private String gardenLocation;
     @Column
@@ -50,6 +60,36 @@ public class Garden {
     }
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
+    }
+    public String getGardenAddress() {
+        return gardenAddress;
+    }
+    public void setGardenAddress(String gardenAddress) {
+        this.gardenAddress = gardenAddress;
+    }
+    public String getGardenSuburb() {
+        return gardenSuburb;
+    }
+    public void setGardenSuburb(String gardenSuburb) {
+        this.gardenSuburb = gardenSuburb;
+    }
+    public String getGardenPostcode() {
+        return gardenPostcode;
+    }
+    public void setGardenPostcode(String gardenPostcode) {
+        this.gardenPostcode = gardenPostcode;
+    }
+    public String getGardenCity() {
+        return gardenCity;
+    }
+    public void setGardenCity(String gardenCity) {
+        this.gardenCity = gardenCity;
+    }
+    public String getGardenCountry() {
+        return gardenCountry;
+    }
+    public void setGardenCountry() {
+        this.gardenCountry = gardenCountry;
     }
     public String getGardenLocation() {
         return gardenLocation;
