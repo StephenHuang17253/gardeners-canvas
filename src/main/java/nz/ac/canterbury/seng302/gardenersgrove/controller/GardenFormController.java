@@ -94,6 +94,11 @@ public class GardenFormController {
 
         }
         model.addAttribute("gardenName", gardenName);
+        model.addAttribute("streetAddress", streetAddress);
+        model.addAttribute("suburb", suburb);
+        model.addAttribute("city", city);
+        model.addAttribute("country", country);
+        model.addAttribute("postcode", postcode);
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
@@ -194,6 +199,11 @@ public class GardenFormController {
 
         }
         model.addAttribute("gardenName", gardenName);
+        model.addAttribute("streetAddress", streetAddress);
+        model.addAttribute("suburb", suburb);
+        model.addAttribute("city", city);
+        model.addAttribute("country", country);
+        model.addAttribute("postcode", postcode);
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
