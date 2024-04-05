@@ -35,6 +35,14 @@ public class GardenService {
     public List<Garden> getGardens() {
         return gardenRepository.findAll();
     }
+    /**
+     * Retrieves all gardens from persistence where the owner id matches the inputted id
+     * @param id the user's ID
+     * @return a list of all garden objects saved in persistence
+     */
+    public List<Garden> getAllUsersGardens(long id) {
+        return gardenRepository.findByOwnerId(id);
+    }
 
     /**
      * Retrieves a garden by ID
