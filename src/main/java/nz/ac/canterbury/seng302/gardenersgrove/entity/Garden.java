@@ -23,9 +23,9 @@ public class Garden {
     private String gardenSuburb;
     @Column
     private String gardenPostcode;
-    @Column(nullable = false)
+    @Column
     private String gardenCity;
-    @Column(nullable = false)
+    @Column
     private String gardenCountry;
     @Column(nullable = false)
     private String gardenLocation;
@@ -46,11 +46,18 @@ public class Garden {
      * @param gardenLocation the location of the garden
      * @param gardenSize the size of the garden
      */
-    public Garden(String gardenName, String gardenLocation, float gardenSize) {
+    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
+                  String gardenPostcode, String gardenCountry, String gardenLocation, float gardenSize) {
         this.gardenName = gardenName;
+        this.gardenAddress = gardenAddress;
+        this.gardenSuburb = gardenSuburb;
+        this.gardenPostcode = gardenPostcode;
+        this.gardenCity = gardenCity;
+        this.gardenCountry = gardenCountry;
         this.gardenLocation = gardenLocation;
         this.gardenSize = gardenSize;
     }
+
 
     public Long getGardenId() {
         return gardenId;
@@ -88,7 +95,7 @@ public class Garden {
     public String getGardenCountry() {
         return gardenCountry;
     }
-    public void setGardenCountry() {
+    public void setGardenCountry(String gardenCountry) {
         this.gardenCountry = gardenCountry;
     }
     public String getGardenLocation() {

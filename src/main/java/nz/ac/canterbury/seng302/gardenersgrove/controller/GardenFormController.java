@@ -114,7 +114,7 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        Garden garden = new Garden(gardenName, gardenLocation,floatGardenSize);
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,gardenLocation,floatGardenSize);
         gardenService.addGarden(garden);
 
         logger.info("Created Garden Page");
@@ -144,6 +144,11 @@ public class GardenFormController {
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();
             model.addAttribute("gardenName", garden.getGardenName());
+            model.addAttribute("streetAddress", garden.getGardenAddress());
+            model.addAttribute("suburb", garden.getGardenSuburb());
+            model.addAttribute("city", garden.getGardenCity());
+            model.addAttribute("postcode", garden.getGardenPostcode());
+            model.addAttribute("country", garden.getGardenCountry());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("locationIqAccessToken", locationIqAccessToken);
             Float gardenSize = garden.getGardenSize();
@@ -219,7 +224,7 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation,floatGardenSize));
+        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName,streetAddress,suburb,city,postcode,country,gardenLocation,floatGardenSize));
         logger.info("edited garden");
 
         return "redirect:/my-gardens/{gardenId}={gardenName}";
