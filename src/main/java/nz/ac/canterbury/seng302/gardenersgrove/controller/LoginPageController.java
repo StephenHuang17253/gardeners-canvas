@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 /**
  * This is a basic spring boot controller for the login form page, 
@@ -28,10 +30,13 @@ import org.springframework.ui.Model;
  * This controller defines endpoints as functions with specific HTTP mappings
  */
 @Controller
+@SessionAttributes("userGardens")
 public class LoginPageController {
     Logger logger = LoggerFactory.getLogger(LoginPageController.class);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+
+    private final GardenService gardenService;
 
     /**
      * Constructor for the LoginPageController with {@link Autowired} to connect this
@@ -41,9 +46,10 @@ public class LoginPageController {
      * @param authenticationManager
      */
     @Autowired
-    public LoginPageController(UserService userService, AuthenticationManager authenticationManager) {
+    public LoginPageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.gardenService = gardenService;
     }
 
     /**
@@ -97,7 +103,7 @@ public class LoginPageController {
      */
     @PostMapping("/login")
     public String handleLoginRequest(HttpServletRequest request, @RequestParam String email,
-            @RequestParam String password, Model model) {
+            @RequestParam String password, HttpSession session, Model model) {
         logger.info("POST /login");
 
         ValidationResult validEmail = InputValidator.validateEmail(email);
@@ -115,8 +121,9 @@ public class LoginPageController {
         }
 
         setSecurityContext(email, password, request.getSession());
+        session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
 
-        return "redirect:/home";
+        return "redirect:/landing";
 
     }
 

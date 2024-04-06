@@ -2,14 +2,19 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.Optional;
 
@@ -22,23 +27,23 @@ public class MyGardensController {
     Logger logger = LoggerFactory.getLogger(MyGardensController.class);
 
     private final GardenService gardenService;
+    private final UserService userService;
 
     @Autowired
-    public MyGardensController(GardenService gardenService) {
+    public MyGardensController(GardenService gardenService, UserService userService) {
         this.gardenService = gardenService;
+        this.userService = userService;
     }
 
     /**
      * Maps the myGardensPage html file to /my-gardens url
      * @return thymeleaf createNewGardenForm
      */
+//    @RequiresUserGardens
     @GetMapping("/my-gardens")
     public String myGardens(Model model) {
         logger.info("GET /my-gardens");
-        model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("gardenCount", gardenService.getGardens().size());
-
-
+//        model.addAttribute("gardenCount", gardenService.getGardens().size());
 
         return "myGardensPage";
     }
@@ -49,22 +54,21 @@ public class MyGardensController {
      * but with the custom url of /my-gardens/{gardenId}={gardenName}
      * @return thymeleaf createNewGardenForm
      */
+    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}")
-    public String showGardenDetails(@PathVariable("gardenId") String gardenIdString,
+    public String showGardenDetails(@PathVariable Long gardenId,
                                     @PathVariable String gardenName,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenIdString, gardenName);
+        logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
 
-        long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.findById(gardenId);
-        model.addAttribute("myGardens", gardenService.getGardens());
 
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenId",gardenIdString);
+            model.addAttribute("gardenId",gardenId);
             model.addAttribute("plants",garden.getPlants());
             model.addAttribute("totalPlants",garden.getPlants().size());
             return "gardenDetailsPage";

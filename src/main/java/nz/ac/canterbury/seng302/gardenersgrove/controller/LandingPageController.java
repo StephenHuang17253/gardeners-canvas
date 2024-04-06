@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
 
 
 /**
@@ -29,11 +32,9 @@ public class LandingPageController {
      * @return the html landing page
      */
     @GetMapping("/landing")
-    public String getLanding(Model model)
+    public String getLanding()
     {
         logger.info("Get /landing");
-
-        model.addAttribute("myGardens", gardenService.getGardens());
 
         return "landingPage";
     }

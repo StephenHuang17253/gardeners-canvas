@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +41,9 @@ public class PlantFormController {
      * Maps the createNewPlantForm html page to /create-new-plant url
      * @return thymeleaf createNewPlantForm
      */
+    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}/create-new-plant")
-    public String newPlantForm(@PathVariable("gardenId") Long gardenId,
+    public String newPlantForm(@PathVariable Long gardenId,
                                @PathVariable("gardenName") String gardenName,
                                @RequestParam(name = "plantName", required = false) String plantName,
                                @RequestParam(name = "plantCount", required = false) Float plantCount,
@@ -54,7 +56,6 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
-        model.addAttribute("myGardens", gardenService.getGardens());
         logger.info("GET /create-new-plant");
         return "createNewPlantForm"; // Return the view for creating a new plant
     }
@@ -90,7 +91,6 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
-        model.addAttribute("myGardens", gardenService.getGardens());
 
 
         if (!plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
@@ -112,6 +112,7 @@ public class PlantFormController {
      * sends user to 404 page if plant is not found
      * @return thymeleaf createNewPlantForm
      */
+    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
                                 @PathVariable("gardenName") String gardenName,
@@ -129,7 +130,6 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
-        model.addAttribute("myGardens", gardenService.getGardens());
         logger.info("GET /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         return "editPlantForm"; // Return the view for creating a new plant
     }
@@ -167,7 +167,6 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
-        model.addAttribute("myGardens", gardenService.getGardens());
 
         if (!plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
             System.out.println("Passed");

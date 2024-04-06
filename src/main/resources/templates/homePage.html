@@ -6,10 +6,12 @@
 
     <link th:href="@{/css/homePage.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
 
 </head>
 
 <body>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
     <div class="container">
         <h2>Gardener's Grove</h2>
 
