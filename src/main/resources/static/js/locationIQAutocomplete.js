@@ -10,7 +10,7 @@ $(document).ready(function () {
         params: {
             key: locationiqKey,
             format: "json",
-            limit: 5
+            limit: 7
         },
         ajaxSettings: {
             dataType: 'json'
