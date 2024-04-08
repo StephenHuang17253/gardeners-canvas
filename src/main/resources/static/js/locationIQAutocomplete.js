@@ -25,6 +25,7 @@ function updateAutocompleteSuggestions(suggestions) {
         option.addEventListener('click', function() {
             fillAddressFields(suggestion);
             autocompleteDropdown.classList.remove('show');
+            hideNoMatchingLocationMessage();
         });
     });
     autocompleteDropdown.classList.add('show'); // Add the 'show' class to display the suggestions dropdown
@@ -35,6 +36,17 @@ function hideAutocompleteDropdown() {
     autocompleteDropdown.innerHTML = ''; // Clear the dropdown content
     autocompleteDropdown.classList.remove('show'); // Remove the 'show' class to hide the dropdown
 }
+
+function showNoMatchingLocationMessage() {
+    const noMatchingLocationMessage = document.getElementById('noMatchingLocationMessage');
+    noMatchingLocationMessage.classList.add('show');
+}
+
+function hideNoMatchingLocationMessage() {
+    const noMatchingLocationMessage = document.getElementById('noMatchingLocationMessage');
+    noMatchingLocationMessage.classList.remove('show');
+}
+
 
 function debounce(func, delay) {
     let timeoutId;
@@ -51,17 +63,33 @@ document.getElementById('streetAddress').addEventListener('input', debounce(asyn
     addressInput = event.target.value.trim(); // Update the current address variable
     if (addressInput.length >= 3) {
         const suggestions = await fetchLocationIQData(addressInput); // Make a LocationIQ API request when address is at least 3 characters long
-        console.log('Suggestions:', suggestions);
-        updateAutocompleteSuggestions(suggestions) // Update autocomplete suggestions
+        if (suggestions && suggestions.length > 0) {
+            updateAutocompleteSuggestions(suggestions) // Update autocomplete suggestions
+        } else {
+            hideAutocompleteDropdown()
+            showNoMatchingLocationMessage()
+        }
     }
+
 }, 300));
 
+// Event listener for when the street address field loses focus
+document.getElementById('streetAddress').addEventListener('blur', function(event) {
+    hideAutocompleteDropdown(); // Hide autocomplete suggestions when the street address field loses focus
+});
+
 // If input is too short for autocomplete, hide suggestion box.
-// Also for cases where user initially types a valid input, then deletes it.
 document.getElementById('streetAddress').addEventListener('input', function(event) {
+    const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
     if (event.target.value.trim().length < 3) {
         hideAutocompleteDropdown();
+        hideNoMatchingLocationMessage();
+    } else {
+        if (!autocompleteDropdown.classList.contains('show')) {
+            showNoMatchingLocationMessage();
+        }
     }
+
 });
 
 // Event listener for selecting an autocomplete suggestion from the dropdown
@@ -73,7 +101,7 @@ document.getElementById('autocompleteDropdown').addEventListener('change', funct
 /**
  * Was needed for updateGardenLocation to handle manual inputs when user didn't use autocomplete.
  * GardenLocation string is now being dynamically constructed in the controller.
- *
+
 const addManualInputListeners = () => {
     const streetAddressField = document.getElementById('streetAddress');
     const suburbField = document.getElementById('suburb');
@@ -89,9 +117,7 @@ const addManualInputListeners = () => {
 };
 
 addManualInputListeners();
-
 **/
-
 
 
 // If a autocomplete suggestion is chosen, fill in form fields with the address components.

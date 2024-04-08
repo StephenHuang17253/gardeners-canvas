@@ -89,6 +89,7 @@ label {
     max-height: 200px;
     overflow-y: auto;
     display: none; /* Initially hidden */
+    margin-top: -0.7vh;
 }
 
 #autocompleteSuggestions li {
@@ -114,4 +115,12 @@ label {
 
 #autocompleteSuggestions.show {
     display: block; /* Show when 'show' class is added */
+}
+
+#noMatchingLocationMessage {
+    display: none;
+}
+
+#noMatchingLocationMessage.show {
+    display: block;
 }
