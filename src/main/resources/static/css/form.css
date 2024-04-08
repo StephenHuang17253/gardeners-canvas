@@ -75,10 +75,10 @@ label {
 }
 
 /* For location autocomplete */
-.autocomplete-suggestions {
+#autocompleteSuggestions {
     position: absolute;
     z-index: 9999;
-    width: 100%;
+    width: 25vw; /* Adjust the width as needed */
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -88,9 +88,10 @@ label {
     margin: 0;
     max-height: 200px;
     overflow-y: auto;
+    display: none; /* Initially hidden */
 }
 
-.autocomplete-suggestion {
+#autocompleteSuggestions li {
     padding: 8px 12px;
     border-top: 1px solid #f1f1f1;
     font-size: 14px;
@@ -98,13 +99,19 @@ label {
     cursor: pointer;
 }
 
-.autocomplete-suggestion:hover {
+#autocompleteSuggestions li:hover {
+
+
     background-color: #d5f1f3;
     border-color: #d5f1f3;
-}
 
-.autocomplete-selected,
-.autocomplete-selected:hover {
+
+    /*
     background-color: #b2e3e7;
     border-color: #b2e3e7;
+    */
+}
+
+#autocompleteSuggestions.show {
+    display: block; /* Show when 'show' class is added */
 }

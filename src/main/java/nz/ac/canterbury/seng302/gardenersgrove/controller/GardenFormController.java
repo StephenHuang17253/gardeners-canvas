@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -9,12 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -29,14 +28,20 @@ public class GardenFormController {
 
     private final GardenService gardenService;
 
-    Dotenv dotenv = Dotenv.load();
-
-    String locationIqAccessToken = dotenv.get("LOCATION_IQ_ACCESS_TOKEN");
+    private final LocationService locationService;
 
     @Autowired
-    public GardenFormController(GardenService gardenService) {
+    public GardenFormController(GardenService gardenService, LocationService locationService) {
         this.gardenService = gardenService;
+        this.locationService = locationService;
     }
+
+    @GetMapping("/api/location/suggestions")
+    @ResponseBody
+    public String getLocationSuggestions(@RequestParam("query") String query) throws IOException, InterruptedException {
+        return locationService.getLocationSuggestions(query);
+    }
+
     /**
      * Maps the createNewGardenForm html page to /create-new-garden url
      * @return thymeleaf createNewGardenForm
@@ -50,7 +55,6 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("locationIqAccessToken", locationIqAccessToken);
         logger.info("GET /create-new-garden");
         return "createNewGardenForm";
     }
@@ -77,6 +81,31 @@ public class GardenFormController {
                               Model model, RedirectAttributes redirectAttributes) {
         logger.info("POST /landingPage");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
+
+        String locationValues = "";
+        if (!streetAddress.isBlank()) {
+            locationValues += streetAddress + ", ";
+        }
+        if (!suburb.isBlank()) {
+            locationValues += suburb + ", ";
+        }
+        if (!city.isBlank()) {
+            locationValues += city;
+            if (postcode.isBlank()) {
+                locationValues += ", ";
+            } else {
+                locationValues += " ";
+            }
+        }
+        if (!postcode.isBlank()) {
+            locationValues += postcode + ", ";
+        }
+        if (!country.isBlank()) {
+            locationValues += country;
+        }
+
+        gardenLocation = locationValues;
+
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
@@ -102,7 +131,7 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("locationIqAccessToken", locationIqAccessToken);
+
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
@@ -150,7 +179,6 @@ public class GardenFormController {
             model.addAttribute("postcode", garden.getGardenPostcode());
             model.addAttribute("country", garden.getGardenCountry());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
-            model.addAttribute("locationIqAccessToken", locationIqAccessToken);
             Float gardenSize = garden.getGardenSize();
             if (Float.isNaN(gardenSize)) {
                 model.addAttribute("gardenSize", "");
@@ -187,6 +215,31 @@ public class GardenFormController {
                                        Model model) {
         logger.info("POST / edited garden");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
+
+        String locationValues = "";
+        if (!streetAddress.isBlank()) {
+            locationValues += streetAddress + ", ";
+        }
+        if (!suburb.isBlank()) {
+            locationValues += suburb + ", ";
+        }
+        if (!city.isBlank()) {
+            locationValues += city;
+            if (postcode.isBlank()) {
+                locationValues += ", ";
+            } else {
+                locationValues += " ";
+            }
+        }
+        if (!postcode.isBlank()) {
+            locationValues += postcode + ", ";
+        }
+        if (!country.isBlank()) {
+            locationValues += country;
+        }
+
+        gardenLocation = locationValues;
+
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
@@ -212,7 +265,6 @@ public class GardenFormController {
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
         model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("locationIqAccessToken", locationIqAccessToken);
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
             return "editGardenForm";
@@ -257,7 +309,7 @@ public class GardenFormController {
         {
             model.addAttribute("AddressErrorText","Address " + streetAddressResult);
             model.addAttribute("AddressErrorClass","errorBorder");
-            logger.info("Garden Name failed validation");
+            logger.info("Garden Street failed validation");
         }
         else
         {
@@ -269,7 +321,7 @@ public class GardenFormController {
         {
             model.addAttribute("SuburbErrorText","Suburb " + suburbResult);
             model.addAttribute("SuburbErrorClass","errorBorder");
-            logger.info("Garden Name failed validation");
+            logger.info("Garden Suburb failed validation");
         }
         else
         {

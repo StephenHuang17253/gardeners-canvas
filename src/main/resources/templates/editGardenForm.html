@@ -28,6 +28,8 @@
             <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress" placeholder="e.g. 20 Kirkwood Avenue (Optional)"
                    th:name="streetAddress" th:value="${streetAddress}" data-cy="streetAddress" autofocus>
 
+            <ul id="autocompleteSuggestions"></ul>
+
             <div th:if="${AddressErrorText!=''}">
                 <h3 class="error" th:text="${AddressErrorText}"></h3>
             </div>
@@ -83,7 +85,6 @@
             <br/>
 
             <input type="hidden" th:name="gardenLocation" id="gardenLocation" data-cy="gardenLocation">
-            <input type="hidden" th:name="locationIqAccessToken" th:value="${locationIqAccessToken}" id="locationIqAccessToken" data-cy="gardenLocation">
             <button type="submit" class = "submit-button">Submit</button>
             <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${gardenId}, gardenName=${gardenName})}">
                 <button type="button" class="cancel-button" >Cancel</button>
@@ -92,8 +93,6 @@
     </div>
 </div>
 <script src="/js/preventEnterSubmit.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
 <script src="/js/locationIQAutocomplete.js"></script>
 
 </body>
