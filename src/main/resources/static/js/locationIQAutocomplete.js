@@ -78,6 +78,22 @@ document.getElementById('streetAddress').addEventListener('blur', function(event
     hideAutocompleteDropdown(); // Hide autocomplete suggestions when the street address field loses focus
 });
 
+
+// Event listener for when the autocomplete dropdown is opened
+document.getElementById('autocompleteSuggestions').addEventListener('mousedown', function(event) {
+    event.preventDefault(); // Prevent the dropdown from losing focus when clicking inside it
+});
+
+// Event listener for clicking anywhere outside the street address field and the autocomplete dropdown
+document.addEventListener('click', function(event) {
+    const streetAddressField = document.getElementById('streetAddress');
+    const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
+    if (event.target !== streetAddressField && event.target !== autocompleteDropdown) {
+        hideAutocompleteDropdown(); // Hide autocomplete suggestions when clicking outside
+    }
+});
+
+
 // If input is too short for autocomplete, hide suggestion box.
 document.getElementById('streetAddress').addEventListener('input', function(event) {
     const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
