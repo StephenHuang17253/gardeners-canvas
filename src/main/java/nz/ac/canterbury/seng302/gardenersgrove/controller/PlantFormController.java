@@ -78,7 +78,7 @@ public class PlantFormController {
                                      Model model) {
         logger.info("POST /landingPage");
         //logic to handle checking if fields are vaild
-        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
+        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
@@ -155,7 +155,7 @@ public class PlantFormController {
                                      Model model) {
         logger.info("POST /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         //logic to handle checking if fields are vaild
-        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
+        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
