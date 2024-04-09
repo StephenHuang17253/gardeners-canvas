@@ -5,13 +5,6 @@ const fetchLocationIQData = async(query) => {
     try {
         const response = await fetch(`/api/location/suggestions?query=${query}`);
         const data = await response.json();
-
-        if (data === 429) {
-            showRateLimitMessage();
-            hideNoMatchingLocationMessage();
-        } else {
-            hideRateLimitMessage();
-        }
         console.log(data);
         return data
     } catch (error) {
@@ -54,15 +47,6 @@ function hideNoMatchingLocationMessage() {
     noMatchingLocationMessage.classList.remove('show');
 }
 
-function showRateLimitMessage() {
-    const rateLimitMessage = document.getElementById('rateLimitMessage');
-    rateLimitMessage.classList.add('show');
-}
-
-function hideRateLimitMessage() {
-    const rateLimitMessage = document.getElementById('rateLimitMessage');
-    rateLimitMessage.classList.remove('show');
-}
 
 function debounce(func, delay) {
     let timeoutId;
@@ -129,6 +113,29 @@ document.getElementById('autocompleteDropdown').addEventListener('change', funct
     fillAddressFields(event.target.value); // Update fields with values from selected suggestion
 });
 
+
+/**
+ * Was needed for updateGardenLocation to handle manual inputs when user didn't use autocomplete.
+ * GardenLocation string is now being dynamically constructed in the controller.
+
+const addManualInputListeners = () => {
+    const streetAddressField = document.getElementById('streetAddress');
+    const suburbField = document.getElementById('suburb');
+    const cityField = document.getElementById('city');
+    const postcodeField = document.getElementById('postcode');
+    const countryField = document.getElementById('country');
+
+    streetAddressField.addEventListener('input', updateGardenLocation);
+    suburbField.addEventListener('input', updateGardenLocation);
+    cityField.addEventListener('input', updateGardenLocation);
+    postcodeField.addEventListener('input', updateGardenLocation);
+    countryField.addEventListener('input', updateGardenLocation);
+};
+
+addManualInputListeners();
+**/
+
+
 // If a autocomplete suggestion is chosen, fill in form fields with the address components.
 function fillAddressFields(data) {
     let streetAddress = ""
@@ -153,5 +160,48 @@ function fillAddressFields(data) {
     // updateGardenLocation();
 }
 
+/** It stopped working and I don't know why
+ * Handling this in GardenFormController now
+
+function updateGardenLocation() {
+    const streetAddressField = document.getElementById('streetAddress').value || "";
+    const suburbField = document.getElementById('suburb').value || "";
+    const cityField = document.getElementById('city').value || "";
+    const postcodeField = document.getElementById('postcode').value || "";
+    const countryField = document.getElementById('country').value || "";
+
+    console.log(streetAddressField)
+    console.log(suburbField)
+    console.log(cityField)
+    console.log(postcodeField)
+    console.log(countryField)
+
+    //const fieldValues = `${streetAddressField}, ${suburbField}, ${cityField} ${postcodeField}, ${countryField}`;
+    let fieldValues = "";
+    if (streetAddressField !== "") {
+        fieldValues += `${streetAddressField}, `
+    }
+    if (suburbField !== "") {
+        fieldValues += `${suburbField}, `
+    }
+    if (cityField !== "") {
+        fieldValues += `${cityField}`
+        if (postcodeField === "") {
+            fieldValues += ", "
+        } else {
+            fieldValues += " "
+        }
+    }
+    if (postcodeField !== "") {
+        fieldValues += `${postcodeField}, `
+    }
+    if (countryField !== "") {
+        fieldValues += `${countryField}`
+    }
+
+    console.log(fieldValues)
+    document.getElementById('gardenLocation').value = fieldValues;
+}
+**/
 
 

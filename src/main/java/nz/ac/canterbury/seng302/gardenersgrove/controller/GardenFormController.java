@@ -15,8 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Controller for creating a new Garden using a form page
@@ -30,34 +30,15 @@ public class GardenFormController {
 
     private final LocationService locationService;
 
-    private static final int MAX_REQUESTS_PER_SECOND = 2;
-
-    private final AtomicInteger requestCount = new AtomicInteger(0);
-
     @Autowired
     public GardenFormController(GardenService gardenService, LocationService locationService) {
         this.gardenService = gardenService;
         this.locationService = locationService;
     }
 
-    /**
-     * Retrieves location suggestions from the LocationIQ API based on query string provided by frontend JS.
-     * Also handles rate limiting to prevent exceeding 2 requests per second, to match our free tier.
-     * @param query The search query for location autocomplete suggestions.
-     * @return A JSON response string containing location suggestions, or a "429" string if rate limit is exceeded.
-     * @throws IOException If an I/O error occurs while making the requesting
-     * @throws InterruptedException If an interruption occurs while waiting for response
-     */
     @GetMapping("/api/location/suggestions")
     @ResponseBody
     public String getLocationSuggestions(@RequestParam("query") String query) throws IOException, InterruptedException {
-        if (requestCount.incrementAndGet() > MAX_REQUESTS_PER_SECOND) {
-            logger.info("Exceeded location API rate limit of 2 requests per second.");
-            // Doesn't need more info, not shown to user, just checked in frontend script.
-            String response = "429";
-            return response;
-        }
-        requestCount.decrementAndGet();
         return locationService.getLocationSuggestions(query);
     }
 
