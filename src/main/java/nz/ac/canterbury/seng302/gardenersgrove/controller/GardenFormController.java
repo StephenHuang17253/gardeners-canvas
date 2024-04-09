@@ -1,10 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Semaphore;
 
 
 /**
@@ -32,7 +33,9 @@ public class GardenFormController {
 
     private static final int MAX_REQUESTS_PER_SECOND = 2;
 
-    private final AtomicInteger requestCount = new AtomicInteger(0);
+    private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
+
+    private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
     @Autowired
     public GardenFormController(GardenService gardenService, LocationService locationService) {
@@ -51,14 +54,29 @@ public class GardenFormController {
     @GetMapping("/api/location/suggestions")
     @ResponseBody
     public String getLocationSuggestions(@RequestParam("query") String query) throws IOException, InterruptedException {
-        if (requestCount.incrementAndGet() > MAX_REQUESTS_PER_SECOND) {
-            logger.info("Exceeded location API rate limit of 2 requests per second.");
-            // Doesn't need more info, not shown to user, just checked in frontend script.
-            String response = "429";
-            return response;
+        long currentTime = Instant.now().getEpochSecond();
+        long timeElapsed = currentTime - lastRequestTime;
+
+        logger.info("Time elapsed: " + timeElapsed);
+        // Every second, the number of available permits is reset to 2
+        if (timeElapsed >= 1) {
+            semaphore.drainPermits();
+            semaphore.release(MAX_REQUESTS_PER_SECOND);
+            logger.info("A second elapsed, permits reset to: " + semaphore.availablePermits());
+            lastRequestTime = currentTime;
         }
-        requestCount.decrementAndGet();
+
+        logger.info("Permits left before request: " + semaphore.availablePermits());
+
+        // Check if rate limit exceeded
+        if (!semaphore.tryAcquire()) {
+            logger.info("Exceeded location API rate limit of 2 requests per second.");
+            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
+        }
+        logger.info("Permits left after request: " + semaphore.availablePermits());
+
         return locationService.getLocationSuggestions(query);
+
     }
 
     /**

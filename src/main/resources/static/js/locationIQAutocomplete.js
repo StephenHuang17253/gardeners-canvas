@@ -19,6 +19,42 @@ const fetchLocationIQData = async(query) => {
     }
 }
 
+// Call 3 requests at once to test if rate limit works.
+const testRateLimit = async(query) => {
+    try {
+        const [response, response2, response3] = await Promise.all([
+            fetch(`/api/location/suggestions?query=${query}`),
+            fetch(`/api/location/suggestions?query=${query}`),
+            fetch(`/api/location/suggestions?query=${query}`),
+        ]);
+        const data = await response.json();
+        const data2 = await response2.json();
+        const data3 = await response3.json();
+
+        if (data === 429 || data2 === 429 || data3 === 429) {
+            showRateLimitMessage();
+            hideNoMatchingLocationMessage();
+            console.log(data);
+            return;
+        } else {
+            hideRateLimitMessage();
+        }
+
+        console.log("Rate limit exceeded")
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+    }
+}
+
+
+// Type 'Fabian Gilson' to test rate limit
+document.getElementById('streetAddress').addEventListener('input', function(event) {
+    const inputText = event.target.value.trim();
+    if (inputText === "Fabian Gilson") {
+        testRateLimit(inputText);
+    }
+});
+
 // Function to update the autocomplete suggestions
 function updateAutocompleteSuggestions(suggestions) {
     const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
