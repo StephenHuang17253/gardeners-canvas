@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ public class LocationService {
     @Value("${locationiq.access.token}")
     private String locationIqAccessToken;
 
+    Logger logger = LoggerFactory.getLogger(LocationService.class);
+
     /**
      * Retrieves location suggestions based on provided query string.
      * @param query The string for which autocomplete suggestions are requested.
@@ -36,8 +40,8 @@ public class LocationService {
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        System.out.println("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&key=" + locationIqAccessToken);
-        System.out.println("Call to API with query = '" + query + "'");
+        //System.out.println("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&key=" + locationIqAccessToken);
+        logger.info("API request with query = '" + query + "'");
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         // System.out.println(response.body());
         return response.body();

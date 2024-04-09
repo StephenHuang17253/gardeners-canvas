@@ -62,7 +62,7 @@ public class GardenFormController {
         if (timeElapsed >= 1) {
             semaphore.drainPermits();
             semaphore.release(MAX_REQUESTS_PER_SECOND);
-            logger.info("A second elapsed, permits reset to: " + semaphore.availablePermits());
+            logger.info("A second or more has elapsed, permits reset to: " + semaphore.availablePermits());
             lastRequestTime = currentTime;
         }
 
