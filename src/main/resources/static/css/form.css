@@ -124,3 +124,11 @@ label {
 #noMatchingLocationMessage.show {
     display: block;
 }
+
+#rateLimitMessage {
+    display: none;
+}
+
+#rateLimitMessage.show {
+    display: block;
+}
