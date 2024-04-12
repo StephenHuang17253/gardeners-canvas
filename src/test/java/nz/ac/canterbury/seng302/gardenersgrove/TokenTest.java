@@ -26,14 +26,14 @@ public class TokenTest {
     public void tokenCreation_GetTokenString_ValidLength() {
         Duration lifeTime = Duration.ofHours(1);
         Token token = new Token(user, lifeTime);
-        assertEquals(9, token.getTokenString().length());
+        assertEquals(6, token.getTokenString().length());
     }
 
     @Test
     public void tokenCreation_GetTokenString_ValidContainsChars() {
         Duration lifeTime = Duration.ofHours(1);
         Token token = new Token(user, lifeTime);
-        assertTrue(token.getTokenString().matches("[0-9a-z]+"));
+        assertTrue(token.getTokenString().matches("[0-9A-Z]+"));
     }
 
     @Test

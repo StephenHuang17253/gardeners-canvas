@@ -370,11 +370,4 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
-
-    @GetMapping("/profile/validate")
-    public String validateProfile(Model model) {
-        logger.info("GET /profile/validate");
-
-        return "validateProfile";
-    }
 }

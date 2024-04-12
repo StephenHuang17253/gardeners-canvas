@@ -38,7 +38,7 @@ public class Token {
     @JoinColumn(name = "id")
     private User user;
 
-    private static final int TOKEN_LENGTH = 9;
+    private static final int TOKEN_LENGTH = 6;
 
     /**
      * JPA required no-args constructor
@@ -53,8 +53,7 @@ public class Token {
      * @return the token string
      */
     private String generateTokenString(int length) {
-
-        String alphanumericChars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        String alphanumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
         StringBuilder token = new StringBuilder(length);
 
@@ -73,7 +72,6 @@ public class Token {
      * @param lifetime the lifetime that the token should be valid for
      */
     public Token(User user, Duration lifetime) {
-
         this.tokenString = generateTokenString(TOKEN_LENGTH);
         this.creationDate = LocalDateTime.now();
         this.lifetime = lifetime;
@@ -112,7 +110,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return "RegistrationToken{" +
+        return "Token{" +
                 "id=" + id +
                 ", tokenString='" + tokenString + '\'' +
                 ", creationDate=" + creationDate +

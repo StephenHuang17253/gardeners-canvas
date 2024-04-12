@@ -140,4 +140,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Verify a user, for when they enter the correct token
+     * @param user user to verify
+     */
+    public void verifyUser(User user) {
+        user.setVerified(true);
+        userRepository.save(user);
+    }
+
 }

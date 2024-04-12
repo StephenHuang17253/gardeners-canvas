@@ -2,6 +2,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import org.springframework.stereotype.Repository;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
+
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
@@ -35,5 +38,12 @@ public interface TokenRepository extends CrudRepository<Token, Long> {
      * @return Token or null if not found
      */
     Token findByUser(User user);
+
+    /**
+     * Returns all tokens
+     * 
+     * @return List of tokens
+     */
+    List<Token> findAll();
 
 }

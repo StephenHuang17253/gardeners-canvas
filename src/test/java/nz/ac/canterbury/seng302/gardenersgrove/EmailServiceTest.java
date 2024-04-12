@@ -8,10 +8,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
