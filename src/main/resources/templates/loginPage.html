@@ -11,7 +11,7 @@
       <form th:action="@{login}" method="POST">
         <div>
           <label for="emailAddress">Email</label>
-          <input type="emailAddress" class="form-control" id="emailAddress" placeholder="emailAddress" th:name="emailAddress" required autofocus />
+          <input type="email" class="form-control" id="emailAddress" placeholder="email" th:name="emailAddress" required autofocus />
           <p th:if="${emailAddressError}" class="error-message" th:text="${emailAddressError}"></p>
         </div>
         <div>
