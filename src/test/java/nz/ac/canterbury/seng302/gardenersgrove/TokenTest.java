@@ -30,7 +30,7 @@ public class TokenTest {
     }
 
     @Test
-    public void tokenCreation_GetTokenString_ValidContainsChars() {
+    public void tokenCreation_GetTokenString_ValidChars() {
         Duration lifeTime = Duration.ofHours(1);
         Token token = new Token(user, lifeTime);
         assertTrue(token.getTokenString().matches("[0-9A-Z]+"));

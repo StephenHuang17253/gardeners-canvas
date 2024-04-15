@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -30,8 +35,10 @@ import org.springframework.ui.Model;
 @Controller
 public class LoginPageController {
     Logger logger = LoggerFactory.getLogger(LoginPageController.class);
+    
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     /**
      * Constructor for the LoginPageController with {@link Autowired} to connect this
@@ -41,9 +48,10 @@ public class LoginPageController {
      * @param authenticationManager
      */
     @Autowired
-    public LoginPageController(UserService userService, AuthenticationManager authenticationManager) {
+    public LoginPageController(UserService userService, AuthenticationManager authenticationManager, TokenService tokenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -77,14 +85,16 @@ public class LoginPageController {
      * @return thymeleaf loginPage
      */
     @GetMapping("/login")
-    public String loginPage(Model model) {
+    public String loginPage(Model model, HttpServletRequest request) {
         logger.info("GET /login");
+        
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        if (inputFlashMap != null) {
+            model.addAttribute("message", inputFlashMap.get("message"));
+        }
 
-        boolean validEmail = true;
-        boolean validLogin = true;
-
-        model.addAttribute("validEmail", validEmail);
-        model.addAttribute("validLogin", validLogin);
+        model.addAttribute("validEmail", true);
+        model.addAttribute("validLogin", true);
 
         return "loginPage";
     }
@@ -96,25 +106,43 @@ public class LoginPageController {
      * @return thymeleaf loginPage
      */
     @PostMapping("/login")
-    public String handleLoginRequest(HttpServletRequest request, @RequestParam String email,
+    public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        ValidationResult validEmail = InputValidator.validateEmail(email);
+        User existingUser = userService.getUserByEmail(emailAddress);
+
+        // For the given email address if there is an existing unverified user whose
+        // token has expired, delete them and their associated token
+        if (existingUser != null && !existingUser.isVerified()) {
+
+            Token token = tokenService.getTokenByUser(existingUser);
+
+            if (token != null && token.isExpired()) {
+                userService.deleteUser(existingUser);
+                tokenService.deleteToken(token);
+            }
+        }
+
+        ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
 
         if (!validEmail.valid()) {
-            model.addAttribute("emailError", validEmail);
+            model.addAttribute("emailAddressError", validEmail);
             return "loginPage";
         }
 
-        User user = userService.getUserByEmailAndPassword(email, password);
+        User user = userService.getUserByEmailAndPassword(emailAddress, password);
 
         if (user == null) {
             model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
             return "loginPage";
         }
 
-        setSecurityContext(email, password, request.getSession());
+        if (!user.isVerified()) {
+            return "redirect:/verify/" + user.getEmailAddress();
+        }
+
+        setSecurityContext(emailAddress, password, request.getSession());
 
         return "redirect:/home";
 

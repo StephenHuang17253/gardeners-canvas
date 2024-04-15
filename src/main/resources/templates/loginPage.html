@@ -10,9 +10,9 @@
       <h1>Login</h1>
       <form th:action="@{login}" method="POST">
         <div>
-          <label for="email">Email</label>
-          <input type="email" class="form-control" id="email" placeholder="email" th:name="email" required autofocus />
-          <p th:if="${emailError}" class="error-message" th:text="${emailError}"></p>
+          <label for="emailAddress">Email</label>
+          <input type="emailAddress" class="form-control" id="emailAddress" placeholder="emailAddress" th:name="emailAddress" required autofocus />
+          <p th:if="${emailAddressError}" class="error-message" th:text="${emailAddressError}"></p>
         </div>
         <div>
           <label for="password">Password</label>
@@ -24,6 +24,7 @@
           <a th:href="@{home}"><button type="button">Cancel</button></a>
         </div>
         <a th:href="@{register}" class="link">Not registered? Create an account</a>
+        <p th:if="${message}" th:text="${message}"></p>
       </form>
     </div>
   </body>

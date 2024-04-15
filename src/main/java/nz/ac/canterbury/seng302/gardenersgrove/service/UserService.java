@@ -149,4 +149,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Deletes a user
+     * 
+     * @param user
+     */
+    public void deleteUser(User user) {
+        userRepository.deleteById(user.getId());
+    }
+
 }

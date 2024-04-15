@@ -47,4 +47,8 @@ public class TokenService {
         return tokenRepository.findAll();
     }
 
+    public void deleteToken(Token token) {
+        tokenRepository.deleteById(token.getId());
+    }
+
 }

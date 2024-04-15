@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
 
 /**
  * Entity class reflecting a token used for registration/verification
@@ -20,6 +21,11 @@ import jakarta.persistence.OneToOne;
  */
 @Entity
 public class Token {
+    @Transient
+    private static final int TOKEN_LENGTH = 6;
+
+    @Transient
+    private static final int TOKEN_LIFETIME = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,10 +41,8 @@ public class Token {
     private Duration lifetime;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
-
-    private static final int TOKEN_LENGTH = 6;
 
     /**
      * JPA required no-args constructor
@@ -47,7 +51,7 @@ public class Token {
     }
 
     /**
-     * Creates a new token string for a RegistrationToken object with a given length
+     * Creates a new token string for a Token object with a given length
      * 
      * @param length the length of the token string
      * @return the token string
@@ -66,15 +70,20 @@ public class Token {
     }
 
     /**
-     * Creates a new RegistrationToken object
+     * Creates a new Token object
      *
      * @param user     the user accociated with this token
-     * @param lifetime the lifetime that the token should be valid for
+     * @param lifetime the lifetime that the token should be valid for, or null to
+     *                 use default value
      */
     public Token(User user, Duration lifetime) {
         this.tokenString = generateTokenString(TOKEN_LENGTH);
         this.creationDate = LocalDateTime.now();
-        this.lifetime = lifetime;
+        if (lifetime == null) {
+            this.lifetime = Duration.ofMinutes(TOKEN_LIFETIME);
+        } else {
+            this.lifetime = lifetime;
+        }
         this.user = user;
     }
 

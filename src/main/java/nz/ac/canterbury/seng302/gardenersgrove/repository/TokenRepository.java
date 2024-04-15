@@ -46,4 +46,11 @@ public interface TokenRepository extends CrudRepository<Token, Long> {
      */
     List<Token> findAll();
 
+    /**
+     * Deletes a token by id
+     * 
+     * @param id the token id
+     */
+    void deleteById(long id);
+
 }

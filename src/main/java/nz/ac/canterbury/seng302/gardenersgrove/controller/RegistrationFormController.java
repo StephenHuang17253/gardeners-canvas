@@ -1,8 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -17,14 +21,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.ui.Model;
 
-import java.util.Objects;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -34,21 +42,28 @@ import java.util.Locale;
 @Controller
 public class RegistrationFormController {
     Logger logger = LoggerFactory.getLogger(RegistrationFormController.class);
+
+    private final EmailService emailService;
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
      * connect this
      * controller with other services
      * 
-     * @param userService to use for checking persistence to validate email and password
+     * @param userService           to use for checking persistence to validate
+     *                              email and password
      * @param authenticationManager to login user after registration
      */
     @Autowired
-    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager) {
+    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager,
+            EmailService emailService, TokenService tokenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -56,9 +71,9 @@ public class RegistrationFormController {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      * 
-     * @param email of user who is registering
+     * @param email    of user who is registering
      * @param password of user who is registering
-     * @param session http session to set the cookies with the context key
+     * @param session  http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
         User user = userService.getUserByEmailAndPassword(email, password);
@@ -77,37 +92,20 @@ public class RegistrationFormController {
     }
 
     /**
-     * Redirects GET url '/register' to the registration form
+     * handles GET '/register' requests
      *
-     * @param firstName      - user's first name
-     * @param lastName       - user's last name
-     * @param noLastName     - checkbox for whether user has a last name
-     * @param dateOfBirth    - user's date of birth (optional)
-     * @param emailAddress   - user's email address
-     * @param password       - user's password
-     * @param repeatPassword - user's repeating password for confirmation
-     * @param model          - (map-like) representation of user's input (above
-     *                       parameters)
-     * @return redirect to registration form
+     * @return registration form
      */
     @GetMapping("/register")
-    public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
-            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
-            @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
-            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-            @RequestParam(name = "password", defaultValue = "") String password,
-            @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
-            Model model) {
+    public String registrationForm() {
         logger.info("GET /register");
-        addUserAttributes(firstName, lastName, noLastName, dateOfBirth,
-                emailAddress, password, repeatPassword, model);
         return "registrationForm";
     }
 
     /**
-     * Redirects POST url '/register' to the registration form if invalid input
-     * or to user's profile page if registration completed
+     * Handles POST url '/register' requests, returns the registration form if
+     * invalid input
+     * or to verification page if valid
      *
      * @param firstName      - user's first name
      * @param lastName       - user's last name
@@ -118,7 +116,7 @@ public class RegistrationFormController {
      * @param repeatPassword - user's repeating password for confirmation
      * @param model          - (map-like) representation of user's input (above
      *                       parameters)
-     * @return redirect to registration form or to profile page
+     * @return registration form or verification page
      */
     @PostMapping("/register")
     public String submitRegistrationForm(HttpServletRequest request,
@@ -132,121 +130,132 @@ public class RegistrationFormController {
             Model model) {
         logger.info("POST /register");
 
-        addUserAttributes(firstName, lastName, noLastName, dateOfBirth, emailAddress, password, repeatPassword, model);
+        // Create a map of validation results for each input
+        Map<String, ValidationResult> validationMap = new HashMap<>();
 
-        boolean valid = true;
+        validationMap.put("firstName", InputValidator.validateName(firstName));
 
-        if (!Objects.equals(password, repeatPassword)) {
-            model.addAttribute("passwordMatchingError", "Passwords do not match");
-            valid = false;
+        ValidationResult lastNameValidation = InputValidator.validateName(lastName);
+        if (noLastName) {
+            lastNameValidation = ValidationResult.OK;
+        }
+        validationMap.put("lastName", lastNameValidation);
+
+        User existingUser = userService.getUserByEmail(emailAddress);
+
+        // For the given email address if there is an existing unverified user whose
+        // token has expired, delete them and their associated token
+        if (existingUser != null && !existingUser.isVerified()) {
+
+            Token token = tokenService.getTokenByUser(existingUser);
+
+            if (token != null && token.isExpired()) {
+                userService.deleteUser(existingUser);
+                tokenService.deleteToken(token);
+            }
         }
 
-        ValidationResult firstNameValidation = InputValidator.validateName(firstName);
-        ValidationResult lastNameValidation = InputValidator.validateName(lastName);
-        ValidationResult passwordValidation = InputValidator.validatePassword(password);
-        ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
+        validationMap.put("emailAddress", InputValidator.validateUniqueEmail(emailAddress));
+
         ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (Objects.equals(dateOfBirth, "")) {
+        if (dateOfBirth.equals("")) {
             dateOfBirthValidation = ValidationResult.OK;
         }
+        validationMap.put("dateOfBirth", dateOfBirthValidation);
 
-        valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
-                emailAddressValidation, passwordValidation, dateOfBirthValidation, valid, model);
+        // Check that all inputs are valid
+        boolean valid = true;
+        for (Map.Entry<String, ValidationResult> entry : validationMap.entrySet()) {
+            if (!entry.getValue().valid()) {
+
+                String error = entry.getValue().toString();
+
+                if (entry.getKey().equals("firstName")) {
+                    error = "First name " + error;
+                } else if (entry.getKey().equals("lastName")) {
+                    error = "First name " + error;
+                }
+
+                model.addAttribute(entry.getKey() + "Error", error);
+                valid = false;
+            }
+        }
 
         if (!valid) {
+            model.addAttribute("firstName", firstName);
+            model.addAttribute("lastName", lastName);
+            model.addAttribute("emailAddress", emailAddress);
+            model.addAttribute("dateOfBirth", dateOfBirth);
+            model.addAttribute("noLastName", noLastName);
             return "registrationForm";
+        }
+
+        LocalDate date;
+        if (!dateOfBirth.equals("")) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+            date = LocalDate.parse(dateOfBirth, formatter);
         } else {
-            LocalDate date;
-            if (!Objects.equals(dateOfBirth, "")) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-                date = LocalDate.parse(dateOfBirth, formatter);
-            } else {
-                date = null;
+            date = null;
+        }
+
+        User user = new User(firstName, lastName, emailAddress, date);
+        userService.addUser(user, password);
+
+        Token token = new Token(user, null);
+
+        tokenService.addToken(token);
+
+        // For development to not send signup emails but print the signup token to the
+        // terminal instead
+        boolean sendEmail = true;
+
+        if (sendEmail) {
+            try {
+                emailService.sendRegistrationEmail(token);
+            } catch (MessagingException e) {
+                logger.info("could not send email to " + user.getEmailAddress());
             }
-
-            User user = new User(firstName, lastName, emailAddress, date);
-            userService.addUser(user, password);
-
-            setSecurityContext(user.getEmailAddress(), password, request.getSession());
-            return "redirect:/profile"; // Placeholder for Profile Page
+        } else {
+            logger.info("Here is the token: " + token.toString());
         }
+
+        return "redirect:/verify/" + user.getEmailAddress();
+
     }
 
-    /**
-     * Function to add user's inputs to the model
-     *
-     * @param firstName      - user's first name
-     * @param lastName       - user's last name
-     * @param noLastName     - checkbox for whether user has a last name
-     * @param dateOfBirth    - user's date of birth (optional)
-     * @param emailAddress   - user's email address
-     * @param password       - user's password
-     * @param repeatPassword - user's repeating password for confirmation
-     * @param model          - (map-like) representation of user's input (above
-     *                       parameters)
-     */
-    private void addUserAttributes(@RequestParam(name = "firstName", defaultValue = "") String firstName,
-            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
-            @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
-            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-            @RequestParam(name = "password", defaultValue = "") String password,
-            @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
-            Model model) {
-        model.addAttribute("firstName", firstName);
-        model.addAttribute("lastName", lastName);
-        model.addAttribute("noLastName", noLastName);
-        model.addAttribute("dateOfBirth", dateOfBirth);
+    @GetMapping("/verify/{emailAddress}")
+    public String verifyEmail(@PathVariable String emailAddress, Model model, HttpServletRequest request) {
+        logger.info("GET /verify");
+
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        if (inputFlashMap != null) {
+            model.addAttribute("message", inputFlashMap.get("message"));
+        }
+
         model.addAttribute("emailAddress", emailAddress);
-        model.addAttribute("password", password);
-        model.addAttribute("repeatPassword", repeatPassword);
+
+        return "verificationPage";
     }
 
-    /**
-     * Runs OldValidationResult.isvalid() on all of the user's input
-     *
-     * @param firstNameValidation    - OldValidationResult for user's first name
-     * @param lastNameValidation     - OldValidationResult for user's last name
-     * @param noLastName             - boolean checking if user has last name
-     * @param emailAddressValidation - OldValidationResult for user's email address
-     * @param passwordValidation     - OldValidationResult for user's password
-     * @param dateOfBirthValidation  - OldValidationResult for user's DOB
-     * @param valid                  - Boolean for if user's input is valid
-     * @param model                  - (map-like) representation of user's input
-     *                               (above parameters)
-     * @return valid
-     */
-    public Boolean checkAllValid(ValidationResult firstNameValidation,
-                                 ValidationResult lastNameValidation,
-                                 String noLastName,
-                                 ValidationResult emailAddressValidation,
-                                 ValidationResult passwordValidation,
-                                 ValidationResult dateOfBirthValidation,
-                                 boolean valid,
-                                 Model model) {
-        if (!firstNameValidation.valid()) {
-            model.addAttribute("firstNameError", "First Name " +firstNameValidation);
-            valid = false;
-        }
-        if (!lastNameValidation.valid() && !Boolean.parseBoolean(noLastName)) {
-            model.addAttribute("lastNameError", "Last Name " + lastNameValidation);
-            valid = false;
-        }
-        if (!emailAddressValidation.valid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation);
-            valid = false;
-        }
-        if (!dateOfBirthValidation.valid()) {
-            model.addAttribute("dateOfBirthError", dateOfBirthValidation);
-            valid = false;
+    @PostMapping("/verify")
+    public String verifyEmailPost(@RequestParam(name = "tokenString") String tokenString,
+            @RequestParam(name = "emailAddress") String emailAddress, Model model,
+            RedirectAttributes redirectAttributes) {
+        logger.info("POST /verify");
+
+        Token token = tokenService.getTokenByTokenString(tokenString);
+
+        if (token == null || token.isExpired() || !token.getUser().getEmailAddress().equals(emailAddress)) {
+            redirectAttributes.addFlashAttribute("message", "Signup code invalid");
+            return "redirect:/verify/" + emailAddress;
         }
 
-        if (!passwordValidation.valid()) {
-            model.addAttribute("passwordError", passwordValidation);
-            valid = false;
-        }
+        User user = token.getUser();
+        userService.verifyUser(user);
+        tokenService.deleteToken(token);
 
-        return valid;
+        redirectAttributes.addFlashAttribute("message", "Your account has been activated, please log in");
+        return "redirect:/login";
     }
 
 }

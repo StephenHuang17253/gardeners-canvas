@@ -56,7 +56,6 @@ public class EmailService {
         message.setSubject(subject);
         message.setText(body);
         mailSender.send(message);
-        logger.info("Email sent to: " + toEmail);
     }
 
     /**
@@ -78,7 +77,6 @@ public class EmailService {
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
         mailSender.send(message);
-        logger.info("Email sent to: " + recipientEmail);
     }
 
     /**

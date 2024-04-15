@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import org.springframework.format.annotation.DateTimeFormat;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +21,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, length = 64)
@@ -89,7 +88,6 @@ public class User {
         this.password = password;
     }
 
-
     public void setProfilePictureFilename(String profilePictureFilename) {
         this.profilePictureFilename = profilePictureFilename;
     }
@@ -97,7 +95,8 @@ public class User {
     public void setVerified(boolean verified) {
         this.verified = verified;
     }
-    
+
+
     public Long getId() {
         return id;
     }
@@ -125,7 +124,7 @@ public class User {
     public String getEncodedPassword() {
         return password;
     }
-    
+
     public boolean isVerified() {
         return verified;
     }
@@ -140,7 +139,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
-                ", profilePictureFilename='" + profilePictureFilename + '\''+
+                ", profilePictureFilename='" + profilePictureFilename + '\'' +
                 ", verified='" + verified + '\'' +
                 '}';
     }

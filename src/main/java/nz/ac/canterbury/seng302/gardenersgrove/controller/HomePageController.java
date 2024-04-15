@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
@@ -38,7 +37,6 @@ public class HomePageController {
      *
      * @param userService
      * @param authenticationManager
-     * @param emailService // Added email service
      */
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager) {
