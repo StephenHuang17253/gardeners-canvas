@@ -269,6 +269,19 @@ public class InputValidator {
     }
 
     /**
+     * Checks if the given date is in a valid format
+     *
+     * @param date
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateDate(String date) {
+        return new InputValidator(date)
+                .dateFormatHelper()
+                .getResult();
+    }
+
+    /**
      * Checks if a string is blank or not if a string is
      * updates local variables with results
      * ignored if string failed any previous validation
