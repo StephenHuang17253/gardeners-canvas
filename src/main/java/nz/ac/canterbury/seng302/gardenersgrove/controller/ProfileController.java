@@ -184,7 +184,14 @@ public class ProfileController {
         String profilePicture = getProfilePictureString(filename);
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("userName", userName);
-        model.addAttribute("dateOfBirth", user.getDateOfBirth());
+
+        String formattedDateOfBirth = "";
+        LocalDate dateOfBirth = user.getDateOfBirth();
+        if (dateOfBirth != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            formattedDateOfBirth = dateOfBirth.format(formatter);
+        }
+        model.addAttribute("dateOfBirth", formattedDateOfBirth);
         model.addAttribute("emailAddress", user.getEmailAddress());
 
         return "profilePage";
