@@ -465,4 +465,27 @@ public class InputValidatorTest {
     }
 
 
+
+    /**
+     * Test for valid DOB
+     * @param date
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
+    public void InputValidator_isValidDate_ValidDate_return_OK(String date) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
+    };
+    /**
+     * Test for invalid DOB format
+     * @param date
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014"})
+    public void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
+        Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
+    }
+
+
+
+
 }
