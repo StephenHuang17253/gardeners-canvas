@@ -13,17 +13,16 @@ public class ResetPasswordController {
     Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
 
     private final UserService userService;
-    ;
 
     @Autowired
     public ResetPasswordController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/lost-password")
+    @GetMapping("/reset-password")
     public String resetPassword() {
 
-        logger.info("GET /lost-pasword");
+        logger.info("GET /reset-password");
 
         return "resetPasswordForm";
 
