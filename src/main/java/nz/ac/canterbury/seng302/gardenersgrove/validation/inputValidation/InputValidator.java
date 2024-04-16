@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
@@ -404,21 +405,41 @@ public class InputValidator {
             return this;
         }
 
-        List<String> dobList = Arrays.asList(testedValue.split("/"));
+        List<String> dateList = Arrays.asList(testedValue.split("/"));
 
-        if (dobList.size() != 3) {
+        if (dateList.size() != 3) {
             this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
             this.passState = false;
             return this;
         }
 
-        if (dobList.get(0).length() != 2 || dobList.get(1).length() != 2 || dobList.get(2).length() != 4) {
+        if (dateList.get(0).length() != 2 || dateList.get(1).length() != 2 || dateList.get(2).length() != 4) {
             this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
             this.passState = false;
             return this;
         }
 
-        for (String s : dobList) {
+        try {
+            LocalDate date;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+            date = LocalDate.parse(testedValue, formatter);
+            if (!date.isLeapYear() && Objects.equals(dateList.get(0), "29") && Objects.equals(dateList.get(1), "02")) {
+                this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+                this.passState = false;
+                return this;
+            }
+            if (date.lengthOfMonth() < Integer.parseInt(dateList.get(0))) {
+                this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+                this.passState = false;
+                return this;
+            }
+        } catch (Exception e) {
+            this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+            this.passState = false;
+            return this;
+        }
+
+        for (String s : dateList) {
             if (!s.matches("[0-9]+")) {
                 this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
                 this.passState = false;

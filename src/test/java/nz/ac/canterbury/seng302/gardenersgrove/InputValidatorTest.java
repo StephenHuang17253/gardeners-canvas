@@ -480,7 +480,7 @@ public class InputValidatorTest {
      * @param date
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014"})
+    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
     public void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
     }
