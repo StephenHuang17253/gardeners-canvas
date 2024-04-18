@@ -163,6 +163,10 @@ public class RegistrationFormController {
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
 
+        InputValidator.validatePassword(password);
+        validationMap.put("password", InputValidator.validatePassword(password));
+
+
         // Check that all inputs are valid
         boolean valid = true;
         for (Map.Entry<String, ValidationResult> entry : validationMap.entrySet()) {
@@ -179,6 +183,11 @@ public class RegistrationFormController {
                 model.addAttribute(entry.getKey() + "Error", error);
                 valid = false;
             }
+        }
+
+        if (!password.equals(repeatPassword)) {
+            model.addAttribute("passwordMatchingError", "Passwords do not match");
+            valid = false;
         }
 
         if (!valid) {
@@ -205,9 +214,9 @@ public class RegistrationFormController {
 
         tokenService.addToken(token);
 
-        // For development to not send signup emails but print the signup token to the
-        // terminal instead
-        boolean sendEmail = true;
+        // For development to avoid sending signup emails but print the signup token to
+        // the terminal instead, set to true or remove for production
+        boolean sendEmail = false;
 
         if (sendEmail) {
             try {

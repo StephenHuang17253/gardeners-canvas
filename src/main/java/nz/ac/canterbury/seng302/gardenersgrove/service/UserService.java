@@ -56,6 +56,10 @@ public class UserService {
      * @param rawPassword string to encode and add to user
      */
     public void addUser(User user, String rawPassword) {
+        logger.info("added user with: ");
+        logger.info("password: " + rawPassword);
+        logger.info("user: " + user);
+
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         userRepository.save(user);
@@ -70,12 +74,12 @@ public class UserService {
      */
     public User getUserByEmailAndPassword(String email, String password) {
         User[] users = userRepository.findByEmailAddress(email);
-        if (users.length == 0) {
-            return null;
-        }
-        User user = users[0];
-        if (passwordEncoder.matches(password, user.getEncodedPassword())) {
-            return user;
+        logger.info("getting user by email: ");
+        logger.info(email);
+        logger.info(password);
+        if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
+            logger.info(users[0].toString());
+            return users[0];
         }
         return null;
     }
@@ -91,6 +95,7 @@ public class UserService {
         if (users.length == 0) {
             return null;
         }
+        logger.info("getting user with email: " + users[0]);
         return users[0];
     }
 
@@ -132,7 +137,7 @@ public class UserService {
      * Update users profile picture filename
      * 
      * @param filename filename of profile picture
-     * @param id      id of user to update
+     * @param id       id of user to update
      */
     public void updateProfilePictureFilename(String filename, long id) {
         User user = getUserById(id);
@@ -142,9 +147,11 @@ public class UserService {
 
     /**
      * Verify a user, for when they enter the correct token
+     * 
      * @param user user to verify
      */
     public void verifyUser(User user) {
+        logger.info("verify: " + user);
         user.setVerified(true);
         userRepository.save(user);
     }
@@ -155,6 +162,7 @@ public class UserService {
      * @param user
      */
     public void deleteUser(User user) {
+        logger.info("delete: " + user);
         userRepository.deleteById(user.getId());
     }
 

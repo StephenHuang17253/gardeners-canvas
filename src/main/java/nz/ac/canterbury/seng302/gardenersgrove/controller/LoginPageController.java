@@ -28,27 +28,29 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.springframework.ui.Model;
 
 /**
- * This is a basic spring boot controller for the login form page, 
+ * This is a basic spring boot controller for the login form page,
  * note the {@link Controller} annotation which defines this.
  * This controller defines endpoints as functions with specific HTTP mappings
  */
 @Controller
 public class LoginPageController {
     Logger logger = LoggerFactory.getLogger(LoginPageController.class);
-    
+
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
     /**
-     * Constructor for the LoginPageController with {@link Autowired} to connect this
+     * Constructor for the LoginPageController with {@link Autowired} to connect
+     * this
      * controller with other services
      * 
      * @param userService
      * @param authenticationManager
      */
     @Autowired
-    public LoginPageController(UserService userService, AuthenticationManager authenticationManager, TokenService tokenService) {
+    public LoginPageController(UserService userService, AuthenticationManager authenticationManager,
+            TokenService tokenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
@@ -61,7 +63,7 @@ public class LoginPageController {
      * 
      * @param email
      * @param password
-     * @param session http session to set the cookies with the context key
+     * @param session  http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
         User user = userService.getUserByEmailAndPassword(email, password);
@@ -87,7 +89,7 @@ public class LoginPageController {
     @GetMapping("/login")
     public String loginPage(Model model, HttpServletRequest request) {
         logger.info("GET /login");
-        
+
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("message", inputFlashMap.get("message"));
