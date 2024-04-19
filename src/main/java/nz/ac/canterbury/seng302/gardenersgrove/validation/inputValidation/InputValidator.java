@@ -141,7 +141,7 @@ public class InputValidator {
      * Checks input against a criteria:
      * This function only allows non blank strings containing only alphanumeric
      * characters and select punctuation
-     * 
+     *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -149,7 +149,24 @@ public class InputValidator {
         return new InputValidator(text)
                 .blankHelper()
                 .alphaPlusHelper()
-                .lengthHelper(200)
+                .lengthHelper(255)
+                .getResult();
+    }
+
+    /**
+     * Checks input against a criteria:
+     * This function only allows non blank strings containing only alphanumeric
+     * characters and select punctuation
+     *
+     * @param text text to validate
+     * @param length max number of characters in text
+     * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
+     */
+    public static ValidationResult compulsoryAlphaPlusTextField(String text, int length) {
+        return new InputValidator(text)
+                .blankHelper()
+                .alphaPlusHelper()
+                .lengthHelper(length)
                 .getResult();
     }
 
@@ -174,9 +191,10 @@ public class InputValidator {
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult numberCommaSingleTextField(String text) {
+    public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
+                .areaHelper(Float.MAX_VALUE, 0.01F)
                 .getResult();
     }
 
@@ -534,6 +552,43 @@ public class InputValidator {
             this.validationResult = ValidationResult.NON_NUMERIC_COMMA;
             this.passState = false;
         }
+        return this;
+    }
+
+    /**
+     * Checks if a garden area is a valid number
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @param maxArea max area of garden
+     * @param minArea min area of garden
+     * @return the calling object
+     */
+    private InputValidator areaHelper(float maxArea, float minArea) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        float floatGardenSize;
+        if(testedValue.isBlank()){
+            this.validationResult = ValidationResult.OK;
+            return this;
+        } else{
+            floatGardenSize = Float.parseFloat(testedValue.replace(",","."));
+        }
+
+        if (floatGardenSize < minArea) {
+            this.validationResult = ValidationResult.AREA_TOO_SMALL;
+            this.passState = false;
+            return this;
+        }
+        if (floatGardenSize > maxArea) {
+            this.validationResult = ValidationResult.AREA_TOO_LARGE;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
         return this;
     }
 
