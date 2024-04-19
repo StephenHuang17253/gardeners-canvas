@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -11,10 +11,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.util.Assert;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

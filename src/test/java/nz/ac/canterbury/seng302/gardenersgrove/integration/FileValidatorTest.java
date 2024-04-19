@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
