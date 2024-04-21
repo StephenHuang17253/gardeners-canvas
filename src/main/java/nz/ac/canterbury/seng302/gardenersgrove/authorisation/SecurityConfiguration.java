@@ -69,9 +69,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request ->
                 // Allow "/", "/register", and "/login" to anyone (permitAll)
 
-                // Allow "/email" and "/verify" only for development purposes, remove for submission
                 request.requestMatchers("/", "/register", "/login", "/home", "/static/**", "/css/**", "/js/**",
-                        "/Images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/email", "/verify/**")
+                        "/Images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**")
                         .permitAll()
                         // Any other request requires authentication
                         .anyRequest()

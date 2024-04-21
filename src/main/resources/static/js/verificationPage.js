@@ -11,9 +11,7 @@ const KEYBOARDS = {
 };
 
 const updateTokenString = () => {
-  const code = inputs.map(input => input.value).join('');
-  console.log(code);
-  tokenString.value = code;
+  tokenString.value = inputs.map(input => input.value).join('');
 }
 
 const handleInput = (e) => {
@@ -38,15 +36,18 @@ const handlePaste = (e) => {
 }
 
 const handleBackspace = (e) => {
-  const input = e.target;
-  if (input.value) {
-    input.value = '';
+  e.preventDefault();
+  const lastFilledInput = inputs.findLast(input => input.value !== '');
+  if (lastFilledInput.value) {
+    lastFilledInput.value = '';
     updateTokenString();
+    const previousInput = lastFilledInput.previousElementSibling;
+    if (previousInput) {
+      previousInput.focus();
+    }
     return;
   }
-  const previousInput = e.target.previousElementSibling;
-  if (!previousInput) return;
-  previousInput.focus();
+  inputs[0].focus();
 }
 
 const handleArrowLeft = (e) => {

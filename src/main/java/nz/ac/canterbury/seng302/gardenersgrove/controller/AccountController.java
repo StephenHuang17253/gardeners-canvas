@@ -48,6 +48,10 @@ public class AccountController {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
+    // For development to avoid sending signup emails but print the signup token to
+    // the terminal instead, set to true or remove for production
+    private final boolean SEND_EMAIL = false;
+
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
      * connect this
@@ -214,11 +218,7 @@ public class AccountController {
 
         tokenService.addToken(token);
 
-        // For development to avoid sending signup emails but print the signup token to
-        // the terminal instead, set to true or remove for production
-        boolean sendEmail = true;
-
-        if (sendEmail) {
+        if (SEND_EMAIL) {
             try {
                 emailService.sendRegistrationEmail(token);
             } catch (MessagingException e) {
