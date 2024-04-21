@@ -40,6 +40,10 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
@@ -51,7 +55,7 @@ public class EmailService {
      */
     public void sendPlaintextEmail(String toEmail, String subject, String body) throws MailException {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(senderEmail);
+        message.setFrom(getSenderEmail());
         message.setTo(toEmail);
         message.setSubject(subject);
         message.setText(body);
@@ -72,7 +76,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
         String htmlContent = templateEngine.process(template, context);
 
-        helper.setFrom(senderEmail);
+        helper.setFrom(getSenderEmail());
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
