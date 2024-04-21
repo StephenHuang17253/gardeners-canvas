@@ -40,8 +40,8 @@ import java.util.Map;
  * This controller defines endpoints as functions with specific HTTP mappings
  */
 @Controller
-public class RegistrationFormController {
-    Logger logger = LoggerFactory.getLogger(RegistrationFormController.class);
+public class AccountController {
+    Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     private final EmailService emailService;
     private final UserService userService;
@@ -58,7 +58,7 @@ public class RegistrationFormController {
      * @param authenticationManager to login user after registration
      */
     @Autowired
-    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager,
+    public AccountController(UserService userService, AuthenticationManager authenticationManager,
             EmailService emailService, TokenService tokenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
@@ -216,7 +216,7 @@ public class RegistrationFormController {
 
         // For development to avoid sending signup emails but print the signup token to
         // the terminal instead, set to true or remove for production
-        boolean sendEmail = false;
+        boolean sendEmail = true;
 
         if (sendEmail) {
             try {
@@ -265,6 +265,78 @@ public class RegistrationFormController {
 
         redirectAttributes.addFlashAttribute("message", "Your account has been activated, please log in");
         return "redirect:/login";
+    }
+
+
+    /**
+     * Gets the login page
+     * 
+     * @return thymeleaf loginPage
+     */
+    @GetMapping("/login")
+    public String loginPage(Model model, HttpServletRequest request) {
+        logger.info("GET /login");
+
+        // Check if there is a message in the flash map and add it to the model
+        // Used for displaying messages after a redirect e.g. from the verify page
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        if (inputFlashMap != null) {
+            model.addAttribute("message", inputFlashMap.get("message"));
+        }
+
+        model.addAttribute("validEmail", true);
+        model.addAttribute("validLogin", true);
+
+        return "loginPage";
+    }
+
+    /**
+     * Handles the login request
+     * 
+     * @param email the email parameter
+     * @return thymeleaf loginPage
+     */
+    @PostMapping("/login")
+    public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
+            @RequestParam String password, Model model) {
+        logger.info("POST /login");
+
+        User existingUser = userService.getUserByEmail(emailAddress);
+
+        // For the given email address if there is an existing unverified user whose
+        // token has expired, delete them and their associated token
+        if (existingUser != null && !existingUser.isVerified()) {
+
+            Token token = tokenService.getTokenByUser(existingUser);
+
+            if (token != null && token.isExpired()) {
+                userService.deleteUser(existingUser);
+                tokenService.deleteToken(token);
+            }
+        }
+
+        ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
+
+        if (!validEmail.valid()) {
+            model.addAttribute("emailAddressError", validEmail);
+            return "loginPage";
+        }
+
+        User user = userService.getUserByEmailAndPassword(emailAddress, password);
+
+        if (user == null) {
+            model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
+            return "loginPage";
+        }
+
+        if (!user.isVerified()) {
+            return "redirect:/verify/" + user.getEmailAddress();
+        }
+
+        setSecurityContext(emailAddress, password, request.getSession());
+
+        return "redirect:/home";
+
     }
 
 }
