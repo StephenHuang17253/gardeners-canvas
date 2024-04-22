@@ -1,10 +1,11 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -79,7 +79,7 @@ public class PlantFormController {
         logger.info("POST /landingPage");
         //logic to handle checking if fields are vaild
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
-        ValidationResult plantCountResult = InputValidator.numberCommaSingleTextField(plantCount);
+        ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
 
@@ -156,7 +156,7 @@ public class PlantFormController {
         logger.info("POST /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         //logic to handle checking if fields are vaild
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
-        ValidationResult plantCountResult = InputValidator.numberCommaSingleTextField(plantCount);
+        ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
 
