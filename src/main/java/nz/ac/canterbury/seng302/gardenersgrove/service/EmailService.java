@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 
 import org.springframework.mail.MailException;
@@ -16,6 +14,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 /**
  * This class is a service class for sending emails
@@ -40,10 +41,6 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
-    public String getSenderEmail() {
-        return senderEmail;
-    }
-
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
@@ -55,7 +52,7 @@ public class EmailService {
      */
     public void sendPlaintextEmail(String toEmail, String subject, String body) throws MailException {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(getSenderEmail());
+        message.setFrom(senderEmail);
         message.setTo(toEmail);
         message.setSubject(subject);
         message.setText(body);
@@ -76,7 +73,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
         String htmlContent = templateEngine.process(template, context);
 
-        helper.setFrom(getSenderEmail());
+        helper.setFrom(senderEmail);
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);

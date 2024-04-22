@@ -7,10 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 
 import org.springframework.mail.javamail.JavaMailSender;
 
-import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.thymeleaf.TemplateEngine;
@@ -23,8 +20,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -48,7 +43,6 @@ class EmailServiceTest {
 
         emailService = spy(new EmailService(mailSender, templateEngine));
 
-        when(emailService.getSenderEmail()).thenReturn("test@email.com");
     }
 
     @Test
