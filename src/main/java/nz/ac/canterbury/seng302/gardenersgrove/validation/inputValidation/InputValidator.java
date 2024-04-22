@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
+
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +12,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 /**
  * Tests inputs on a variety of rules to check if values are valid
@@ -90,24 +90,37 @@ public class InputValidator {
      * @param length - int, the character limit of string
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult compulsoryTextFieldWithLengthLimit(String text, int length) {
+    public static ValidationResult compulsoryTextField(String text, int length) {
         return new InputValidator(text)
                 .blankHelper()
                 .lengthHelper(length)
                 .getResult();
     }
-
     /**
      * Checks input against a criteria:
      * This function allows blank strings.
      * The string can contain any characters.
-     * It checks the string against a character limit.
+     * It checks the string against a default character limit.
+     *
+     * @param text   - text to validate
+     * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
+     */
+    public static ValidationResult optionalTextField(String text) {
+        return new InputValidator(text)
+                .lengthHelper(200)
+                .getResult();
+    }
+    /**
+     * Checks input against a criteria:
+     * This function allows blank strings.
+     * The string can contain any characters.
+     * It checks the string against a character limit of param length.
      *
      * @param text   - text to validate
      * @param length - int, the character limit of string
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult optionalTextFieldWithLengthLimit(String text, int length) {
+    public static ValidationResult optionalTextField(String text, int length) {
         return new InputValidator(text)
                 .lengthHelper(length)
                 .getResult();
@@ -173,6 +186,7 @@ public class InputValidator {
     /**
      * Checks input against a criteria:
      * This function only allows alphanumeric characters and select punctuation
+     * Checks input against default character limit of 200.
      *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
@@ -186,13 +200,14 @@ public class InputValidator {
 
     /**
      * Checks input against a criteria:
-     * This function only allows alphanumeric characters and select punctuation.
-     * It also checks the input against a character limit.
+     * This function only allows alphanumeric characters and select punctuation
+     * Checks input against character limit of param length.
+     *
      * @param text text to validate
+     * @param length int, the character limit of input
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult optionalAlphaPlusTextFieldWithLengthLimit(String text, int length)
-    {
+    public static ValidationResult optionalAlphaPlusTextField(String text, int length) {
         return new InputValidator(text)
                 .alphaPlusHelper()
                 .lengthHelper(length)
@@ -213,7 +228,7 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult numberCommaSingleTextFieldWithLengthLimit(String text, int length)
+    public static ValidationResult numberCommaSingleTextField(String text, int length)
     {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
@@ -623,5 +638,14 @@ public class InputValidator {
     private ValidationResult getResult() {
         return this.validationResult;
     }
+
+
+
+
+
+
+
+
+
 
 }

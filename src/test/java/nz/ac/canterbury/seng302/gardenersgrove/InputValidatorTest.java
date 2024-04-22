@@ -265,13 +265,13 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_compTextWithLengthLimit_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.compulsoryTextFieldWithLengthLimit("12345", 5));
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryTextField("12345", 5));
     }
 
     @Test
     public void InputValidator_compTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
-        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextFieldWithLengthLimit("123456789", 2));
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextField("123456789", 2));
     }
 
     @Test
@@ -289,19 +289,19 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_optTextWithLengthLimit_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("123", 4));
+        assertEquals(ValidationResult.OK,InputValidator.optionalTextField("123", 4));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
-        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextFieldWithLengthLimit("123456789", 2));
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextField("123456789", 2));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_blankInput_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("", 5));
+        assertEquals(ValidationResult.OK,InputValidator.optionalTextField("", 5));
     }
 
     @Test

@@ -78,6 +78,10 @@
                 <h3 class="error" th:text="${CountryErrorText}"></h3>
             </div>
 
+            <input type="hidden" th:name="gardenLocation" th:class="${GLErrorClass}" id="gardenLocation" data-cy="gardenLocation">
+
+
+
             <label for="gardenSize"> Garden Size(m^2): </label>
             <br>
             <input type="text" class="form-control" th:class = "${GSErrorClass}" id="gardenSize" placeholder="7.5"
@@ -86,9 +90,11 @@
             <div th:if="${GSErrorText!=''}">
                 <h3 class = "error" th:text="${GSErrorText}"></h3>
             </div>
+
+
             <br/>
 
-            <input type="hidden" th:name="gardenLocation" id="gardenLocation" data-cy="gardenLocation">
+
             <button type="submit" class = "submit-button">Create</button>
             <button type="button" onclick="window.location.href = localStorage.getItem('previousUrl')" class="cancel-button" >Cancel</button>
 

@@ -27,7 +27,7 @@ public class Garden {
     private String gardenCity;
     @Column
     private String gardenCountry;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 522)
     private String gardenLocation;
     @Column
     private float gardenSize;

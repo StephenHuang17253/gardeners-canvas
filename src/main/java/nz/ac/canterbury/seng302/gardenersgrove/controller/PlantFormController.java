@@ -80,7 +80,7 @@ public class PlantFormController {
         //logic to handle checking if fields are vaild
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
 
         plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
@@ -157,7 +157,7 @@ public class PlantFormController {
         //logic to handle checking if fields are vaild
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
 
         plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
