@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +36,14 @@ public class LostPasswordController {
     @PostMapping("/lost-password")
     public String checkEmail(@RequestParam("email") String email, Model model) {
         boolean isRegistered = userService.emailInUse(email);
-        if (isRegistered) {
-            model.addAttribute("message", "Okay");
+        ValidationResult emailValidation = InputValidator.validateUniqueEmail(email);
+
+        if (!isRegistered && !emailValidation.valid()) {
+            model.addAttribute("emailError", emailValidation);
         } else {
-            model.addAttribute("message", "Error: Email not registered.");
+            model.addAttribute("message", "An email was sent to the address if it was recognised");
         }
+
         return "lostPasswordForm";
     }
 }
