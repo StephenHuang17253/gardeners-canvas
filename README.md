@@ -19,6 +19,12 @@ gradlew bootRun
 By default, the application will run on local port 8080 [http://localhost:8080](http://localhost:8080)
 
 ### 2 - Using the application
+
+In order for Gardener's Grove to send emails, an email.properties file must be created in the root directory with the follow lines placed in it.
+spring.mail.username=<your_email>
+spring.mail.password=<your_app_password>
+To generate an app password you can visit [this link](myaccount.google.com/u/3/apppasswords)
+
 This project includes basic user registration, user login, profile view, and edit profile.
 
 This application also has a default user loaded in at the moment with the details:
