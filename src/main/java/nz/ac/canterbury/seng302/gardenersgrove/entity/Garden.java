@@ -29,7 +29,7 @@ public class Garden {
     /**
      * JPA required no-args constructor
      */
-    protected Garden() {}
+    public Garden() {}
     /**
      * Creates a new Garden object.
      * @param gardenName the name of the garden
