@@ -14,6 +14,9 @@ import java.util.List;
 @Service
 public class GardenService {
 
+    @Autowired
+    private UserService userService;
+
     /**
      * Interface for generic CRUD operations on a repository for Garden types.
      */
@@ -32,16 +35,21 @@ public class GardenService {
      * Retrieves all gardens from persistence
      * @return a list of all garden objects saved in persistence
      */
+    //might be irrlevant for this sprint
     public List<Garden> getGardens() {
         return gardenRepository.findAll();
     }
     /**
      * Retrieves all gardens from persistence where the owner id matches the inputted id
      * @param id the user's ID
-     * @return a list of all garden objects saved in persistence
+     * @throws IllegalArgumentException if the provided user ID is invalid
      */
     public List<Garden> getAllUsersGardens(long id) {
-        return gardenRepository.findByOwnerId(id);
+        if (userService.getUserById(id) != null) {
+            return gardenRepository.findByOwnerId(id);
+        } else {
+            throw new IllegalArgumentException("Invalid user ID: " + id);
+        }
     }
 
     /**

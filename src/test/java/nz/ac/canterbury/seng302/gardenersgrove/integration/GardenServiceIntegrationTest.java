@@ -4,25 +4,24 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<<< HEAD:src/test/java/nz/ac/canterbury/seng302/gardenersgrove/GardenServiceIntegrationTest.java
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-========
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
-import java.time.LocalDate;
->>>>>>>> origin/dev:src/test/java/nz/ac/canterbury/seng302/gardenersgrove/integration/GardenServiceTest.java
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -38,25 +37,52 @@ public class GardenServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
+    private List<Garden> gardenList = new ArrayList<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
-    @Test
-    public void testGetGardens() {
-
+    @BeforeEach
+    void ClearRepository_AddUsersAndGardens() {
+        userRepository.deleteAll();
         User user1 = new User("John","Doe","johnDoe@email.com", date);
         User user2 = new User("Jane","Doe","janeDoe@email.com", date);
+        User user3 = new User("Bruce","Wayne","bruceWyane@email.com", date);
         userService.addUser(user1,"1es1P@ssword");
         userService.addUser(user2,"1es1P@ssword");
+        userService.addUser(user3,"1es1P@ssword");
         Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden2 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
+        Garden garden2 = new Garden("John's Garden", "John's Backyard", 15, user1);
+        Garden garden3 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
+        gardenList.add(garden1);
+        gardenList.add(garden2);
+        gardenList.add(garden3);
+        gardenRepository.saveAll(gardenList);
+    }
+    @Test
+    public void GetAllUsersGardens_UserInPersistenceAndOwnsSingleGardens() {
         List<Garden> expectedGardens = new ArrayList<>();
-        expectedGardens.add(garden1);
-        expectedGardens.add(garden2);
-        gardenRepository.save(garden1);
-        gardenRepository.save(garden2);
-        List<Garden> actualGardens = gardenService.getGardens();
+        expectedGardens.add(gardenList.get(2));
+        List<Garden> actualGardens = gardenService.getAllUsersGardens(2L);
+        Assertions.assertEquals(1, actualGardens.size());
+
+        for (int i = 0; i < expectedGardens.size(); i++) {
+            Garden expectedGarden = expectedGardens.get(i);
+            Garden actualGarden = actualGardens.get(i);
+
+            Assertions.assertEquals(expectedGarden.getGardenName(), actualGarden.getGardenName());
+            Assertions.assertEquals(expectedGarden.getGardenLocation(), actualGarden.getGardenLocation());
+            Assertions.assertEquals(expectedGarden.getGardenSize(), actualGarden.getGardenSize());
+            Assertions.assertEquals(expectedGarden.getOwner().getId(), actualGarden.getOwner().getId());
+        }
+    }
+    @Test
+    public void GetAllUsersGardens_UserInPersistenceAndOwnsMultipleGardens() {
+        List<Garden> expectedGardens = new ArrayList<>();
+        expectedGardens.add(gardenList.get(0));
+        List<Garden> actualGardens = gardenService.getAllUsersGardens(1L);
         Assertions.assertEquals(2, actualGardens.size());
 
         for (int i = 0; i < expectedGardens.size(); i++) {
@@ -70,37 +96,37 @@ public class GardenServiceIntegrationTest {
         }
     }
     @Test
-    public void GetAllUsersGardens_UserInPersistenceAndOwnsGardens() {
-
-        GardenService gardenService = new GardenService(gardenRepository);
-        User user1 = new User("John","Doe","johnDoe@email.com", date);
-        User user2 = new User("Jane","Doe","janeDoe@email.com", date);
-        Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden2 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
-
-        Mockito.when(user1.getId()).thenReturn(1L);
-        Mockito.when(user2.getId()).thenReturn(2L);
-
-        gardenRepository.save(garden1);
-        gardenRepository.save(garden2);
-        List<Garden> jhonsGardens = gardenService.getAllUsersGardens(user1.getId());
-        List<Garden> janesGardens = gardenService.getAllUsersGardens(user2.getId());
-        Assertions.assertTrue(jhonsGardens.contains(garden1));
-        Assertions.assertTrue(janesGardens.contains(garden2));
-
+    public void GetAllUsersGardens_UserInPersistenceAndOwnsNoGardens() {
+        List<Garden> actualGardens = gardenService.getAllUsersGardens(3L);
+        Assertions.assertEquals(0, actualGardens.size());
+    }
+    @Test
+    void GetAllUsersGardens_UserNotInPersistence_ThrowsIllegalArgumentException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            gardenService.getAllUsersGardens(3L);
+        });
     }
     @Mock
     GardenRepository gardenRepo;
     @Test
-    public void testFindById() {
-        User user = new User("John","Doe","johnDoe@email.com", date);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15, user);
-        Mockito.when(gardenRepo.findById(1L)).thenReturn(Optional.of(garden));
-
-        GardenService gardenService = new GardenService(gardenRepo);
+    public void FindById_GardenIdExists() {
+        List<Garden> expectedGardens = new ArrayList<>();
+        expectedGardens.add(gardenList.get(0));
         Optional<Garden> optionalGarden = gardenService.findById(1L);
-
         Assertions.assertTrue(optionalGarden.isPresent());
+
+        Garden expectedGarden = gardenList.get(0);
+        Garden actualGarden =  optionalGarden.get();
+
+        Assertions.assertEquals(expectedGarden.getGardenName(), actualGarden.getGardenName());
+        Assertions.assertEquals(expectedGarden.getGardenLocation(), actualGarden.getGardenLocation());
+        Assertions.assertEquals(expectedGarden.getGardenSize(), actualGarden.getGardenSize());
+        Assertions.assertEquals(expectedGarden.getOwner().getId(), actualGarden.getOwner().getId());
+    }
+    @Test
+    public void FindById_GardenIdDoseNotExist() {
+        Optional<Garden> optionalGarden = gardenService.findById(1L);
+        Assertions.assertFalse(optionalGarden.isPresent());
     }
 
     @Test
