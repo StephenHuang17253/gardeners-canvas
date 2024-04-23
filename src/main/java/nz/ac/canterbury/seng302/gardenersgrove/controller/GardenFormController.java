@@ -144,17 +144,15 @@ public class GardenFormController {
         gardenLocation = locationValues;
 
 
+        logger.info(String.valueOf(gardenLocation.length()));
+
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
-        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 128);
-        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 128);
-        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 128);
-        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 128);
+        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
         ValidationResult postcodeResult = InputValidator.numberCommaSingleTextField(postcode,10);
-        ValidationResult gardenLocationResult = ValidationResult.BLANK;
-        // This if block is needed to stop the validation for garden location overwriting the prior error messages.
-        if (streetAddressResult.valid() & suburbResult.valid() & cityResult.valid() & countryResult.valid()) {
-            gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
-        }
+        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
 
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
@@ -284,10 +282,10 @@ public class GardenFormController {
         gardenLocation = locationValues;
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
-        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 128);
-        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 128);
-        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 128);
-        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 128);
+        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
         ValidationResult postcodeResult = InputValidator.numberCommaSingleTextField(postcode,10);
         ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
@@ -350,6 +348,9 @@ public class GardenFormController {
         // notifies the user that the street address is invalid (if applicable)
         if(!streetAddressResult.valid())
         {
+            if (streetAddressResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                streetAddressResult.updateMessage("cannot be longer than 96 characters");
+            }
             model.addAttribute("AddressErrorText","Address " + streetAddressResult);
             model.addAttribute("AddressErrorClass","errorBorder");
             logger.info("Garden Street failed validation");
@@ -362,6 +363,9 @@ public class GardenFormController {
         // notifies the user that the suburb is invalid (if applicable)
         if(!suburbResult.valid())
         {
+            if (suburbResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                suburbResult.updateMessage("cannot be longer than 96 characters");
+            }
             model.addAttribute("SuburbErrorText","Suburb " + suburbResult);
             model.addAttribute("SuburbErrorClass","errorBorder");
             logger.info("Garden Suburb failed validation");
@@ -374,12 +378,12 @@ public class GardenFormController {
         // notifies the user that the city input is invalid (if applicable)
         if(!cityResult.valid())
         {
-            if (cityResult == ValidationResult.BLANK) {
-                model.addAttribute("CityErrorText","City " + cityResult);
+            if (cityResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                cityResult.updateMessage("cannot be longer than 96 characters");
             }
-            if (cityResult == ValidationResult.NON_ALPHA_PLUS || cityResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                model.addAttribute("CityErrorText","City " + cityResult);
-            }
+            model.addAttribute("CityErrorText","City " + cityResult);
+
+
             model.addAttribute("CityErrorClass","errorBorder");
             logger.info("Garden City failed validation");
         }
@@ -391,11 +395,8 @@ public class GardenFormController {
         // notifies the user that the country input is invalid (if applicable)
         if(!countryResult.valid())
         {
-            if (countryResult == ValidationResult.BLANK) {
-                model.addAttribute("CountryErrorText","Country " + countryResult);
-            }
-            if (countryResult == ValidationResult.NON_ALPHA_PLUS || countryResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                model.addAttribute("CountryErrorText","Country " + countryResult);
+            if (countryResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                countryResult.updateMessage("cannot be longer than 128 characters");
             }
             model.addAttribute("CountryErrorClass","errorBorder");
             logger.info("Garden Country failed validation");
@@ -408,6 +409,9 @@ public class GardenFormController {
         // notifies the user that the postcode input is invalid (if applicable)
         if(!postcodeResult.valid())
         {
+            if (postcodeResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                postcodeResult.updateMessage("cannot be longer than 10 characters");
+            }
 
             model.addAttribute("PostCodeErrorText","Postcode " + postcodeResult);
             model.addAttribute("PostCodeErrorClass","errorBorder");

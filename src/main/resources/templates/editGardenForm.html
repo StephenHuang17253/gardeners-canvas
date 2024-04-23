@@ -79,10 +79,6 @@
                 <h3 class="error" th:text="${CountryErrorText}"></h3>
             </div>
 
-            <div th:if="${GLErrorText!=''}">
-                <h3 class = "error" th:text="${GLErrorText}"></h3>
-            </div>
-
             <label for="gardenSize"> Garden Size(m^2): </label>
             <br>
             <input type="text" class="form-control" th:class = "${GSErrorClass}" id="gardenSize" placeholder="7.5"
