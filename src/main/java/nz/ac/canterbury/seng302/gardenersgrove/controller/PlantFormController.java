@@ -195,7 +195,11 @@ public class PlantFormController {
 
         // notifies the user that the plant Name is invalid (if applicable)
         if (!plantNameResult.valid()) {
-            plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+            if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                plantNameResult.updateMessage("cannot be greater than 64 characters in length");
+            } else {
+                plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+            }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
             model.addAttribute("PNErrorClass", "errorBorder");
             logger.info("Plant Name failed validation");
