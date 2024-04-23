@@ -26,9 +26,9 @@ public enum ValidationResult {
     LENGTH_OVER_LIMIT("must be less than limit characters"),
 
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
-    INVALID_FILE_SIZE("Image must be less than 10MB");
-    
-
+    INVALID_FILE_SIZE("Image must be less than 10MB"),
+    AREA_TOO_SMALL("Area (meters squared) is too small"),
+    AREA_TOO_LARGE("Area (meters squared) is too large");
 
     private String message;
 

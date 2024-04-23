@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.unit;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -199,50 +199,50 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_numCommSingle_blank_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField(""));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(""));
     }
 
     @Test
     public void InputValidator_numCommSingle_number_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("123"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("123"));
     }
 
     @Test
     public void InputValidator_numCommSingle_numberWComma_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("123,23"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("123,23"));
     }
 
     @Test
     public void InputValidator_numCommSingle_numberW2Comma_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("12,23,23"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("12,23,23"));
     }
     @Test
     public void InputValidator_numCommSingle_letters_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("Abc"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("Abc"));
     }
     @Test
     public void InputValidator_numCommSingle_numbersWletters_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("12JK23"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("12JK23"));
     }
     @Test
     public void InputValidator_numCommSingle_NonAlpha_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("~ÉI3Á┌1&"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("~ÉI3Á┌1&"));
     }
     @Test
     public void InputValidator_numCommSingle_onlyComma_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField(","));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput(","));
     }
     @Test
     public void InputValidator_numCommSingle_singleNumber_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("1"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("1"));
     }
 
     @Test
@@ -275,6 +275,18 @@ public class InputValidatorTest {
     }
 
     @Test
+    public void InputValidator_compAlphaTestWithLengthLimit_return_OK()
+    {
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("12345", 5));
+    }
+
+    @Test
+    public void InputValidator_compAlphaTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
+    {
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryAlphaPlusTextField("123456789", 2));
+    }
+
+    @Test
     public void InputValidator_optTextWithLengthLimit_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("123", 4));
@@ -295,33 +307,53 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_numCommSingle_1comma0_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("1,0"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("1,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_negative1comma0_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("-1,0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("-1,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_InvalidFormat1_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("1-0,0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("1-0,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_InvalidFormat2_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("!9,0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("!9,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_InvalidFormat3_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("1 ! 0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("1 ! 0"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1", "340282346638528860000000000000000000000" })
+    public void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input)
+    {
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "0.0000001", "0.009", "0" })
+    public void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input)
+    {
+        assertEquals(ValidationResult.AREA_TOO_SMALL,InputValidator.validateGardenAreaInput(input));
+    }
+
+    @Test
+    public void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE()
+    {
+        String sizeOfJavaFloat = "340300000000000000000000000000000000000";
+        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(sizeOfJavaFloat));
+    }
 
     /**
      * Test for valid names

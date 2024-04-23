@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -81,7 +80,7 @@ public class PlantFormController {
         logger.info("POST /landingPage");
         //logic to handle checking if fields are vaild
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
-        ValidationResult plantCountResult = InputValidator.numberCommaSingleTextField(plantCount);
+        ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
 
@@ -157,7 +156,7 @@ public class PlantFormController {
         logger.info("POST /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         //logic to handle checking if fields are vaild
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
-        ValidationResult plantCountResult = InputValidator.numberCommaSingleTextField(plantCount);
+        ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
 
