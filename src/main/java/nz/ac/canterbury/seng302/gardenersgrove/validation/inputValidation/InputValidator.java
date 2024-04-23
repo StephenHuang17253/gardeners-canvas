@@ -303,7 +303,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("[a-zA-Z\\-\\s']+")) {
+        if (!testedValue.matches("^\\p{L}[\\p{L} \\-'’]*$")) {
             this.validationResult = ValidationResult.INVALID_USERNAME;
             this.passState = false;
             return this;
