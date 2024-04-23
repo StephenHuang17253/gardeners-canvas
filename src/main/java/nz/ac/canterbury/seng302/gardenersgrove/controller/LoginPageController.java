@@ -73,20 +73,15 @@ public class LoginPageController {
 
         ValidationResult validEmail = InputValidator.validateEmail(email);
 
-        boolean validLogin = userService.getUserByEmailAndPassword(email, password) != null;
-
-        if (!validEmail.valid() || !validLogin) {
+        if (!validEmail.valid()) {
             model.addAttribute("emailError", validEmail);
-            model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
-
             return "loginPage";
         }
+
         User user = userService.getUserByEmailAndPassword(email, password);
 
         if (user == null) {
-            model.addAttribute("validEmail", validEmail);
-            model.addAttribute("validLogin", false);
-
+            model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
             return "loginPage";
         }
 
