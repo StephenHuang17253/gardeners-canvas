@@ -113,4 +113,22 @@ public class PlantService {
         }
     }
 
+    /**
+     * Update a plant's picture filename
+     *
+     * @param filename filename of plant picture
+     * @param id      id of plant to update
+     */
+    public void updatePlantPictureFilename(String filename, long id) {
+        Optional<Plant> targetPlant = findById(id);
+        if (targetPlant.isPresent()) {
+            Plant plant = targetPlant.get();
+            plant.setPlantPictureFilename(filename);
+            plantRepository.save(plant);
+        } else {
+            throw new IllegalArgumentException("Invalid plant id");
+        }
+
+    }
+
 }

@@ -1,21 +1,25 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -29,11 +33,13 @@ public class PlantFormController {
 
     private final PlantService plantService;
     private final GardenService gardenService;
+    private final FileService fileService;
 
     @Autowired
-    public PlantFormController(PlantService plantService, GardenService gardenService) {
+    public PlantFormController(PlantService plantService, GardenService gardenService, FileService fileService) {
         this.plantService = plantService;
         this.gardenService = gardenService;
+        this.fileService = fileService;
     }
     /**
      * Maps the createNewPlantForm html page to /create-new-plant url
@@ -229,5 +235,69 @@ public class PlantFormController {
         }
 
     }
+
+    /**
+     * Gets the resource url for the plant picture, or the default plant picture
+     * if the plant does not have one
+     *
+     * @param filename string filename
+     * @return string of the plant picture url
+     */
+    public String getPlantPictureString(String filename) {
+
+        String plantPictureString = "/Images/default_plant.png";
+
+        if (filename != null && filename.length() != 0) {
+            plantPictureString = MvcUriComponentsBuilder
+                    .fromMethodName(PlantFormController.class, "serveFile", filename)
+                    .build()
+                    .toUri()
+                    .toString();
+        }
+        return plantPictureString;
+    }
+
+    /**
+     * Serves the file from the file service
+     *
+     * @param filename file to retrieve
+     * @return response with the file
+     */
+    @GetMapping("/files/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+        logger.info("GET /files/" + filename);
+        try {
+            Resource file = fileService.loadFile(filename);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                    .body(file);
+        } catch (MalformedURLException error) {
+            error.printStackTrace();
+        }
+        return null;
+
+    }
+
+    public void updatePlantPicture(Plant plant, MultipartFile plantPicture) {
+        String fileExtension = plantPicture.getOriginalFilename().split("\\.")[1];
+        try {
+            String[] allFiles = fileService.getAllFiles();
+            // Delete past plant image/s
+            for (String file : allFiles) {
+                if (file.contains("plant_" + plant.getPlantId() + "_plant_picture")) {
+                    fileService.deleteFile(file);
+                }
+            }
+
+            String fileName = "plant_" + plant.getPlantId() + "_plant_picture." + fileExtension.toLowerCase();
+            plantService.updatePlantPictureFilename(fileName, plant.getPlantId());
+            fileService.saveFile(fileName, plantPicture);
+
+        } catch (IOException error) {
+            error.printStackTrace();
+        }
+    }
+
 
 }
