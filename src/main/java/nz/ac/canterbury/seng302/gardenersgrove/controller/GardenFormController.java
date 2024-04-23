@@ -336,6 +336,9 @@ public class GardenFormController {
         // notifies the user that the garden Name is invalid (if applicable)
         if(!gardenNameResult.valid())
         {
+            if (gardenNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                gardenNameResult.updateMessage("cannot be greater than 64 characters in length");
+            }
             model.addAttribute("GNErrorText","Garden name " + gardenNameResult);
             model.addAttribute("GNErrorClass","errorBorder");
             logger.info("Garden Name failed validation");
