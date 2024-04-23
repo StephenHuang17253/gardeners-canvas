@@ -38,6 +38,7 @@ public class Garden {
      * @param gardenName the name of the garden
      * @param gardenLocation the location of the garden
      * @param gardenSize the size of the garden
+     * @param owner the User object that owns the garden
      */
     public Garden(String gardenName, String gardenLocation, float gardenSize, User owner) {
         this.gardenName = gardenName;
@@ -45,7 +46,18 @@ public class Garden {
         this.gardenSize = gardenSize;
         this.owner = owner;
     }
-
+    /**
+     * Creates a new Garden object without the owner param
+     * Useful for updating plants
+     * @param gardenName the name of the garden
+     * @param gardenLocation the location of the garden
+     * @param gardenSize the size of the garden
+     */
+    public Garden(String gardenName, String gardenLocation, float gardenSize) {
+        this.gardenName = gardenName;
+        this.gardenLocation = gardenLocation;
+        this.gardenSize = gardenSize;
+    }
     public Long getGardenId() {
         return gardenId;
     }
@@ -78,7 +90,7 @@ public class Garden {
                 ", name='" + gardenName + '\'' +
                 ", location='" + gardenLocation + '\'' +
                 ", size='" + gardenSize + '\'' +
-                ", owner='" + owner + '\'' +
+                ", owner_id='" + owner.getId() + '\'' +
                 ", plants='" + plants + '\'' +
                 '}';
     }

@@ -7,14 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.Optional;
 
@@ -39,11 +35,9 @@ public class MyGardensController {
      * Maps the myGardensPage html file to /my-gardens url
      * @return thymeleaf createNewGardenForm
      */
-//    @RequiresUserGardens
     @GetMapping("/my-gardens")
     public String myGardens(Model model) {
         logger.info("GET /my-gardens");
-//        model.addAttribute("gardenCount", gardenService.getGardens().size());
 
         return "myGardensPage";
     }
@@ -69,8 +63,8 @@ public class MyGardensController {
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("gardenSize", garden.getGardenSize());
             model.addAttribute("gardenId",gardenId);
-            model.addAttribute("plants",garden.getPlants());
-            model.addAttribute("totalPlants",garden.getPlants().size());
+            model.addAttribute("plants", garden.getPlants());
+            model.addAttribute("totalPlants", garden.getPlants().size());
             return "gardenDetailsPage";
         } else {
             return "404";

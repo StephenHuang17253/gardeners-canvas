@@ -177,10 +177,10 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
+        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation, floatGardenSize));
+        logger.info("Edited Garden Page");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User owner = userService.getUserByEmail(authentication.getName());
-        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation,floatGardenSize, owner));
-        logger.info("Edited Garden Page");
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
 
         return "redirect:/my-gardens/{gardenId}={gardenName}";

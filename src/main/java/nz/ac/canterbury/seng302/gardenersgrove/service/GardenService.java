@@ -100,7 +100,4 @@ public class GardenService {
             throw new IllegalArgumentException("Invalid garden ID");
         }
     }
-
-
-
 }
