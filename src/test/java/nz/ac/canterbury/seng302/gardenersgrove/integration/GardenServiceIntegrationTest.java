@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
@@ -11,11 +11,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<<< HEAD:src/test/java/nz/ac/canterbury/seng302/gardenersgrove/GardenServiceIntegrationTest.java
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+========
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+
+import java.time.LocalDate;
+>>>>>>>> origin/dev:src/test/java/nz/ac/canterbury/seng302/gardenersgrove/integration/GardenServiceTest.java
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
