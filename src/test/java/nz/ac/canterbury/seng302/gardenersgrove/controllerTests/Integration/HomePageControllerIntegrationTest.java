@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove.integration;
+package nz.ac.canterbury.seng302.gardenersgrove.controllerTests.Integration;
 
 
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
