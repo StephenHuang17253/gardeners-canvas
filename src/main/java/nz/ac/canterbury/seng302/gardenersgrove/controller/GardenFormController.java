@@ -399,8 +399,9 @@ public class GardenFormController {
         if(!countryResult.valid())
         {
             if (countryResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                countryResult.updateMessage("cannot be longer than 128 characters");
+                countryResult.updateMessage("cannot be longer than 96 characters");
             }
+            model.addAttribute("CountryErrorText","Country " + countryResult);
             model.addAttribute("CountryErrorClass","errorBorder");
             logger.info("Garden Country failed validation");
         }
