@@ -117,7 +117,10 @@ jacocoTestReport { // Generate a report for all generated test data
 		include '**/*.exec'
 	}
 	reports {
-		html.destination file("${buildDir}/reports/coverage/overall")
+		xml.enabled true
+		xml.destination file("${buildDir}/jacoco/test-report.xml")
+		csv.enabled false
+		html.destination file("${buildDir}/jacoco/html")
 	}
 }
 
