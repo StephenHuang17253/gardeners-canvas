@@ -6,7 +6,7 @@ Background:
   And I am on the garden edit form
 
 
-  Scenario Outline: AC2 - valid values
+  Scenario Outline: AC2 can submit valid values
     When  I enter valid values for the "<name>", "<location>", and "<size>"
     And I click the edit plant form Submit button
     And The garden details have been updated
@@ -19,7 +19,7 @@ Background:
       | ward-connect |   14 b STREET   | 7.9   |
       | ward-cÁÕăect |   14 b STÁÕăT   | 0.1   |
 
-  Scenario Outline: AC3
+  Scenario Outline: AC3 can't submit invalid names
     Given I enter valid values for the "name", "Location", and "0.0"
     When I enter an invalid name value "<Name>"
     And I click the edit plant form Submit button
@@ -36,7 +36,7 @@ Background:
 
 
 
-  Scenario Outline: AC4
+  Scenario Outline: AC4 - can't submit invalid size
     Given I enter valid values for the "name", "Location", and "0.0"
     When I enter an invalid size value "<size>"
     And I click the edit plant form Submit button
@@ -52,7 +52,7 @@ Background:
       | Null            |
 
 
-  Scenario Outline: AC5
+  Scenario Outline: AC5 - cant submit invalid location
     Given I enter valid values for the "name", "Location", and "0.0"
     When I enter an invalid location value "<inv_location>"
     And I click the edit plant form Submit button
@@ -61,10 +61,10 @@ Background:
       | inv_location   |
       | 13@fifty_laner |
       | sgsha!asdksad  |
-      | nowhereçua§il   |
+      | nowhereçua§il  |
 
 
-  Scenario: AC6
+  Scenario: AC6 - can enter a size with a comma instead of full stop
     Given I enter valid values for the "name", "Location", and "0.0"
     When I enter a size using a comma
     And I click the edit plant form Submit button
