@@ -5,6 +5,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,10 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
+
+        String plantPicture = getPlantPictureString("");
+        model.addAttribute("plantPicture", plantPicture);
+
         logger.info("GET /create-new-plant");
         return "createNewPlantForm"; // Return the view for creating a new plant
     }
@@ -80,16 +86,21 @@ public class PlantFormController {
                                      @RequestParam(name = "plantCount", required = false) String plantCount,
                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
                                      @PathVariable("gardenId") Long gardenId,
                                      Model model) {
         logger.info("POST /landingPage");
+
+
+
         //logic to handle checking if fields are vaild
+        ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
 
-        plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
@@ -128,8 +139,11 @@ public class PlantFormController {
         {
             return "404";
         }
+
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", gardenName); // Pass gardenName to the form
+        String plantPicture = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+        model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
@@ -156,25 +170,39 @@ public class PlantFormController {
                                      @RequestParam(name = "plantCount", required = false) String plantCount,
                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                                     @RequestParam("plantPictureInput") MultipartFile plantPicture,
                                      @PathVariable("gardenId") Long gardenId,
                                       @PathVariable("plantId") Long plantId,
                                      Model model) {
         logger.info("POST /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
+
+        Optional<Plant> plantToUpdate =  plantService.findById(plantId);
+        if(!plantToUpdate.isPresent())
+        {
+            return "404";
+        }
+
         //logic to handle checking if fields are vaild
+        ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
+        if (plantPicture.isEmpty()) {
+            plantPictureResult = ValidationResult.OK;
+        }
 
-        plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
 
+        String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+        model.addAttribute("plantPicture", plantPictureString);
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
 
-        if (!plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
+        if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
             System.out.println("Passed");
             return "editPlantForm";
         }
@@ -182,6 +210,12 @@ public class PlantFormController {
         if(plantCount.isBlank()) {plantCount = "1.0";}
         float floatPlantCount = Float.parseFloat(plantCount.replace(",", "."));
         plantService.updatePlant(plantId, plantName, floatPlantCount, plantDescription, plantDate);
+
+        if (!plantPicture.isEmpty()) {
+            updatePlantPicture(plantToUpdate.get(), plantPicture);
+        }
+
+
         logger.info("updated Plant");
         return "redirect:/my-gardens/{gardenId}={gardenName}";
     }
@@ -196,8 +230,13 @@ public class PlantFormController {
      * @param plantCountResult result of validating count (OK or appropriate error)
      * @param plantDescriptionResult result of validating description (OK or appropriate error)
      */
-    private void plantFormErrorText (Model model, ValidationResult plantNameResult,
+    private void plantFormErrorText (Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
             ValidationResult plantCountResult, ValidationResult plantDescriptionResult){
+
+
+        if (!plantPictureResult.valid()) {
+            model.addAttribute("profilePictureError", plantPictureResult);
+        }
 
         // notifies the user that the plant Name is invalid (if applicable)
         if (!plantNameResult.valid()) {
@@ -245,7 +284,7 @@ public class PlantFormController {
      */
     public String getPlantPictureString(String filename) {
 
-        String plantPictureString = "/Images/default_plant.png";
+        String plantPictureString = "/images/default_plant.png";
 
         if (filename != null && filename.length() != 0) {
             plantPictureString = MvcUriComponentsBuilder
@@ -263,10 +302,10 @@ public class PlantFormController {
      * @param filename file to retrieve
      * @return response with the file
      */
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("/files/plants/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/" + filename);
+        logger.info("GET /files/plants/" + filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
@@ -279,6 +318,12 @@ public class PlantFormController {
 
     }
 
+    /**
+     * Update the plant's picture
+     *
+     * @param plant           plant to update
+     * @param plantPicture new plant picture
+     */
     public void updatePlantPicture(Plant plant, MultipartFile plantPicture) {
         String fileExtension = plantPicture.getOriginalFilename().split("\\.")[1];
         try {

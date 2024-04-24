@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
         <title>Garden Details</title>
@@ -40,7 +40,8 @@
                         plantName=${plant.getPlantName},
                         plantCount=${plant.getPlantCount},
                         plantDescription=${plant.getPlantDescription},
-                        plantDate=${plant.getFormattedPlantDate})">
+                        plantDate=${plant.getFormattedPlantDate},
+                        plantPicture=${plant.getPlantPictureFilename})">
                     </div>
                 </div>
             </div>

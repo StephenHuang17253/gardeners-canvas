@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Create new Plant</title>
     <link th:href="@{/css/navBar.css}" rel="stylesheet">
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/form.css}" rel="stylesheet">
+    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
+    <script th:src="@{/js/profilePicturePicker.js}"></script>
 </head>
 <body>
 <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
@@ -13,7 +15,16 @@
     <h1>Create New Plant</h1>
     <br>
     <div>
-        <form th:action="@{create-new-plant}" method="post">
+        <form th:action="@{create-new-plant}" method="post" enctype="multipart/form-data">
+            <!-- Some things are still 'profile_picture, so I reuse the existing css and js. -->
+            <div class="profile_picture_container small_pic">
+                <img id="profilePicture" th:src="@{${plantPicture}}" alt="Plant image">
+                <label for="plantPictureInput">+</label>
+                <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
+                    onChange="handleFileSelect(event)">
+            </div>
+            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
+
             <label for="plantName"> Plant Name: </label>
             <br>
             <input type="text" class="form-control" th:class = "${PNErrorClass}" id="plantName" placeholder="Name of plant"

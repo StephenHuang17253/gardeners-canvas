@@ -58,11 +58,33 @@ public class PlantService {
      * @param gardenId id of garden the plant belongs to
      * @throws IllegalArgumentException if invalid garden ID
      */
-
     public Plant addPlant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Long gardenId) {
         Optional<Garden> optionalGarden = gardenService.findById(gardenId);
         if (optionalGarden.isPresent()) {
             Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get());
+            gardenService.addPlantToGarden(gardenId, plant);
+            return plantRepository.save(plant);
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+    /**
+     * Adds a new plant (with a image)
+     * Added this method for now, so I don't have to refactor the tests.
+     * @param plantName plant's name
+     * @param plantCount count of plants
+     * @param plantDescription plant's description
+     * @param plantDate date of planting
+     * @param gardenId id of garden the plant belongs to
+     * @param filename the plant image
+     * @throws IllegalArgumentException if invalid garden ID
+     */
+    public Plant addPlant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Long gardenId, String filename) {
+        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
+        if (optionalGarden.isPresent()) {
+            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get());
+            plant.setPlantPictureFilename(filename);
             gardenService.addPlantToGarden(gardenId, plant);
             return plantRepository.save(plant);
         } else {

@@ -83,6 +83,10 @@ public class Plant {
 
     public Garden getGarden() {return garden;}
 
+    public String getPlantPictureFilename() {
+        return this.plantPictureFilename;
+    }
+
     public void setPlantPictureFilename(String plantPictureFilename) {
         this.plantPictureFilename = plantPictureFilename;
     }
