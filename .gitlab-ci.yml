@@ -29,6 +29,20 @@ cucumber-test:
   script:
     - ./gradlew cucumber
 
+junit:
+  stage: test
+  script:
+    - ./gradlew test
+    - ls ./build/jacoco
+  artifacts:
+    paths:
+      - build/jacoco/test-report.xml
+
+sonarqube-report:
+  stage: sonarqube
+  script:
+    ./gradlew sonarqube
+
 # builds all branches, except dev and main
 branch-build:
   stage: build
