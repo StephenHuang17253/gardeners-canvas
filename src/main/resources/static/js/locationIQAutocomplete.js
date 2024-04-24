@@ -47,7 +47,7 @@ const testRateLimit = async(query) => {
 }
 
 
-// Type 'Fabian Gilson' to test rate limit
+// Type 'Fabian Gilson' into street address to test rate limit
 document.getElementById('streetAddress').addEventListener('input', function(event) {
     const inputText = event.target.value.trim();
     if (inputText === "Fabian Gilson") {
@@ -100,6 +100,13 @@ function hideRateLimitMessage() {
     rateLimitMessage.classList.remove('show');
 }
 
+/**
+ * Morgan requested a debouncing implementation as a prerequisite to approval for the API.
+ * Delays call of a function until after a specified time.
+ * @param {Function} func The function to debounce.
+ * @param {number} delay The delay in milliseconds before invoking the function after the last call.
+ * @returns {Function} Returns the debounced function.
+ */
 function debounce(func, delay) {
     let timeoutId;
     return function() {
@@ -110,19 +117,21 @@ function debounce(func, delay) {
     };
 }
 
-// Event listener for input in the street address field and autocomplete
-document.getElementById('streetAddress').addEventListener('input', debounce(async function (event) {
+// Event listener for input in the street address field
+// and for displaying location autocomplete suggestions
+document.getElementById('streetAddress').addEventListener('input', debounce(async function (event){
     addressInput = event.target.value.trim(); // Update the current address variable
-    if (addressInput.length >= 3) {
+    const minInputLengthForAPICall = 3
+    if (addressInput.length >= minInputLengthForAPICall) {
         const suggestions = await fetchLocationIQData(addressInput); // Make a LocationIQ API request when address is at least 3 characters long
         if (suggestions && suggestions.length > 0) {
             updateAutocompleteSuggestions(suggestions) // Update autocomplete suggestions
+            hideNoMatchingLocationMessage()
         } else {
             hideAutocompleteDropdown()
             showNoMatchingLocationMessage()
         }
     }
-
 }, 300));
 
 // Event listener for when the street address field loses focus
