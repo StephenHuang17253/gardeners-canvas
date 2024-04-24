@@ -24,6 +24,7 @@ In order for Gardener's Grove to send emails, an email.properties file must be c
 spring.mail.username=<your_email>
 spring.mail.password=<your_app_password>
 To generate an app password you can visit [this link](myaccount.google.com/u/3/apppasswords)
+The credentials can be found on the repositories wiki
 
 This project includes basic user registration, user login, profile view, and edit profile.
 
