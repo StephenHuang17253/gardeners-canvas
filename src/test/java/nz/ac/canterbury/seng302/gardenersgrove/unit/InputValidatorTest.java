@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.unit;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -463,6 +463,29 @@ public class InputValidatorTest {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
+
+
+
+    /**
+     * Test for valid DOB
+     * @param date
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
+    public void InputValidator_isValidDate_ValidDate_return_OK(String date) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
+    };
+    /**
+     * Test for invalid DOB format
+     * @param date
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
+    public void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
+        Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
+    }
+
+
 
 
 }
