@@ -64,26 +64,35 @@ public class GardenService {
     /**
      * Adds a new garden
      * @param garden the garden to add
+     * @throws IllegalArgumentException if the user associated with the garden is not in the db
      */
     public Garden addGarden(Garden garden) {
-        return gardenRepository.save(garden);
+        if (garden.getOwner().getId() != null && userService.getUserById(garden.getOwner().getId()) != null) {
+            userService.addGardenToGardenList(garden, garden.getOwner().getId());
+            return gardenRepository.save(garden);
+        } else {
+            throw new IllegalArgumentException("User " + garden.getOwner().getFirstName()
+                    + " " + garden.getOwner().getLastName()
+                    + " does not exist");
+        }
     }
 
     /**
      * Updates a garden
      * @param id the id of the existing garden
-     * @param newGarden the new garden details
+     * @param newGardenValues the new garden values
      */
-    public Garden updateGarden(Long id, Garden newGarden) {
-        Optional<Garden> targetGarden = findById(id);
-        if (targetGarden.isPresent()) {
-            Garden oldGarden = targetGarden.get();
+    public Garden updateGarden(Long id, Garden newGardenValues) {
+        Optional<Garden> optionalGarden = findById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
 
-            oldGarden.setGardenName(newGarden.getGardenName());
-            oldGarden.setGardenLocation(newGarden.getGardenLocation());
-            oldGarden.setGardenSize(newGarden.getGardenSize());
+            targetGarden.setGardenName(newGardenValues.getGardenName());
+            targetGarden.setGardenLocation(newGardenValues.getGardenLocation());
+            targetGarden.setGardenSize(newGardenValues.getGardenSize());
 
-            return gardenRepository.save(oldGarden);
+            userService.addGardenToGardenList(targetGarden, targetGarden.getOwner().getId());
+            return gardenRepository.save(targetGarden);
 
         } else {
             throw new IllegalArgumentException("Invalid garden ID");

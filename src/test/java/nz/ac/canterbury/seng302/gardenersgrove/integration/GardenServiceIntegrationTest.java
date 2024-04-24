@@ -4,62 +4,62 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @SpringBootTest
 public class GardenServiceIntegrationTest {
-
     @Autowired
     private GardenRepository gardenRepository;
-
     @Autowired
     private GardenService gardenService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PlantRepository plantRepository;
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
 
     private List<Garden> gardenList = new ArrayList<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
-
+    boolean isDataInitialized = false;
     @BeforeEach
-    void ClearRepository_AddUsersAndGardens() {
-        userRepository.deleteAll();
-        User user1 = new User("John","Doe","johnDoe@email.com", date);
-        User user2 = new User("Jane","Doe","janeDoe@email.com", date);
-        User user3 = new User("Bruce","Wayne","bruceWyane@email.com", date);
-        userService.addUser(user1,"1es1P@ssword");
-        userService.addUser(user2,"1es1P@ssword");
-        userService.addUser(user3,"1es1P@ssword");
-        Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden2 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden3 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
-        gardenList.add(garden1);
-        gardenList.add(garden2);
-        gardenList.add(garden3);
-        gardenRepository.saveAll(gardenList);
+    public void setupOnce() {
+        if (!isDataInitialized) {
+            // Perform setup logic here
+            // This method will run once before any test method is executed
+            User user1 = new User("John", "Doe", "johnDoe@email.com", date);
+            User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);
+            User user3 = new User("Bruce", "Wayne", "bruceWyane@email.com", date);
+
+            userService.addUser(user1, "1es1P@ssword");
+            userService.addUser(user2, "1es1P@ssword");
+            userService.addUser(user3, "1es1P@ssword");
+
+            Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
+            Garden garden2 = new Garden("John's Garden", "John's Backyard", 15, user1);
+            Garden garden3 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
+
+            List<Garden> gardenList = new ArrayList<>();
+            gardenList.add(garden1);
+            gardenList.add(garden2);
+            gardenList.add(garden3);
+
+            gardenRepository.saveAll(gardenList);
+
+            isDataInitialized = true;
+        }
     }
     @Test
     public void GetAllUsersGardens_UserInPersistenceAndOwnsSingleGardens() {
@@ -106,8 +106,6 @@ public class GardenServiceIntegrationTest {
             gardenService.getAllUsersGardens(3L);
         });
     }
-    @Mock
-    GardenRepository gardenRepo;
     @Test
     public void FindById_GardenIdExists() {
         List<Garden> expectedGardens = new ArrayList<>();
@@ -125,54 +123,85 @@ public class GardenServiceIntegrationTest {
     }
     @Test
     public void FindById_GardenIdDoseNotExist() {
-        Optional<Garden> optionalGarden = gardenService.findById(1L);
+        Optional<Garden> optionalGarden = gardenService.findById(4L);
         Assertions.assertFalse(optionalGarden.isPresent());
     }
 
     @Test
-    public void testAddGarden() {
-        GardenService gardenService = new GardenService(gardenRepository);
-        User user = new User("John","Doe","johnDoe@email.com", date);
-        Garden garden = gardenService.addGarden(new Garden("John's Garden", "John's Backyard", 15, user));
-        Assertions.assertEquals(garden.getGardenName(), "John's Garden");
-        Assertions.assertEquals(garden.getGardenLocation(), "John's Backyard");
-        Assertions.assertEquals(garden.getGardenSize(), 15);
+    public void AddGarden_UserInPersistence() {
+        Garden garden = new Garden("Bat Cave", "Wayne Manor", 15, userService.getUserById(3L));
+        gardenService.addGarden(garden);
+        Optional<Garden> optionalGarden = gardenService.findById(4L);
+        Assertions.assertTrue(optionalGarden.isPresent());
+
+        Garden expectedGarden = garden;
+        Garden actualGarden = optionalGarden.get();
+
+        Assertions.assertEquals(expectedGarden.getGardenName(), actualGarden.getGardenName());
+        Assertions.assertEquals(expectedGarden.getGardenLocation(), actualGarden.getGardenLocation());
+        Assertions.assertEquals(expectedGarden.getGardenSize(), actualGarden.getGardenSize());
+        Assertions.assertEquals(expectedGarden.getOwner().getId(), actualGarden.getOwner().getId());
+    }
+    @Test
+    public void AddGarden_UserNotInPersistence_ThrowsIllegalArgumentException() {
+        User user = new User("Boogie", "Man","boogieMan@email.com", date);
+        Garden garden = new Garden("Bat Cave", "Wayne Manor", 15, user);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            gardenService.addGarden(garden);
+        });
     }
 
     @Test
-    public void testUpdateGarden() {
-        GardenService gardenService = new GardenService(gardenRepository);
-        User user = new User("John","Doe","johnDoe@email.com", date);
-        Garden oldGarden = new Garden("John's Garden", "John's Backyard", 15, user);
-        Garden newGarden = new Garden("Jane's Garden", "Jane's Backyard", 20);
-        gardenService.addGarden(oldGarden);
-        gardenService.updateGarden(oldGarden.getGardenId(), newGarden);
-        Assertions.assertEquals(oldGarden.getGardenName(), newGarden.getGardenName());
-        Assertions.assertEquals(oldGarden.getGardenLocation(), newGarden.getGardenLocation());
-        Assertions.assertEquals(oldGarden.getGardenSize(), newGarden.getGardenSize());
+    public void UpdateGarden_GardenInPersistence() {
+        Garden gardenWithUpdatedValues = new Garden("John's Garden", "John's Front Yard", 20);
+
+        gardenService.updateGarden(1L, gardenWithUpdatedValues);
+        User user = userService.getUserById(1L);
+        Garden garden = user.getGardens().get(0);
+        Assertions.assertEquals(user.getGardens().size(), 2);
+        Assertions.assertEquals(garden.getGardenName(), gardenWithUpdatedValues.getGardenName());
+        Assertions.assertEquals(garden.getGardenLocation(), gardenWithUpdatedValues.getGardenLocation());
+        Assertions.assertEquals(garden.getGardenSize(), gardenWithUpdatedValues.getGardenSize());
     }
 
     @Test
-    public void testAddPlantToGarden() {
+    public void UpdateGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
+        Garden gardenWithUpdatedValues = new Garden("John's Garden", "John's Front Yard", 20);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            gardenService.updateGarden(4L, gardenWithUpdatedValues);
+        });
+    }
+    @Test
+    public void AddPlantToGarden_GardenInPersistence() {
         // Given
+        Garden garden = userService.getUserById(1L).getGardens().get(0);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        GardenService gardenService = new GardenService(gardenRepository);
-        User user = new User("John","Doe","johnDoe@email.com", date);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15, user);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+//        plantRepository.save(plant);
 
         // When
-        gardenService.addGarden(garden);
-        gardenService.addPlantToGarden(garden.getGardenId(), plant);
+        gardenService.addPlantToGarden(1L, plant);
 
         // That
-        Assertions.assertEquals(1, garden.getPlants().size());
-        Plant resultPlant = garden.getPlants().get(0);
+        Garden resultGarden = userService.getUserById(1L).getGardens().get(0);
+        Assertions.assertEquals(1, resultGarden.getPlants().size());
+        Plant resultPlant = resultGarden.getPlants().get(0);
         Assertions.assertEquals(resultPlant.getPlantName(),"John's Plant");
         Assertions.assertEquals(resultPlant.getPlantCount(),3);
         Assertions.assertEquals(resultPlant.getPlantDescription(),"Plant owned by John");
         Assertions.assertEquals(resultPlant.getPlantDate(),dateOfPlanting);
-        Assertions.assertEquals(resultPlant.getGarden(),garden);
+        Assertions.assertEquals(resultPlant.getGarden().getGardenId(),garden.getGardenId());
+    }
+    @Test
+    public void AddPlantToGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
+        Garden garden = new Garden("John's Garden", "John's Front Yard", 20);
+        LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            gardenService.addPlantToGarden(4L, plant);
+        });
     }
 
 

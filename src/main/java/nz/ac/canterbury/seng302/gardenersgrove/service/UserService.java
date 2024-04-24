@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
@@ -105,8 +106,7 @@ public class UserService {
 
     /**
      * Takes a user instance and copies the fields to the user with the given id
-     * 
-     * @param newUser
+     *
      * @param id
      */
     public void updateUser(long id, String firstName, String lastName, String emailAddress, LocalDate dateOfBirth) {
@@ -132,12 +132,25 @@ public class UserService {
      * Update users profile picture filename
      * 
      * @param filename filename of profile picture
-     * @param id      id of user to update
+     * @param id      id of the user to update
      */
     public void updateProfilePictureFilename(String filename, long id) {
         User user = getUserById(id);
         user.setProfilePictureFilename(filename);
         userRepository.save(user);
     }
+
+    /**
+     * Add garden to the user's garden list
+     *
+     * @param garden Garden entity to add to the list
+     * @param id id of the user to add garden to
+     */
+    public void addGardenToGardenList(Garden garden, Long id) {
+        User user = getUserById(id);
+        user.getGardens().add(garden);
+        userRepository.save(user);
+    }
+
 
 }
