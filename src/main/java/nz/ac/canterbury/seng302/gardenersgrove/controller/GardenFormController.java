@@ -151,7 +151,7 @@ public class GardenFormController {
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
-        ValidationResult postcodeResult = InputValidator.numberCommaSingleTextField(postcode,10);
+        ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
         ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
 
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
@@ -286,7 +286,7 @@ public class GardenFormController {
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
-        ValidationResult postcodeResult = InputValidator.numberCommaSingleTextField(postcode,10);
+        ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
         ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
@@ -414,7 +414,7 @@ public class GardenFormController {
         if(!postcodeResult.valid())
         {
             if (postcodeResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                postcodeResult.updateMessage("cannot be longer than 10 characters");
+                postcodeResult.updateMessage("cannot be longer than 10 digits");
             }
 
             model.addAttribute("PostCodeErrorText","Postcode " + postcodeResult);

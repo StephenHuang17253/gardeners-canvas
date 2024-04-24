@@ -229,6 +229,13 @@ public class InputValidator {
                 .getResult();
     }
 
+    public static ValidationResult validatePostcodeInput(String text, int length) {
+        return new InputValidator(text)
+                .numbersOnlyHelper()
+                .lengthHelper(length)
+                .getResult();
+    }
+
     public static ValidationResult numberCommaSingleTextField(String text, int length)
     {
         return new InputValidator(text)
@@ -657,6 +664,20 @@ public class InputValidator {
         }
         if (floatGardenSize > maxArea) {
             this.validationResult = ValidationResult.AREA_TOO_LARGE;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    private InputValidator numbersOnlyHelper() {
+        if (!this.passState) {
+            return this;
+        }
+
+        if (!testedValue.matches("\\d+")) {
+            this.validationResult = ValidationResult.INVALID_POSTCODE;
             this.passState = false;
             return this;
         }
