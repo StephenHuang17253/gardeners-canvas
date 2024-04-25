@@ -18,12 +18,15 @@ public class LostPasswordController {
 
     private final UserService userService;
 
-
     @Autowired
     public LostPasswordController(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Gets the lost password page at /lost-password
+     * @return the lost password form
+     */
     @GetMapping("/lost-password")
     public String lostPassword() {
 
@@ -34,7 +37,7 @@ public class LostPasswordController {
     }
 
     @PostMapping("/lost-password")
-    public String checkEmail(@RequestParam("email") String email, Model model) {
+    public String emailChecker(@RequestParam("email") String email, Model model) {
         boolean isRegistered = userService.emailInUse(email);
         ValidationResult emailValidation = InputValidator.validateUniqueEmail(email);
 
