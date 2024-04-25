@@ -256,15 +256,9 @@ public class ProfileController {
         model.addAttribute("lastName", user.getLastName());
         model.addAttribute("emailAddress", user.getEmailAddress());
 
-        String formattedDateOfBirth = "";
-        LocalDate dateOfBirth = user.getDateOfBirth();
-        if (dateOfBirth != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            formattedDateOfBirth = dateOfBirth.format(formatter);
-        }
-        model.addAttribute("dateOfBirth", formattedDateOfBirth);
+        model.addAttribute("dateOfBirth", user.getDateOfBirth());
 
-        boolean noLastName = user.getLastName().equals("");
+        boolean noLastName = user.getLastName().isEmpty();
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
@@ -293,7 +287,7 @@ public class ProfileController {
             @RequestParam(name = "firstName") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress") String emailAddress,
             @RequestParam("profilePictureInput") MultipartFile profilePicture,
             Model model) {
@@ -317,11 +311,15 @@ public class ProfileController {
             emailAddressValidation = ValidationResult.OK;
         }
         validationMap.put("emailAddress", emailAddressValidation);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (dateOfBirth.equals("")) {
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
+        } else {
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
+
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
@@ -364,13 +362,7 @@ public class ProfileController {
             updateProfilePicture(currentUser, profilePicture);
         }
 
-        LocalDate newDateOfBirth = null;
-        if (!dateOfBirth.equals("")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            newDateOfBirth = LocalDate.parse(dateOfBirth, formatter);
-        }
-
-        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, newDateOfBirth);
+        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, dateOfBirth);
 
         setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
 
