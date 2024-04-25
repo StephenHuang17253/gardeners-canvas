@@ -86,6 +86,11 @@ public class LoginPageController {
         model.addAttribute("validEmail", validEmail);
         model.addAttribute("validLogin", validLogin);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         return "loginPage";
     }
 

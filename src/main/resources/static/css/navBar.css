@@ -9,6 +9,13 @@
     box-shadow: 7px 7px;
 }
 
+nav
+{
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 1px;
+}
+
 /*make navbar horizontal list*/
 #navbar ul
 {
@@ -136,6 +143,17 @@
     background-color: #4CAF50;
 }
 #createGardenBtn {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    /* Add any additional styling you need */
+}
+
+#navbar .navBarButton
+{
     background-color: transparent;
     border: none;
     padding: 0;

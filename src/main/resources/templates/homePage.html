@@ -3,13 +3,14 @@
 
 <head>
     <title>Gardener's Grove Home Page</title>
-
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/homePage.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
-
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
 </head>
 
 <body>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
     <div class="container">
         <h2>Gardener's Grove</h2>
 

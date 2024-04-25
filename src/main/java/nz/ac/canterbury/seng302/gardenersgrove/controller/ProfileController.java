@@ -174,6 +174,8 @@ public class ProfileController {
         logger.info("GET /profile");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         String currentEmail = authentication.getName();
 

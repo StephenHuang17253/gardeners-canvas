@@ -100,6 +100,12 @@ public class RegistrationFormController {
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
             Model model) {
         logger.info("GET /register");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         addUserAttributes(firstName, lastName, noLastName, dateOfBirth,
                 emailAddress, password, repeatPassword, model);
         return "registrationForm";

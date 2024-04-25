@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8"/>
     <title>Registration Form</title>
     <link th:href="@{/css/registrationForm.css}" rel="stylesheet">
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
     <script th:src="@{/js/registrationForm.js}"></script>
+
 </head>
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('register')" th:with="loggedIn=${loggedIn}"></div>
 <h1>Registration Form</h1>
 <div>
+
     <form th:action="@{/register}" method="post">
         <label for="firstName"> First Name: </label>
         <input type="text" class="form-control" id="firstName" placeholder="First Name"
