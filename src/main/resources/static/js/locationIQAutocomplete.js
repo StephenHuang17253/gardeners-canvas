@@ -19,42 +19,6 @@ const fetchLocationIQData = async(query) => {
     }
 }
 
-// Call 3 requests at once to test if rate limit works.
-const testRateLimit = async(query) => {
-    try {
-        const [response, response2, response3] = await Promise.all([
-            fetch(`/api/location/suggestions?query=${query}`),
-            fetch(`/api/location/suggestions?query=${query}`),
-            fetch(`/api/location/suggestions?query=${query}`),
-        ]);
-        const data = await response.json();
-        const data2 = await response2.json();
-        const data3 = await response3.json();
-
-        if (data === 429 || data2 === 429 || data3 === 429) {
-            showRateLimitMessage();
-            hideNoMatchingLocationMessage();
-            console.log(data);
-            return;
-        } else {
-            hideRateLimitMessage();
-        }
-
-        console.log("Rate limit exceeded")
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-    }
-}
-
-
-// Type 'Fabian Gilson' into street address to test rate limit
-document.getElementById('streetAddress').addEventListener('input', function(event) {
-    const inputText = event.target.value.trim();
-    if (inputText === "Fabian Gilson") {
-        testRateLimit(inputText);
-    }
-});
-
 // Function to update the autocomplete suggestions
 function updateAutocompleteSuggestions(suggestions) {
     const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
@@ -98,23 +62,6 @@ function showRateLimitMessage() {
 function hideRateLimitMessage() {
     const rateLimitMessage = document.getElementById('rateLimitMessage');
     rateLimitMessage.classList.remove('show');
-}
-
-/**
- * Morgan requested a debouncing implementation as a prerequisite to approval for the API.
- * Delays call of a function until after a specified time.
- * @param {Function} func The function to debounce.
- * @param {number} delay The delay in milliseconds before invoking the function after the last call.
- * @returns {Function} Returns the debounced function.
- */
-function debounce(func, delay) {
-    let timeoutId;
-    return function() {
-        const context = this;
-        const args = arguments;
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(context, args), delay);
-    };
 }
 
 // Event listener for input in the street address field
@@ -197,6 +144,55 @@ function fillAddressFields(data) {
     document.getElementById('country').value = data.address.country || "";
     // updateGardenLocation();
 }
+// /**
+//  * Morgan requested a debouncing implementation as a prerequisite to approval for the API.
+//  * Delays call of a function until after a specified time.
+//  * @param {Function} func The function to debounce.
+//  * @param {number} delay The delay in milliseconds before invoking the function after the last call.
+//  * @returns {Function} Returns the debounced function.
+//  */
+// function debounce(func, delay) {
+//     let timeoutId;
+//     return function() {
+//         const context = this;
+//         const args = arguments;
+//         clearTimeout(timeoutId);
+//         timeoutId = setTimeout(() => func.apply(context, args), delay);
+//     };
+// }
+// // Call 3 requests at once to test if rate limit works.
+// const testRateLimit = async(query) => {
+//     try {
+//         const [response, response2, response3] = await Promise.all([
+//             fetch(`/api/location/suggestions?query=${query}`),
+//             fetch(`/api/location/suggestions?query=${query}`),
+//             fetch(`/api/location/suggestions?query=${query}`),
+//         ]);
+//         const data = await response.json();
+//         const data2 = await response2.json();
+//         const data3 = await response3.json();
+//
+//         if (data === 429 || data2 === 429 || data3 === 429) {
+//             showRateLimitMessage();
+//             hideNoMatchingLocationMessage();
+//             console.log(data);
+//             return;
+//         } else {
+//             hideRateLimitMessage();
+//         }
+//
+//         console.log("Rate limit exceeded")
+//     } catch (error) {
+//         console.error('There was a problem with the fetch operation:', error);
+//     }
+// }
 
+// // Type 'Fabian Gilson' into street address to test rate limit
+// document.getElementById('streetAddress').addEventListener('input', function(event) {
+//     const inputText = event.target.value.trim();
+//     if (inputText === "Fabian Gilson") {
+//         testRateLimit(inputText);
+//     }
+// });
 
 
