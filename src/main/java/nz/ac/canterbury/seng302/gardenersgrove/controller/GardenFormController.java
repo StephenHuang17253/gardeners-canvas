@@ -84,14 +84,14 @@ public class GardenFormController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/create-new-garden")
-    public String newGardenForm( @RequestParam(name="gardenName") String gardenName,
-                                 @RequestParam(name = "streetAddress") String streetAddress,
-                                 @RequestParam(name = "suburb") String suburb,
-                                 @RequestParam(name = "city") String city,
-                                 @RequestParam(name = "country") String country,
-                                 @RequestParam(name = "postcode") String postcode,
-                                 @RequestParam(name = "gardenLocation") String gardenLocation,
-                                 @RequestParam(name = "gardenSize") String gardenSize,
+    public String newGardenForm( @RequestParam(name="gardenName", required = false) String gardenName,
+                                 @RequestParam(name = "streetAddress", required = false) String streetAddress ,
+                                 @RequestParam(name = "suburb", required = false) String suburb,
+                                 @RequestParam(name = "city", required = false) String city,
+                                 @RequestParam(name = "country", required = false) String country,
+                                 @RequestParam(name = "postcode", required = false )String postcode,
+                                 @RequestParam(name = "gardenLocation", required = false) String gardenLocation,
+                                 @RequestParam(name = "gardenSize", required = false) String gardenSize,
                                  Model model) {
         model.addAttribute("gardenName", gardenName);
         model.addAttribute("gardenLocation", gardenLocation);
