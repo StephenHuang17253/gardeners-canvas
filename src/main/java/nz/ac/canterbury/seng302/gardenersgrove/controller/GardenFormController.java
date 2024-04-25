@@ -1,9 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,9 +66,9 @@ public class GardenFormController {
                               Model model, RedirectAttributes redirectAttributes) {
         logger.info("POST /landingPage");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
-        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
-        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation);
-        ValidationResult gardenSizeResult = InputValidator.numberCommaSingleTextField(gardenSize);
+        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
+        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 64);
+        ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
         gardenFormErrorText(model,gardenNameResult,gardenLocationResult,gardenSizeResult);
 
@@ -121,7 +122,7 @@ public class GardenFormController {
             Garden garden = optionalGarden.get();
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
-            Float gardenSize = garden.getGardenSize();
+            float gardenSize = garden.getGardenSize();
             if (Float.isNaN(gardenSize)) {
                 model.addAttribute("gardenSize", "");
             } else {
@@ -152,9 +153,9 @@ public class GardenFormController {
                                        Model model) {
         logger.info("POST / edited garden");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
-        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
-        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation);
-        ValidationResult gardenSizeResult = InputValidator.numberCommaSingleTextField(gardenSize);
+        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
+        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 64);
+        ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
         gardenFormErrorText(model,gardenNameResult,gardenLocationResult,gardenSizeResult);
 

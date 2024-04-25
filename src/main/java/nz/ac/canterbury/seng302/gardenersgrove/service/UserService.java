@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class UserService {
 
     /**
      * Returns a user found by id
+     * 
      * @param id
      * @return user if found, null otherwise
      */
@@ -54,6 +56,7 @@ public class UserService {
      * @param rawPassword string to encode and add to user
      */
     public void addUser(User user, String rawPassword) {
+
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         userRepository.save(user);
@@ -68,12 +71,9 @@ public class UserService {
      */
     public User getUserByEmailAndPassword(String email, String password) {
         User[] users = userRepository.findByEmailAddress(email);
-        if (users.length == 0) {
-            return null;
-        }
-        User user = users[0];
-        if (passwordEncoder.matches(password, user.getEncodedPassword())) {
-            return user;
+        if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
+            logger.info(users[0].toString());
+            return users[0];
         }
         return null;
     }
@@ -107,13 +107,13 @@ public class UserService {
      * @param newUser
      * @param id
      */
-    public void updateUser(User newUser, long id) {
-        User u = getUserById(id);
-        u.setFirstName(newUser.getFirstName());
-        u.setLastName(newUser.getLastName());
-        u.setEmailAddress(newUser.getEmailAddress());
-        u.setDateOfBirth(newUser.getDateOfBirth());
-        userRepository.save(u);
+    public void updateUser(long id, String firstName, String lastName, String emailAddress, LocalDate dateOfBirth) {
+        User user = getUserById(id);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmailAddress(emailAddress);
+        user.setDateOfBirth(dateOfBirth);
+        userRepository.save(user);
     }
 
     /**
@@ -124,6 +124,37 @@ public class UserService {
      */
     public boolean emailInUse(String email) {
         return userRepository.countDistinctByEmailAddress(email) > 0;
+    }
+
+    /**
+     * Update users profile picture filename
+     * 
+     * @param filename filename of profile picture
+     * @param id       id of user to update
+     */
+    public void updateProfilePictureFilename(String filename, long id) {
+        User user = getUserById(id);
+        user.setProfilePictureFilename(filename);
+        userRepository.save(user);
+    }
+
+    /**
+     * Verify a user, for when they enter the correct token
+     * 
+     * @param user user to verify
+     */
+    public void verifyUser(User user) {
+        user.setVerified(true);
+        userRepository.save(user);
+    }
+
+    /**
+     * Deletes a user
+     * 
+     * @param user
+     */
+    public void deleteUser(User user) {
+        userRepository.deleteById(user.getId());
     }
 
 }

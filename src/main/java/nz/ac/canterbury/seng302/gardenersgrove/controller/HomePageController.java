@@ -9,10 +9,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -32,7 +34,7 @@ public class HomePageController {
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
-     * 
+     *
      * @param userService
      * @param authenticationManager
      */
@@ -45,16 +47,36 @@ public class HomePageController {
      * Redirects GET default url '/' to '/home'
      * 
      * @return redirect to /home
+     * @throws IOException
      */
     @GetMapping("/")
-    public String home() {
+    public String home() throws IOException {
         logger.info("GET /");
+
         return "redirect:./home";
     }
 
+    /**
+     * Gets the resource url for the profile picture, or the default profile picture
+     * if the user does not have one
+     * 
+     * @param filename string filename
+     * @return string of the profile picture url
+     */
+    public String getProfilePictureString(String filename) {
+
+        String profilePictureString = "/Images/default_profile_picture.png";
+
+        if (filename != null && filename.length() != 0) {
+            profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
+                    "serveFile", filename).build().toUri().toString();
+        }
+        return profilePictureString;
+    }
 
     /**
      * This function is called when a GET request is made to /home
+     * 
      * @param model
      * @return The homePage html page
      */
@@ -67,9 +89,9 @@ public class HomePageController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
             LocalDate date = LocalDate.parse("01/01/2001", formatter);
             userService.addUser(new User("John",
-                            "Doe",
-                            "johndoe@email.com",
-                            date),
+                    "Doe",
+                    "johndoe@email.com",
+                    date),
                     "DefaultUser10!");
             onStart = true;
         }
@@ -88,13 +110,18 @@ public class HomePageController {
         model.addAttribute("loggedIn", loggedIn);
 
         String welcomeString = "";
+        String profilePicture = "";
 
         if (loggedIn) {
             User user = userService.getUserByEmail(authentication.getName());
             if (user != null) {
                 welcomeString = "Welcome " + user.getFirstName() + " " + user.getLastName();
+                String filename = user.getProfilePictureFilename();
+                profilePicture = getProfilePictureString(filename);
             }
         }
+
+        model.addAttribute("profilePicture", profilePicture);
 
         model.addAttribute("username", welcomeString);
 
