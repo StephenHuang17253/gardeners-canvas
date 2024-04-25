@@ -91,7 +91,6 @@ public class GardenService {
             targetGarden.setGardenLocation(newGardenValues.getGardenLocation());
             targetGarden.setGardenSize(newGardenValues.getGardenSize());
 
-            userService.addGardenToGardenList(targetGarden, targetGarden.getOwner().getId());
             return gardenRepository.save(targetGarden);
 
         } else {

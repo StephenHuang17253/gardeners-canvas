@@ -11,12 +11,14 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GardenServiceIntegrationTest {
     @Autowired
     private GardenRepository gardenRepository;
@@ -25,41 +27,28 @@ public class GardenServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private PlantRepository plantRepository;
-
-    @Autowired
     private UserService userService;
 
     private List<Garden> gardenList = new ArrayList<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
-    boolean isDataInitialized = false;
     @BeforeEach
-    public void setupOnce() {
-        if (!isDataInitialized) {
-            // Perform setup logic here
-            // This method will run once before any test method is executed
-            User user1 = new User("John", "Doe", "johnDoe@email.com", date);
-            User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);
-            User user3 = new User("Bruce", "Wayne", "bruceWyane@email.com", date);
-
-            userService.addUser(user1, "1es1P@ssword");
-            userService.addUser(user2, "1es1P@ssword");
-            userService.addUser(user3, "1es1P@ssword");
-
-            Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
-            Garden garden2 = new Garden("John's Garden", "John's Backyard", 15, user1);
-            Garden garden3 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
-
-            List<Garden> gardenList = new ArrayList<>();
-            gardenList.add(garden1);
-            gardenList.add(garden2);
-            gardenList.add(garden3);
-
-            gardenRepository.saveAll(gardenList);
-
-            isDataInitialized = true;
-        }
+    void ClearRepository_AddUsersAndGardens() {
+        gardenList = new ArrayList<>();
+        userRepository.deleteAll();
+        User user1 = new User("John","Doe","johnDoe@email.com", date);
+        User user2 = new User("Jane","Doe","janeDoe@email.com", date);
+        User user3 = new User("Bruce","Wayne","bruceWyane@email.com", date);
+        userService.addUser(user1,"1es1P@ssword");
+        userService.addUser(user2,"1es1P@ssword");
+        userService.addUser(user3,"1es1P@ssword");
+        Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
+        Garden garden2 = new Garden("John's Garden", "John's Backyard", 15, user1);
+        Garden garden3 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
+        gardenList.add(garden1);
+        gardenList.add(garden2);
+        gardenList.add(garden3);
+        gardenRepository.saveAll(gardenList);
     }
     @Test
     public void GetAllUsersGardens_UserInPersistenceAndOwnsSingleGardens() {
@@ -103,7 +92,7 @@ public class GardenServiceIntegrationTest {
     @Test
     void GetAllUsersGardens_UserNotInPersistence_ThrowsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            gardenService.getAllUsersGardens(3L);
+            gardenService.getAllUsersGardens(4L);
         });
     }
     @Test

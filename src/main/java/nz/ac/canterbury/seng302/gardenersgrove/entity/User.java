@@ -39,7 +39,7 @@ public class User {
     @Column(length = 64)
     private String profilePictureFilename;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private List<Garden> gardens =  new ArrayList<>();
 
