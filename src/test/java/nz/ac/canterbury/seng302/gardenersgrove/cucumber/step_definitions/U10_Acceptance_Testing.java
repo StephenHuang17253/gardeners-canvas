@@ -10,12 +10,14 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.h2.table.Plan;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,6 +47,9 @@ public class U10_Acceptance_Testing {
 
     @Autowired
     public AuthenticationManager authenticationManager;
+
+    @MockBean
+    private LocationService locationService;
 
     public static GardenService gardenService;
 
@@ -77,7 +82,7 @@ public class U10_Acceptance_Testing {
 
 
 
-        GardenFormController gardenFormController = new GardenFormController(gardenService);
+        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
     }
@@ -91,7 +96,9 @@ public class U10_Acceptance_Testing {
     public void owns_a_garden(String gardenName) {
         initialGardenLocation = "University Testing Lab";
         initialGardenSize = "0.0";
-        Garden newGarden = new Garden(gardenName, initialGardenLocation, 0.0f);
+        Garden newGarden = new Garden(gardenName, initialGardenLocation
+                ,initialGardenLocation,initialGardenLocation,initialGardenLocation
+                ,initialGardenLocation,initialGardenLocation, 0.0f);
         initialGardenName = gardenName;
         gardenService.addGarden(newGarden);
         gardenId = newGarden.getGardenId();
