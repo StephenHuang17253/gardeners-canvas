@@ -64,6 +64,24 @@ function hideRateLimitMessage() {
     rateLimitMessage.classList.remove('show');
 }
 
+/**
+ * This is needed, don't remove.
+ * Morgan requested a debouncing implementation as a prerequisite to approval for the API.
+ * Delays call of a function until after a specified time.
+ * @param {Function} func The function to debounce.
+ * @param {number} delay The delay in milliseconds before invoking the function after the last call.
+ * @returns {Function} Returns the debounced function.
+ */
+function debounce(func, delay) {
+    let timeoutId;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
 // Event listener for input in the street address field
 // and for displaying location autocomplete suggestions
 document.getElementById('streetAddress').addEventListener('input', debounce(async function (event){
@@ -144,22 +162,8 @@ function fillAddressFields(data) {
     document.getElementById('country').value = data.address.country || "";
     // updateGardenLocation();
 }
-// /**
-//  * Morgan requested a debouncing implementation as a prerequisite to approval for the API.
-//  * Delays call of a function until after a specified time.
-//  * @param {Function} func The function to debounce.
-//  * @param {number} delay The delay in milliseconds before invoking the function after the last call.
-//  * @returns {Function} Returns the debounced function.
-//  */
-// function debounce(func, delay) {
-//     let timeoutId;
-//     return function() {
-//         const context = this;
-//         const args = arguments;
-//         clearTimeout(timeoutId);
-//         timeoutId = setTimeout(() => func.apply(context, args), delay);
-//     };
-// }
+
+
 // // Call 3 requests at once to test if rate limit works.
 // const testRateLimit = async(query) => {
 //     try {

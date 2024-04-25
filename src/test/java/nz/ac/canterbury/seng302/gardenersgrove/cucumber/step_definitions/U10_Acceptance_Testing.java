@@ -10,12 +10,14 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.h2.table.Plan;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +30,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class U10_Acceptance_Testing {
@@ -46,6 +50,9 @@ public class U10_Acceptance_Testing {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @MockBean
+    private LocationService locationService;
+
     public static GardenService gardenService;
 
     public static UserService userService;
@@ -54,10 +61,14 @@ public class U10_Acceptance_Testing {
     String gardenName;
     String gardenLocation;
     String gardenSize;
+    String gardenPostCode;
 
     String initialGardenName;
     String initialGardenLocation;
     String initialGardenSize;
+    String initialGardenPostCode;
+
+    String expectedNewLocation;
 
     String userEmail;
 
@@ -77,7 +88,7 @@ public class U10_Acceptance_Testing {
 
 
 
-        GardenFormController gardenFormController = new GardenFormController(gardenService);
+        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
     }
@@ -91,10 +102,13 @@ public class U10_Acceptance_Testing {
     public void owns_a_garden(String gardenName) {
         initialGardenLocation = "University Testing Lab";
         initialGardenSize = "0.0";
-        Garden newGarden = new Garden(gardenName, initialGardenLocation, 0.0f);
+        Garden newGarden = new Garden(gardenName, initialGardenLocation
+                ,initialGardenLocation,initialGardenLocation,gardenPostCode
+                ,initialGardenLocation,initialGardenLocation, 0.0f);
         initialGardenName = gardenName;
         gardenService.addGarden(newGarden);
         gardenId = newGarden.getGardenId();
+        initialGardenPostCode = newGarden.getGardenPostcode();
     }
 
     @Given("I am on the garden edit form")
@@ -104,11 +118,12 @@ public class U10_Acceptance_Testing {
         gardenSize = "0.0";
     }
 
-    @Given("I enter valid values for the {string}, {string}, and {string}")
-    public void i_enter_valid_values_for_the_and_optionally(String name, String location, String size) {
+    @Given("I enter valid values for the {string}, {string}, {string} and {string}")
+    public void i_enter_valid_values_for_the_and_optionally(String name, String location, String size, String postcode) {
         gardenName = name;
         gardenLocation = location;
         gardenSize = size;
+        gardenPostCode = postcode;
     }
 
     @When("I enter a size using a comma")
@@ -138,8 +153,14 @@ public class U10_Acceptance_Testing {
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
-                        .param("gardenLocation", gardenLocation)
                         .param("gardenSize", gardenSize)
+                        .param("streetAddress",gardenLocation)
+                        .param("suburb",gardenLocation)
+                        .param("city", gardenLocation)
+                        .param("country",gardenLocation)
+                        .param("postcode",gardenPostCode)
+                        .param("gardenLocation", "") // must be present, but is overridden immediately in controller
+
         );
     }
 
@@ -152,9 +173,9 @@ public class U10_Acceptance_Testing {
         }
         Garden updatedGarden = optionalUpdatedGarden.get();
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
-        Assertions.assertEquals(gardenLocation, updatedGarden.getGardenLocation());
+        Assertions.assertTrue( updatedGarden.getGardenLocation().contains(gardenLocation));
         Assertions.assertEquals(Float.parseFloat(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
-
+        Assertions.assertEquals(gardenPostCode, updatedGarden.getGardenPostcode());
     }
 
     @Then("The garden details are not updated")
@@ -168,6 +189,7 @@ public class U10_Acceptance_Testing {
         Assertions.assertEquals(initialGardenName, updatedGarden.getGardenName());
         Assertions.assertEquals(initialGardenLocation, updatedGarden.getGardenLocation());
         Assertions.assertEquals(Float.parseFloat(initialGardenSize.replace(",", ".")), updatedGarden.getGardenSize());
+        Assertions.assertEquals(initialGardenPostCode, updatedGarden.getGardenPostcode());
     }
 
 }

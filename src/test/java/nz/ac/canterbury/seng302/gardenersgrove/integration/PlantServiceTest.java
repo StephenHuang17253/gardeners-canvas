@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
@@ -19,7 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@DataJpaTest
+/**
+ * Using {@link SpringBootTest} instead
+ * of @DataJpaTest fixed the tests
+ */
+@SpringBootTest
 @Import({GardenService.class, PlantService.class})
 public class PlantServiceTest {
 
