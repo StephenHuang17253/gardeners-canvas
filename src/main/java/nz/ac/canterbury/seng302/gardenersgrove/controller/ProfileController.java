@@ -286,7 +286,7 @@ public class ProfileController {
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
             @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress") String emailAddress,
-            @RequestParam(value = "profilePictureInput", required = false) MultipartFile profilePicture,
+            @RequestParam(name = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
 
