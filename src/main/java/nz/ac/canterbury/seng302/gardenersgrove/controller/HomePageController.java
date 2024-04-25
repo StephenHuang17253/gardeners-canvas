@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class HomePageController {
     @GetMapping("/")
     public String home() throws IOException {
         logger.info("GET /");
+        WeatherService weatherService = new WeatherService();
+        weatherService.getWeather("-43.532055","172.636230");
         return "redirect:./home";
     }
 
