@@ -79,6 +79,7 @@
     display: inline;
     align-self: center;
 
+
 }
 
 /* Dropdown contents */
@@ -90,7 +91,7 @@
     margin-top: -2px;
     max-height: 400px;
     overflow: auto;
-
+    border: 1px solid #a4a0a0;
 }
 
 #navbar #gardenDropDown:hover ul li {
@@ -108,6 +109,7 @@
     width: 400px; /* Adjust the width as needed */
     padding: 0;
     margin: 0;
+    border-top: 1px solid #f1f1f1;
 
 }
 #navbar #gardenDropDown.active ul li a {
