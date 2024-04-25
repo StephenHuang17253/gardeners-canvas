@@ -7,20 +7,20 @@ Background:
 
 
   Scenario Outline: AC2 can submit valid values
-    When  I enter valid values for the "<name>", "<location>", and "<size>"
+    When  I enter valid values for the "<name>", "<location>", "<size>" and "<postcode>"
     And I click the edit plant form Submit button
     And The garden details have been updated
     Examples:
-      | name         | location        | size  |
-      | gard         |   here          | 7     |
-      | ward         |   there         | 15    |
-      | Everywhere   |   13 A street   | 7,9   |
-      | ward         |   14 b STREET   | 7.9   |
-      | ward-connect |   14 b STREET   | 7.9   |
-      | ward-cÁÕăect |   14 b STÁÕăT   | 0.1   |
+      | name         | location        | size  | postcode |
+      | gard         |   here          | 7     | 123      |
+      | ward         |   there         | 15    | 234      |
+      | Everywhere   |   13 A street   | 7,9   | 123      |
+      | ward         |   14 b STREET   | 7.9   | 67898    |
+      | ward-connect |   14 b STREET   | 7.9   | 99273    |
+      | ward-cÁÕăect |   14 b STÁÕăT   | 0.1   | 2823932  |
 
   Scenario Outline: AC3 can't submit invalid names
-    Given I enter valid values for the "name", "Location", and "0.0"
+    Given I enter valid values for the "name", "Location", "0.0" and "1234"
     When I enter an invalid name value "<Name>"
     And I click the edit plant form Submit button
     Then The garden details are not updated
@@ -37,7 +37,7 @@ Background:
 
 
   Scenario Outline: AC4 - can't submit invalid size
-    Given I enter valid values for the "name", "Location", and "0.0"
+    Given I enter valid values for the "name", "Location", "0.0" and "1234"
     When I enter an invalid size value "<size>"
     And I click the edit plant form Submit button
     Then The garden details are not updated
@@ -53,7 +53,7 @@ Background:
 
 
   Scenario Outline: AC5 - cant submit invalid location
-    Given I enter valid values for the "name", "Location", and "0.0"
+    Given I enter valid values for the "name", "Location", "0.0" and "1234"
     When I enter an invalid location value "<inv_location>"
     And I click the edit plant form Submit button
     Then The garden details are not updated
@@ -65,7 +65,7 @@ Background:
 
 
   Scenario: AC6 - can enter a size with a comma instead of full stop
-    Given I enter valid values for the "name", "Location", and "0.0"
+    Given I enter valid values for the "name", "Location", "0.0" and "1234"
     When I enter a size using a comma
     And I click the edit plant form Submit button
     Then The garden details have been updated
