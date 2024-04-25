@@ -9,6 +9,9 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Verdana", sans-serif;
+    display: inline-block;
+    margin-top: -4px;
+
 }
 
 .submit-button:hover{
@@ -30,14 +33,104 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Verdana", sans-serif;
+    display: inline-block;
+    margin-top: -4px;
 }
 
 .form-description textarea
 {
-    width: 40.534vw;
-    height: 4.5vw;
+    width: 25vw;
+    height: 6vw;
     resize: none; /* Disable resizing */
     overflow: auto; /* Enable scrollbars when content exceeds the size */
     border: 1px solid #ccc; /* Add a border for visual appeal */
-    padding: 5px; /* Add some padding for better readability */
+    padding: 9px 15px;; /* Add some padding for better readability */
+    border-radius: 4px;
+    font-family: "Roboto", sans-serif;
+}
+
+input[type=text] {
+    width: 25vw;
+    padding: 9px 15px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.main-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    font-family: "Roboto", sans-serif;
+}
+
+h1 {
+    text-align: center;
+    padding-bottom: 1.5vh;
+}
+
+label {
+    text-align: left;
+}
+
+/* For location autocomplete */
+#autocompleteSuggestions {
+    position: absolute;
+    z-index: 9999;
+    width: 25vw; /* Adjust the width as needed */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none; /* Initially hidden */
+    margin-top: -0.7vh;
+}
+
+#autocompleteSuggestions li {
+    padding: 8px 12px;
+    border-top: 1px solid #f1f1f1;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+#autocompleteSuggestions li:hover {
+
+
+    background-color: #d5f1f3;
+    border-color: #d5f1f3;
+
+
+    /*
+    background-color: #b2e3e7;
+    border-color: #b2e3e7;
+    */
+}
+
+#autocompleteSuggestions.show {
+    display: block; /* Show when 'show' class is added */
+}
+
+#noMatchingLocationMessage {
+    display: none;
+}
+
+#noMatchingLocationMessage.show {
+    display: block;
+}
+
+#rateLimitMessage {
+    display: none;
+}
+
+#rateLimitMessage.show {
+    display: block;
 }

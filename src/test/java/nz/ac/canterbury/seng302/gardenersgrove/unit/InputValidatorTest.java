@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.unit;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -199,50 +199,50 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_numCommSingle_blank_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField(""));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(""));
     }
 
     @Test
     public void InputValidator_numCommSingle_number_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("123"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("123"));
     }
 
     @Test
     public void InputValidator_numCommSingle_numberWComma_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("123,23"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("123,23"));
     }
 
     @Test
     public void InputValidator_numCommSingle_numberW2Comma_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("12,23,23"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("12,23,23"));
     }
     @Test
     public void InputValidator_numCommSingle_letters_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("Abc"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("Abc"));
     }
     @Test
     public void InputValidator_numCommSingle_numbersWletters_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("12JK23"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("12JK23"));
     }
     @Test
     public void InputValidator_numCommSingle_NonAlpha_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("~ÉI3Á┌1&"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("~ÉI3Á┌1&"));
     }
     @Test
     public void InputValidator_numCommSingle_onlyComma_return_NONNUMERICCOMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField(","));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput(","));
     }
     @Test
     public void InputValidator_numCommSingle_singleNumber_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("1"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("1"));
     }
 
     @Test
@@ -265,63 +265,95 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_compTextWithLengthLimit_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.compulsoryTextFieldWithLengthLimit("12345", 5));
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryTextField("12345", 5));
     }
 
     @Test
     public void InputValidator_compTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
-        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextFieldWithLengthLimit("123456789", 2));
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextField("123456789", 2));
+    }
+
+    @Test
+    public void InputValidator_compAlphaTestWithLengthLimit_return_OK()
+    {
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("12345", 5));
+    }
+
+    @Test
+    public void InputValidator_compAlphaTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
+    {
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryAlphaPlusTextField("123456789", 2));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("123", 4));
+        assertEquals(ValidationResult.OK,InputValidator.optionalTextField("123", 4));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
-        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextFieldWithLengthLimit("123456789", 2));
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextField("123456789", 2));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_blankInput_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("", 5));
+        assertEquals(ValidationResult.OK,InputValidator.optionalTextField("", 5));
     }
 
     @Test
     public void InputValidator_numCommSingle_1comma0_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.numberCommaSingleTextField("1,0"));
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("1,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_negative1comma0_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("-1,0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("-1,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_InvalidFormat1_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("1-0,0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("1-0,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_InvalidFormat2_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("!9,0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("!9,0"));
     }
 
     @Test
     public void InputValidator_numCommSingle_InvalidFormat3_return_NON_NUMERIC_COMMA()
     {
-        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.numberCommaSingleTextField("1 ! 0"));
+        assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("1 ! 0"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1", "340282346638528860000000000000000000000" })
+    public void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input)
+    {
+        assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "0.0000001", "0.009", "0" })
+    public void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input)
+    {
+        assertEquals(ValidationResult.AREA_TOO_SMALL,InputValidator.validateGardenAreaInput(input));
+    }
+
+    @Test
+    public void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE()
+    {
+        String sizeOfJavaFloat = "340300000000000000000000000000000000000";
+        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(sizeOfJavaFloat));
+    }
 
     /**
      * Test for valid names
@@ -364,7 +396,8 @@ public class InputValidatorTest {
      * @param email
      */
     @ParameterizedTest
-    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c","test@test.abcdf", "test@.com", "@test.com" })
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c", "test@.com", "@test.com",
+            "abc-@mail.com","abc..def@mail.com",".abc@mail.com", "abc.def@mail#archive.com","abc.def@mail..com" })
     public void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
@@ -431,6 +464,79 @@ public class InputValidatorTest {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
+
+
+
+    /**
+     * Test for valid DOB
+     * @param date
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
+    public void InputValidator_isValidDate_ValidDate_return_OK(String date) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
+    }
+    /**
+     * Test for invalid DOB format
+     * @param date
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
+    public void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
+        Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
+    }
+
+    /**
+     * Test for valid garden street address
+     * @param streetAddress string input for a garden's street address
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road" })
+    public void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalAlphaPlusTextField(streetAddress));
+    }
+    /**
+     * Test for invalid garden street address
+     * @param streetAddress string input for a garden's street address
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenea" })
+    public void InputValidator_isValidStreetAddress_invalidStreetAddress_return_LENGTH_OVER_LIMIT(String streetAddress) {
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
+    }
+    @ParameterizedTest
+    @ValueSource(strings = { "116 !@#$%^&*()_+-=[]{};:',.<>/?| Road" })
+    public void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
+        Assertions.assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
+    }
+    /**
+     * Test for valid postcode
+     * @param postcode string input for a garden's postcode
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "8041", "23020392"})
+    public void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode, 10));
+    }
+    /**
+     * Test for invalid postcode
+     * @param postcode string input for a garden's postcode
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "THIS IS NOT A POSTCODE", "8041!@#$"})
+    public void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
+        Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode, 10));
+    }
+    /**
+     * Test for invalid postcode
+     * @param postcode string input for a garden's postcode
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "1234567891011", "012345678910"})
+    public void InputValidator_isValidPostcode_invalidPostcode_return_LENGTH_OVER_LIMIT(String postcode) {
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.validatePostcodeInput(postcode, 10));
+    }
+
 
 
 }
