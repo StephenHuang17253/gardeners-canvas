@@ -30,21 +30,44 @@ public class GardenServiceTest {
     public void testGetGardens() {
 
         GardenService gardenService = new GardenService(gardenRepository);
-        Garden garden1 = new Garden("John's Garden", "John's Backyard", 15);
-        Garden garden2 = new Garden("Jane's Garden", "Jane's Backyard", 20);
+        Garden garden1 = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                10);
+        Garden garden2 = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "20 Kirkwood Avenue, Upper Riccarton, Christchurch 8041, New Zealand",
+                20);
         gardenRepository.save(garden1);
         gardenRepository.save(garden2);
         List<Garden> gardens = gardenService.getGardens();
         Assertions.assertTrue(gardens.contains(garden1));
         Assertions.assertTrue(gardens.contains(garden2));
-
     }
     @Mock
     GardenRepository gardenRepo;
     @Test
     public void testFindById() {
 
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15);
         when(gardenRepo.findById(1L)).thenReturn(Optional.of(garden));
 
         GardenService gardenService = new GardenService(gardenRepo);
@@ -56,20 +79,54 @@ public class GardenServiceTest {
     @Test
     public void testAddGarden() {
         GardenService gardenService = new GardenService(gardenRepository);
-        Garden garden = gardenService.addGarden(new Garden("John's Garden", "John's Backyard", 15));
+        Garden garden = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15));
         Assertions.assertEquals(garden.getGardenName(), "John's Garden");
-        Assertions.assertEquals(garden.getGardenLocation(), "John's Backyard");
+        Assertions.assertEquals(garden.getGardenAddress(), "114 Ilam Road");
+        Assertions.assertEquals(garden.getGardenSuburb(), "Ilam");
+        Assertions.assertEquals(garden.getGardenCity(), "Christchurch");
+        Assertions.assertEquals(garden.getGardenPostcode(), "8041");
+        Assertions.assertEquals(garden.getGardenCountry(), "New Zealand");
+        Assertions.assertEquals(garden.getGardenLocation(), "114 Ilam Road, Ilam, Christchurch 8041, New Zealand");
         Assertions.assertEquals(garden.getGardenSize(), 15);
     }
 
     @Test
     public void testUpdateGarden() {
         GardenService gardenService = new GardenService(gardenRepository);
-        Garden oldGarden = new Garden("John's Garden", "John's Backyard", 15);
-        Garden newGarden = new Garden("Jane's Garden", "Jane's Backyard", 20);
+        Garden oldGarden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                10);
+        Garden newGarden = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "20 Kirkwood Avenue, Upper Riccarton, Christchurch 8041, New Zealand",
+                20);
         gardenService.addGarden(oldGarden);
         gardenService.updateGarden(oldGarden.getGardenId(), newGarden);
         Assertions.assertEquals(oldGarden.getGardenName(), newGarden.getGardenName());
+        Assertions.assertEquals(oldGarden.getGardenAddress(), newGarden.getGardenAddress());
+        Assertions.assertEquals(oldGarden.getGardenSuburb(), newGarden.getGardenSuburb());
+        Assertions.assertEquals(oldGarden.getGardenCity(), newGarden.getGardenCity());
+        Assertions.assertEquals(oldGarden.getGardenPostcode(), newGarden.getGardenPostcode());
+        Assertions.assertEquals(oldGarden.getGardenCountry(), newGarden.getGardenCountry());
         Assertions.assertEquals(oldGarden.getGardenLocation(), newGarden.getGardenLocation());
         Assertions.assertEquals(oldGarden.getGardenSize(), newGarden.getGardenSize());
 
@@ -81,7 +138,15 @@ public class GardenServiceTest {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         GardenService gardenService = new GardenService(gardenRepository);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                10);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // When

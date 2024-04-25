@@ -17,7 +17,17 @@ public class Garden {
     private Long gardenId;
     @Column(nullable = false)
     private String gardenName;
-    @Column(nullable = false)
+    @Column
+    private String gardenAddress;
+    @Column
+    private String gardenSuburb;
+    @Column
+    private String gardenPostcode;
+    @Column
+    private String gardenCity;
+    @Column
+    private String gardenCountry;
+    @Column(nullable = false, length = 522)
     private String gardenLocation;
     @Column
     private float gardenSize;
@@ -36,11 +46,18 @@ public class Garden {
      * @param gardenLocation the location of the garden
      * @param gardenSize the size of the garden
      */
-    public Garden(String gardenName, String gardenLocation, float gardenSize) {
+    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
+                  String gardenPostcode, String gardenCountry, String gardenLocation, float gardenSize) {
         this.gardenName = gardenName;
+        this.gardenAddress = gardenAddress;
+        this.gardenSuburb = gardenSuburb;
+        this.gardenPostcode = gardenPostcode;
+        this.gardenCity = gardenCity;
+        this.gardenCountry = gardenCountry;
         this.gardenLocation = gardenLocation;
         this.gardenSize = gardenSize;
     }
+
 
     public Long getGardenId() {
         return gardenId;
@@ -50,6 +67,36 @@ public class Garden {
     }
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
+    }
+    public String getGardenAddress() {
+        return gardenAddress;
+    }
+    public void setGardenAddress(String gardenAddress) {
+        this.gardenAddress = gardenAddress;
+    }
+    public String getGardenSuburb() {
+        return gardenSuburb;
+    }
+    public void setGardenSuburb(String gardenSuburb) {
+        this.gardenSuburb = gardenSuburb;
+    }
+    public String getGardenPostcode() {
+        return gardenPostcode;
+    }
+    public void setGardenPostcode(String gardenPostcode) {
+        this.gardenPostcode = gardenPostcode;
+    }
+    public String getGardenCity() {
+        return gardenCity;
+    }
+    public void setGardenCity(String gardenCity) {
+        this.gardenCity = gardenCity;
+    }
+    public String getGardenCountry() {
+        return gardenCountry;
+    }
+    public void setGardenCountry(String gardenCountry) {
+        this.gardenCountry = gardenCountry;
     }
     public String getGardenLocation() {
         return gardenLocation;
