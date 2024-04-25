@@ -9,8 +9,7 @@ Feature: U4 As Sarah, I want to edit my user profile so that I can keep my detai
     |"Alice"|"Anders"|"alice@email.com"|"12/04/2001"|
 
   Scenario: AC4 - I click the check box marked “I have no surname” ticked
-    Given I have a surname "Doe"
-    When I click the check box marked "I have no surname"
+    When I check the check box marked "I have no surname"
     And I click the "Submit" button
     Then My surname will become ""
 
