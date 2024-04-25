@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -287,7 +286,7 @@ public class ProfileController {
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
             @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress") String emailAddress,
-            @RequestParam("profilePictureInput") MultipartFile profilePicture,
+            @RequestParam(value = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
 
@@ -302,6 +301,7 @@ public class ProfileController {
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         if (noLastName) {
             lastNameValidation = ValidationResult.OK;
+            lastName = "";
         }
         validationMap.put("lastName", lastNameValidation);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
@@ -342,6 +342,7 @@ public class ProfileController {
             }
         }
 
+
         // If any input is invalid, return to the edit form
         if (!valid) {
             model.addAttribute("firstName", firstName);
@@ -363,7 +364,6 @@ public class ProfileController {
         userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, dateOfBirth);
 
         setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
-
         return "redirect:/profile";
     }
 
