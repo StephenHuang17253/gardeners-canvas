@@ -13,7 +13,10 @@
     <div class="container">
         <h2>Gardener's Grove</h2>
 
-        <img th:src="@{/images/Garden.webp}" alt="Garden">
+        // For some reason the home image will not load unless this is '/Images/' instead of '/images/'
+        // Even though the folder is actually 'images'.
+        // Don't know why, but this is how it is.
+        <img th:src="@{/Images/Garden.webp}" alt="Garden">
 
         <div th:if="${loggedIn}" class="profile_info">
             <div class="profile_picture_container small_pic">

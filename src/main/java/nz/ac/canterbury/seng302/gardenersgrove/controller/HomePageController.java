@@ -64,7 +64,7 @@ public class HomePageController {
      */
     public String getProfilePictureString(String filename) {
 
-        String profilePictureString = "/Images/default_profile_picture.png";
+        String profilePictureString = "/images/default_profile_picture.png";
 
         if (filename != null && filename.length() != 0) {
             profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,

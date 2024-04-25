@@ -63,8 +63,9 @@ public class PlantFormController {
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
 
-        String plantPicture = getPlantPictureString("");
-        model.addAttribute("plantPicture", plantPicture);
+        // Sets default plant image
+        String plantPictureString = getPlantPictureString("");
+        model.addAttribute("plantPicture", plantPictureString);
 
         logger.info("GET /create-new-plant");
         return "createNewPlantForm"; // Return the view for creating a new plant
@@ -99,6 +100,10 @@ public class PlantFormController {
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
 
+        // Plant image is optional
+        if (plantPicture.isEmpty()) {
+            plantPictureResult = ValidationResult.OK;
+        }
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
 
@@ -108,14 +113,24 @@ public class PlantFormController {
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
 
+        // Sets default plant image
+        String plantPictureString = getPlantPictureString("");
+        model.addAttribute("plantPicture", plantPictureString);
 
-        if (!plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
-            System.out.println("Passed");
+        logger.info("Validating form inputs");
+        if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
+            logger.info("Validation checks passed.");
             return "createNewPlantForm";
         }
         if(plantCount.isBlank()) {plantCount = "1.0";}
         float floatPlantCount = Float.parseFloat(plantCount.replace(",", "."));
-        plantService.addPlant(plantName, floatPlantCount, plantDescription, plantDate, gardenId);
+        logger.info("Creating new Plant");
+        Plant newPlant = plantService.addPlant(plantName, floatPlantCount, plantDescription, plantDate, gardenId);
+        if (!plantPicture.isEmpty()) {
+            logger.info("Setting plant image");
+            updatePlantPicture(newPlant, plantPicture);
+        }
+
         logger.info("Created new Plant");
         return "redirect:/my-gardens/{gardenId}={gardenName}";
     }
@@ -202,21 +217,24 @@ public class PlantFormController {
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
 
+        logger.info("Validating form inputs");
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
-            System.out.println("Passed");
+            logger.info("Validation checks passed");
             return "editPlantForm";
         }
 
         if(plantCount.isBlank()) {plantCount = "1.0";}
         float floatPlantCount = Float.parseFloat(plantCount.replace(",", "."));
+        logger.info("Updating plant");
         plantService.updatePlant(plantId, plantName, floatPlantCount, plantDescription, plantDate);
 
         if (!plantPicture.isEmpty()) {
+            logger.info("Updating plant picture");
             updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
 
 
-        logger.info("updated Plant");
+        logger.info("Plant updated successfully");
         return "redirect:/my-gardens/{gardenId}={gardenName}";
     }
 
@@ -335,7 +353,7 @@ public class PlantFormController {
                 }
             }
 
-            String fileName = "plant_" + plant.getPlantId() + "_plant_picture." + fileExtension.toLowerCase();
+            String fileName = "plant_" + plant.getPlantId() + "_picture." + fileExtension.toLowerCase();
             plantService.updatePlantPictureFilename(fileName, plant.getPlantId());
             fileService.saveFile(fileName, plantPicture);
 
