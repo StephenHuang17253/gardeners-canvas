@@ -31,6 +31,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 public class U10_Acceptance_Testing {
 
@@ -59,10 +61,14 @@ public class U10_Acceptance_Testing {
     String gardenName;
     String gardenLocation;
     String gardenSize;
+    String gardenPostCode;
 
     String initialGardenName;
     String initialGardenLocation;
     String initialGardenSize;
+    String initialGardenPostCode;
+
+    String expectedNewLocation;
 
     String userEmail;
 
@@ -97,11 +103,12 @@ public class U10_Acceptance_Testing {
         initialGardenLocation = "University Testing Lab";
         initialGardenSize = "0.0";
         Garden newGarden = new Garden(gardenName, initialGardenLocation
-                ,initialGardenLocation,initialGardenLocation,initialGardenLocation
+                ,initialGardenLocation,initialGardenLocation,gardenPostCode
                 ,initialGardenLocation,initialGardenLocation, 0.0f);
         initialGardenName = gardenName;
         gardenService.addGarden(newGarden);
         gardenId = newGarden.getGardenId();
+        initialGardenPostCode = newGarden.getGardenPostcode();
     }
 
     @Given("I am on the garden edit form")
@@ -111,11 +118,12 @@ public class U10_Acceptance_Testing {
         gardenSize = "0.0";
     }
 
-    @Given("I enter valid values for the {string}, {string}, and {string}")
-    public void i_enter_valid_values_for_the_and_optionally(String name, String location, String size) {
+    @Given("I enter valid values for the {string}, {string}, {string} and {string}")
+    public void i_enter_valid_values_for_the_and_optionally(String name, String location, String size, String postcode) {
         gardenName = name;
         gardenLocation = location;
         gardenSize = size;
+        gardenPostCode = postcode;
     }
 
     @When("I enter a size using a comma")
@@ -145,8 +153,14 @@ public class U10_Acceptance_Testing {
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
-                        .param("gardenLocation", gardenLocation)
                         .param("gardenSize", gardenSize)
+                        .param("streetAddress",gardenLocation)
+                        .param("suburb",gardenLocation)
+                        .param("city", gardenLocation)
+                        .param("country",gardenLocation)
+                        .param("postcode",gardenPostCode)
+                        .param("gardenLocation", "") // must be present, but is overridden immediately in controller
+
         );
     }
 
@@ -159,9 +173,9 @@ public class U10_Acceptance_Testing {
         }
         Garden updatedGarden = optionalUpdatedGarden.get();
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
-        Assertions.assertEquals(gardenLocation, updatedGarden.getGardenLocation());
+        Assertions.assertTrue( updatedGarden.getGardenLocation().contains(gardenLocation));
         Assertions.assertEquals(Float.parseFloat(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
-
+        Assertions.assertEquals(gardenPostCode, updatedGarden.getGardenPostcode());
     }
 
     @Then("The garden details are not updated")
@@ -175,6 +189,7 @@ public class U10_Acceptance_Testing {
         Assertions.assertEquals(initialGardenName, updatedGarden.getGardenName());
         Assertions.assertEquals(initialGardenLocation, updatedGarden.getGardenLocation());
         Assertions.assertEquals(Float.parseFloat(initialGardenSize.replace(",", ".")), updatedGarden.getGardenSize());
+        Assertions.assertEquals(initialGardenPostCode, updatedGarden.getGardenPostcode());
     }
 
 }
