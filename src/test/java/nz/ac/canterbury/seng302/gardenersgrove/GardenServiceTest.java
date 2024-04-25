@@ -11,10 +11,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.util.Assert;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +61,26 @@ public class GardenServiceTest {
         Assertions.assertEquals(garden.getGardenName(), "John's Garden");
         Assertions.assertEquals(garden.getGardenLocation(), "John's Backyard");
         Assertions.assertEquals(garden.getGardenSize(), 15);
+    }
+
+    @Test
+    public void testAddGardenNameCharLimitExceeds() {
+        GardenService gardenService = new GardenService(gardenRepository);
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+            gardenService.addGarden(new Garden(
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    "John's Backyard", 15));
+        });
+    }
+
+    @Test
+    public void testAddGardenLocationCharLimitExceeds() {
+        GardenService gardenService = new GardenService(gardenRepository);
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+            gardenService.addGarden(new Garden(
+                    "John's Garden",
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 15));
+        });
     }
 
     @Test
