@@ -1,13 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import net.bytebuddy.asm.Advice;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -43,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ProfileControllerTest {
+public class GardenFormControllerTest {
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -53,8 +49,11 @@ public class ProfileControllerTest {
     private UserService userServiceMock;
 
     User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.now());
+
+
     @InjectMocks
     private static ProfileController profileController;
+
 
     @BeforeEach
     public void setup() {
@@ -62,7 +61,6 @@ public class ProfileControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
-
     }
 
     @AfterAll
@@ -82,32 +80,21 @@ public class ProfileControllerTest {
     public void mvcMockIsAlive() throws Exception
     {
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
-        mockMvc.perform(get("/profile"))
+        mockMvc.perform(get("/create-new-garden"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void getProfilePage_notAuthenticated_Forbidden() throws Exception
-    {
-        mockMvc.perform(get("/profile"))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void getProfilePage_LoggedIn_FilledPage() throws Exception
+    public void postProfilePage_LoggedIn_FilledPage() throws Exception
     {
-        Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
-        mockMvc.perform(get("/profile"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("userName","John Test"))
-                .andExpect(model().attribute("dateOfBirth", LocalDate.now()))
-                .andExpect(model().attribute("emailAddress","profile.user.test@ProfileController.com"));
+        mockMvc.perform(post("/create-new-garden").with(csrf())
+                        .flashAttr("gardenName","Hi")
+                        .flashAttr("gardenLocation","Hi")
+                        .flashAttr("gardenSize","123"))
+                .andExpect(status().is3xxRedirection()).andDo(print());
     }
 
-
-    // Add tests for posting picture method
-    // useful reference: https://stackoverflow.com/questions/38571716/how-to-put-multipart-form-data-using-spring-mockmvc
 
 
 }
