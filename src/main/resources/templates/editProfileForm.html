@@ -13,8 +13,8 @@
 
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
 <div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
-<title>Edit Profile</title>
     <div class="container">
+        <title>Edit Profile</title>
         <h1>Edit Profile Form</h1>
         <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
 
