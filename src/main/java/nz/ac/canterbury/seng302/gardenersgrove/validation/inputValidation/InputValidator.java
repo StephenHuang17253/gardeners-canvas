@@ -270,6 +270,7 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .emailUniquenessHelper()
                 .getResult();
     }
@@ -284,6 +285,7 @@ public class InputValidator {
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .getResult();
     }
 

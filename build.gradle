@@ -39,6 +39,8 @@ dependencies {
 	testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.15.0'
 	testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
 
+	testImplementation 'org.springframework.security:spring-security-test'
+
 
 }
 
@@ -47,10 +49,10 @@ jacoco {
 }
 
 
-sonarqube {
+sonar {
 	properties {
-		property "sonar.projectKey", "team-500"
-		property "sonar.projectName", "team-500"
+		property "sonar.projectKey", "seng302-20240team500"
+		property "sonar.projectName", "seng302-20240team500"
 		property "sonar.sourceEncoding", "UTF-8"
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"
