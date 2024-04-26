@@ -228,7 +228,7 @@ public class RegistrationFormController {
             valid = false;
         }
         if (!emailAddressValidation.valid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation);
+            model.addAttribute("emailAddressError", "Email address " + emailAddressValidation);
             valid = false;
         }
         if (!dateOfBirthValidation.valid()) {

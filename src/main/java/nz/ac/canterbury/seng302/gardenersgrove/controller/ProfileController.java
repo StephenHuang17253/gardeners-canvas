@@ -331,11 +331,12 @@ public class ProfileController {
 
                 String error = entry.getValue().toString();
 
-                if (entry.getKey().equals("firstName")) {
-                    error = "First name " + error;
-                } else if (entry.getKey().equals("lastName")) {
-                    error = "First name " + error;
-                }
+                error = switch (entry.getKey()) {
+                    case "firstName" -> "First name " + error;
+                    case "lastName" -> "Last name " + error;
+                    case "emailAddress" -> "Email address " + error;
+                    default -> entry.getValue().toString();
+                };
 
                 model.addAttribute(entry.getKey() + "Error", error);
                 valid = false;
