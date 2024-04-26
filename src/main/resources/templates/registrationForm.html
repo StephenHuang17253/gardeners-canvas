@@ -29,8 +29,11 @@
         </div>
         
         <label for="dateOfBirth"> Date of Birth (Optional): </label>
-        <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY"
-               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth" required autofocus>
+        <input type="date" class="form-control"  id="dateOfBirth" placeholder=""
+               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth"
+               autofocus >
+<!--        <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY"-->
+<!--               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth" required autofocus>-->
         <div th:if="${dateOfBirthError}" class="error-message">
             <span th:text="${dateOfBirthError}"></span>
         </div>

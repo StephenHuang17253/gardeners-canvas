@@ -270,6 +270,7 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .emailUniquenessHelper()
                 .getResult();
     }
@@ -284,6 +285,7 @@ public class InputValidator {
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .getResult();
     }
 
@@ -362,7 +364,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("[a-zA-Z\\-\\s']+")) {
+        if (!testedValue.matches("^\\p{L}[\\p{L} \\-'’]*$")) {
             this.validationResult = ValidationResult.INVALID_USERNAME;
             this.passState = false;
             return this;
@@ -384,7 +386,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[a-zA-Z0-9._-]{1,64}@[a-zA-Z0-9.-]{1,255}\\.[a-zA-Z]{2,4}$")) {
+        if (!testedValue.matches("^[\\p{L}\\p{M}\\p{N}]{1,64}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,255}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$")) {
             this.validationResult = ValidationResult.INVALID_EMAIL;
             this.passState = false;
             return this;
