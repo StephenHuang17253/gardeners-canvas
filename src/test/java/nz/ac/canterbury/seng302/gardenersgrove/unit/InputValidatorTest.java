@@ -265,13 +265,13 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_compTextWithLengthLimit_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.compulsoryTextFieldWithLengthLimit("12345", 5));
+        assertEquals(ValidationResult.OK,InputValidator.compulsoryTextField("12345", 5));
     }
 
     @Test
     public void InputValidator_compTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
-        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextFieldWithLengthLimit("123456789", 2));
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextField("123456789", 2));
     }
 
     @Test
@@ -289,19 +289,19 @@ public class InputValidatorTest {
     @Test
     public void InputValidator_optTextWithLengthLimit_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("123", 4));
+        assertEquals(ValidationResult.OK,InputValidator.optionalTextField("123", 4));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
-        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextFieldWithLengthLimit("123456789", 2));
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextField("123456789", 2));
     }
 
     @Test
     public void InputValidator_optTextWithLengthLimit_blankInput_return_OK()
     {
-        assertEquals(ValidationResult.OK,InputValidator.optionalTextFieldWithLengthLimit("", 5));
+        assertEquals(ValidationResult.OK,InputValidator.optionalTextField("", 5));
     }
 
     @Test
@@ -396,7 +396,8 @@ public class InputValidatorTest {
      * @param email
      */
     @ParameterizedTest
-    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c","test@test.abcdf", "test@.com", "@test.com" })
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c", "test@.com", "@test.com",
+            "abc-@mail.com","abc..def@mail.com",".abc@mail.com", "abc.def@mail#archive.com","abc.def@mail..com" })
     public void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
@@ -474,7 +475,7 @@ public class InputValidatorTest {
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     public void InputValidator_isValidDate_ValidDate_return_OK(String date) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
-    };
+    }
     /**
      * Test for invalid DOB format
      * @param date
@@ -485,6 +486,56 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
     }
 
+    /**
+     * Test for valid garden street address
+     * @param streetAddress string input for a garden's street address
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road" })
+    public void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalAlphaPlusTextField(streetAddress));
+    }
+    /**
+     * Test for invalid garden street address
+     * @param streetAddress string input for a garden's street address
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenea" })
+    public void InputValidator_isValidStreetAddress_invalidStreetAddress_return_LENGTH_OVER_LIMIT(String streetAddress) {
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
+    }
+    @ParameterizedTest
+    @ValueSource(strings = { "116 !@#$%^&*()_+-=[]{};:',.<>/?| Road" })
+    public void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
+        Assertions.assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
+    }
+    /**
+     * Test for valid postcode
+     * @param postcode string input for a garden's postcode
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "8041", "23020392"})
+    public void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode, 10));
+    }
+    /**
+     * Test for invalid postcode
+     * @param postcode string input for a garden's postcode
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "THIS IS NOT A POSTCODE", "8041!@#$"})
+    public void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
+        Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode, 10));
+    }
+    /**
+     * Test for invalid postcode
+     * @param postcode string input for a garden's postcode
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "1234567891011", "012345678910"})
+    public void InputValidator_isValidPostcode_invalidPostcode_return_LENGTH_OVER_LIMIT(String postcode) {
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.validatePostcodeInput(postcode, 10));
+    }
 
 
 

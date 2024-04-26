@@ -11,14 +11,20 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -63,6 +69,11 @@ public class PlantFormController {
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
         model.addAttribute("plantPicture", plantPictureString);
@@ -98,7 +109,7 @@ public class PlantFormController {
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
         // Plant image is optional
         if (plantPicture.isEmpty()) {
@@ -164,6 +175,11 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
         model.addAttribute("myGardens", gardenService.getGardens());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         logger.info("GET /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         return "editPlantForm"; // Return the view for creating a new plant
     }
@@ -201,7 +217,7 @@ public class PlantFormController {
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;

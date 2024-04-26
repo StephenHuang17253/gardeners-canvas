@@ -4,9 +4,12 @@
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8"/>
     <title>Registration Form</title>
     <link th:href="@{/css/registrationForm.css}" rel="stylesheet">
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <script th:src="@{/js/registrationForm.js}"></script>
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
 </head>
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
 <h1>Registration Form</h1>
 <div>
     <form th:action="@{/register}" method="post">
@@ -29,8 +32,11 @@
         </div>
         
         <label for="dateOfBirth"> Date of Birth (Optional): </label>
-        <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY"
-               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth" required autofocus>
+        <input type="date" class="form-control"  id="dateOfBirth" placeholder=""
+               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth"
+               autofocus >
+<!--        <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY"-->
+<!--               th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth" required autofocus>-->
         <div th:if="${dateOfBirthError}" class="error-message">
             <span th:text="${dateOfBirthError}"></span>
         </div>
@@ -55,8 +61,8 @@
         </div>
         <br><br>
         <div class="buttons">
-            <button type="submit" formnovalidate >Sign Up!</button>
-            <a th:href = "@{/home}" ><button type="button">Cancel :(</button></a>
+            <button type="submit" class="user_button" formnovalidate >Sign Up!</button>
+            <a th:href = "@{/home}" ><button class="user_button" type="button">Cancel :(</button></a>
         </div>
     </form>
     

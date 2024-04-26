@@ -10,7 +10,7 @@
     <script th:src="@{/js/profilePicturePicker.js}"></script>
 </head>
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
 <div class="main-container">
     <h1>Create New Plant</h1>
     <br>
@@ -45,6 +45,7 @@
 
 
             <label for="plantDescription"> Plant Description </label>
+            <br>
             <div class="form-description" >
                 <textarea class="form-control" th:class = "${PDErrorClass}" id="plantDescription" placeholder="Description"
                        th:name="plantDescription" th:text="*{plantDescription}" data-cy="plantDescription"

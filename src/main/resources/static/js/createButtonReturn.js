@@ -9,9 +9,45 @@ function createGarden() {
 
     }
     var previousUrl = localStorage.getItem('previousUrl');
-    // Default the return URL to landing page if not set
+    // Default the return URL to home page if not set
     if (!previousUrl) {
-        localStorage.setItem('previousUrl', '/landing');
+        localStorage.setItem('previousUrl', '/home');
+    }
+
+}
+
+function openRegisterPage() {
+    var currentUrl = window.location.pathname;
+    //if currentURL is not register send them to this page
+    if (currentUrl !== '/register') {
+        localStorage.setItem('previousUrl', window.location.href);
+
+        // Redirect to create-new-garden page
+        window.location.href = '/register';
+
+    }
+    var previousUrl = localStorage.getItem('previousUrl');
+    // Default the return URL to home page if not set
+    if (!previousUrl) {
+        localStorage.setItem('previousUrl', '/home');
+    }
+
+}
+
+function openLoginPage() {
+    var currentUrl = window.location.pathname;
+    //if currentURL is not login send them to this page
+    if (currentUrl !== '/login') {
+        localStorage.setItem('previousUrl', window.location.href);
+
+        // Redirect to create-new-garden page
+        window.location.href = '/login';
+
+    }
+    var previousUrl = localStorage.getItem('previousUrl');
+    // Default the return URL to home page if not set
+    if (!previousUrl) {
+        localStorage.setItem('previousUrl', '/home');
     }
 
 }

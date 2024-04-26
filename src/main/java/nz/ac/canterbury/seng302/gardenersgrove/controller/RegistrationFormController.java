@@ -24,7 +24,6 @@ import org.springframework.ui.Model;
 import java.util.Objects;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -94,12 +93,18 @@ public class RegistrationFormController {
     public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
             Model model) {
         logger.info("GET /register");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         addUserAttributes(firstName, lastName, noLastName, dateOfBirth,
                 emailAddress, password, repeatPassword, model);
         return "registrationForm";
@@ -125,7 +130,7 @@ public class RegistrationFormController {
             @RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -141,34 +146,30 @@ public class RegistrationFormController {
             valid = false;
         }
 
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
+            dateOfBirthValidation = ValidationResult.OK;
+        } else{
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
+
+        }
+
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (Objects.equals(dateOfBirth, "")) {
-            dateOfBirthValidation = ValidationResult.OK;
-        }
 
         valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
-                emailAddressValidation, passwordValidation, dateOfBirthValidation, valid, model);
+                emailAddressValidation, passwordValidation,dateOfBirthValidation, valid, model);
 
         if (!valid) {
             return "registrationForm";
         } else {
-            LocalDate date;
-            if (!Objects.equals(dateOfBirth, "")) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-                date = LocalDate.parse(dateOfBirth, formatter);
-            } else {
-                date = null;
-            }
-
-            User user = new User(firstName, lastName, emailAddress, date);
+            User user = new User(firstName, lastName, emailAddress, dateOfBirth);
             userService.addUser(user, password);
-
             setSecurityContext(user.getEmailAddress(), password, request.getSession());
-            return "redirect:/profile"; // Placeholder for Profile Page
+            return "redirect:/profile";
         }
     }
 
@@ -188,7 +189,7 @@ public class RegistrationFormController {
     private void addUserAttributes(@RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -233,7 +234,7 @@ public class RegistrationFormController {
             valid = false;
         }
         if (!emailAddressValidation.valid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation);
+            model.addAttribute("emailAddressError", "Email address " + emailAddressValidation);
             valid = false;
         }
         if (!dateOfBirthValidation.valid()) {
