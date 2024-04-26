@@ -13,7 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -67,7 +71,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName",""))
                 .andExpect(model().attribute("lastName",""))
                 .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth",""))
                 .andExpect(model().attribute("emailAddress",""))
                 .andExpect(model().attribute("password",""))
                 .andExpect(model().attribute("repeatPassword",""));
@@ -80,7 +83,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName","123"))
                 .andExpect(model().attribute("lastName",""))
                 .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth",""))
                 .andExpect(model().attribute("emailAddress",""))
                 .andExpect(model().attribute("password",""))
                 .andExpect(model().attribute("repeatPassword",""));
@@ -94,7 +96,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName",""))
                 .andExpect(model().attribute("lastName","123"))
                 .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth",""))
                 .andExpect(model().attribute("emailAddress",""))
                 .andExpect(model().attribute("password",""))
                 .andExpect(model().attribute("repeatPassword",""));
@@ -108,21 +109,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName",""))
                 .andExpect(model().attribute("lastName",""))
                 .andExpect(model().attribute("noLastName",true))
-                .andExpect(model().attribute("dateOfBirth",""))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword",""));
-    }
-
-    @Test
-    public void getRegistrationPage_DOB_PageWDOB() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("dateOfBirth","123"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth","123"))
                 .andExpect(model().attribute("emailAddress",""))
                 .andExpect(model().attribute("password",""))
                 .andExpect(model().attribute("repeatPassword",""));
@@ -136,7 +122,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName",""))
                 .andExpect(model().attribute("lastName",""))
                 .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth",""))
                 .andExpect(model().attribute("emailAddress","123"))
                 .andExpect(model().attribute("password",""))
                 .andExpect(model().attribute("repeatPassword",""));
@@ -150,7 +135,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName",""))
                 .andExpect(model().attribute("lastName",""))
                 .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth",""))
                 .andExpect(model().attribute("emailAddress",""))
                 .andExpect(model().attribute("password","123"))
                 .andExpect(model().attribute("repeatPassword",""));
@@ -164,7 +148,6 @@ public class RegistrationFormControllerTest {
                 .andExpect(model().attribute("firstName",""))
                 .andExpect(model().attribute("lastName",""))
                 .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("dateOfBirth",""))
                 .andExpect(model().attribute("emailAddress",""))
                 .andExpect(model().attribute("password",""))
                 .andExpect(model().attribute("repeatPassword","123"));

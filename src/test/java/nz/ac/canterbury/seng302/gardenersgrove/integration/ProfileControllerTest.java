@@ -52,7 +52,7 @@ public class ProfileControllerTest {
     @MockBean
     private UserService userServiceMock;
 
-    User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.now());
+    User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
     @InjectMocks
     private static ProfileController profileController;
 
@@ -101,7 +101,7 @@ public class ProfileControllerTest {
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("userName","John Test"))
-                .andExpect(model().attribute("dateOfBirth", LocalDate.now()))
+                .andExpect(model().attribute("dateOfBirth", "02/05/2003"))
                 .andExpect(model().attribute("emailAddress","profile.user.test@ProfileController.com"));
     }
 

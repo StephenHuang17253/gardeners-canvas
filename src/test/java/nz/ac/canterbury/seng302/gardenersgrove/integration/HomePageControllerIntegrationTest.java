@@ -1,8 +1,15 @@
-package nz.ac.canterbury.seng302.gardenersgrove.controllerTests.Integration;
+package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 
+import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -12,6 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
@@ -31,18 +40,27 @@ public class HomePageControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private static SecurityContext securityContextMock;
-    private static Authentication authenticationMock;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-    @BeforeAll
-    public static void setup() {
-//        securityContextHolderMock = Mockito.mockStatic(SecurityContextHolder.class);
-        authenticationMock = Mockito.mock(Authentication.class);
-        securityContextMock = Mockito.spy(SecurityContext.class);
+    @Autowired
+    UserRepository userRepository;
 
+    UserService userService;
 
-        SecurityContextHolder.setContext(securityContextMock);
+@BeforeEach
+public void before_or_after_all() {
+    if(userService == null)
+    {
+        userService = new UserService(passwordEncoder, userRepository);
     }
+
+    String userEmail = "johndoe.test@email.com";
+    if (!userService.emailInUse(userEmail)) {
+        User user = new User("John", "Doe", userEmail, null);
+        userService.addUser(user, "AlphabetSoup10!");
+    }
+}
 
     @Test
     public void controllerLoads()
@@ -76,7 +94,6 @@ public class HomePageControllerIntegrationTest {
     }
 
 
-
     @Test
     public void getProfilePictureString_Null_DefaultPath() throws Exception
     {
@@ -84,15 +101,6 @@ public class HomePageControllerIntegrationTest {
         assertEquals("/Images/default_profile_picture.png", pictureUrl);
     }
 
-    // Todo Check if this test is needed (is the function expected to recover from errors?)
-    // checks if the function can recover from missing images
-//    @ParameterizedTest
-//    @ValueSource( strings = {"", "definitely a valid user image","definitely a valid user image.png","myImage","myImage.png"})
-//    public void getProfilePictureString_NoSuchImage_DefaultPath(String url) throws Exception
-//    {
-//        String pictureUrl = homePageController.getProfilePictureString(url);
-//        assertEquals("/Images/default_profile_picture.png", pictureUrl);
-//    }
     @Test
     public void getMappingNotLoggedIn_home_containsNoNames() throws Exception
     {
@@ -104,24 +112,15 @@ public class HomePageControllerIntegrationTest {
     };
 
     @Test
+    @WithMockUser(username="johndoe.test@email.com")
     public void getMappingLoggedIn_home_containsNames() throws Exception
     {
-        Mockito.when(authenticationMock.getName()).thenReturn("johndoe@email.com");
-        Mockito.when(securityContextMock.getAuthentication()).thenReturn(authenticationMock);
-        SecurityContextHolder.setContext(securityContextMock);
-        assertEquals(securityContextMock.getAuthentication().getName(), "johndoe@email.com");
-        assertEquals(SecurityContextHolder.getContext().getAuthentication().getName(), "johndoe@email.com");
-        MockedStatic<SecurityContextHolder> securityContextHolderMockedStatic = Mockito.mockStatic(SecurityContextHolder.class);
-        securityContextHolderMockedStatic.when(() -> getContext()).thenReturn(securityContextMock);
-
 
         this.mockMvc.perform(get("/home"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("username",is("Welcome John Doe")))
                 .andExpect(model().attribute("profilePicture", is("/Images/default_profile_picture.png")));
-
-        securityContextHolderMockedStatic.close();
     };
 
 

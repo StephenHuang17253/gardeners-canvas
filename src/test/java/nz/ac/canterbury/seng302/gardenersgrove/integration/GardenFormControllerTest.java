@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -102,23 +104,37 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
+        MockedConstruction mockGardenConstruction = null;
         try {
-            Mockito.mockConstruction(Garden.class, (mock, context) -> {
+            mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
             });
+            when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
+
+            mockMvc.perform(post("/create-new-garden").with(csrf())
+                            .param("gardenName","Hi")
+                            .param("streetAddress","Hi")
+                            .param("suburb","Hi")
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123"))
+                    .andExpect(status().is3xxRedirection()).andDo(MockMvcResultHandlers.print());
+            Mockito.verify(gardenService, Mockito.atLeastOnce()).addGarden(Mockito.any());
+
         }
         catch (Exception err)
         {
             Assertions.fail("Constructor Mock failed: " + err.getMessage());
         }
-        when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
-
-        mockMvc.perform(post("/create-new-garden").with(csrf())
-                        .param("gardenName","Hi")
-                        .param("gardenLocation","Hi")
-                        .param("gardenSize","123"))
-                .andExpect(status().is3xxRedirection()).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.atLeastOnce()).addGarden(Mockito.any());
+        finally {
+            // need to always kill the mock, otherwise the Garden Service tests will fail
+            if(!(mockGardenConstruction == null))
+            {
+                mockGardenConstruction.close();
+            }
+        }
     }
 
 
