@@ -27,6 +27,12 @@ public class UpdateUserPassword {
     String newPassword;
     String retypePassword;
 
+    //
+    //
+    //New Tests:
+    //
+    //
+
     @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
@@ -34,53 +40,11 @@ public class UpdateUserPassword {
         MOCK_MVC = MockMvcBuilders.standaloneSetup(profileController).build();
     }
 
-    //AC1
-    @Given("I am on the edit profile form")
-    public void iAmOnTheEditProfileForm() throws Exception {
-    //    MOCK_MVC.perform(MockMvcRequestBuilders.get("/edit-profile")).andExpect(MockMvcResultMatchers.view().name("edit-profile-form"));
-    }
-    //AC1
-    @When("I hit the change password button")
-    public void iHitTheChangePasswordButton() throws Exception {
-        MOCK_MVC.perform(MockMvcRequestBuilders.get("/editPassword"));
-    }
-    @Given("I am on the change password form")
-    public void IAmOnTheChangePasswordForm() throws Exception {
-        MOCK_MVC.perform(MockMvcRequestBuilders.get("/editPassword"))
-        .andExpect(MockMvcResultMatchers.view().name("/editPassword"));
-    }
-    //AC1
-    @Then("a dedicated form is shown with three text fields: “old password”, “new password”, and “retype password”")
-    public void aDedicatedFormIsShownWithThreeTextFieldsOldPasswordNewPasswordAndRetypePassword() throws Exception {
-        MOCK_MVC.perform(MockMvcRequestBuilders.get("/profile/editPassword"));
-        String responseContent = MOCK_MVC.perform(MockMvcRequestBuilders.get("/profile/editPassword")).andReturn().getResponse().getContentAsString();
-
-        Assert.hasText(responseContent, "<input type=\"password\" id=\"currentPassword\" name=\"currentPassword\" />");
-
-    }
-    //AC2
-    @When("I enter an old password <oldPassword> that does not match the password <passwordInFile> in file")
-    public void iEnterAnOldPasswordThatDoesNotMatchThePasswordInFile() throws Exception {
-        MOCK_MVC.perform(
-                MockMvcRequestBuilders
-                        .post("/editPassword")
-                        .param("currentPassword",currentPassword)
-                        .param("newPassword", newPassword)
-                        .param("retypePassword", retypePassword)
-        );
-    }
-
-    //
-    //
-    //New Tests:
-    //
-    //
-
-    @io.cucumber.java.en.When("I enter a weak password")
+    @When("I enter the weak password: {string}")
     public void IEnterAWeakPassword(String weakPassword) {
 
     }
-    @When("I enter two different new passwords: <newPassword> and <retypePassword>")
+    @When("I enter two different new passwords: {string} and {string}")
     public void iEnterTwoDifferentPasswordsInNew(String newPassword,String retypePassword) {
 
     }
@@ -105,5 +69,10 @@ public class UpdateUserPassword {
 
     @And("I click the “Submit” button")
     public void iClickTheSubmitButton() {
+    }
+
+    @When("I enter an old password {string} that does not match the current password")
+    public void iEnterAnOldPasswordThatDoesNotMatchTheCurrentPassword(String oldPassword) {
+
     }
 }

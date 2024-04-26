@@ -4,7 +4,7 @@ Feature: U7 As Sarah, I want to be able to change my password, so that I can kee
     Given There exists a user with email "admin@email.com"
 
   Scenario: AC2 - Entering passwords that don't match the old password
-    When I enter an old password <oldPassword> that does not match the password <passwordInFile> in file
+    When I enter an old password "NewPassword10!" that does not match the current password
     And I click the “Submit” button
     Then The password does not get updated
 
@@ -14,7 +14,7 @@ Feature: U7 As Sarah, I want to be able to change my password, so that I can kee
     Then The password does not get updated
     Examples:
       | newPassword | retypePassword |
-      |       a      |         a       |
+      |       "a"      |         "b"       |
 
   Scenario Outline: AC4 - I enter a weak password e.g. under 8 chars, No variation in char
     When I enter the weak password: <weakPassword>
@@ -22,9 +22,9 @@ Feature: U7 As Sarah, I want to be able to change my password, so that I can kee
     Then The password does not get updated
     Examples:
       | weakPassword |
+      | "notEight"   |
 
   Scenario: AC5
-    Given I am on the change password form
     When I enter fully compliant details
     And I click the “Submit” button
     Then The password is updated
