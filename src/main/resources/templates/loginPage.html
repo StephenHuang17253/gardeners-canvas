@@ -23,8 +23,8 @@
           <p th:if="${loginError}" class="error-message" th:text="${loginError}"></p>
         </div>
         <div class="buttons">
-          <button type="submit" formnovalidate>Sign In</button>
-          <a th:href="@{home}"><button type="button">Cancel</button></a>
+          <button type="submit" class="user_button" formnovalidate>Sign In</button>
+          <a th:href="@{home}"><button type="button" class="user_button">Cancel</button></a>
         </div>
         <a th:href="@{register}" class="link">Not registered? Create an account</a>
       </form>

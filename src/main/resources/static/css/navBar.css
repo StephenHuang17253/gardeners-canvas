@@ -44,6 +44,12 @@ nav
     transition: background-color 0.3s ease;
 }
 
+#navbar button
+{
+    height:auto;
+
+}
+
 /*make hovered over items different*/
 #navbar li:hover
 {

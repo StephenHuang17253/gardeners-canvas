@@ -29,8 +29,8 @@
             <p th:if="${dateOfBirth}" th:text="'DoB: ' + ${dateOfBirth}"></p>
             <p th:text="'Email Address: ' + ${emailAddress}">Email: </p>
             <div class="buttons">
-                <a th:href="@{/profile/edit}"><button> Edit Profile</button></a>
-                <a th:href="@{/home}"><button>Home</button></a>
+                <a th:href="@{/profile/edit}"><button class="user_button"> Edit Profile</button></a>
+                <a th:href="@{/home}"><button class="user_button">Home</button></a>
             </div>
         </div>
     </div>

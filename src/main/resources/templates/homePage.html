@@ -25,14 +25,14 @@
         </div>
 
         <div class="buttons">
-            <a th:if="${!loggedIn}" th:href="@{register}"><button>Register</button></a>
+            <a th:if="${!loggedIn}" th:href="@{register}"><button class="user_button">Register</button></a>
 
-            <a th:if="${!loggedIn}" th:href="@{login}"><button>Sign In</button></a>
+            <a th:if="${!loggedIn}" th:href="@{login}"><button class="user_button">Sign In</button></a>
 
-            <a th:if="${loggedIn}" th:href="@{profile}"><button>View Profile</button></a>
+            <a th:if="${loggedIn}" th:href="@{profile}"><button class="user_button">View Profile</button></a>
 
             <form th:if="${loggedIn}" th:action="@{/logout}" method="post">
-                <button type="submit">Logout</button>
+                <button type="submit" class="user_button">Logout</button>
             </form>
         </div>
     </div>
