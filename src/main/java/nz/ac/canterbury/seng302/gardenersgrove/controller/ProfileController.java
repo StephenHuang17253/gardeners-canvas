@@ -254,6 +254,9 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         model.addAttribute("firstName", user.getFirstName());
         model.addAttribute("lastName", user.getLastName());
         model.addAttribute("emailAddress", user.getEmailAddress());
@@ -300,7 +303,6 @@ public class ProfileController {
             @RequestParam("profilePictureInput") MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
