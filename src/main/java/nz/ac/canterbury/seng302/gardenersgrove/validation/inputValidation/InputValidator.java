@@ -678,7 +678,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[a-zA-Z0-9 ]+$")) {
+        if (!testedValue.matches("^[a-zA-Z0-9 ]*$")) {
             this.validationResult = ValidationResult.INVALID_POSTCODE;
             this.passState = false;
             return this;
