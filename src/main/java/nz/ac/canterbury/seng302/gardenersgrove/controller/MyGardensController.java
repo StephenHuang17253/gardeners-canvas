@@ -1,18 +1,22 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
@@ -38,7 +42,7 @@ public class MyGardensController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
-    public String myGardens(Model model) {
+    public String myGardens() {
         logger.info("GET /my-gardens");
 
         return "myGardensPage";
@@ -48,22 +52,33 @@ public class MyGardensController {
      * Gets all the users created gardens
      * and maps them all and there attributes to the gardenDetailsPage
      * but with the custom url of /my-gardens/{gardenId}={gardenName}
+     *
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens/{gardenId}={gardenName}")
-    public String showGardenDetails(@PathVariable Long gardenId,
-                                    @PathVariable String gardenName,
-                                    Model model) {
+    public ModelAndView showGardenDetails(@PathVariable Long gardenId,
+                                          @PathVariable String gardenName,
+                                          HttpServletResponse response,
+                                          Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-        if (!optionalGarden.isPresent() || gardenName != optionalGarden.get().getGardenName()) {
-            return "404";
+        try {
+            gardenName = URLDecoder.decode(gardenName, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            // Handle URL decoding exception if necessary
+            e.printStackTrace();
+        }
+
+        if (!optionalGarden.isPresent() || !gardenName.equals(optionalGarden.get().getGardenName())) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND); // Set HTTP 404 status
+            return new ModelAndView("404"); // Render 404.html or equivalent error page
         }
         Garden garden = optionalGarden.get();
         if(!securityService.isOwner(garden.getOwner().getId())){
-            return "403";
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return new ModelAndView("403");
         }
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
@@ -71,7 +86,7 @@ public class MyGardensController {
         model.addAttribute("gardenId",gardenId);
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
-        return "gardenDetailsPage";
+        return new ModelAndView("gardenDetailsPage");
 
     }
 
