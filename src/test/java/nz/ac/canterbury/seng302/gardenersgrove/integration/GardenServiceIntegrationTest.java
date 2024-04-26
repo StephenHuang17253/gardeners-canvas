@@ -41,9 +41,33 @@ public class GardenServiceIntegrationTest {
         userService.addUser(user1,"1es1P@ssword");
         userService.addUser(user2,"1es1P@ssword");
         userService.addUser(user3,"1es1P@ssword");
-        Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden2 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden3 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
+        Garden garden1 = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                10,
+                user1);
+        Garden garden2 = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                10,
+                user1);
+        Garden garden3 = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                20,
+                user2);
         gardenList.add(garden1);
         gardenList.add(garden2);
         gardenList.add(garden3);
@@ -117,7 +141,15 @@ public class GardenServiceIntegrationTest {
 
     @Test
     public void AddGarden_UserInPersistence() {
-        Garden garden = new Garden("Bat Cave", "Wayne Manor", 15, userService.getUserById(3L));
+        Garden garden = new Garden(
+                "Bat Cave",
+                "1 Wayne Manor",
+                "Wayne Island",
+                "Gotham City",
+                "8041",
+                "United States of America",
+                20,
+                userService.getUserById(3L));
         gardenService.addGarden(garden);
         Optional<Garden> optionalGarden = gardenService.getGardenById(4L);
         Assertions.assertTrue(optionalGarden.isPresent());
@@ -133,7 +165,15 @@ public class GardenServiceIntegrationTest {
     @Test
     public void AddGarden_UserNotInPersistence_ThrowsIllegalArgumentException() {
         User user = new User("Boogie", "Man","boogieMan@email.com", date);
-        Garden garden = new Garden("Bat Cave", "Wayne Manor", 15, user);
+        Garden garden = new Garden(
+                "Bat Cave",
+                "1 Wayne Manor",
+                "Wayne Island",
+                "Gotham City",
+                "8041",
+                "United States of America",
+                20,
+                user);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gardenService.addGarden(garden);
         });
@@ -141,7 +181,14 @@ public class GardenServiceIntegrationTest {
 
     @Test
     public void UpdateGarden_GardenInPersistence() {
-        Garden gardenWithUpdatedValues = new Garden("John's Garden", "John's Front Yard", 20);
+        Garden gardenWithUpdatedValues = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                20);
 
         gardenService.updateGarden(1L, gardenWithUpdatedValues);
         User user = userService.getUserById(1L);
@@ -154,7 +201,14 @@ public class GardenServiceIntegrationTest {
 
     @Test
     public void UpdateGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
-        Garden gardenWithUpdatedValues = new Garden("John's Garden", "John's Front Yard", 20);
+        Garden gardenWithUpdatedValues = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                20);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gardenService.updateGarden(4L, gardenWithUpdatedValues);
@@ -183,7 +237,14 @@ public class GardenServiceIntegrationTest {
     }
     @Test
     public void AddPlantToGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
-        Garden garden = new Garden("John's Garden", "John's Front Yard", 20);
+        Garden garden = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                20);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 

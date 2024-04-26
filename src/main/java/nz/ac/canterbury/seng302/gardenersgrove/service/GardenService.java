@@ -57,7 +57,7 @@ public class GardenService {
      * @param id the garden's ID
      * @return the garden or Optional#empty() if none found
      */
-    public Optional<Garden> findById(long id) {
+    public Optional<Garden> getGardenById(long id) {
         return gardenRepository.findById(id);
     }
 
@@ -78,26 +78,22 @@ public class GardenService {
     }
 
     /**
-     * Updates a garden
+     * Updates a garden values
      * @param id the id of the existing garden
      * @param newGardenValues the new garden values
+     * @throws IllegalArgumentException if invalid garden id
      */
     public Garden updateGarden(Long id, Garden newGardenValues) {
         Optional<Garden> optionalGarden = getGardenById(id);
         if (optionalGarden.isPresent()) {
             Garden targetGarden = optionalGarden.get();
 
-            oldGarden.setGardenName(newGarden.getGardenName());
-            oldGarden.setGardenAddress(newGarden.getGardenAddress());
-            oldGarden.setGardenSuburb(newGarden.getGardenSuburb());
-            oldGarden.setGardenCity(newGarden.getGardenCity());
-            oldGarden.setGardenPostcode(newGarden.getGardenPostcode());
-            oldGarden.setGardenCountry(newGarden.getGardenCountry());
-            oldGarden.setGardenLocation(newGarden.getGardenLocation());
-            oldGarden.setGardenSize(newGarden.getGardenSize());
             targetGarden.setGardenName(newGardenValues.getGardenName());
-            targetGarden.setGardenLocation(newGardenValues.getGardenLocation());
-            targetGarden.setGardenSize(newGardenValues.getGardenSize());
+            targetGarden.setGardenAddress(newGardenValues.getGardenAddress());
+            targetGarden.setGardenSuburb(newGardenValues.getGardenSuburb());
+            targetGarden.setGardenCity(newGardenValues.getGardenCity());
+            targetGarden.setGardenPostcode(newGardenValues.getGardenPostcode());
+            targetGarden.setGardenCountry(newGardenValues.getGardenCountry());
 
             return gardenRepository.save(targetGarden);
 
@@ -116,10 +112,7 @@ public class GardenService {
 
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();
-            //add plant to the garden's list
             garden.getPlants().add(plant);
-            //since list is updated save changes to repo
-            gardenRepository.save(garden);
         } else {
             throw new IllegalArgumentException("Invalid garden ID");
         }

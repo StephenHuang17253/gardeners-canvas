@@ -28,10 +28,8 @@ public class Garden {
     private String gardenCity;
     @Column
     private String gardenCountry;
-    @Column(nullable = false, length = 522)
-    private String gardenLocation;
     @Column
-    private float gardenSize;
+    private double gardenSize;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -47,34 +45,47 @@ public class Garden {
     /**
      * Creates a new Garden object.
      * @param gardenName the name of the garden
-     * @param gardenLocation the location of the garden
+     * @param gardenAddress the address of the garden
+     * @param gardenSuburb the suburb of the garden
+     * @param gardenCity the city of the garden
+     * @param gardenPostcode the postcode of the garden
+     * @param gardenCountry the country of the garden
      * @param gardenSize the size of the garden
      * @param owner the User object that owns the garden
      */
-    public Garden(String gardenName, String gardenLocation, float gardenSize, User owner) {
-        this.gardenName = gardenName;
-        this.gardenLocation = gardenLocation;
-        this.gardenSize = gardenSize;
-        this.owner = owner;
-    }
-    /**
-     * Creates a new Garden object without the owner param
-     * Useful for updating plants
-     * @param gardenName the name of the garden
-     * @param gardenLocation the location of the garden
-     * @param gardenSize the size of the garden
-     */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, String gardenLocation, float gardenSize) {
+                  String gardenPostcode, String gardenCountry, double gardenSize, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
-        this.gardenPostcode = gardenPostcode;
         this.gardenCity = gardenCity;
+        this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
-        this.gardenLocation = gardenLocation;
+        this.gardenSize = gardenSize;
+        this.owner = owner;
+    }
+
+    /**
+     * Creates a new Garden object without owner used for update Garden.
+     * @param gardenName the name of the garden
+     * @param gardenAddress the address of the garden
+     * @param gardenSuburb the suburb of the garden
+     * @param gardenCity the city of the garden
+     * @param gardenPostcode the postcode of the garden
+     * @param gardenCountry the country of the garden
+     * @param gardenSize the size of the garden
+     */
+    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
+                  String gardenPostcode, String gardenCountry, double gardenSize) {
+        this.gardenName = gardenName;
+        this.gardenAddress = gardenAddress;
+        this.gardenSuburb = gardenSuburb;
+        this.gardenCity = gardenCity;
+        this.gardenPostcode = gardenPostcode;
+        this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
     }
+
     public Long getGardenId() {
         return gardenId;
     }
@@ -114,13 +125,7 @@ public class Garden {
     public void setGardenCountry(String gardenCountry) {
         this.gardenCountry = gardenCountry;
     }
-    public String getGardenLocation() {
-        return gardenLocation;
-    }
-    public void setGardenLocation(String gardenLocation) {
-        this.gardenLocation = gardenLocation;
-    }
-    public float getGardenSize() {
+    public double getGardenSize() {
         return gardenSize;
     }
     public void setGardenSize(float gardenSize) {
@@ -130,12 +135,33 @@ public class Garden {
     public List<Plant> getPlants(){
         return plants;
     }
+
+    /**
+     * Retrieves the concatenated string of the garden location
+     *
+     * @return garden location string in the format: <address>, <suburb>, <city> <postcode>, <country>
+     */
+    public String getGardenLocation() {
+        // Concatenate address components to form the complete location string
+        StringBuilder locationBuilder = new StringBuilder();
+        locationBuilder.append(gardenAddress); // Add address
+        locationBuilder.append(", "); // Add comma and space
+        locationBuilder.append(gardenSuburb); // Add suburb
+        locationBuilder.append(", "); // Add comma and space
+        locationBuilder.append(gardenPostcode); // Add postcode
+        locationBuilder.append(", "); // Add comma and space
+        locationBuilder.append(gardenCity); // Add city
+        locationBuilder.append(", "); // Add comma and space
+        locationBuilder.append(gardenCountry); // Add country
+
+        return locationBuilder.toString();
+    }
     @Override
     public String toString() {
         return "Garden{" +
                 "id=" + gardenId +
                 ", name='" + gardenName + '\'' +
-                ", location='" + gardenLocation + '\'' +
+                ", location='" + getGardenLocation() + '\'' +
                 ", size='" + gardenSize + '\'' +
                 ", owner_id='" + owner.getId() + '\'' +
                 ", plants='" + plants + '\'' +

@@ -1,25 +1,29 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -35,7 +39,6 @@ public class GardenFormController {
 
     private final GardenService gardenService;
     private final SecurityService securityService;
-
     private final LocationService locationService;
 
     private static final int MAX_REQUESTS_PER_SECOND = 2;
@@ -45,8 +48,7 @@ public class GardenFormController {
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
     @Autowired
-    public GardenFormController(GardenService gardenService, LocationService locationService) {
-    public GardenFormController(GardenService gardenService, SecurityService securityService) {
+    public GardenFormController(GardenService gardenService, LocationService locationService, SecurityService securityService) {
         this.gardenService = gardenService;
         this.locationService = locationService;
         this.securityService = securityService;
@@ -93,42 +95,54 @@ public class GardenFormController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/create-new-garden")
-    public String newGardenForm( @RequestParam(name = "gardenName", required = false) String gardenName,
-                                 @RequestParam(name = "gardenLocation", required = false) String gardenLocation,
-                                 @RequestParam(name = "gardenSize",required = false) String gardenSize,
+    public String newGardenForm( @RequestParam(name="gardenName", required = false) String gardenName,
+                                 @RequestParam(name = "streetAddress", required = false) String streetAddress ,
+                                 @RequestParam(name = "suburb", required = false) String suburb,
+                                 @RequestParam(name = "city", required = false) String city,
+                                 @RequestParam(name = "country", required = false) String country,
+                                 @RequestParam(name = "postcode", required = false )String postcode,
+                                 @RequestParam(name = "gardenSize", required = false) String gardenSize,
                                  Model model) {
         model.addAttribute("gardenName", gardenName);
-        model.addAttribute("gardenLocation", gardenLocation);
+        model.addAttribute("streetAddress", streetAddress);
+        model.addAttribute("suburb", suburb);
+        model.addAttribute("city", city);
+        model.addAttribute("country", country);
+        model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+
         logger.info("GET /create-new-garden");
         return "createNewGardenForm";
     }
+
     /**
      * Logic to handle the confirm new garden form button
      * also validates inputs into form and informs the user if their input is invalid
-     * @param gardenName users entered garden name
-     * @param gardenLocation users entered garden location
-     * @param gardenSize users entered garden size(m^2)
+     * @param gardenName The user-entered garden name
+     * @param streetAddress The user-entered street address of the garden location.
+     * @param suburb The user-entered suburb of the garden location.
+     * @param city The user-entered city of the garden location.
+     * @param country The user-entered country of the garden location.
+     * @param postcode The user-entered postcode of the garden location.
+     * @param gardenSize The user-entered garden size(m^2)
+     * @param session The HttpSession object for managing user session data.
+     * @param redirectAttributes RedirectAttributes object
      * @param model (map-like) representation of gardenName, gardenLocation and gardenSize for use in thymeleaf,
      *              with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
     @PostMapping("/create-new-garden")
     public String submitNewGardenForm( @RequestParam(name="gardenName") String gardenName,
-                                       @RequestParam(name = "gardenLocation") String gardenLocation,
+                                       @RequestParam(name = "streetAddress") String streetAddress,
+                                       @RequestParam(name = "suburb") String suburb,
+                                       @RequestParam(name = "city") String city,
+                                       @RequestParam(name = "country") String country,
+                                       @RequestParam(name = "postcode") String postcode,
                                        @RequestParam(name = "gardenSize") String gardenSize,
                                        HttpSession session,
                                        Model model,
                                        RedirectAttributes redirectAttributes) {
-    public String submitNewGardenForm(@RequestParam(name="gardenName") String gardenName,
-                              @RequestParam(name = "streetAddress") String streetAddress,
-                              @RequestParam(name = "suburb") String suburb,
-                              @RequestParam(name = "city") String city,
-                              @RequestParam(name = "country") String country,
-                              @RequestParam(name = "postcode") String postcode,
-                              @RequestParam(name = "gardenLocation") String gardenLocation,
-                              @RequestParam(name = "gardenSize") String gardenSize,
-                              Model model, RedirectAttributes redirectAttributes) {
+
         logger.info("POST /landingPage");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
 
@@ -154,22 +168,16 @@ public class GardenFormController {
             locationValues += country;
         }
 
-        gardenLocation = locationValues;
-
-
-        logger.info(String.valueOf(gardenLocation.length()));
-
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
-        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
 
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
-        gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenLocationResult,gardenSizeResult);
+        gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
 
         if(gardenSize.isBlank())
         {
@@ -182,13 +190,10 @@ public class GardenFormController {
         model.addAttribute("city", city);
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
-        model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
-        if(!gardenNameResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
-        model.addAttribute("myGardens", gardenService.getGardens());
 
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
-                !countryResult.valid() || !postcodeResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
+                !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
         }
 
@@ -199,8 +204,7 @@ public class GardenFormController {
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName, gardenLocation,floatGardenSize,owner);
-        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,gardenLocation,floatGardenSize);
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, owner);
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
 
@@ -217,78 +221,67 @@ public class GardenFormController {
      * @return thymeleaf editGardenForm
      */
     @GetMapping("/my-gardens/{gardenId}={gardenName}/edit")
-    public String editGardenDetails(@PathVariable Long gardenId,
-                                    @PathVariable String gardenName,
-                                    Model model) {
+    public ModelAndView editGardenDetails(@PathVariable Long gardenId,
+                                          @PathVariable String gardenName,
+                                          HttpServletResponse response,
+                                          Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-        if (!optionalGarden.isPresent() || gardenName != optionalGarden.get().getGardenName()) {
-            return "404";
+        //url name might not match the db garden name ie space is %20
+        gardenName = URLDecoder.decode(gardenName, StandardCharsets.UTF_8);
+
+        if (optionalGarden.isEmpty() || !gardenName.equals(optionalGarden.get().getGardenName())) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return new ModelAndView("404");
         }
         Garden garden = optionalGarden.get();
         if(!securityService.isOwner(garden.getOwner().getId())){
-            return "403";
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return new ModelAndView("403");
         }
         model.addAttribute("gardenName", garden.getGardenName());
+        model.addAttribute("streetAddress", garden.getGardenAddress());
+        model.addAttribute("suburb", garden.getGardenSuburb());
+        model.addAttribute("city", garden.getGardenCity());
+        model.addAttribute("postcode", garden.getGardenPostcode());
+        model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
-        float gardenSize = garden.getGardenSize();
-        if (Float.isNaN(gardenSize)) {
+        double gardenSize = garden.getGardenSize();
+        if (Double.isNaN(gardenSize)) {
             model.addAttribute("gardenSize", "");
         } else {
             model.addAttribute("gardenSize", gardenSize);
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
-        model.addAttribute("myGardens", gardenService.getGardens());
-
-        if (optionalGarden.isPresent()) {
-            Garden garden = optionalGarden.get();
-            model.addAttribute("gardenName", garden.getGardenName());
-            model.addAttribute("streetAddress", garden.getGardenAddress());
-            model.addAttribute("suburb", garden.getGardenSuburb());
-            model.addAttribute("city", garden.getGardenCity());
-            model.addAttribute("postcode", garden.getGardenPostcode());
-            model.addAttribute("country", garden.getGardenCountry());
-            model.addAttribute("gardenLocation", garden.getGardenLocation());
-            Float gardenSize = garden.getGardenSize();
-            if (Float.isNaN(gardenSize)) {
-                model.addAttribute("gardenSize", "");
-            } else {
-                model.addAttribute("gardenSize", gardenSize);
-            }
-            return "editGardenForm"; // Thymeleaf template name
-        } else {
-            return "404";
         }
-        return "editGardenForm";
+        return new ModelAndView("gardenDetailsPage");
     }
 
 
     /**
      * Logic to handle the confirm new garden form button
      * also validates inputs into form and informs the user if their input is invalid
-     * @param gardenName users entered garden name
-     * @param gardenLocation users entered garden location
-     * @param gardenSize users entered garden size(m^2)
+     * @param gardenName The user-entered garden name
+     * @param streetAddress The user-entered street address of the garden location.
+     * @param suburb The user-entered suburb of the garden location.
+     * @param city The user-entered city of the garden location.
+     * @param country The user-entered country of the garden location.
+     * @param postcode The user-entered postcode of the garden location.
+     * @param gardenSize The user-entered garden size(m^2)
+     * @param gardenId The id of the garden being edited
+     * @param session The HttpSession object for managing user session data.
      * @param model (map-like) representation of gardenName, gardenLocation and gardenSize for use in thymeleaf,
      *              with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}={gardenName}/edit")
     public String submitEditedGardenForm(@RequestParam(name="gardenName") String gardenName,
-                                         @RequestParam(name = "gardenLocation") String gardenLocation,
-                                         @RequestParam(name = "gardenSize") String gardenSize,
-                                         @PathVariable("gardenId") String gardenIdString,
-                                         HttpSession session,
-                                         Model model) {
-    public String submitEditedGardenForm( @RequestParam(name="gardenName") String gardenName,
                                        @RequestParam(name = "streetAddress") String streetAddress,
                                        @RequestParam(name = "suburb") String suburb,
                                        @RequestParam(name = "city") String city,
                                        @RequestParam(name = "country") String country,
                                        @RequestParam(name = "postcode") String postcode,
-                                       @RequestParam(name = "gardenLocation") String gardenLocation,
                                        @RequestParam(name = "gardenSize") String gardenSize,
-                                       @PathVariable("gardenId") String gardenIdString,
+                                       @PathVariable Long gardenId, HttpSession session,
                                        Model model) {
         logger.info("POST / edited garden");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
@@ -315,18 +308,15 @@ public class GardenFormController {
             locationValues += country;
         }
 
-        gardenLocation = locationValues;
-
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
-        ValidationResult gardenLocationResult = InputValidator.compulsoryAlphaPlusTextField(gardenLocation, 522);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
-        gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenLocationResult,gardenSizeResult);
+        gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
 
         if(gardenSize.isBlank())
         {
@@ -339,12 +329,10 @@ public class GardenFormController {
         model.addAttribute("city", city);
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
-        model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
-        if(!gardenNameResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
-        model.addAttribute("myGardens", gardenService.getGardens());
+
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
-                !countryResult.valid() || !postcodeResult.valid() || !gardenLocationResult.valid() || !gardenSizeResult.valid()) {
+                !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
             return "editGardenForm";
 
         }
@@ -354,12 +342,10 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation, floatGardenSize));
+        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
         logger.info("Edited Garden Page");
         User owner = securityService.getCurrentUser();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
-        gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName,streetAddress,suburb,city,postcode,country,gardenLocation,floatGardenSize));
-        logger.info("edited garden");
 
         return "redirect:/my-gardens/{gardenId}={gardenName}";
     }
@@ -370,7 +356,7 @@ public class GardenFormController {
      */
     private void gardenFormErrorText(Model model, ValidationResult gardenNameResult, ValidationResult streetAddressResult,
                                      ValidationResult suburbResult, ValidationResult cityResult,
-                                     ValidationResult countryResult, ValidationResult postcodeResult, ValidationResult gardenLocationResult,
+                                     ValidationResult countryResult, ValidationResult postcodeResult,
                                      ValidationResult gardenSizeResult)
     {
 
@@ -466,20 +452,6 @@ public class GardenFormController {
         {
             model.addAttribute("CountryErrorClass","noErrorBorder");
         }
-
-        // notifies the user that the garden Location is invalid (if applicable)
-        if(!gardenLocationResult.valid())
-        {
-            model.addAttribute("GLErrorText","Location " + gardenLocationResult);
-            model.addAttribute("GLErrorClass","errorBorder");
-            logger.info("Garden Location failed validation");
-
-        }
-        else
-        {
-            model.addAttribute("GLErrorClass","noErrorBorder");
-        }
-
         // notifies the user that the garden Size is invalid (if applicable)
         if(!gardenSizeResult.valid())
         {

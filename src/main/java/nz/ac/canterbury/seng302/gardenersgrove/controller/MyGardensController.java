@@ -72,8 +72,8 @@ public class MyGardensController {
         }
 
         if (!optionalGarden.isPresent() || !gardenName.equals(optionalGarden.get().getGardenName())) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND); // Set HTTP 404 status
-            return new ModelAndView("404"); // Render 404.html or equivalent error page
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return new ModelAndView("404");
         }
         Garden garden = optionalGarden.get();
         if(!securityService.isOwner(garden.getOwner().getId())){
