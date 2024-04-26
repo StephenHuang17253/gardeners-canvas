@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -30,12 +31,12 @@ public class GardenFormController {
 
     Logger logger = LoggerFactory.getLogger(GardenFormController.class);
     private final GardenService gardenService;
-    private final UserService userService;
+    private final SecurityService securityService;
 
     @Autowired
-    public GardenFormController(GardenService gardenService, UserService userService) {
+    public GardenFormController(GardenService gardenService, SecurityService securityService) {
         this.gardenService = gardenService;
-        this.userService = userService;
+        this.securityService = securityService;
     }
     /**
      * Maps the createNewGardenForm html page to /create-new-garden url
@@ -95,8 +96,7 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User owner = this.userService.getUserByEmail(authentication.getName());
+        User owner = securityService.getCurrentUser();
         Garden garden = new Garden(gardenName, gardenLocation,floatGardenSize,owner);
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
@@ -111,28 +111,29 @@ public class GardenFormController {
      * Maps the editGardenForm html page to /my-gardens/{gardenId}={gardenName}/edit url
      * @return thymeleaf editGardenForm
      */
-    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}/edit")
     public String editGardenDetails(@PathVariable Long gardenId,
                                     @PathVariable String gardenName,
                                     Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
 
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
-        if (optionalGarden.isPresent()) {
-            Garden garden = optionalGarden.get();
-            model.addAttribute("gardenName", garden.getGardenName());
-            model.addAttribute("gardenLocation", garden.getGardenLocation());
-            float gardenSize = garden.getGardenSize();
-            if (Float.isNaN(gardenSize)) {
-                model.addAttribute("gardenSize", "");
-            } else {
-                model.addAttribute("gardenSize", gardenSize);
-            }
-            return "editGardenForm"; // Thymeleaf template name
-        } else {
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (!optionalGarden.isPresent() || gardenName != optionalGarden.get().getGardenName()) {
             return "404";
         }
+        Garden garden = optionalGarden.get();
+        if(!securityService.isOwner(garden.getOwner().getId())){
+            return "403";
+        }
+        model.addAttribute("gardenName", garden.getGardenName());
+        model.addAttribute("gardenLocation", garden.getGardenLocation());
+        float gardenSize = garden.getGardenSize();
+        if (Float.isNaN(gardenSize)) {
+            model.addAttribute("gardenSize", "");
+        } else {
+            model.addAttribute("gardenSize", gardenSize);
+        }
+        return "editGardenForm";
     }
     /**
      * Logic to handle the confirm new garden form button
@@ -179,8 +180,7 @@ public class GardenFormController {
         }
         gardenService.updateGarden(Long.parseLong(gardenIdString), new Garden(gardenName, gardenLocation, floatGardenSize));
         logger.info("Edited Garden Page");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User owner = userService.getUserByEmail(authentication.getName());
+        User owner = securityService.getCurrentUser();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
 
         return "redirect:/my-gardens/{gardenId}={gardenName}";

@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +24,13 @@ public class MyGardensController {
     Logger logger = LoggerFactory.getLogger(MyGardensController.class);
 
     private final GardenService gardenService;
-    private final UserService userService;
+    private final SecurityService securityService;
+
 
     @Autowired
-    public MyGardensController(GardenService gardenService, UserService userService) {
+    public MyGardensController(GardenService gardenService, SecurityService securityService) {
         this.gardenService = gardenService;
-        this.userService = userService;
+        this.securityService = securityService;
     }
 
     /**
@@ -48,27 +50,29 @@ public class MyGardensController {
      * but with the custom url of /my-gardens/{gardenId}={gardenName}
      * @return thymeleaf createNewGardenForm
      */
-    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}")
     public String showGardenDetails(@PathVariable Long gardenId,
                                     @PathVariable String gardenName,
                                     Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
 
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-        if (optionalGarden.isPresent()) {
-            Garden garden = optionalGarden.get();
-            model.addAttribute("gardenName", garden.getGardenName());
-            model.addAttribute("gardenLocation", garden.getGardenLocation());
-            model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenId",gardenId);
-            model.addAttribute("plants", garden.getPlants());
-            model.addAttribute("totalPlants", garden.getPlants().size());
-            return "gardenDetailsPage";
-        } else {
+        if (!optionalGarden.isPresent() || gardenName != optionalGarden.get().getGardenName()) {
             return "404";
         }
+        Garden garden = optionalGarden.get();
+        if(!securityService.isOwner(garden.getOwner().getId())){
+            return "403";
+        }
+        model.addAttribute("gardenName", garden.getGardenName());
+        model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("gardenSize", garden.getGardenSize());
+        model.addAttribute("gardenId",gardenId);
+        model.addAttribute("plants", garden.getPlants());
+        model.addAttribute("totalPlants", garden.getPlants().size());
+        return "gardenDetailsPage";
+
     }
 
 }

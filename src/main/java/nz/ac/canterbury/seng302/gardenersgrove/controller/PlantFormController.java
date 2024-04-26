@@ -1,8 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
@@ -30,17 +32,18 @@ public class PlantFormController {
 
     private final PlantService plantService;
     private final GardenService gardenService;
+    private final SecurityService securityService;
 
     @Autowired
-    public PlantFormController(PlantService plantService, GardenService gardenService) {
+    public PlantFormController(PlantService plantService, GardenService gardenService, SecurityService securityService) {
         this.plantService = plantService;
         this.gardenService = gardenService;
+        this.securityService = securityService;
     }
     /**
      * Maps the createNewPlantForm html page to /create-new-plant url
      * @return thymeleaf createNewPlantForm
      */
-    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}/create-new-plant")
     public String newPlantForm(@PathVariable Long gardenId,
                                @PathVariable("gardenName") String gardenName,
@@ -49,6 +52,14 @@ public class PlantFormController {
                                @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
                                Model model) {
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (!optionalGarden.isPresent() || gardenName != optionalGarden.get().getGardenName()) {
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if(!securityService.isOwner(garden.getOwner().getId())){
+            return "403";
+        }
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", gardenName); // Pass gardenName to the form
         model.addAttribute("plantName", plantName);
@@ -103,23 +114,28 @@ public class PlantFormController {
         return "redirect:/my-gardens/{gardenId}={gardenName}";
     }
 
-
-
     /**
      * Maps the editPlantForm html page to /create-new-plant url
      * Pre populates the values with the plants record from the database,
      * sends user to 404 page if plant is not found
      * @return thymeleaf createNewPlantForm
      */
-    @PreAuthorize("@securityService.isOwner(#gardenId)")
     @GetMapping("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
                                 @PathVariable("gardenName") String gardenName,
                                 @PathVariable("plantId") Long plantId,
                                 @PathVariable("plantName") String plantName,
                                Model model) {
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (!optionalGarden.isPresent() || gardenName != optionalGarden.get().getGardenName()) {
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if(!securityService.isOwner(garden.getOwner().getId())){
+            return "403";
+        }
         Optional<Plant> plantToUpdate =  plantService.findById(plantId);
-        if(!plantToUpdate.isPresent())
+        if(!plantToUpdate.isPresent() || plantName != plantToUpdate.get().getPlantName())
         {
             return "404";
         }
@@ -134,7 +150,7 @@ public class PlantFormController {
     }
 
     /**
-     * Logic to handle the confirm the edit  plant form button
+     * Logic to handle the confirmation of the edit  plant form button
      * also validates inputs into form and informs the user if their input is invalid
      *
      * @param plantName        user entered plant name
@@ -178,9 +194,6 @@ public class PlantFormController {
         logger.info("updated Plant");
         return "redirect:/my-gardens/{gardenId}={gardenName}";
     }
-
-
-
 
     /**
      * Takes as an input the result of validating the plant name, count, description and date,

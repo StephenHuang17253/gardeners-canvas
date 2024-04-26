@@ -60,7 +60,7 @@ public class PlantService {
      */
 
     public Plant addPlant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Long gardenId) {
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isPresent()) {
             Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get());
             gardenService.addPlantToGarden(gardenId, plant);

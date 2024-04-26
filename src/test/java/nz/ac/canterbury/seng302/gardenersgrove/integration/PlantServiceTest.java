@@ -44,7 +44,7 @@ public class PlantServiceTest {
         List<Plant> mockPlantsList = new ArrayList<>();
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(Mockito.any(Plant.class)))
                 .thenAnswer(invocation -> {
                     mockPlantsList.add(invocation.getArgument(0));
@@ -76,7 +76,7 @@ public class PlantServiceTest {
         mockPlantsList.add(plant);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for getPlants
         Mockito.when(plantRepository.findAll()).thenReturn(mockPlantsList);
@@ -102,7 +102,7 @@ public class PlantServiceTest {
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for findById
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
@@ -130,7 +130,7 @@ public class PlantServiceTest {
         Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for updatePlant
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
@@ -156,7 +156,7 @@ public class PlantServiceTest {
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for updatePlant
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));

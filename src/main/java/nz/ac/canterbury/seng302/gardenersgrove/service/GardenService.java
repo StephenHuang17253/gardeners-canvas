@@ -57,7 +57,7 @@ public class GardenService {
      * @param id the garden's ID
      * @return the garden or Optional#empty() if none found
      */
-    public Optional<Garden> findById(long id) {
+    public Optional<Garden> getGardenById(long id) {
         return gardenRepository.findById(id);
     }
 
@@ -83,7 +83,7 @@ public class GardenService {
      * @param newGardenValues the new garden values
      */
     public Garden updateGarden(Long id, Garden newGardenValues) {
-        Optional<Garden> optionalGarden = findById(id);
+        Optional<Garden> optionalGarden = getGardenById(id);
         if (optionalGarden.isPresent()) {
             Garden targetGarden = optionalGarden.get();
 
@@ -104,7 +104,7 @@ public class GardenService {
      * @throws IllegalArgumentException if invalid garden ID
      */
     public void addPlantToGarden(Long gardenId, Plant plant) {
-        Optional<Garden> optionalGarden = findById(gardenId);
+        Optional<Garden> optionalGarden = getGardenById(gardenId);
 
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();

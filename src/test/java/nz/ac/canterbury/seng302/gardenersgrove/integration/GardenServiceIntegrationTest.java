@@ -98,7 +98,7 @@ public class GardenServiceIntegrationTest {
     public void FindById_GardenIdExists() {
         List<Garden> expectedGardens = new ArrayList<>();
         expectedGardens.add(gardenList.get(0));
-        Optional<Garden> optionalGarden = gardenService.findById(1L);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(1L);
         Assertions.assertTrue(optionalGarden.isPresent());
 
         Garden expectedGarden = gardenList.get(0);
@@ -111,7 +111,7 @@ public class GardenServiceIntegrationTest {
     }
     @Test
     public void FindById_GardenIdDoseNotExist() {
-        Optional<Garden> optionalGarden = gardenService.findById(4L);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(4L);
         Assertions.assertFalse(optionalGarden.isPresent());
     }
 
@@ -119,7 +119,7 @@ public class GardenServiceIntegrationTest {
     public void AddGarden_UserInPersistence() {
         Garden garden = new Garden("Bat Cave", "Wayne Manor", 15, userService.getUserById(3L));
         gardenService.addGarden(garden);
-        Optional<Garden> optionalGarden = gardenService.findById(4L);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(4L);
         Assertions.assertTrue(optionalGarden.isPresent());
 
         Garden expectedGarden = garden;
