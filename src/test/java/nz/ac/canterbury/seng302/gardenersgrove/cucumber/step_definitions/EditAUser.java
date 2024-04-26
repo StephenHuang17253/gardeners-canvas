@@ -115,30 +115,30 @@ public class EditAUser {
     @Then("No details are changed")
     public void no_details_are_changed() {
         Assertions.assertNotNull(userService.getUserByEmail(emailAddress));
-        User u = userService.getUserByEmail(emailAddress);
-        Assertions.assertEquals(firstName, u.getFirstName());
-        Assertions.assertEquals(lastName, u.getLastName());
-        Assertions.assertEquals(emailAddress, u.getEmailAddress());
-        Assertions.assertEquals(dateOfBirth, u.getDateOfBirth());
+        User test_user = userService.getUserByEmail(emailAddress);
+        Assertions.assertEquals(firstName, test_user.getFirstName());
+        Assertions.assertEquals(lastName, test_user.getLastName());
+        Assertions.assertEquals(emailAddress, test_user.getEmailAddress());
+        Assertions.assertEquals(dateOfBirth, test_user.getDateOfBirth());
     }
 
     @Then("My surname will become {string}")
     public void my_surname_will_become(String surname) {
         Assertions.assertNotNull(userService.getUserByEmail(emailAddress));
-        User u = userService.getUserByEmail(emailAddress);
-        Assertions.assertEquals(surname, u.getLastName());
+        User test_user = userService.getUserByEmail(emailAddress);
+        Assertions.assertEquals(surname, test_user.getLastName());
     }
 
     @Then("I will be a user with first name {string}, last name {string}, email address {string}, and date of birth {string}")
     public void i_will_be_a_user_with_new_details(String fname, String lname, String email, String date) {
         Assertions.assertNotNull(userService.getUserByEmail(email));
-        User u = userService.getUserByEmail(email);
-        Assertions.assertEquals(fname, u.getFirstName());
-        Assertions.assertEquals(lname, u.getLastName());
-        Assertions.assertEquals(email, u.getEmailAddress());
+        User test_user = userService.getUserByEmail(email);
+        Assertions.assertEquals(fname, test_user.getFirstName());
+        Assertions.assertEquals(lname, test_user.getLastName());
+        Assertions.assertEquals(email, test_user.getEmailAddress());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate newDateOfBirth = LocalDate.parse(date, formatter);
-        Assertions.assertEquals(newDateOfBirth, u.getDateOfBirth());
+        Assertions.assertEquals(newDateOfBirth, test_user.getDateOfBirth());
     }
 
     @When("I check the check box marked {string}")
