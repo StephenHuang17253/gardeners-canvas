@@ -69,7 +69,7 @@ tasks.named('test') {
 	}
 
 	// The unitTestReport will be run after the unit test task has completed
-	finalizedBy jacocoTestReport
+	finalizedBy "unitTestReport"
 
 }
 
@@ -86,7 +86,7 @@ tasks.register("integration", Test) {
 	}
 
 	// The integrationTestReport will be run after the integration test task has completed
-	finalizedBy jacocoTestReport
+	finalizedBy "integrationTestReport"
 }
 
 tasks.register("cucumber", Test) {
@@ -117,9 +117,9 @@ jacocoTestReport { // Generate a report for all generated test data
 		include '**/*.exec'
 	}
 	reports {
-		xml.required = true
+		xml.required.set(true)
 		xml.destination file("${buildDir}/jacoco/test-report.xml")
-		csv.required = false
+		csv.required.set(true)
 		html.destination file("${buildDir}/jacoco/html")
 	}
 }

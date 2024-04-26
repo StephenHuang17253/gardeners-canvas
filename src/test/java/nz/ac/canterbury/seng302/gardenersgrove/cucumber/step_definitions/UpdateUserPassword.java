@@ -2,9 +2,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.RegistrationFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,59 +15,91 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 public class UpdateUserPassword {
 
-    @io.cucumber.java.en.Given("^I am on the edit profile form,$")
-    public void iAmOnTheEditProfileForm() {
+    public AuthenticationManager authenticationManager;
+    public static MockMvc MOCK_MVC;
+    public UserRepository userRepository;
+    public static UserService userService;
+    public PasswordEncoder passwordEncoder;
+    public FileService fileService;
+
+    String currentPassword;
+    String newPassword;
+    String retypePassword;
+
+    @Before
+    public void before_or_after_all() {
+        userService = new UserService(passwordEncoder, userRepository);
+        ProfileController profileController = new ProfileController(userService, authenticationManager, fileService);
+        MOCK_MVC = MockMvcBuilders.standaloneSetup(profileController).build();
     }
 
-    @io.cucumber.java.en.When("^I hit the change password button,$")
-    public void iHitTheChangePasswordButton() {
+    //AC1
+    @io.cucumber.java.en.Given("I am on the edit profile form")
+    public void iAmOnTheEditProfileForm() throws Exception {
+        MOCK_MVC.perform(MockMvcRequestBuilders.get("/edit-profile"))
+                .andExpect(MockMvcResultMatchers.view().name("edit-profile-form"));
     }
-
-    @io.cucumber.java.en.Then("^a dedicated form is shown with three text fields: “old password”, “new password”, and “retype password”$")
-    public void aDedicatedFormIsShownWithThreeTextFieldsOldPasswordNewPasswordAndRetypePassword() {
+    //AC1
+    @io.cucumber.java.en.When("I hit the change password button")
+    public void iHitTheChangePasswordButton() throws Exception {
+        MOCK_MVC.perform(MockMvcRequestBuilders.get("/editPassword"));
     }
+    //AC1
+    @io.cucumber.java.en.Then("a dedicated form is shown with three text fields: “old password”, “new password”, and “retype password”")
+    public void aDedicatedFormIsShownWithThreeTextFieldsOldPasswordNewPasswordAndRetypePassword() throws Exception {
+        MOCK_MVC.perform(MockMvcRequestBuilders.get("/profile/editPassword"));
+        String responseContent = MOCK_MVC.perform(MockMvcRequestBuilders.get("/profile/editPassword")).andReturn().getResponse().getContentAsString();
 
-    @io.cucumber.java.en.Given("^I am on the change password form,$")
-    public void iAmOnTheChangePasswordForm() {
+        Assert.hasText(responseContent, "<input type=\"password\" id=\"currentPassword\" name=\"currentPassword\" />");
+
     }
-
-    @io.cucumber.java.en.When("^I enter an old password that does not match the password in file,$")
-    public void iEnterAnOldPasswordThatDoesNotMatchThePasswordInFile() {
+    //AC2
+    @io.cucumber.java.en.When("I enter an old password that does not match the password in file")
+    public void iEnterAnOldPasswordThatDoesNotMatchThePasswordInFile() throws Exception {
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .post("/editPassword")
+                        .param("currentPassword",currentPassword)
+                        .param("newPassword", newPassword)
+                        .param("retypePassword", retypePassword)
+        );
     }
-
-    @io.cucumber.java.en.Then("^an error message tells me “Your old password is incorrect$")
+    //AC2
+    @io.cucumber.java.en.Then("an error message tells me “Your old password is incorrect")
     public void anErrorMessageTellsMeYourOldPasswordIsIncorrect() {
     }
-
-    @io.cucumber.java.en.And("^I enter two different passwords in “new”$")
+    //AC3
+    @io.cucumber.java.en.And("I enter two different passwords in “new”")
     public void iEnterTwoDifferentPasswordsInNew() {
     }
-
-    @io.cucumber.java.en.And("^“retype password” fields, when I hit the save button,$")
+    //
+    @io.cucumber.java.en.And("“retype password” fields, when I hit the save button")
     public void retypePasswordFieldsWhenIHitTheSaveButton() {
     }
 
-    @io.cucumber.java.en.Then("^an error message tells me “The new passwords do not match”\\.$")
+    @io.cucumber.java.en.Then("an error message tells me “The new passwords do not match”")
     public void anErrorMessageTellsMeTheNewPasswordsDoNotMatch() {
     }
 
-    @io.cucumber.java.en.And("^I enter a weak password \\(e\\.g\\., contains any other fields from the user profile form, is below (\\d+) char long, does not contain a variation of different types of characters with one lowercase letter, one uppercase letter, one digit, one special character\\),$")
+    @io.cucumber.java.en.When("I enter a weak password")
     public void iEnterAWeakPasswordEGContainsAnyOtherFieldsFromTheUserProfileFormIsBelowCharLongDoesNotContainAVariationOfDifferentTypesOfCharactersWithOneLowercaseLetterOneUppercaseLetterOneDigitOneSpecialCharacter(int arg0) {
     }
 
-    @io.cucumber.java.en.When("^I hit the save button$")
+    @io.cucumber.java.en.And("^I hit the save button$")
     public void iHitTheSaveButton() {
     }
 
-    @io.cucumber.java.en.Then("^an error message tells “Your password must be at least (\\d+) characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character\\.”$")
-    public void anErrorMessageTellsYourPasswordMustBeAtLeastCharactersLongAndIncludeAtLeastOneUppercaseLetterOneLowercaseLetterOneNumberAndOneSpecialCharacter(int arg0) {
+    @io.cucumber.java.en.Then("an error message tells “Your password must be at least eight characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character\\.”$")
+    public void anErrorMessageTellsYourPasswordMustBeAtLeastEightCharactersLongAndIncludeAtLeastOneUppercaseLetterOneLowercaseLetterOneNumberAndOneSpecialCharacter(int arg0) {
     }
 
     @io.cucumber.java.en.When("^I enter fully compliant details$")
