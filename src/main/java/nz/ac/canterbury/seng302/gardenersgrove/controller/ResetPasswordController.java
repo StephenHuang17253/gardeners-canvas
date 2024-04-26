@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Objects;
 
-
 @Controller
 public class ResetPasswordController {
-    Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
 
     private final UserService userService;
 
@@ -26,22 +25,39 @@ public class ResetPasswordController {
         this.userService = userService;
     }
 
-    /**
-     * Gets the reset password page at /reset-password
-     * @return the reset password form
-     */
+    // Lost Password
+    @GetMapping("/lost-password")
+    public String lostPassword() {
+        logger.info("GET /lost-password");
+        return "lostPasswordForm";
+    }
+
+    @PostMapping("/lost-password")
+    public String emailChecker(@RequestParam("email") String email, Model model) {
+        boolean isRegistered = userService.emailInUse(email);
+        ValidationResult emailValidation = InputValidator.validateUniqueEmail(email);
+
+        if (!isRegistered && !emailValidation.valid()) {
+            model.addAttribute("emailError", emailValidation);
+        } else {
+            model.addAttribute("message", "An email was sent to the address if it was recognised");
+        }
+
+        return "lostPasswordForm";
+    }
+
+    // Reset Password
     @GetMapping("/reset-password")
     public String resetPassword() {
         logger.info("GET /reset-password");
-
         return "resetPasswordForm";
-
     }
+
     @PostMapping("/reset-password")
     public String passwordChecker(@RequestParam("password") String password, @RequestParam("retypePassword") String retypePassword, Model model) {
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
+        ValidationResult rePasswordValidation = InputValidator.validatePassword(retypePassword);
 
-        ValidationResult rePasswordValidation = InputValidator.validatePassword(password);
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
         } else if (!Objects.equals(password, retypePassword)) {
@@ -49,5 +65,4 @@ public class ResetPasswordController {
         }
         return "resetPasswordForm";
     }
-
 }
