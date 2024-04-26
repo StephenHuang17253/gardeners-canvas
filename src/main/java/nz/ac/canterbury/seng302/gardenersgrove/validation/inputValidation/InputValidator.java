@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
+
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import java.util.Objects;
 
 /**
  * Tests inputs on a variety of rules to check if values are valid
@@ -55,7 +56,7 @@ public class InputValidator {
     /**
      * A private constructor for the input validator,
      * this is used to run the static methods for input validation
-     * 
+     *
      * @param valueToTest the text undergoing validation
      */
     private InputValidator(String valueToTest) {
@@ -67,7 +68,7 @@ public class InputValidator {
      * Checks input against a criteria:
      * This function does not allow blank strings but otherwise the strings can
      * contain anything.
-     * 
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -85,29 +86,42 @@ public class InputValidator {
      * contain anything.
      * As long as the string does not contain more characters than the length limit
      * parameter.
-     * 
+     *
      * @param text   - text to validate
      * @param length - int, the character limit of string
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult compulsoryTextFieldWithLengthLimit(String text, int length) {
+    public static ValidationResult compulsoryTextField(String text, int length) {
         return new InputValidator(text)
                 .blankHelper()
                 .lengthHelper(length)
                 .getResult();
     }
-
     /**
      * Checks input against a criteria:
      * This function allows blank strings.
      * The string can contain any characters.
-     * It checks the string against a character limit.
-     * 
+     * It checks the string against a default character limit.
+     *
+     * @param text   - text to validate
+     * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
+     */
+    public static ValidationResult optionalTextField(String text) {
+        return new InputValidator(text)
+                .lengthHelper(200)
+                .getResult();
+    }
+    /**
+     * Checks input against a criteria:
+     * This function allows blank strings.
+     * The string can contain any characters.
+     * It checks the string against a character limit of param length.
+     *
      * @param text   - text to validate
      * @param length - int, the character limit of string
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
-    public static ValidationResult optionalTextFieldWithLengthLimit(String text, int length) {
+    public static ValidationResult optionalTextField(String text, int length) {
         return new InputValidator(text)
                 .lengthHelper(length)
                 .getResult();
@@ -117,7 +131,7 @@ public class InputValidator {
      * This function is called by methods which require checking against a set
      * length.
      * e.g. text fields with length limits
-     * 
+     *
      * @param length - int, the character limit
      * @return the calling object
      */
@@ -173,7 +187,8 @@ public class InputValidator {
     /**
      * Checks input against a criteria:
      * This function only allows alphanumeric characters and select punctuation
-     * 
+     * Checks input against default character limit of 200.
+     *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -186,8 +201,24 @@ public class InputValidator {
 
     /**
      * Checks input against a criteria:
+     * This function only allows alphanumeric characters and select punctuation
+     * Checks input against character limit of param length.
+     *
+     * @param text text to validate
+     * @param length int, the character limit of input
+     * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
+     */
+    public static ValidationResult optionalAlphaPlusTextField(String text, int length) {
+        return new InputValidator(text)
+                .alphaPlusHelper()
+                .lengthHelper(length)
+                .getResult();
+    }
+
+    /**
+     * Checks input against a criteria:
      * This function only allows numeric values and up to 1 comma
-     * 
+     *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -195,6 +226,21 @@ public class InputValidator {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
                 .areaHelper(Float.MAX_VALUE, 0.01F)
+                .getResult();
+    }
+
+    public static ValidationResult validatePostcodeInput(String text, int length) {
+        return new InputValidator(text)
+                .numbersOnlyHelper()
+                .lengthHelper(length)
+                .getResult();
+    }
+
+    public static ValidationResult numberCommaSingleTextField(String text, int length)
+    {
+        return new InputValidator(text)
+                .numberCommaSingleHelper()
+                .lengthHelper(length)
                 .getResult();
     }
 
@@ -224,13 +270,14 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .emailUniquenessHelper()
                 .getResult();
     }
 
     /**
      * Checks if the given email is valid
-     * 
+     *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
@@ -238,6 +285,7 @@ public class InputValidator {
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .getResult();
     }
 
@@ -269,10 +317,23 @@ public class InputValidator {
     }
 
     /**
+     * Checks if the given date is in a valid format
+     *
+     * @param date
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateDate(String date) {
+        return new InputValidator(date)
+                .dateFormatHelper()
+                .getResult();
+    }
+
+    /**
      * Checks if a string is blank or not if a string is
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator blankHelper() {
@@ -294,7 +355,7 @@ public class InputValidator {
      * Checks if a string only contains letters, spaces, hyphens or apostrophes
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator nameHelper() {
@@ -303,7 +364,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("[a-zA-Z\\-\\s']+")) {
+        if (!testedValue.matches("^\\p{L}[\\p{L} \\-'’]*$")) {
             this.validationResult = ValidationResult.INVALID_USERNAME;
             this.passState = false;
             return this;
@@ -316,7 +377,7 @@ public class InputValidator {
      * Checks if a string matches proper email syntax
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator emailSyntaxHelper() {
@@ -325,7 +386,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[a-zA-Z0-9._-]{1,64}@[a-zA-Z0-9.-]{1,255}\\.[a-zA-Z]{2,4}$")) {
+        if (!testedValue.matches("^[\\p{L}\\p{M}\\p{N}]{1,64}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,255}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$")) {
             this.validationResult = ValidationResult.INVALID_EMAIL;
             this.passState = false;
             return this;
@@ -338,7 +399,7 @@ public class InputValidator {
      * Checks if a string representing an email is unique
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator emailUniquenessHelper() {
@@ -360,7 +421,7 @@ public class InputValidator {
      * Checks if a string matches proper password syntax
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator passwordSyntaxHelper() {
@@ -382,7 +443,7 @@ public class InputValidator {
      * Checks if a string matches proper date syntax
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator dateFormatHelper() {
@@ -391,21 +452,41 @@ public class InputValidator {
             return this;
         }
 
-        List<String> dobList = Arrays.asList(testedValue.split("/"));
+        List<String> dateList = Arrays.asList(testedValue.split("/"));
 
-        if (dobList.size() != 3) {
+        if (dateList.size() != 3) {
             this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
             this.passState = false;
             return this;
         }
 
-        if (dobList.get(0).length() != 2 || dobList.get(1).length() != 2 || dobList.get(2).length() != 4) {
+        if (dateList.get(0).length() != 2 || dateList.get(1).length() != 2 || dateList.get(2).length() != 4) {
             this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
             this.passState = false;
             return this;
         }
 
-        for (String s : dobList) {
+        try {
+            LocalDate date;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+            date = LocalDate.parse(testedValue, formatter);
+            if (!date.isLeapYear() && Objects.equals(dateList.get(0), "29") && Objects.equals(dateList.get(1), "02")) {
+                this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+                this.passState = false;
+                return this;
+            }
+            if (date.lengthOfMonth() < Integer.parseInt(dateList.get(0))) {
+                this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+                this.passState = false;
+                return this;
+            }
+        } catch (Exception e) {
+            this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
+            this.passState = false;
+            return this;
+        }
+
+        for (String s : dateList) {
             if (!s.matches("[0-9]+")) {
                 this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
                 this.passState = false;
@@ -422,7 +503,7 @@ public class InputValidator {
      * ago
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator dateAgeHelper() {
@@ -455,7 +536,7 @@ public class InputValidator {
      * characters
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator alphaPlusHelper() {
@@ -501,7 +582,7 @@ public class InputValidator {
      * Checks if a string contains only numbers and up to 1 comma character
      * updates local variables with results
      * ignored if string failed any previous validation
-     * 
+     *
      * @return the calling object
      */
     private InputValidator numberCommaSingleHelper() {
@@ -592,13 +673,36 @@ public class InputValidator {
         return this;
     }
 
+    private InputValidator numbersOnlyHelper() {
+        if (!this.passState) {
+            return this;
+        }
+
+        if (!testedValue.matches("\\d+")) {
+            this.validationResult = ValidationResult.INVALID_POSTCODE;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
     /**
      * returns this objects validation result
-     * 
+     *
      * @return validationResult variable of object
      */
     private ValidationResult getResult() {
         return this.validationResult;
     }
+
+
+
+
+
+
+
+
+
 
 }

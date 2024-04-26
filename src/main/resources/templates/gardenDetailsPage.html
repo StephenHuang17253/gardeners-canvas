@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
         <title>Garden Details</title>
@@ -9,7 +9,7 @@
         <link th:href="@{/css/infoBox.css}" rel="stylesheet">
     </head>
     <body>
-        <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
         <div class = "main-container">
             <div class="tableList-header">
                 <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
@@ -40,7 +40,7 @@
                         plantName=${plant.getPlantName},
                         plantCount=${plant.getPlantCount},
                         plantDescription=${plant.getPlantDescription},
-                        plantDate=${plant.getPlantDate})">
+                        plantDate=${plant.getFormattedPlantDate})">
                     </div>
                 </div>
             </div>

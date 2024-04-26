@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -10,6 +10,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +24,6 @@ import org.springframework.ui.Model;
 import java.util.Objects;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -30,8 +34,7 @@ import java.util.Locale;
 public class RegistrationFormController {
     Logger logger = LoggerFactory.getLogger(RegistrationFormController.class);
     private final UserService userService;
-
-    private final SecurityService securityService;
+    private final AuthenticationManager authenticationManager;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
@@ -39,14 +42,38 @@ public class RegistrationFormController {
      * controller with other services
      * 
      * @param userService to use for checking persistence to validate email and password
-     * @param securityService to login user after registration
+     * @param authenticationManager to login user after registration
      */
     @Autowired
-    public RegistrationFormController(UserService userService, SecurityService securityService) {
+    public RegistrationFormController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
-        this.securityService = securityService;
+        this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Set the security context for the user
+     * This method is shared functionality between the login and registration pages
+     * possibly should be moved to a different class? As not correct to be here
+     * 
+     * @param email of user who is registering
+     * @param password of user who is registering
+     * @param session http session to set the cookies with the context key
+     */
+    public void setSecurityContext(String email, String password, HttpSession session) {
+        User user = userService.getUserByEmailAndPassword(email, password);
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getEmailAddress(),
+                password);
+
+        Authentication authentication = authenticationManager.authenticate(token);
+        // Check if the authentication is actually authenticated (in this example any
+        // username/password is accepted so this should never be false)
+        if (authentication.isAuthenticated()) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    SecurityContextHolder.getContext());
+        }
+    }
 
     /**
      * Redirects GET url '/register' to the registration form
@@ -66,12 +93,18 @@ public class RegistrationFormController {
     public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
             Model model) {
         logger.info("GET /register");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         addUserAttributes(firstName, lastName, noLastName, dateOfBirth,
                 emailAddress, password, repeatPassword, model);
         return "registrationForm";
@@ -97,7 +130,7 @@ public class RegistrationFormController {
             @RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -113,33 +146,29 @@ public class RegistrationFormController {
             valid = false;
         }
 
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
+            dateOfBirthValidation = ValidationResult.OK;
+        } else{
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
+
+        }
+
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (Objects.equals(dateOfBirth, "")) {
-            dateOfBirthValidation = ValidationResult.OK;
-        }
 
         valid = checkAllValid(firstNameValidation, lastNameValidation, String.valueOf(noLastName),
-                emailAddressValidation, passwordValidation, dateOfBirthValidation, valid, model);
+                emailAddressValidation, passwordValidation,dateOfBirthValidation, valid, model);
 
         if (!valid) {
             return "registrationForm";
         } else {
-            LocalDate date;
-            if (!Objects.equals(dateOfBirth, "")) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-                date = LocalDate.parse(dateOfBirth, formatter);
-            } else {
-                date = null;
-            }
-
-            User user = new User(firstName, lastName, emailAddress, date);
+            User user = new User(firstName, lastName, emailAddress, dateOfBirth);
             userService.addUser(user, password);
-
-            securityService.setSecurityContext(user.getEmailAddress(), password, request.getSession());
+            setSecurityContext(user.getEmailAddress(), password, request.getSession());
             return "redirect:/profile";
         }
     }
@@ -160,7 +189,7 @@ public class RegistrationFormController {
     private void addUserAttributes(@RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -205,7 +234,7 @@ public class RegistrationFormController {
             valid = false;
         }
         if (!emailAddressValidation.valid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation);
+            model.addAttribute("emailAddressError", "Email address " + emailAddressValidation);
             valid = false;
         }
         if (!dateOfBirthValidation.valid()) {

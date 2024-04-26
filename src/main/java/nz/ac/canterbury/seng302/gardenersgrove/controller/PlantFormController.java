@@ -9,6 +9,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +56,11 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         logger.info("GET /create-new-plant");
         return "createNewPlantForm"; // Return the view for creating a new plant
     }
@@ -78,9 +85,9 @@ public class PlantFormController {
                                      Model model) {
         logger.info("POST /landingPage");
         //logic to handle checking if fields are vaild
-        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
+        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
 
         plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
@@ -129,6 +136,11 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
         model.addAttribute("myGardens", gardenService.getGardens());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         logger.info("GET /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         return "editPlantForm"; // Return the view for creating a new plant
     }
@@ -155,9 +167,9 @@ public class PlantFormController {
                                      Model model) {
         logger.info("POST /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         //logic to handle checking if fields are vaild
-        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
+        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
 
         plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
@@ -195,7 +207,11 @@ public class PlantFormController {
 
         // notifies the user that the plant Name is invalid (if applicable)
         if (!plantNameResult.valid()) {
-            plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+            if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                plantNameResult.updateMessage("cannot be greater than 64 characters in length");
+            } else {
+                plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+            }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
             model.addAttribute("PNErrorClass", "errorBorder");
             logger.info("Plant Name failed validation");

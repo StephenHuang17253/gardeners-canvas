@@ -5,10 +5,9 @@ import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,21 +50,22 @@ public class ProfileController {
 
     Logger logger = LoggerFactory.getLogger(ProfileController.class);
     private final UserService userService;
-    private final SecurityService securityService;
+    private final AuthenticationManager authenticationManager;
     private final FileService fileService;
 
     /**
      * Constructor for the ProfileController with {@link Autowired} to connect this
      * controller with services
      * 
-     * @param userService to get current user
-     * @param securityService to login user again if profile changes
-     * @param fileService to get user profile image
+     * @param userService service to access repository
+     * @param authenticationManager manager for user's authentication details
+     * @param fileService service to manage files
      */
     @Autowired
-    public ProfileController(UserService userService, SecurityService securityService, FileService fileService) {
+    public ProfileController(UserService userService,
+            AuthenticationManager authenticationManager, FileService fileService) {
         this.userService = userService;
-        this.securityService = securityService;
+        this.authenticationManager = authenticationManager;
         this.fileService = fileService;
     }
 
@@ -80,7 +80,7 @@ public class ProfileController {
 
         String profilePictureString = "/Images/default_profile_picture.png";
 
-        if (filename != null && filename.length() != 0) {
+        if (filename != null && !filename.isEmpty()) {
             profilePictureString = MvcUriComponentsBuilder
                     .fromMethodName(ProfileController.class, "serveFile", filename)
                     .build()
@@ -106,12 +106,36 @@ public class ProfileController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
         } catch (MalformedURLException error) {
-            error.printStackTrace();
+            logger.error("File url incorrect", error);
         }
         return null;
 
     }
 
+    /**
+     * Set the security context for the user
+     * This method is shared functionality between the login and registration pages
+     * possibly should be moved to a different class? As not correct to be here
+     * 
+     * @param email    email of the user
+     * @param password password of the user
+     * @param session  http session to set the cookies with the context key
+     */
+    public void setSecurityContext(String email, String password, HttpSession session) {
+        User user = userService.getUserByEmail(email);
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getEmailAddress(),
+                user.getEncodedPassword());
+
+        Authentication authentication = authenticationManager.authenticate(token);
+        // Check if the authentication is actually authenticated (in this example any
+        // username/password is accepted so this should never be false)
+        if (authentication.isAuthenticated()) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    SecurityContextHolder.getContext());
+        }
+    }
 
     /**
      * Update the user's profile picture
@@ -120,7 +144,7 @@ public class ProfileController {
      * @param profilePicture new profile picture
      */
     public void updateProfilePicture(User user, MultipartFile profilePicture) {
-        String fileExtension = profilePicture.getOriginalFilename().split("\\.")[1];
+        String fileExtension = Objects.requireNonNull(profilePicture.getOriginalFilename()).split("\\.")[1];
         try {
             String[] allFiles = fileService.getAllFiles();
             // Delete past profile image/s
@@ -135,14 +159,14 @@ public class ProfileController {
             fileService.saveFile(fileName, profilePicture);
 
         } catch (IOException error) {
-            error.printStackTrace();
+            logger.error("incorrect user or profilePicture file", error);
         }
     }
 
     /**
      * This function is called when a GET request is made to /profile
      * 
-     * @param model
+     * @param model contains all fields
      * @return The profilePage html page
      */
     @GetMapping("/profile")
@@ -150,6 +174,8 @@ public class ProfileController {
         logger.info("GET /profile");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         String currentEmail = authentication.getName();
 
@@ -160,7 +186,14 @@ public class ProfileController {
         String profilePicture = getProfilePictureString(filename);
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("userName", userName);
-        model.addAttribute("dateOfBirth", user.getDateOfBirth());
+
+        String formattedDateOfBirth = "";
+        LocalDate dateOfBirth = user.getDateOfBirth();
+        if (dateOfBirth != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            formattedDateOfBirth = dateOfBirth.format(formatter);
+        }
+        model.addAttribute("dateOfBirth", formattedDateOfBirth);
         model.addAttribute("emailAddress", user.getEmailAddress());
 
         return "profilePage";
@@ -171,8 +204,8 @@ public class ProfileController {
      * Gets authenticated user and updates their profile picture
      * 
      * @param profilePicture user's profile picture
-     * @param model
-     * @return
+     * @param model contains all field data
+     * @return redirect to profile page
      */
     @PostMapping("/profile")
     public String updateProfilePicture(
@@ -190,8 +223,6 @@ public class ProfileController {
         }
 
         if (!profilePictureValidation.valid()) {
-
-            
             model.addAttribute("profilePictureError", profilePictureValidation);
             String userName = user.getFirstName() + " " + user.getLastName();
             model.addAttribute("userName", userName);
@@ -211,7 +242,7 @@ public class ProfileController {
     /**
      * This function is called when a GET request is made to /profile/edit
      * 
-     * @param model
+     * @param model contains all field data
      * @return The profileEditPage html page
      */
     @GetMapping("/profile/edit")
@@ -221,19 +252,15 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         model.addAttribute("firstName", user.getFirstName());
         model.addAttribute("lastName", user.getLastName());
         model.addAttribute("emailAddress", user.getEmailAddress());
+        model.addAttribute("dateOfBirth", user.getDateOfBirth());
 
-        String formattedDateOfBirth = "";
-        LocalDate dateOfBirth = user.getDateOfBirth();
-        if (dateOfBirth != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            formattedDateOfBirth = dateOfBirth.format(formatter);
-        }
-        model.addAttribute("dateOfBirth", formattedDateOfBirth);
-
-        boolean noLastName = user.getLastName().equals("");
+        boolean noLastName = user.getLastName().isEmpty();
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
@@ -262,12 +289,11 @@ public class ProfileController {
             @RequestParam(name = "firstName") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress") String emailAddress,
-            @RequestParam("profilePictureInput") MultipartFile profilePicture,
+            @RequestParam(name = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
@@ -279,6 +305,7 @@ public class ProfileController {
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         if (noLastName) {
             lastNameValidation = ValidationResult.OK;
+            lastName = "";
         }
         validationMap.put("lastName", lastNameValidation);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
@@ -286,11 +313,15 @@ public class ProfileController {
             emailAddressValidation = ValidationResult.OK;
         }
         validationMap.put("emailAddress", emailAddressValidation);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (dateOfBirth.isEmpty()) {
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
+        } else {
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
+
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
@@ -304,16 +335,18 @@ public class ProfileController {
 
                 String error = entry.getValue().toString();
 
-                if (entry.getKey().equals("firstName")) {
-                    error = "First name " + error;
-                } else if (entry.getKey().equals("lastName")) {
-                    error = "First name " + error;
-                }
+                error = switch (entry.getKey()) {
+                    case "firstName" -> "First name " + error;
+                    case "lastName" -> "Last name " + error;
+                    case "emailAddress" -> "Email address " + error;
+                    default -> entry.getValue().toString();
+                };
 
                 model.addAttribute(entry.getKey() + "Error", error);
                 valid = false;
             }
         }
+
 
         // If any input is invalid, return to the edit form
         if (!valid) {
@@ -333,16 +366,9 @@ public class ProfileController {
             updateProfilePicture(currentUser, profilePicture);
         }
 
-        LocalDate newDateOfBirth = null;
-        if (!dateOfBirth.equals("")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            newDateOfBirth = LocalDate.parse(dateOfBirth, formatter);
-        }
+        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, dateOfBirth);
 
-        User updatedUser = userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, newDateOfBirth);
-
-        securityService.setSecurityContext(updatedUser.getEmailAddress(), updatedUser.getEncodedPassword(), request.getSession());
-
+        setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
         return "redirect:/profile";
     }
 
