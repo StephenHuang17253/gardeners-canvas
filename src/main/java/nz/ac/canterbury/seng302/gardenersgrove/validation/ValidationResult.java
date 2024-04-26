@@ -9,7 +9,7 @@ public enum ValidationResult {
     BLANK("cannot be empty"),
     NOT_PARSABLE("cannot be parsed to a number"),
     NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
-    INVALID_POSTCODE("must only contain numbers"),
+    INVALID_POSTCODE("must only contain numbers, letters, and spaces"),
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
     INVALID_EMAIL(" must be in the form 'jane@doe.nz'"),
     INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
