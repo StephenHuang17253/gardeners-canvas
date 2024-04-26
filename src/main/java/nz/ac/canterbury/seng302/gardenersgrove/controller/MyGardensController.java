@@ -5,6 +5,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +40,9 @@ public class MyGardensController {
         model.addAttribute("myGardens", gardenService.getGardens());
         model.addAttribute("gardenCount", gardenService.getGardens().size());
 
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         return "myGardensPage";
     }
@@ -58,6 +62,10 @@ public class MyGardensController {
         long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.findById(gardenId);
         model.addAttribute("myGardens", gardenService.getGardens());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();

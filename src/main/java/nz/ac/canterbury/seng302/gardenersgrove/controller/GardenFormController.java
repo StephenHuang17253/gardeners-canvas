@@ -8,6 +8,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -93,6 +95,10 @@ public class GardenFormController {
                                  @RequestParam(name = "gardenLocation", required = false) String gardenLocation,
                                  @RequestParam(name = "gardenSize", required = false) String gardenSize,
                                  Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         model.addAttribute("gardenName", gardenName);
         model.addAttribute("gardenLocation", gardenLocation);
         model.addAttribute("gardenSize", gardenSize);
@@ -209,6 +215,10 @@ public class GardenFormController {
                                     @PathVariable String gardenName,
                                     Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenIdString, gardenName);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         // Convert gardenIdString to Long
         long gardenId = Long.parseLong(gardenIdString);

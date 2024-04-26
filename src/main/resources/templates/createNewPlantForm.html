@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Create new Plant</title>
@@ -8,7 +8,7 @@
     <link th:href="@{/css/form.css}" rel="stylesheet">
 </head>
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
 <div class="main-container">
     <h1>Create New Plant</h1>
     <br>
