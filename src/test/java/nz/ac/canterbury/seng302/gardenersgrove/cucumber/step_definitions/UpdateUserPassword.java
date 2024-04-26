@@ -45,8 +45,10 @@ public class UpdateUserPassword {
 
     }
     @When("I enter two different new passwords: {string} and {string}")
-    public void iEnterTwoDifferentPasswordsInNew(String newPassword,String retypePassword) {
-
+    public void iEnterTwoDifferentPasswordsInNew(String newPassword,String retypePassword) throws Exception {
+        this.currentPassword = "AlphabetSoup10!";
+        this.newPassword = newPassword;
+        this.retypePassword = retypePassword;
     }
     @Then("The password does not get updated")
     public void thePasswordDoesNotGetUpdated() {
@@ -68,7 +70,14 @@ public class UpdateUserPassword {
     }
 
     @And("I click the “Submit” button")
-    public void iClickTheSubmitButton() {
+    public void iClickTheSubmitButton() throws Exception {
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .post("/editPassword")
+                        .param("currentPassword", currentPassword)
+                        .param("newPassword", newPassword)
+                        .param("repeatPassword", retypePassword)
+        );
     }
 
     @When("I enter an old password {string} that does not match the current password")
