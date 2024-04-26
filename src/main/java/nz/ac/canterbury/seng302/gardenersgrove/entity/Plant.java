@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Entity class of a Plant, reflecting an entry of plant name
@@ -66,6 +67,15 @@ public class Plant {
         this.plantDescription = plantDescription;
     }
     public LocalDate getPlantDate() {return plantDate;}
+
+    public String getFormattedPlantDate() {
+        String formattedDate = "";
+        if (plantDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            formattedDate = plantDate.format(formatter);
+        }
+        return formattedDate;
+    }
     public void setPlantDate(LocalDate plantDate) {this.plantDate = plantDate;}
     public Garden getGarden() {return garden;}
     @Override

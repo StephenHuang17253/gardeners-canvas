@@ -90,9 +90,9 @@ public class PlantFormController {
                                      Model model) {
         logger.info("POST /landingPage");
         //logic to handle checking if fields are vaild
-        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
+        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
 
         plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
@@ -171,9 +171,9 @@ public class PlantFormController {
                                      Model model) {
         logger.info("POST /my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit");
         //logic to handle checking if fields are vaild
-        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName);
+        ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextFieldWithLengthLimit(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
 
 
         plantFormErrorText(model, plantNameResult, plantCountResult, plantDescriptionResult);
@@ -207,7 +207,11 @@ public class PlantFormController {
 
         // notifies the user that the plant Name is invalid (if applicable)
         if (!plantNameResult.valid()) {
-            plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+            if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                plantNameResult.updateMessage("cannot be greater than 64 characters in length");
+            } else {
+                plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+            }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
             model.addAttribute("PNErrorClass", "errorBorder");
             logger.info("Plant Name failed validation");

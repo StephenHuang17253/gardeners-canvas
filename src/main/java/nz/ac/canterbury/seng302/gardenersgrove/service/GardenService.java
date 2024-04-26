@@ -57,7 +57,7 @@ public class GardenService {
      * @param id the garden's ID
      * @return the garden or Optional#empty() if none found
      */
-    public Optional<Garden> getGardenById(long id) {
+    public Optional<Garden> findById(long id) {
         return gardenRepository.findById(id);
     }
 
@@ -87,6 +87,14 @@ public class GardenService {
         if (optionalGarden.isPresent()) {
             Garden targetGarden = optionalGarden.get();
 
+            oldGarden.setGardenName(newGarden.getGardenName());
+            oldGarden.setGardenAddress(newGarden.getGardenAddress());
+            oldGarden.setGardenSuburb(newGarden.getGardenSuburb());
+            oldGarden.setGardenCity(newGarden.getGardenCity());
+            oldGarden.setGardenPostcode(newGarden.getGardenPostcode());
+            oldGarden.setGardenCountry(newGarden.getGardenCountry());
+            oldGarden.setGardenLocation(newGarden.getGardenLocation());
+            oldGarden.setGardenSize(newGarden.getGardenSize());
             targetGarden.setGardenName(newGardenValues.getGardenName());
             targetGarden.setGardenLocation(newGardenValues.getGardenLocation());
             targetGarden.setGardenSize(newGardenValues.getGardenSize());
