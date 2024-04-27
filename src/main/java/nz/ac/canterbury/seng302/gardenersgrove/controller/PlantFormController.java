@@ -11,22 +11,17 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -130,7 +125,7 @@ public class PlantFormController {
 
         logger.info("Validating form inputs");
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
-            logger.info("Validation checks passed.");
+            logger.info("Validation checks failed.");
             return "createNewPlantForm";
         }
         if(plantCount.isBlank()) {plantCount = "1.0";}
@@ -139,7 +134,7 @@ public class PlantFormController {
         Plant newPlant = plantService.addPlant(plantName, floatPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             logger.info("Setting plant image");
-            updatePlantPicture(newPlant, plantPicture);
+            plantService.updatePlantPicture(newPlant, plantPicture);
         }
 
         logger.info("Created new Plant");
@@ -235,7 +230,7 @@ public class PlantFormController {
 
         logger.info("Validating form inputs");
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
-            logger.info("Validation checks passed");
+            logger.info("Validation checks failed");
             return "editPlantForm";
         }
 
@@ -246,7 +241,7 @@ public class PlantFormController {
 
         if (!plantPicture.isEmpty()) {
             logger.info("Updating plant picture");
-            updatePlantPicture(plantToUpdate.get(), plantPicture);
+            plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
 
 
@@ -352,31 +347,6 @@ public class PlantFormController {
 
     }
 
-    /**
-     * Update the plant's picture
-     *
-     * @param plant           plant to update
-     * @param plantPicture new plant picture
-     */
-    public void updatePlantPicture(Plant plant, MultipartFile plantPicture) {
-        String fileExtension = plantPicture.getOriginalFilename().split("\\.")[1];
-        try {
-            String[] allFiles = fileService.getAllFiles();
-            // Delete past plant image/s
-            for (String file : allFiles) {
-                if (file.contains("plant_" + plant.getPlantId() + "_plant_picture")) {
-                    fileService.deleteFile(file);
-                }
-            }
-
-            String fileName = "plant_" + plant.getPlantId() + "_picture." + fileExtension.toLowerCase();
-            plantService.updatePlantPictureFilename(fileName, plant.getPlantId());
-            fileService.saveFile(fileName, plantPicture);
-
-        } catch (IOException error) {
-            error.printStackTrace();
-        }
-    }
 
 
 }
