@@ -5,8 +5,7 @@ Feature: U1 As Sarah, I want to register on Gardener’s Grove so that I can use
     And I click the "Sign Up" button
     Then A new user is added to database
 
-  Scenario: AC3 Given I am on the registration form, and I click the check box marked “I have no surname” ticked,
-  then the last name text field is disabled, and it will be ignored when I click the “Sign Up” button.
+  Scenario: AC3 - I click the check box marked "I have no surname"
     When I click the check box marked "I have no surname"
     And I enter valid values for my first name "James" and last name "", email address "james12@email.com", password "TestPassword10!", repeat password "TestPassword10!" and optionally date of birth "10/10/2001"
     And I click the "Sign Up" button

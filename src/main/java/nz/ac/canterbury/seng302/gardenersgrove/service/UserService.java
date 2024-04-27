@@ -163,9 +163,6 @@ public class UserService {
     public boolean checkPassword(long id, String passwordToCheck) {
         User user = getUserById(id);
         String currentPassword = user.getEncodedPassword();
-        if (!passwordEncoder.matches(passwordToCheck, currentPassword)) {
-            return false;
-        }
-        return true;
+        return passwordEncoder.matches(passwordToCheck, currentPassword);
     }
 }
