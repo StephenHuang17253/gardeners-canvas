@@ -2,7 +2,9 @@
     <div class="plantbox" id="plantbox">
         <div class="plant-info">
             <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
-            <form th:action="@{__${gardenId}__=__${gardenName}__/__${plantId}__/updateImage}" method="post" enctype="multipart/form-data">
+
+            <form th:action="@{/my-gardens/{gardenId}={gardenName}/update/plantid-{plantId}
+            (gardenId=${gardenId}, gardenName=${gardenName}, plantId=${plantId})}" method="post" enctype="multipart/form-data">
             <div class="plant_picture_container small_pic">
                 <img id="imageToChange" th:src="${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}"
                      alt="Plant Image" class="plant-image">
@@ -11,7 +13,7 @@
                        onChange="handleFileSelect(event); this.form.submit()">
             </div>
             </form>
-            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
+            <span th:if="${plantPictureError}" class="error-message" th:text="${plantPictureError}"></span>
             <br>
         </div>
         <div class="plant-details">

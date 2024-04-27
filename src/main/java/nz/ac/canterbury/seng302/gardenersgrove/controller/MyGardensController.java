@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.Optional;
 
@@ -105,7 +106,7 @@ public class MyGardensController {
      * @param model the model
      * @return thymeleaf gardenDetails
      */
-    @PostMapping("/my-gardens/{gardenId}={gardenName}/{plantId}/updateImage")
+    @PostMapping("/my-gardens/{gardenId}={gardenName}/update/plantid-{plantId}")
     public String updatePlantImage(@PathVariable("gardenId") String gardenIdString,
                                    @PathVariable String gardenName,
                                    @PathVariable String plantId,
@@ -132,9 +133,19 @@ public class MyGardensController {
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
         }
-        if (!plantPictureResult.valid()) {
+
+        if (optionalGarden.isPresent() & !plantPictureResult.valid()) {
             logger.info("Plant picture validation failed");
+            Garden garden = optionalGarden.get();
             model.addAttribute("plantPictureError", plantPictureResult);
+            String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+            model.addAttribute("plantPicture", plantPictureString);
+            model.addAttribute("gardenName", garden.getGardenName());
+            model.addAttribute("gardenLocation", garden.getGardenLocation());
+            model.addAttribute("gardenSize", garden.getGardenSize());
+            model.addAttribute("gardenId",gardenIdString);
+            model.addAttribute("plants",garden.getPlants());
+            model.addAttribute("totalPlants",garden.getPlants().size());
             return "gardenDetailsPage";
         }
 
@@ -152,6 +163,26 @@ public class MyGardensController {
         }
     }
 
+    /**
+     * Gets the resource url for the plant picture, or the default plant picture
+     * if the plant does not have one
+     *
+     * @param filename string filename
+     * @return string of the plant picture url
+     */
+    public String getPlantPictureString(String filename) {
+
+        String plantPictureString = "/images/default_plant.png";
+
+        if (filename != null && filename.length() != 0) {
+            plantPictureString = MvcUriComponentsBuilder
+                    .fromMethodName(PlantFormController.class, "serveFile", filename)
+                    .build()
+                    .toUri()
+                    .toString();
+        }
+        return plantPictureString;
+    }
 
 
 }
