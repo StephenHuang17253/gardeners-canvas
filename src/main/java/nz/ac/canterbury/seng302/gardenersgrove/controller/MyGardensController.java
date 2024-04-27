@@ -119,6 +119,7 @@ public class MyGardensController {
         model.addAttribute("myGardens", gardenService.getGardens());
 
         Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong(plantId));
+        model.addAttribute("plantToEditId", Long.parseLong(plantId));
         if(!plantToUpdate.isPresent())
         {
             return "404";

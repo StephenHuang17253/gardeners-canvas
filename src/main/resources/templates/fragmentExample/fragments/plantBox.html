@@ -13,9 +13,10 @@
                        onChange="handleFileSelect(event); this.form.submit()">
             </div>
             </form>
-            <span th:if="${plantPictureError}" class="error-message" th:text="${plantPictureError}"></span>
+            <span th:if="${plantToEditId == plantId}" class="error-message" th:text="${plantPictureError}"></span>
             <br>
         </div>
+
         <div class="plant-details">
             <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>
             <span th:if="${plantDate != null}" th:text="'Planted on: ' + ${plantDate}" class="plant-date"> Name </span>
