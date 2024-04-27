@@ -2,10 +2,18 @@
     <div class="plantbox" id="plantbox">
         <div class="plant-info">
             <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
-            <img th:if="${plantPicture == null}" src="/images/default_plant.png"
-                 alt="Default Plant Image" class="plant-image">
-            <img th:if="${plantPicture != null}" th:src="'/files/plants/' + ${plantPicture}"
-                 alt="Default Plant Image" class="plant-image">
+            <form th:action="@{profile}" method="post" enctype="multipart/form-data">
+            <div class="plant_picture_container small_pic">
+<!--                <img id="profilePicture" th:src="@{${plantPicture}}" alt="Plant image">-->
+                <img id="imageToChange" th:src="${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}"
+                     alt="Plant Image" class="plant-image">
+                <label for="plantPictureInput">+</label>
+                <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
+                       onChange="handleFileSelect(event); this.form.submit()">
+            </div>
+            </form>
+            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
+            <br>
         </div>
         <div class="plant-details">
             <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>

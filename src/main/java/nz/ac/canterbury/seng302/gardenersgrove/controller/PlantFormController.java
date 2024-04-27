@@ -269,7 +269,7 @@ public class PlantFormController {
 
 
         if (!plantPictureResult.valid()) {
-            model.addAttribute("profilePictureError", plantPictureResult);
+            model.addAttribute("plantPictureError", plantPictureResult);
         }
 
         // notifies the user that the plant Name is invalid (if applicable)
