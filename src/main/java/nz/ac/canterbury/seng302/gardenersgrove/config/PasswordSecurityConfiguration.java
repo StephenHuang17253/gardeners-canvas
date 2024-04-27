@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * Class to handle security configuration
  */
 @Configuration
-public class SecurityConfig {
+public class PasswordSecurityConfiguration {
 
     /**
      * Password encoder bean for storage of passwords in database
