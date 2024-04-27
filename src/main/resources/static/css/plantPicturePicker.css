@@ -54,6 +54,8 @@
 
 .error-message {
     color: red;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
 }
 
 .small_pic {
