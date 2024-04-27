@@ -10,6 +10,7 @@ Feature: U7 As Sarah, I want to be able to change my password, so that I can kee
 
   Scenario: AC3 - I enter two different password that don't match
     When I enter two different new passwords: "myNewPassword10!" and "AnotherNewPassword10!"
+    And I click the “Submit” button
     Then The password does not get updated
 
   Scenario Outline: AC4 - I enter a weak password e.g. under 8 chars, No variation in char
