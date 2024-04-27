@@ -127,7 +127,7 @@ public class GardenFormController {
                               @RequestParam(name = "gardenLocation") String gardenLocation,
                               @RequestParam(name = "gardenSize") String gardenSize,
                               Model model, RedirectAttributes redirectAttributes) {
-        logger.info("POST /landingPage");
+        logger.info("POST /create-new-garden");
         //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
 
         String locationValues = "";

@@ -86,7 +86,7 @@ public class GardenServiceTest {
     @Test
     public void testAddGarden() {
         GardenService gardenService = new GardenService(gardenRepository);
-        Garden garden = gardenService.addGarden(new Garden(
+        Garden test_garden = new Garden(
                 "John's Garden",
                 "114 Ilam Road",
                 "Ilam",
@@ -94,7 +94,9 @@ public class GardenServiceTest {
                 "8041",
                 "New Zealand",
                 "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
-                15));
+                15);
+        Garden garden = gardenService.addGarden(test_garden);
+
         Assertions.assertEquals(garden.getGardenName(), "John's Garden");
         Assertions.assertEquals(garden.getGardenAddress(), "114 Ilam Road");
         Assertions.assertEquals(garden.getGardenSuburb(), "Ilam");
