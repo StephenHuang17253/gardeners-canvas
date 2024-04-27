@@ -231,7 +231,7 @@ public class InputValidator {
 
     public static ValidationResult validatePostcodeInput(String text, int length) {
         return new InputValidator(text)
-                .numbersOnlyHelper()
+                .postcodeHelper()
                 .lengthHelper(length)
                 .getResult();
     }
@@ -270,6 +270,7 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .emailUniquenessHelper()
                 .getResult();
     }
@@ -284,6 +285,7 @@ public class InputValidator {
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .getResult();
     }
 
@@ -671,12 +673,12 @@ public class InputValidator {
         return this;
     }
 
-    private InputValidator numbersOnlyHelper() {
+    private InputValidator postcodeHelper() {
         if (!this.passState) {
             return this;
         }
 
-        if (!testedValue.matches("\\d+")) {
+        if (!testedValue.matches("^[a-zA-Z0-9 ]*$")) {
             this.validationResult = ValidationResult.INVALID_POSTCODE;
             this.passState = false;
             return this;

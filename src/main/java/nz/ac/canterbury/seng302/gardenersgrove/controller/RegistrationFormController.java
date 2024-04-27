@@ -24,7 +24,6 @@ import org.springframework.ui.Model;
 import java.util.Objects;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -100,6 +99,12 @@ public class RegistrationFormController {
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
             Model model) {
         logger.info("GET /register");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         addUserAttributes(firstName, lastName, noLastName, dateOfBirth,
                 emailAddress, password, repeatPassword, model);
         return "registrationForm";
@@ -140,6 +145,7 @@ public class RegistrationFormController {
             model.addAttribute("passwordMatchingError", "Passwords do not match");
             valid = false;
         }
+
         ValidationResult dateOfBirthValidation;
         if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
@@ -148,6 +154,7 @@ public class RegistrationFormController {
             dateOfBirthValidation = InputValidator.validateDOB(dateString);
 
         }
+
         ValidationResult firstNameValidation = InputValidator.validateName(firstName);
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
@@ -159,19 +166,10 @@ public class RegistrationFormController {
         if (!valid) {
             return "registrationForm";
         } else {
-//            LocalDate date;
-//            if (!Objects.equals(dateOfBirth, "")) {
-//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-//                date = LocalDate.parse(dateOfBirth, formatter);
-//            } else {
-//                date = null;
-//            }
-
             User user = new User(firstName, lastName, emailAddress, dateOfBirth);
             userService.addUser(user, password);
-
             setSecurityContext(user.getEmailAddress(), password, request.getSession());
-            return "redirect:/profile"; // Placeholder for Profile Page
+            return "redirect:/profile";
         }
     }
 
@@ -236,7 +234,7 @@ public class RegistrationFormController {
             valid = false;
         }
         if (!emailAddressValidation.valid()) {
-            model.addAttribute("emailAddressError", emailAddressValidation);
+            model.addAttribute("emailAddressError", "Email address " + emailAddressValidation);
             valid = false;
         }
         if (!dateOfBirthValidation.valid()) {

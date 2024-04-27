@@ -37,8 +37,8 @@ public class LoginPageController {
      * Constructor for the LoginPageController with {@link Autowired} to connect this
      * controller with other services
      * 
-     * @param userService
-     * @param authenticationManager
+     * @param userService for accessing persistence
+     * @param authenticationManager for storing authenticated user's details
      */
     @Autowired
     public LoginPageController(UserService userService, AuthenticationManager authenticationManager) {
@@ -51,8 +51,8 @@ public class LoginPageController {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      * 
-     * @param email
-     * @param password
+     * @param email the user's email
+     * @param password the user's raw password
      * @param session http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
@@ -85,6 +85,11 @@ public class LoginPageController {
 
         model.addAttribute("validEmail", validEmail);
         model.addAttribute("validLogin", validLogin);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         return "loginPage";
     }
