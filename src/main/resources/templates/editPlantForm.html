@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Edit Plant</title>
@@ -8,13 +8,14 @@
     <link th:href="@{/css/form.css}" rel="stylesheet">
 </head>
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
 <div class="main-container">
     <h1>Edit Plant</h1>
     <br>
     <div>
         <form th:action="@{edit}" method="post">
             <label for="plantName"> Plant Name: </label>
+            <br>
             <input type="text" class="form-control" th:class = "${PNErrorClass}" id="plantName" placeholder="Name of plant"
                    th:name="plantName" th:value="*{plantName}" data-cy="plantName" autofocus>
 
@@ -23,6 +24,7 @@
             </div>
 
             <label for="plantCount"> Plant Count: </label>
+            <br>
             <input type="text" class="form-control" th:class = "${PCErrorClass}" id="plantCount" placeholder="Number of plants"
                    th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount" autofocus>
 
@@ -32,6 +34,7 @@
 
 
             <label for="plantDescription"> Plant Description </label>
+            <br>
             <div class="form-description" >
                 <textarea class="form-control" th:class = "${PDErrorClass}" id="plantDescription" placeholder="Description"
                           th:name="plantDescription" th:text="*{plantDescription}" data-cy="plantDescription"

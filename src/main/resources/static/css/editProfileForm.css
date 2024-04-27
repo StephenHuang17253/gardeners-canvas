@@ -1,0 +1,123 @@
+/**
+Stylises the editForm.html webpage
+*/
+
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    height: auto;
+    min-height: 250px;
+    width: 300px;
+    min-width: 200px;
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 25px;
+    margin: auto;
+
+    background-color: #fff;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+form input[type=text] {
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.error-message {
+    color: red;
+}
+
+
+/* profile picture styling */
+.profile_picture_container {
+    position: relative;
+    display: block;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    border: 3px solid rgba(0, 0, 0, 0.5);
+    height: 200px;
+    width: 200px;
+}
+
+.profile_picture_container img {
+    display: block;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.profile_picture_container input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.profile_picture_container label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 150%;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 20%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.profile_picture_container:hover label {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+
+/* button styling */
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.buttons button a {
+    text-decoration: none;
+    color: white;
+}

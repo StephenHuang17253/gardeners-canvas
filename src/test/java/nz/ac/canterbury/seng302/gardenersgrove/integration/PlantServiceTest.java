@@ -1,4 +1,4 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
+package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -7,28 +7,23 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import org.h2.table.Plan;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
-
-@DataJpaTest
+/**
+ * Using {@link SpringBootTest} instead
+ * of @DataJpaTest fixed the tests
+ */
+@SpringBootTest
 @Import({GardenService.class, PlantService.class})
 public class PlantServiceTest {
 
@@ -49,7 +44,15 @@ public class PlantServiceTest {
     public void testAddPlant() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15);
         List<Plant> mockPlantsList = new ArrayList<>();
 
         // Mocks for addPlant
@@ -79,7 +82,15 @@ public class PlantServiceTest {
     public void testGetPlants() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         List<Plant> mockPlantsList = new ArrayList<>();
         mockPlantsList.add(plant);
@@ -107,7 +118,15 @@ public class PlantServiceTest {
     public void testFindById() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // Mocks for addPlant
@@ -134,7 +153,15 @@ public class PlantServiceTest {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         LocalDate newDateOfPlanting = LocalDate.of(2023, 2, 13);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden);
 
@@ -161,7 +188,15 @@ public class PlantServiceTest {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         LocalDate newDateOfPlanting = LocalDate.of(2023, 2, 13);
-        Garden garden = new Garden("John's Garden", "John's Backyard", 15);
+        Garden garden = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
+                15);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // Mocks for addPlant

@@ -1,7 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.InputValidator.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 import org.springframework.ui.Model;
 
@@ -37,8 +37,8 @@ public class LoginPageController {
      * Constructor for the LoginPageController with {@link Autowired} to connect this
      * controller with other services
      * 
-     * @param userService
-     * @param authenticationManager
+     * @param userService for accessing persistence
+     * @param authenticationManager for storing authenticated user's details
      */
     @Autowired
     public LoginPageController(UserService userService, AuthenticationManager authenticationManager) {
@@ -51,8 +51,8 @@ public class LoginPageController {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      * 
-     * @param email
-     * @param password
+     * @param email the user's email
+     * @param password the user's raw password
      * @param session http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
@@ -86,6 +86,11 @@ public class LoginPageController {
         model.addAttribute("validEmail", validEmail);
         model.addAttribute("validLogin", validLogin);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         return "loginPage";
     }
 
@@ -100,22 +105,17 @@ public class LoginPageController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        ValidationResult validEmail = InputValidator.validateUniqueEmail(email);
+        ValidationResult validEmail = InputValidator.validateEmail(email);
 
-        boolean validLogin = userService.getUserByEmailAndPassword(email, password) != null;
-
-        if (!validEmail.valid() || !validLogin) {
+        if (!validEmail.valid()) {
             model.addAttribute("emailError", validEmail);
-            model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
-
             return "loginPage";
         }
+
         User user = userService.getUserByEmailAndPassword(email, password);
 
         if (user == null) {
-            model.addAttribute("validEmail", validEmail);
-            model.addAttribute("validLogin", false);
-
+            model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
             return "loginPage";
         }
 

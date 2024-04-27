@@ -3,47 +3,56 @@ Stylises the homePage.html webpage
 */
 
 .container {
-    width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f2f2f2;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  width: 400px;
+  margin: 0 auto;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
 h2 {
-    text-align: center;
-    color: #306030;
-}
-
-.sub-container {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.sub-container form {
-    all: unset;
+  text-align: center;
+  color: #306030;
 }
 
 img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-    border-radius: 50%;
-    cursor: pointer;
+  width: 90%;
+  height: auto;
+  border-radius: 50%;
 }
 
-button {
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+form {
+  all: unset
+}
+
+.user_button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 button a {
-    text-decoration: none;
-    color: white;
+  text-decoration: none;
+  color: white;
+}
+
+.profile_info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
