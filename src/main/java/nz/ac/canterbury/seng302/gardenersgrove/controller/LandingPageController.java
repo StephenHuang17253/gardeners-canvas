@@ -34,7 +34,7 @@ public class LandingPageController {
      * @return the html landing page
      */
     @GetMapping("/landing")
-    public String getLanding()
+    public String getLanding(Model model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";

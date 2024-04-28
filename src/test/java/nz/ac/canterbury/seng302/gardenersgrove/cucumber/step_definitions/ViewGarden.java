@@ -9,9 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,16 +37,21 @@ public class ViewGarden {
 
     public SecurityService securityService;
 
-    public static GardenService gardenService;
+    private static GardenService gardenService;
 
-    public static UserService userService;
+    private static UserService userService;
+
+    private static PlantService plantService;
+
+    private static FileService fileService;
+
     @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        securityService = new SecurityService(userService, gardenService);
+        securityService = new SecurityService(userService, authenticationManager);
 
-        MyGardensController myGardensController = new MyGardensController(gardenService, securityService);
+        MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
 

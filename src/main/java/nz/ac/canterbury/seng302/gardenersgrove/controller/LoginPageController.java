@@ -128,7 +128,7 @@ public class LoginPageController {
         setSecurityContext(email, password, request.getSession());
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
 
-        return "redirect:/landing";
+        return "redirect:/home";
 
     }
 

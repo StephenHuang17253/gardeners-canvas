@@ -70,6 +70,12 @@ public class PlantFormController {
                                @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
                                Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
             return "404";
@@ -169,6 +175,11 @@ public class PlantFormController {
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
                                 @PathVariable("plantId") Long plantId,
                                Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
             return "404";

@@ -3,13 +3,21 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,8 +65,13 @@ public class MyGardensController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
-    public String myGardens() {
+    public String myGardens(Model model) {
         logger.info("GET /my-gardens");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         return "myGardensPage";
     }
 
@@ -74,6 +87,10 @@ public class MyGardensController {
                                           HttpServletResponse response,
                                           Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -100,7 +117,6 @@ public class MyGardensController {
      * This function is called when a user tries to update a plants image directly from the My Garden's page
      * instead of one of the plant forms.
      * @param gardenIdString id of the garden being edited
-     * @param gardenName name of the garden being edited
      * @param plantId id of the plant being edited
      * @param plantPicture the new picture
      * @param model the model
@@ -114,7 +130,7 @@ public class MyGardensController {
         logger.info("GET /my-gardens/{}", gardenIdString);
 
         long gardenId = Long.parseLong(gardenIdString);
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         model.addAttribute("myGardens", gardenService.getGardens());
 
         Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));

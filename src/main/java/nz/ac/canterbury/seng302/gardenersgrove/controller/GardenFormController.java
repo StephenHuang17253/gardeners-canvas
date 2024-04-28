@@ -106,6 +106,12 @@ public class GardenFormController {
                                  @RequestParam(name = "postcode", required = false )String postcode,
                                  @RequestParam(name = "gardenSize", required = false) String gardenSize,
                                  Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+
         model.addAttribute("gardenName", gardenName);
         model.addAttribute("streetAddress", streetAddress);
         model.addAttribute("suburb", suburb);
@@ -211,6 +217,11 @@ public class GardenFormController {
                                           Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
         if (optionalGarden.isEmpty()) {
@@ -268,6 +279,9 @@ public class GardenFormController {
         logger.info("POST / edited garden");
         // logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
@@ -284,6 +298,7 @@ public class GardenFormController {
             gardenSize = null;
 
         }
+        model.addAttribute("loggedIn", loggedIn);
         model.addAttribute("gardenName", gardenName);
         model.addAttribute("streetAddress", streetAddress);
         model.addAttribute("suburb", suburb);
