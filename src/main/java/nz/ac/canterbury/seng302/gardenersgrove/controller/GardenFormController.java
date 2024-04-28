@@ -175,11 +175,11 @@ public class GardenFormController {
             return "createNewGardenForm";
         }
 
-        float floatGardenSize;
+        double floatGardenSize;
         if(gardenSize == null){
-            floatGardenSize = Float.NaN;
+            floatGardenSize = Double.NaN;
         }else{
-            floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
+            floatGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
         User owner = securityService.getCurrentUser();
         Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, owner);
@@ -294,11 +294,11 @@ public class GardenFormController {
             return "editGardenForm";
 
         }
-        float floatGardenSize;
+        double floatGardenSize;
         if(gardenSize == null){
-            floatGardenSize = Float.NaN;
+            floatGardenSize = Double.NaN;
         }else{
-            floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
+            floatGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
         gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
         logger.info("Edited Garden Page");
