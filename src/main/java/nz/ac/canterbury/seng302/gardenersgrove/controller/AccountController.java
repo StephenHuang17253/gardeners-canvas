@@ -33,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -152,7 +153,7 @@ public class AccountController {
             @RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -174,9 +175,13 @@ public class AccountController {
 
         validationMap.put("emailAddress", InputValidator.validateUniqueEmail(emailAddress));
 
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (dateOfBirth.equals("")) {
+
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null ) {
             dateOfBirthValidation = ValidationResult.OK;
+        } else {
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
 
@@ -216,15 +221,7 @@ public class AccountController {
             return "registrationForm";
         }
 
-        LocalDate date;
-        if (!dateOfBirth.equals("")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            date = LocalDate.parse(dateOfBirth, formatter);
-        } else {
-            date = null;
-        }
-
-        User user = new User(firstName, lastName, emailAddress, date);
+        User user = new User(firstName, lastName, emailAddress, dateOfBirth);
         userService.addUser(user, password);
 
         Token token = new Token(user, null);
@@ -327,8 +324,8 @@ public class AccountController {
 
     /**
      * Handles the login request
-     * 
-     * @param email the email parameter
+     *
+     * @param emailAddress the email parameter
      * @return thymeleaf loginPage
      */
     @PostMapping("/login")
