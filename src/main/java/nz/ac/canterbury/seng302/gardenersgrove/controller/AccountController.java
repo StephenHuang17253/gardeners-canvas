@@ -101,7 +101,7 @@ public class AccountController {
      * @param emailAddress the email address of the user
      */
     public void removeIfExpired(String emailAddress) {
-        
+
         User existingUser = userService.getUserByEmail(emailAddress);
 
         if (existingUser != null && !existingUser.isVerified()) {
@@ -121,9 +121,24 @@ public class AccountController {
      * @return registration form
      */
     @GetMapping("/register")
-    public String registrationForm(Model model) {
+    public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
+            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+            @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
+            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+            @RequestParam(name = "password", defaultValue = "") String password,
+            @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword, Model model) {
         logger.info("GET /register");
-        model.addAttribute("loggedIn", false);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("firstName", firstName);
+        model.addAttribute("lastName", lastName);
+        model.addAttribute("noLastName", noLastName);
+        model.addAttribute("dateOfBirth", dateOfBirth);
+        model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("password", password);
+        model.addAttribute("repeatPassword", repeatPassword);
         return "registrationForm";
     }
 
@@ -170,9 +185,8 @@ public class AccountController {
 
         validationMap.put("emailAddress", InputValidator.validateUniqueEmail(emailAddress));
 
-
         ValidationResult dateOfBirthValidation;
-        if (dateOfBirth == null ) {
+        if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
         } else {
             String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -182,7 +196,6 @@ public class AccountController {
 
         InputValidator.validatePassword(password);
         validationMap.put("password", InputValidator.validatePassword(password));
-
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -262,10 +275,10 @@ public class AccountController {
     /**
      * Handles POST '/verify' requests
      *
-     * @param tokenString  - user's token string
-     * @param emailAddress  - user's email address
-     * @param model        - (map-like) representation of user's input (above
-     *                     parameters)
+     * @param tokenString        - user's token string
+     * @param emailAddress       - user's email address
+     * @param model              - (map-like) representation of user's input (above
+     *                           parameters)
      * @param redirectAttributes - used to pass messages between redirects
      * @return verification page
      */
@@ -290,7 +303,6 @@ public class AccountController {
         return "redirect:/login";
     }
 
-
     /**
      * Gets the login page
      * 
@@ -309,7 +321,7 @@ public class AccountController {
 
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
-        
+
         model.addAttribute("loggedIn", false);
 
         return "loginPage";
