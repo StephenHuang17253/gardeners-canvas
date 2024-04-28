@@ -1,22 +1,25 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
-    <title>Edit Profile</title>
     <link th:href="@{/css/editProfileForm.css}" rel="stylesheet">
     <script th:src="@{/js/editProfileForm.js}"></script>
     <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
-    <script th:src="@{/js/profilePicturePicker.js}"></script>
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <script th:src="@{/js/imagePicker.js}"></script>
 </head>
 
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
     <div class="container">
+        <title>Edit Profile</title>
         <h1>Edit Profile Form</h1>
         <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
 
             <div class="profile_picture_container">
-                <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+                <img id="imageToChange" th:src="@{${profilePicture}}" alt="User's profile picture">
                 <label for="profilePictureInput">+</label>
                 <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
                     onChange="handleFileSelect(event)">

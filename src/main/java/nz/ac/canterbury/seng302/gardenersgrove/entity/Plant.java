@@ -32,6 +32,9 @@ public class Plant {
     @JoinColumn(name = "garden_id",nullable = false)
     private Garden garden;
 
+    @Column
+    private String plantPictureFilename;
+
 
     /**
      * JPA required no-args constructor
@@ -77,7 +80,16 @@ public class Plant {
         return formattedDate;
     }
     public void setPlantDate(LocalDate plantDate) {this.plantDate = plantDate;}
+
     public Garden getGarden() {return garden;}
+
+    public String getPlantPictureFilename() {
+        return this.plantPictureFilename;
+    }
+
+    public void setPlantPictureFilename(String plantPictureFilename) {
+        this.plantPictureFilename = plantPictureFilename;
+    }
     @Override
     public String toString() {
         return "Plant{" +
@@ -86,7 +98,8 @@ public class Plant {
                 ", count='" + plantCount + '\'' +
                 ", description='" + plantDescription + '\'' +
                 ", plant date='" + plantDate + '\'' +
-                ", garden_id='" + garden.getGardenId() + '\'' +
+                ", plant picture filename='" + plantPictureFilename + '\'' +
+                ", garden id='" + garden.getGardenId() + '\'' +
                 '}';
     }
 

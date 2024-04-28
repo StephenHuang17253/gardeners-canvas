@@ -5,7 +5,7 @@ function handleFileSelect(event) {
         const reader = new FileReader();
 
         reader.onload = (e) => {
-            const previewImage = document.getElementById('profilePicture');
+            const previewImage = document.getElementById('imageToChange');
             previewImage.src = e.target.result;
         };
         reader.readAsDataURL(file);

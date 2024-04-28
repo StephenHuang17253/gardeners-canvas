@@ -6,12 +6,15 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -132,16 +135,16 @@ public class GardenFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/create-new-garden")
-    public String submitNewGardenForm( @RequestParam(name="gardenName") String gardenName,
-                                       @RequestParam(name = "streetAddress") String streetAddress,
-                                       @RequestParam(name = "suburb") String suburb,
-                                       @RequestParam(name = "city") String city,
-                                       @RequestParam(name = "country") String country,
-                                       @RequestParam(name = "postcode") String postcode,
-                                       @RequestParam(name = "gardenSize") String gardenSize,
-                                       HttpSession session,
-                                       Model model,
-                                       RedirectAttributes redirectAttributes) {
+    public String submitNewGardenForm(@RequestParam(name="gardenName") String gardenName,
+                                      @RequestParam(name = "streetAddress") String streetAddress,
+                                      @RequestParam(name = "suburb") String suburb,
+                                      @RequestParam(name = "city") String city,
+                                      @RequestParam(name = "country") String country,
+                                      @RequestParam(name = "postcode") String postcode,
+                                      @RequestParam(name = "gardenSize") String gardenSize,
+                                      HttpSession session,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
 
         logger.info("POST /create-new-garden");
 
@@ -295,9 +298,9 @@ public class GardenFormController {
 
         }
         double floatGardenSize;
-        if(gardenSize == null){
+        if (gardenSize == null) {
             floatGardenSize = Double.NaN;
-        }else{
+        } else {
             floatGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
         gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));

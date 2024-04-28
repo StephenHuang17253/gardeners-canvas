@@ -514,7 +514,7 @@ public class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = { "8041", "23020392"})
+    @ValueSource(strings = { "8041", "23020392", "SN6 8TL"})
     public void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode, 10));
     }
@@ -523,7 +523,7 @@ public class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = { "THIS IS NOT A POSTCODE", "8041!@#$"})
+    @ValueSource(strings = { "THIS IS NOT A POSTC*DE", "8041!@#$"})
     public void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
         Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode, 10));
     }

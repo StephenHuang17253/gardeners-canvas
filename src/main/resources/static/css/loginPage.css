@@ -71,7 +71,7 @@ p.error-message {
   justify-content: space-around;
 }
 
-button {
+.user_button {
   margin: 10px;
   padding: 10px 20px;
   background-color: #4CAF50;

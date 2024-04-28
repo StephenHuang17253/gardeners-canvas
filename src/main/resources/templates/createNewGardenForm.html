@@ -8,7 +8,7 @@
     <link th:href="@{/css/form.css}" rel="stylesheet">
 </head>
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('create')"></div>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('create')" th:with="loggedIn=${loggedIn}"></div>
 <div class = main-container>
     <h1>Create New Garden</h1>
     <br>

@@ -15,17 +15,24 @@ Editing content below will change the nav bar on all pages where it is implement
 <nav th:fragment = "navBar(activeParam)" id="navbar">
     <ul>
         <li th:class="${activeParam == 'home' ? 'active' : ''}">
-            <a th:href="@{/landing}">Landing</a>
-        </li>
-        <li th:class="${activeParam == 'home' ? 'active' : ''}">
             <a th:href="@{/home}">Home</a>
         </li>
-        <li th:class="${activeParam == 'create' ? 'active' : ''}">
-            <button id="createGardenBtn" onclick="createGarden()">
+        <li th:class="${activeParam == 'create' ? 'active' : ''}" th:if="${loggedIn == null ? false : loggedIn}">
+            <button id="createGardenBtn" class =  "navBarButton" onclick="createGarden()">
                 <a>Create Garden</a>
             </button>
         </li>
-        <li th:class="${activeParam == 'gardens' ? 'active' : ''}" id = "gardenDropDown">
+        <li th:class="${activeParam == 'register' ? 'active' : ''}" th:if="${loggedIn == null ? true : !loggedIn}">
+            <button id="registerBtn" class =  "navBarButton" onclick="openRegisterPage()">
+                <a>Register</a>
+            </button>
+        </li>
+        <li th:class="${activeParam == 'login' ? 'active' : ''}" th:if="${loggedIn == null ? true : !loggedIn}">
+            <button id="loginBtn" class =  "navBarButton" onclick="openLoginPage()">
+                <a>Login</a>
+            </button>
+        </li>
+        <li th:class="${activeParam == 'gardens' ? 'active' : ''}" th:if="${loggedIn == null ? false : loggedIn}" id = "gardenDropDown" >
             <a th:href="@{/my-gardens}">My Gardens</a>
             <ul>
                 <li th:each="garden : ${userGardens}">
