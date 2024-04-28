@@ -31,9 +31,7 @@ import org.springframework.ui.Model;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -125,10 +123,7 @@ public class AccountController {
     @GetMapping("/register")
     public String registrationForm(Model model) {
         logger.info("GET /register");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn", false);
         return "registrationForm";
     }
 
@@ -259,6 +254,7 @@ public class AccountController {
         }
 
         model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("loggedIn", false);
 
         return "verificationPage";
     }
@@ -313,11 +309,8 @@ public class AccountController {
 
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        
+        model.addAttribute("loggedIn", false);
 
         return "loginPage";
     }
