@@ -63,8 +63,24 @@ public class MyGardensControllerIntegrationTests {
         userService.addUser(user1,"1es1P@ssword");
         userService.addUser(user2,"1es1P@ssword");
         userService.addUser(user3,"1es1P@ssword");
-        Garden garden1 = new Garden("John's Garden", "John's Backyard", 15, user1);
-        Garden garden2 = new Garden("Jane's Garden", "Jane's Backyard", 20, user2);
+        Garden garden1 = new Garden(
+                "John's Garden",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                10,
+                user1);
+        Garden garden2 = new Garden(
+                "Jane's Garden",
+                "20 Kirkwood Avenue",
+                "Upper Riccarton",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                20,
+                user2);
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);
         plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());

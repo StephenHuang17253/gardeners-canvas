@@ -14,7 +14,6 @@ import java.util.List;
 @Service
 public class GardenService {
 
-    @Autowired
     private UserService userService;
 
     /**
@@ -27,8 +26,9 @@ public class GardenService {
      * @param gardenRepository the repository for Gardens
      */
     @Autowired
-    public GardenService(GardenRepository gardenRepository) {
+    public GardenService(GardenRepository gardenRepository, UserService userService) {
         this.gardenRepository = gardenRepository;
+        this.userService = userService;
     }
 
     /**
@@ -94,6 +94,7 @@ public class GardenService {
             targetGarden.setGardenCity(newGardenValues.getGardenCity());
             targetGarden.setGardenPostcode(newGardenValues.getGardenPostcode());
             targetGarden.setGardenCountry(newGardenValues.getGardenCountry());
+            targetGarden.setGardenSize(newGardenValues.getGardenSize());
 
             return gardenRepository.save(targetGarden);
 
@@ -113,6 +114,7 @@ public class GardenService {
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();
             garden.getPlants().add(plant);
+            gardenRepository.save(garden);
         } else {
             throw new IllegalArgumentException("Invalid garden ID");
         }

@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,7 +127,7 @@ public class Garden {
     public double getGardenSize() {
         return gardenSize;
     }
-    public void setGardenSize(float gardenSize) {
+    public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
     public User getOwner() { return owner; }

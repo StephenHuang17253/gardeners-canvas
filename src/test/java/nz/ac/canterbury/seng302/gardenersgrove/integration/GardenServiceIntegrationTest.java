@@ -193,10 +193,10 @@ public class GardenServiceIntegrationTest {
         gardenService.updateGarden(1L, gardenWithUpdatedValues);
         User user = userService.getUserById(1L);
         Garden garden = user.getGardens().get(0);
-        Assertions.assertEquals(user.getGardens().size(), 2);
-        Assertions.assertEquals(garden.getGardenName(), gardenWithUpdatedValues.getGardenName());
-        Assertions.assertEquals(garden.getGardenLocation(), gardenWithUpdatedValues.getGardenLocation());
-        Assertions.assertEquals(garden.getGardenSize(), gardenWithUpdatedValues.getGardenSize());
+        Assertions.assertEquals(2, user.getGardens().size());
+        Assertions.assertEquals(gardenWithUpdatedValues.getGardenName(), garden.getGardenName());
+        Assertions.assertEquals(gardenWithUpdatedValues.getGardenLocation(), garden.getGardenLocation());
+        Assertions.assertEquals(gardenWithUpdatedValues.getGardenSize(), garden.getGardenSize());
     }
 
     @Test
