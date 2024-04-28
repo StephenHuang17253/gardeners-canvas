@@ -28,7 +28,7 @@ public class Garden {
     @Column
     private String gardenCountry;
     @Column
-    private double gardenSize;
+    private float gardenSize;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -53,7 +53,7 @@ public class Garden {
      * @param owner the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, double gardenSize, User owner) {
+                  String gardenPostcode, String gardenCountry, float gardenSize, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -75,7 +75,7 @@ public class Garden {
      * @param gardenSize the size of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, double gardenSize) {
+                  String gardenPostcode, String gardenCountry, float gardenSize) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -124,10 +124,10 @@ public class Garden {
     public void setGardenCountry(String gardenCountry) {
         this.gardenCountry = gardenCountry;
     }
-    public double getGardenSize() {
+    public float getGardenSize() {
         return gardenSize;
     }
-    public void setGardenSize(double gardenSize) {
+    public void setGardenSize(float gardenSize) {
         this.gardenSize = gardenSize;
     }
     public User getOwner() { return owner; }

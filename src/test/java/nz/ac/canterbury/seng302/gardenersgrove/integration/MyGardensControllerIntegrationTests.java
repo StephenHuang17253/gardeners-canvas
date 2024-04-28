@@ -109,21 +109,21 @@ public class MyGardensControllerIntegrationTests {
     @WithAnonymousUser
     public void GetGardenDetailsPage_UserNotAuthenticated_Return403() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1=John's Garden"))
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
     @Test
     @WithMockUser(username = "janeDoe@email.com")
     public void GetGardenDetailsPage_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/4=John's Garden"))
+                .perform(MockMvcRequestBuilders.get("/my-gardens/4"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
     @Test
     @WithMockUser(username = "bruceWyane@email.com")
     public void GetGardenDetailsPage_UserNotAuthorizedAndGardenExists_Return403() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1=John's Garden"))
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
     @Test
@@ -131,7 +131,7 @@ public class MyGardensControllerIntegrationTests {
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExists_Return200() throws Exception {
         Garden garden = gardenList.get(0);
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1=John's Garden"))
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
@@ -143,7 +143,7 @@ public class MyGardensControllerIntegrationTests {
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsWithPlants_Return200() throws Exception {
         Garden garden = gardenList.get(1);
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/2=Jane's Garden"))
+                .perform(MockMvcRequestBuilders.get("/my-gardens/2"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
