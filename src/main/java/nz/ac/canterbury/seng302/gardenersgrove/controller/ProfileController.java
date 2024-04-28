@@ -78,7 +78,7 @@ public class ProfileController {
      */
     public String getProfilePictureString(String filename) {
 
-        String profilePictureString = "/Images/default_profile_picture.png";
+        String profilePictureString = "/images/default_profile_picture.png";
 
         if (filename != null && !filename.isEmpty()) {
             profilePictureString = MvcUriComponentsBuilder
@@ -96,10 +96,10 @@ public class ProfileController {
      * @param filename file to retrieve
      * @return response with the file
      */
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("/files/users/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/" + filename);
+        logger.info("GET /files/users/" + filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
