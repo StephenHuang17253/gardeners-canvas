@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
@@ -23,6 +25,7 @@ import java.util.Optional;
  * Controller for viewing all the created Gardens
  */
 @Controller
+@SessionAttributes("userGardens")
 public class MyGardensController {
 
     Logger logger = LoggerFactory.getLogger(MyGardensController.class);
@@ -42,36 +45,28 @@ public class MyGardensController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
-    public String myGardens() {
+    public String myGardens(Model model, HttpSession session) {
         logger.info("GET /my-gardens");
-
+        session.getAttribute("userGardens");
         return "myGardensPage";
     }
 
     /**
      * Gets all the users created gardens
      * and maps them all and there attributes to the gardenDetailsPage
-     * but with the custom url of /my-gardens/{gardenId}={gardenName}
+     * but with the custom url of /my-gardens/{gardenId}
      *
      * @return thymeleaf createNewGardenForm
      */
-    @GetMapping("/my-gardens/{gardenId}={gardenName}")
+    @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
-                                          @PathVariable String gardenName,
                                           HttpServletResponse response,
                                           Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
+        logger.info("GET /my-gardens/{}-{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-        try {
-            gardenName = URLDecoder.decode(gardenName, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            // Handle URL decoding exception if necessary
-            e.printStackTrace();
-        }
-
-        if (!optionalGarden.isPresent() || !gardenName.equals(optionalGarden.get().getGardenName())) {
+        if (!optionalGarden.isPresent()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }

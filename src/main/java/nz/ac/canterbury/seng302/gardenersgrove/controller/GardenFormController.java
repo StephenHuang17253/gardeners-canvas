@@ -190,26 +190,23 @@ public class GardenFormController {
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
         redirectAttributes.addAttribute("gardenName", gardenName);
 
-        return "redirect:/my-gardens/{gardenId}={gardenName}";
+        return "redirect:/my-gardens/{gardenId}";
     }
 
 
     /**
-     * Maps the editGardenForm html page to /my-gardens/{gardenId}={gardenName}/edit url
+     * Maps the editGardenForm html page to /my-gardens/{gardenId}/edit url
      * @return thymeleaf editGardenForm
      */
-    @GetMapping("/my-gardens/{gardenId}={gardenName}/edit")
+    @GetMapping("/my-gardens/{gardenId}/edit")
     public String editGardenDetails(@PathVariable Long gardenId,
-                                          @PathVariable String gardenName,
                                           HttpServletResponse response,
                                           Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenId, gardenName);
+        logger.info("GET /my-gardens/{}-{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-        //url name might not match the db garden name ie space is %20
-        gardenName = URLDecoder.decode(gardenName, StandardCharsets.UTF_8);
 
-        if (optionalGarden.isEmpty() || !gardenName.equals(optionalGarden.get().getGardenName())) {
+        if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
@@ -231,7 +228,7 @@ public class GardenFormController {
         } else {
             model.addAttribute("gardenSize", gardenSize);
         }
-        return "gardenDetailsPage";
+        return "editGardenForm";
     }
 
 
@@ -251,7 +248,7 @@ public class GardenFormController {
      *              with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
-    @PostMapping("/my-gardens/{gardenId}={gardenName}/edit")
+    @PostMapping("/my-gardens/{gardenId}/edit")
     public String submitEditedGardenForm(@RequestParam(name="gardenName") String gardenName,
                                        @RequestParam(name = "streetAddress") String streetAddress,
                                        @RequestParam(name = "suburb") String suburb,
@@ -304,7 +301,7 @@ public class GardenFormController {
         User owner = securityService.getCurrentUser();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
 
-        return "redirect:/my-gardens/{gardenId}={gardenName}";
+        return "redirect:/my-gardens/{gardenId}";
     }
 
 
