@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
@@ -47,7 +48,6 @@ public class MyGardensController {
     @GetMapping("/my-gardens")
     public String myGardens(Model model, HttpSession session) {
         logger.info("GET /my-gardens");
-        session.getAttribute("userGardens");
         return "myGardensPage";
     }
 

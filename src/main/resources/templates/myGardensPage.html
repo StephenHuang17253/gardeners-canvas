@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
         <title>My Gardens</title>
@@ -23,9 +23,9 @@
             <div class="tableList-table-contain">
                 <div class="tableList-table-count">
                     <br>
-                    <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
+                    <span th:text="${userGardens?.size() ?: 0} + ' Gardens'"> </span>
                 </div>
-                <div th:each="garden : ${session.userGardens}">
+                <div th:each="garden : ${userGardens}">
                     <div th:replace="fragmentExample/fragments/gardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},

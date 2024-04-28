@@ -183,10 +183,14 @@ public class GardenFormController {
         }
         User owner = securityService.getCurrentUser();
         Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, owner);
+
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
+        model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
+        logger.info(String.valueOf(gardenService.getAllUsersGardens(owner.getId())));
         logger.info("Created Garden Page");
+
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
         redirectAttributes.addAttribute("gardenName", gardenName);
 
@@ -298,8 +302,10 @@ public class GardenFormController {
         }
         gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
         logger.info("Edited Garden Page");
+
         User owner = securityService.getCurrentUser();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
+        model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
         return "redirect:/my-gardens/{gardenId}";
     }
