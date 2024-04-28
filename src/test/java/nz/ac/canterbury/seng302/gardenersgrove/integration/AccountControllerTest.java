@@ -1,6 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import nz.ac.canterbury.seng302.gardenersgrove.controller.RegistrationFormController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,21 +13,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class RegistrationFormControllerTest {
+public class AccountControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +34,7 @@ public class RegistrationFormControllerTest {
     private static UserService userServiceMock;
 
     @InjectMocks
-    private static RegistrationFormController registrationFormController;
+    private static AccountController accountController;
 
     @BeforeAll
     public static void setup() {
@@ -54,7 +48,7 @@ public class RegistrationFormControllerTest {
     @Test
     public void controllerLoads()
     {
-        assertNotNull(registrationFormController);
+        assertNotNull(accountController);
     }
 
     @Test

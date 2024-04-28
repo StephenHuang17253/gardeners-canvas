@@ -122,8 +122,12 @@ public class AccountController {
      * @return registration form
      */
     @GetMapping("/register")
-    public String registrationForm() {
+    public String registrationForm(Model model) {
         logger.info("GET /register");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
         return "registrationForm";
     }
 
@@ -312,6 +316,11 @@ public class AccountController {
 
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         return "loginPage";
     }
