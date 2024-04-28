@@ -29,7 +29,7 @@ Editing content below will change the nav bar on all pages where it is implement
             <a th:href="@{/my-gardens}">My Gardens</a>
             <ul>
                 <li th:each="garden : ${session.userGardens}">
-                    <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${garden.getGardenId}, gardenName=${garden.getGardenName})}">
+                    <a th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}">
                         <span th:text="${garden.getGardenName}">Garden Name</span>
                     </a>
                 </li>

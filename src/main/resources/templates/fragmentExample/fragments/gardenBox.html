@@ -1,5 +1,5 @@
 <div th:fragment="gardenBox(gardenId, gardenName, gardenLocation, gardenSize, numberOfPlants)">
-    <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${gardenId}, gardenName=${gardenName})}" style="text-decoration: none;">
+    <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}" style="text-decoration: none;">
         <div class="gardenbox" id="gardenbox">
             <div class="garden-details">
                 <span th:text="${gardenName}" class="garden-name"></span>
