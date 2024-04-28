@@ -70,7 +70,7 @@ public class SecurityConfiguration {
                 // Allow "/", "/register", and "/login" to anyone (permitAll)
 
                 request.requestMatchers("/", "/register", "/login", "/home", "/static/**", "/css/**", "/js/**",
-                        "/Images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**")
+                        "/images/**", "/Images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**")
                         .permitAll()
                         // Any other request requires authentication
                         .anyRequest()

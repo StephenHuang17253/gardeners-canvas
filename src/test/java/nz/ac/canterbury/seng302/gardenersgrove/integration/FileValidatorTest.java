@@ -21,7 +21,7 @@ public class FileValidatorTest {
     private static FileType fileType = FileType.IMAGES;
 
     @BeforeAll
-    private static void setUp() {
+    public static void setUp() {
 
         String validFilename = "client_filename.png";
         String invalidFilename = "filename.txt";

@@ -5,6 +5,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,12 @@ public class UserService {
      */
     public User getUserByEmailAndPassword(String email, String password) {
         User[] users = userRepository.findByEmailAddress(email);
+        if (users.length == 0) {
+            return null;
+        }
+        User user = users[0];
+        if (passwordEncoder.matches(password, user.getEncodedPassword()) || Objects.equals(password, user.getEncodedPassword())) {
+            return user;
         if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
             logger.info(users[0].toString());
             return users[0];
@@ -103,17 +110,17 @@ public class UserService {
 
     /**
      * Takes a user instance and copies the fields to the user with the given id
-     * 
-     * @param newUser
+     *
      * @param id
+     * @return
      */
-    public void updateUser(long id, String firstName, String lastName, String emailAddress, LocalDate dateOfBirth) {
+    public User updateUser(long id, String firstName, String lastName, String emailAddress, LocalDate dateOfBirth) {
         User user = getUserById(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmailAddress(emailAddress);
         user.setDateOfBirth(dateOfBirth);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     /**
