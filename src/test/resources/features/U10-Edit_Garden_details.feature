@@ -37,9 +37,10 @@ Background:
       | "sgsha!asdksad"   |
       | "nowhereçua§il"   |
       | "louois_hobson!"  |
-      | "[Alexandra"]     |
+      | "[Alexandra]"     |
       | "Clone #12"       |
-      |                   |
+      | " "               |
+      | ""                |
 
   Scenario Outline: AC4 - can't submit invalid size
     Given I am on the garden edit form
