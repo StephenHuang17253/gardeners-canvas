@@ -9,6 +9,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,9 +139,208 @@ public class PlantFormControllerTest {
                         .param("gardenId", String.valueOf(1L)))
                 .andDo(MockMvcResultHandlers.print());
         Mockito.verify(plantService, Mockito.times(1)).updatePlant(1L, "test", 1.0F, "test", date);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "!, 1, test description, 2024-03-28",
+            "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length, 1, test description, 2024-03-28",
+            "'', 1, test description, 2024-03-28"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_addNameVariantsFail(String plantName, int plantCount, String plantDescription, LocalDate date) throws Exception {
+        Plant mockPlant = Mockito.spy(Plant.class);
+        when(mockPlant.getPlantId()).thenReturn(1L);
+        String gardenId = "1";
+        String gardenName = "test";
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/create-new-plant", gardenId, gardenName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService, Mockito.never()).addPlant(plantName, plantCount, plantDescription, date, Long.parseLong(gardenId));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "!",
+            "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length",
+            "''"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_editNameVariantsFail(String plantName) throws Exception {
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        int plantCount = 1;  // Standard count for testing
+        LocalDate date = LocalDate.of(2024, 3, 28);
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService, Mockito.never()).updatePlant(
+                Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, date);
 
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "!",
+            "a very long plant that exceeds the maximum length" +
+                    "a very long plant that exceeds the maximum length" +
+                    "a very long plant that exceeds the maximum length" +
+                    "a very long plant that exceeds the maximum length" +
+                    "a very long plant that exceeds the maximum length",
+            "''"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_editDescriptionVariantsFail(String plantName) throws Exception {
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        int plantCount = 1;  // Standard count for testing
+        LocalDate date = LocalDate.of(2024, 3, 28);
 
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantDescription)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantName)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService, Mockito.never()).updatePlant(
+                Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, date);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "-1", "0", "-1.0", "a", "!", "{}"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantName = "test name";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        LocalDate date = LocalDate.of(2024, 3, 28);
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", plantCount)
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        // try catch for different input types
+        try {
+            Float.parseFloat(plantCount);
+            Mockito.verify(plantService, Mockito.never()).updatePlant(
+                    Long.parseLong(plantId), plantName, Float.parseFloat(plantCount), plantDescription, date);
+        } catch (NumberFormatException e) {
+            // If plant count is non numeric it will throw an error and won't interact with plantService anyway
+            Mockito.verifyNoInteractions(plantService);
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "plant name", "PLANT NAME", "plantName", "c00l pl4nt", "this, is. a-real_plant"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_editNameVariantsPass(String plantName) throws Exception {
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        int plantCount = 1;
+        LocalDate date = LocalDate.of(2024, 3, 28);
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService,  Mockito.times(1)).updatePlant(
+                Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, date);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "plant description", "PLANT", "plantDescription", "c00l pl4nt", "this, is. a-real_plant"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantId = "1";
+        String plantName = "standardPlant";
+        int plantCount = 1;  // Standard count for testing
+        LocalDate date = LocalDate.of(2024, 3, 28);
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService, Mockito.times(1)).updatePlant(
+                Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, date);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1", "1.0", "9999", "0.1", "9987.123"
+    })
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    public void plantFormController_editCountVariantsPass(String plantCount) throws Exception {
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantName = "test name";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        LocalDate date = LocalDate.of(2024, 3, 28);
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", plantCount)
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", date.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+
+        Float.parseFloat(plantCount);
+        Mockito.verify(plantService, Mockito.times(1)).updatePlant(
+                Long.parseLong(plantId), plantName, Float.parseFloat(plantCount), plantDescription, date);
+    }
 
 }
