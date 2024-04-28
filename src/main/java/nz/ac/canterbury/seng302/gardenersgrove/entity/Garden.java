@@ -136,24 +136,35 @@ public class Garden {
     }
 
     /**
-     * Retrieves the concatenated string of the garden location
+     * Retrieves a garden's location which is a concatenation of its address components.
      *
-     * @return garden location string in the format: <address>, <suburb>, <city> <postcode>, <country>
+     * @return garden location string in the format: {address}, {suburb}, {city} {postcode}, {country}
      */
     public String getGardenLocation() {
         // Concatenate address components to form the complete location string
-        StringBuilder locationBuilder = new StringBuilder();
-        locationBuilder.append(gardenAddress); // Add address
-        locationBuilder.append(", "); // Add comma and space
-        locationBuilder.append(gardenSuburb); // Add suburb
-        locationBuilder.append(", "); // Add comma and space
-        locationBuilder.append(gardenPostcode); // Add postcode
-        locationBuilder.append(", "); // Add comma and space
-        locationBuilder.append(gardenCity); // Add city
-        locationBuilder.append(", "); // Add comma and space
-        locationBuilder.append(gardenCountry); // Add country
+        String locationString = "";
+        if (!gardenAddress.isBlank()) {
+            locationString += gardenAddress + ", ";
+        }
+        if (!gardenSuburb.isBlank()) {
+            locationString += gardenSuburb + ", ";
+        }
+        if (!gardenCity.isBlank()) {
+            locationString += gardenCity;
+            if (gardenPostcode.isBlank()) {
+                locationString += ", ";
+            } else {
+                locationString += " ";
+            }
+        }
+        if (!gardenPostcode.isBlank()) {
+            locationString += gardenPostcode + ", ";
+        }
+        if (!gardenCountry.isBlank()) {
+            locationString += gardenCountry;
+        }
 
-        return locationBuilder.toString();
+        return locationString;
     }
     @Override
     public String toString() {

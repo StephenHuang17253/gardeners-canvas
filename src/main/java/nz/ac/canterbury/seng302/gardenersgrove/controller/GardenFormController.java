@@ -143,30 +143,9 @@ public class GardenFormController {
                                        Model model,
                                        RedirectAttributes redirectAttributes) {
 
-        logger.info("POST /landingPage");
-        //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
+        logger.info("POST /create-new-garden");
 
-        String locationValues = "";
-        if (!streetAddress.isBlank()) {
-            locationValues += streetAddress + ", ";
-        }
-        if (!suburb.isBlank()) {
-            locationValues += suburb + ", ";
-        }
-        if (!city.isBlank()) {
-            locationValues += city;
-            if (postcode.isBlank()) {
-                locationValues += ", ";
-            } else {
-                locationValues += " ";
-            }
-        }
-        if (!postcode.isBlank()) {
-            locationValues += postcode + ", ";
-        }
-        if (!country.isBlank()) {
-            locationValues += country;
-        }
+        // logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
@@ -174,7 +153,6 @@ public class GardenFormController {
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
-
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
         gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
@@ -284,29 +262,8 @@ public class GardenFormController {
                                        @PathVariable Long gardenId, HttpSession session,
                                        Model model) {
         logger.info("POST / edited garden");
-        //logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
+        // logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
 
-        String locationValues = "";
-        if (!streetAddress.isBlank()) {
-            locationValues += streetAddress + ", ";
-        }
-        if (!suburb.isBlank()) {
-            locationValues += suburb + ", ";
-        }
-        if (!city.isBlank()) {
-            locationValues += city;
-            if (postcode.isBlank()) {
-                locationValues += ", ";
-            } else {
-                locationValues += " ";
-            }
-        }
-        if (!postcode.isBlank()) {
-            locationValues += postcode + ", ";
-        }
-        if (!country.isBlank()) {
-            locationValues += country;
-        }
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
