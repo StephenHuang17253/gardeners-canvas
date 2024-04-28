@@ -223,10 +223,6 @@ public class ProfileController {
         }
 
         if (!profilePictureValidation.valid()) {
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
             model.addAttribute("profilePictureError", profilePictureValidation);
             String userName = user.getFirstName() + " " + user.getLastName();
             model.addAttribute("userName", userName);

@@ -76,8 +76,10 @@ public class UserService {
             return null;
         }
         User user = users[0];
-        if (passwordEncoder.matches(password, user.getEncodedPassword()) || Objects.equals(password, user.getEncodedPassword())) {
+        if (passwordEncoder.matches(password, user.getEncodedPassword())
+                || Objects.equals(password, user.getEncodedPassword())) {
             return user;
+        }
         if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
             logger.info(users[0].toString());
             return users[0];
