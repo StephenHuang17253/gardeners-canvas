@@ -13,53 +13,53 @@ Background:
 
   Scenario Outline: AC2 can submit valid values
     Given I am on the garden edit form
-    And  I enter valid garden values for the "<name>", "<city>", "<country>" and "<size>"
+    And  I enter valid garden values for the <name>, <city>, <country> and <size>
     When I click the Submit button on the edit garden form
     Then The garden details have been updated
     And I am taken back to the garden details page
     Examples:
-      | name          | city            | country      | size     |
-      | gard          | Townsville      | France       | 7        |
-      | ward          | Läkeside        | Switzerland  | 15       |
-      | Everywhere    | Rivèrdale       | Italy        | 7.9      |
-      | ward          | Hílltop         | Spain        | 7.9      |
-      | ward-connect  | Súnset City     | Brazil       | 7.9      |
-      | ward-cÁÕăect  | Ocëanview       | Portugal     | 0.1      |
+      | name            | city            | country        | size       |
+      | "gard"          | "Townsville"    | "France"       | "7"        |
+      | "ward"          | "Läkeside"      | "Switzerland"  | "15"       |
+      | "Everywhere"    | "Rivèrdale"     | "Italy"        | "7.9"      |
+      | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
+      | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
     Given I am on the garden edit form
-    And I enter an invalid garden name value "<Name>"
+    And I enter an invalid garden name value <Name>
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
-      | Name            |
-      | 13@fifty_laner  |
-      | sgsha!asdksad   |
-      | nowhereçua§il   |
-      | louois_hobson!  |
-      | [Alexandra]     |
-      | Clone #12       |
-      |                 |
+      | Name              |
+      | "13@fifty_laner"  |
+      | "sgsha!asdksad"   |
+      | "nowhereçua§il"   |
+      | "louois_hobson!"  |
+      | "[Alexandra"]     |
+      | "Clone #12"       |
+      |                   |
 
   Scenario Outline: AC4 - can't submit invalid size
     Given I am on the garden edit form
-    And I enter an invalid garden size value "<size>"
+    And I enter an invalid garden size value <size>
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
-      | size            |
-      | 13@fifty_laner  |
-      | sgsha!asdksad   |
-      | nowhereçua§il   |
-      | 12.6.5          |
-      | six             |
-      | 12,4.3          |
-      | Null            |
+      | size              |
+      | "13@fifty_laner"  |
+      | "sgsha!asdksad"   |
+      | "nowhereçua§il"   |
+      | "12.6.5"          |
+      | "six"             |
+      | "12,4.3"          |
+      | "Null"            |
 
 
   Scenario Outline: AC5 - cannot submit invalid location
     Given I am on the garden edit form
-    And I enter invalid garden location values "<City>", "<Country>"
+    And I enter invalid garden location values <City>, <Country>
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:

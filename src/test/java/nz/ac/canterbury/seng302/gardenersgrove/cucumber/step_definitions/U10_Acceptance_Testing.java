@@ -210,7 +210,7 @@ public class U10_Acceptance_Testing {
         Assertions.assertEquals(expectedGarden.getGardenCountry(), updatedGarden.getGardenCountry());
         Assertions.assertEquals(expectedGarden.getGardenSize(), updatedGarden.getGardenSize());
     }
-    @When("I enter invalid garden location values {string} {string}")
+    @Given("I enter invalid garden location values {string}, {string}")
     public void i_enter_invalid_garden_location_values(String city, String country) {
         gardenCity = city;
         gardenCountry = country;
