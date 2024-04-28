@@ -37,13 +37,13 @@
                     <span th:text="${totalPlants} + ' Plants'"> # Plants </span>
                 </div>
                 <div th:each="plant : ${plants}">
-                    <div th:replace="fragmentExample/fragments/plantBox.html :: plantBox(
-                        plantId=${plant.getPlantId},
-                        plantName=${plant.getPlantName},
-                        plantCount=${plant.getPlantCount},
-                        plantDescription=${plant.getPlantDescription},
-                        plantDate=${plant.getFormattedPlantDate},
-                        plantPicture=${plant.getPlantPictureFilename})">
+                    <div th:replace="~{fragmentExample/fragments/plantBox.html :: plantBox(
+                        plantId=${plant.getPlantId()},
+                        plantName=${plant.getPlantName()},
+                        plantCount=${plant.getPlantCount()},
+                        plantDescription=${plant.getPlantDescription()},
+                        plantDate=${plant.getFormattedPlantDate()},
+                        plantPicture=${plant.getPlantPictureFilename()})}">
                     </div>
                 </div>
             </div>

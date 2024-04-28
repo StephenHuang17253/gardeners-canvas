@@ -106,10 +106,10 @@ public class MyGardensController {
      * @param model the model
      * @return thymeleaf gardenDetails
      */
-    @PostMapping("/my-gardens/{gardenId}={gardenName}/update/plantid-{plantId}")
+    @PostMapping("/my-gardens/{gardenId}={gardenName}")
     public String updatePlantImage(@PathVariable("gardenId") String gardenIdString,
                                    @PathVariable String gardenName,
-                                   @PathVariable String plantId,
+                                   @RequestParam("plantId") String plantId,
                                    @RequestParam("plantPictureInput") MultipartFile plantPicture,
                                    Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenIdString, gardenName);
@@ -118,8 +118,8 @@ public class MyGardensController {
         Optional<Garden> optionalGarden = gardenService.findById(gardenId);
         model.addAttribute("myGardens", gardenService.getGardens());
 
-        Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong(plantId));
-        model.addAttribute("plantToEditId", Long.parseLong(plantId));
+        Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));
+        model.addAttribute("plantToEditId", (Long.parseLong(plantId)));
         if(!plantToUpdate.isPresent())
         {
             return "404";
@@ -135,10 +135,9 @@ public class MyGardensController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        if (optionalGarden.isPresent() & !plantPictureResult.valid()) {
-            logger.info("Plant picture validation failed");
+        if (optionalGarden.isPresent()) {
+
             Garden garden = optionalGarden.get();
-            model.addAttribute("plantPictureError", plantPictureResult);
             String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
             model.addAttribute("plantPicture", plantPictureString);
             model.addAttribute("gardenName", garden.getGardenName());
@@ -147,10 +146,16 @@ public class MyGardensController {
             model.addAttribute("gardenId",gardenIdString);
             model.addAttribute("plants",garden.getPlants());
             model.addAttribute("totalPlants",garden.getPlants().size());
-            return "gardenDetailsPage";
+        } else {
+            return "404";
         }
 
-        if (plantPictureResult.valid()) {
+        if (!plantPictureResult.valid()) {
+            logger.info("Plant picture validation failed");
+            model.addAttribute("plantPictureError", plantPictureResult);
+            return "gardenDetailsPage";
+
+        } else {
 
             if (!plantPicture.isEmpty()) {
                 logger.info("Updating plant picture");
@@ -159,9 +164,8 @@ public class MyGardensController {
             logger.info("Plant updated successfully");
 
             return "redirect:/my-gardens/{gardenId}={gardenName}";
-        } else {
-            return "404";
         }
+
     }
 
     /**

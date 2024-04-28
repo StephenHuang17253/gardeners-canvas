@@ -3,12 +3,12 @@
         <div class="plant-info">
             <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
 
-            <form th:action="@{/my-gardens/{gardenId}={gardenName}/update/plantid-{plantId}
-            (gardenId=${gardenId}, gardenName=${gardenName}, plantId=${plantId})}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/my-gardens/__${gardenId}__=__${gardenName}__}" method="post" enctype="multipart/form-data">
             <div class="plant_picture_container small_pic">
                 <img id="imageToChange" th:src="${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}"
                      alt="Plant Image" class="plant-image">
                 <label for="plantPictureInput">+</label>
+                <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden"/>
                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                        onChange="handleFileSelect(event); this.form.submit()">
             </div>
