@@ -221,7 +221,7 @@ public class GardenFormController {
      * @return thymeleaf editGardenForm
      */
     @GetMapping("/my-gardens/{gardenId}={gardenName}/edit")
-    public ModelAndView editGardenDetails(@PathVariable Long gardenId,
+    public String editGardenDetails(@PathVariable Long gardenId,
                                           @PathVariable String gardenName,
                                           HttpServletResponse response,
                                           Model model) {
@@ -233,12 +233,12 @@ public class GardenFormController {
 
         if (optionalGarden.isEmpty() || !gardenName.equals(optionalGarden.get().getGardenName())) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return new ModelAndView("404");
+            return "404";
         }
         Garden garden = optionalGarden.get();
         if(!securityService.isOwner(garden.getOwner().getId())){
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return new ModelAndView("403");
+            return "403";
         }
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("streetAddress", garden.getGardenAddress());
@@ -253,7 +253,7 @@ public class GardenFormController {
         } else {
             model.addAttribute("gardenSize", gardenSize);
         }
-        return new ModelAndView("gardenDetailsPage");
+        return "gardenDetailsPage";
     }
 
 

@@ -13,7 +13,7 @@ Background:
 
   Scenario Outline: AC2 can submit valid values
     Given I am on the garden edit form
-    And  I enter valid values for the "<name>", "<city>", "<country>" and "<size>"
+    And  I enter valid garden values for the "<name>", "<city>", "<country>" and "<size>"
     When I click the Submit button on the edit garden form
     Then The garden details have been updated
     And I am taken back to the garden details page
