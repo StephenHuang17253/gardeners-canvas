@@ -70,7 +70,7 @@ public class ViewGarden {
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .get("/my-gardens/{gardenId}={gardenName}", gardenId, gardenName)
+                        .get("/my-gardens/{gardenId}", gardenId)
         ).andExpect(MockMvcResultMatchers.status().isOk());
         
     }

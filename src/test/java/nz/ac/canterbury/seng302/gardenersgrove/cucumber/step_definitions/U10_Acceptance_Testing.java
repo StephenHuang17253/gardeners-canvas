@@ -106,11 +106,14 @@ public class U10_Acceptance_Testing {
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
+        this.gardenName = gardenName;
+        gardenCity = garden.getGardenCity();
+        gardenCountry = garden.getGardenCountry();
     }
 
     @When("I click the edit garden button")
     public void iClickTheEditGardenButton() throws Exception {
-        String gardenUrl = String.format("/my-gardens/%d=%s/edit", expectedGarden.getGardenId(), expectedGarden.getGardenName());
+        String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
         editGardenResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(gardenUrl)
@@ -129,7 +132,7 @@ public class U10_Acceptance_Testing {
 
     @Given("I am on the garden edit form")
     public void i_am_on_the_garden_edit_form() throws Exception {
-        String gardenUrl = String.format("/my-gardens/%d=%s/edit", expectedGarden.getGardenId(), expectedGarden.getGardenName());
+        String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
         editGardenResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(gardenUrl)
@@ -154,71 +157,73 @@ public class U10_Acceptance_Testing {
         gardenSize = size;
     }
 
-    @When("I enter a size using a comma")
-    public void i_enter_a_size_using_a_comma() {
-        gardenSize = "3,9";
-    }
-
-    @When("I enter an invalid name value {string}")
-    public void i_enter_an_invalid_name_value_for_the(String string) {
-        gardenName = string;
-    }
-
-    @When("I enter an invalid location value {string}")
-    public void i_enter_an_invalid_location_value_for_the(String string) {
-        gardenCity = string;
-    }
-
-    @When("I enter an invalid size value {string}")
-    public void i_enter_an_invalid_size_value_for_the(String string) {
-        gardenSize = string;
-    }
-
     @When("I click the Submit button on the edit garden form")
     public void i_click_the_submit_button_on_the_edit_plant_form() throws Exception {
-        String gardenUrl = String.format("/my-gardens/%d=%s/edit", gardenCity, gardenName);
-        MOCK_MVC.perform(
+        String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
+        editGardenResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
-                        .param("gardenSize", gardenSize)
                         .param("streetAddress", "")
                         .param("suburb", "")
                         .param("city", gardenCity)
                         .param("country", gardenCountry)
                         .param("postcode", "")
-                        .param("size", gardenSize) // must be present, but is overridden immediately in controller
+                        .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
 
-        );
+        ).andReturn();
     }
-//
-//    @Then("The garden details have been updated")
-//    public void the_garden_details_have_been_updated() {
-//        Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(gardenId);
-//        if (optionalUpdatedGarden.isEmpty()) {
-//            Assertions.fail();
-//            return;
-//        }
-//        Garden updatedGarden = optionalUpdatedGarden.get();
-//        Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
-//        Assertions.assertTrue(updatedGarden.getGardenLocation().contains(gardenLocation));
-//        Assertions.assertEquals(Float.parseFloat(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
-//        Assertions.assertEquals(gardenPostCode, updatedGarden.getGardenPostcode());
-//    }
-//
-//    @Then("The garden details are not updated")
-//    public void the_garden_details_are_not_updated() {
-//        Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(gardenId);
-//        if (optionalUpdatedGarden.isEmpty()) {
-//            Assertions.fail();
-//            return;
-//        }
-//        Garden updatedGarden = optionalUpdatedGarden.get();
-//        Assertions.assertEquals(initialGardenName, updatedGarden.getGardenName());
-//        Assertions.assertEquals(initialGardenLocation, updatedGarden.getGardenLocation());
-//        Assertions.assertEquals(Float.parseFloat(initialGardenSize.replace(",", ".")), updatedGarden.getGardenSize());
-//        Assertions.assertEquals(initialGardenPostCode, updatedGarden.getGardenPostcode());
-//    }
+    @Then("The garden details have been updated")
+    public void the_garden_details_have_been_updated() {
+        Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
+        if (optionalUpdatedGarden.isEmpty()) {
+            Assertions.fail();
+            return;
+        }
+        Garden updatedGarden = optionalUpdatedGarden.get();
+        Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
+        Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
+        Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
+        Assertions.assertEquals(Float.parseFloat(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
+    }
+
+    @Then("I am taken back to the garden details page")
+    public void i_am_taken_back_to_the_garden_details_page(){
+        String redirectedUrl = editGardenResult.getResponse().getRedirectedUrl();
+        Assertions.assertEquals(String.format("/my-gardens/%d", expectedGarden.getGardenId()), redirectedUrl);
+
+    }
+    @When("I enter an invalid garden name value {string}")
+    public void i_enter_an_invalid_garden_name_value(String string) {
+        gardenName = string;
+    }
+    @Then("The garden details are not updated")
+    public void the_garden_details_are_not_updated() {
+        Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
+        if (optionalUpdatedGarden.isEmpty()) {
+            Assertions.fail();
+            return;
+        }
+        Garden updatedGarden = optionalUpdatedGarden.get();
+        Assertions.assertEquals(expectedGarden.getGardenName(), updatedGarden.getGardenName());
+        Assertions.assertEquals(expectedGarden.getGardenCity(), updatedGarden.getGardenCity());
+        Assertions.assertEquals(expectedGarden.getGardenCountry(), updatedGarden.getGardenCountry());
+        Assertions.assertEquals(expectedGarden.getGardenSize(), updatedGarden.getGardenSize());
+    }
+    @When("I enter invalid garden location values {string} {string}")
+    public void i_enter_invalid_garden_location_values(String city, String country) {
+        gardenCity = city;
+        gardenCountry = country;
+    }
+    @When("I enter an invalid garden size value {string}")
+    public void i_enter_an_invalid_garden_size_value_for_the(String string) {
+        gardenSize = string;
+    }
+
+    @When("I enter {float} as a size")
+    public void i_enter_a_size_using_a_comma(float size) {
+        gardenSize = String.valueOf(size);
+    }
 
 }
 

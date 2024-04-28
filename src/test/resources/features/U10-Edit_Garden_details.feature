@@ -43,7 +43,7 @@ Background:
 
   Scenario Outline: AC4 - can't submit invalid size
     Given I am on the garden edit form
-    And I enter an invalid size value "<size>"
+    And I enter an invalid garden size value "<size>"
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
@@ -57,16 +57,17 @@ Background:
       | Null            |
 
 
-  Scenario Outline: AC5 - cant submit invalid location
+  Scenario Outline: AC5 - cannot submit invalid location
     Given I am on the garden edit form
-    And I enter an invalid location values "<city>" "<Country>"
+    And I enter invalid garden location values "<City>", "<Country>"
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
-      | inv_location   |
-      | 13@fifty_laner |
-      | sgsha!asdksad  |
-      | nowhereçua§il  |
+      | City            | Country         |
+      | "a"             | "a"             |
+      | "13@fifty_laner"| "sgsha!asdksad" |
+      | "nowhereçua§i?" | "a"             |
+
 
 
   Scenario: AC6 - can enter a size with a comma instead of full stop
