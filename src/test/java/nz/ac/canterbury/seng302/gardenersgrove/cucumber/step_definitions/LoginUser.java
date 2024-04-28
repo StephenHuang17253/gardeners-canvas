@@ -71,7 +71,7 @@ public class LoginUser {
                         .post("/login")
                         .param("email", userEmail)
                         .param("password", userPassword)
-        ).andExpect(MockMvcResultMatchers.redirectedUrl("/landing"));
+        ).andExpect(MockMvcResultMatchers.redirectedUrl("/home"));
     }
 
 }
