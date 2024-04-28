@@ -40,7 +40,9 @@ public class TokenService {
     }
 
     public Token getTokenByTokenString(String tokenString) {
-        return tokenRepository.findByTokenString(tokenString);
+        String capitalisedTokenString = tokenString.toUpperCase();
+        logger.info(capitalisedTokenString);
+        return tokenRepository.findByTokenString(capitalisedTokenString);
     }
     
     public List<Token> getAllTokens() {

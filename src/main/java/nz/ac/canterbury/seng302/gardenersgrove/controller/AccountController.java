@@ -50,7 +50,7 @@ public class AccountController {
 
     // For development to avoid sending signup emails but print the signup token to
     // the terminal instead, set to true or remove for production
-    private final boolean SEND_EMAIL = false;
+    private final boolean SEND_EMAIL = true;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
@@ -95,21 +95,25 @@ public class AccountController {
         }
     }
 
+    /**
+     * For the given email address if there is an existing unverified user whose
+     * token has expired, delete them and their associated token
+     * 
+     * @param emailAddress the email address of the user
+     */
     public void removeIfExpired(String emailAddress) {
-        return;
-        // User existingUser = userService.getUserByEmail(emailAddress);
+        
+        User existingUser = userService.getUserByEmail(emailAddress);
 
-        // // For the given email address if there is an existing unverified user whose
-        // // token has expired, delete them and their associated token
-        // if (existingUser != null && !existingUser.isVerified()) {
+        if (existingUser != null && !existingUser.isVerified()) {
 
-        //     Token token = tokenService.getTokenByUser(existingUser);
+            Token token = tokenService.getTokenByUser(existingUser);
 
-        //     if (token != null && token.isExpired()) {
-        //         userService.deleteUser(existingUser);
-        //         tokenService.deleteToken(token);
-        //     }
-        // }
+            if (token != null && token.isExpired()) {
+                userService.deleteUser(existingUser);
+                tokenService.deleteToken(token);
+            }
+        }
     }
 
     /**
@@ -309,9 +313,6 @@ public class AccountController {
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
 
-        User user = userService.getUserByEmail("lachiestewart2003@gmail.com");
-        logger.info(user.toString());
-
         return "loginPage";
     }
 
@@ -325,12 +326,6 @@ public class AccountController {
     public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
             @RequestParam String password, Model model) {
         logger.info("POST /login");
-
-        logger.info(emailAddress);
-
-        User user3 = userService.getUserByEmail(emailAddress);
-
-        logger.info(user3.toString());
 
         removeIfExpired(emailAddress);
 
