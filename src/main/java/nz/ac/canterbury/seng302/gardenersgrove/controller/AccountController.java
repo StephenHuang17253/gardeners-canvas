@@ -95,6 +95,23 @@ public class AccountController {
         }
     }
 
+    public void removeIfExpired(String emailAddress) {
+        return;
+        // User existingUser = userService.getUserByEmail(emailAddress);
+
+        // // For the given email address if there is an existing unverified user whose
+        // // token has expired, delete them and their associated token
+        // if (existingUser != null && !existingUser.isVerified()) {
+
+        //     Token token = tokenService.getTokenByUser(existingUser);
+
+        //     if (token != null && token.isExpired()) {
+        //         userService.deleteUser(existingUser);
+        //         tokenService.deleteToken(token);
+        //     }
+        // }
+    }
+
     /**
      * handles GET '/register' requests
      *
@@ -145,19 +162,7 @@ public class AccountController {
         }
         validationMap.put("lastName", lastNameValidation);
 
-        User existingUser = userService.getUserByEmail(emailAddress);
-
-        // For the given email address if there is an existing unverified user whose
-        // token has expired, delete them and their associated token
-        if (existingUser != null && !existingUser.isVerified()) {
-
-            Token token = tokenService.getTokenByUser(existingUser);
-
-            if (token != null && token.isExpired()) {
-                userService.deleteUser(existingUser);
-                tokenService.deleteToken(token);
-            }
-        }
+        removeIfExpired(emailAddress);
 
         validationMap.put("emailAddress", InputValidator.validateUniqueEmail(emailAddress));
 
@@ -229,11 +234,18 @@ public class AccountController {
         }
 
         return "redirect:/verify/" + user.getEmailAddress();
-
     }
 
+    /**
+     * Handles GET '/verify/{emailAddress}' requests
+     *
+     * @param emailAddress - user's email address
+     * @param model        - (map-like) representation of user's input (above
+     *                     parameters)
+     * @return verification page
+     */
     @GetMapping("/verify/{emailAddress}")
-    public String verifyEmail(@PathVariable String emailAddress, Model model, HttpServletRequest request) {
+    public String getVerify(@PathVariable String emailAddress, Model model, HttpServletRequest request) {
         logger.info("GET /verify");
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
@@ -246,8 +258,18 @@ public class AccountController {
         return "verificationPage";
     }
 
+    /**
+     * Handles POST '/verify' requests
+     *
+     * @param tokenString  - user's token string
+     * @param emailAddress  - user's email address
+     * @param model        - (map-like) representation of user's input (above
+     *                     parameters)
+     * @param redirectAttributes - used to pass messages between redirects
+     * @return verification page
+     */
     @PostMapping("/verify")
-    public String verifyEmailPost(@RequestParam(name = "tokenString") String tokenString,
+    public String postVerify(@RequestParam(name = "tokenString") String tokenString,
             @RequestParam(name = "emailAddress") String emailAddress, Model model,
             RedirectAttributes redirectAttributes) {
         logger.info("POST /verify");
@@ -287,6 +309,9 @@ public class AccountController {
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
 
+        User user = userService.getUserByEmail("lachiestewart2003@gmail.com");
+        logger.info(user.toString());
+
         return "loginPage";
     }
 
@@ -301,19 +326,13 @@ public class AccountController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        User existingUser = userService.getUserByEmail(emailAddress);
+        logger.info(emailAddress);
 
-        // For the given email address if there is an existing unverified user whose
-        // token has expired, delete them and their associated token
-        if (existingUser != null && !existingUser.isVerified()) {
+        User user3 = userService.getUserByEmail(emailAddress);
 
-            Token token = tokenService.getTokenByUser(existingUser);
+        logger.info(user3.toString());
 
-            if (token != null && token.isExpired()) {
-                userService.deleteUser(existingUser);
-                tokenService.deleteToken(token);
-            }
-        }
+        removeIfExpired(emailAddress);
 
         ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
 
