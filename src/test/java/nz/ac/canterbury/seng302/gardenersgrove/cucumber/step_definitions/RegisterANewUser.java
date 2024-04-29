@@ -8,7 +8,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.RegistrationFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
@@ -42,7 +41,14 @@ public class RegisterANewUser {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
+    public TokenService tokenService;
+
+    @Autowired
+    public EmailService emailService;
+
     public static UserService userService;
+
 
 
 
@@ -57,9 +63,9 @@ public class RegisterANewUser {
     @Given("i am on the registration page")
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
-        RegistrationFormController registrationFormController = new RegistrationFormController(userService, authenticationManager);
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(registrationFormController).build();
+        MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
     @Given("There exists a user with email {string}")
