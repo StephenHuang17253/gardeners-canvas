@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +115,7 @@ public class EmailService {
      * @param baseURL url to build link to reset password page
      */
     public void sendResetPasswordEmail(Token token, String baseURL) throws MessagingException {
+        logger.info("Sending reset password email to "+token.getUser().getEmailAddress());
         String subject = "Link to Reset Password to Gardeners Grove!";
         String template = "generalEmail";
 

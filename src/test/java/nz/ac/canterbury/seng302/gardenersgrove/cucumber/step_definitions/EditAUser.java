@@ -4,6 +4,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
@@ -51,6 +52,10 @@ public class EditAUser {
     public AuthenticationManager authenticationManager;
 
     @Autowired
+    public TokenRepository tokenRepository;
+
+
+    @Autowired
     public FileService fileService;
     public UserService userService;
 
@@ -64,6 +69,7 @@ public class EditAUser {
     @Given("Given i am editing a user profile")
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
+        tokenRepository.deleteAll();
         userRepository.deleteAll();
         userService.addUser(new User(firstName,
                 lastName,
@@ -80,6 +86,14 @@ public class EditAUser {
                 "1es1P@ssword");
         Authentication authentication = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    @Given("There exists an old user with email {string}")
+    public void there_exists_an_old_user_with_email(String email) {
+        User user = new User("Admin","Test",email,null);
+        userService.addUser(user,"AlphabetSoup10!");
+        Assertions.assertNotNull(userService.getUserByEmail(email));
+
     }
 
     @When("I click the \"Submit\" button")
