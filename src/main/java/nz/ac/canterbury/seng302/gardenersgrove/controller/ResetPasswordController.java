@@ -16,8 +16,10 @@ import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -41,6 +43,7 @@ public class ResetPasswordController {
     @GetMapping("/lost-password")
     public String lostPassword() {
         logger.info("GET /lost-password");
+
         return "lostPasswordForm";
     }
 
@@ -73,15 +76,31 @@ public class ResetPasswordController {
         return "lostPasswordForm";
     }
 
-    // Reset Password
+    /**
+     * @param resetToken unique temp token for resetting password
+     * @param redirectAttributes to add message before redirecting to different page
+     * @return form for resetting password
+     */
     @GetMapping("/reset-password/{token}")
-    public String resetPassword() {
+    public String resetPassword(@PathVariable("token") String resetToken,
+                                RedirectAttributes redirectAttributes) {
         logger.info("GET /reset-password");
+
+        Token token = tokenService.getTokenByTokenString(resetToken);
+        if (token == null || token.isExpired()) {
+            assert token != null;
+            tokenService.deleteToken(token);
+            redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+            return "redirect:/login";
+        }
+
         return "resetPasswordForm";
     }
 
     @PostMapping("/reset-password/{token}")
-    public String passwordChecker(@RequestParam("password") String password, @RequestParam("retypePassword") String retypePassword, Model model) {
+    public String passwordChecker(@RequestParam("password") String password,
+                                  @RequestParam("retypePassword") String retypePassword,
+                                  Model model) {
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
         ValidationResult rePasswordValidation = InputValidator.validatePassword(retypePassword);
 
