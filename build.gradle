@@ -71,7 +71,7 @@ tasks.named('test') {
 	}
 
 	// The unitTestReport will be run after the unit test task has completed
-	finalizedBy "unitTestReport"
+	finalizedBy "jacocoTestReport"
 
 }
 
@@ -119,9 +119,9 @@ jacocoTestReport { // Generate a report for all generated test data
 		include '**/*.exec'
 	}
 	reports {
-		xml.required.set(true)
+		xml.required = true
 		xml.destination file("${buildDir}/jacoco/test-report.xml")
-		csv.required.set(true)
+		csv.required = false
 		html.destination file("${buildDir}/jacoco/html")
 	}
 }

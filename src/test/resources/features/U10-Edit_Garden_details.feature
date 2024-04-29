@@ -1,7 +1,8 @@
 Feature: U10 Edit garden details
 
 Background:
-  Given There is a user
+  Given I am on the edit garden page
+  And There is a user
   And the user owns a garden "Test Garden"
   And I am on the garden edit form
 

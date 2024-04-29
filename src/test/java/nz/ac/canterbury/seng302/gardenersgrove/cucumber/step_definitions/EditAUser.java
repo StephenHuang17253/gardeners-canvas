@@ -1,6 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,8 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
-
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -64,7 +61,7 @@ public class EditAUser {
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
 
 
-    @Before
+    @Given("Given i am editing a user profile")
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         userRepository.deleteAll();
@@ -89,6 +86,12 @@ public class EditAUser {
     public void i_click_the_submit_button() throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = dateOfBirth.format(formatter);
+        logger.debug(String.valueOf(lastName));
+        logger.debug(String.valueOf(noLastName));
+        if (noLastName) {
+            lastName = "";
+        }
+
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .multipart("/profile/edit")
@@ -141,8 +144,9 @@ public class EditAUser {
         Assertions.assertEquals(newDateOfBirth, test_user.getDateOfBirth());
     }
 
-    @When("I check the check box marked {string}")
-    public void i_check_the_check_box_marked_no_last_name(String arg0) {
+    @When("I check the check box marked \"I have no surname\"")
+    public void i_click_the_check_box_marked_I_have_no_surname(){
         noLastName = true;
     }
+
 }
