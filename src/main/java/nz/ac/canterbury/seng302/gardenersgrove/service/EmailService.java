@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,17 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * This class is a service class for sending emails
@@ -62,9 +69,9 @@ public class EmailService {
     /**
      * Sends an HTML email to the specified email address with the specified subject
      * 
-     * @param toEmail
+     * @param recipientEmail
      * @param subject
-     * @param body
+     * @param template
      * @throws MessagingException
      */
     public void sendHTMLEmail(String recipientEmail, String subject, String template, Context context)
@@ -101,6 +108,23 @@ public class EmailService {
 
         String toEmail = token.getUser().getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
+    }
+
+    /**
+     * Sends a registration email to the user with the token
+     *
+     * @param token the token to send information about
+     * @throws MessagingException
+     */
+    public void sendResetPasswordEmail(Token token, String baseURL) throws MailException, URISyntaxException, MalformedURLException {
+        String subject = "Link to Reset Password to Gardeners Grove!";
+        String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
+        String tokenString = token.getTokenString();
+        int lifetime = (int) token.getLifetime().toMinutes();
+        String url = UriComponentsBuilder.fromPath((baseURL +"/reset-password/{token}")).buildAndExpand(tokenString).toUriString();
+        String body = String.format("Kia ora %s, \n\n Following is the link to resetting your password:m \n %s \n This link expires in %s minutes \n\n Regards, Gardeners Grove Team 500", username, url, lifetime);
+        String toEmail = token.getUser().getEmailAddress();
+        sendPlaintextEmail(toEmail, subject, body);
     }
 
 }
