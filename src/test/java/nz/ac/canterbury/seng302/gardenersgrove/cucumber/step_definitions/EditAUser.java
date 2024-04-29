@@ -66,9 +66,9 @@ public class EditAUser {
         userService = new UserService(passwordEncoder, userRepository);
         userRepository.deleteAll();
         userService.addUser(new User(firstName,
-                        lastName,
-                        emailAddress,
-                        dateOfBirth), "1es1P@ssword");
+                lastName,
+                emailAddress,
+                dateOfBirth), "1es1P@ssword");
 
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders
