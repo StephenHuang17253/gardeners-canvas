@@ -21,11 +21,6 @@ import org.thymeleaf.context.Context;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 /**
  * This class is a service class for sending emails
  * defined by the {@link Service} annotation.
@@ -70,10 +65,10 @@ public class EmailService {
     /**
      * Sends an HTML email to the specified email address with the specified subject
      * 
-     * @param recipientEmail
-     * @param subject
-     * @param template
-     * @throws MessagingException
+     * @param recipientEmail email of person to receive message
+     * @param subject subject of email
+     * @param template html template to fill for email
+     * @throws MessagingException if cannot send email
      */
     public void sendHTMLEmail(String recipientEmail, String subject, String template, Context context)
             throws MessagingException {
@@ -128,7 +123,10 @@ public class EmailService {
         String tokenString = token.getTokenString();
         int lifetime = (int) token.getLifetime().toMinutes();
 
-        String url = UriComponentsBuilder.fromPath((baseURL +"/reset-password/{token}")).buildAndExpand(tokenString).toUriString();
+        String url = UriComponentsBuilder.fromUriString(baseURL)
+                .path("/reset-password/{token}")
+                .buildAndExpand(tokenString)
+                .toUriString();
         String urlText = "RESET PASSWORD";
         String mainBody = String.format("Following is the link to resetting your password. \n This link expires in %s minutes.", lifetime);
         String signOff = "Regards, Gardeners Grove Team 500";
