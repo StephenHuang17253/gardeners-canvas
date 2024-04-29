@@ -1,19 +1,11 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
-import jakarta.servlet.http.HttpServletRequest;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.LoginPageController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -52,12 +44,16 @@ public class LoginUser {
     public static GardenService gardenService;
 
     public static UserService userService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private TokenService tokenService;
     @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
-        LoginPageController loginPageController = new LoginPageController(userService, authenticationManager, gardenService);
+        AccountController loginPageController = new AccountController(userService, authenticationManager, emailService, tokenService, gardenService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(loginPageController).build();
 

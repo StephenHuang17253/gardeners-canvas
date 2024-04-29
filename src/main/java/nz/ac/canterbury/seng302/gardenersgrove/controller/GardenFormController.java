@@ -295,9 +295,6 @@ public class GardenFormController {
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
 

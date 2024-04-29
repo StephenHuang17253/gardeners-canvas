@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ public class AccountControllerTest {
 
     @Mock
     private static UserService userServiceMock;
+    @Mock
+    private static GardenService gardenService;
 
     @InjectMocks
     private static AccountController accountController;
@@ -42,6 +45,7 @@ public class AccountControllerTest {
         authenticationManagerMock = Mockito.mock(AuthenticationManager.class);
         securityContextMock = Mockito.spy(SecurityContext.class);
         userServiceMock = Mockito.mock(UserService.class);
+        gardenService = Mockito.mock(GardenService.class);
         SecurityContextHolder.setContext(securityContextMock);
     }
 
