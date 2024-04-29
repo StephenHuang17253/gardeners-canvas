@@ -146,6 +146,8 @@ public class MyGardensController {
             model.addAttribute("gardenId",gardenIdString);
             model.addAttribute("plants",garden.getPlants());
             model.addAttribute("totalPlants",garden.getPlants().size());
+
+
         } else {
             return "404";
         }
