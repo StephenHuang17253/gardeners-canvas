@@ -58,6 +58,7 @@ public class UserService {
      * @param rawPassword string to encode and add to user
      */
     public void addUser(User user, String rawPassword) {
+
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         userRepository.save(user);
@@ -76,8 +77,13 @@ public class UserService {
             return null;
         }
         User user = users[0];
-        if (passwordEncoder.matches(password, user.getEncodedPassword()) || Objects.equals(password, user.getEncodedPassword())) {
+        if (passwordEncoder.matches(password, user.getEncodedPassword())
+                || Objects.equals(password, user.getEncodedPassword())) {
             return user;
+        }
+        if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
+            logger.info(users[0].toString());
+            return users[0];
         }
         return null;
     }
@@ -134,12 +140,31 @@ public class UserService {
      * Update users profile picture filename
      * 
      * @param filename filename of profile picture
-     * @param id      id of the user to update
+     * @param id       id of user to update
      */
     public void updateProfilePictureFilename(String filename, long id) {
         User user = getUserById(id);
         user.setProfilePictureFilename(filename);
         userRepository.save(user);
+    }
+
+    /**
+     * Verify a user, for when they enter the correct token
+     *
+     * @param user user to verify
+     */
+    public void verifyUser(User user) {
+        user.setVerified(true);
+        userRepository.save(user);
+    }
+
+    /**
+     * Deletes a user
+     *
+     * @param user
+     */
+    public void deleteUser(User user) {
+        userRepository.deleteById(user.getId());
     }
 
     /**

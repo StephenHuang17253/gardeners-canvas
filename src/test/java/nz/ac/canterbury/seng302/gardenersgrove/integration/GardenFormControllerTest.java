@@ -30,14 +30,12 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -60,11 +58,6 @@ public class GardenFormControllerTest {
     @InjectMocks
     private static GardenFormController gardenFormController;
 
-    private Long editTestGardenID;
-
-    private String editTestGardenName;
-
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
@@ -72,7 +65,7 @@ public class GardenFormControllerTest {
                 .apply(springSecurity())
                 .build();
         ;
-        
+
         if (!userService.emailInUse(mockUser.getEmailAddress()))
         {
             userService.addUser(mockUser, "password");
@@ -126,7 +119,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -198,7 +191,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -266,7 +259,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -339,7 +332,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -407,7 +400,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -479,7 +472,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -547,7 +540,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -618,7 +611,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -686,7 +679,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -758,7 +751,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -826,7 +819,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -898,7 +891,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -966,7 +959,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -1037,7 +1030,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
@@ -1108,7 +1101,7 @@ public class GardenFormControllerTest {
 
         // Below implementation (3 lines) is to mock the Garden class constructor when a new garden is created
         // ref (Section 4): https://www.baeldung.com/java-mockito-constructors-unit-testing
-        MockedConstruction mockGardenConstruction = null;
+        MockedConstruction<Garden> mockGardenConstruction = null;
         try {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);

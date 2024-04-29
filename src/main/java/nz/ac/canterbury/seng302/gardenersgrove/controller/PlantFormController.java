@@ -119,7 +119,7 @@ public class PlantFormController {
                                      @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
                                      @PathVariable("gardenId") Long gardenId,
                                      Model model) {
-        logger.info("POST /landingPage");
+        logger.info("POST /create-new-plant");
 
 
 
@@ -140,6 +140,10 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
@@ -240,6 +244,10 @@ public class PlantFormController {
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;

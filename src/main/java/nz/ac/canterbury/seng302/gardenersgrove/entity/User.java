@@ -1,7 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
-import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,6 +44,9 @@ public class User {
     @Column(length = 64)
     private String profilePictureFilename;
 
+    @Column
+    private boolean verified;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private List<Garden> gardens =  new ArrayList<>();
@@ -63,6 +71,7 @@ public class User {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.dateOfBirth = dateOfBirth;
+        this.verified = false;
     }
 
     public void setFirstName(String firstName) {
@@ -89,9 +98,10 @@ public class User {
         this.profilePictureFilename = profilePictureFilename;
     }
 
-    public String getEncodedPassword() {
-        return password;
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
+
 
     public Long getId() {
         return id;
@@ -117,6 +127,14 @@ public class User {
         return profilePictureFilename;
     }
 
+    public String getEncodedPassword() {
+        return password;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
     public List<Garden> getGardens() { return gardens; }
 
     /**
@@ -132,6 +150,7 @@ public class User {
                 ", emailAddress='" + emailAddress + '\'' +
                 ", profilePictureFilename='" + profilePictureFilename + '\''+
                 ", gardens='" + gardens + '\''+
+                ", verified='" + verified + '\'' +
                 '}';
     }
 }

@@ -36,6 +36,7 @@ form {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 10px;
 }
 
 label {
@@ -56,7 +57,6 @@ p.error-message {
   color: red;
   font-weight: bold;
   text-align: left;
-  margin: 5px 0;
   font-size: 14px;
 }
 
@@ -71,17 +71,11 @@ p.error-message {
   justify-content: space-around;
 }
 
-.user_button {
-  margin: 10px;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 button a {
   text-decoration: none;
   color: white;
+}
+
+p {
+  text-align: center;
 }
