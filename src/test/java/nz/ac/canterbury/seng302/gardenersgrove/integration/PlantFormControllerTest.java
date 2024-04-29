@@ -5,7 +5,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -43,12 +44,9 @@ public class PlantFormControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserService userServiceMock;
-
-    @MockBean
     private PlantService plantService;
 
-    User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.now());
+    User mockUser = new User("Test", "Test", "test@gmail.com", LocalDate.now());
 
 
     @InjectMocks
@@ -93,7 +91,7 @@ public class PlantFormControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void heartbeat() throws Exception {
         String gardenId = "1";
         String gardenName = "test";
@@ -103,7 +101,7 @@ public class PlantFormControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_OnePlantAdded() throws Exception
     {
         Plant mockPlant = Mockito.spy(Plant.class);
@@ -123,7 +121,7 @@ public class PlantFormControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_plantEdited() throws Exception
     {
         String gardenId = "1";
@@ -150,7 +148,7 @@ public class PlantFormControllerTest {
                     "a very long plant name that exceeds the maximum length, 1, test description, 2024-03-28",
             "'', 1, test description, 2024-03-28"
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_addNameVariantsFail(String plantName, int plantCount, String plantDescription, LocalDate date) throws Exception {
         Plant mockPlant = Mockito.spy(Plant.class);
         when(mockPlant.getPlantId()).thenReturn(1L);
@@ -176,9 +174,9 @@ public class PlantFormControllerTest {
                     "a very long plant name that exceeds the maximum length" +
                     "a very long plant name that exceeds the maximum length" +
                     "a very long plant name that exceeds the maximum length",
-            "''"
+            "''", "[", "{", "|", "$$", "o_o", "test@gmail.com", ":", ";", ","
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editNameVariantsFail(String plantName) throws Exception {
         String gardenId = "1";
         String gardenName = "test";
@@ -203,14 +201,14 @@ public class PlantFormControllerTest {
     @ParameterizedTest
     @CsvSource({
             "!",
-            "a very long plant that exceeds the maximum length" +
-                    "a very long plant that exceeds the maximum length" +
-                    "a very long plant that exceeds the maximum length" +
-                    "a very long plant that exceeds the maximum length" +
-                    "a very long plant that exceeds the maximum length",
-            "''"
+            "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length",
+            "''", "[", "{", "|", "$$", "o_o", "test@gmail.com", ":", ";"
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsFail(String plantName) throws Exception {
         String gardenId = "1";
         String gardenName = "test";
@@ -234,9 +232,63 @@ public class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "-1", "0", "-1.0", "a", "!", "{}"
+            "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length",
+            "''", "[", "{", "|", "$$", "o_o", "test@gmail.com", ":", ";",
+            "-1", "0", "-1.0", "a", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7",
+            "00/00/0000", "13/12/2000", "12/32/2000", "11/11/abcd", "!",
+            "test", "''", "{}", "a/12/2000","12/a/2000",
+            "71/1/1", "1/12/2000", "12/1/2000", "01/02/2", "01/05/0000"
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
+    public void plantFormController_editDateVariantsFail(String date) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDate formattedDate;
+        // try catch for different date input types
+        try {
+            formattedDate = LocalDate.parse(date, formatter);
+        } catch (DateTimeParseException e) {
+            //checks that if input value cannot be parsed into a date then it does not interact with plantService
+            Mockito.verifyNoInteractions(plantService);
+            return;
+        }
+
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        int plantCount = 1;
+        String plantName = "test";
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", formattedDate.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService, Mockito.never()).updatePlant(
+                Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, formattedDate);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "!",
+            "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length" +
+                    "a very long plant name that exceeds the maximum length",
+            "''", "[", "{", "|", "$$", "o_o", "test@gmail.com", ":", ";",
+            "-1", "0", "-1.0", "a", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7"
+
+    })
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
         String gardenId = "1";
         String gardenName = "test";
@@ -245,6 +297,17 @@ public class PlantFormControllerTest {
         String plantDescription = "standardPlant";
         LocalDate date = LocalDate.of(2024, 3, 28);
 
+        // try catch for different input types
+        try {
+            Float.parseFloat(plantCount);
+            Mockito.verify(plantService, Mockito.never()).updatePlant(
+                    Long.parseLong(plantId), plantName, Float.parseFloat(plantCount), plantDescription, date);
+        } catch (NumberFormatException e) {
+            // If plant count is non numeric it will throw an error and won't interact with plantService
+            Mockito.verifyNoInteractions(plantService);
+            return;
+        }
+
         mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
                         .param("plantName", plantName)
                         .param("plantCount", plantCount)
@@ -252,23 +315,42 @@ public class PlantFormControllerTest {
                         .param("plantDate", date.toString())
                         .param("gardenId", gardenId))
                 .andDo(MockMvcResultHandlers.print());
+    }
 
-        // try catch for different input types
-        try {
-            Float.parseFloat(plantCount);
-            Mockito.verify(plantService, Mockito.never()).updatePlant(
-                    Long.parseLong(plantId), plantName, Float.parseFloat(plantCount), plantDescription, date);
-        } catch (NumberFormatException e) {
-            // If plant count is non numeric it will throw an error and won't interact with plantService anyway
-            Mockito.verifyNoInteractions(plantService);
-        }
+    @ParameterizedTest
+    @CsvSource({
+            "11/11/2000", "09/05/1253", "01/02/0003", "07/06/9999"
+    })
+    @WithMockUser(username = "test@gmail.com")
+    public void plantFormController_editDateVariantsPass(String date) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDate formattedDate = LocalDate.parse(date, formatter);
+
+        String gardenId = "1";
+        String gardenName = "test";
+        String plantId = "1";
+        String plantDescription = "standardPlant";
+        int plantCount = 1;
+        String plantName = "test";
+
+        mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
+                        .param("plantName", plantName)
+                        .param("plantCount", String.valueOf(plantCount))
+                        .param("plantDescription", plantDescription)
+                        .param("plantDate", formattedDate.toString())
+                        .param("gardenId", gardenId))
+                .andDo(MockMvcResultHandlers.print());
+
+        Mockito.verify(plantService, Mockito.times(1)).updatePlant(
+                Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, formattedDate);
+
     }
 
     @ParameterizedTest
     @CsvSource({
             "plant name", "PLANT NAME", "plantName", "c00l pl4nt", "this, is. a-real_plant"
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editNameVariantsPass(String plantName) throws Exception {
         String gardenId = "1";
         String gardenName = "test";
@@ -294,7 +376,7 @@ public class PlantFormControllerTest {
     @CsvSource({
             "plant description", "PLANT", "plantDescription", "c00l pl4nt", "this, is. a-real_plant"
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
         String gardenId = "1";
         String gardenName = "test";
@@ -320,7 +402,7 @@ public class PlantFormControllerTest {
     @CsvSource({
             "1", "1.0", "9999", "0.1", "9987.123"
     })
-    @WithMockUser(username = "profile.user.test@ProfileController.com")
+    @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editCountVariantsPass(String plantCount) throws Exception {
         String gardenId = "1";
         String gardenName = "test";
