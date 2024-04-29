@@ -94,11 +94,14 @@ public class HomePageController {
         if (!onStart) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
             LocalDate date = LocalDate.parse("01/01/2001", formatter);
-            userService.addUser(new User("John",
+
+            // Add a default user to speed up manual testing.
+            User johnDoe = new User("John",
                     "Doe",
                     "johndoe@email.com",
-                    date),
-                    "DefaultUser10!");
+                    date);
+            userService.addUser(johnDoe, "DefaultUser10!");
+            userService.verifyUser(johnDoe);
             onStart = true;
         }
 

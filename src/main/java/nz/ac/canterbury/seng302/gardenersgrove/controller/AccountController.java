@@ -109,8 +109,8 @@ public class AccountController {
             Token token = tokenService.getTokenByUser(existingUser);
 
             if (token != null && token.isExpired()) {
-                userService.deleteUser(existingUser);
                 tokenService.deleteToken(token);
+                userService.deleteUser(existingUser);
             }
         }
     }
@@ -207,7 +207,7 @@ public class AccountController {
                 if (entry.getKey().equals("firstName")) {
                     error = "First name " + error;
                 } else if (entry.getKey().equals("lastName")) {
-                    error = "First name " + error;
+                    error = "Last name " + error;
                 }
 
                 model.addAttribute(entry.getKey() + "Error", error);
