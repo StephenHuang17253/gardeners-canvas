@@ -139,6 +139,10 @@ public class RegistrationFormController {
 
         addUserAttributes(firstName, lastName, noLastName, dateOfBirth, emailAddress, password, repeatPassword, model);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         boolean valid = true;
 
         if (!Objects.equals(password, repeatPassword)) {

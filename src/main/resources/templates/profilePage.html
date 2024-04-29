@@ -7,7 +7,7 @@
     <link th:href="@{/css/profilePage.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
     <link th:href="@{/css/navBar.css}" rel="stylesheet">
-    <script th:src="@{/js/profilePicturePicker.js}"></script>
+    <script th:src="@{/js/imagePicker.js}"></script>
 
 </head>
 
@@ -18,7 +18,7 @@
         <div class="profile_info">
             <form th:action="@{profile}" method="post" enctype="multipart/form-data">
                 <div class="profile_picture_container small_pic">
-                    <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+                    <img id="imageToChange" th:src="@{${profilePicture}}" alt="User's profile picture">
                     <label for="profilePictureInput">+</label>
                     <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
                         onChange="handleFileSelect(event); this.form.submit()">

@@ -107,6 +107,10 @@ public class LoginPageController {
 
         ValidationResult validEmail = InputValidator.validateEmail(email);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         if (!validEmail.valid()) {
             model.addAttribute("emailError", validEmail);
             return "loginPage";
