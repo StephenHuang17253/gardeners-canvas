@@ -98,7 +98,8 @@ public class ResetPasswordController {
     }
 
     @PostMapping("/reset-password/{token}")
-    public String passwordChecker(@RequestParam("password") String password,
+    public String passwordChecker(@PathVariable("token") String resetToken,
+                                  @RequestParam("password") String password,
                                   @RequestParam("retypePassword") String retypePassword,
                                   Model model) {
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
@@ -106,9 +107,22 @@ public class ResetPasswordController {
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
+            return "resetPasswordForm";
         } else if (!Objects.equals(password, retypePassword)) {
             model.addAttribute("passwordError", "The passwords do not match");
+            return "resetPasswordForm";
+        } else {
+            Token token = tokenService.getTokenByTokenString(resetToken);
+            User currentUser = token.getUser();
+            userService.updatePassword(currentUser.getId(), password);
+            String subject = "Your Password Has Been Updated";
+            String body = String.format("Kia ora %s! \n This email is to confirm that your Gardeners Grove account's password has been updated \n Regards, Gardeners Grove Team 500", currentUser.getFirstName());
+            try {
+                emailService.sendPlaintextEmail(currentUser.getEmailAddress(), subject, body);
+            } catch (MailException e) {
+                logger.error("Password reset confirmation email not sent");
+            }
+            return "redirect:/login";
         }
-        return "resetPasswordForm";
     }
 }
