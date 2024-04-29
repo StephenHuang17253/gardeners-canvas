@@ -112,7 +112,7 @@ public class MyGardensController {
                                    @RequestParam("plantId") String plantId,
                                    @RequestParam("plantPictureInput") MultipartFile plantPicture,
                                    Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenIdString, gardenName);
+        logger.info("POST /my-gardens/{}-{}", gardenIdString, gardenName);
 
         long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.findById(gardenId);
