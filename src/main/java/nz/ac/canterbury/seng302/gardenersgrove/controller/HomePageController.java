@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class HomePageController {
 
     private boolean onStart = false;
 
+    private GardenService gardenService;
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -39,8 +42,9 @@ public class HomePageController {
      * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager) {
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService) {
         this.userService = userService;
+        this.gardenService = gardenService;
     }
 
     /**
@@ -65,7 +69,7 @@ public class HomePageController {
      */
     public String getProfilePictureString(String filename) {
 
-        String profilePictureString = "/Images/default_profile_picture.png";
+        String profilePictureString = "/images/default_profile_picture.png";
 
         if (filename != null && filename.length() != 0) {
             profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
@@ -85,14 +89,19 @@ public class HomePageController {
 
         logger.info("GET /home");
 
+        model.addAttribute("myGardens", gardenService.getGardens());
+
         if (!onStart) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
             LocalDate date = LocalDate.parse("01/01/2001", formatter);
-            userService.addUser(new User("John",
+
+            // Add a default user to speed up manual testing.
+            User johnDoe = new User("John",
                     "Doe",
                     "johndoe@email.com",
-                    date),
-                    "DefaultUser10!");
+                    date);
+            userService.addUser(johnDoe, "DefaultUser10!");
+            userService.verifyUser(johnDoe);
             onStart = true;
         }
 
@@ -104,9 +113,7 @@ public class HomePageController {
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-
         model.addAttribute("loggedIn", loggedIn);
 
         String welcomeString = "";

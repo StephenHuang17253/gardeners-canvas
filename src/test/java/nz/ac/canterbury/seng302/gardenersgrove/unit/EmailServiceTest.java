@@ -1,28 +1,18 @@
-package nz.ac.canterbury.seng302.gardenersgrove;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-
-import org.springframework.mail.javamail.JavaMailSender;
+package nz.ac.canterbury.seng302.gardenersgrove.unit;
 
 import jakarta.mail.MessagingException;
-
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 
 class EmailServiceTest {
 

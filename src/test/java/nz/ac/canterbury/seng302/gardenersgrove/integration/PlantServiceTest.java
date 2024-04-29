@@ -3,15 +3,14 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
@@ -30,16 +29,15 @@ public class PlantServiceTest {
 
 
     private static PlantRepository plantRepository;
-    private static GardenRepository gardenRepository;
     private static GardenService gardenService;
     private static PlantService plantService;
+    private static FileService fileService;
 
     @BeforeAll
     public static void setup() {
-        gardenRepository = Mockito.mock(GardenRepository.class);
         gardenService = Mockito.mock(GardenService.class);
         plantRepository = Mockito.mock(PlantRepository.class);
-        plantService = new PlantService(plantRepository,gardenService);
+        plantService = new PlantService(plantRepository,gardenService,fileService);
     }
     @Test
     public void testAddPlant() {

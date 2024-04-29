@@ -1,18 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
+import jakarta.persistence.*;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Random;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Transient;
 
 /**
  * Entity class reflecting a token used for registration/verification
@@ -40,7 +32,7 @@ public class Token {
     @Column
     private Duration lifetime;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 

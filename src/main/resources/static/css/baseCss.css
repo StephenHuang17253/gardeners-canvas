@@ -1,11 +1,10 @@
 body {
     background: #ccdf92;
-    background: linear-gradient(#ccdf92,rgb(25,100,25)) no-repeat;
+    background: linear-gradient(#e2ffe4, #bdffc2) no-repeat;
     background-attachment: fixed;
 }
 
-.main-container
-{
+.main-container {
     padding: 4mm;
     margin: auto;
     width: 1200px;
@@ -15,8 +14,7 @@ body {
 }
 
 
-.error
-{
+.error {
     font-family: monospace;
     color: red;
     font-weight: bold;
@@ -24,25 +22,21 @@ body {
     margin-bottom: 7.5px;
 }
 
-.noError
-{
+.noError {
     font-family: monospace;
     color: black;
     font-weight: normal;
 }
 
-.errorBorder
-{
+.errorBorder {
     border-color: red;
 }
 
-.noErrorBorder
-{
+.noErrorBorder {
     border-color: black;
 }
 
-.ui-button
-{
+.ui-button {
     display: block;
     width: 60px;
     height: 30px;
@@ -57,8 +51,7 @@ body {
 
 }
 
-.ui-button-3x
-{
+.ui-button-3x {
     display: block;
     width: 180px;
     height: 30px;
@@ -73,23 +66,30 @@ body {
 
 }
 
-.ui-button :hover
-{
+.ui-button :hover {
 
     background: green;
+}
+
+.user_button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 
 @media screen and (max-width: 1310px) {
 
-    body
-    {
+    body {
         margin: .4vw;
         padding: .4vw;
     }
 
-    .main-container
-    {
+    .main-container {
         padding: 2mm;
         margin: auto;
         width: 95%;

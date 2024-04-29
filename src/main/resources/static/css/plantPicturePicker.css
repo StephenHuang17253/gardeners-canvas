@@ -1,0 +1,70 @@
+/* 
+    plant picture picker and viewing styling
+    Needed separate stylesheet because of some U13 ACs.
+*/
+
+.plant_picture_container {
+    position: relative;
+    display: block;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    border: 3px solid rgba(0, 0, 0, 0.5);
+    height: 200px;
+    width: 200px;
+}
+
+.plant_picture_container img {
+    display: block;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.plant_picture_container input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.plant_picture_container label {
+    position: absolute;
+    top: 20%;
+    right: 5%;
+    transform: translate(-50%, -50%);
+    font-size: 150%;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 20%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.plant_picture_container:hover label {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.error-message {
+    color: red;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+}
+
+.small_pic {
+    width: 100px;
+    height: 100px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.small_pic img {
+    width: 100px;
+    height: 100px;
+}

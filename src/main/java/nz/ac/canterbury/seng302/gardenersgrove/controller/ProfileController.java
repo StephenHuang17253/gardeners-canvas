@@ -1,45 +1,38 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Controller for the profile and edit profile pages, handles viewing and
@@ -57,9 +50,9 @@ public class ProfileController {
      * Constructor for the ProfileController with {@link Autowired} to connect this
      * controller with services
      * 
-     * @param userService
-     * @param authenticationManager
-     * @param fileService
+     * @param userService service to access repository
+     * @param authenticationManager manager for user's authentication details
+     * @param fileService service to manage files
      */
     @Autowired
     public ProfileController(UserService userService,
@@ -78,9 +71,9 @@ public class ProfileController {
      */
     public String getProfilePictureString(String filename) {
 
-        String profilePictureString = "/Images/default_profile_picture.png";
+        String profilePictureString = "/images/default_profile_picture.png";
 
-        if (filename != null && filename.length() != 0) {
+        if (filename != null && !filename.isEmpty()) {
             profilePictureString = MvcUriComponentsBuilder
                     .fromMethodName(ProfileController.class, "serveFile", filename)
                     .build()
@@ -96,17 +89,17 @@ public class ProfileController {
      * @param filename file to retrieve
      * @return response with the file
      */
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("/files/users/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/" + filename);
+        logger.info("GET /files/users/" + filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
         } catch (MalformedURLException error) {
-            error.printStackTrace();
+            logger.error("File url incorrect", error);
         }
         return null;
 
@@ -144,7 +137,7 @@ public class ProfileController {
      * @param profilePicture new profile picture
      */
     public void updateProfilePicture(User user, MultipartFile profilePicture) {
-        String fileExtension = profilePicture.getOriginalFilename().split("\\.")[1];
+        String fileExtension = Objects.requireNonNull(profilePicture.getOriginalFilename()).split("\\.")[1];
         try {
             String[] allFiles = fileService.getAllFiles();
             // Delete past profile image/s
@@ -159,14 +152,14 @@ public class ProfileController {
             fileService.saveFile(fileName, profilePicture);
 
         } catch (IOException error) {
-            error.printStackTrace();
+            logger.error("incorrect user or profilePicture file", error);
         }
     }
 
     /**
      * This function is called when a GET request is made to /profile
      * 
-     * @param model
+     * @param model contains all fields
      * @return The profilePage html page
      */
     @GetMapping("/profile")
@@ -174,6 +167,8 @@ public class ProfileController {
         logger.info("GET /profile");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         String currentEmail = authentication.getName();
 
@@ -202,8 +197,8 @@ public class ProfileController {
      * Gets authenticated user and updates their profile picture
      * 
      * @param profilePicture user's profile picture
-     * @param model
-     * @return
+     * @param model contains all field data
+     * @return redirect to profile page
      */
     @PostMapping("/profile")
     public String updateProfilePicture(
@@ -221,7 +216,6 @@ public class ProfileController {
         }
 
         if (!profilePictureValidation.valid()) {
-
             model.addAttribute("profilePictureError", profilePictureValidation);
             String userName = user.getFirstName() + " " + user.getLastName();
             model.addAttribute("userName", userName);
@@ -241,7 +235,7 @@ public class ProfileController {
     /**
      * This function is called when a GET request is made to /profile/edit
      * 
-     * @param model
+     * @param model contains all field data
      * @return The profileEditPage html page
      */
     @GetMapping("/profile/edit")
@@ -251,19 +245,15 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         model.addAttribute("firstName", user.getFirstName());
         model.addAttribute("lastName", user.getLastName());
         model.addAttribute("emailAddress", user.getEmailAddress());
+        model.addAttribute("dateOfBirth", user.getDateOfBirth());
 
-        String formattedDateOfBirth = "";
-        LocalDate dateOfBirth = user.getDateOfBirth();
-        if (dateOfBirth != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            formattedDateOfBirth = dateOfBirth.format(formatter);
-        }
-        model.addAttribute("dateOfBirth", formattedDateOfBirth);
-
-        boolean noLastName = user.getLastName().equals("");
+        boolean noLastName = user.getLastName().isEmpty();
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
@@ -292,15 +282,18 @@ public class ProfileController {
             @RequestParam(name = "firstName") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress") String emailAddress,
-            @RequestParam("profilePictureInput") MultipartFile profilePicture,
+            @RequestParam(name = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
+
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
@@ -309,6 +302,7 @@ public class ProfileController {
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         if (noLastName) {
             lastNameValidation = ValidationResult.OK;
+            lastName = "";
         }
         validationMap.put("lastName", lastNameValidation);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
@@ -316,11 +310,15 @@ public class ProfileController {
             emailAddressValidation = ValidationResult.OK;
         }
         validationMap.put("emailAddress", emailAddressValidation);
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (dateOfBirth.equals("")) {
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
+        } else {
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
+
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
@@ -334,16 +332,18 @@ public class ProfileController {
 
                 String error = entry.getValue().toString();
 
-                if (entry.getKey().equals("firstName")) {
-                    error = "First name " + error;
-                } else if (entry.getKey().equals("lastName")) {
-                    error = "First name " + error;
-                }
+                error = switch (entry.getKey()) {
+                    case "firstName" -> "First name " + error;
+                    case "lastName" -> "Last name " + error;
+                    case "emailAddress" -> "Email address " + error;
+                    default -> entry.getValue().toString();
+                };
 
                 model.addAttribute(entry.getKey() + "Error", error);
                 valid = false;
             }
         }
+
 
         // If any input is invalid, return to the edit form
         if (!valid) {
@@ -363,16 +363,9 @@ public class ProfileController {
             updateProfilePicture(currentUser, profilePicture);
         }
 
-        LocalDate newDateOfBirth = null;
-        if (!dateOfBirth.equals("")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            newDateOfBirth = LocalDate.parse(dateOfBirth, formatter);
-        }
-
-        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, newDateOfBirth);
+        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, dateOfBirth);
 
         setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
-
         return "redirect:/profile";
     }
 

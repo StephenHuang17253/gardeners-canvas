@@ -31,7 +31,6 @@ import org.springframework.ui.Model;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -50,7 +49,7 @@ public class AccountController {
 
     // For development to avoid sending signup emails but print the signup token to
     // the terminal instead, set to true or remove for production
-    private final boolean SEND_EMAIL = false;
+    private final boolean SEND_EMAIL = true;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
@@ -96,13 +95,50 @@ public class AccountController {
     }
 
     /**
+     * For the given email address if there is an existing unverified user whose
+     * token has expired, delete them and their associated token
+     * 
+     * @param emailAddress the email address of the user
+     */
+    public void removeIfExpired(String emailAddress) {
+
+        User existingUser = userService.getUserByEmail(emailAddress);
+
+        if (existingUser != null && !existingUser.isVerified()) {
+
+            Token token = tokenService.getTokenByUser(existingUser);
+
+            if (token != null && token.isExpired()) {
+                tokenService.deleteToken(token);
+                userService.deleteUser(existingUser);
+            }
+        }
+    }
+
+    /**
      * handles GET '/register' requests
      *
      * @return registration form
      */
     @GetMapping("/register")
-    public String registrationForm() {
+    public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
+            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+            @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
+            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+            @RequestParam(name = "password", defaultValue = "") String password,
+            @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword, Model model) {
         logger.info("GET /register");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("firstName", firstName);
+        model.addAttribute("lastName", lastName);
+        model.addAttribute("noLastName", noLastName);
+        model.addAttribute("dateOfBirth", dateOfBirth);
+        model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("password", password);
+        model.addAttribute("repeatPassword", repeatPassword);
         return "registrationForm";
     }
 
@@ -127,7 +163,7 @@ public class AccountController {
             @RequestParam(name = "firstName", defaultValue = "") String firstName,
             @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false, defaultValue = "") String dateOfBirth,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
             @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
@@ -145,31 +181,21 @@ public class AccountController {
         }
         validationMap.put("lastName", lastNameValidation);
 
-        User existingUser = userService.getUserByEmail(emailAddress);
-
-        // For the given email address if there is an existing unverified user whose
-        // token has expired, delete them and their associated token
-        if (existingUser != null && !existingUser.isVerified()) {
-
-            Token token = tokenService.getTokenByUser(existingUser);
-
-            if (token != null && token.isExpired()) {
-                userService.deleteUser(existingUser);
-                tokenService.deleteToken(token);
-            }
-        }
+        removeIfExpired(emailAddress);
 
         validationMap.put("emailAddress", InputValidator.validateUniqueEmail(emailAddress));
 
-        ValidationResult dateOfBirthValidation = InputValidator.validateDOB(dateOfBirth);
-        if (dateOfBirth.equals("")) {
+        ValidationResult dateOfBirthValidation;
+        if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
+        } else {
+            String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
 
         InputValidator.validatePassword(password);
         validationMap.put("password", InputValidator.validatePassword(password));
-
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -181,7 +207,7 @@ public class AccountController {
                 if (entry.getKey().equals("firstName")) {
                     error = "First name " + error;
                 } else if (entry.getKey().equals("lastName")) {
-                    error = "First name " + error;
+                    error = "Last name " + error;
                 }
 
                 model.addAttribute(entry.getKey() + "Error", error);
@@ -203,15 +229,7 @@ public class AccountController {
             return "registrationForm";
         }
 
-        LocalDate date;
-        if (!dateOfBirth.equals("")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            date = LocalDate.parse(dateOfBirth, formatter);
-        } else {
-            date = null;
-        }
-
-        User user = new User(firstName, lastName, emailAddress, date);
+        User user = new User(firstName, lastName, emailAddress, dateOfBirth);
         userService.addUser(user, password);
 
         Token token = new Token(user, null);
@@ -229,11 +247,18 @@ public class AccountController {
         }
 
         return "redirect:/verify/" + user.getEmailAddress();
-
     }
 
+    /**
+     * Handles GET '/verify/{emailAddress}' requests
+     *
+     * @param emailAddress - user's email address
+     * @param model        - (map-like) representation of user's input (above
+     *                     parameters)
+     * @return verification page
+     */
     @GetMapping("/verify/{emailAddress}")
-    public String verifyEmail(@PathVariable String emailAddress, Model model, HttpServletRequest request) {
+    public String getVerify(@PathVariable String emailAddress, Model model, HttpServletRequest request) {
         logger.info("GET /verify");
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
@@ -242,12 +267,23 @@ public class AccountController {
         }
 
         model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("loggedIn", false);
 
         return "verificationPage";
     }
 
+    /**
+     * Handles POST '/verify' requests
+     *
+     * @param tokenString        - user's token string
+     * @param emailAddress       - user's email address
+     * @param model              - (map-like) representation of user's input (above
+     *                           parameters)
+     * @param redirectAttributes - used to pass messages between redirects
+     * @return verification page
+     */
     @PostMapping("/verify")
-    public String verifyEmailPost(@RequestParam(name = "tokenString") String tokenString,
+    public String postVerify(@RequestParam(name = "tokenString") String tokenString,
             @RequestParam(name = "emailAddress") String emailAddress, Model model,
             RedirectAttributes redirectAttributes) {
         logger.info("POST /verify");
@@ -266,7 +302,6 @@ public class AccountController {
         redirectAttributes.addFlashAttribute("message", "Your account has been activated, please log in");
         return "redirect:/login";
     }
-
 
     /**
      * Gets the login page
@@ -287,13 +322,15 @@ public class AccountController {
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
 
+        model.addAttribute("loggedIn", false);
+
         return "loginPage";
     }
 
     /**
      * Handles the login request
-     * 
-     * @param email the email parameter
+     *
+     * @param emailAddress the email parameter
      * @return thymeleaf loginPage
      */
     @PostMapping("/login")
@@ -301,19 +338,7 @@ public class AccountController {
             @RequestParam String password, Model model) {
         logger.info("POST /login");
 
-        User existingUser = userService.getUserByEmail(emailAddress);
-
-        // For the given email address if there is an existing unverified user whose
-        // token has expired, delete them and their associated token
-        if (existingUser != null && !existingUser.isVerified()) {
-
-            Token token = tokenService.getTokenByUser(existingUser);
-
-            if (token != null && token.isExpired()) {
-                userService.deleteUser(existingUser);
-                tokenService.deleteToken(token);
-            }
-        }
+        removeIfExpired(emailAddress);
 
         ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
         <title>Gardener's Grove</title>
@@ -9,7 +9,7 @@
     </head>
 
     <body>
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')"></div>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
         <div class="container">
             <div class="image-container">
                 <img src="/images/landingPlant.JPG" alt="Gardener's Grove" class="blur">
