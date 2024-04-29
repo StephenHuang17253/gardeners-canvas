@@ -73,7 +73,7 @@ tasks.named('test') {
 	}
 
 	// The unitTestReport will be run after the unit test task has completed
-	finalizedBy jacocoTestReport
+	finalizedBy "jacocoTestReport"
 
 }
 
@@ -90,7 +90,7 @@ tasks.register("integration", Test) {
 	}
 
 	// The integrationTestReport will be run after the integration test task has completed
-	finalizedBy jacocoTestReport
+	finalizedBy "integrationTestReport"
 }
 
 tasks.register("cucumber", Test) {

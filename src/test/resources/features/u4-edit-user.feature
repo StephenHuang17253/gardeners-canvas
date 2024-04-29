@@ -1,4 +1,6 @@
 Feature: U4 As Sarah, I want to edit my user profile so that I can keep my details accurate.
+  Background:
+    Given Given i am editing a user profile
 
   Scenario Outline: AC3 - Given I am on the edit profile form
     When I enter valid values for first name <fname>, last name <lname>, email address <email>, and date of birth <date>

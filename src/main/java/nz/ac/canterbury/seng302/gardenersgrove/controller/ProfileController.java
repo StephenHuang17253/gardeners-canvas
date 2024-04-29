@@ -369,4 +369,73 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
+    /**
+     * This function is called when a GET request is made to /profile/editPassword and processes authentication
+     *
+     * @param model          - (map-like) representation of user's input
+     * @return redirect to editPasswordForm form
+     */
+    @GetMapping("profile/editPassword")
+    public String editPassword(Model model)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email);
+
+        logger.info("GET profile/editPassword");
+        return "editPasswordForm";
+    }
+
+
+    /**
+     * Redirects POST url '/profile/editPassword' to the edit form if invalid input
+     * or to user's profile page '/profile' if edit completed
+     *
+     * @param currentPassword      - user's current password
+     * @param newPassword       - new password user would like to change to
+     * @param retypePassword     - retyped password to see if matches new password
+     * @param model          - (map-like) representation of user's input (above
+     *                       parameters)
+     * @return redirect to editpassword form or to profile page
+     */
+    @PostMapping("/profile/editPassword")
+    public String editProfile(HttpServletRequest request,
+                              @RequestParam(name = "currentPassword") String currentPassword,
+                              @RequestParam(name = "newPassword") String newPassword,
+                              @RequestParam(name = "retypePassword") String retypePassword,
+                              Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = authentication.getName();
+        User currentUser = userService.getUserByEmail(currentEmail);
+
+        boolean valid = true;
+
+        if (!userService.checkPassword(currentUser.getId(), currentPassword)) {
+            model.addAttribute("currentPasswordError", "Your old password is incorrect");
+            valid = false;
+        }
+
+
+        if (!newPassword.equals(retypePassword)) {
+            model.addAttribute("passwordMatchingError", "The new passwords do not match");
+            valid = false;
+        }
+
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword);
+
+        if (!passwordValidation.valid()) {
+            model.addAttribute("passwordError", passwordValidation);
+            valid = false;
+        }
+
+        if (!valid) {
+            return "editPasswordForm";
+        }
+
+        //Update user's password
+        userService.updatePassword(currentUser.getId(), newPassword);
+        return "redirect:/profile";
+    }
+
 }
