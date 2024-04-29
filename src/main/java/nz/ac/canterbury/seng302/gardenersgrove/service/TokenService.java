@@ -36,6 +36,10 @@ public class TokenService {
     }
 
     public void addToken(Token token) {
+        User thisUser = token.getUser();
+        if (this.getTokenByUser(thisUser) != null) {
+            this.deleteToken(this.getTokenByUser(thisUser));
+        }
         tokenRepository.save(token);
     }
 

@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,7 @@ public class EmailService {
         mailSender.send(message);
     }
 
+
     /**
      * Sends a registration email to the user with the token
      * 
@@ -110,21 +112,58 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
+
+
     /**
-     * Sends a registration email to the user with the token
+     * Sends a reset password email to the user with token in reset password link
      *
-     * @param token the token to send information about
-     * @throws MessagingException
+     * @param token the token to use to reset password
+     * @param baseURL url to build link to reset password page
      */
-    public void sendResetPasswordEmail(Token token, String baseURL) throws MailException, URISyntaxException, MalformedURLException {
+    public void sendResetPasswordEmail(Token token, String baseURL) throws MessagingException {
         String subject = "Link to Reset Password to Gardeners Grove!";
+        String template = "generalEmail";
+
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
         String tokenString = token.getTokenString();
         int lifetime = (int) token.getLifetime().toMinutes();
+
         String url = UriComponentsBuilder.fromPath((baseURL +"/reset-password/{token}")).buildAndExpand(tokenString).toUriString();
-        String body = String.format("Kia ora %s, \n\n Following is the link to resetting your password:m \n %s \n This link expires in %s minutes \n\n Regards, Gardeners Grove Team 500", username, url, lifetime);
+        String urlText = "RESET PASSWORD";
+        String mainBody = String.format("Following is the link to resetting your password. \n This link expires in %s minutes.", lifetime);
+        String signOff = "Regards, Gardeners Grove Team 500";
+
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("mainBody", mainBody);
+        context.setVariable("url", url);
+        context.setVariable("urlText", urlText);
+        context.setVariable("signOff", signOff);
+
         String toEmail = token.getUser().getEmailAddress();
-        sendPlaintextEmail(toEmail, subject, body);
+        sendHTMLEmail(toEmail, subject, template, context);
     }
 
+    /**
+     * Sends a confirmation of reset password
+     *
+     * @param currentUser user to send confirmation of password reset to
+     */
+    public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
+        logger.info("Sending confirmation email to "+currentUser.getEmailAddress());
+        String subject = "Your Password Has Been Updated";
+        String template = "generalEmail";
+
+        String username = currentUser.getFirstName() + " " + currentUser.getLastName();
+        String mainBody = "This email is to confirm that your Gardeners Grove account's password has been updated";
+        String signOff = "Regards, Gardeners Grove Team 500";
+
+        Context context = new Context();
+        context.setVariable("username", username);
+        context.setVariable("mainBody", mainBody);
+        context.setVariable("signOff", signOff);
+
+        String toEmail = currentUser.getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
 }

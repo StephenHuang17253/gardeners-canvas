@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
@@ -48,8 +49,11 @@ public class ResetPasswordController {
     }
 
     @PostMapping("/lost-password")
-    public String emailChecker(@RequestParam("email") String email, Model model, HttpServletRequest request) {
+    public String emailChecker(@RequestParam("email") String email,
+                               Model model,
+                               HttpServletRequest request) {
 
+        logger.info("POST /lost-password");
         boolean isRegistered = userService.emailInUse(email);
         ValidationResult emailValidation = InputValidator.validateUniqueEmail(email);
 
@@ -64,12 +68,8 @@ public class ResetPasswordController {
                 // code for getting the baseURL is from https://gist.github.com/beradrian/d66008b6c5a784185c29
                 String baseURL = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
                 emailService.sendResetPasswordEmail(token, baseURL);
-            } catch (MailException e) {
+            } catch (MessagingException e) {
                 logger.info("could not send email to " + email);
-            } catch (URISyntaxException e) {
-                logger.info("could not send email to " + email + " due to URL not being generated");
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
             }
         }
 
@@ -88,8 +88,9 @@ public class ResetPasswordController {
 
         Token token = tokenService.getTokenByTokenString(resetToken);
         if (token == null || token.isExpired()) {
-            assert token != null;
-            tokenService.deleteToken(token);
+            if (token != null) {
+                tokenService.deleteToken(token);
+            }
             redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
             return "redirect:/login";
         }
@@ -102,8 +103,8 @@ public class ResetPasswordController {
                                   @RequestParam("password") String password,
                                   @RequestParam("retypePassword") String retypePassword,
                                   Model model) {
+        logger.info("POST /reset-password");
         ValidationResult passwordValidation = InputValidator.validatePassword(password);
-        ValidationResult rePasswordValidation = InputValidator.validatePassword(retypePassword);
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
@@ -116,14 +117,13 @@ public class ResetPasswordController {
             User currentUser = token.getUser();
             userService.updatePassword(currentUser.getId(), password);
             tokenService.deleteToken(token);
-            String subject = "Your Password Has Been Updated";
-            String body = String.format("Kia ora %s! \n This email is to confirm that your Gardeners Grove account's password has been updated \n Regards, Gardeners Grove Team 500", currentUser.getFirstName());
             try {
-                emailService.sendPlaintextEmail(currentUser.getEmailAddress(), subject, body);
-            } catch (MailException e) {
+                emailService.sendPasswordResetConfirmationEmail(currentUser);
+            } catch (MessagingException e) {
                 logger.error("Password reset confirmation email not sent");
             }
-            return "redirect:/login";
+
         }
+        return "redirect:/login";
     }
 }
