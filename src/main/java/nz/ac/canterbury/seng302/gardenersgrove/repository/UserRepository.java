@@ -39,4 +39,11 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @return number of users with the given email address
      */
     int countDistinctByEmailAddress(String emailAddress);
+
+
+    /**
+     * Deletes a user by id
+     * @param id The id of the user to delete
+     */
+    void deleteById(long id);
 }

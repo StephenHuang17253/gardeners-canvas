@@ -17,7 +17,8 @@ import java.nio.file.StandardCopyOption;
 import org.slf4j.Logger;
 
 /**
- * Service class for handling file operations such as saving, loading, and deleting files
+ * Service class for handling file operations such as saving, loading, and
+ * deleting files
  */
 @Service
 public class FileService {
@@ -36,9 +37,10 @@ public class FileService {
 
     /**
      * Creates a Resource object from the given file path
+     * 
      * @param file Path to the file
      * @return Resource object representing the file
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public Resource createResource(Path file) throws MalformedURLException {
         try {
@@ -50,6 +52,7 @@ public class FileService {
 
     /**
      * Returns the rootLocation directory as a Path
+     * 
      * @return rootLocation directory
      */
     public Path getRootLocation() {
@@ -58,6 +61,7 @@ public class FileService {
 
     /**
      * Loads a file with the given fileName from the rootLocation directory
+     * 
      * @param fileName Name of the file to load
      * @return Resource object representing the file
      * @throws MalformedURLException if the file cannot be read
@@ -78,8 +82,9 @@ public class FileService {
 
     /**
      * Saves a file with the given fileName to the rootLocation directory
+     * 
      * @param fileName Name to save the file as
-     * @param file The file to save
+     * @param file     The file to save
      * @throws IOException
      */
     public void saveFile(String fileName, MultipartFile file) throws IOException {
@@ -114,9 +119,9 @@ public class FileService {
     public String[] getAllFiles() throws IOException {
         try {
             String[] thingy = Files.walk(getRootLocation(), 1)
-            .map(Path::getFileName)
-            .map(Path::toString)
-            .toArray(String[]::new);
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .toArray(String[]::new);
             return thingy;
         } catch (IOException error) {
             throw new IOException("Could not list the files");

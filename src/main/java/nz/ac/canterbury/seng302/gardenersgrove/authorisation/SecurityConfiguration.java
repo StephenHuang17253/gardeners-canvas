@@ -68,9 +68,9 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**")))
                 .authorizeHttpRequests(request ->
                 // Allow "/", "/register", and "/login" to anyone (permitAll)
+
                 request.requestMatchers("/", "/register", "/login", "/home", "/static/**", "/css/**", "/js/**",
-                        "/images/**", "/Images/**",
-                        "/img/**", "/error", "/access-denied")
+                        "/images/**", "/Images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**")
                         .permitAll()
                         // Any other request requires authentication
                         .anyRequest()
