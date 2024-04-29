@@ -46,7 +46,7 @@ public class RegisterANewUser {
     String repeatPassword;
     LocalDate dateOfBirth;
 
-    @Given("Given i am on the registration page")
+    @Given("i am on the registration page")
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         RegistrationFormController registrationFormController = new RegistrationFormController(userService, authenticationManager);

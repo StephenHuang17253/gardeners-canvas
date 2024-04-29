@@ -1,5 +1,6 @@
 Feature: U1 As Sarah, I want to register on Gardener’s Grove so that I can use its awesome features.
-  Background: Given i am on the registration page
+  Background: set up test
+    Given i am on the registration page
 
   Scenario: AC2 - I enter valid values for the registration form
     When I enter valid values for my first name "Jane" and last name "Doe", email address "janedoe@email.com", password "TestPassword10!", repeat password "TestPassword10!" and optionally date of birth "10/10/2001"
