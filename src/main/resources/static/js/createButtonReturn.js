@@ -41,14 +41,6 @@ function openLoginPage() {
         localStorage.setItem('previousUrl', window.location.href);
 
         // Redirect to create-new-garden page
-        if (window.location.href.includes("test"))
-        {
-            window.location.href = '/test/login'
-        }
-        else if (window.location.href.includes("prod"))
-        {
-            window.location.href = '/prod/login'
-        }
         window.location.href = '/login';
 
     }
