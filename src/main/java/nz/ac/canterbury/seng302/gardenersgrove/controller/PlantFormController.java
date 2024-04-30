@@ -223,7 +223,7 @@ public class PlantFormController {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Plant> plantToUpdate =  plantService.findById(plantId);
-        if(!plantToUpdate.isPresent())
+        if(plantToUpdate.isEmpty())
         {
             return "404";
         }
