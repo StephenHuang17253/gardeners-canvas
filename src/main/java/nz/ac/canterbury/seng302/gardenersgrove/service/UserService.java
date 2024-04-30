@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
@@ -191,4 +192,17 @@ public class UserService {
         String currentPassword = user.getEncodedPassword();
         return passwordEncoder.matches(passwordToCheck, currentPassword);
     }
+    /**
+     * Add garden to the user's garden list
+     *
+     * @param garden Garden entity to add to the list
+     * @param id id of the user to add garden to
+     */
+    public void addGardenToGardenList(Garden garden, Long id) {
+        User user = getUserById(id);
+        user.getGardens().add(garden);
+        userRepository.save(user);
+    }
+
+
 }

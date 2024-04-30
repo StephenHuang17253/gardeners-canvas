@@ -52,24 +52,25 @@ public class ResetPasswordController {
 
         logger.info("POST /lost-password");
         boolean isRegistered = userService.emailInUse(email);
-        ValidationResult emailValidation = InputValidator.validateUniqueEmail(email);
+        ValidationResult emailValidation = InputValidator.validateEmail(email);
 
-        if (!isRegistered && !emailValidation.valid()) {
+        if (!emailValidation.valid()){
             model.addAttribute("emailError", emailValidation);
-        } else {
+        } else  {
             model.addAttribute("message", "An email was sent to the address if it was recognised");
-            User currentUser = userService.getUserByEmail(email);
-            Token token = new Token(currentUser, null);
-            tokenService.addToken(token);
-            try {
-                // code for getting the baseURL is from https://gist.github.com/beradrian/d66008b6c5a784185c29
-                String baseURL = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
-                emailService.sendResetPasswordEmail(token, baseURL);
-            } catch (MessagingException e) {
-                logger.info("could not send email to " + email);
+            if (isRegistered) {
+                User currentUser = userService.getUserByEmail(email);
+                Token token = new Token(currentUser, null);
+                tokenService.addToken(token);
+                try {
+                    // code for getting the baseURL is from https://gist.github.com/beradrian/d66008b6c5a784185c29
+                    String baseURL = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
+                    emailService.sendResetPasswordEmail(token, baseURL);
+                } catch (MessagingException e) {
+                    logger.info("could not send email to " + email);
+                }
             }
         }
-
         return "lostPasswordForm";
     }
 

@@ -8,9 +8,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,12 +40,13 @@ public class RegisterANewUser {
     public AuthenticationManager authenticationManager;
 
     @Autowired
-    public TokenService tokenService;
-
-    @Autowired
-    public EmailService emailService;
+    public GardenService gardenService;
 
     public static UserService userService;
+
+    public EmailService emailService;
+
+    public TokenService tokenService;
 
 
     String firstName;
@@ -57,7 +60,11 @@ public class RegisterANewUser {
     @Given("i am on the registration page")
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
-        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService);
+        emailService = Mockito.mock(EmailService.class);
+        tokenService = Mockito.mock(TokenService.class);
+        gardenService = Mockito.mock(GardenService.class);
+
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService,gardenService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }

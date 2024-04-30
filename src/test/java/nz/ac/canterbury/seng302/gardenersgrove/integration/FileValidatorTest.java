@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.multipart.MultipartFile;
 
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
@@ -21,6 +22,7 @@ public class FileValidatorTest {
     private static FileType fileType = FileType.IMAGES;
 
     @BeforeAll
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
     public static void setUp() {
 
         String validFilename = "client_filename.png";

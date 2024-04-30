@@ -1,10 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
@@ -28,32 +31,36 @@ import java.util.Optional;
  * Controller for viewing all the created Gardens
  */
 @Controller
+@SessionAttributes("userGardens")
 public class MyGardensController {
 
     Logger logger = LoggerFactory.getLogger(MyGardensController.class);
 
     private final GardenService gardenService;
 
+    private final SecurityService securityService;
+
     private final PlantService plantService;
 
     private final FileService fileService;
 
     @Autowired
-    public MyGardensController(GardenService gardenService, PlantService plantService, FileService fileService) {
+    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.fileService = fileService;
+        this.securityService = securityService;
+
     }
 
     /**
      * Maps the myGardensPage html file to /my-gardens url
+     *
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
     public String myGardens(Model model) {
         logger.info("GET /my-gardens");
-        model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("gardenCount", gardenService.getGardens().size());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -65,63 +72,65 @@ public class MyGardensController {
     /**
      * Gets all the users created gardens
      * and maps them all and there attributes to the gardenDetailsPage
-     * but with the custom url of /my-gardens/{gardenId}={gardenName}
+     * but with the custom url of /my-gardens/{gardenId}
+     *
      * @return thymeleaf createNewGardenForm
      */
-    @GetMapping("/my-gardens/{gardenId}={gardenName}")
-    public String showGardenDetails(@PathVariable("gardenId") String gardenIdString,
-                                    @PathVariable String gardenName,
+    @GetMapping("/my-gardens/{gardenId}")
+    public String showGardenDetails(@PathVariable Long gardenId,
+                                    HttpServletResponse response,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenIdString, gardenName);
-
-        long gardenId = Long.parseLong(gardenIdString);
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
-        model.addAttribute("myGardens", gardenService.getGardens());
+        logger.info("GET /my-gardens/{}-{}", gardenId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        if (optionalGarden.isPresent()) {
-            Garden garden = optionalGarden.get();
-            model.addAttribute("gardenName", garden.getGardenName());
-            model.addAttribute("gardenLocation", garden.getGardenLocation());
-            model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenId",gardenIdString);
-            model.addAttribute("plants",garden.getPlants());
-            model.addAttribute("totalPlants",garden.getPlants().size());
-            return "gardenDetailsPage";
-        } else {
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (!optionalGarden.isPresent()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+        model.addAttribute("gardenName", garden.getGardenName());
+        model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("gardenSize", garden.getGardenSize());
+        model.addAttribute("gardenId", gardenId);
+        model.addAttribute("plants", garden.getPlants());
+        model.addAttribute("totalPlants", garden.getPlants().size());
+        return "gardenDetailsPage";
+
     }
 
     /**
      * This function is called when a user tries to update a plants image directly from the My Garden's page
      * instead of one of the plant forms.
+     *
      * @param gardenIdString id of the garden being edited
-     * @param gardenName name of the garden being edited
-     * @param plantId id of the plant being edited
-     * @param plantPicture the new picture
-     * @param model the model
+     * @param plantId        id of the plant being edited
+     * @param plantPicture   the new picture
+     * @param model          the model
      * @return thymeleaf gardenDetails
      */
-    @PostMapping("/my-gardens/{gardenId}={gardenName}")
+    @PostMapping("/my-gardens/{gardenId}")
     public String updatePlantImage(@PathVariable("gardenId") String gardenIdString,
-                                   @PathVariable String gardenName,
                                    @RequestParam("plantId") String plantId,
                                    @RequestParam("plantPictureInput") MultipartFile plantPicture,
                                    Model model) {
-        logger.info("POST /my-gardens/{}-{}", gardenIdString, gardenName);
+        logger.info("POST /my-gardens/{}", gardenIdString);
 
         long gardenId = Long.parseLong(gardenIdString);
-        Optional<Garden> optionalGarden = gardenService.findById(gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         model.addAttribute("myGardens", gardenService.getGardens());
 
         Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));
         model.addAttribute("plantToEditId", (Long.parseLong(plantId)));
-        if(!plantToUpdate.isPresent())
-        {
+        if (!plantToUpdate.isPresent()) {
             return "404";
         }
 
@@ -143,9 +152,9 @@ public class MyGardensController {
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenId",gardenIdString);
-            model.addAttribute("plants",garden.getPlants());
-            model.addAttribute("totalPlants",garden.getPlants().size());
+            model.addAttribute("gardenId", gardenIdString);
+            model.addAttribute("plants", garden.getPlants());
+            model.addAttribute("totalPlants", garden.getPlants().size());
 
 
         } else {
@@ -165,7 +174,7 @@ public class MyGardensController {
             }
             logger.info("Plant updated successfully");
 
-            return "redirect:/my-gardens/{gardenId}={gardenName}";
+            return "redirect:/my-gardens/{gardenId}";
         }
 
     }

@@ -46,7 +46,7 @@ public class Plant {
      * @param plantCount the count of the plant
      * @param plantDescription the description of the plant
      * @param plantDate the date of planting
-     //* @param gardenId the ID of the Garden the plant is planted in
+     * @param garden the Garden object that the plant belongs to
      */
     public Plant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Garden garden) {
         this.plantName = plantName;
