@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Objects;
 
@@ -76,8 +77,10 @@ public class ResetPasswordController {
                 Token token = new Token(currentUser, null);
                 tokenService.addToken(token);
                 try {
+                    logger.info(request.getRequestURL().toString());
+                    logger.info(ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
                     // code for getting the baseURL is from https://gist.github.com/beradrian/d66008b6c5a784185c29
-                    String baseURL = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
+                    String baseURL = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
                     emailService.sendResetPasswordEmail(token, baseURL);
                 } catch (MessagingException e) {
                     logger.info("could not send email to " + email);
