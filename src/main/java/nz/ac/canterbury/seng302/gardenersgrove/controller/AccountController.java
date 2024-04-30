@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -46,6 +47,7 @@ public class AccountController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final GardenService gardenService;
 
     // For development to avoid sending signup emails but print the signup token to
     // the terminal instead, set to true or remove for production
@@ -62,11 +64,12 @@ public class AccountController {
      */
     @Autowired
     public AccountController(UserService userService, AuthenticationManager authenticationManager,
-            EmailService emailService, TokenService tokenService) {
+                             EmailService emailService, TokenService tokenService, GardenService gardenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
         this.tokenService = tokenService;
+        this.gardenService = gardenService;
     }
 
     /**
@@ -335,7 +338,7 @@ public class AccountController {
      */
     @PostMapping("/login")
     public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
-            @RequestParam String password, Model model) {
+            @RequestParam String password, HttpSession session, Model model) {
         logger.info("POST /login");
 
         removeIfExpired(emailAddress);
@@ -359,6 +362,7 @@ public class AccountController {
         }
 
         setSecurityContext(emailAddress, password, request.getSession());
+        session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
 
         return "redirect:/home";
 

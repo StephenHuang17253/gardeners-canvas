@@ -30,6 +30,7 @@ dependencies {
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	// Use JUnit Jupiter for testing.
 	//    testImplementation libs.junit.jupiter
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

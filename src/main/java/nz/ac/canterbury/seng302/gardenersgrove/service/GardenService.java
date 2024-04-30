@@ -14,6 +14,8 @@ import java.util.List;
 @Service
 public class GardenService {
 
+    private UserService userService;
+
     /**
      * Interface for generic CRUD operations on a repository for Garden types.
      */
@@ -24,16 +26,30 @@ public class GardenService {
      * @param gardenRepository the repository for Gardens
      */
     @Autowired
-    public GardenService(GardenRepository gardenRepository) {
+    public GardenService(GardenRepository gardenRepository, UserService userService) {
         this.gardenRepository = gardenRepository;
+        this.userService = userService;
     }
 
     /**
      * Retrieves all gardens from persistence
      * @return a list of all garden objects saved in persistence
      */
+    //might be irrlevant for this sprint
     public List<Garden> getGardens() {
         return gardenRepository.findAll();
+    }
+    /**
+     * Retrieves all gardens from persistence where the owner id matches the inputted id
+     * @param id the user's ID
+     * @throws IllegalArgumentException if the provided user ID is invalid
+     */
+    public List<Garden> getAllUsersGardens(long id) {
+        if (userService.getUserById(id) != null) {
+            return gardenRepository.findByOwnerId(id);
+        } else {
+            throw new IllegalArgumentException("Invalid user ID: " + id);
+        }
     }
 
     /**
@@ -41,38 +57,46 @@ public class GardenService {
      * @param id the garden's ID
      * @return the garden or Optional#empty() if none found
      */
-    public Optional<Garden> findById(long id) {
+    public Optional<Garden> getGardenById(long id) {
         return gardenRepository.findById(id);
     }
 
     /**
      * Adds a new garden
      * @param garden the garden to add
+     * @throws IllegalArgumentException if the user associated with the garden is not in the db
      */
     public Garden addGarden(Garden garden) {
-        return gardenRepository.save(garden);
+        if (garden.getOwner().getId() != null && userService.getUserById(garden.getOwner().getId()) != null) {
+            userService.addGardenToGardenList(garden, garden.getOwner().getId());
+            return gardenRepository.save(garden);
+        } else {
+            throw new IllegalArgumentException("User " + garden.getOwner().getFirstName()
+                    + " " + garden.getOwner().getLastName()
+                    + " does not exist");
+        }
     }
 
     /**
-     * Updates a garden
+     * Updates a garden values
      * @param id the id of the existing garden
-     * @param newGarden the new garden details
+     * @param newGardenValues the new garden values
+     * @throws IllegalArgumentException if invalid garden id
      */
-    public Garden updateGarden(Long id, Garden newGarden) {
-        Optional<Garden> targetGarden = findById(id);
-        if (targetGarden.isPresent()) {
-            Garden oldGarden = targetGarden.get();
+    public Garden updateGarden(Long id, Garden newGardenValues) {
+        Optional<Garden> optionalGarden = getGardenById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
 
-            oldGarden.setGardenName(newGarden.getGardenName());
-            oldGarden.setGardenAddress(newGarden.getGardenAddress());
-            oldGarden.setGardenSuburb(newGarden.getGardenSuburb());
-            oldGarden.setGardenCity(newGarden.getGardenCity());
-            oldGarden.setGardenPostcode(newGarden.getGardenPostcode());
-            oldGarden.setGardenCountry(newGarden.getGardenCountry());
-            oldGarden.setGardenLocation(newGarden.getGardenLocation());
-            oldGarden.setGardenSize(newGarden.getGardenSize());
+            targetGarden.setGardenName(newGardenValues.getGardenName());
+            targetGarden.setGardenAddress(newGardenValues.getGardenAddress());
+            targetGarden.setGardenSuburb(newGardenValues.getGardenSuburb());
+            targetGarden.setGardenCity(newGardenValues.getGardenCity());
+            targetGarden.setGardenPostcode(newGardenValues.getGardenPostcode());
+            targetGarden.setGardenCountry(newGardenValues.getGardenCountry());
+            targetGarden.setGardenSize(newGardenValues.getGardenSize());
 
-            return gardenRepository.save(oldGarden);
+            return gardenRepository.save(targetGarden);
 
         } else {
             throw new IllegalArgumentException("Invalid garden ID");
@@ -85,19 +109,14 @@ public class GardenService {
      * @throws IllegalArgumentException if invalid garden ID
      */
     public void addPlantToGarden(Long gardenId, Plant plant) {
-        Optional<Garden> optionalGarden = findById(gardenId);
+        Optional<Garden> optionalGarden = getGardenById(gardenId);
 
         if (optionalGarden.isPresent()) {
             Garden garden = optionalGarden.get();
-            //add plant to the garden's list
             garden.getPlants().add(plant);
-            //since list is updated save changes to repo
             gardenRepository.save(garden);
         } else {
             throw new IllegalArgumentException("Invalid garden ID");
         }
     }
-
-
-
 }
