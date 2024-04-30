@@ -182,7 +182,7 @@ public class PlantFormControllerTest {
         String gardenName = "test";
         String plantId = "1";
         String plantDescription = "standardPlant";
-        int plantCount = 1;  // Standard count for testing
+        int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
 
         mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
@@ -214,7 +214,7 @@ public class PlantFormControllerTest {
         String gardenName = "test";
         String plantId = "1";
         String plantDescription = "standardPlant";
-        int plantCount = 1;  // Standard count for testing
+        int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
 
         mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
@@ -382,7 +382,7 @@ public class PlantFormControllerTest {
         String gardenName = "test";
         String plantId = "1";
         String plantName = "standardPlant";
-        int plantCount = 1;  // Standard count for testing
+        int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
 
         mockMvc.perform(post("/my-gardens/{gardenId}={gardenName}/{plantId}={plantName}/edit", gardenId, gardenName, plantId, plantName).with(csrf())
