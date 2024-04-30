@@ -92,11 +92,18 @@
 
             <input type="hidden" th:name="gardenLocation" id="gardenLocation" data-cy="gardenLocation">
             <button type="submit" class = "submit-button">Submit</button>
-            <a th:href="@{/my-gardens/{gardenId}={gardenName}(gardenId=${gardenId}, gardenName=${gardenName})}">
+            <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
                 <button type="button" class="cancel-button" >Cancel</button>
             </a>
         </form>
     </div>
+
+    <!-- This is a licensing term for our free plan -->
+    <div class="location-footer">
+        <br>
+        <p>Location Services powered by <a href="https://locationiq.com/?ref=link-back">LocationIQ</a></p>
+    </div>
+
 </div>
 <script src="/js/preventEnterSubmit.js"></script>
 <script src="/js/locationIQAutocomplete.js"></script>

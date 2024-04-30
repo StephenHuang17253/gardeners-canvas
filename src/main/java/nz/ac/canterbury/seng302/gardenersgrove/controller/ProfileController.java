@@ -1,5 +1,31 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
@@ -7,39 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 /**
  * Controller for the profile and edit profile pages, handles viewing and
@@ -78,7 +71,7 @@ public class ProfileController {
      */
     public String getProfilePictureString(String filename) {
 
-        String profilePictureString = "/Images/default_profile_picture.png";
+        String profilePictureString = "/images/default_profile_picture.png";
 
         if (filename != null && !filename.isEmpty()) {
             profilePictureString = MvcUriComponentsBuilder
@@ -96,10 +89,10 @@ public class ProfileController {
      * @param filename file to retrieve
      * @return response with the file
      */
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("/files/users/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/" + filename);
+        logger.info("GET /files/users/" + filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
@@ -246,7 +239,7 @@ public class ProfileController {
      * @return The profileEditPage html page
      */
     @GetMapping("/profile/edit")
-    public String editForm(Model model) {
+    public String editProfile(Model model) {
         logger.info("GET /profile/edit");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -297,6 +290,10 @@ public class ProfileController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
+
+
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
 
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
@@ -369,6 +366,75 @@ public class ProfileController {
         userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, dateOfBirth);
 
         setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
+        return "redirect:/profile";
+    }
+
+    /**
+     * This function is called when a GET request is made to /profile/editPassword and processes authentication
+     *
+     * @param model          - (map-like) representation of user's input
+     * @return redirect to editPasswordForm form
+     */
+    @GetMapping("profile/editPassword")
+    public String editPassword(Model model)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email);
+
+        logger.info("GET profile/editPassword");
+        return "editPasswordForm";
+    }
+
+
+    /**
+     * Redirects POST url '/profile/editPassword' to the edit form if invalid input
+     * or to user's profile page '/profile' if edit completed
+     *
+     * @param currentPassword      - user's current password
+     * @param newPassword       - new password user would like to change to
+     * @param retypePassword     - retyped password to see if matches new password
+     * @param model          - (map-like) representation of user's input (above
+     *                       parameters)
+     * @return redirect to editpassword form or to profile page
+     */
+    @PostMapping("/profile/editPassword")
+    public String editProfile(HttpServletRequest request,
+                              @RequestParam(name = "currentPassword") String currentPassword,
+                              @RequestParam(name = "newPassword") String newPassword,
+                              @RequestParam(name = "retypePassword") String retypePassword,
+                              Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentEmail = authentication.getName();
+        User currentUser = userService.getUserByEmail(currentEmail);
+
+        boolean valid = true;
+
+        if (!userService.checkPassword(currentUser.getId(), currentPassword)) {
+            model.addAttribute("currentPasswordError", "Your old password is incorrect");
+            valid = false;
+        }
+
+
+        if (!newPassword.equals(retypePassword)) {
+            model.addAttribute("passwordMatchingError", "The new passwords do not match");
+            valid = false;
+        }
+
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword);
+
+        if (!passwordValidation.valid()) {
+            model.addAttribute("passwordError", passwordValidation);
+            valid = false;
+        }
+
+        if (!valid) {
+            return "editPasswordForm";
+        }
+
+        //Update user's password
+        userService.updatePassword(currentUser.getId(), newPassword);
         return "redirect:/profile";
     }
 

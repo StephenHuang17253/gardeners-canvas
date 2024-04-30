@@ -134,3 +134,8 @@ label {
 #rateLimitMessage.show {
     display: block;
 }
+
+.location-footer {
+    font-family: "Roboto", sans-serif;
+    font-size: 12px;
+}

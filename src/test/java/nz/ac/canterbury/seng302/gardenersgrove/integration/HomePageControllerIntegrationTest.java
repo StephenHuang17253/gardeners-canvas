@@ -1,37 +1,29 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 
-import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class HomePageControllerIntegrationTest {
 
     @Autowired
@@ -98,7 +90,7 @@ public void before_or_after_all() {
     public void getProfilePictureString_Null_DefaultPath() throws Exception
     {
         String pictureUrl = homePageController.getProfilePictureString(null);
-        assertEquals("/Images/default_profile_picture.png", pictureUrl);
+        assertEquals("/images/default_profile_picture.png", pictureUrl);
     }
 
     @Test
@@ -120,7 +112,7 @@ public void before_or_after_all() {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("username",is("Welcome John Doe")))
-                .andExpect(model().attribute("profilePicture", is("/Images/default_profile_picture.png")));
+                .andExpect(model().attribute("profilePicture", is("/images/default_profile_picture.png")));
     };
 
 

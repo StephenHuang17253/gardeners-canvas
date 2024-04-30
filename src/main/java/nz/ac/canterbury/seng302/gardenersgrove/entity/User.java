@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity class reflecting a registered user
@@ -16,6 +18,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false, length = 64)
@@ -35,6 +38,13 @@ public class User {
 
     @Column(length = 64)
     private String profilePictureFilename;
+
+    @Column
+    private boolean verified;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Garden> gardens =  new ArrayList<>();
 
     /**
      * JPA required no-args constructor
@@ -56,6 +66,7 @@ public class User {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.dateOfBirth = dateOfBirth;
+        this.verified = false;
     }
 
     public void setFirstName(String firstName) {
@@ -82,9 +93,10 @@ public class User {
         this.profilePictureFilename = profilePictureFilename;
     }
 
-    public String getEncodedPassword() {
-        return password;
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
+
 
     public Long getId() {
         return id;
@@ -110,17 +122,30 @@ public class User {
         return profilePictureFilename;
     }
 
+    public String getEncodedPassword() {
+        return password;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public List<Garden> getGardens() { return gardens; }
+
     /**
      * Returns a string representation of the user
      */
     @Override
     public String toString() {
         return "User{" +
+                "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
                 ", profilePictureFilename='" + profilePictureFilename + '\''+
+                ", gardens='" + gardens + '\''+
+                ", verified='" + verified + '\'' +
                 '}';
     }
 }

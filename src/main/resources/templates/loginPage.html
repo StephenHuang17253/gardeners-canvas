@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/loginPage.css}" rel="stylesheet">
-    <link th:href="@{/css/navBar.css}" rel="stylesheet">
-    <title>Login Page</title>
-  </head>
-  <body>
+
+<head>
+  <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
+  <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+  <link th:href="@{/css/loginPage.css}" rel="stylesheet">
+  <link th:href="@{/css/navBar.css}" rel="stylesheet">
+  <title>Login Page</title>
+</head>
+
+<body>
   <div th:replace="fragmentExample/fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="container">
-      <h1>Login</h1>
-      <form th:action="@{login}" method="POST">
-        <div>
-          <label for="email">Email</label>
-          <input type="email" class="form-control" id="email" placeholder="email" th:name="email" required autofocus />
-          <p th:if="${emailError}" class="error-message" th:text="${emailError}"></p>
-        </div>
-        <div>
-          <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="password" th:name="password" required />
-          <p th:if="${loginError}" class="error-message" th:text="${loginError}"></p>
-        </div>
-        <div class="buttons">
-          <button type="submit" class="user_button" formnovalidate>Sign In</button>
-          <a th:href="@{home}"><button type="button" class="user_button">Cancel</button></a>
-        </div>
-        <a th:href="@{register}" class="link">Not registered? Create an account</a>
-      </form>
-    </div>
-  </body>
+  <div class="container">
+    <h1>Login</h1>
+    <form th:action="@{login}" method="POST">
+      <div>
+        <label for="emailAddress">Email</label>
+        <input type="email" class="form-control" id="emailAddress" placeholder="email" th:name="emailAddress" required
+          autofocus />
+        <p th:if="${emailAddressError}" class="error" th:text="${emailAddressError}"></p>
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" placeholder="password" th:name="password" required />
+        <p th:if="${loginError}" class="error" th:text="${loginError}"></p>
+      </div>
+      <div class="buttons">
+        <button type="submit" class="user_button" formnovalidate>Sign In</button>
+        <a th:href="@{home}"><button type="button" class="user_button">Cancel</button></a>
+      </div>
+      <a th:href="@{register}" class="link">Not registered? Create an account</a>
+      <p th:if="${message}" th:text="${message}"></p>
+      <a th:href="@{lost-password}" class="link">Forgot your Password?</a>
+    </form>
+  </div>
+</body>
+
 </html>

@@ -17,6 +17,7 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
     /**
      * Finds a Garden object by id
      * @param id the garden's id
+     * @return none or a garden object
      */
     Optional<Garden> findById(long id);
 
@@ -25,4 +26,10 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
      * @return list of garden objects
      */
     List<Garden> findAll();
+    /**
+     * Find all Garden objects in repo where owner id matches userId
+     * @param userId the garden's id
+     * @return list of garden objects
+     */
+    List<Garden> findByOwnerId(long userId);
 }

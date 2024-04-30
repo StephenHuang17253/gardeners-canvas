@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gardener's Grove</title>
+    <link th:href="@{${#httpServletRequest.requestURL.root}/css/registrationEmail.css}" rel="stylesheet"
+          type="text/css">
+</head>
+
+<body>
+<p th:text="|Kia ora ${username}!|"></p>
+<p th:text="${mainBody}"></p>
+<a th:href="${url}"><p th:text="${urlText}"></p></a>
+<p th:text="${signOff}"></p>
+</body>
+
+</html>
