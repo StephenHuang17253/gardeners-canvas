@@ -382,13 +382,21 @@ public class ProfileController {
      * @return redirect to editPasswordForm form
      */
     @GetMapping("profile/editPassword")
-    public String editPassword(Model model)
+    public String editPassword(Model model,
+                               @RequestParam(name = "currentPassword", required = false) String currentPassword,
+                               @RequestParam(name = "newPassword", required = false) String newPassword,
+                               @RequestParam(name = "retypePassword", required = false) String retypePassword
+                                )
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
         String email = authentication.getName();
         User currentUser = userService.getUserByEmail(email);
+
+        model.addAttribute("currentPassword", currentPassword);
+        model.addAttribute("newPassword", newPassword);
+        model.addAttribute("retypePassword", retypePassword);
 
         logger.info("GET profile/editPassword");
         return "editPasswordForm";
@@ -440,6 +448,9 @@ public class ProfileController {
         }
 
         if (!valid) {
+            model.addAttribute("currentPassword", currentPassword);
+            model.addAttribute("newPassword", newPassword);
+            model.addAttribute("retypePassword", retypePassword);
             return "editPasswordForm";
         }
 
