@@ -2,7 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
@@ -20,12 +19,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Objects;
 
 /**
- *
+ * Controller for reset password and lost password forms.
+ * Handles resetting password and sending all relevant emails for it.
  */
 @Controller
 public class ResetPasswordController {
@@ -56,13 +55,11 @@ public class ResetPasswordController {
      * Checks if input values are valid and then sends reset password link to email entered
      * @param email input email to send reset password link to
      * @param model to collect field values and error messages
-     * @param request to identify base url
      * @return lostPasswordForm
      */
     @PostMapping("/lost-password")
     public String emailChecker(@RequestParam("email") String email,
-                               Model model,
-                               HttpServletRequest request) {
+                               Model model) {
 
         logger.info("POST /lost-password");
         boolean isRegistered = userService.emailInUse(email);
@@ -77,11 +74,7 @@ public class ResetPasswordController {
                 Token token = new Token(currentUser, null);
                 tokenService.addToken(token);
                 try {
-                    logger.info(request.getRequestURL().toString());
-                    logger.info(ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
-                    // code for getting the baseURL is from https://gist.github.com/beradrian/d66008b6c5a784185c29
-                    String baseURL = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-                    emailService.sendResetPasswordEmail(token, baseURL);
+                    emailService.sendResetPasswordEmail(token);
                 } catch (MessagingException e) {
                     logger.info("could not send email to " + email);
                 }
@@ -89,6 +82,7 @@ public class ResetPasswordController {
         }
         return "lostPasswordForm";
     }
+
 
     /**
      * Get form for entering in new passwords (for resetting passwords)

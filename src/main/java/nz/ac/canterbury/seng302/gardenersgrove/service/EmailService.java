@@ -44,6 +44,12 @@ public class EmailService {
     private String senderEmail;
 
     /**
+     * The base url of application
+     */
+    @Value("${spring.base.url}")
+    private String baseURL;
+
+    /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
      * 
@@ -112,9 +118,8 @@ public class EmailService {
      * Sends a reset password email to the user with token in reset password link
      *
      * @param token the token to use to reset password
-     * @param baseURL url to build link to reset password page
      */
-    public void sendResetPasswordEmail(Token token, String baseURL) throws MessagingException {
+    public void sendResetPasswordEmail(Token token) throws MessagingException {
         logger.info("Sending reset password email to "+token.getUser().getEmailAddress());
         String subject = "Link to Reset Password to Gardeners Grove!";
         String template = "generalEmail";
