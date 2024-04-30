@@ -65,7 +65,7 @@ public class LoginUser {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .post("/login")
-                        .param("email", userEmail)
+                        .param("emailAddress", userEmail)
                         .param("password", userPassword)
         ).andExpect(MockMvcResultMatchers.redirectedUrl("/home"));
     }

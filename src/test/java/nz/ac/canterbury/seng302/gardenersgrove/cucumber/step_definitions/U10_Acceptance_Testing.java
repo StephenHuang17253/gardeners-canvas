@@ -87,6 +87,7 @@ public class U10_Acceptance_Testing {
         LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
 
         User user = new User(firstName, LastName, userEmail, dateOfBirth);
+        user.setVerified(true);
         userService.addUser(user, userPassword);
         Assertions.assertNotNull(userService.getUserByEmail(userEmail));
     }
