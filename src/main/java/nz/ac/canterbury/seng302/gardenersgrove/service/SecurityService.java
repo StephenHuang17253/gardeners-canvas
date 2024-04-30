@@ -40,14 +40,23 @@ public class SecurityService {
         this.authenticationManager = authenticationManager;
 
     }
-
+    /**
+     * Cheeks if the owner id matches the current logged, in user
+     *
+     * @param ownerId user id of the user entity associated with a given garden entity
+     * @return boolean of if the current logged, in user matches the owner id of a garden
+     */
     public boolean isOwner(Long ownerId){
         logger.info("Security check");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByEmail(authentication.getName());
         return user.getId() == ownerId;
     }
-
+    /**
+     * Helper to get the current logged, in user
+     *
+     * @return user entity of logged, in user
+     */
     public User getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = this.userService.getUserByEmail(authentication.getName());
