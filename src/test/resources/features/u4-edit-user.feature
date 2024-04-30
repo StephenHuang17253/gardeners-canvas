@@ -56,7 +56,7 @@ Feature: U4 As Sarah, I want to edit my user profile so that I can keep my detai
 
 
   Scenario: AC8 I enter an email address associated to an account that already exists
-    Given There exists a user with email "example@email.com"
+    Given There exists an old user with email "example@email.com"
     When I enter invalid value for my email "example@email.com"
     And I click the "Submit" button
     Then No details are changed

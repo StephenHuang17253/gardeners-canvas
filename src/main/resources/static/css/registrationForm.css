@@ -3,10 +3,8 @@ Stylises the registrationForm.html webpage
 */
 
 h1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: underline;
+    text-align: center;
+    color: #333;
 }
 
 form {

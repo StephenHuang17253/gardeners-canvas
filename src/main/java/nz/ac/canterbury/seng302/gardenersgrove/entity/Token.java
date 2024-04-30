@@ -64,7 +64,7 @@ public class Token {
     /**
      * Creates a new Token object
      *
-     * @param user     the user accociated with this token
+     * @param user     the user associated with this token
      * @param lifetime the lifetime that the token should be valid for, or null to
      *                 use default value
      */

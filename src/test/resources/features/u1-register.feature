@@ -16,12 +16,12 @@ Feature: U1 As Sarah, I want to register on Gardener’s Grove so that I can use
     And I click the "Sign Up" button
     Then No account is created
     Examples:
-    | fname | lname   |
-    | "##"  | "Doe"   |
-    | "Jane"| "$$#doe"|
-    | "123" | "456"   |
-    | ""    | "Doe"   |
-    | "Jane"| ""      |
+      | fname | lname   |
+      | "##"  | "Doe"   |
+      | "Jane"| "$$#doe"|
+      | "123" | "456"   |
+      | ""    | "Doe"   |
+      | "Jane"| ""      |
 
 
   Scenario Outline: AC5 - I enter a first or last name that is more than 64 characters.
@@ -29,9 +29,9 @@ Feature: U1 As Sarah, I want to register on Gardener’s Grove so that I can use
     And I click the "Sign Up" button
     Then No account is created
     Examples:
-    |fname  | lname |
-    |"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" | "Doe" |
-    | "Jane"                                                | "abcdefghijklmnopqrstuvwxyzzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"|
+      |fname  | lname |
+      |"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" | "Doe" |
+      | "Jane"                                                | "abcdefghijklmnopqrstuvwxyzzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"|
 
 
   Scenario Outline: AC6 - I enter an empty or malformed email address
@@ -39,18 +39,18 @@ Feature: U1 As Sarah, I want to register on Gardener’s Grove so that I can use
     And I click the "Sign Up" button
     Then No account is created
     Examples:
-    | email|
-    |" "   |
-    |"user_123gmail.co.nz"|
-    |"john.doe@h."        |
-    |"test@test.c"        |
-    |"test@.com"          |
-    |"@test.com"          |
-    |"abc-@mail.com"      |
-    |"abc..def@mail.com"  |
-    |".abc@mail.com"      |
-    |"abc.def@mail#archive.com"|
-    |"abc.def@mail..com"       |
+      | email|
+      |" "   |
+      |"user_123gmail.co.nz"|
+      |"john.doe@h."        |
+      |"test@test.c"        |
+      |"test@.com"          |
+      |"@test.com"          |
+      |"abc-@mail.com"      |
+      |"abc..def@mail.com"  |
+      |".abc@mail.com"      |
+      |"abc.def@mail#archive.com"|
+      |"abc.def@mail..com"       |
 
 
   Scenario: AC7 I enter an email address associated to an account that already exists
@@ -76,19 +76,19 @@ Feature: U1 As Sarah, I want to register on Gardener’s Grove so that I can use
     And I click the "Sign Up" button
     Then No account is created
     Examples:
-    | password     | repeatPassword |
-    |"TestPass10!" | "TestPass200!"  |
-    |"TestPass200!"| "TestPass10! "  |
+      | password     | repeatPassword |
+      |"TestPass10!" | "TestPass200!"  |
+      |"TestPass200!"| "TestPass10! "  |
 
-    Scenario Outline: AC12 Given I am on the registration form, and I enter a weak password (i.e. is less than 8 characters,
-    does not contain at least one lower case letter, one upper case letter, one number, and one special
-    character), when I click the “Sign Up” button, then an error message tells me “Your password must be
-    at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number,
-    and one special character.”
-      When I enter invalid passwords for password <password> and repeat password <password>
-      And I click the "Sign Up" button
-      Then No account is created
-      Examples:
+  Scenario Outline: AC12 Given I am on the registration form, and I enter a weak password (i.e. is less than 8 characters,
+  does not contain at least one lower case letter, one upper case letter, one number, and one special
+  character), when I click the “Sign Up” button, then an error message tells me “Your password must be
+  at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number,
+  and one special character.”
+    When I enter invalid passwords for password <password> and repeat password <password>
+    And I click the "Sign Up" button
+    Then No account is created
+    Examples:
       | password |
       | ""       |
       |"aaa"     |
