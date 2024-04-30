@@ -1,7 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import io.cucumber.java.Before;
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -29,7 +30,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class U10_Acceptance_Testing {
@@ -68,8 +68,9 @@ public class U10_Acceptance_Testing {
 
     private MvcResult editGardenResult;
 
-    @Before
+    @Given("I am on the edit garden page")
     public void before_or_after_all() {
+        userRepository.deleteAll();
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
@@ -219,7 +220,4 @@ public class U10_Acceptance_Testing {
     }
 
 }
-
-
-
 

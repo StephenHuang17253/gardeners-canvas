@@ -140,7 +140,7 @@ public class UserService {
      * Update users profile picture filename
      * 
      * @param filename filename of profile picture
-     * @param id       id of user to update
+     * @param id      id of user to update
      */
     public void updateProfilePictureFilename(String filename, long id) {
         User user = getUserById(id);
@@ -167,6 +167,31 @@ public class UserService {
         userRepository.deleteById(user.getId());
     }
 
+    /**
+     * Finds user by the id input then encodes the NewPassword input using passwordEncoder
+     * then sets it as the users password
+     *
+     * @param id id of user to update
+     * @param NewPassword New password to set for user's account
+     */
+    public void updatePassword(long id, String NewPassword) {
+        User user = getUserById(id);
+        String encodedNewPassword = passwordEncoder.encode(NewPassword);
+        user.setPassword(encodedNewPassword);
+        userRepository.save(user);
+    }
+
+    /**
+     * Returns true if input password matches user's password in database
+     *
+     * @param id id of user to match
+     * @param passwordToCheck Password to check if same in database
+     */
+    public boolean checkPassword(long id, String passwordToCheck) {
+        User user = getUserById(id);
+        String currentPassword = user.getEncodedPassword();
+        return passwordEncoder.matches(passwordToCheck, currentPassword);
+    }
     /**
      * Add garden to the user's garden list
      *

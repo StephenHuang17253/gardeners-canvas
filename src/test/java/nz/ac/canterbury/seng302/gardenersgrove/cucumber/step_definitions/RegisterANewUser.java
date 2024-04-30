@@ -1,8 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import io.cucumber.java.Before;
-import io.cucumber.java.en.*;
-import jakarta.mail.MessagingException;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -56,8 +57,8 @@ public class RegisterANewUser {
     String repeatPassword;
     LocalDate dateOfBirth;
 
-    @Before
-    public void before_or_after_all() throws MessagingException {
+    @Given("i am on the registration page")
+    public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         emailService = Mockito.mock(EmailService.class);
         tokenService = Mockito.mock(TokenService.class);
