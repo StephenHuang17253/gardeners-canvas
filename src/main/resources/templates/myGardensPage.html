@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
         <title>My Gardens</title>
@@ -16,22 +16,22 @@
                 <h1 class="tableList-header-title"> User's Gardens </h1>
                 <span> Public Gardens: 0 </span>
                 <span> | </span>
-                <span th:text="'Private Gardens: ' + ${gardenCount}"> Private Gardens: 0 </span>
+                <span th:text="'Private Gardens: ' + ${session.userGardens?.size() ?: 0}"> Private Gardens: 0 </span>
                 <br>
             </div>
             <br>
             <div class="tableList-table-contain">
                 <div class="tableList-table-count">
                     <br>
-                    <span th:text="${gardenCount} + ' Gardens'"> # Plants </span>
+                    <span th:text="${userGardens?.size() ?: 0} + ' Gardens'"> </span>
                 </div>
-                <div th:each="garden : ${myGardens}">
+                <div th:each="garden : ${userGardens}">
                     <div th:replace="fragmentExample/fragments/gardenBox.html ::
-                        gardenBox(gardenId=${garden.gardenId},
-                        gardenName=${garden.gardenName},
-                        gardenLocation=${garden.gardenLocation},
-                        gardenSize=${garden.gardenSize},
-                        numberOfPlants=${garden.plants.size})">
+                        gardenBox(gardenId=${garden.getGardenId},
+                        gardenName=${garden.getGardenName},
+                        gardenLocation=${garden.getGardenLocation},
+                        gardenSize=${garden.getGardenSize},
+                        numberOfPlants=${garden.getPlants?.size()})">
                     </div>
 
                 </div>

@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AccountControllerTest {
 
     @Autowired
@@ -32,6 +35,8 @@ public class AccountControllerTest {
 
     @Mock
     private static UserService userServiceMock;
+    @Mock
+    private static GardenService gardenService;
 
     @InjectMocks
     private static AccountController accountController;
@@ -42,6 +47,7 @@ public class AccountControllerTest {
         authenticationManagerMock = Mockito.mock(AuthenticationManager.class);
         securityContextMock = Mockito.spy(SecurityContext.class);
         userServiceMock = Mockito.mock(UserService.class);
+        gardenService = Mockito.mock(GardenService.class);
         SecurityContextHolder.setContext(securityContextMock);
     }
 

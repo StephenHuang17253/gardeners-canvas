@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class GardenFormControllerTest {
 
     @Autowired
@@ -46,10 +49,10 @@ public class GardenFormControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserService userServiceMock;
-
-    @MockBean
     private GardenService gardenService;
+
+    @Autowired
+    UserService userService;
 
     User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.now());
 
@@ -63,9 +66,29 @@ public class GardenFormControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+        ;
 
+        if (!userService.emailInUse(mockUser.getEmailAddress()))
+        {
+            userService.addUser(mockUser, "password");
+        }
+
+
+
+        Garden test_garden = new Garden(
+                "test",
+                "test",
+                "test",
+                "test",
+                "80",
+                "test",
+                1.0f,
+                mockUser
+
+        );
         Optional<Garden> gardenOptional = Mockito.mock(Optional.class);
-        when(gardenService.findById(Mockito.anyLong())).thenReturn(gardenOptional);
+        Mockito.when(gardenOptional.get()).thenReturn(test_garden);
+        when(gardenService.getGardenById(Mockito.anyLong())).thenReturn(gardenOptional);
 
     }
 
@@ -111,7 +134,6 @@ public class GardenFormControllerTest {
                             .param("suburb","Hi")
                             .param("city","Hi")
                             .param("country","Hi")
-                            .param("gardenLocation","My Home")
                             .param("postcode","123")
                             .param("gardenSize","123"))
                     .andDo(MockMvcResultHandlers.print());
@@ -137,13 +159,12 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress","Hi")
                 .param("suburb","Hi")
                 .param("city","Hi")
                 .param("country","Hi")
-                .param("gardenLocation","My Home")
                 .param("postcode","123")
                 .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
@@ -214,7 +235,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName",input)
                 .param("streetAddress","Hi")
                 .param("suburb","Hi")
@@ -283,7 +304,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName",input)
                 .param("streetAddress","Hi")
                 .param("suburb","Hi")
@@ -355,7 +376,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress",input)
                 .param("suburb","Hi")
@@ -424,7 +445,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","input")
                 .param("streetAddress",input)
                 .param("suburb","Hi")
@@ -495,7 +516,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress","input")
                 .param("suburb",input)
@@ -564,7 +585,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","input")
                 .param("streetAddress","input")
                 .param("suburb",input)
@@ -634,7 +655,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -703,7 +724,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","input")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -774,7 +795,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -843,7 +864,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","input")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -913,7 +934,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -984,7 +1005,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","input")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -1052,7 +1073,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","Hi")
                 .param("streetAddress","input")
                 .param("suburb","input")
@@ -1129,7 +1150,7 @@ public class GardenFormControllerTest {
     {
 
 
-        mockMvc.perform(post("/my-gardens/123=test/edit").with(csrf())
+        mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName","input")
                 .param("streetAddress","input")
                 .param("suburb","input")

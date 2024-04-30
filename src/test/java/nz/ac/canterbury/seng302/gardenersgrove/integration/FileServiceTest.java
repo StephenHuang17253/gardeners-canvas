@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.multipart.MultipartFile;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 
@@ -30,6 +31,7 @@ public class FileServiceTest {
     public static String[] mockFileContents = { "Hello, World!", "ABCDEF", "Content" };
 
     @BeforeAll
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
     public static void setup() throws IOException {
         fileService = spy(new FileService());
     }

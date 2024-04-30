@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -37,6 +38,9 @@ public class RegisterANewUser {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
+    public GardenService gardenService;
+
     public static UserService userService;
 
     public EmailService emailService;
@@ -57,8 +61,9 @@ public class RegisterANewUser {
         userService = new UserService(passwordEncoder, userRepository);
         emailService = Mockito.mock(EmailService.class);
         tokenService = Mockito.mock(TokenService.class);
+        gardenService = Mockito.mock(GardenService.class);
 
-        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService);
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService,gardenService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }

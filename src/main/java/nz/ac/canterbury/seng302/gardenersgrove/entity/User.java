@@ -1,14 +1,11 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
+import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity class reflecting a registered user
@@ -44,6 +41,10 @@ public class User {
 
     @Column
     private boolean verified;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Garden> gardens =  new ArrayList<>();
 
     /**
      * JPA required no-args constructor
@@ -129,17 +130,21 @@ public class User {
         return verified;
     }
 
+    public List<Garden> getGardens() { return gardens; }
+
     /**
      * Returns a string representation of the user
      */
     @Override
     public String toString() {
         return "User{" +
-                "firstName='" + firstName + '\'' +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
-                ", profilePictureFilename='" + profilePictureFilename + '\'' +
+                ", profilePictureFilename='" + profilePictureFilename + '\''+
+                ", gardens='" + gardens + '\''+
                 ", verified='" + verified + '\'' +
                 '}';
     }
