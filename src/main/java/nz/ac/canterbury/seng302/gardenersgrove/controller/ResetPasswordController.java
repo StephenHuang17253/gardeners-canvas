@@ -23,7 +23,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Objects;
 
 /**
- *
+ * Controller for reset password and lost password forms.
+ * Handles resetting password and sending all relevant emails for it.
  */
 @Controller
 public class ResetPasswordController {
