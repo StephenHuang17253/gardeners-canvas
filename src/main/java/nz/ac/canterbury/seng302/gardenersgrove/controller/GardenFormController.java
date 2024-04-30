@@ -205,7 +205,6 @@ public class GardenFormController {
         logger.info("Created Garden Page");
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
-        redirectAttributes.addAttribute("gardenName", gardenName);
 
         return "redirect:/my-gardens/{gardenId}";
     }
