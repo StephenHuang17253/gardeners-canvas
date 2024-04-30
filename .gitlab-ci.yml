@@ -64,6 +64,7 @@ deploy-staging:
     - echo "export LOCATIONIQ_API_KEY=${LOCATIONIQ_API_KEY}" >> /home/gitlab-runner/staging/.env
     - echo "export EMAIL_PASSWORD=${EMAIL_PASSWORD}" >> /home/gitlab-runner/staging/.env
     - echo "export EMAIL_USERNAME=${EMAIL_USERNAME}" >> /home/gitlab-runner/staging/.env
+    - echo "export BASE_URL=${BASE_URL}/test" >> /home/gitlab-runner/staging/.env
     - sudo systemctl restart staging
   artifacts:
     paths:
