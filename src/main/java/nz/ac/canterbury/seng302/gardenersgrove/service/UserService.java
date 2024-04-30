@@ -140,31 +140,12 @@ public class UserService {
      * Update users profile picture filename
      * 
      * @param filename filename of profile picture
-     * @param id      id of user to update
+     * @param id       id of user to update
      */
     public void updateProfilePictureFilename(String filename, long id) {
         User user = getUserById(id);
         user.setProfilePictureFilename(filename);
         userRepository.save(user);
-    }
-
-    /**
-     * Verify a user, for when they enter the correct token
-     *
-     * @param user user to verify
-     */
-    public void verifyUser(User user) {
-        user.setVerified(true);
-        userRepository.save(user);
-    }
-
-    /**
-     * Deletes a user
-     *
-     * @param user
-     */
-    public void deleteUser(User user) {
-        userRepository.deleteById(user.getId());
     }
 
     /**
@@ -192,6 +173,25 @@ public class UserService {
         String currentPassword = user.getEncodedPassword();
         return passwordEncoder.matches(passwordToCheck, currentPassword);
     }
+    /**
+     * Verify a user, for when they enter the correct token
+     *
+     * @param user user to verify
+     */
+    public void verifyUser(User user) {
+        user.setVerified(true);
+        userRepository.save(user);
+    }
+
+    /**
+     * Deletes a user
+     *
+     * @param user
+     */
+    public void deleteUser(User user) {
+        userRepository.deleteById(user.getId());
+    }
+
     /**
      * Add garden to the user's garden list
      *

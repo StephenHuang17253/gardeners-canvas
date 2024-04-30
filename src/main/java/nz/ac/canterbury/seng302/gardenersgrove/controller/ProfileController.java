@@ -1,8 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -42,9 +44,10 @@ import java.util.Objects;
 public class ProfileController {
 
     Logger logger = LoggerFactory.getLogger(ProfileController.class);
-    private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
     private final FileService fileService;
+    private final EmailService emailService;
 
     /**
      * Constructor for the ProfileController with {@link Autowired} to connect this
@@ -55,11 +58,14 @@ public class ProfileController {
      * @param fileService service to manage files
      */
     @Autowired
-    public ProfileController(UserService userService,
-            AuthenticationManager authenticationManager, FileService fileService) {
-        this.userService = userService;
+    public ProfileController(AuthenticationManager authenticationManager,
+                             UserService userService,
+                             FileService fileService,
+                             EmailService emailService) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
         this.fileService = fileService;
+        this.emailService = emailService;
     }
 
     /**
@@ -376,11 +382,21 @@ public class ProfileController {
      * @return redirect to editPasswordForm form
      */
     @GetMapping("profile/editPassword")
-    public String editPassword(Model model)
+    public String editPassword(Model model,
+                               @RequestParam(name = "currentPassword", required = false) String currentPassword,
+                               @RequestParam(name = "newPassword", required = false) String newPassword,
+                               @RequestParam(name = "retypePassword", required = false) String retypePassword
+                                )
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
         String email = authentication.getName();
         User currentUser = userService.getUserByEmail(email);
+
+        model.addAttribute("currentPassword", currentPassword);
+        model.addAttribute("newPassword", newPassword);
+        model.addAttribute("retypePassword", retypePassword);
 
         logger.info("GET profile/editPassword");
         return "editPasswordForm";
@@ -406,6 +422,8 @@ public class ProfileController {
                               Model model) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
 
@@ -430,11 +448,23 @@ public class ProfileController {
         }
 
         if (!valid) {
+            model.addAttribute("currentPassword", currentPassword);
+            model.addAttribute("newPassword", newPassword);
+            model.addAttribute("retypePassword", retypePassword);
             return "editPasswordForm";
         }
 
-        //Update user's password
+        // Update user's password
         userService.updatePassword(currentUser.getId(), newPassword);
+
+        try {
+            logger.info("Attempting to send confirmation email");
+            emailService.sendPasswordResetConfirmationEmail(currentUser);
+            logger.info("Password update confirmation email was sent");
+        } catch (MessagingException e) {
+            logger.error("Password update confirmation email not sent");
+        }
+
         return "redirect:/profile";
     }
 

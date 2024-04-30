@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -66,7 +67,7 @@ public class EditAUser {
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
 
 
-    @Given("Given i am editing a user profile")
+    @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         tokenRepository.deleteAll();
