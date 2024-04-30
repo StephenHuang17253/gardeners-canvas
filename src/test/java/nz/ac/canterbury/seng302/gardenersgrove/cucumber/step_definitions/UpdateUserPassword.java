@@ -10,6 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
@@ -39,6 +41,8 @@ public class UpdateUserPassword {
     public UserRepository userRepository;
     @Autowired
     public FileService fileService;
+    @Autowired
+    public EmailService emailService;
 
     public static MockMvc MOCK_MVC;
     public static UserService userService;
@@ -53,7 +57,7 @@ public class UpdateUserPassword {
     @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
-        ProfileController profileController = new ProfileController(userService, authenticationManager, fileService);
+        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(profileController).build();
 
     }
