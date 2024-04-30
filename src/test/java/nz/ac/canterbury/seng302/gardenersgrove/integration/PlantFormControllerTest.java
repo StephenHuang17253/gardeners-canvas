@@ -22,10 +22,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -35,8 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -146,7 +145,7 @@ public class PlantFormControllerTest {
         );
 
         // Perform the request with MockMvc
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, mockPlant.getPlantId())
+        mockMvc.perform(multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, mockPlant.getPlantId())
                         .file(mockFile) // Attach the file using the file() method
                         .param("plantName", "test")
                         .param("plantCount", "1")
@@ -176,7 +175,13 @@ public class PlantFormControllerTest {
         when(mockPlant.getPlantId()).thenReturn(1L);
         String gardenId = "1";
         String gardenName = "test";
-        String plantPictureInput = "image.jpg";
+        String plantPictureInput = plantFormController.getPlantPictureString("test");
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "plantPictureInput", // This should match the name of the form field for the file in the request
+                "image.jpg",         // Filename
+                "image/jpeg",        // Content type
+                "image data".getBytes() // File content
+        );
         mockMvc.perform(post("/my-gardens/{gardenId}/create-new-plant", gardenId)
                         .contentType(MediaType.MULTIPART_FORM_DATA) // Set content type to multipart/form-data
                         .with(csrf())
@@ -187,6 +192,8 @@ public class PlantFormControllerTest {
                         .param("gardenId", gardenId)
                         .param("plantPictureInput", plantPictureInput))
                 .andDo(MockMvcResultHandlers.print());
+
+
 
         Mockito.verify(plantService, Mockito.never()).addPlant(plantName, plantCount, plantDescription, date, Long.parseLong(gardenId));
     }
@@ -401,20 +408,20 @@ public class PlantFormControllerTest {
         String plantDescription = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
+
+        MultipartFile emptyFile = new MockMultipartFile("empty", new byte[0]);
+
         MockMultipartFile plantPictureInput = new MockMultipartFile(
                 "plantPictureInput", "image.jpg", MediaType.IMAGE_JPEG_VALUE, "some image data".getBytes());
-        mockMvc.perform(post("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(csrf())
-                        .param("plantName", plantName)
-                        .param("plantCount", String.valueOf(plantCount))
-                        .param("plantDescription", plantDescription)
-                        .param("plantDate", date.toString())
-                        .param("gardenId", gardenId)
-                        .param("plantPictureInput", String.valueOf(plantPictureInput)))
+        MockMultipartFile pictureFile = new MockMultipartFile("plantPictureInput", "test.jpg", "image/jpeg", "test image".getBytes());
 
-                .andDo(MockMvcResultHandlers.print());
-
+        // Perform the mock POST request
+        mockMvc.perform(multipart("/my-gardens/{gardenId}/{plantId}/edit", 123L, 456L)
+                        .param("plantName", "Rose")
+                        .param("plantCount", "5")
+                        .param("plantDescription", "Beautiful flower")
+                        .param("plantDate", "2024-04-30")) // LocalDate format as string
+                .andExpect(status().isOk());
         Mockito.verify(plantService,  Mockito.times(1)).updatePlant(
                 Long.parseLong(plantId), plantName, (float)plantCount, plantDescription, date);
 
@@ -462,15 +469,12 @@ public class PlantFormControllerTest {
         String plantDescription = "standardPlant";
         LocalDate date = LocalDate.of(2024, 3, 28);
         String plantPictureInput = "image.jpg";
-        mockMvc.perform(post("/my-gardens/{gardenId}/{plantId}/edit", gardenId, gardenName, plantId, plantName)
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
+        mockMvc.perform(post("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
                         .with(csrf())
                         .param("plantName", plantName)
                         .param("plantCount", plantCount)
                         .param("plantDescription", plantDescription)
-                        .param("plantDate", date.toString())
-                        .param("gardenId", gardenId)
-                        .param("plantPictureInput", plantPictureInput))
+                        .param("plantDate", date.toString()))
 
                 .andDo(MockMvcResultHandlers.print());
 

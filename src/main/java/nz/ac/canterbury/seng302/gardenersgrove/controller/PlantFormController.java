@@ -10,7 +10,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,24 +18,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+
 import java.net.MalformedURLException;
 import java.time.LocalDate;
-import java.util.Optional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -227,7 +216,7 @@ public class PlantFormController {
                                      @RequestParam(name = "plantCount", required = false) String plantCount,
                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                     @RequestParam("plantPictureInput") MultipartFile plantPicture,
+                                     @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
                                      @PathVariable("gardenId") Long gardenId,
                                       @PathVariable("plantId") Long plantId,
                                      Model model) {
