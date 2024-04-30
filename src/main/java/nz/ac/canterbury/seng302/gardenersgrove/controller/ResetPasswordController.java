@@ -23,6 +23,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
 
+/**
+ *
+ */
 @Controller
 public class ResetPasswordController {
     private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
@@ -37,14 +40,24 @@ public class ResetPasswordController {
         this.tokenService = tokenService;
     }
 
-    // Lost Password
+    /**
+     * Get form for entering email if user has forgotten their password
+     * @return lostPasswordForm
+     */
     @GetMapping("/lost-password")
     public String lostPassword() {
         logger.info("GET /lost-password");
-
         return "lostPasswordForm";
     }
 
+    /**
+     * Post form for entering email if user has forgotten their password
+     * Checks if input values are valid and then sends reset password link to email entered
+     * @param email input email to send reset password link to
+     * @param model to collect field values and error messages
+     * @param request to identify base url
+     * @return lostPasswordForm
+     */
     @PostMapping("/lost-password")
     public String emailChecker(@RequestParam("email") String email,
                                Model model,
@@ -75,6 +88,8 @@ public class ResetPasswordController {
     }
 
     /**
+     * Get form for entering in new passwords (for resetting passwords)
+     * Checks token in url is valid
      * @param resetToken unique temp token for resetting password
      * @param redirectAttributes to add message before redirecting to different page
      * @return form for resetting password
@@ -96,6 +111,17 @@ public class ResetPasswordController {
         return "resetPasswordForm";
     }
 
+    /**
+     * Get form for entering in new passwords (for resetting passwords)
+     * Checks if input values are valid and then resets the password
+     * Sends confirmation email to user
+     * Also deletes the token to ensure it cannot be reused
+     * @param resetToken token to identify user whose password has to be reset
+     * @param password new password
+     * @param retypePassword new password
+     * @param model to collect field values and error messages
+     * @return resetPasswordForm or loginPage if reset password is successful
+     */
     @PostMapping("/reset-password/{token}")
     public String passwordChecker(@PathVariable("token") String resetToken,
                                   @RequestParam("password") String password,
