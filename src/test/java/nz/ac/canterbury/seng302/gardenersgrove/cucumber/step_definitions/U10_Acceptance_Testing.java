@@ -30,7 +30,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class U10_Acceptance_Testing {
@@ -71,6 +70,7 @@ public class U10_Acceptance_Testing {
 
     @Given("I am on the edit garden page")
     public void before_or_after_all() {
+        userRepository.deleteAll();
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
 

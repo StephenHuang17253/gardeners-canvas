@@ -1,6 +1,7 @@
 Feature: U10 (Edit garden details): As Kaia, I want to edit information about my garden so I can keep it up to date
 
 Background:
+  Given I am on the edit garden page
   Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
   And I as user "kaia@email.com" have a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
   And I as user "kaia@email.com" am logged in with "TestPassword10!"
@@ -12,7 +13,6 @@ Background:
 
 
   Scenario Outline: AC2 can submit valid values
-    Given I am on the garden edit form
     And  I enter valid garden values for the <name>, <city>, <country> and <size>
     When I click the Submit button on the edit garden form
     Then The garden details have been updated
@@ -27,7 +27,6 @@ Background:
       | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
-    Given I am on the garden edit form
     And I enter an invalid garden name value <Name>
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
@@ -43,7 +42,6 @@ Background:
       | ""                |
 
   Scenario Outline: AC4 - can't submit invalid size
-    Given I am on the garden edit form
     And I enter an invalid garden size value <size>
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
@@ -59,7 +57,6 @@ Background:
 
 
   Scenario Outline: AC5 - cannot submit invalid location
-    Given I am on the garden edit form
     And I enter invalid garden location values <City>, <Country>
     When I click the Submit button on the edit garden form
     Then The garden details are not updated
@@ -72,7 +69,6 @@ Background:
 
 
   Scenario: AC6 - can enter a size with a comma instead of full stop
-    Given I am on the garden edit form
     And I enter 1,5 as a size
     When I click the Submit button on the edit garden form
     Then The garden details have been updated

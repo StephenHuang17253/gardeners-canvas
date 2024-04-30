@@ -1,10 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -15,7 +13,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileVal
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -26,12 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
@@ -62,6 +55,7 @@ public class MyGardensController {
 
     /**
      * Maps the myGardensPage html file to /my-gardens url
+     *
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
@@ -84,8 +78,8 @@ public class MyGardensController {
      */
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
-                                          HttpServletResponse response,
-                                          Model model) {
+                                    HttpServletResponse response,
+                                    Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -99,14 +93,14 @@ public class MyGardensController {
             return "404";
         }
         Garden garden = optionalGarden.get();
-        if(!securityService.isOwner(garden.getOwner().getId())){
+        if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         model.addAttribute("gardenSize", garden.getGardenSize());
-        model.addAttribute("gardenId",gardenId);
+        model.addAttribute("gardenId", gardenId);
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
         return "gardenDetailsPage";
@@ -116,10 +110,11 @@ public class MyGardensController {
     /**
      * This function is called when a user tries to update a plants image directly from the My Garden's page
      * instead of one of the plant forms.
+     *
      * @param gardenIdString id of the garden being edited
-     * @param plantId id of the plant being edited
-     * @param plantPicture the new picture
-     * @param model the model
+     * @param plantId        id of the plant being edited
+     * @param plantPicture   the new picture
+     * @param model          the model
      * @return thymeleaf gardenDetails
      */
     @PostMapping("/my-gardens/{gardenId}")
@@ -127,7 +122,7 @@ public class MyGardensController {
                                    @RequestParam("plantId") String plantId,
                                    @RequestParam("plantPictureInput") MultipartFile plantPicture,
                                    Model model) {
-        logger.info("POST /my-gardens/{}-{}", gardenIdString, gardenName);
+        logger.info("POST /my-gardens/{}", gardenIdString);
 
         long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -135,8 +130,7 @@ public class MyGardensController {
 
         Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));
         model.addAttribute("plantToEditId", (Long.parseLong(plantId)));
-        if(!plantToUpdate.isPresent())
-        {
+        if (!plantToUpdate.isPresent()) {
             return "404";
         }
 
@@ -158,9 +152,9 @@ public class MyGardensController {
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenId",gardenIdString);
-            model.addAttribute("plants",garden.getPlants());
-            model.addAttribute("totalPlants",garden.getPlants().size());
+            model.addAttribute("gardenId", gardenIdString);
+            model.addAttribute("plants", garden.getPlants());
+            model.addAttribute("totalPlants", garden.getPlants().size());
 
 
         } else {
