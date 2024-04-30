@@ -1,72 +1,79 @@
-Feature: U10 Edit garden details
+Feature: U10 (Edit garden details): As Kaia, I want to edit information about my garden so I can keep it up to date
 
 Background:
-  Given I am on the edit garden page
-  And There is a user
-  And the user owns a garden "Test Garden"
-  And I am on the garden edit form
+  Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
+  And I as user "kaia@email.com" have a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
+  And I as user "kaia@email.com" am logged in with "TestPassword10!"
+
+  Scenario: AC1 - “Edit” button takes you to prepopulated edit garden form
+    Given I as user "kaia@email.com" is on my garden details page for "Kaia's Garden"
+    When I click the edit garden button
+    Then I see the edit garden form where all the details are prepopulated
 
 
   Scenario Outline: AC2 can submit valid values
-    When  I enter valid values for the "<name>", "<location>", "<size>" and "<postcode>"
-    And I click the edit plant form Submit button
-    And The garden details have been updated
+    Given I am on the garden edit form
+    And  I enter valid garden values for the <name>, <city>, <country> and <size>
+    When I click the Submit button on the edit garden form
+    Then The garden details have been updated
+    And I am taken back to the garden details page
     Examples:
-      | name         | location        | size  | postcode |
-      | gard         |   here          | 7     | 123      |
-      | ward         |   there         | 15    | 234      |
-      | Everywhere   |   13 A street   | 7,9   | 123      |
-      | ward         |   14 b STREET   | 7.9   | 67898    |
-      | ward-connect |   14 b STREET   | 7.9   | 99273    |
-      | ward-cÁÕăect |   14 b STÁÕăT   | 0.1   | 2823932  |
+      | name            | city            | country        | size       |
+      | "gard"          | "Townsville"    | "France"       | "7"        |
+      | "ward"          | "Läkeside"      | "Switzerland"  | "15"       |
+      | "Everywhere"    | "Rivèrdale"     | "Italy"        | "7.9"      |
+      | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
+      | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
 
-  Scenario Outline: AC3 can't submit invalid names
-    Given I enter valid values for the "name", "Location", "0.0" and "1234"
-    When I enter an invalid name value "<Name>"
-    And I click the edit plant form Submit button
+  Scenario Outline: AC3 can't submit non-alphanumeric names
+    Given I am on the garden edit form
+    And I enter an invalid garden name value <Name>
+    When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
-      | Name            |
-      | 13@fifty_laner  |
-      | sgsha!asdksad   |
-      | nowhereçua§il   |
-      | louois_hobson!  |
-      | [Alexandra]     |
-      | Clone #12       |
-      |        %        |
-
-
+      | Name              |
+      | "13@fifty_laner"  |
+      | "sgsha!asdksad"   |
+      | "nowhereçua§il"   |
+      | "louois_hobson!"  |
+      | "[Alexandra]"     |
+      | "Clone #12"       |
+      | " "               |
+      | ""                |
 
   Scenario Outline: AC4 - can't submit invalid size
-    Given I enter valid values for the "name", "Location", "0.0" and "1234"
-    When I enter an invalid size value "<size>"
-    And I click the edit plant form Submit button
+    Given I am on the garden edit form
+    And I enter an invalid garden size value <size>
+    When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
-      | size            |
-      | 13@fifty_laner  |
-      | sgsha!asdksad   |
-      | nowhereçua§il   |
-      | 12.6.5          |
-      | six             |
-      | 12,4.3          |
-      | Null            |
+      | size              |
+      | "13@fifty_laner"  |
+      | "sgsha!asdksad"   |
+      | "nowhereçua§il"   |
+      | "12.6.5"          |
+      | "six"             |
+      | "12,4.3"          |
+      | "Null"            |
 
 
-  Scenario Outline: AC5 - cant submit invalid location
-    Given I enter valid values for the "name", "Location", "0.0" and "1234"
-    When I enter an invalid location value "<inv_location>"
-    And I click the edit plant form Submit button
+  Scenario Outline: AC5 - cannot submit invalid location
+    Given I am on the garden edit form
+    And I enter invalid garden location values <City>, <Country>
+    When I click the Submit button on the edit garden form
     Then The garden details are not updated
     Examples:
-      | inv_location   |
-      | 13@fifty_laner |
-      | sgsha!asdksad  |
-      | nowhereçua§il  |
+      | City            | Country         |
+      | "a"             | "a"             |
+      | "13@fifty_laner"| "sgsha!asdksad" |
+      | "nowhereçua§i?" | "a"             |
+
 
 
   Scenario: AC6 - can enter a size with a comma instead of full stop
-    Given I enter valid values for the "name", "Location", "0.0" and "1234"
-    When I enter a size using a comma
-    And I click the edit plant form Submit button
+    Given I am on the garden edit form
+    And I enter 1,5 as a size
+    When I click the Submit button on the edit garden form
     Then The garden details have been updated
+    And I am taken back to the garden details page

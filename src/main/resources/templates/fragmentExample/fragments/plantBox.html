@@ -3,7 +3,7 @@
         <div class="plant-info">
             <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
 
-            <form th:action="@{/my-gardens/__${gardenId}__=__${gardenName}__}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data">
             <div class="plant_picture_container small_pic">
                 <img id="imageToChange" th:src="${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}"
                      alt="Plant Image" class="plant-image">
@@ -25,7 +25,7 @@
     </div>
 
     <div class="edit-button-container">
-        <a th:href="@{__${gardenId}__=__${gardenName}__/__${plantId}__=__${plantName}__/edit}">
+        <a th:href="@{__${gardenId}__/__${plantId}__/edit}">
             <button class="rounded-button">Edit Plant</button>
         </a>
     </div>

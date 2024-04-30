@@ -25,9 +25,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.h2database:h2'
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	// Use JUnit Jupiter for testing.
 	//    testImplementation libs.junit.jupiter
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -51,8 +54,8 @@ jacoco {
 
 sonar {
 	properties {
-		property "sonar.projectKey", "seng302-20240team500"
-		property "sonar.projectName", "seng302-20240team500"
+		property "sonar.projectKey", "seng302-2024-team500"
+		property "sonar.projectName", "seng302-2024-team500"
 		property "sonar.sourceEncoding", "UTF-8"
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"

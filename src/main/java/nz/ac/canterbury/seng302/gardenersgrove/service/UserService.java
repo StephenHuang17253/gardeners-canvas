@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
@@ -57,6 +58,7 @@ public class UserService {
      * @param rawPassword string to encode and add to user
      */
     public void addUser(User user, String rawPassword) {
+
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         userRepository.save(user);
@@ -75,8 +77,13 @@ public class UserService {
             return null;
         }
         User user = users[0];
-        if (passwordEncoder.matches(password, user.getEncodedPassword()) || Objects.equals(password, user.getEncodedPassword())) {
+        if (passwordEncoder.matches(password, user.getEncodedPassword())
+                || Objects.equals(password, user.getEncodedPassword())) {
             return user;
+        }
+        if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
+            logger.info(users[0].toString());
+            return users[0];
         }
         return null;
     }
@@ -133,7 +140,7 @@ public class UserService {
      * Update users profile picture filename
      * 
      * @param filename filename of profile picture
-     * @param id      id of user to update
+     * @param id       id of user to update
      */
     public void updateProfilePictureFilename(String filename, long id) {
         User user = getUserById(id);
@@ -166,4 +173,36 @@ public class UserService {
         String currentPassword = user.getEncodedPassword();
         return passwordEncoder.matches(passwordToCheck, currentPassword);
     }
+    /**
+     * Verify a user, for when they enter the correct token
+     *
+     * @param user user to verify
+     */
+    public void verifyUser(User user) {
+        user.setVerified(true);
+        userRepository.save(user);
+    }
+
+    /**
+     * Deletes a user
+     *
+     * @param user
+     */
+    public void deleteUser(User user) {
+        userRepository.deleteById(user.getId());
+    }
+
+    /**
+     * Add garden to the user's garden list
+     *
+     * @param garden Garden entity to add to the list
+     * @param id id of the user to add garden to
+     */
+    public void addGardenToGardenList(Garden garden, Long id) {
+        User user = getUserById(id);
+        user.getGardens().add(garden);
+        userRepository.save(user);
+    }
+
+
 }

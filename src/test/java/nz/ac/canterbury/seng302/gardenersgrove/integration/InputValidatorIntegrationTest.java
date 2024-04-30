@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @SpringJUnitConfig
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InputValidatorIntegrationTest {
 
     @Autowired

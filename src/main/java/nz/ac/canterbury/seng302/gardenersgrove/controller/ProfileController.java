@@ -239,7 +239,7 @@ public class ProfileController {
      * @return The profileEditPage html page
      */
     @GetMapping("/profile/edit")
-    public String editForm(Model model) {
+    public String editProfile(Model model) {
         logger.info("GET /profile/edit");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
