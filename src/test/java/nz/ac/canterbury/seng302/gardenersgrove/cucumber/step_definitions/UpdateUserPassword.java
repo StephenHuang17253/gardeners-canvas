@@ -115,13 +115,13 @@ public class UpdateUserPassword {
     }
 
     @When("I enter an old password {string} that does not match the current password")
-    public void i_enter_an_old_password_that_does_not_match_the_current_password(String oldPassword) throws Exception {
+    public void i_enter_an_old_password_that_does_not_match_the_current_password(String incorrectOldPassword) throws Exception {
         editPasswordResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .post("/profile/editPassword")
-                        .param("currentPassword", currentPassword)
-                        .param("newPassword", oldPassword)
-                        .param("retypePassword", oldPassword)
+                        .param("currentPassword", incorrectOldPassword)
+                        .param("newPassword", "NewPassword10!")
+                        .param("retypePassword", "NewPassword10!")
         ).andReturn();
     }
 
