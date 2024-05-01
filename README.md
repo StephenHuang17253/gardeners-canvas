@@ -81,7 +81,16 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 
 This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location.
 
-For more information, check the user manual in the wiki
+For more information, check the user manual in the wiki.
+
+
+## User accounts
+
+| Account Type | Email | Password | Gmail Password | Use: |
+|--------------|-------|----------|----------------|------|
+| Default User | gardenersgrovetest@gmail.com | Password1! | Password10! | This is account is initialised and pre-verified on startup, allows developers to skip verification steps to more quickly test features during development. |
+| Test User | gardenersgrovetest1@gmail.com | Password10! | Password10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so that the email is not in use. |
+
 
 
 ### 3 -  How to run tests
