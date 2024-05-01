@@ -5,6 +5,20 @@ Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise leve
 
 #### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
 
+### Test user accounts for testing the application
+
+This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location when running with environment variables.
+
+For more information, check the user manual in the wiki.
+
+
+#### User accounts
+
+| Account Type | Email | Password | Gmail Password | Use: |
+|--------------|-------|----------|----------------|------|
+| Default User | gardenersgrovetest@gmail.com | Password1! | Password10! | This is account is initialised and pre-verified on startup, allows developers to skip verification steps to more quickly test features during development. |
+| Test User | gardenersgrovetest1@gmail.com | Password10! | Password10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so that the email is not in use. |
+
 ## How to run
 ### 1 - Running the project with full functionality
 #### From the project on IDE...
@@ -108,22 +122,8 @@ On Windows:
 gradlew bootRun
 ```
 
-### 3 - Using the application
 
-This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location when running with environment variables.
-
-For more information, check the user manual in the wiki.
-
-
-#### User accounts
-
-| Account Type | Email | Password | Gmail Password | Use: |
-|--------------|-------|----------|----------------|------|
-| Default User | gardenersgrovetest@gmail.com | Password1! | Password10! | This is account is initialised and pre-verified on startup, allows developers to skip verification steps to more quickly test features during development. |
-| Test User | gardenersgrovetest1@gmail.com | Password10! | Password10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so that the email is not in use. |
-
-
-### 4 -  How to run tests with full functionality
+### 3 -  How to run tests with full functionality
 #### From the project open on IDE ...
 
 Ensure you have environment variables setup as metioned in Section 1 of How to run. 
