@@ -1,35 +1,41 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>Gardener's Grove Home Page</title>
-
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/homePage.css}" rel="stylesheet" type="text/css">
-
+    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
 </head>
+
 <body>
-<div class="container">
-    <h2>Gardener's Grove</h2>
-    <div class="sub-container">
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
+    <div class="container">
+        <h2>Gardener's Grove</h2>
 
-        <img th:src="@{/Images/Garden.webp}" alt="Garden">
+        <img th:src="@{/images/landingPlant.JPG}" alt="Garden">
 
-        <div>
-            <a th:href="@{register}"><button th:if="${!loggedIn}">Register</button></a>
+        <div th:if="${loggedIn}" class="profile_info">
+            <div class="profile_picture_container small_pic">
+                <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+            </div>
 
-            <a th:href="@{login}"><button th:if="${!loggedIn}">Sign In</button></a>
-
-            <a th:href="@{profile}"><button th:if="${loggedIn}">View Profile</button></a>
-            
-            <form th:if="${loggedIn}" th:action="@{/logout}" method="post">
-                <button type="submit" >Logout</button>
-            </form>
-
-            <p th:if="${loggedIn}" th:text="${username}"></p>
+            <p th:text="${username}"></p>
         </div>
 
+        <div class="buttons">
+            <a th:if="${!loggedIn}" th:href="@{register}"><button class="user_button">Register</button></a>
+
+            <a th:if="${!loggedIn}" th:href="@{login}"><button class="user_button">Sign In</button></a>
+
+            <a th:if="${loggedIn}" th:href="@{profile}"><button class="user_button">View Profile</button></a>
+
+            <form th:if="${loggedIn}" th:action="@{/logout}" method="post">
+                <button type="submit" class="user_button">Logout</button>
+            </form>
+        </div>
     </div>
-</div>
 </body>
+
 </html>

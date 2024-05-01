@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
+        <title>Gardener's Grove</title>
+        <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+        <link th:href="@{/css/landingPage.css}" rel="stylesheet">
+        <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    </head>
+
+    <body>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
+        <div class="container">
+            <div class="image-container">
+                <img src="/images/landingPlant.JPG" alt="Gardener's Grove" class="blur">
+                <div class="centered-text">
+                    <h1>Welcome to the</h1>
+                    <h2>GARDENER'S GROVE</h2>
+                    <p>"For Greater Gardening Communities"</p>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

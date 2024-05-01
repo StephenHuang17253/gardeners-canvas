@@ -3,10 +3,8 @@ Stylises the registrationForm.html webpage
 */
 
 h1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: underline;
+    text-align: center;
+    color: #333;
 }
 
 form {
@@ -30,7 +28,7 @@ input[type=password] {
     box-sizing: border-box;
 }
 
-button {
+.user_button {
     background-color: #ffffff;
     border: 2px solid black;
     color: black;
@@ -53,14 +51,14 @@ button:hover {
 
 .buttons {
     display: flex;
-    flex-direction: horizontal;
+    flex-direction: row;
     justify-content: space-around;
 }
 
 
 .check_box_container {
     display: flex;
-    flex-direction: horizontal;
+    flex-direction: row;
     justify-items: flex-start;
     gap: 30px;
     padding-bottom: 10px;

@@ -1,23 +1,40 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>My Profile</title>
-
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/profilePage.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <script th:src="@{/js/imagePicker.js}"></script>
 
 </head>
+
 <body>
-<div class="form-container">
-    <h2>My Profile</h2>
-    <div>
-        <p th:text = "'Name: ' + ${userName}">Name: </p>
-        <p th:if = "${!noDoB}" th:text = "'DoB: ' + ${dateOfBirth}"></p>
-        <p th:text = "'Email Address: ' + ${emailAddress}">Email: </p>
-        <a th:href = "@{/edit}" ><button> Edit Profile</button></a>
-        <a th:href = "@{/home}" ><button>Home</button></a>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
+    <div class="form-container">
+        <h2>My Profile</h2>
+        <div class="profile_info">
+            <form th:action="@{profile}" method="post" enctype="multipart/form-data">
+                <div class="profile_picture_container small_pic">
+                    <img id="imageToChange" th:src="@{${profilePicture}}" alt="User's profile picture">
+                    <label for="profilePictureInput">+</label>
+                    <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
+                        onChange="handleFileSelect(event); this.form.submit()">
+                </div>
+            </form>
+            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
+            <p th:text="'Name: ' + ${userName}">Name: </p>
+            <p th:if="${dateOfBirth}" th:text="'DoB: ' + ${dateOfBirth}"></p>
+            <p th:text="'Email Address: ' + ${emailAddress}">Email: </p>
+            <div class="buttons">
+                <a th:href="@{/profile/edit}"><button class="user_button"> Edit Profile</button></a>
+                <a th:href="@{/profile/editPassword}"><button class="user_button"> Change Password</button></a>
+                <a th:href="@{/home}"><button class="user_button">Home</button></a>
+            </div>
+        </div>
     </div>
-</div>
 </body>
+
 </html>
