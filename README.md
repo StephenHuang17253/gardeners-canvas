@@ -59,9 +59,18 @@ Go to jar directory:
 ```
 cd build/libs
 ```
-Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with your own details.
+Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. 
+Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with your own details (instructions on how to receive these values are above).
+
 ```
-java -jar gardeners-grove-0.0.1-SNAPSHOT.jar --server.port=8080 --spring.application.name=gardeners-grove --locationiq.access.token=<your_locationiq_api_key> --spring.mail.username=<your_email> --spring.mail.password=<your_app_password> --spring.base.url=http://localhost:8080
+java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
+--server.port=8080 \
+--spring.application.name=gardeners-grove \
+--locationiq.access.token=<your_locationiq_api_key>\
+--spring.mail.username=<your_email> \
+--spring.mail.password=<your_password> \
+--spring.base.url=http://localhost:8080
+
 ```
 
 
