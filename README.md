@@ -84,7 +84,7 @@ Run the jar on [http://localhost:8080](http://localhost:8080) with the following
 - e.g. spring.mail.username=gardenersgroveinfo@gmail.com
 
 
-Steps (including setting environment variables)
+Steps including setting environment variables (Full functionality)
 ```
 java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --server.port=8080 \
@@ -97,7 +97,7 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 ```
 
 
-Steps (without setting environment variables)
+Steps without setting environment variables (Parial functionality)
 ```
 java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --server.port=8080 \
