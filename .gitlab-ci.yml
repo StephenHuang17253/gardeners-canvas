@@ -81,6 +81,12 @@ deploy-production:
     - cp -r ./build/libs /home/gitlab-runner/production
     - cp runner-scripts/production.sh /home/gitlab-runner/production.sh
     - chmod u+x /home/gitlab-runner/production.sh
+    - echo "export DB_USERNAME=${DB_USERNAME}" > /home/gitlab-runner/production/.env
+    - echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/production/.env
+    - echo "export LOCATIONIQ_API_KEY=${LOCATIONIQ_API_KEY}" >> /home/gitlab-runner/production/.env
+    - echo "export EMAIL_PASSWORD=${EMAIL_PASSWORD}" >> /home/gitlab-runner/production/.env
+    - echo "export EMAIL_USERNAME=${EMAIL_USERNAME}" >> /home/gitlab-runner/production/.env
+    - echo "export BASE_URL=${BASE_URL}/prod" >> /home/gitlab-runner/production/.env
     - sudo systemctl restart production
   artifacts:
     paths:
