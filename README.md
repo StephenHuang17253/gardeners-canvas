@@ -2,9 +2,85 @@
 Basic project using ```gradle```, ```Spring Boot```, ```Thymeleaf```, and ```GitLab CI```.
 
 Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruit and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discuss various gardening topics.
+
+#### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
+
 ## How to run
-### 1 - Running the project
-From the root directory ...
+### 1 - Running the project with full functionality
+#### From the project on IDE...
+
+##### Set the following environment variables within your IDE to run application with full functionality:
+
+These must be set for Gradle, Spring Boot, and Cucumber Java  configurations.
+
+BASE_URL=<your_base_url>
+
+EMAIL_PASSWORD=<your_email>
+
+EMAIL_USERNAME=<your_app_password>
+
+LOCATIONIQ_API_KEY=<your_locationiq_api_key>
+
+For running locally on port 8080, <your_base_url> will be http://localhost:8080.
+
+Values for <your_email> and <your_app_password> are located on the repository wiki.
+
+To get <your_locationiq_api_key> you can visit [this link](https://my.locationiq.com/register) and get a key for free (they don't ask for credit card.)
+
+The credentials for the deployed version be found on the repository within the environment variables. 
+
+##### Then Run (on Intellij)
+
+Right click on GardenersGroveApplication.java and on Run 'GardenersGroveApp...' from the dropdown menu.
+
+By default, the application will run on local port 8080 [http://localhost:8080](http://localhost:8080)
+
+
+#### From terminal (using a jar)...
+
+On your Terminal (Powershell on windows)
+
+Go to directory you want to run from: 
+```
+cd <path_to_directory>
+```
+Clone the repository:
+```
+git clone https://eng-git.canterbury.ac.nz/seng302-2024/team-500.git
+```
+Go to project root:
+```
+cd team-500
+```
+Create jar:
+```
+./gradlew bootJar
+```
+Go to jar directory:
+```
+cd build/libs
+```
+Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. 
+- Note: Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with the details you got earlier (instructions on how to receive these values are above). 
+- You could copy and paste the command into notepad or any text editor, and then replace the placeholders.
+- e.g. spring.mail.username=gardenersgroveinfo@gmail.com
+
+```
+java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
+--server.port=8080 \
+--spring.application.name=gardeners-grove \
+--locationiq.access.token=<your_locationiq_api_key>\
+--spring.mail.username=<your_email> \
+--spring.mail.password=<your_app_password> \
+--spring.base.url=http://localhost:8080
+
+```
+
+
+### 2 - Running the project with partial functionality
+
+You do not have to set environment variables. Note that some parts of the application will not work
+#### From the root directory of project on terminal ...
 
 On Linux:
 ```
@@ -16,35 +92,45 @@ On Windows:
 gradlew bootRun
 ```
 
-By default, the application will run on local port 8080 [http://localhost:8080](http://localhost:8080)
+### 3 - Using the application
 
-### 2 - Using the application
+This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location when running with environment variables.
 
-In order for Gardener's Grove to send emails, an email.properties file must be created in the root directory with the follow lines placed in it.
-spring.mail.username=<your_email>
-spring.mail.password=<your_app_password>
-To generate an app password you can visit [this link](myaccount.google.com/u/3/apppasswords)
-The credentials can be found on the repositories wiki
-
-This project includes basic user registration, user login, profile view, and edit profile.
-
-This application also has a default user loaded in at the moment with the details:
-
-firstName:John
-
-lastName:Doe
-
-dateOfBirth:01/01/2001
-
-email:johndoe@email.com
-
-password:DefaultUser10!
-
-For more information, check the user manual in the wiki
+For more information, check the user manual in the wiki.
 
 
-## How to run tests
-From the root directory ...
+#### User accounts
+
+| Account Type | Email | Password | Gmail Password | Use: |
+|--------------|-------|----------|----------------|------|
+| Default User | gardenersgrovetest@gmail.com | Password1! | Password10! | This is account is initialised and pre-verified on startup, allows developers to skip verification steps to more quickly test features during development. |
+| Test User | gardenersgrovetest1@gmail.com | Password10! | Password10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so that the email is not in use. |
+
+
+### 4 -  How to run tests with full functionality
+#### From the project open on IDE ...
+
+Ensure you have environment variables setup as metioned in Section 1 of How to run. 
+
+##### To run unit tests:
+
+Right click on the unit folder and click on Run 'Tests in ...' from the dropdown menu.
+If an additional dropdown appears, click on test.
+
+##### To run integration tests:
+
+Right click on the integration folder and click on Run 'Tests in ...' from the dropdown menu.
+If an additional dropdown appears, click on integration.
+
+##### To run cucumber tests:
+
+Right click on the cucumber folder and click on Run 'Tests in ...' from the dropdown menu.
+If an additional dropdown appears, click on cucumber.
+
+### 5 - How to run tests with partial functionality 
+You do not have to set environment variables. Note that some tests will fail
+
+#### From the root directory of project on terminal ...
 
 On Linux:
 ```
@@ -72,10 +158,11 @@ gradlew test
 ## References
 
 - [Spring Boot Docs](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
-- [Spring JPA docs](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+- [Spring JPA Docs](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
 - [Thymeleaf Docs](https://www.thymeleaf.org/documentation.html)
 - [Learn resources](https://learn.canterbury.ac.nz/course/view.php?id=17797&section=8)
-
+- [LocationIQ API Docs](https://docs.locationiq.com/reference/reverse-api)
+- [Spring Boot Starter Mail Starter Guide](https://www.baeldung.com/spring-email)
 
 ## Licences
 
