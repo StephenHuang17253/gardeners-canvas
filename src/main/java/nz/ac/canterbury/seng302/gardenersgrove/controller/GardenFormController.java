@@ -237,8 +237,8 @@ public class GardenFormController {
         model.addAttribute("postcode", garden.getGardenPostcode());
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
-        float gardenSize = garden.getGardenSize();
-        if (Float.isNaN(gardenSize)) {
+        double gardenSize = garden.getGardenSize();
+        if (Double.isNaN(gardenSize)) {
             model.addAttribute("gardenSize", "");
         } else {
             model.addAttribute("gardenSize", gardenSize);

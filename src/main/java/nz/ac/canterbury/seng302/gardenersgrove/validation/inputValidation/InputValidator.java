@@ -613,6 +613,11 @@ public class InputValidator {
         // checks if string contains only numbers and up to 1 comma or full stop
         for (Character letter : testedValue.toCharArray()) {
             if (!Character.isDigit(letter)) {
+                if (Character.toLowerCase(letter) == 'e')
+                {  
+                    continue;
+                }
+
                 stringPasses = false;
                 if ((letter.toString().equals(",") || letter.toString().equals(".")) && allowedCommaNumber > 0) {
                     stringPasses = true;
