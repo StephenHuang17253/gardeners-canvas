@@ -21,8 +21,10 @@ EMAIL_USERNAME=<your_app_password>
 
 LOCATIONIQ_API_KEY=<your_locationiq_api_key>
 
-For running locally on port 8080, <your_base_url> will be http://localhost:8080
-Values for <your_email> and <your_app_password> are located on the repository wiki
+For running locally on port 8080, <your_base_url> will be http://localhost:8080.
+
+Values for <your_email> and <your_app_password> are located on the repository wiki.
+
 To get <your_locationiq_api_key> you can visit [this link](https://my.locationiq.com/register) and get a key for free (they don't ask for credit card.)
 
 The credentials for the deployed version be found on the repository within the environment variables. 
@@ -59,7 +61,9 @@ Go to jar directory:
 cd build/libs
 ```
 Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. 
-- Note: Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with the details you got earlier (instructions on how to receive these values are above).
+- Note: Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with the details you got earlier (instructions on how to receive these values are above). 
+- You could copy and paste the command into notepad or any text editor, and then replace the placeholders.
+- e.g. spring.mail.username=gardenersgroveinfo@gmail.com
 
 ```
 java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
