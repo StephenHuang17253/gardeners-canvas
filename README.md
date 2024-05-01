@@ -52,6 +52,10 @@ Go to project root:
 ```
 cd team-500
 ```
+Checkout main branch because dev is our default:
+```
+git checkout main
+```
 Create jar:
 ```
 ./gradlew bootJar
@@ -65,6 +69,8 @@ Run the jar on [http://localhost:8080](http://localhost:8080) with the following
 - You could copy and paste the command into notepad or any text editor, and then replace the placeholders.
 - e.g. spring.mail.username=gardenersgroveinfo@gmail.com
 
+
+Steps (including setting environment variables)
 ```
 java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --server.port=8080 \
@@ -77,9 +83,19 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 ```
 
 
+Steps (without setting environment variables)
+```
+java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
+--server.port=8080 \
+--spring.application.name=gardeners-grove \
+
+```
+
+
 ### 2 - Running the project with partial functionality
 
-You do not have to set environment variables. Note that some parts of the application will not work
+If environment variables are not set, the app will still build and run but note that some parts of the application will not work.
+
 #### From the root directory of project on terminal ...
 
 On Linux:
@@ -126,9 +142,6 @@ If an additional dropdown appears, click on integration.
 
 Right click on the cucumber folder and click on Run 'Tests in ...' from the dropdown menu.
 If an additional dropdown appears, click on cucumber.
-
-### 5 - How to run tests with partial functionality 
-You do not have to set environment variables. Note that some tests will fail
 
 #### From the root directory of project on terminal ...
 
