@@ -252,7 +252,6 @@ public class InputValidator {
                 .nameHelper()
                 .lengthHelper(64)
                 .getResult();
-
     }
 
     /**
