@@ -40,6 +40,8 @@ email:johndoe@email.com
 
 password:DefaultUser10!
 
+For more information, check the user manual in the wiki
+
 
 ## How to run tests
 From the root directory ...
@@ -54,27 +56,17 @@ On Windows:
 gradlew test
 ```
 
-## Todo (Sprint 1)
-
-- Add team name into `build.gradle`
-- Update this README title
-- Update this README contributors
-
-## Todo (Sprint 2)
-
-- Update team name into `build.gradle`
-- Update this README title
-- Update this README contributors
-- Set up Gitlab CI server (refer to the student guide on Scrumboard)
-- Decide on a LICENSE
-
 ## Contributors
 
-- SENG302 teaching team
 - Lachlan Stewart
 - Emma Davis
 - Aditi Sharma
 - Finlay Widdowson
+- Tyler Fauchelle
+- Dominic Gorny
+- Stephen Huang
+- Luke Edwards
+- SENG302 teaching team
 
 
 ## References
