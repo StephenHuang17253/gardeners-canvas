@@ -2,59 +2,93 @@
 Basic project using ```gradle```, ```Spring Boot```, ```Thymeleaf```, and ```GitLab CI```.
 
 Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruit and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discuss various gardening topics.
+
+#### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
+
 ## How to run
 ### 1 - Running the project
-From the root directory ...
+#### From the root directory ...
 
-On Linux:
-```
-./gradlew bootRun
-```
+##### Set the following environment variables within your IDE:
 
-On Windows:
-```
-gradlew bootRun
-```
+These must be set for Gradle, Spring Boot, and Cucumber Java  configurations.
+
+BASE_URL=<your_base_url>
+EMAIL_PASSWORD=<your_email>
+EMAIL_USERNAME=<your_app_password>
+LOCATIONIQ_API_KEY=<your_locationiq_api_key>
+
+For running locally on port 8080, <your_base_url> will be http://localhost:8080
+Values for <your_email> and <your_app_password> are located on the repository wiki
+To generate an app password you can visit [this link](myaccount.google.com/u/3/apppasswords)
+To get <your_locationiq_api_key> you can visit [this link](https://locationiq.com/geocoding) and get a key for free (you also don't need to enter in credit card details)
+
+The credentials for the deployed version be found on the repository within the environment variables. 
+
+##### Then Run (on Intellij)
+
+Right click on GardenersGroveApplication.java and on Run 'GardenersGroveApp...' from the dropdown menu.
 
 By default, the application will run on local port 8080 [http://localhost:8080](http://localhost:8080)
 
+
+#### From a jar...
+
+On your Terminal (Powershell on windows)
+
+Go to directory you want to run from using 
+```
+cd <path_to_directory>
+```
+Clone the repository using
+```
+git clone https://eng-git.canterbury.ac.nz/seng302-2024/team-500.git
+```
+Go to project root
+```
+cd team-500
+```
+Create jar using:
+```
+./gradlew bootJar
+```
+Go to jar directory using:
+```
+cd build/libs
+```
+Run the jar on [http://localhost:8080](http://localhost:8080). Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with your own details.
+```
+java -jar gardeners-grove-0.0.1-SNAPSHOT.jar --server.port=8080 --server.servlet.contextPath=/test --spring.application.name=gardeners-grove --locationiq.access.token=<your_locationiq_api_key> --spring.mail.username=<your_email> --spring.mail.password=<your_app_password> --spring.base.url=http://localhost:8080
+```
+
+
 ### 2 - Using the application
 
-In order for Gardener's Grove to send emails, an email.properties file must be created in the root directory with the follow lines placed in it.
-spring.mail.username=<your_email>
-spring.mail.password=<your_app_password>
-To generate an app password you can visit [this link](myaccount.google.com/u/3/apppasswords)
-The credentials can be found on the repositories wiki
-
-This project includes basic user registration, user login, profile view, and edit profile.
-
-This application also has a default user loaded in at the moment with the details:
-
-firstName:John
-
-lastName:Doe
-
-dateOfBirth:01/01/2001
-
-email:johndoe@email.com
-
-password:DefaultUser10!
+This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location.
 
 For more information, check the user manual in the wiki
 
 
-## How to run tests
-From the root directory ...
+### 3 -  How to run tests
+#### From the root directory ...
 
-On Linux:
-```
-./gradlew test
-```
+Ensure you have environment variables setup as metioned in Section 1 of How to run. 
 
-On Windows:
-```
-gradlew test
-```
+##### To run unit tests:
+
+Right click on the unit folder and click on Run 'Tests in ...' from the dropdown menu.
+If an additional dropdown appears, click on test.
+
+##### To run integration tests:
+
+Right click on the integration folder and click on Run 'Tests in ...' from the dropdown menu.
+If an additional dropdown appears, click on integration.
+
+##### To run cucumber tests:
+
+Right click on the cucumber folder and click on Run 'Tests in ...' from the dropdown menu.
+If an additional dropdown appears, click on cucumber.
+
 
 ## Contributors
 
@@ -72,10 +106,11 @@ gradlew test
 ## References
 
 - [Spring Boot Docs](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
-- [Spring JPA docs](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+- [Spring JPA Docs](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
 - [Thymeleaf Docs](https://www.thymeleaf.org/documentation.html)
 - [Learn resources](https://learn.canterbury.ac.nz/course/view.php?id=17797&section=8)
-
+- [LocationIQ API Docs](https://docs.locationiq.com/reference/reverse-api)
+- [Spring Boot Starter Mail Starter Guide](https://www.baeldung.com/spring-email)
 
 ## Licences
 
