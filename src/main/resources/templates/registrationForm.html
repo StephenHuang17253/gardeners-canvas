@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8"/>
     <title>Registration Form</title>
     <link th:href="@{/css/registrationForm.css}" rel="stylesheet">
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <script th:src="@{/js/registrationForm.js}"></script>
     <link th:href="@{/css/navBar.css}" rel="stylesheet">
 </head>
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
@@ -67,6 +66,6 @@
     </form>
     
 </div>
-
+<script th:src="@{/js/preventEnterSubmit.js}"></script>
 </body>
 </html>
