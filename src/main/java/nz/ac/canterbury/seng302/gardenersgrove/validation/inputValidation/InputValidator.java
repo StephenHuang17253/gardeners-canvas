@@ -297,9 +297,15 @@ public class InputValidator {
      *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePassword(String password) {
-        return new InputValidator(password)
+        ValidationResult result = new InputValidator(password)
                 .passwordSyntaxHelper()
+                .minimumLengthHelpter(8)
                 .getResult();
+        if (result == ValidationResult.LENGTH_UNDER_MINIMUM)
+        {
+            result = ValidationResult.INVALID_PASSWORD;
+        }
+        return result;
     }
 
     /**
@@ -433,6 +439,22 @@ public class InputValidator {
         if (!testedValue.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9\\s]).+$")) {
             this.validationResult = ValidationResult.INVALID_PASSWORD;
             this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    private InputValidator minimumLengthHelpter(int minimumNumberOfDigits) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        if (testedValue.length() < minimumNumberOfDigits)
+        {
+            this.passState = false;
+            this.validationResult = ValidationResult.LENGTH_UNDER_MINIMUM;
             return this;
         }
         this.validationResult = ValidationResult.OK;
