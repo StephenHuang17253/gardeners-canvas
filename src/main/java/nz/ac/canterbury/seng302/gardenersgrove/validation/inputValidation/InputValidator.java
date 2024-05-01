@@ -163,7 +163,6 @@ public class InputValidator {
         return new InputValidator(text)
                 .blankHelper()
                 .alphaPlusHelper()
-                .lengthHelper(255)
                 .getResult();
     }
 
@@ -187,7 +186,6 @@ public class InputValidator {
     /**
      * Checks input against a criteria:
      * This function only allows alphanumeric characters and select punctuation
-     * Checks input against default character limit of 200.
      *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
@@ -195,7 +193,6 @@ public class InputValidator {
     public static ValidationResult optionalAlphaPlusTextField(String text) {
         return new InputValidator(text)
                 .alphaPlusHelper()
-                .lengthHelper(200)
                 .getResult();
     }
 
@@ -229,10 +226,9 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult validatePostcodeInput(String text, int length) {
+    public static ValidationResult validatePostcodeInput(String text) {
         return new InputValidator(text)
                 .postcodeHelper()
-                .lengthHelper(length)
                 .getResult();
     }
 
