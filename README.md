@@ -6,10 +6,10 @@ Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise leve
 #### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
 
 ## How to run
-### 1 - Running the project
-#### From the root directory ...
+### 1 - Running the project with full functionality
+#### From the project on IDE...
 
-##### Set the following environment variables within your IDE:
+##### Set the following environment variables within your IDE to run application with full functionality:
 
 These must be set for Gradle, Spring Boot, and Cucumber Java  configurations.
 
@@ -36,7 +36,7 @@ Right click on GardenersGroveApplication.java and on Run 'GardenersGroveApp...' 
 By default, the application will run on local port 8080 [http://localhost:8080](http://localhost:8080)
 
 
-#### From a jar...
+#### From terminal (using a jar)...
 
 On your Terminal (Powershell on windows)
 
@@ -77,14 +77,29 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 ```
 
 
-### 2 - Using the application
+### 2 - Running the project with partial functionality
 
-This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location.
+You do not have to set environment variables. Note that some parts of the application will not work
+#### From the root directory of project on terminal ...
+
+On Linux:
+```
+./gradlew bootRun
+```
+
+On Windows:
+```
+gradlew bootRun
+```
+
+### 3 - Using the application
+
+This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location when running with environment variables.
 
 For more information, check the user manual in the wiki.
 
 
-## User accounts
+#### User accounts
 
 | Account Type | Email | Password | Gmail Password | Use: |
 |--------------|-------|----------|----------------|------|
@@ -92,9 +107,8 @@ For more information, check the user manual in the wiki.
 | Test User | gardenersgrovetest1@gmail.com | Password10! | Password10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so that the email is not in use. |
 
 
-
-### 3 -  How to run tests
-#### From the root directory ...
+### 4 -  How to run tests with full functionality
+#### From the project open on IDE ...
 
 Ensure you have environment variables setup as metioned in Section 1 of How to run. 
 
@@ -113,6 +127,20 @@ If an additional dropdown appears, click on integration.
 Right click on the cucumber folder and click on Run 'Tests in ...' from the dropdown menu.
 If an additional dropdown appears, click on cucumber.
 
+### 5 - How to run tests with partial functionality 
+You do not have to set environment variables. Note that some tests will fail
+
+#### From the root directory of project on terminal ...
+
+On Linux:
+```
+./gradlew test
+```
+
+On Windows:
+```
+gradlew test
+```
 
 ## Contributors
 
