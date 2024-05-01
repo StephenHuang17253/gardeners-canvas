@@ -148,6 +148,12 @@ public class InputValidatorTest {
     }
 
     @Test
+    public void InputValidator_compText_Quotes_return_NONALPHAPLUS()
+    {
+        assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.compulsoryAlphaPlusTextField(" \" "));
+    }
+
+    @Test
     public void InputValidator_optText_invalidPunct_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("!"));

@@ -546,7 +546,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "\"", "-" };
+        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-" };
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
