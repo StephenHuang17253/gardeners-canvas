@@ -97,7 +97,7 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 ```
 
 
-Steps without setting environment variables (Parial functionality)
+Steps without setting environment variables (Partial functionality)
 ```
 java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --server.port=8080 \
