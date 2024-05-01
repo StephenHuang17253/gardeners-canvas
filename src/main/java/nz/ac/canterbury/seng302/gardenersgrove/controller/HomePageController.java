@@ -105,9 +105,9 @@ public class HomePageController {
             // Add a default user to speed up manual testing.
             User johnDoe = new User("John",
                     "Doe",
-                    "johndoe@email.com",
+                    "gardenersgrovetest@gmail.com",
                     date);
-            userService.addUser(johnDoe, "DefaultUser10!");
+            userService.addUser(johnDoe, "Password1!");
             userService.verifyUser(johnDoe);
             onStart = true;
 
