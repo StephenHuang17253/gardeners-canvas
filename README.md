@@ -36,29 +36,29 @@ By default, the application will run on local port 8080 [http://localhost:8080](
 
 On your Terminal (Powershell on windows)
 
-Go to directory you want to run from using 
+Go to directory you want to run from: 
 ```
 cd <path_to_directory>
 ```
-Clone the repository using
+Clone the repository:
 ```
 git clone https://eng-git.canterbury.ac.nz/seng302-2024/team-500.git
 ```
-Go to project root
+Go to project root:
 ```
 cd team-500
 ```
-Create jar using:
+Create jar:
 ```
 ./gradlew bootJar
 ```
-Go to jar directory using:
+Go to jar directory:
 ```
 cd build/libs
 ```
-Run the jar on [http://localhost:8080](http://localhost:8080). Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with your own details.
+Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with your own details.
 ```
-java -jar gardeners-grove-0.0.1-SNAPSHOT.jar --server.port=8080 --server.servlet.contextPath=/test --spring.application.name=gardeners-grove --locationiq.access.token=<your_locationiq_api_key> --spring.mail.username=<your_email> --spring.mail.password=<your_app_password> --spring.base.url=http://localhost:8080
+java -jar gardeners-grove-0.0.1-SNAPSHOT.jar --server.port=8080 --spring.application.name=gardeners-grove --locationiq.access.token=<your_locationiq_api_key> --spring.mail.username=<your_email> --spring.mail.password=<your_app_password> --spring.base.url=http://localhost:8080
 ```
 
 
