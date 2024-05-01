@@ -23,8 +23,7 @@ LOCATIONIQ_API_KEY=<your_locationiq_api_key>
 
 For running locally on port 8080, <your_base_url> will be http://localhost:8080
 Values for <your_email> and <your_app_password> are located on the repository wiki
-To generate an app password you can visit [this link](myaccount.google.com/u/3/apppasswords)
-To get <your_locationiq_api_key> you can visit [this link](https://locationiq.com/geocoding) and get a key for free (you also don't need to enter in credit card details)
+To get <your_locationiq_api_key> you can visit [this link](https://my.locationiq.com/register) and get a key for free (they don't ask for credit card.)
 
 The credentials for the deployed version be found on the repository within the environment variables. 
 
@@ -60,7 +59,7 @@ Go to jar directory:
 cd build/libs
 ```
 Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. 
-Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with your own details (instructions on how to receive these values are above).
+- Note: Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with the details you got earlier (instructions on how to receive these values are above).
 
 ```
 java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
@@ -68,7 +67,7 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --spring.application.name=gardeners-grove \
 --locationiq.access.token=<your_locationiq_api_key>\
 --spring.mail.username=<your_email> \
---spring.mail.password=<your_password> \
+--spring.mail.password=<your_app_password> \
 --spring.base.url=http://localhost:8080
 
 ```
