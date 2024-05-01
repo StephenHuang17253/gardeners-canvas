@@ -15,23 +15,32 @@ public class Garden {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "garden_id")
     private Long gardenId;
-    @Column(nullable = false)
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String gardenName;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String gardenAddress;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String gardenSuburb;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String gardenPostcode;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String gardenCity;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String gardenCountry;
+
     @Column
-    private float gardenSize;
+    private double gardenSize;
+    
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "garden_id")
     private List<Plant> plants =  new ArrayList<>();
@@ -124,10 +133,10 @@ public class Garden {
     public void setGardenCountry(String gardenCountry) {
         this.gardenCountry = gardenCountry;
     }
-    public float getGardenSize() {
+    public double getGardenSize() {
         return gardenSize;
     }
-    public void setGardenSize(float gardenSize) {
+    public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
     public User getOwner() { return owner; }

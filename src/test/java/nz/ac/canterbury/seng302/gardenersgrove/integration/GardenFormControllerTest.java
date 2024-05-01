@@ -33,7 +33,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -249,10 +248,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-    "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-            "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-            "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenName(String input) throws Exception
     {
@@ -295,10 +291,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenName(String input) throws Exception
     {
@@ -390,10 +383,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
@@ -436,10 +426,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
@@ -530,10 +517,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_suburb(String input) throws Exception
     {
@@ -576,10 +560,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_suburb(String input) throws Exception
     {
@@ -669,10 +650,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) throws Exception
     {
@@ -715,10 +693,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_city(String input) throws Exception
     {
@@ -809,10 +784,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_country(String input) throws Exception
     {
@@ -855,10 +827,7 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_country(String input) throws Exception
     {
@@ -949,10 +918,7 @@ public class GardenFormControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)", "1234567890112",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_postCode(String input) throws Exception
     {
@@ -996,10 +962,7 @@ public class GardenFormControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)", "1234567890112",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_postCode(String input) throws Exception
     {
@@ -1091,10 +1054,7 @@ public class GardenFormControllerTest {
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
@@ -1141,10 +1101,7 @@ public class GardenFormControllerTest {
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)",
-            "Really long string zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" +
-                    "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {

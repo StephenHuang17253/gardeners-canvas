@@ -9,7 +9,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -156,12 +150,12 @@ public class GardenFormController {
 
         // logic to handle checking if Garden Name, Garden Location and Garden size fields are valid
 
-        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
-        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
-        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
-        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
-        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
-        ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
+        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
+        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
+        ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
         gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
@@ -243,8 +237,8 @@ public class GardenFormController {
         model.addAttribute("postcode", garden.getGardenPostcode());
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
-        float gardenSize = garden.getGardenSize();
-        if (Float.isNaN(gardenSize)) {
+        double gardenSize = garden.getGardenSize();
+        if (Double.isNaN(gardenSize)) {
             model.addAttribute("gardenSize", "");
         } else {
             model.addAttribute("gardenSize", gardenSize);
@@ -286,12 +280,12 @@ public class GardenFormController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName, 64);
-        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress, 96);
-        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 96);
-        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 96);
-        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 96);
-        ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode,10);
+        ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
+        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
+        ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
 
