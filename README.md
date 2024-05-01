@@ -14,8 +14,11 @@ Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise leve
 These must be set for Gradle, Spring Boot, and Cucumber Java  configurations.
 
 BASE_URL=<your_base_url>
+
 EMAIL_PASSWORD=<your_email>
+
 EMAIL_USERNAME=<your_app_password>
+
 LOCATIONIQ_API_KEY=<your_locationiq_api_key>
 
 For running locally on port 8080, <your_base_url> will be http://localhost:8080
