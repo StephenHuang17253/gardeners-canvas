@@ -5,7 +5,7 @@ Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise leve
 
 #### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
 
-### Test user accounts for testing the application
+## User accounts for testing the application
 
 This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location when running with environment variables.
 
