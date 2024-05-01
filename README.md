@@ -1,4 +1,10 @@
 # SENG302 The Gardener's Grove
+
+#### Current Deployment Status
+- Deployed version is not fully functional, use local version
+- Currently using in memory database
+
+
 Basic project using ```gradle```, ```Spring Boot```, ```Thymeleaf```, and ```GitLab CI```.
 
 Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruit and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discuss various gardening topics.
