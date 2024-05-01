@@ -423,7 +423,8 @@ public class InputValidatorTest {
      * @param password
      */
     @ParameterizedTest
-    @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!" })
+    @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
+    "1D!0", "D!1", "aA!0","Pa!0AAA"})
     public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
         Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password));
     };
