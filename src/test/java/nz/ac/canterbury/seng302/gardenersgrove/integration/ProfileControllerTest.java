@@ -87,7 +87,7 @@ public class ProfileControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("userName","John Test"))
                 .andExpect(model().attribute("dateOfBirth", "02/05/2003"))
-                .andExpect(model().attribute("emailAddress","profile.user.test@ProfileController.com"));
+                .andExpect(model().attribute("emailAddress","profile.user.test@profilecontroller.com"));
     }
 
 

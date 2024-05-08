@@ -76,7 +76,7 @@ public class UserServiceTest {
         List<User> allUsers = userRepository.findAll();
         Assertions.assertEquals(allUsers.get(0).getFirstName(), "John");
         Assertions.assertEquals(allUsers.get(0).getLastName(), "Doe");
-        Assertions.assertEquals(allUsers.get(0).getEmailAddress(), "johnDoe@email.com");
+        Assertions.assertEquals(allUsers.get(0).getEmailAddress(), "johndoe@email.com");
         Assertions.assertEquals(allUsers.get(0).getDateOfBirth(), date);
         Assertions.assertNotEquals(allUsers.get(0).getEncodedPassword(), "1es1P@ssword");
     }
@@ -90,7 +90,7 @@ public class UserServiceTest {
         String fName = "John";
         String lName = "Doe";
         String email = "john@email.com";
-        long id = userRepository.findByEmailAddress("johnDoe@email.com")[0].getId();
+        long id = userRepository.findByEmailAddress("johndoe@email.com")[0].getId();
         userService.updateUser(id, fName, lName, email, date);
         Assertions.assertEquals(userRepository.findAll().size(), 1);
     }
@@ -103,14 +103,14 @@ public class UserServiceTest {
     public void UpdateAllUserDetails_AllDetailsUpdatedForUser() {
         String fName = "Jane";
         String lName = "Ode";
-        String email = "janeOde@email.com";
+        String email = "janeode@email.com";
         LocalDate newDate = LocalDate.parse("01/01/2000", formatter);
-        long id = userRepository.findByEmailAddress("johnDoe@email.com")[0].getId();
+        long id = userRepository.findByEmailAddress("johndoe@email.com")[0].getId();
         userService.updateUser(id, fName, lName, email, newDate);
         List<User> allUsers = userRepository.findAll();
         Assertions.assertEquals(allUsers.get(0).getFirstName(), "Jane");
         Assertions.assertEquals(allUsers.get(0).getLastName(), "Ode");
-        Assertions.assertEquals(allUsers.get(0).getEmailAddress(), "janeOde@email.com");
+        Assertions.assertEquals(allUsers.get(0).getEmailAddress(), "janeode@email.com");
         Assertions.assertEquals(allUsers.get(0).getDateOfBirth(), newDate);
 
     }

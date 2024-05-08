@@ -63,7 +63,7 @@ public class EditAUser {
     String firstName = "John";
     String lastName = "Doe";
     Boolean noLastName = false;
-    String emailAddress = "JohnDoe22@email.com";
+    String emailAddress = "johndoe22@email.com";
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
 
 

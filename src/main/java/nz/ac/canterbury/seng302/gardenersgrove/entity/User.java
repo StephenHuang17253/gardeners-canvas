@@ -64,7 +64,7 @@ public class User {
             LocalDate dateOfBirth) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.emailAddress = emailAddress;
+        this.emailAddress = emailAddress.toLowerCase();
         this.dateOfBirth = dateOfBirth;
         this.verified = false;
     }
@@ -78,7 +78,7 @@ public class User {
     }
 
     public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+        this.emailAddress = emailAddress.toLowerCase();
     }
 
     public void setDateOfBirth(LocalDate dateOfBirth) {
