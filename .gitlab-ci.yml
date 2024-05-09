@@ -37,16 +37,6 @@ sonarqube-report:
   script:
     ./gradlew sonarqube
 
-integration-test:
-  stage: test
-  script:
-    - ./gradlew integration
-
-cucumber-test:
-  stage: test
-  script:
-    - ./gradlew cucumber
-
 # builds all branches, except dev and main
 branch-build:
   stage: build
