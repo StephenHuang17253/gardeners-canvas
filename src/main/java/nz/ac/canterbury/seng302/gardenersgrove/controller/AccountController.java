@@ -197,8 +197,8 @@ public class AccountController {
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
 
-        InputValidator.validatePassword(password);
-        validationMap.put("password", InputValidator.validatePassword(password));
+        InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress);
+        validationMap.put("password", InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress));
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -218,6 +218,10 @@ public class AccountController {
             }
         }
 
+//        if(password.contains(firstName) || password.contains(lastName) || password.contains(dateOfBirth.toString()) || password.contains(emailAddress)) {
+//            model.addAttribute("passwordMatchingError", "Passwords do not have first name match");
+//            valid = false;
+//        }
         if (!password.equals(repeatPassword)) {
             model.addAttribute("passwordMatchingError", "Passwords do not match");
             valid = false;

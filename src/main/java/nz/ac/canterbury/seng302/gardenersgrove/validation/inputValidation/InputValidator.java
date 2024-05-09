@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Tests inputs on a variety of rules to check if values are valid
@@ -284,6 +281,28 @@ public class InputValidator {
                 .getResult();
     }
 
+
+    public static ValidationResult validatePassword(String password, String firstName, String lastName, boolean noLastName, LocalDate dateOfBirth, String emailAddress) {
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        ValidationResult result = new InputValidator(password)
+                .passwordLikenessHelper(otherFields)
+                .passwordSyntaxHelper()
+                .minimumLengthHelpter(8)
+                .getResult();
+        if (result == ValidationResult.LENGTH_UNDER_MINIMUM) {
+            result = ValidationResult.INVALID_PASSWORD;
+        }
+        return result;
+    }
+
     /**
      * Checks if the given password is valid
      *
@@ -296,8 +315,7 @@ public class InputValidator {
                 .passwordSyntaxHelper()
                 .minimumLengthHelpter(8)
                 .getResult();
-        if (result == ValidationResult.LENGTH_UNDER_MINIMUM)
-        {
+        if (result == ValidationResult.LENGTH_UNDER_MINIMUM) {
             result = ValidationResult.INVALID_PASSWORD;
         }
         return result;
@@ -435,6 +453,25 @@ public class InputValidator {
             this.validationResult = ValidationResult.INVALID_PASSWORD;
             this.passState = false;
             return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    private InputValidator passwordLikenessHelper(List<String> fields) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        for (String field : fields) {
+            String lower_case_field = field.toLowerCase();
+            String lower_case_tested_value = testedValue.toLowerCase();
+            if (lower_case_tested_value.contains(lower_case_field) && !field.equals("")) {
+                this.validationResult = ValidationResult.INVALID_PASSWORD;
+                this.passState = false;
+                return this;
+            }
         }
         this.validationResult = ValidationResult.OK;
         return this;
