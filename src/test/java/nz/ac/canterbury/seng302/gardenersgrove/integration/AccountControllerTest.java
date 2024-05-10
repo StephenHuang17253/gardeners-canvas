@@ -182,7 +182,7 @@ public class AccountControllerTest {
             "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:Jobs:true:steve@jobs.com:Password1!",
             "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:true:steve@jobs.com:Password1!",
                 }, delimiter = ':')
-    public void RegistrationPage_addValidUser_createsUser_returnsOK(String firstname, String lastname, String noLastName,
+    public void RegistrationPage_validInputs_createsUser(String firstname, String lastname, String noLastName,
                                                                     String emailAddress, String password) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
                         .param("firstName",firstname)
@@ -190,8 +190,7 @@ public class AccountControllerTest {
                         .param("noLastName",noLastName)
                         .param("emailAddress",emailAddress)
                         .param("password",password)
-                        .param("repeatPassword",password))
-                .andDo(print());
+                        .param("repeatPassword",password));
         Mockito.verify(userServiceMock, Mockito.times(1)).addUser(Mockito.any(),Mockito.any());
         Mockito.verify(emailServiceMock, Mockito.times(1)).sendRegistrationEmail(Mockito.any());
     }
@@ -264,7 +263,7 @@ public class AccountControllerTest {
 
 
     }, delimiter = ':')
-    public void RegistrationPage_addInvalidUser_createsNoUser_returnsOK(String firstname, String lastname, String noLastName,
+    public void RegistrationPage_InvalidInputs_createsNoUser(String firstname, String lastname, String noLastName,
                                                                     String emailAddress, String password, String repeatedPassword) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
                         .param("firstName",firstname)
@@ -272,8 +271,7 @@ public class AccountControllerTest {
                         .param("noLastName",noLastName)
                         .param("emailAddress",emailAddress)
                         .param("password",password)
-                        .param("repeatPassword",repeatedPassword))
-                .andDo(print());
+                        .param("repeatPassword",repeatedPassword));
         Mockito.verify(userServiceMock, Mockito.never()).addUser(Mockito.any(),Mockito.any());
         Mockito.verify(emailServiceMock, Mockito.never()).sendRegistrationEmail(Mockito.any());
     }
