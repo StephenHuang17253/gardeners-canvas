@@ -315,24 +315,6 @@ public class InputValidator {
     }
 
     /**
-     * Checks if the given password is valid
-     *
-     * @param password
-     * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
-     */
-    public static ValidationResult validatePassword(String password) {
-        ValidationResult result = new InputValidator(password)
-                .passwordSyntaxHelper()
-                .minimumLengthHelpter(8)
-                .getResult();
-        if (result == ValidationResult.LENGTH_UNDER_MINIMUM) {
-            result = ValidationResult.INVALID_PASSWORD;
-        }
-        return result;
-    }
-
-    /**
      * Checks if the given dob is valid
      *
      * @param dob
