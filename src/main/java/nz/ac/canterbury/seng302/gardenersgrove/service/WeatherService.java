@@ -4,13 +4,14 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 
+@Service
 public class WeatherService {
 
     Logger logger = LoggerFactory.getLogger(WeatherService.class);
@@ -24,7 +25,7 @@ public class WeatherService {
     JSONArray dailyRain;
     JSONArray dates;
 
-    public void getWeather(String gardenLatitude, String gardenLongitude) {
+    public String getWeather(String gardenLatitude, String gardenLongitude) {
         String url = "https://api.open-meteo.com/v1/forecast?latitude="
                 + gardenLatitude
                 + "&longitude=" + gardenLongitude
@@ -42,12 +43,13 @@ public class WeatherService {
             current = jsonObject.getJSONObject("current");
             daily = jsonObject.getJSONObject("daily");
 
-            getDailyWeather();
-            getForecast();
+            logger.info(response.body());
+            return response.body();
 
         } catch (Exception e) {
             logger.error(e.toString());
         }
+        return null;
     }
 
     public JSONObject getCurrentWeather() {

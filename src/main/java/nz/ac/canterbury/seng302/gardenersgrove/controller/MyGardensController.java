@@ -10,6 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -44,13 +46,15 @@ public class MyGardensController {
 
     private final FileService fileService;
 
+    private final WeatherService weatherService;
+
     @Autowired
-    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService) {
+    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService, WeatherService weatherService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.fileService = fileService;
         this.securityService = securityService;
-
+        this.weatherService = weatherService;
     }
 
     /**
@@ -200,6 +204,16 @@ public class MyGardensController {
         return plantPictureString;
     }
 
+
+    @GetMapping("/my-gardens/{gardenId}={gardenName}/weather")
+    public String showGardenWeather(@PathVariable("gardenId") String gardenIdString,
+                                    @PathVariable String gardenName,
+                                    Model model) {
+        logger.info("GET /my-gardens/{}-{}/weather", gardenIdString, gardenName);
+
+        return weatherService.getWeather("-43.532055","172.636230");
+
+    }
 
 }
 
