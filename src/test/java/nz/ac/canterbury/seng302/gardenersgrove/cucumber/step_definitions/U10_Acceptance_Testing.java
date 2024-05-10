@@ -1,7 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -28,8 +30,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class U10_Acceptance_Testing {
@@ -95,7 +95,7 @@ public class U10_Acceptance_Testing {
     @Given("I as user {string} have a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, Float.NaN, user);
+        Garden garden = new Garden(gardenName, "", "", city, "", country, Double.NaN, user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
@@ -177,7 +177,7 @@ public class U10_Acceptance_Testing {
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
         Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
-        Assertions.assertEquals(Float.parseFloat(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
+        Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
     }
 
     @Then("I am taken back to the garden details page")
@@ -213,8 +213,8 @@ public class U10_Acceptance_Testing {
         gardenSize = string;
     }
 
-    @When("I enter {float} as a size")
-    public void i_enter_a_size_using_a_comma(float size) {
+    @When("I enter {double} as a size")
+    public void i_enter_a_size_using_a_comma(double size) {
         gardenSize = String.valueOf(size);
     }
 
