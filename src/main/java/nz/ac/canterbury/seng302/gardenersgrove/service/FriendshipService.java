@@ -1,9 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +48,22 @@ public class FriendshipService {
      * Retrieves all Friendships from persistence where user1 or user2 id matches
      * @param id the user's ID
      */
-    public List<Garden> getAllUsersGardens(long id) {
+    public List<Friendship> getAllUsersFriends(long id) {
+        return null;
+    }
+    /**
+     * Adds a new friendship
+     * @param friendship the friendship to add
+     */
+    public Friendship addFriendship(Friendship friendship) {
+        return null;
+    }
+    /**
+     * Updates a friendship status of an existing friendship
+     * @param id the id of the existing friend
+     * @param friendshipStatus the status to update it to
+     */
+    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus) {
         return null;
     }
 }
