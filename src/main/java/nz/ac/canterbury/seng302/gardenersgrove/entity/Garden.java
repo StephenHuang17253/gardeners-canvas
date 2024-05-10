@@ -62,7 +62,7 @@ public class Garden {
      * @param owner the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, float gardenSize, User owner) {
+                  String gardenPostcode, String gardenCountry, double gardenSize, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -84,7 +84,7 @@ public class Garden {
      * @param gardenSize the size of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, float gardenSize) {
+                  String gardenPostcode, String gardenCountry, double gardenSize) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
