@@ -148,6 +148,12 @@ public class InputValidatorTest {
     }
 
     @Test
+    public void InputValidator_compText_Quotes_return_NONALPHAPLUS()
+    {
+        assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.compulsoryAlphaPlusTextField(" \" "));
+    }
+
+    @Test
     public void InputValidator_optText_invalidPunct_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("!"));
@@ -417,7 +423,8 @@ public class InputValidatorTest {
      * @param password
      */
     @ParameterizedTest
-    @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!" })
+    @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
+    "1D!0", "D!1", "aA!0","Pa!0AAA"})
     public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
         Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password));
     };
@@ -514,29 +521,17 @@ public class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = { "8041", "23020392"})
+    @ValueSource(strings = { "8041", "23020392", "SN6 8TL"})
     public void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
-        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode, 10));
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode));
     }
     /**
      * Test for invalid postcode
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = { "THIS IS NOT A POSTCODE", "8041!@#$"})
+    @ValueSource(strings = { "THIS IS NOT A POSTC*DE", "8041!@#$"})
     public void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
-        Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode, 10));
+        Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode));
     }
-    /**
-     * Test for invalid postcode
-     * @param postcode string input for a garden's postcode
-     */
-    @ParameterizedTest
-    @ValueSource(strings = { "1234567891011", "012345678910"})
-    public void InputValidator_isValidPostcode_invalidPostcode_return_LENGTH_OVER_LIMIT(String postcode) {
-        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.validatePostcodeInput(postcode, 10));
-    }
-
-
-
 }

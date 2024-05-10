@@ -1,6 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -30,18 +35,23 @@ public class HomePageController {
     Logger logger = LoggerFactory.getLogger(HomePageController.class);
     private final UserService userService;
 
+    private final PlantService plantService;
     private boolean onStart = false;
+
+    private GardenService gardenService;
 
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
-     * 
+     *
      * @param userService
      * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager) {
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService) {
         this.userService = userService;
+        this.gardenService = gardenService;
+        this.plantService = plantService;
     }
 
     /**
@@ -67,7 +77,7 @@ public class HomePageController {
      */
     public String getProfilePictureString(String filename) {
 
-        String profilePictureString = "/Images/default_profile_picture.png";
+        String profilePictureString = "/images/default_profile_picture.png";
 
         if (filename != null && filename.length() != 0) {
             profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
@@ -87,15 +97,43 @@ public class HomePageController {
 
         logger.info("GET /home");
 
+        model.addAttribute("myGardens", gardenService.getGardens());
+
+        // Add a test user with test gardens and test plants
         if (!onStart) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
             LocalDate date = LocalDate.parse("01/01/2001", formatter);
-            userService.addUser(new User("John",
+
+            // Add a default user to speed up manual testing.
+            User johnDoe = new User("John",
                     "Doe",
-                    "johndoe@email.com",
-                    date),
-                    "DefaultUser10!");
+                    "gardenersgrovetest@gmail.com",
+                    date);
+            userService.addUser(johnDoe, "Password1!");
+            userService.verifyUser(johnDoe);
             onStart = true;
+
+            ArrayList<Plant> samplePlants = new ArrayList<>();
+
+            for (int i = 0; i < 12; i++) {
+                Garden sampleGarden = new Garden(
+                        "John's Garden " + i,
+                        "114 Ilam Road",
+                        "Ilam",
+                        "Christchurch",
+                        "8041",
+                        "New Zealand",
+                        15,
+                        johnDoe);
+                sampleGarden = gardenService.addGarden(sampleGarden);
+
+                for(int k = 0; k < 12; k++)
+                {
+                    plantService.addPlant("Test Plant #" + k,2,
+                            "test", LocalDate.now(),sampleGarden.getGardenId());
+                }
+
+            }
         }
 
         // If no users exist then clear the security context,
@@ -106,9 +144,7 @@ public class HomePageController {
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-
         model.addAttribute("loggedIn", loggedIn);
 
         String welcomeString = "";

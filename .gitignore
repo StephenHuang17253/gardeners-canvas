@@ -42,5 +42,5 @@ out/
 ### Profile Pics ###
 uploads/
 
-### Email Credentials ###
-email.properties
+### Test Outputs ###
+target/

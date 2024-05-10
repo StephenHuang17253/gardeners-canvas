@@ -16,7 +16,7 @@ public class Plant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long plantId;
 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String plantName;
 
     @Column
@@ -32,6 +32,9 @@ public class Plant {
     @JoinColumn(name = "garden_id",nullable = false)
     private Garden garden;
 
+    @Column
+    private String plantPictureFilename;
+
 
     /**
      * JPA required no-args constructor
@@ -43,7 +46,7 @@ public class Plant {
      * @param plantCount the count of the plant
      * @param plantDescription the description of the plant
      * @param plantDate the date of planting
-     //* @param gardenId the ID of the Garden the plant is planted in
+     * @param garden the Garden object that the plant belongs to
      */
     public Plant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Garden garden) {
         this.plantName = plantName;
@@ -77,7 +80,16 @@ public class Plant {
         return formattedDate;
     }
     public void setPlantDate(LocalDate plantDate) {this.plantDate = plantDate;}
+
     public Garden getGarden() {return garden;}
+
+    public String getPlantPictureFilename() {
+        return this.plantPictureFilename;
+    }
+
+    public void setPlantPictureFilename(String plantPictureFilename) {
+        this.plantPictureFilename = plantPictureFilename;
+    }
     @Override
     public String toString() {
         return "Plant{" +
@@ -86,6 +98,7 @@ public class Plant {
                 ", count='" + plantCount + '\'' +
                 ", description='" + plantDescription + '\'' +
                 ", plant date='" + plantDate + '\'' +
+                ", plant picture filename='" + plantPictureFilename + '\'' +
                 ", garden id='" + garden.getGardenId() + '\'' +
                 '}';
     }

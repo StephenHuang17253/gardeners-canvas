@@ -3,17 +3,19 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,22 +28,29 @@ import java.util.Optional;
  */
 @SpringBootTest
 @Import({GardenService.class, PlantService.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PlantServiceTest {
 
 
     private static PlantRepository plantRepository;
-    private static GardenRepository gardenRepository;
     private static GardenService gardenService;
     private static PlantService plantService;
+    private static FileService fileService;
+
+    private static User owner;
 
     @BeforeAll
     public static void setup() {
-        gardenRepository = Mockito.mock(GardenRepository.class);
         gardenService = Mockito.mock(GardenService.class);
         plantRepository = Mockito.mock(PlantRepository.class);
-        plantService = new PlantService(plantRepository,gardenService);
+        plantService = new PlantService(plantRepository,gardenService,fileService);
+        owner =  new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
     }
+
+    // TODO
+
     @Test
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testAddPlant() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
@@ -52,12 +61,12 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
-                15);
+                15,
+                owner);
         List<Plant> mockPlantsList = new ArrayList<>();
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(Mockito.any(Plant.class)))
                 .thenAnswer(invocation -> {
                     mockPlantsList.add(invocation.getArgument(0));
@@ -80,6 +89,7 @@ public class PlantServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testGetPlants() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
@@ -90,14 +100,15 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
-                15);
+                15,
+                owner
+                );
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         List<Plant> mockPlantsList = new ArrayList<>();
         mockPlantsList.add(plant);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for getPlants
         Mockito.when(plantRepository.findAll()).thenReturn(mockPlantsList);
@@ -116,6 +127,7 @@ public class PlantServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testFindById() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
@@ -126,12 +138,12 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
-                15);
+                15,
+                owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for findById
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
@@ -150,6 +162,7 @@ public class PlantServiceTest {
         Assertions.assertEquals(resultPlant.getGarden(),garden);
     }
     @Test
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePlant() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
@@ -161,13 +174,13 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
-                15);
+                15,
+                owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for updatePlant
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
@@ -185,6 +198,7 @@ public class PlantServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePlantOverloadedConstructor() {
         // Given
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
@@ -196,12 +210,12 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                "114 Ilam Road, Ilam, Christchurch 8041, New Zealand",
-                15);
+                15,
+                owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
         // Mocks for addPlant
-        Mockito.when(gardenService.findById(1L)).thenReturn(Optional.of(garden));
+        Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
         Mockito.when(plantRepository.save(plant)).thenReturn(plant);
         // Mock for updatePlant
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));

@@ -163,7 +163,6 @@ public class InputValidator {
         return new InputValidator(text)
                 .blankHelper()
                 .alphaPlusHelper()
-                .lengthHelper(255)
                 .getResult();
     }
 
@@ -187,7 +186,6 @@ public class InputValidator {
     /**
      * Checks input against a criteria:
      * This function only allows alphanumeric characters and select punctuation
-     * Checks input against default character limit of 200.
      *
      * @param text text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
@@ -195,7 +193,6 @@ public class InputValidator {
     public static ValidationResult optionalAlphaPlusTextField(String text) {
         return new InputValidator(text)
                 .alphaPlusHelper()
-                .lengthHelper(200)
                 .getResult();
     }
 
@@ -229,10 +226,9 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult validatePostcodeInput(String text, int length) {
+    public static ValidationResult validatePostcodeInput(String text) {
         return new InputValidator(text)
-                .numbersOnlyHelper()
-                .lengthHelper(length)
+                .postcodeHelper()
                 .getResult();
     }
 
@@ -256,7 +252,6 @@ public class InputValidator {
                 .nameHelper()
                 .lengthHelper(64)
                 .getResult();
-
     }
 
     /**
@@ -270,6 +265,7 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .emailUniquenessHelper()
                 .getResult();
     }
@@ -284,6 +280,7 @@ public class InputValidator {
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
                 .emailSyntaxHelper()
+                .lengthHelper(320)
                 .getResult();
     }
 
@@ -295,9 +292,15 @@ public class InputValidator {
      *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePassword(String password) {
-        return new InputValidator(password)
+        ValidationResult result = new InputValidator(password)
                 .passwordSyntaxHelper()
+                .minimumLengthHelpter(8)
                 .getResult();
+        if (result == ValidationResult.LENGTH_UNDER_MINIMUM)
+        {
+            result = ValidationResult.INVALID_PASSWORD;
+        }
+        return result;
     }
 
     /**
@@ -437,6 +440,22 @@ public class InputValidator {
         return this;
     }
 
+    private InputValidator minimumLengthHelpter(int minimumNumberOfDigits) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        if (testedValue.length() < minimumNumberOfDigits)
+        {
+            this.passState = false;
+            this.validationResult = ValidationResult.LENGTH_UNDER_MINIMUM;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
     /**
      * Checks if a string matches proper date syntax
      * updates local variables with results
@@ -544,7 +563,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "\"", "-" };
+        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-" };
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
@@ -594,6 +613,11 @@ public class InputValidator {
         // checks if string contains only numbers and up to 1 comma or full stop
         for (Character letter : testedValue.toCharArray()) {
             if (!Character.isDigit(letter)) {
+                if (Character.toLowerCase(letter) == 'e')
+                {  
+                    continue;
+                }
+
                 stringPasses = false;
                 if ((letter.toString().equals(",") || letter.toString().equals(".")) && allowedCommaNumber > 0) {
                     stringPasses = true;
@@ -671,12 +695,12 @@ public class InputValidator {
         return this;
     }
 
-    private InputValidator numbersOnlyHelper() {
+    private InputValidator postcodeHelper() {
         if (!this.passState) {
             return this;
         }
 
-        if (!testedValue.matches("\\d+")) {
+        if (!testedValue.matches("^[a-zA-Z0-9 ]*$")) {
             this.validationResult = ValidationResult.INVALID_POSTCODE;
             this.passState = false;
             return this;

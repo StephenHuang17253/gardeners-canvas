@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
+  <title>Validate Gardener's Grove Account</title>
+  <link th:href="@{/css/navBar.css}" rel="stylesheet">
+  <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+  <link th:href="@{/css/verificationPage.css}" rel="stylesheet" />
+</head>
+
+<body>
+  <div th:replace="fragmentExample/fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
+  <h1>Verify Account</h1>
+  <form id="code-form" th:action="@{/verify}" method="post">
+    <div>
+      <p>An email has been sent to your inbox with a 6 character signup code</p>
+      <p>Enter the code below to verify your account</p>
+    </div>
+    <div class="code-container">
+      <input class="code-input" autofocus />
+      <input class="code-input" />
+      <input class="code-input" />
+      <input class="code-input" />
+      <input class="code-input" />
+      <input class="code-input" />
+    </div>
+
+    <!-- Hidden inputs to send the email address and token string to the server -->
+
+    <input type="hidden" th:name="emailAddress" th:value="*{emailAddress}" id="emailAddress">
+    <input type="hidden" th:name="tokenString" th:value="*{tokenString}" id="tokenString">
+
+    <button type="submit" class="user_button">Verify</button>
+    <p class="error" th:text="${message}"></p>
+  </form>
+
+
+  <script th:src="@{/js/verificationPage.js}"></script>
+  <script th:src="@{/js/preventEnterSubmit.js}"></script>
+</body>
+
+</html>

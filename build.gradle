@@ -25,9 +25,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.h2database:h2'
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation "org.mariadb.jdbc:mariadb-java-client:3.0.4"
+
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	// Use JUnit Jupiter for testing.
 	//    testImplementation libs.junit.jupiter
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -39,6 +43,9 @@ dependencies {
 	testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.15.0'
 	testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
 
+	testImplementation 'org.springframework.security:spring-security-test'
+
+
 	//JSON dependency for Weather monitoring
 	implementation 'org.json:json:20240303'
 }
@@ -48,10 +55,10 @@ jacoco {
 }
 
 
-sonarqube {
+sonar {
 	properties {
-		property "sonar.projectKey", "team-500"
-		property "sonar.projectName", "team-500"
+		property "sonar.projectKey", "seng302-2024-team500"
+		property "sonar.projectName", "seng302-2024-team500"
 		property "sonar.sourceEncoding", "UTF-8"
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"
@@ -70,7 +77,7 @@ tasks.named('test') {
 	}
 
 	// The unitTestReport will be run after the unit test task has completed
-	finalizedBy jacocoTestReport
+	finalizedBy "jacocoTestReport"
 
 }
 
@@ -87,7 +94,7 @@ tasks.register("integration", Test) {
 	}
 
 	// The integrationTestReport will be run after the integration test task has completed
-	finalizedBy jacocoTestReport
+	finalizedBy "integrationTestReport"
 }
 
 tasks.register("cucumber", Test) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
         <title>Garden Details</title>
@@ -7,23 +7,25 @@
         <link th:href="@{/css/navBar.css}" rel="stylesheet">
         <link th:href="@{/css/tableList.css}" rel="stylesheet">
         <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+        <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
+        <script th:src="@{/js/imagePicker.js}"></script>
     </head>
     <body>
-        <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')"></div>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
         <div class = "main-container">
             <div class="tableList-header">
                 <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
-                <span th:text="'Garden Location: ' + ${gardenLocation}"> Name </span>
-                <span> | </span>
-                <span th:if="${#strings.equals(gardenSize, 'NaN')}"> Garden size: not specified </span>
-                <span th:if="${not #strings.equals(gardenSize, 'NaN')}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
+                <p th:text="'Garden Location: ' + ${gardenLocation}"> Name </p>
+                <p> | </p>
+                <p th:if="${#strings.equals(gardenSize, 'NaN')}"> Garden size: not specified </p>
+                <p th:if="${not #strings.equals(gardenSize, 'NaN')}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
 
                 <br>
                 <div class="tableList-header-button-contain">
-                    <a th:href="@{__${gardenId}__=__${gardenName}__/edit}">
+                    <a th:href="@{__${gardenId}__/edit}">
                         <button class = rounded-button >Edit</button>
                     </a>
-                    <a th:href="@{__${gardenId}__=__${gardenName}__/create-new-plant}">
+                    <a th:href="@{__${gardenId}__/create-new-plant}">
                         <button class="rounded-button">Create New Plant</button>
                     </a>
                 </div>
@@ -35,12 +37,13 @@
                     <span th:text="${totalPlants} + ' Plants'"> # Plants </span>
                 </div>
                 <div th:each="plant : ${plants}">
-                    <div th:replace="fragmentExample/fragments/plantBox.html :: plantBox(
-                        plantId=${plant.getPlantId},
-                        plantName=${plant.getPlantName},
-                        plantCount=${plant.getPlantCount},
-                        plantDescription=${plant.getPlantDescription},
-                        plantDate=${plant.getFormattedPlantDate})">
+                    <div th:replace="~{fragmentExample/fragments/plantBox.html :: plantBox(
+                        plantId=${plant.getPlantId()},
+                        plantName=${plant.getPlantName()},
+                        plantCount=${plant.getPlantCount()},
+                        plantDescription=${plant.getPlantDescription()},
+                        plantDate=${plant.getFormattedPlantDate()},
+                        plantPicture=${plant.getPlantPictureFilename()})}">
                     </div>
                 </div>
             </div>

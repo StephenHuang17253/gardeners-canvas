@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Create new Garden</title>
@@ -8,7 +8,7 @@
     <link th:href="@{/css/form.css}" rel="stylesheet">
 </head>
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('create')"></div>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('create')" th:with="loggedIn=${loggedIn}"></div>
 <div class = main-container>
     <h1>Create New Garden</h1>
     <br>
@@ -98,8 +98,16 @@
 
         </form>
     </div>
+
+    <!-- This is a licensing term for our free plan -->
+    <div class="location-footer">
+        <br>
+        <p>Location Services powered by <a href="https://locationiq.com/?ref=link-back">LocationIQ</a></p>
+    </div>
+
 </div>
-<script src="/js/preventEnterSubmit.js"></script>
-<script src="/js/locationIQAutocomplete.js"></script>
+
+<script th:src="@{/js/preventEnterSubmit.js}"></script>
+<script th:src="@{/js/locationIQAutocomplete.js}"></script>
 </body>
 </html>

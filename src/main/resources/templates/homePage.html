@@ -3,17 +3,18 @@
 
 <head>
     <title>Gardener's Grove Home Page</title>
-
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/homePage.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
-
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
 </head>
 
 <body>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
     <div class="container">
         <h2>Gardener's Grove</h2>
 
-        <img th:src="@{/Images/Garden.webp}" alt="Garden">
+        <img th:src="@{/images/landingPlant.JPG}" alt="Garden">
 
         <div th:if="${loggedIn}" class="profile_info">
             <div class="profile_picture_container small_pic">
@@ -24,14 +25,14 @@
         </div>
 
         <div class="buttons">
-            <a th:if="${!loggedIn}" th:href="@{register}"><button>Register</button></a>
+            <a th:if="${!loggedIn}" th:href="@{register}"><button class="user_button">Register</button></a>
 
-            <a th:if="${!loggedIn}" th:href="@{login}"><button>Sign In</button></a>
+            <a th:if="${!loggedIn}" th:href="@{login}"><button class="user_button">Sign In</button></a>
 
-            <a th:if="${loggedIn}" th:href="@{profile}"><button>View Profile</button></a>
+            <a th:if="${loggedIn}" th:href="@{profile}"><button class="user_button">View Profile</button></a>
 
             <form th:if="${loggedIn}" th:action="@{/logout}" method="post">
-                <button type="submit">Logout</button>
+                <button type="submit" class="user_button">Logout</button>
             </form>
         </div>
     </div>

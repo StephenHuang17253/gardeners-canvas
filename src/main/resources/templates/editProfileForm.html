@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
-    <title>Edit Profile</title>
     <link th:href="@{/css/editProfileForm.css}" rel="stylesheet">
-    <script th:src="@{/js/editProfileForm.js}"></script>
     <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
-    <script th:src="@{/js/profilePicturePicker.js}"></script>
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
 </head>
 
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
     <div class="container">
+        <title>Edit Profile</title>
         <h1>Edit Profile Form</h1>
         <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
 
             <div class="profile_picture_container">
-                <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+                <img id="imageToChange" th:src="@{${profilePicture}}" alt="User's profile picture">
                 <label for="profilePictureInput">+</label>
                 <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
                     onChange="handleFileSelect(event)">
@@ -40,13 +41,14 @@
 
 
             <label for="dateOfBirth">Date of Birth (Optional)</label>
-            <input type="text" class="form-control" id="dateOfBirth" placeholder="DD/MM/YYYY" th:name="dateOfBirth"
-                th:value="*{dateOfBirth}" data-cy="dateOfBirth">
+            <input type="date" class="form-control"  id="dateOfBirth" placeholder=""
+                   th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth"
+                   autofocus >
             <span th:if="${dateOfBirthError}" class="error-message" th:text="${dateOfBirthError}"></span>
 
             <label for="emailAddress">Email Address</label>
             <input type="text" class="form-control" id="emailAddress" placeholder="johndoe@gmail.com"
-                th:name="emailAddress" th:value="*{emailAddress}" data-cy="emailAddress">
+                th:name="emailAddress" th:value="*{emailAddress}" data-cy="emailAddress" required autofocus>
             <span th:if="${emailAddressError}" class="error-message" th:text="${emailAddressError}"></span>
 
             <div class="buttons">
@@ -55,6 +57,9 @@
             </div>
         </form>
     </div>
+<script th:src="@{/js/preventEnterSubmit.js}"></script>
+<script th:src="@{/js/editProfileForm.js}"></script>
+<script th:src="@{/js/imagePicker.js}"></script>
 </body>
 
 </html>
