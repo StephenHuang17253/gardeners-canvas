@@ -184,7 +184,7 @@ public class GardenFormController {
 
         Double doubleGardenSize;
         if (gardenSize == null) {
-            doubleGardenSize = null;
+            doubleGardenSize = 0.0;
         }else{
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
