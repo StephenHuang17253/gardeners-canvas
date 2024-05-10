@@ -17,8 +17,8 @@
                 <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
                 <p th:text="'Garden Location: ' + ${gardenLocation}"> Name </p>
                 <p> | </p>
-                <p th:if="${#strings.equals(gardenSize, 'NaN')}"> Garden size: not specified </p>
-                <p th:if="${not #strings.equals(gardenSize, 'NaN')}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
+                <p th:if="${#strings.equals(gardenSize, 'null')}"> Garden size: not specified </p>
+                <p th:if="${not #strings.equals(gardenSize, 'null')}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
 
                 <br>
                 <div class="tableList-header-button-contain">

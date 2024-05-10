@@ -6,8 +6,8 @@
                 <br>
                 <span th:text="'Garden Location: ' + ${gardenLocation}"></span>
                 <br>
-                <span th:if="${#strings.equals(gardenSize, 'NaN')}"> Garden size: not specified </span>
-                <span th:if="${not #strings.equals(gardenSize, 'NaN')}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
+                <span th:if="${#strings.equals(gardenSize, 'null')}"> Garden size: not specified </span>
+                <span th:if="${not #strings.equals(gardenSize, 'null')}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
                 <br>
                 <span th:text="'Number of Plant types recorded: ' + ${numberOfPlants}"></span>
                 <br>

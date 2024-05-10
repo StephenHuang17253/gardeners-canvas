@@ -184,7 +184,7 @@ public class GardenFormController {
 
         Double doubleGardenSize;
         if (gardenSize == null) {
-            doubleGardenSize = Double.NaN;
+            doubleGardenSize = null;
         }else{
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
