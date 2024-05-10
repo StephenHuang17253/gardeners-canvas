@@ -213,10 +213,10 @@ public class AccountControllerTest {
             "Steve:Jobs:false:steve@jobs.com:password1!:password1!", //weak password no capitals
             "Steve:Jobs:false:steve@jobs.com:PASSWORD1!:PASSWORD1!", //weak password no lower case
             "Steve:Jobs:false:steve@jobs.com:Pa1!:Pas1!", //weak password short
-            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:Jobs:true:steve@jobs.com:Password1!", //long fname 65 char
-            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:true:steve@jobs.com:Password1!", //long lname 65 char
-            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:Jobs:true:steve@jobs.com:Password1!", //long fname 67 char
-            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:true:steve@jobs.com:Password1!", //long lname 67 char
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:Jobs:true:steve@jobs.com:Password1!:Password1!", //long fname 65 char
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:true:steve@jobs.com:Password1:Password1!!", //long lname 65 char
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:Jobs:true:steve@jobs.com:Password1!:Password1!", //long fname 67 char
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:true:steve@jobs.com:Password1!:Password1!", //long lname 67 char
             "Steve:Jobs:false:steve@jobs:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@.com:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@jobs@com.nz:Password1!:Password1!", //bad email
@@ -224,7 +224,6 @@ public class AccountControllerTest {
             "Steve:Jobs:false:steve@jobs.com.nz.somewhere.else:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve..@gmail.com:Password1!:Password1!", //bad email
-            "Steve:Jobs:false:steve.som.ewhere@gmail.com:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@gmail..com:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve.co.nz@gmail:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@hotmail:Password1!:Password1!", //bad email
