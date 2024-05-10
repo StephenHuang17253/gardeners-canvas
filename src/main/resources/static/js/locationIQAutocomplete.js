@@ -3,7 +3,14 @@ let addressInput = ''; // Store the current address entered by the user
 // Function to make a LocationIQ API request
 const fetchLocationIQData = async(query) => {
     try {
-        const response = await fetch(`/api/location/suggestions?query=${query}`);
+        const path = window.location.pathname
+        let instance = "";
+        if (path.includes('/test/')) {
+            instance = 'test/';
+        } else if (path.includes('/prod/')) {
+            instance = 'prod/';
+        }
+        const response = await fetch(`/${instance}api/location/suggestions?query=${query}`);
         const data = await response.json();
 
         if (data === 429) {
