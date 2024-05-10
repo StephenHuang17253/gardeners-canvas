@@ -173,9 +173,12 @@ public class AccountControllerTest {
     @ParameterizedTest
     @CsvSource(value = {
             "Steve:Jobs:false:steve@jobs.com:Password1!",
+            "Steve's:Jobs:false:steve@jobs.com:Password1!",
+            "Steve:Job's:false:steve@jobs.com:Password1!",
             "Steve:Jobs:false:steve@jobs.co.nz:Password1!",
             "Steve-e:Jobs:false:steve@jobs.com:Password1!",
             "Steve-e:Jobs:true:steve@jobs.com:Password1!",
+            "Steve-e:Jobs:true:steve@jobs.co.nz:Password1!",
             "Steve::true:steve@jobs.com:Password1!",
             "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:Jobs:true:steve@jobs.com:Password1!",
             "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:true:steve@jobs.com:Password1!",
@@ -195,20 +198,20 @@ public class AccountControllerTest {
     }
 
 
-    //For below test, a valid string is "Steve:Jobs:false:steve@jobs.com:Password1!:Password1!"
+    //For below test, a valid string is "Steve:Jobs:false:steve@jobs.com:Password1!:Password1!",
     // included such that new test cases can easily be made with copy and paste
     @ParameterizedTest
     @CsvSource(value = {
             ":Jobs:false:steve@jobs.com:Password1!:Password1!", // no fname
             "Steve::false:steve@jobs.com:Password1!:Password1!", //no lname (last name bool set to required)
             "Steve:Jobs:false::Password1!:Password1!", // no email
-            "Steve:Jobs:false:steve@jobs.com:!:Password1!", //no password
-            "Steve:Jobs:false:steve@jobs.com:Password1!:!", //no repeat password
+            "Steve:Jobs:false:steve@jobs.com::Password1!", //no password
+            "Steve:Jobs:false:steve@jobs.com:Password1!:", //no repeat password
             "Steve:Jobs:false:steve@jobs.com:Password1!!:Password1!", //mismatched password
             "Steve:Jobs:false:steve@jobs.com:Password1:Password1", //weak password no non char
             "Steve:Jobs:false:steve@jobs.com:Password!:Password!", //weak password no num
             "Steve:Jobs:false:steve@jobs.com:password1!:password1!", //weak password no capitals
-            "Steve:Jobs:false:steve@jobs.com:PASSWORD1!:PASSWORD1!", //weak password no upper case
+            "Steve:Jobs:false:steve@jobs.com:PASSWORD1!:PASSWORD1!", //weak password no lower case
             "Steve:Jobs:false:steve@jobs.com:Pa1!:Pas1!", //weak password short
             "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:Jobs:true:steve@jobs.com:Password1!", //long fname 65 char
             "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:true:steve@jobs.com:Password1!", //long lname 65 char
@@ -217,6 +220,50 @@ public class AccountControllerTest {
             "Steve:Jobs:false:steve@jobs:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@.com:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@jobs@com.nz:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:@com.nz:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve@jobs.com.nz.somewhere.else:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve..@gmail.com:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve.som.ewhere@gmail.com:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve@gmail..com:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve.co.nz@gmail:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve@hotmail:Password1!:Password1!", //bad email
+            "Steve**:Jobs:false:steve@jobs.com:Password1!:Password1!", // bad fname
+            "Steve:Jobs&=:false:steve@jobs.com:Password1!:Password1!", //bad lname
+            "Steve:Jobs:wateringCan:steve@jobs.com:Password1!:Password1!", //bad noLastNameBool
+            "Steve\":Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve&:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve^:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve&:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve@:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve?:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve!:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve╚:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve):Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve}:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve]:Jobs:false:steve@jobs.com:Password1!:Password1!", // illegal chars in fname
+            "Steve:Jobs\":false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs&:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs^:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs&:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs@:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs?:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs!:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs╚:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs):false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs}:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            "Steve:Jobs]:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
+            " :Jobs:false:steve@jobs.com:Password1!:Password1!", // no fname (Blank)
+            "Steve: :false:steve@jobs.com:Password1!:Password1!", //no lname (last name bool set to required) (Blank)
+            "Steve:Jobs:false: :Password1!:Password1!", // no email (Blank)
+            "Steve:Jobs:false:steve@jobs.com: :Password1!", //no password (Blank)
+            "Steve:Jobs:false:steve@jobs.com:Password1!: ", //no repeat password (Blank)
+            "'':Jobs:false:steve@jobs.com:Password1!:Password1!", // just special chars fname
+            "Steve:'':false:steve@jobs.com:Password1!:Password1!", //just special chars lname (last name bool set to Required)
+            "Steve:Jobs:false:'':Password1!:Password1!", // just special chars email
+            "Steve:Jobs:false:steve@jobs.com:'':Password1!", //just special chars password
+            "Steve:Jobs:false:steve@jobs.com:Password1!:''", //just special chars repeat password
+
 
     }, delimiter = ':')
     public void RegistrationPage_addInvalidUser_createsNoUser_returnsOK(String firstname, String lastname, String noLastName,
