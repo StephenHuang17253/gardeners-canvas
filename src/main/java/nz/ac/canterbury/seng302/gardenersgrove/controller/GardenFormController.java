@@ -238,7 +238,7 @@ public class GardenFormController {
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         double gardenSize = garden.getGardenSize();
-        if (Double.isNaN(gardenSize)) {
+        if (gardenSize == 0.0) {
             model.addAttribute("gardenSize", "");
         } else {
             model.addAttribute("gardenSize", gardenSize);
