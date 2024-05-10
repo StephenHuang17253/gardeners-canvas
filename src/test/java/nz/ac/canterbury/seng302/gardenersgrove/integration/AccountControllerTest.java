@@ -5,6 +5,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import org.hamcrest.Matchers;
+import org.hamcrest.core.AllOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,7 +24,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import org.hamcrest.BaseMatcher.*;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.core.AnyOf.anyOf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -190,7 +196,7 @@ public class AccountControllerTest {
                         .param("noLastName",noLastName)
                         .param("emailAddress",emailAddress)
                         .param("password",password)
-                        .param("repeatPassword",password));
+                        .param("repeatPassword",password)).andExpect(status().is3xxRedirection());
         Mockito.verify(userServiceMock, Mockito.times(1)).addUser(Mockito.any(),Mockito.any());
         Mockito.verify(emailServiceMock, Mockito.times(1)).sendRegistrationEmail(Mockito.any());
     }
@@ -271,7 +277,8 @@ public class AccountControllerTest {
                         .param("noLastName",noLastName)
                         .param("emailAddress",emailAddress)
                         .param("password",password)
-                        .param("repeatPassword",repeatedPassword));
+                        .param("repeatPassword",repeatedPassword)).andExpect(status()
+                .is(anyOf( Matchers.equalToObject(200), Matchers.equalToObject(400))));
         Mockito.verify(userServiceMock, Mockito.never()).addUser(Mockito.any(),Mockito.any());
         Mockito.verify(emailServiceMock, Mockito.never()).sendRegistrationEmail(Mockito.any());
     }
