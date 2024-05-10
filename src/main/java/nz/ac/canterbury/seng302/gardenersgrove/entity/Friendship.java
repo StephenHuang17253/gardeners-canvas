@@ -2,7 +2,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-
+/**
+ * Entity class of a Friendship, reflecting a many-to-many relationship between users
+ */
 @Entity
 @Table(name = "friendship_table")
 public class Friendship {
