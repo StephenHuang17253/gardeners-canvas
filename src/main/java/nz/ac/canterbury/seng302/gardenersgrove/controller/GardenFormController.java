@@ -177,19 +177,19 @@ public class GardenFormController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
+        if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
         }
 
-        float floatGardenSize;
-        if(gardenSize == null){
-            floatGardenSize = Float.NaN;
+        Double doubleGardenSize;
+        if (gardenSize == null) {
+            doubleGardenSize = 0.0;
         }else{
-            floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
+            doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, owner);
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize, owner);
 
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
@@ -238,7 +238,7 @@ public class GardenFormController {
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         double gardenSize = garden.getGardenSize();
-        if (Double.isNaN(gardenSize)) {
+        if (gardenSize == 0.0) {
             model.addAttribute("gardenSize", "");
         } else {
             model.addAttribute("gardenSize", gardenSize);
@@ -310,13 +310,13 @@ public class GardenFormController {
             return "editGardenForm";
 
         }
-        float floatGardenSize;
+        double doubleGardenSize;
         if (gardenSize == null) {
-            floatGardenSize = Float.NaN;
+            doubleGardenSize = 0.0;
         } else {
-            floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
+            doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
+        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize));
         logger.info("Edited Garden Page");
 
         User owner = securityService.getCurrentUser();
