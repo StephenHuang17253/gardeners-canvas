@@ -173,20 +173,64 @@ public class AccountControllerTest {
     @ParameterizedTest
     @CsvSource(value = {
             "Steve:Jobs:false:steve@jobs.com:Password1!",
-            "Steve::true:steve@jobs.com:Password1!"
-    }, delimiter = ':')
+            "Steve:Jobs:false:steve@jobs.co.nz:Password1!",
+            "Steve-e:Jobs:false:steve@jobs.com:Password1!",
+            "Steve-e:Jobs:true:steve@jobs.com:Password1!",
+            "Steve::true:steve@jobs.com:Password1!",
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:Jobs:true:steve@jobs.com:Password1!",
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:true:steve@jobs.com:Password1!",
+                }, delimiter = ':')
     public void RegistrationPage_addValidUser_createsUser_returnsOK(String firstname, String lastname, String noLastName,
                                                                     String emailAddress, String password) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
-                .param("firstName",firstname)
-                .param("lastName",lastname)
-                .param("noLastName",noLastName)
-                .param("emailAddress",emailAddress)
-                .param("password",password)
-                .param("repeatPassword",password))
+                        .param("firstName",firstname)
+                        .param("lastName",lastname)
+                        .param("noLastName",noLastName)
+                        .param("emailAddress",emailAddress)
+                        .param("password",password)
+                        .param("repeatPassword",password))
                 .andDo(print());
         Mockito.verify(userServiceMock, Mockito.times(1)).addUser(Mockito.any(),Mockito.any());
         Mockito.verify(emailServiceMock, Mockito.times(1)).sendRegistrationEmail(Mockito.any());
+    }
+
+
+    //For below test, a valid string is "Steve:Jobs:false:steve@jobs.com:Password1!:Password1!"
+    // included such that new test cases can easily be made with copy and paste
+    @ParameterizedTest
+    @CsvSource(value = {
+            ":Jobs:false:steve@jobs.com:Password1!:Password1!", // no fname
+            "Steve::false:steve@jobs.com:Password1!:Password1!", //no lname (last name bool set to required)
+            "Steve:Jobs:false::Password1!:Password1!", // no email
+            "Steve:Jobs:false:steve@jobs.com:!:Password1!", //no password
+            "Steve:Jobs:false:steve@jobs.com:Password1!:!", //no repeat password
+            "Steve:Jobs:false:steve@jobs.com:Password1!!:Password1!", //mismatched password
+            "Steve:Jobs:false:steve@jobs.com:Password1:Password1", //weak password no non char
+            "Steve:Jobs:false:steve@jobs.com:Password!:Password!", //weak password no num
+            "Steve:Jobs:false:steve@jobs.com:password1!:password1!", //weak password no capitals
+            "Steve:Jobs:false:steve@jobs.com:PASSWORD1!:PASSWORD1!", //weak password no upper case
+            "Steve:Jobs:false:steve@jobs.com:Pa1!:Pas1!", //weak password short
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:Jobs:true:steve@jobs.com:Password1!", //long fname 65 char
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:true:steve@jobs.com:Password1!", //long lname 65 char
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:Jobs:true:steve@jobs.com:Password1!", //long fname 67 char
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:true:steve@jobs.com:Password1!", //long lname 67 char
+            "Steve:Jobs:false:steve@jobs:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve@.com:Password1!:Password1!", //bad email
+            "Steve:Jobs:false:steve@jobs@com.nz:Password1!:Password1!", //bad email
+
+    }, delimiter = ':')
+    public void RegistrationPage_addInvalidUser_createsNoUser_returnsOK(String firstname, String lastname, String noLastName,
+                                                                    String emailAddress, String password, String repeatedPassword) throws Exception {
+        this.mockMvc.perform(post("/register").with(csrf())
+                        .param("firstName",firstname)
+                        .param("lastName",lastname)
+                        .param("noLastName",noLastName)
+                        .param("emailAddress",emailAddress)
+                        .param("password",password)
+                        .param("repeatPassword",repeatedPassword))
+                .andDo(print());
+        Mockito.verify(userServiceMock, Mockito.never()).addUser(Mockito.any(),Mockito.any());
+        Mockito.verify(emailServiceMock, Mockito.never()).sendRegistrationEmail(Mockito.any());
     }
 
 
