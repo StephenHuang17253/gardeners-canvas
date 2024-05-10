@@ -23,7 +23,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -213,10 +212,10 @@ public class AccountControllerTest {
             "Steve:Jobs:false:steve@jobs.com:password1!:password1!", //weak password no capitals
             "Steve:Jobs:false:steve@jobs.com:PASSWORD1!:PASSWORD1!", //weak password no lower case
             "Steve:Jobs:false:steve@jobs.com:Pa1!:Pas1!", //weak password short
-            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:Jobs:true:steve@jobs.com:Password1!:Password1!", //long fname 65 char
-            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:true:steve@jobs.com:Password1:Password1!!", //long lname 65 char
-            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:Jobs:true:steve@jobs.com:Password1!:Password1!", //long fname 67 char
-            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:true:steve@jobs.com:Password1!:Password1!", //long lname 67 char
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:Jobs:false:steve@jobs.com:Password1!:Password1!", //long fname 65 char
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksaka:false:steve@jobs.com:Password1:Password1!!", //long lname 65 char
+            "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:Jobs:false:steve@jobs.com:Password1!:Password1!", //long fname 67 char
+            "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksakaaa:false:steve@jobs.com:Password1!:Password1!", //long lname 67 char
             "Steve:Jobs:false:steve@jobs:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@.com:Password1!:Password1!", //bad email
             "Steve:Jobs:false:steve@jobs@com.nz:Password1!:Password1!", //bad email
