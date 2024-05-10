@@ -281,7 +281,18 @@ public class InputValidator {
                 .getResult();
     }
 
-
+    /**
+     * Checks if the given password is valid
+     *
+     * @param password
+     * @param firstName
+     * @param lastName
+     * @param noLastName
+     * @param dateOfBirth
+     * @param emailAddress
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
     public static ValidationResult validatePassword(String password, String firstName, String lastName, boolean noLastName, LocalDate dateOfBirth, String emailAddress) {
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
