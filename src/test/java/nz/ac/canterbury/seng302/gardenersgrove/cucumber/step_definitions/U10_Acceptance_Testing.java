@@ -213,8 +213,8 @@ public class U10_Acceptance_Testing {
         gardenSize = string;
     }
 
-    @When("I enter {double} as a size")
-    public void i_enter_a_size_using_a_comma(double size) {
+    @When("I enter {Double} as a size")
+    public void i_enter_a_size_using_a_comma(Double size) {
         gardenSize = String.valueOf(size);
     }
 

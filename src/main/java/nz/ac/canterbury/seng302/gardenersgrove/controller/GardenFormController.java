@@ -177,13 +177,13 @@ public class GardenFormController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
+        if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
         }
 
-        double doubleGardenSize;
-        if(gardenSize == null){
+        Double doubleGardenSize;
+        if (gardenSize == null) {
             doubleGardenSize = Double.NaN;
         }else{
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));

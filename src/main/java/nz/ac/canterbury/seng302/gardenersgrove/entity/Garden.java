@@ -34,8 +34,8 @@ public class Garden {
     @Column(columnDefinition = "TEXT")
     private String gardenCountry;
 
-    @Column
-    private double gardenSize;
+    @Column(nullable = true)
+    private Double gardenSize;
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
