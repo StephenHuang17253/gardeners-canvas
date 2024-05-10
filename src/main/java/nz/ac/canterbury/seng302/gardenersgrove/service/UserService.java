@@ -72,7 +72,6 @@ public class UserService {
      * @return user if found, null otherwise
      */
     public User getUserByEmailAndPassword(String email, String password) {
-        email = email.toLowerCase();
         User[] users = userRepository.findByEmailAddress(email);
         if (users.length == 0) {
             return null;
@@ -89,7 +88,6 @@ public class UserService {
         return null;
     }
 
-
     /**
      * Returns a user found by email
      * 
@@ -97,7 +95,6 @@ public class UserService {
      * @return user if found, null otherwise
      */
     public User getUserByEmail(String email) {
-        email = email.toLowerCase();
         User[] users = userRepository.findByEmailAddress(email);
         if (users.length == 0) {
             return null;
@@ -121,7 +118,6 @@ public class UserService {
      * @return
      */
     public User updateUser(long id, String firstName, String lastName, String emailAddress, LocalDate dateOfBirth) {
-        emailAddress = emailAddress.toLowerCase();
         User user = getUserById(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -137,7 +133,6 @@ public class UserService {
      * @return true if a user with the given email exists, false otherwise
      */
     public boolean emailInUse(String email) {
-        email = email.toLowerCase();
         return userRepository.countDistinctByEmailAddress(email) > 0;
     }
 
