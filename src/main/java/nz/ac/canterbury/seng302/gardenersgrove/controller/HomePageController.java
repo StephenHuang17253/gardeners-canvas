@@ -121,7 +121,7 @@ public class HomePageController {
                         "Christchurch",
                         "8041",
                         "New Zealand",
-                        15,
+                        15.0,
                         johnDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
 

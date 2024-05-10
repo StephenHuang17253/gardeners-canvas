@@ -184,7 +184,7 @@ public class GardenFormController {
 
         Double doubleGardenSize;
         if (gardenSize == null) {
-            doubleGardenSize = Double.NaN;
+            doubleGardenSize = 0.0;
         }else{
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
@@ -312,7 +312,7 @@ public class GardenFormController {
         }
         double doubleGardenSize;
         if (gardenSize == null) {
-            doubleGardenSize = Double.NaN;
+            doubleGardenSize = 0.0;
         } else {
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
