@@ -1,30 +1,34 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,22 +37,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AccountControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    WebApplicationContext webApplicationContext;
 
     @MockBean
     private UserService userServiceMock;
 
+    @MockBean
+    private EmailService emailServiceMock;
+
+    @MockBean
+    private TokenService tokenServiceMock;
+
     @Mock
-    private static GardenService gardenService;
+    private static GardenService gardenServiceMock;
 
     private static User mockUser = new User("John", "Test", "account.user.test@accountcontroller.com", LocalDate.now());
 
     @BeforeEach
     public void setup() {
-        userServiceMock = Mockito.mock(UserService.class);
-        Mockito.when(userServiceMock.getUserByEmail("account.user.test@accountcontroller.com")).thenReturn(mockUser);
-        gardenService = Mockito.mock(GardenService.class);
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
+
+        gardenServiceMock = Mockito.mock(GardenService.class);
     }
 
 
@@ -155,6 +170,24 @@ public class AccountControllerTest {
                 .andExpect(model().attribute("repeatPassword","123"));
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {
+            "Steve:Jobs:false:steve@jobs.com:Password1!",
+            "Steve::true:steve@jobs.com:Password1!"
+    }, delimiter = ':')
+    public void RegistrationPage_addValidUser_createsUser_returnsOK(String firstname, String lastname, String noLastName,
+                                                                    String emailAddress, String password) throws Exception {
+        this.mockMvc.perform(post("/register").with(csrf())
+                .param("firstName",firstname)
+                .param("lastName",lastname)
+                .param("noLastName",noLastName)
+                .param("emailAddress",emailAddress)
+                .param("password",password)
+                .param("repeatPassword",password))
+                .andDo(print());
+        Mockito.verify(userServiceMock, Mockito.times(1)).addUser(Mockito.any(),Mockito.any());
+        Mockito.verify(emailServiceMock, Mockito.times(1)).sendRegistrationEmail(Mockito.any());
+    }
 
 
 
