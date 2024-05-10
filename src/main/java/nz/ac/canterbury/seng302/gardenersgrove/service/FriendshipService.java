@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class FriendshipService {
         return null;
     }
     /**
-     * Adds a new friendship
-     * @param friendship the friendship to add
+     * Adds a new pending friendship entity to persistence
+     * @param user1 the 1st half of the relation
      */
-    public Friendship addFriendship(Friendship friendship) {
+    public Friendship addFriendship(User user1, User user2) {
         return null;
     }
     /**
