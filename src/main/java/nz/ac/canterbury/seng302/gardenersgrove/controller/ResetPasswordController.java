@@ -46,8 +46,10 @@ public class ResetPasswordController {
      * @return lostPasswordForm
      */
     @GetMapping("/lost-password")
-    public String lostPassword() {
+    public String lostPassword(@RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+                               Model model) {
         logger.info("GET /lost-password");
+        model.addAttribute("emailAddress", emailAddress);
         return "lostPasswordForm";
     }
 

@@ -5,19 +5,23 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.ResetPasswordController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.ui.ModelMap;
 
 @SpringBootTest
 public class ResetUserPassword {
@@ -32,34 +36,61 @@ public class ResetUserPassword {
     public FileService fileService;
     @Autowired
     public EmailService emailService;
+    @Autowired
+    public GardenService gardenService;
 
     public static MockMvc MOCK_MVC;
+
     public static UserService userService;
-    private MvcResult editPasswordResult;
+    public TokenService tokenService;
+    private MvcResult resetPasswordResult;
 
     User loggedInUser;
 
     String currentPassword;
     String origHash;
     String userEmail;
+
     @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(profileController).build();
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService,gardenService);
+        ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService, emailService);
+        MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController).build();
 
     }
 
     @Given("I am on the login page")
-    public void iAmOnTheLoginPage() {
+    public void iAmOnTheLoginPage() throws Exception {
+        String url = "/login";
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
     }
 
     @When("I hit the “Forgot your password?” link")
-    public void iHitTheForgotYourPasswordLink() {
+    public void iHitTheForgotYourPasswordLink() throws Exception {
+        String url = "/lost-password";
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
     }
 
     @Then("I see a form asking me for my email address")
-    public void iSeeAFormAskingMeForMyEmailAddress() {
+    public void iSeeAFormAskingMeForMyEmailAddress() throws Exception {
+        String url = "/lost-password";
+        resetPasswordResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+        System.out.println("model =" + modelMap);
+        Assertions.assertEquals(modelMap.getAttribute("emailAddress"),"");
     }
 
     @Given("I am on the lost password form")
