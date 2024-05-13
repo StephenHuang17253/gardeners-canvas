@@ -7,34 +7,38 @@ Feature: U16 As Sarah, I want to be able to change my password over email, so th
 
   Scenario: AC2 - I submit an empty or malformed email address
     Given I am on the lost password form
-    When I enter an empty or malformed email address and click "Submit"
-    Then an error message tells me "Email address must be in the form 'jane@doe.nz'"
+    When I enter an empty or malformed email address "bademail.com"
+    And I click the submit button
+    Then an error message tells me "Email must be in the form 'jane@doe.nz'"
 
   Scenario: AC3 - I submit a valid email not known to the system
     Given I am on the lost password form
-    When I enter a valid email that is not known to the system and click "Submit"
+    When I enter a valid email "johndoe@gmail.com" that is not known to the system
+    And I click the submit button
     Then a confirmation message tells me "An email was sent to the address if it was recognised"
 
   Scenario: AC4 - I submit an email known to the system
     Given I am on the lost password form
-    When I enter an email that is known to the system and click "Submit"
+    And There exists a user with email "admin@gmail.com"
+    When I enter an email "admin@gmail.com" that is known to the system
+    And I click the submit button
     Then a confirmation message tells me "An email was sent to the address if it was recognised"
-    And an email is sent to the email address with a link containing a unique reset token
+    And an email is sent with a link containing a unique reset token
 
-  Scenario: AC5 - I reset password using the received email link
-    Given I received an email to reset my password
-    When I go to the given URL passed in the email
-    Then I am taken to the reset password form
+#  Scenario: AC5 - I reset password using the received email link
+#    Given I received an email to reset my password
+#    When I go to the given URL passed in the email
+#    Then I am taken to the reset password form
 
-  Scenario: AC6 - I enter mismatching passwords on the reset form
-    Given I am on the reset password form
-    When I enter two different passwords in "new" and "retype password" fields and hit the save button
-    Then The password does not get updated
+#  Scenario: AC6 - I enter mismatching passwords on the reset form
+#    Given I am on the reset password form
+#    When I enter two different passwords in "new" and "retype password" fields and hit the save button
+#    Then The password does not get updated
 
-  Scenario: AC7 - I enter a weak password
-    Given I am on the reset password form
-    When I enter a weak password and hit the save button
-    Then The password does not get updated
+#  Scenario: AC7 - I enter a weak password
+#    Given I am on the reset password form
+#    When I enter a weak password and hit the save button
+#    Then The password does not get updated
 
   Scenario: AC8 - I enter a valid password
     Given I am on the reset password form

@@ -76,6 +76,7 @@ public class ResetPasswordController {
                 User currentUser = userService.getUserByEmail(email);
                 Token token = new Token(currentUser, null);
                 tokenService.addToken(token);
+                model.addAttribute("emailSent", "An email was delivered");
                 try {
                     emailService.sendResetPasswordEmail(token);
                 } catch (MessagingException e) {

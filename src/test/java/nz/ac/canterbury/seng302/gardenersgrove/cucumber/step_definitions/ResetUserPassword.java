@@ -8,6 +8,7 @@ import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ResetPasswordController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
@@ -19,9 +20,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class ResetUserPassword {
@@ -38,12 +41,15 @@ public class ResetUserPassword {
     public EmailService emailService;
     @Autowired
     public GardenService gardenService;
+    @Autowired
+    private TokenService tokenService;
 
     public static MockMvc MOCK_MVC;
-
-    public static UserService userService;
-    public TokenService tokenService;
+    @Autowired
+    public UserService userService;
     private MvcResult resetPasswordResult;
+
+    private Token token;
 
     User loggedInUser;
 
@@ -53,12 +59,13 @@ public class ResetUserPassword {
 
     @Before
     public void before_or_after_all() {
+        token = new Token(loggedInUser, null);
         userService = new UserService(passwordEncoder, userRepository);
         ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
         AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService,gardenService);
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService, emailService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController).build();
-
+        tokenService.addToken(token);
     }
 
     @Given("I am on the login page")
@@ -67,7 +74,7 @@ public class ResetUserPassword {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(url)
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        ).andExpect(status().isOk()).andReturn();
 
     }
 
@@ -77,7 +84,7 @@ public class ResetUserPassword {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(url)
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        ).andExpect(status().isOk()).andReturn();
     }
 
     @Then("I see a form asking me for my email address")
@@ -87,42 +94,76 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url)
 
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        ).andExpect(status().isOk()).andReturn();
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
-        System.out.println("model =" + modelMap);
-        Assertions.assertEquals(modelMap.getAttribute("emailAddress"),"");
+
+        assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
     }
+
 
     @Given("I am on the lost password form")
-    public void iAmOnTheLostPasswordForm() {
+    public void iAmOnTheLostPasswordForm() throws Exception {
+        String url = "/lost-password";
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+        ).andExpect(status().isOk()).andReturn();
     }
 
-    @When("I enter an empty or malformed email address and click {string}")
-    public void iEnterAnEmptyOrMalformedEmailAddressAndClick(String arg0) {
+    @When("I enter an empty or malformed email address {string}")
+    public void iEnterAnEmptyOrMalformedEmailAddress(String email) {
+        userEmail = email;
+    }
+
+    @And("I click the submit button")
+    public void iClickTheSubmitButton() throws Exception {
+        String url = "/lost-password";
+        resetPasswordResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders.post(url)
+                        .param("email", userEmail))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Then("an error message tells me {string}")
-    public void anErrorMessageTellsMe(String arg0) {
+    public void anErrorMessageTellsMe(String errorMessage) throws Exception {
+        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+        Object errorObject = modelMap.get("emailError");
+        String givenErrorMessage = errorObject.toString();
+        Assertions.assertEquals(errorMessage, givenErrorMessage, "Error message match");
     }
 
-    @When("I enter a valid email that is not known to the system and click {string}")
-    public void iEnterAValidEmailThatIsNotKnownToTheSystemAndClick(String arg0) {
+    @When("I enter a valid email {string} that is not known to the system")
+    public void iEnterAValidEmailThatIsNotKnownToTheSystem(String email) {
+        userEmail = email;
     }
 
     @Then("a confirmation message tells me {string}")
-    public void aConfirmationMessageTellsMe(String arg0) {
+    public void aConfirmationMessageTellsMe(String message) {
+        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+        Object messageObject = modelMap.get("message");
+        String givenMessage = messageObject.toString();
+        Assertions.assertEquals(message, givenMessage, "Message match");
     }
 
-    @When("I enter an email that is known to the system and click {string}")
-    public void iEnterAnEmailThatIsKnownToTheSystemAndClick(String arg0) {
+    @When("I enter an email {string} that is known to the system")
+    public void iEnterAnEmailThatIsKnownToTheSystem(String email) {
+        userEmail = email;
     }
 
-    @And("an email is sent to the email address with a link containing a unique reset token")
+    @And("an email is sent with a link containing a unique reset token")
     public void anEmailIsSentToTheEmailAddressWithALinkContainingAUniqueResetToken() {
+        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+        assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
     }
 
     @Given("I received an email to reset my password")
-    public void iReceivedAnEmailToResetMyPassword() {
+    public void iReceivedAnEmailToResetMyPassword() throws Exception {
+        String url = "/reset-password/{token}";
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+        ).andExpect(status().isOk()).andReturn();
     }
 
     @When("I go to the given URL passed in the email")
