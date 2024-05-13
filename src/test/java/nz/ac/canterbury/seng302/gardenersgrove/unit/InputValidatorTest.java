@@ -404,10 +404,6 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password));
     }
 
-    /**
-     * Test for invalid passwords
-     * @param password
-     */
     @ParameterizedTest
     @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
     "1D!0", "D!1", "aA!0","Pa!0AAA"})
@@ -415,20 +411,12 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password));
     }
 
-    /**
-     * Test for valid DOB
-     * @param dob
-     */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     public void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDOB(dob));
     }
 
-    /**
-     * Test for invalid DOB age below 13
-     * @param dob
-     */
     @ParameterizedTest
     @ValueSource(strings = {"01/02/2023"})
     public void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {

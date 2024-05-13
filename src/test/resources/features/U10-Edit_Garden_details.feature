@@ -25,8 +25,8 @@ Background:
       | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
       | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
       | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
-      | "ward-connect"  | "Súnset City"   | "Brazil"       | "0.01"      |
-      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "8000000"      |
+      | "ward-connect"  | "Súnset City"   | "Brazil"       | "0.01"     |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "8000000"  |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
     Given I am on the garden edit form
