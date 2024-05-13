@@ -25,6 +25,8 @@ Background:
       | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
       | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
       | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
+      | "ward-connect"  | "Súnset City"   | "Brazil"       | "0.01"      |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "8000000"      |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
     Given I am on the garden edit form
@@ -56,6 +58,9 @@ Background:
       | "six"             |
       | "12,4.3"          |
       | "Null"            |
+      | "0.009"           |
+      | "8000000.01"      |
+      | "0.00"            |
 
 
   Scenario Outline: AC5 - cannot submit invalid location
