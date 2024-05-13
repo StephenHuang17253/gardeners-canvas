@@ -18,11 +18,10 @@ public class LanguageFilterAPI {
 
     public String containsProfanity(String query) throws IOException, InterruptedException {
         String requestBody = "{body: \"" + URLEncoder.encode(query, "UTF-8") + "\"}";
-        String url = "https://api.apilayer.com/bad_words?censor_character={*}";
+        String url = "https://api.apilayer.com/bad_words?censor_character=" + URLEncoder.encode("*", "UTF-8");
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("accept", "application/json")
                 .header("apikey", apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
