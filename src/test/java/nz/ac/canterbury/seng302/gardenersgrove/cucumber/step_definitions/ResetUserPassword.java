@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 
@@ -54,32 +55,31 @@ public class ResetUserPassword {
     User loggedInUser;
 
     String currentPassword;
-    String origHash;
     String userEmail;
+    String origHash;
 
     @Before
     public void before_or_after_all() {
         token = new Token(loggedInUser, null);
         userService = new UserService(passwordEncoder, userRepository);
         ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
-        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService,gardenService);
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService, gardenService);
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService, emailService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController).build();
         tokenService.addToken(token);
     }
 
     @Given("I am on the login page")
-    public void iAmOnTheLoginPage() throws Exception {
+    public void i_am_on_the_login_page() throws Exception {
         String url = "/login";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
-
     }
 
     @When("I hit the “Forgot your password?” link")
-    public void iHitTheForgotYourPasswordLink() throws Exception {
+    public void i_hit_the_forgot_your_password_link() throws Exception {
         String url = "/lost-password";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
@@ -88,21 +88,18 @@ public class ResetUserPassword {
     }
 
     @Then("I see a form asking me for my email address")
-    public void iSeeAFormAskingMeForMyEmailAddress() throws Exception {
+    public void i_see_a_form_asking_me_for_my_email_address() throws Exception {
         String url = "/lost-password";
         resetPasswordResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(url)
-
         ).andExpect(status().isOk()).andReturn();
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
-
         assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
     }
 
-
     @Given("I am on the lost password form")
-    public void iAmOnTheLostPasswordForm() throws Exception {
+    public void i_am_on_the_lost_password_form() throws Exception {
         String url = "/lost-password";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
@@ -111,22 +108,22 @@ public class ResetUserPassword {
     }
 
     @When("I enter an empty or malformed email address {string}")
-    public void iEnterAnEmptyOrMalformedEmailAddress(String email) {
+    public void i_enter_an_empty_or_malformed_email_address(String email) {
         userEmail = email;
     }
 
     @And("I click the submit button")
-    public void iClickTheSubmitButton() throws Exception {
+    public void i_click_the_submit_button() throws Exception {
         String url = "/lost-password";
         resetPasswordResult = MOCK_MVC.perform(
-                MockMvcRequestBuilders.post(url)
-                        .param("email", userEmail))
+                        MockMvcRequestBuilders.post(url)
+                                .param("email", userEmail))
                 .andExpect(status().isOk())
                 .andReturn();
     }
 
     @Then("an error message tells me {string}")
-    public void anErrorMessageTellsMe(String errorMessage) throws Exception {
+    public void an_error_message_tells_me(String errorMessage) throws Exception {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         Object errorObject = modelMap.get("emailError");
         String givenErrorMessage = errorObject.toString();
@@ -134,12 +131,12 @@ public class ResetUserPassword {
     }
 
     @When("I enter a valid email {string} that is not known to the system")
-    public void iEnterAValidEmailThatIsNotKnownToTheSystem(String email) {
+    public void i_enter_a_valid_email_that_is_not_known_to_the_system(String email) {
         userEmail = email;
     }
 
     @Then("a confirmation message tells me {string}")
-    public void aConfirmationMessageTellsMe(String message) {
+    public void a_confirmation_message_tells_me(String message) {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         Object messageObject = modelMap.get("message");
         String givenMessage = messageObject.toString();
@@ -147,55 +144,98 @@ public class ResetUserPassword {
     }
 
     @When("I enter an email {string} that is known to the system")
-    public void iEnterAnEmailThatIsKnownToTheSystem(String email) {
+    public void i_enter_an_email_that_is_known_to_the_system(String email) {
         userEmail = email;
     }
 
     @And("an email is sent with a link containing a unique reset token")
-    public void anEmailIsSentToTheEmailAddressWithALinkContainingAUniqueResetToken() {
+    public void an_email_is_sent_with_a_link_containing_a_unique_reset_token() {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
     }
 
-    @Given("I received an email to reset my password")
-    public void iReceivedAnEmailToResetMyPassword() throws Exception {
-        String url = "/reset-password/{token}";
+    @Given("I go to the given URL passed in the email")
+    public void i_go_to_the_given_url_passed_in_the_email() throws Exception {
+        String url = "/reset-password/" + token.getTokenString();
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
     }
 
-    @When("I go to the given URL passed in the email")
-    public void iGoToTheGivenURLPassedInTheEmail() {
-    }
-
     @Then("I am taken to the reset password form")
-    public void iAmTakenToTheResetPasswordForm() {
+    public void i_am_taken_to_the_reset_password_form() throws Exception {
+        String url = "/reset-password/" + token.getTokenString();
+        resetPasswordResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+        ).andExpect(status().isOk()).andReturn();
     }
 
-    @Given("I am on the reset password form")
-    public void iAmOnTheResetPasswordForm() {
+    @And("I as user {string} with password {string} am on the reset password form")
+    public void i_as_user_with_password_am_on_the_reset_password_form(String email, String password) throws Exception {
+        loggedInUser = userService.getUserByEmail(email);
+        currentPassword = password;
+        origHash = loggedInUser.getEncodedPassword();
+        userEmail = loggedInUser.getEmailAddress();
+        token = new Token(loggedInUser, null);
+        tokenService.addToken(token);
+
+        String url = "/reset-password/" + token.getTokenString();
+        MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(url)
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
     }
 
-    @When("I enter two different passwords in {string} and {string} fields and hit the save button")
-    public void iEnterTwoDifferentPasswordsInAndFieldsAndHitTheSaveButton(String arg0, String arg1) {
+    @When("I enter two different passwords {string}, {string}")
+    public void i_enter_two_different_passwords(String newPassword, String retypePassword) throws Exception {
+        String url = "/reset-password/" + token.getTokenString();
+        resetPasswordResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .post(url)
+                        .param("password", newPassword)
+                        .param("retypePassword", retypePassword)
+        ).andReturn();
     }
 
-    @When("I enter a weak password and hit the save button")
-    public void iEnterAWeakPasswordAndHitTheSaveButton() {
+    @When("I enter a weak password {string}")
+    public void i_enter_a_weak_password(String weakPassword) throws Exception {
+        String url = "/reset-password/" + token.getTokenString();
+        resetPasswordResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .post(url)
+                        .param("password", weakPassword)
+                        .param("retypePassword", weakPassword)
+        ).andReturn();
     }
 
-    @When("I enter fully compliant details and hit the save button")
-    public void iEnterFullyCompliantDetailsAndHitTheSaveButton() {
+    @Then("My password does not get updated")
+    public void my_password_does_not_get_updated() {
+        Assertions.assertEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
+    }
+
+    @When("I enter {string} in both new and retype fields and hit the save button")
+    public void i_enter_in_both_new_and_retype_fields_and_hit_the_save_button(String password) throws Exception {
+        String url = "/reset-password/" + token.getTokenString();
+        resetPasswordResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .post(url)
+                        .param("password", password)
+                        .param("retypePassword", password)
+        ).andReturn();
     }
 
     @Then("my password is updated")
-    public void myPasswordIsUpdated() {
+    public void my_password_is_updated() {
+        Assertions.assertNotEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
     }
 
     @And("I am redirected to the login page")
-    public void iAmRedirectedToTheLoginPage() {
+    public void i_am_redirected_to_the_login_page() {
+        String url = "/login";
+        String redirectedUrl = resetPasswordResult.getResponse().getRedirectedUrl();
+        Assertions.assertEquals(String.format(url), redirectedUrl);
     }
 
 }
