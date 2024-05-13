@@ -57,6 +57,7 @@ deploy-staging:
     - rm -rf /home/gitlab-runner/staging/ || true
     - mkdir /home/gitlab-runner/staging/
     - cp -r ./build/libs /home/gitlab-runner/staging
+    - cp src/main/resources/application-staging.properties /home/gitlab-runner/application-staging.properties
     - cp runner-scripts/staging.sh /home/gitlab-runner/staging.sh
     - chmod u+x /home/gitlab-runner/staging.sh
     - echo "export DB_USERNAME=${DB_USERNAME}" > /home/gitlab-runner/staging/.env
@@ -78,9 +79,16 @@ deploy-production:
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/production/ || true
     - mkdir /home/gitlab-runner/production/
+    - cp src/main/resources/application-production.properties /home/gitlab-runner/application-production.properties
     - cp -r ./build/libs /home/gitlab-runner/production
     - cp runner-scripts/production.sh /home/gitlab-runner/production.sh
     - chmod u+x /home/gitlab-runner/production.sh
+    - echo "export DB_USERNAME=${DB_USERNAME}" > /home/gitlab-runner/production/.env
+    - echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/production/.env
+    - echo "export LOCATIONIQ_API_KEY=${LOCATIONIQ_API_KEY}" >> /home/gitlab-runner/production/.env
+    - echo "export EMAIL_PASSWORD=${EMAIL_PASSWORD}" >> /home/gitlab-runner/production/.env
+    - echo "export EMAIL_USERNAME=${EMAIL_USERNAME}" >> /home/gitlab-runner/production/.env
+    - echo "export BASE_URL=${BASE_URL}/prod" >> /home/gitlab-runner/production/.env
     - sudo systemctl restart production
   artifacts:
     paths:

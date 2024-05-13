@@ -64,7 +64,7 @@ public class AccountController {
      */
     @Autowired
     public AccountController(UserService userService, AuthenticationManager authenticationManager,
-                             EmailService emailService, TokenService tokenService, GardenService gardenService) {
+            EmailService emailService, TokenService tokenService, GardenService gardenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
@@ -312,7 +312,10 @@ public class AccountController {
      * @return thymeleaf loginPage
      */
     @GetMapping("/login")
-    public String loginPage(Model model, HttpServletRequest request) {
+    public String loginPage(
+            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+            @RequestParam(name = "password", defaultValue = "") String password, Model model,
+            HttpServletRequest request) {
         logger.info("GET /login");
 
         // Check if there is a message in the flash map and add it to the model
@@ -324,7 +327,8 @@ public class AccountController {
 
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
-
+        model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("password", password);
         model.addAttribute("loggedIn", false);
 
         return "loginPage";
