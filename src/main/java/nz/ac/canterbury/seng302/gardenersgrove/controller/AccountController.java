@@ -183,10 +183,6 @@ public class AccountController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        if(loggedIn)
-        {
-            return "redirect:/home";
-        }
 
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
@@ -368,10 +364,6 @@ public class AccountController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        if(loggedIn)
-        {
-            return "redirect:/home";
-        }
 
         removeIfExpired(emailAddress);
 

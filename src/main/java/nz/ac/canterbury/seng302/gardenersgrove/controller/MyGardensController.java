@@ -80,7 +80,7 @@ public class MyGardensController {
     public String showGardenDetails(@PathVariable Long gardenId,
                                     HttpServletResponse response,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenId);
+        logger.info("GET /my-gardens/{}", gardenId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
