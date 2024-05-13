@@ -46,8 +46,8 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 
-	//JSON dependency for Weather monitoring
-	implementation 'org.json:json:20240303'
+//	//JSON dependency for Weather monitoring
+//	implementation 'org.json:json:20240303'
 }
 
 jacoco {
