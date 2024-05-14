@@ -195,6 +195,9 @@ public class ProfileController {
         model.addAttribute("dateOfBirth", formattedDateOfBirth);
         model.addAttribute("emailAddress", user.getEmailAddress());
 
+        logger.info(filename);
+        logger.info(profilePicture);
+
         return "profilePage";
     }
 

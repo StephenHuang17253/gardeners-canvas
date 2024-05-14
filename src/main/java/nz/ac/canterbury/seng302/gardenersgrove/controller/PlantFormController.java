@@ -196,6 +196,7 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
+        logger.info(plantPicture);
         return "editPlantForm"; // Return the view for creating a new plant
     }
 
