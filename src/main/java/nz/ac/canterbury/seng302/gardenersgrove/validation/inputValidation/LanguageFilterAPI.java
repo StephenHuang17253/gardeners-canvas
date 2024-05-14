@@ -13,8 +13,8 @@ public class LanguageFilterAPI {
     @Value("${profanity.access.token}")
     private String apiKey;
 
-    public String sendApiString(String query) throws IOException, InterruptedException {
-        String requestBody = "{body: \"" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "\"}";
+    public String sendPostRequest(String bodyContent) throws IOException, InterruptedException {
+        String requestBody = "{body: \"" + URLEncoder.encode(bodyContent, StandardCharsets.UTF_8) + "\"}";
         String url = "https://api.apilayer.com/bad_words?censor_character=" + URLEncoder.encode("*", StandardCharsets.UTF_8);
 
         HttpRequest request = HttpRequest.newBuilder()
