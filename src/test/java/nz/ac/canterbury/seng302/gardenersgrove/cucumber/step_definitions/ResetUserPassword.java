@@ -154,8 +154,11 @@ public class ResetUserPassword {
         assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
     }
 
-    @Given("I go to the given URL passed in the email")
-    public void i_go_to_the_given_url_passed_in_the_email() throws Exception {
+    @Given("I go to the given URL passed in the email {string}")
+    public void i_go_to_the_given_url_passed_in_the_email(String email) throws Exception {
+        loggedInUser = userService.getUserByEmail(email);
+        token = new Token(loggedInUser, null);
+        tokenService.addToken(token);
         String url = "/reset-password/" + token.getTokenString();
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
