@@ -1,54 +1,65 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FriendshipServiceIntegrationTest {
 
-    private static UserService userService;
-    private static FriendshipRepository friendshipRepository;
-    private static FriendshipService friendshipService;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    private UserService userService;
+    @Autowired
+    private FriendshipRepository friendshipRepository;
+    private FriendshipService friendshipService;
     @Captor
     private ArgumentCaptor<Friendship> friendshipCaptor;
 
-
-    private User user1;
-    private User user2;
-    private User user3;
+    private static User user1;
+    private static User user2;
+    private static User user3;
     private Long MAX_LONG = 1000L;
-    @BeforeEach
+    @BeforeAll
     public void before_or_after_all() {
-        userService = Mockito.mock(UserService.class);
-        friendshipRepository = Mockito.mock(FriendshipRepository.class);
+        userService = new UserService(passwordEncoder, userRepository);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         user1 =  new User("John", "Doe", "jhonDoe@FriendshipServiceIntegrationTest.com", LocalDate.of(2003,5,2));
         user2 =  new User("Jane", "Doe", "janeDoe@FriendshipServiceIntegrationTest.com", LocalDate.of(2003,5,2));
         user3 =  new User("Test", "Doe", "testDoe@FriendshipServiceIntegrationTest.com", LocalDate.of(2003,5,2));
+        userService.addUser(user1,"1es1P@ssword");
+        userService.addUser(user2,"1es1P@ssword");
+        userService.addUser(user3,"1es1P@ssword");
+    }
+
+
+    @Test
+    public void getFriendshipById_FriendshipNotInPersistence_returnsOptionalFriendship(){
+        Optional<Friendship> optionalFriendship = friendshipService.getFriendShipById(MAX_LONG);
+        Assertions.assertTrue(optionalFriendship.isEmpty());
     }
     @Test
-    public void getFriendshipById_FriendshipNotInPersistence_ThrowsIllegalArgumentException(){
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            friendshipService.getFriendShipById(MAX_LONG);
-        });
-    }
-    @Test
-    public void getFriendshipById_FriendshipInPersistence(){
+    public void getFriendshipById_FriendshipInPersistence_returnsOptionalFriendship(){
         Friendship expectedFriendShip = new Friendship(user1,user2, FriendshipStatus.PENDING);
         friendshipRepository.save(expectedFriendShip);
 
@@ -67,7 +78,7 @@ public class FriendshipServiceIntegrationTest {
         });
     }
     @Test
-    public void getAllUsersFriends_UserInPersistenceAndNoFriendshipRelation(){
+    public void getAllUsersFriends_UserInPersistenceAndNoFriendshipRelation_returnsListFriendship(){
         List<Friendship> expectedFriendships = friendshipService.getAllUsersFriends(user3.getId());
         Assertions.assertEquals(0,expectedFriendships.size());
     }
@@ -91,7 +102,7 @@ public class FriendshipServiceIntegrationTest {
                 new Friendship(user1,user3, FriendshipStatus.PENDING));
         friendshipRepository.saveAll(expectedFriendships);
         List<Friendship> actualFriendShips = friendshipService.getAllUsersFriends(user1.getId());
-        Assertions.assertEquals(1,actualFriendShips.size());
+        Assertions.assertEquals(2,actualFriendShips.size());
         for(int i = 0; i < expectedFriendships.size(); i++){
             Friendship expectedFriendship = expectedFriendships.get(i);
             Friendship actualFriendShip = actualFriendShips.get(i);

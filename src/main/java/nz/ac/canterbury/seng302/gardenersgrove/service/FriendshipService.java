@@ -35,29 +35,38 @@ public class FriendshipService {
      * @return the Friendship or Optional.empty() if none found
      */
     public Optional<Friendship> getFriendShipById(long id){
-        return null;
-
-    }
-    /**
-     * Retrieves all Friendship from persistence
-     * @return a list of all Friendship objects saved in persistence
-     */
-    public List<Friendship> getAllFriendship() {
-        return null;
+        return friendshipRepository.findById(id);
     }
     /**
      * Retrieves all Friendships from persistence where user1 or user2 id matches
      * @param id the user's ID
+     * @throws IllegalArgumentException if the provided user ID is invalid
      */
     public List<Friendship> getAllUsersFriends(long id) {
-        return null;
+        if (userService.getUserById(id) != null) {
+            return friendshipRepository.findByUser1IdOrUser2Id(id, id);
+        } else {
+            throw new IllegalArgumentException("Invalid user ID: " + id);
+        }
     }
     /**
      * Adds a new pending friendship entity to persistence
      * @param user1 the 1st half of the relation
      */
     public Friendship addFriendship(User user1, User user2) {
-        return null;
+        if(user1.getId() == user2.getId()){
+            throw new IllegalArgumentException("User cant have a friendship relation with themselves");
+        }
+        else if (user1.getId() == null || userService.getUserById(user1.getId()) == null) {
+            throw new IllegalArgumentException("Invalid user 1 ID: " + user1.getId());
+        }
+        else if(user2.getId() == null || userService.getUserById(user2.getId()) == null) {
+            throw new IllegalArgumentException("Invalid user 2 ID: " + user2.getId());
+        }
+        else{
+            Friendship friendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
+            return friendshipRepository.save(friendship);
+        }
     }
     /**
      * Updates a friendship status of an existing friendship
