@@ -16,8 +16,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,7 +47,7 @@ public class AccountControllerTest {
 
     @BeforeAll
     public static void setup() {
-//      securityContextHolderMock = Mockito.mockStatic(SecurityContextHolder.class);
+        // securityContextHolderMock = Mockito.mockStatic(SecurityContextHolder.class);
         authenticationManagerMock = Mockito.mock(AuthenticationManager.class);
         securityContextMock = Mockito.spy(SecurityContext.class);
         userServiceMock = Mockito.mock(UserService.class);
@@ -52,110 +56,133 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void controllerLoads()
-    {
+    public void controllerLoads() {
         assertNotNull(accountController);
     }
 
     @Test
-    public void mvcMockIsAlive() throws Exception
-    {
+    public void mvcMockIsAlive() throws Exception {
         this.mockMvc.perform(get("/register")).andExpect(status().isOk());
     }
 
     @Test
-    public void getRegistrationPage_NoParams_NonFilledPage() throws Exception
-    {
+    public void getRegistrationPage_NoParams_NonFilledPage() throws Exception {
         this.mockMvc.perform(get("/register"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword",""));
-    }
-    @Test
-    public void getRegistrationPage_FirstName_PageWFirstName() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("firstName","123"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName","123"))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword",""));
-    }
-    @Test
-
-    public void getRegistrationPage_LastName_PageWLastName() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("lastName","123"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName","123"))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword",""));
+                .andExpect(model().attribute("firstName", ""))
+                .andExpect(model().attribute("lastName", ""))
+                .andExpect(model().attribute("noLastName", false))
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", ""))
+                .andExpect(model().attribute("repeatPassword", ""));
     }
 
     @Test
-    public void getRegistrationPage_NoLastName_PageWNoLastName() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("noLastName","true"))
+    public void getRegistrationPage_FirstName_PageWFirstName() throws Exception {
+        this.mockMvc.perform(get("/register").param("firstName", "123"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",true))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword",""));
+                .andExpect(model().attribute("firstName", "123"))
+                .andExpect(model().attribute("lastName", ""))
+                .andExpect(model().attribute("noLastName", false))
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", ""))
+                .andExpect(model().attribute("repeatPassword", ""));
     }
 
     @Test
-    public void getRegistrationPage_Email_PageWEmail() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("emailAddress","123"))
+
+    public void getRegistrationPage_LastName_PageWLastName() throws Exception {
+        this.mockMvc.perform(get("/register").param("lastName", "123"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("emailAddress","123"))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword",""));
+                .andExpect(model().attribute("firstName", ""))
+                .andExpect(model().attribute("lastName", "123"))
+                .andExpect(model().attribute("noLastName", false))
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", ""))
+                .andExpect(model().attribute("repeatPassword", ""));
     }
 
     @Test
-    public void getRegistrationPage_Password_PageWPassword() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("password","123"))
+    public void getRegistrationPage_NoLastName_PageWNoLastName() throws Exception {
+        this.mockMvc.perform(get("/register").param("noLastName", "true"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password","123"))
-                .andExpect(model().attribute("repeatPassword",""));
+                .andExpect(model().attribute("firstName", ""))
+                .andExpect(model().attribute("lastName", ""))
+                .andExpect(model().attribute("noLastName", true))
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", ""))
+                .andExpect(model().attribute("repeatPassword", ""));
     }
 
     @Test
-    public void getRegistrationPage_RepeatPassword_PageWRepeatPassword() throws Exception
-    {
-        this.mockMvc.perform(get("/register").param("repeatPassword","123"))
+    public void getRegistrationPage_Email_PageWEmail() throws Exception {
+        this.mockMvc.perform(get("/register").param("emailAddress", "123"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("firstName",""))
-                .andExpect(model().attribute("lastName",""))
-                .andExpect(model().attribute("noLastName",false))
-                .andExpect(model().attribute("emailAddress",""))
-                .andExpect(model().attribute("password",""))
-                .andExpect(model().attribute("repeatPassword","123"));
+                .andExpect(model().attribute("firstName", ""))
+                .andExpect(model().attribute("lastName", ""))
+                .andExpect(model().attribute("noLastName", false))
+                .andExpect(model().attribute("emailAddress", "123"))
+                .andExpect(model().attribute("password", ""))
+                .andExpect(model().attribute("repeatPassword", ""));
     }
 
+    @Test
+    public void getRegistrationPage_Password_PageWPassword() throws Exception {
+        this.mockMvc.perform(get("/register").param("password", "123"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("firstName", ""))
+                .andExpect(model().attribute("lastName", ""))
+                .andExpect(model().attribute("noLastName", false))
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", "123"))
+                .andExpect(model().attribute("repeatPassword", ""));
+    }
 
+    @Test
+    public void getRegistrationPage_RepeatPassword_PageWRepeatPassword() throws Exception {
+        this.mockMvc.perform(get("/register").param("repeatPassword", "123"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("firstName", ""))
+                .andExpect(model().attribute("lastName", ""))
+                .andExpect(model().attribute("noLastName", false))
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", ""))
+                .andExpect(model().attribute("repeatPassword", "123"));
+    }
 
+    @Test
+    public void getLoginPage_NoParams_NonFilledPage() throws Exception {
+        this.mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", ""));
+    }
 
+    @Test
+    public void getLoginPage_EmailAddress_PageWEmailAddress() throws Exception {
+        this.mockMvc.perform(get("/login").param("emailAddress", "testEmail"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("emailAddress", "testEmail"))
+                .andExpect(model().attribute("password", ""));
+    }
 
+    @Test
+    public void getLoginPage_Password_PageWPassword() throws Exception {
+        this.mockMvc.perform(get("/login").param("password", "testPassword"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("emailAddress", ""))
+                .andExpect(model().attribute("password", "testPassword"));
+    }
+
+//     @Test
+//     public void postLogin_InvalidEmailAddress_AddEmailAddressErrorText() throws Exception {
+//         MvcResult result = this.mockMvc.perform(
+//                 post("/login")
+//                         .with(csrf()).param("emailAddress", "testEmail").param("password", ""))
+//                 .andExpect(status().isOk())
+//                 .andExpect(model().attribute("emailAddress", "testEmail"))
+//                 .andExpect(model().attribute("password", ""));
+// //                .andExpect(model().attribute("emailAddressError", "Email must be in the form 'jane@doe.nz'"));
+//     }
 
 }
