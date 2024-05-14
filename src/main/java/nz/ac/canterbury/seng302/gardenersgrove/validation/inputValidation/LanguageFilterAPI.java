@@ -16,7 +16,7 @@ public class LanguageFilterAPI {
     private String apiKey;
     Logger logger = LoggerFactory.getLogger(LocationService.class);
 
-    public String containsProfanity(String query) throws IOException, InterruptedException {
+    public boolean containsProfanity(String query) throws IOException, InterruptedException {
         String requestBody = "{body: \"" + URLEncoder.encode(query, "UTF-8") + "\"}";
         String url = "https://api.apilayer.com/bad_words?censor_character=" + URLEncoder.encode("*", "UTF-8");
 
@@ -29,6 +29,18 @@ public class LanguageFilterAPI {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return response.body();
+        String resultString = response.body();
+
+        int index = resultString.indexOf("\"bad_words_total\":");
+        if (index != -1) {
+            String fromBadWords = resultString.substring(index);
+            String numberStr = fromBadWords.substring(18, fromBadWords.indexOf(',')).trim();
+            int badWordsTotal = Integer.parseInt(numberStr);
+            return badWordsTotal > 0;
+
+        } else {
+            System.out.println("Cannot phase return string");
+            return false;
+        }
     }
 }
