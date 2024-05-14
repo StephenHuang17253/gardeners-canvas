@@ -19,7 +19,7 @@
 
             <!-- Some things are still named 'profile_picture', this is so I can reuse the existing css and js. -->
             <div class="plant_picture_container small_pic">
-                <img id="imageToChange" th:src="@{${plantPicture}}" alt="Plant image">
+                <img id="imageToChange" th:src="@{${plantPicture != '/images/default_plant.png' ? plantPicture : '/images/default_plant.png'}}" alt="Plant image">
                 <label for="plantPictureInput">+</label>
                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                     onChange="handleFileSelect(event)">
