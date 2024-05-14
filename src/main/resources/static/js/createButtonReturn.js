@@ -6,7 +6,7 @@ function createGarden() {
     } else if (currentUrl.includes('/prod/')) {
         instance = '/prod';
     }
-    console.log(`instance: ${instance}`)
+
     //if currentURL is not create new garden send them to this page
     if (currentUrl !== '/create-new-garden') {
         localStorage.setItem('previousUrl', window.location.href);
@@ -31,7 +31,7 @@ function openRegisterPage() {
     } else if (currentUrl.includes('/prod/')) {
         instance = '/prod';
     }
-    console.log(`instance: ${instance}`)
+
     // if currentURL is not register send them to this page
     if (currentUrl !== '/register') {
         localStorage.setItem('previousUrl', window.location.href);
@@ -56,7 +56,7 @@ function openLoginPage() {
     } else if (currentUrl.includes('/prod/')) {
         instance = '/prod';
     }
-    console.log(`instance: ${instance}`)
+
     // if currentURL is not login send them to this page
     if (currentUrl !== '/login') {
         localStorage.setItem('previousUrl', window.location.href);
