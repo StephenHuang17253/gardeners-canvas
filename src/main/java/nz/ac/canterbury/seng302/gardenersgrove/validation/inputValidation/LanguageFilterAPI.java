@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 public class LanguageFilterAPI {
     @Value("${profanity.access.token}")
@@ -17,8 +18,8 @@ public class LanguageFilterAPI {
     Logger logger = LoggerFactory.getLogger(LocationService.class);
 
     public boolean containsProfanity(String query) throws IOException, InterruptedException {
-        String requestBody = "{body: \"" + URLEncoder.encode(query, "UTF-8") + "\"}";
-        String url = "https://api.apilayer.com/bad_words?censor_character=" + URLEncoder.encode("*", "UTF-8");
+        String requestBody = "{body: \"" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "\"}";
+        String url = "https://api.apilayer.com/bad_words?censor_character=" + URLEncoder.encode("*", StandardCharsets.UTF_8);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
