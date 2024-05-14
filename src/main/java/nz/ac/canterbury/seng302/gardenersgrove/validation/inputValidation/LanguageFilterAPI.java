@@ -15,9 +15,8 @@ import java.nio.charset.StandardCharsets;
 public class LanguageFilterAPI {
     @Value("${profanity.access.token}")
     private String apiKey;
-    Logger logger = LoggerFactory.getLogger(LocationService.class);
 
-    public boolean containsProfanity(String query) throws IOException, InterruptedException {
+    public String sendApiString(String query) throws IOException, InterruptedException {
         String requestBody = "{body: \"" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "\"}";
         String url = "https://api.apilayer.com/bad_words?censor_character=" + URLEncoder.encode("*", StandardCharsets.UTF_8);
 
@@ -30,11 +29,13 @@ public class LanguageFilterAPI {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        String resultString = response.body();
+        return response.body();
+    }
 
-        int index = resultString.indexOf("\"bad_words_total\":");
+    public boolean containsProfanity (String returnedString) {
+        int index = returnedString.indexOf("\"bad_words_total\":");
         if (index != -1) {
-            String fromBadWords = resultString.substring(index);
+            String fromBadWords = returnedString.substring(index);
             String numberStr = fromBadWords.substring(18, fromBadWords.indexOf(',')).trim();
             int badWordsTotal = Integer.parseInt(numberStr);
             return badWordsTotal > 0;
