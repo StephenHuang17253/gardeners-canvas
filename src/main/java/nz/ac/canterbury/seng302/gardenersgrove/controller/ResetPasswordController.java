@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -45,8 +46,10 @@ public class ResetPasswordController {
      * @return lostPasswordForm
      */
     @GetMapping("/lost-password")
-    public String lostPassword() {
+    public String lostPassword(@RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+                               Model model) {
         logger.info("GET /lost-password");
+        model.addAttribute("emailAddress", emailAddress);
         return "lostPasswordForm";
     }
 
@@ -73,6 +76,7 @@ public class ResetPasswordController {
                 User currentUser = userService.getUserByEmail(email);
                 Token token = new Token(currentUser, null);
                 tokenService.addToken(token);
+                model.addAttribute("emailSent", "An email was delivered");
                 try {
                     emailService.sendResetPasswordEmail(token);
                 } catch (MessagingException e) {
@@ -125,7 +129,20 @@ public class ResetPasswordController {
                                   @RequestParam("retypePassword") String retypePassword,
                                   Model model) {
         logger.info("POST /reset-password");
-        ValidationResult passwordValidation = InputValidator.validatePassword(password);
+
+
+        Token token = tokenService.getTokenByTokenString(resetToken);
+        User user = token.getUser();
+        String emailAddress = user.getEmailAddress();
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        boolean noLastName = false;
+        if (lastName == null) {
+            noLastName = true;
+        }
+        LocalDate dateOfBirth = user.getDateOfBirth();
+
+        ValidationResult passwordValidation = InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress);
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
@@ -134,7 +151,6 @@ public class ResetPasswordController {
             model.addAttribute("passwordError", "The passwords do not match");
             return "resetPasswordForm";
         } else {
-            Token token = tokenService.getTokenByTokenString(resetToken);
             User currentUser = token.getUser();
             userService.updatePassword(currentUser.getId(), password);
             tokenService.deleteToken(token);

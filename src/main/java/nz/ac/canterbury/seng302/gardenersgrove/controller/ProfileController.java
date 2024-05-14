@@ -426,6 +426,14 @@ public class ProfileController {
         model.addAttribute("loggedIn", loggedIn);
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
+        String firstName = currentUser.getFirstName();
+        String lastName = currentUser.getLastName();
+        boolean noLastName = false;
+        if (lastName == null) {
+            noLastName = true;
+        }
+        LocalDate dateOfBirth = currentUser.getDateOfBirth();
+
 
         boolean valid = true;
 
@@ -440,7 +448,7 @@ public class ProfileController {
             valid = false;
         }
 
-        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword);
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, firstName, lastName, noLastName, dateOfBirth, currentEmail);;
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
