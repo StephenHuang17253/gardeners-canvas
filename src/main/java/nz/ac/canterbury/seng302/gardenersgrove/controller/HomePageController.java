@@ -153,7 +153,9 @@ public class HomePageController {
             if (user != null) {
                 welcomeString = "Welcome " + user.getFirstName() + " " + user.getLastName();
                 String filename = user.getProfilePictureFilename();
-                profilePicture = getProfilePictureString(filename);
+                // Refactored to just use filename instead of calling getProfilePictureString.
+                // This was done I can use a context-relative URL in html for deployed instances.
+                profilePicture = filename;
             }
         }
 

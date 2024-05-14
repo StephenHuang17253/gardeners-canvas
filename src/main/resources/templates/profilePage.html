@@ -19,7 +19,7 @@
             <form th:action="@{profile}" method="post" enctype="multipart/form-data">
                 <div class="profile_picture_container small_pic">
                     <input type="hidden" th:value="${profilePicture}">
-                    <img id="imageToChange" th:src="@{${profilePicture != '/images/default_profile_picture.png' ? profilePicture : '/images/default_profile_picture.png'}}" alt="User's profile picture">
+                    <img id="imageToChange" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}" alt="User's profile picture">
 
                     <label for="profilePictureInput">+</label>
                     <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
