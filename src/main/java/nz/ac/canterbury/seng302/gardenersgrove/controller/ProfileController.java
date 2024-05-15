@@ -182,8 +182,7 @@ public class ProfileController {
         String userName = user.getFirstName() + " " + user.getLastName();
 
         String filename = user.getProfilePictureFilename();
-        String profilePicture = getProfilePictureString(filename);
-        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("profilePicture", filename);
         model.addAttribute("userName", userName);
 
         String formattedDateOfBirth = "";
@@ -194,6 +193,8 @@ public class ProfileController {
         }
         model.addAttribute("dateOfBirth", formattedDateOfBirth);
         model.addAttribute("emailAddress", user.getEmailAddress());
+
+        logger.info(filename);
 
         return "profilePage";
     }
@@ -231,8 +232,7 @@ public class ProfileController {
             model.addAttribute("dateOfBirth", user.getDateOfBirth());
             model.addAttribute("emailAddress", user.getEmailAddress());
             String filename = user.getProfilePictureFilename();
-            String currentProfilePicture = getProfilePictureString(filename);
-            model.addAttribute("profilePicture", currentProfilePicture);
+            model.addAttribute("profilePicture", filename);
             return "profilePage";
         }
 
@@ -266,8 +266,7 @@ public class ProfileController {
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
-        String profilePicture = getProfilePictureString(filename);
-        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("profilePicture", filename);
 
         return "editProfileForm";
     }
@@ -362,8 +361,7 @@ public class ProfileController {
             model.addAttribute("dateOfBirth", dateOfBirth);
             model.addAttribute("noLastName", noLastName);
             String filename = currentUser.getProfilePictureFilename();
-            String profilePictureString = getProfilePictureString(filename);
-            model.addAttribute("profilePicture", profilePictureString);
+            model.addAttribute("profilePicture", filename);
             return "editProfileForm";
         }
 
