@@ -81,7 +81,7 @@ public class GardenFormControllerTest {
                 "test",
                 "80",
                 "test",
-                1.0f,
+                10.0,
                 mockUser
 
         );
