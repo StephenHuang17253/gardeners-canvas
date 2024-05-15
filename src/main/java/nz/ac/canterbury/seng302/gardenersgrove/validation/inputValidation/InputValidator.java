@@ -333,8 +333,8 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult validateProfanity(String dob) {
-        return new InputValidator(dob)
+    public static ValidationResult validateProfanity(String text) {
+        return new InputValidator(text)
                 .profanityHelper()
                 .getResult();
     }
