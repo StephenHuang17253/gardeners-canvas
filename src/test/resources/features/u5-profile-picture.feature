@@ -1,4 +1,6 @@
 Feature: Add a profile picture to user
+  Background:
+    Given I am logged in and on the profile page
 
   Scenario: AC3
     Given I choose a valid profile picture

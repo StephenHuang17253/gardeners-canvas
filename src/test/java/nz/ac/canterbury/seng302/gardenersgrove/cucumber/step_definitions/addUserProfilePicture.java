@@ -74,6 +74,11 @@ public class addUserProfilePicture {
 
     @Before
     public void before_or_after_all() throws IOException {
+
+    }
+
+    @Given("I am logged in and on the profile page")
+    public void i_am_logged_in_and_on_the_profile_page() throws IOException {
         emailService = Mockito.mock(EmailService.class);
         fileService = Mockito.mock(FileService.class);
         userService = Mockito.mock(UserService.class);
@@ -98,6 +103,7 @@ public class addUserProfilePicture {
                 .standaloneSetup(profileController)
                 .build();
     }
+
 
     @Given("I choose a valid profile picture")
     public void i_choose_a_valid_profile_picture() {
