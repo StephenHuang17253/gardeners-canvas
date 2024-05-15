@@ -158,7 +158,12 @@ public class GardenFormController {
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
+
         gardenFormErrorText(model,gardenNameResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
+
+        ValidationResult gardenNameProfaintyResult = InputValidator.validateProfanity(gardenName);
+
+        gardenFormErrorText(model,gardenNameProfaintyResult,streetAddressResult,suburbResult,cityResult,countryResult,postcodeResult,gardenSizeResult);
 
         if(gardenSize.isBlank())
         {
@@ -178,7 +183,7 @@ public class GardenFormController {
         model.addAttribute("loggedIn", loggedIn);
 
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
-                !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
+                !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid() || !gardenNameProfaintyResult.valid()) {
             return "createNewGardenForm";
         }
 

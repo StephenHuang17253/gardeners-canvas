@@ -6,6 +6,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.LanguageFilterAPI;
 /**
  * Tests inputs on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes
@@ -29,6 +31,7 @@ public class InputValidator {
 
     private static UserService userService;
 
+    LanguageFilterAPI LanguageApiChecker = new LanguageFilterAPI();
     /**
      * Constructor for the Validation with {@link Autowired} to
      * connect this
@@ -327,6 +330,12 @@ public class InputValidator {
     public static ValidationResult validateDate(String date) {
         return new InputValidator(date)
                 .dateFormatHelper()
+                .getResult();
+    }
+
+    public static ValidationResult validateProfanity(String dob) {
+        return new InputValidator(dob)
+                .profanityHelper()
                 .getResult();
     }
 
@@ -705,6 +714,35 @@ public class InputValidator {
             this.passState = false;
             return this;
         }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Sends A string to the bad words API, then checks if the return has
+     * bad word count over 0, if so set to TEXT_CONTAINS_PROFANITY
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator profanityHelper() {
+        if (!this.passState) {
+            return this;
+        }
+        try {
+            String returnedResult = LanguageApiChecker.sendPostRequest(testedValue);
+            boolean containsProfanity = LanguageApiChecker.containsProfanity(returnedResult);
+
+            if (containsProfanity) {
+                this.validationResult = ValidationResult.TEXT_CONTAINS_PROFANITY;
+                this.passState = false;
+                return this;
+            }
+        } catch (IOException | InterruptedException IE) {
+            // Log the fail in the system,
+            System.err.println("Error while sending post request: " + IE.getMessage());
+        }
+
         this.validationResult = ValidationResult.OK;
         return this;
     }

@@ -23,7 +23,8 @@ public enum ValidationResult {
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
     INVALID_FILE_SIZE("Image must be less than 10MB"),
     AREA_TOO_SMALL("Area (meters squared) is too small"),
-    AREA_TOO_LARGE("Area (meters squared) is too large");
+    AREA_TOO_LARGE("Area (meters squared) is too large"),
+    TEXT_CONTAINS_PROFANITY("Field contains Profanity");
 
     private String message;
 
