@@ -1,0 +1,27 @@
+
+.tableList-header-button-contain {
+    display: flex;
+    gap: 10px;
+}
+
+.scrollable-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+.plants-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.plant-box {
+    flex: 1 1 calc(33.33% - 10px);
+    box-sizing: border-box;
+}
+
+.plant-description {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
