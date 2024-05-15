@@ -98,7 +98,7 @@ public class HomePageController {
         model.addAttribute("myGardens", gardenService.getGardens());
 
         // Add a test user with test gardens and test plants
-        if (!onStart) {
+        if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
             LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
@@ -153,7 +153,7 @@ public class HomePageController {
             if (user != null) {
                 welcomeString = "Welcome " + user.getFirstName() + " " + user.getLastName();
                 String filename = user.getProfilePictureFilename();
-                profilePicture = getProfilePictureString(filename);
+                profilePicture = filename;
             }
         }
 
