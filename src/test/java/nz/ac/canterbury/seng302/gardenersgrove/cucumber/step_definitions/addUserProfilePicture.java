@@ -127,7 +127,6 @@ public class addUserProfilePicture {
     }
     @Then("My profile picture is not updated")
     public void my_profile_picture_is_not_updated() {
-        // Write code here that turns the phrase above into concrete actions
         Mockito.verify(userService, Mockito.never()).updateProfilePictureFilename(Mockito.anyString(),Mockito.anyLong());
     }
     @Given("I choose a profile picture larger than 10MB")
