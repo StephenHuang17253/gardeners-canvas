@@ -204,7 +204,7 @@ public class AccountController {
         boolean valid = true;
         for (Map.Entry<String, ValidationResult> entry : validationMap.entrySet()) {
             if (!entry.getValue().valid()) {
-
+                logger.info("User failed validation with: " + entry.getValue().toString());
                 String error = entry.getValue().toString();
 
                 if (entry.getKey().equals("firstName")) {
