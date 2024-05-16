@@ -1,7 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,13 +20,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.ModelAndView;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Map;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,24 +43,56 @@ public class AccountControllerTest {
     private MockMvc mockMvc;
 
     private static SecurityContext securityContextMock;
+
     @Mock
     private static AuthenticationManager authenticationManagerMock;
 
     @Mock
     private static UserService userServiceMock;
+
     @Mock
     private static GardenService gardenService;
+
+    @Mock
+    private static TokenService tokenServiceMock;
 
     @InjectMocks
     private static AccountController accountController;
 
+    private static String verifiedEmail = "verifiedEmail@gmail.com";
+
+    private static String unverifiedEmail = "unVerifiedEmail@gmail.com";
+
+    private static String userPassword = "ValidPa33w0rd!";
+
     @BeforeAll
     public static void setup() {
-        // securityContextHolderMock = Mockito.mockStatic(SecurityContextHolder.class);
         authenticationManagerMock = Mockito.mock(AuthenticationManager.class);
         securityContextMock = Mockito.spy(SecurityContext.class);
         userServiceMock = Mockito.mock(UserService.class);
+
+        User verifiedMockUser = new User("verifiedFirstName", "verifiedLastName", verifiedEmail, null);
+        verifiedMockUser.setVerified(true);
+        verifiedMockUser.setPassword(userPassword);
+
+        User unverifiedMockUser = new User("unverifiedFirstName", "unverifiedLastName", unverifiedEmail, null);
+        unverifiedMockUser.setPassword(userPassword);
+
+        when(userServiceMock.getUserByEmailAndPassword(verifiedEmail, userPassword)).thenReturn(verifiedMockUser);
+        when(userServiceMock.getUserByEmail(verifiedEmail)).thenReturn(verifiedMockUser);
+        when(userServiceMock.getUserByEmailAndPassword(unverifiedEmail, userPassword)).thenReturn(unverifiedMockUser);
+        when(userServiceMock.getUserByEmail(unverifiedEmail)).thenReturn(unverifiedMockUser);
+
+        tokenServiceMock = Mockito.mock(TokenService.class);
+
+        Token token = new Token(unverifiedMockUser, null);
+
+        when(tokenServiceMock.getTokenByUser(verifiedMockUser)).thenReturn(null);
+        when(tokenServiceMock.getTokenByUser(unverifiedMockUser)).thenReturn(token);
+
+
         gardenService = Mockito.mock(GardenService.class);
+
         SecurityContextHolder.setContext(securityContextMock);
     }
 
@@ -174,15 +215,85 @@ public class AccountControllerTest {
                 .andExpect(model().attribute("password", "testPassword"));
     }
 
-//     @Test
-//     public void postLogin_InvalidEmailAddress_AddEmailAddressErrorText() throws Exception {
-//         MvcResult result = this.mockMvc.perform(
-//                 post("/login")
-//                         .with(csrf()).param("emailAddress", "testEmail").param("password", ""))
-//                 .andExpect(status().isOk())
-//                 .andExpect(model().attribute("emailAddress", "testEmail"))
-//                 .andExpect(model().attribute("password", ""));
-// //                .andExpect(model().attribute("emailAddressError", "Email must be in the form 'jane@doe.nz'"));
-//     }
+    @Test
+    public void postLogin_InvalidEmailAddress_AddEmailAddressErrorText() throws Exception {
+        MvcResult result = this.mockMvc.perform(
+                post("/login")
+                        .with(csrf()).param("emailAddress", "testEmail").param("password", ""))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("emailAddress", "testEmail"))
+                .andExpect(model().attribute("password", ""))
+                .andReturn();
 
+        // Check that the email error message is correct, was not working as a
+        // .andExpect so saved result and checked with string.equals(anotherString)
+        ModelAndView modelAndView = result.getModelAndView();
+
+        if (modelAndView == null)
+            return;
+
+        Map<String, Object> model = modelAndView.getModel();
+
+        String error = model.get("emailAddressError").toString();
+
+        assertTrue("Email must be in the form 'jane@doe.nz'".equals(error));
+    }
+
+    @Test
+    public void postLogin_InvalidPassword_AddLoginErrorText() throws Exception {
+        MvcResult result = this.mockMvc.perform(
+                post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param("password",
+                        ""))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("emailAddress", "unUsedTestEmail@gmail.com"))
+                .andExpect(model().attribute("password", ""))
+                .andReturn();
+
+        // Check that the login error message is correct, was not working as a
+        // .andExpect so saved result and checked with string.equals(anotherString)
+        ModelAndView modelAndView = result.getModelAndView();
+
+        if (modelAndView == null)
+            return;
+
+        Map<String, Object> model = modelAndView.getModel();
+
+        String error = model.get("loginError").toString();
+
+        assertTrue("The email address is unknown, or the password is invalid".equals(error));
+    }
+
+    @Test
+    public void postLogin_UserDoesNotExist_AddLoginErrorText() throws Exception {
+
+        MvcResult result = this.mockMvc.perform(
+                post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param("password",
+                        "ValidPa33w0rd!"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("emailAddress", "unUsedTestEmail@gmail.com"))
+                .andExpect(model().attribute("password", "ValidPa33w0rd!"))
+                .andReturn();
+
+        // Check that the login error message is correct, was not working as a
+        // .andExpect so saved result and checked with string.equals(anotherString)
+        ModelAndView modelAndView = result.getModelAndView();
+
+        if (modelAndView == null)
+            return;
+
+        Map<String, Object> model = modelAndView.getModel();
+
+        String error = model.get("loginError").toString();
+
+        assertTrue("The email address is unknown, or the password is invalid".equals(error));
+    }
+
+    @Test
+    public void postLogin_UserExistsAndIsVerified_RedirectToHome() throws Exception {
+        this.mockMvc.perform(
+                post("/login").with(csrf()).param("emailAddress", verifiedEmail).param("password", userPassword))
+                // .andExpect(status().isOk())
+                .andExpect(redirectedUrl("/home"))
+                .andReturn();
+    }
 }

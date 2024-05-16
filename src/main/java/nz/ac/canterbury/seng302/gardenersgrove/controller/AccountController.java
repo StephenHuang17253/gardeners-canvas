@@ -345,33 +345,41 @@ public class AccountController {
             @RequestParam String password, HttpSession session, Model model) {
         logger.info("POST /login");
 
-        removeIfExpired(emailAddress);
-
-        ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
-
-        model.addAttribute("emailAddress", emailAddress);
-        model.addAttribute("password", password);
-
-        if (!validEmail.valid()) {
-            model.addAttribute("emailAddressError", validEmail);
-            return "loginPage";
-        }
-
-        User user = userService.getUserByEmailAndPassword(emailAddress, password);
+        User user = userService.getUserByEmail(emailAddress);
 
         if (user == null) {
-            model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
-            return "loginPage";
+            return "redirect:/lol";
         }
-
-        if (!user.isVerified()) {
-            return "redirect:/verify/" + user.getEmailAddress();
-        }
-
-        setSecurityContext(emailAddress, password, request.getSession());
-        session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
 
         return "redirect:/home";
+
+        // removeIfExpired(emailAddress);
+
+        // ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
+
+        // model.addAttribute("emailAddress", emailAddress);
+        // model.addAttribute("password", password);
+
+        // if (!validEmail.valid()) {
+        //     model.addAttribute("emailAddressError", validEmail);
+        //     return "loginPage";
+        // }
+
+        // User user = userService.getUserByEmailAndPassword(emailAddress, password);
+
+        // if (user == null) {
+        //     model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
+        //     return "loginPage";
+        // }
+
+        // if (!user.isVerified()) {
+        //     return "redirect:/verify/" + user.getEmailAddress();
+        // }
+
+        // setSecurityContext(emailAddress, password, request.getSession());
+        // session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
+
+        // return "redirect:/home";
 
     }
 
