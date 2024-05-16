@@ -3,17 +3,17 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,10 +21,16 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.core.Authentication;
+
+import jakarta.servlet.http.HttpSession;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,19 +50,21 @@ public class AccountControllerTest {
 
     private static SecurityContext securityContextMock;
 
-    @Mock
+    @MockBean
     private static AuthenticationManager authenticationManagerMock;
 
-    @Mock
+    @MockBean
     private static UserService userServiceMock;
 
-    @Mock
-    private static GardenService gardenService;
+    @MockBean
+    private static GardenService gardenServiceMock;
 
-    @Mock
+    @MockBean
     private static TokenService tokenServiceMock;
 
-    @InjectMocks
+    @MockBean
+    private static EmailService emailServiceMock;
+
     private static AccountController accountController;
 
     private static String verifiedEmail = "verifiedEmail@gmail.com";
@@ -67,33 +75,12 @@ public class AccountControllerTest {
 
     @BeforeAll
     public static void setup() {
-        authenticationManagerMock = Mockito.mock(AuthenticationManager.class);
-        securityContextMock = Mockito.spy(SecurityContext.class);
-        userServiceMock = Mockito.mock(UserService.class);
-
-        User verifiedMockUser = new User("verifiedFirstName", "verifiedLastName", verifiedEmail, null);
-        verifiedMockUser.setVerified(true);
-        verifiedMockUser.setPassword(userPassword);
-
-        User unverifiedMockUser = new User("unverifiedFirstName", "unverifiedLastName", unverifiedEmail, null);
-        unverifiedMockUser.setPassword(userPassword);
-
-        when(userServiceMock.getUserByEmailAndPassword(verifiedEmail, userPassword)).thenReturn(verifiedMockUser);
-        when(userServiceMock.getUserByEmail(verifiedEmail)).thenReturn(verifiedMockUser);
-        when(userServiceMock.getUserByEmailAndPassword(unverifiedEmail, userPassword)).thenReturn(unverifiedMockUser);
-        when(userServiceMock.getUserByEmail(unverifiedEmail)).thenReturn(unverifiedMockUser);
-
-        tokenServiceMock = Mockito.mock(TokenService.class);
-
-        Token token = new Token(unverifiedMockUser, null);
-
-        when(tokenServiceMock.getTokenByUser(verifiedMockUser)).thenReturn(null);
-        when(tokenServiceMock.getTokenByUser(unverifiedMockUser)).thenReturn(token);
-
-
-        gardenService = Mockito.mock(GardenService.class);
-
+        securityContextMock = spy(SecurityContext.class);
         SecurityContextHolder.setContext(securityContextMock);
+        accountController = spy(new AccountController(userServiceMock, authenticationManagerMock, emailServiceMock,
+                tokenServiceMock, gardenServiceMock));
+        doNothing().when(accountController).setSecurityContext(any(String.class), any(String.class),
+                any(HttpSession.class));
     }
 
     @Test
@@ -290,10 +277,54 @@ public class AccountControllerTest {
 
     @Test
     public void postLogin_UserExistsAndIsVerified_RedirectToHome() throws Exception {
+
+        User verifiedMockUser = spy(new User("verifiedFirstName", "verifiedLastName", verifiedEmail, null));
+        verifiedMockUser.setVerified(true);
+        verifiedMockUser.setPassword(userPassword);
+        when(verifiedMockUser.getId()).thenReturn(1L);
+
+        when(userServiceMock.getUserByEmailAndPassword(verifiedEmail, userPassword)).thenReturn(verifiedMockUser);
+        when(userServiceMock.getUserByEmail(any(String.class))).thenReturn(verifiedMockUser);
+
+        when(tokenServiceMock.getTokenByUser(verifiedMockUser)).thenReturn(null);
+
+        Authentication authenticationMock = Mockito.mock(Authentication.class);
+
+        when(authenticationMock.isAuthenticated()).thenReturn(false);
+
+        when(authenticationManagerMock.authenticate(any())).thenReturn(authenticationMock);
+
         this.mockMvc.perform(
                 post("/login").with(csrf()).param("emailAddress", verifiedEmail).param("password", userPassword))
-                // .andExpect(status().isOk())
+                .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/home"))
                 .andReturn();
+    }
+
+    @Test
+    public void postLogin_UserExistsAndIsNotVerified_RedirectToVerify() throws Exception {
+
+        User unverifiedMockUser = spy(new User("unverifiedFirstName", "unverifiedLastName", unverifiedEmail, null));
+        unverifiedMockUser.setPassword(userPassword);
+        when(unverifiedMockUser.getId()).thenReturn(1L);
+
+        when(userServiceMock.getUserByEmailAndPassword(unverifiedEmail,
+                userPassword)).thenReturn(unverifiedMockUser);
+        when(userServiceMock.getUserByEmail(unverifiedEmail)).thenReturn(unverifiedMockUser);
+
+        Token token = new Token(unverifiedMockUser, null);
+
+        when(tokenServiceMock.getTokenByUser(unverifiedMockUser)).thenReturn(token);
+
+        Authentication authenticationMock = Mockito.mock(Authentication.class);
+
+        when(authenticationMock.isAuthenticated()).thenReturn(false);
+
+        when(authenticationManagerMock.authenticate(any())).thenReturn(authenticationMock);
+
+        this.mockMvc.perform(
+                post("/login").with(csrf()).param("emailAddress", unverifiedEmail).param("password", userPassword))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/verify/" + unverifiedEmail));
     }
 }
