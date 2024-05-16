@@ -431,7 +431,14 @@ public class GardenFormController {
         // notifies the user that the garden Size is invalid (if applicable)
         if(!gardenSizeResult.valid())
         {
-            model.addAttribute("GSErrorText","Garden size " + gardenSizeResult);
+            String message;
+            if (gardenSizeResult == ValidationResult.AREA_TOO_LARGE) {
+                message = " is too large. \n\r Must be smaller than or equal to 8000000";
+            } else {
+                message = " is too small. \n\r Must be larger than or equal to 0.01";
+            }
+            gardenSizeResult.updateMessage(message);
+            model.addAttribute("GSErrorText","Garden size" + gardenSizeResult);
             model.addAttribute("GSErrorClass","errorBorder");
             logger.info("Garden Size failed validation");
 
