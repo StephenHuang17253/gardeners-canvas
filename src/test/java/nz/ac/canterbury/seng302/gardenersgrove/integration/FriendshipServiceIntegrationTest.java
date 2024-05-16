@@ -150,9 +150,11 @@ public class FriendshipServiceIntegrationTest {
     @Test
     public void addFriendship_User1AndUser2BothInPersistence(){
         friendshipService.addFriendship(user1, user2);
-        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
+//        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
 
-        Friendship savedFriendship = friendshipCaptor.getValue();
+        List<Friendship> friendshipList = friendshipRepository.findByUser1IdOrUser2Id(user1.getId(),user2.getId());
+        Assertions.assertEquals(1,friendshipList.size());
+        Friendship savedFriendship = friendshipList.get(0);
         Assertions.assertEquals(user1.getId(), savedFriendship.getUser1().getId());
         Assertions.assertEquals(user2.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());
@@ -169,9 +171,10 @@ public class FriendshipServiceIntegrationTest {
         Friendship oldFriendship = new Friendship(user1,user2,FriendshipStatus.DECLINED);
         friendshipRepository.save(oldFriendship);
         friendshipService.addFriendship(user2, user1);
-        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
 
-        Friendship savedFriendship = friendshipCaptor.getValue();
+        List<Friendship> friendshipList = friendshipRepository.findByUser1IdOrUser2Id(user2.getId(),user1.getId());
+        Assertions.assertEquals(1,friendshipList.size());
+        Friendship savedFriendship = friendshipList.get(0);
         Assertions.assertEquals(oldFriendship.getId(), savedFriendship.getId());
         Assertions.assertEquals(user2.getId(), savedFriendship.getUser1().getId());
         Assertions.assertEquals(user1.getId(), savedFriendship.getUser2().getId());
@@ -209,9 +212,11 @@ public class FriendshipServiceIntegrationTest {
     public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsANewUser(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
         friendshipService.addFriendship(user1, user3);
-        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
 
-        Friendship savedFriendship = friendshipCaptor.getValue();
+        List<Friendship> friendshipList = friendshipRepository.findByUser1IdOrUser2Id(user1.getId(),user3.getId());
+        Assertions.assertEquals(1,friendshipList.size());
+        Friendship savedFriendship = friendshipList.get(0);
+
         Assertions.assertEquals(user1.getId(), savedFriendship.getUser1().getId());
         Assertions.assertEquals(user3.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());

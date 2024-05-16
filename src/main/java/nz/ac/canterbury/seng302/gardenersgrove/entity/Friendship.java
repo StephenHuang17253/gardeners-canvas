@@ -53,6 +53,9 @@ public class Friendship {
         return user1;
     }
 
+    public void setUser1(User user) { this.user1 = user;}
+    public void setUser2(User user) { this.user2 = user;}
+
     public User getUser2() {
         return user2;
     }

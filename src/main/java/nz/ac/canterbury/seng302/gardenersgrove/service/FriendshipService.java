@@ -64,8 +64,28 @@ public class FriendshipService {
             throw new IllegalArgumentException("Invalid user 2 ID: " + user2.getId());
         }
         else{
-            Friendship friendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
-            return friendshipRepository.save(friendship);
+            List<Friendship> existingFriendship1 = friendshipRepository.findByUser1IdOrUser2Id(user1.getId(), user2.getId());
+            List<Friendship> existingFriendship2 = friendshipRepository.findByUser1IdOrUser2Id(user2.getId(), user1.getId());
+            if(existingFriendship1.size()>0){
+                Friendship existingFriendship = existingFriendship1.get(0);
+                throw new IllegalArgumentException("Cant re-add a Friendship relation when one already exists");
+
+            }else if(existingFriendship2.size()>0){
+                Friendship existingFriendship = existingFriendship2.get(0);
+                if(existingFriendship.getStatus().equals(FriendshipStatus.DECLINED)){
+                    //if user 1 declines user 2 friend request, user 1 can send one on their end
+                    existingFriendship.setUser1(user1);
+                    existingFriendship.setUser2(user2);
+                    existingFriendship.setStatus(FriendshipStatus.PENDING);
+                    return friendshipRepository.save(existingFriendship);
+                }else{
+                    throw new IllegalArgumentException("Cant re-add a Friendship relation when one already exists");
+                }
+            }else{
+                Friendship friendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
+                return friendshipRepository.save(friendship);
+            }
+
         }
     }
     /**
