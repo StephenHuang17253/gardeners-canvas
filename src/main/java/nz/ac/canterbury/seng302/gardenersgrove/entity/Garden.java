@@ -34,6 +34,12 @@ public class Garden {
     @Column(columnDefinition = "TEXT")
     private String gardenCountry;
 
+    @Column(columnDefinition = "TEXT")
+    private String gardenLongitude;
+
+    @Column(columnDefinition = "TEXT")
+    private String gardenLatitude;
+
     @Column
     private double gardenSize;
     
@@ -62,7 +68,7 @@ public class Garden {
      * @param owner the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, float gardenSize, User owner) {
+                  String gardenPostcode, String gardenCountry, float gardenSize, String gardenLatitude, String gardenLongitude, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -70,6 +76,8 @@ public class Garden {
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
         this.owner = owner;
     }
 
@@ -139,6 +147,9 @@ public class Garden {
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
+
+    public String getGardenLongitude() { return gardenLongitude;}
+    public String getGardenLatitude() { return gardenLatitude;}
     public User getOwner() { return owner; }
     public List<Plant> getPlants(){
         return plants;

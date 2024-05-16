@@ -111,7 +111,7 @@ public class MyGardensController {
         }
 
         try {
-            ArrayList<JsonNode> gardenWeather = showGardenWeather("43.5345", "172.6260");
+            ArrayList<JsonNode> gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
         } catch (Error error) {
             return (error.toString());
         }
