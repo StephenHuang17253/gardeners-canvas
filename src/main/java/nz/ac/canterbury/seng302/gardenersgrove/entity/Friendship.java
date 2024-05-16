@@ -12,7 +12,6 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long friendShipId;
 
-
     @ManyToOne
     private User user1;
 
@@ -28,9 +27,10 @@ public class Friendship {
     }
     /**
      * Creates a new Friendship object
+     * NOTE the ordering
      *
-     * @param user1 one half of the user relationship
-     * @param user2 the other half of the user relationship
+     * @param user1 IMPORTANT the user that sent the request
+     * @param user2 IMPORTANT the user that received the request
      * @param status enum status of the two users relationship
      */
     public Friendship(User user1, User user2, FriendshipStatus status) {
