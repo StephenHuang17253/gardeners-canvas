@@ -197,11 +197,11 @@ public class AccountControllerTest {
             "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:Jobs:true:steve@jobs.com:Password1!",
             "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:true:steve@jobs.com:Password1!",
     }, delimiter = ':')
-    public void RegistrationPage_ValidInputs_CreatesUser(String firstname, String lastname, String noLastName,
+    public void RegistrationPage_ValidInputs_CreatesUser(String firstName, String lastName, String noLastName,
             String emailAddress, String password) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
-                .param("firstName", firstname)
-                .param("lastName", lastname)
+                .param("firstName", firstName)
+                .param("lastName", lastName)
                 .param("noLastName", noLastName)
                 .param("emailAddress", emailAddress)
                 .param("password", password)
@@ -290,11 +290,11 @@ public class AccountControllerTest {
             "Steve:Jobs:false:steve@jobs.com:Password1!:''", // just special chars repeat password
 
     }, delimiter = ':')
-    public void RegistrationPage_InvalidInputs_CreatesNoUser(String firstname, String lastname, String noLastName,
+    public void RegistrationPage_InvalidInputs_CreatesNoUser(String firstName, String lastName, String noLastName,
             String emailAddress, String password, String repeatedPassword) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
-                .param("firstName", firstname)
-                .param("lastName", lastname)
+                .param("firstName", firstName)
+                .param("lastName", lastName)
                 .param("noLastName", noLastName)
                 .param("emailAddress", emailAddress)
                 .param("password", password)
