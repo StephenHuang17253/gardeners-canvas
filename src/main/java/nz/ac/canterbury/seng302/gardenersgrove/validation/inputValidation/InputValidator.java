@@ -1,11 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +30,7 @@ public class InputValidator {
     String testedValue;
 
     private static UserService userService;
+    private static ProfanityService profanityService;
 
     /**
      * Constructor for the Validation with {@link Autowired} to
@@ -37,8 +40,9 @@ public class InputValidator {
      * @param inputUserService
      */
     @Autowired
-    public void UserService(UserService inputUserService) {
+    public void UserService(UserService inputUserService, ProfanityService inputProfanityService) {
         userService = inputUserService;
+        profanityService = inputProfanityService;
     }
 
     /**
@@ -329,6 +333,13 @@ public class InputValidator {
                 .dateFormatHelper()
                 .getResult();
     }
+
+    public static ValidationResult validateProfanity(String text) {
+        return new InputValidator(text)
+                .profanityHelper()
+                .getResult();
+    }
+
 
     /**
      * Checks if a string is blank or not if a string is
@@ -708,6 +719,36 @@ public class InputValidator {
         this.validationResult = ValidationResult.OK;
         return this;
     }
+
+    /**
+     * Sends A string to the bad words API, then checks if the return has
+     * bad word count over 0, if so set to TEXT_CONTAINS_PROFANITY
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator profanityHelper() {
+        if (!this.passState) {
+            return this;
+        }
+        try {
+            String returnedResult = profanityService.sendPostRequest(testedValue);
+            boolean containsProfanity = profanityService.containsProfanity(returnedResult);
+
+            if (containsProfanity) {
+                this.validationResult = ValidationResult.TEXT_CONTAINS_PROFANITY;
+                this.passState = false;
+                return this;
+            }
+        } catch (IOException | InterruptedException IE) {
+            // Log the fail in the system,
+            System.err.println("Error while sending post request: " + IE.getMessage());
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
 
     /**
      * returns this objects validation result

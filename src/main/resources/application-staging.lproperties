@@ -1,20 +1,14 @@
 spring.application.name=gardeners-grove
 
 # Datasource
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=password
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.datasource.driverClassName=org.mariadb.jdbc.Driver
+spring.datasource.username=${DB_USERNAME:}
+spring.datasource.password=${DB_PASSWORD:}
+spring.jpa.database-platform=org.hibernate.dialect.MariaDB106Dialect
 
 #If using local file as database uncomment next line
-# spring.datasource.url=jdbc:h2:file:./data/demodb
-
-#spring.datasource.url=jdbc:h2:file:./data/gardenersGroveDB;DB_CLOSE_ON_EXIT=FALSE
-#spring.jpa.hibernate.ddl-auto=update
-
-#If using embedded database uncomment next lines (Temporary, will wipe data on close)
-spring.sql.init.mode=embedded
-spring.datasource.url=jdbc:h2:mem:tempdb
+spring.datasource.url=jdbc:mariadb://db2.csse.canterbury.ac.nz:3306/seng302-2024-team500-test
+spring.jpa.hibernate.ddl-auto=update
 
 #Inititalize data into database on startup (Will run sql file to populate DB)
 # Will run resources/data.sql file, add test data into this file.
@@ -23,7 +17,6 @@ spring.jpa.defer-datasource-initialization=true
 # h2 console settings
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2
-# console login will be at http://localhost:8080/h2/
 # LocationIQ API Key
 locationiq.access.token = ${LOCATIONIQ_API_KEY:}
 profanity.access.token = ${PROFANITY_API_KEY:}
