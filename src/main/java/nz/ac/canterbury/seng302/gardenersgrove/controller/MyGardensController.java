@@ -27,7 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 /**
  * Controller for viewing all the created Gardens
@@ -46,15 +48,20 @@ public class MyGardensController {
 
     private final FileService fileService;
 
-    private final WeatherService weatherService;
+    private static final int MAX_REQUESTS_PER_SECOND = 10;
+
+    private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
+
+    private volatile long lastRequestTime = Instant.now().getEpochSecond();
+
+
 
     @Autowired
-    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService, WeatherService weatherService) {
+    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.fileService = fileService;
         this.securityService = securityService;
-        this.weatherService = weatherService;
     }
 
     /**
@@ -205,11 +212,34 @@ public class MyGardensController {
     }
 
 
-    @GetMapping("/my-gardens/{gardenId}={gardenName}/weather")
+    @GetMapping("/my-gardens/{gardenId}/weather")
     public String showGardenWeather(@PathVariable("gardenId") String gardenIdString,
-                                    @PathVariable String gardenName,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}/weather", gardenIdString, gardenName);
+        logger.info("GET /my-gardens/{}/weather", gardenIdString);
+        long currentTime = Instant.now().getEpochSecond();
+        long timeElapsed = currentTime - lastRequestTime;
+
+        logger.info("Time elapsed: " + timeElapsed);
+        // Every second, the number of available permits is reset to 2
+        if (timeElapsed >= 1) {
+            semaphore.drainPermits();
+            semaphore.release(MAX_REQUESTS_PER_SECOND);
+            logger.info("A second or more has elapsed, permits reset to: " + semaphore.availablePermits());
+            lastRequestTime = currentTime;
+        }
+
+        logger.info("Permits left before request: " + semaphore.availablePermits());
+
+        // Check if rate limit exceeded
+        if (!semaphore.tryAcquire()) {
+            logger.info("Exceeded location API rate limit of 2 requests per second.");
+            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
+        }
+        logger.info("Permits left after request: " + semaphore.availablePermits());
+
+
+        WeatherService weatherService = new WeatherService();
+
 
         return weatherService.getWeather("-43.532055","172.636230");
 

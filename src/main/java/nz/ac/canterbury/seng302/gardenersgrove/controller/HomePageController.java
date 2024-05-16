@@ -63,8 +63,6 @@ public class HomePageController {
     @GetMapping("/")
     public String home() throws IOException {
         logger.info("GET /");
-        WeatherService weatherService = new WeatherService();
-        weatherService.getWeather("-43.532055","172.636230");
         return "redirect:./home";
     }
 
