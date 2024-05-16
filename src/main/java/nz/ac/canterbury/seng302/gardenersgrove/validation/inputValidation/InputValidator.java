@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.LanguageFilterAPI;
 /**
  * Tests inputs on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes
@@ -30,8 +30,8 @@ public class InputValidator {
     String testedValue;
 
     private static UserService userService;
+    private static ProfanityService profanityService;
 
-    LanguageFilterAPI LanguageApiChecker = new LanguageFilterAPI();
     /**
      * Constructor for the Validation with {@link Autowired} to
      * connect this
@@ -40,8 +40,9 @@ public class InputValidator {
      * @param inputUserService
      */
     @Autowired
-    public void UserService(UserService inputUserService) {
+    public void UserService(UserService inputUserService, ProfanityService inputProfanityService) {
         userService = inputUserService;
+        profanityService = inputProfanityService;
     }
 
     /**
@@ -225,7 +226,7 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(Float.MAX_VALUE, 0.01F)
+                .areaHelper(8000000.0, 0.01)
                 .getResult();
     }
 
@@ -338,6 +339,7 @@ public class InputValidator {
                 .profanityHelper()
                 .getResult();
     }
+
 
     /**
      * Checks if a string is blank or not if a string is
@@ -676,26 +678,26 @@ public class InputValidator {
      * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(float maxArea, float minArea) {
+    private InputValidator areaHelper(Double maxArea, Double minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
         }
 
-        float floatGardenSize;
+        double doubleGardenSize;
         if(testedValue.isBlank()){
             this.validationResult = ValidationResult.OK;
             return this;
         } else{
-            floatGardenSize = Float.parseFloat(testedValue.replace(",","."));
+            doubleGardenSize = Double.parseDouble(testedValue.replace(",","."));
         }
 
-        if (floatGardenSize < minArea) {
+        if (doubleGardenSize < minArea) {
             this.validationResult = ValidationResult.AREA_TOO_SMALL;
             this.passState = false;
             return this;
         }
-        if (floatGardenSize > maxArea) {
+        if (doubleGardenSize > maxArea) {
             this.validationResult = ValidationResult.AREA_TOO_LARGE;
             this.passState = false;
             return this;
@@ -730,8 +732,8 @@ public class InputValidator {
             return this;
         }
         try {
-            String returnedResult = LanguageApiChecker.sendPostRequest(testedValue);
-            boolean containsProfanity = LanguageApiChecker.containsProfanity(returnedResult);
+            String returnedResult = profanityService.sendPostRequest(testedValue);
+            boolean containsProfanity = profanityService.containsProfanity(returnedResult);
 
             if (containsProfanity) {
                 this.validationResult = ValidationResult.TEXT_CONTAINS_PROFANITY;
@@ -746,6 +748,7 @@ public class InputValidator {
         this.validationResult = ValidationResult.OK;
         return this;
     }
+
 
     /**
      * returns this objects validation result
