@@ -16,7 +16,7 @@ public class Plant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long plantId;
 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String plantName;
 
     @Column

@@ -37,11 +37,10 @@ out/
 .vscode/
 
 ### Mac ###
-### Mac ###
 .DS_Store
 
 ### Profile Pics ###
 uploads/
 
-### Email Credentials ###
-email.properties
+### Test Outputs ###
+target/
