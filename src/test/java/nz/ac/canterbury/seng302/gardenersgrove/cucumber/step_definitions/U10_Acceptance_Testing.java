@@ -54,7 +54,6 @@ public class U10_Acceptance_Testing {
     @MockBean
     private LocationService locationService;
 
-
     public static GardenService gardenService;
 
     public static UserService userService;
@@ -73,14 +72,16 @@ public class U10_Acceptance_Testing {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
-        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService, securityService);
+        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
+                securityService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
     }
 
     @Given("I {string} {string}, {int} am a user with email {string} and password {string}")
-    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail, String userPassword) {
+    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail,
+            String userPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
@@ -95,9 +96,10 @@ public class U10_Acceptance_Testing {
     @Given("I as user {string} have a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, user);
+        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, false, user);
         gardenService.addGarden(garden);
-        Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
+        Assertions.assertEquals(garden.getGardenId(),
+                userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
@@ -118,9 +120,9 @@ public class U10_Acceptance_Testing {
     public void iSeeTheEditGardenFormWhereAllTheDetailsArePrepopulated() {
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"),expectedGarden.getGardenName());
-        Assertions.assertEquals(modelMap.getAttribute("city"),expectedGarden.getGardenCity());
-        Assertions.assertEquals(modelMap.getAttribute("country"),expectedGarden.getGardenCountry());
+        Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
+        Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
+        Assertions.assertEquals(modelMap.getAttribute("country"), expectedGarden.getGardenCountry());
     }
 
     @Given("I am on the garden edit form")
@@ -133,9 +135,9 @@ public class U10_Acceptance_Testing {
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"),expectedGarden.getGardenName());
-        Assertions.assertEquals(modelMap.getAttribute("city"),expectedGarden.getGardenCity());
-        Assertions.assertEquals(modelMap.getAttribute("country"),expectedGarden.getGardenCountry());
+        Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
+        Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
+        Assertions.assertEquals(modelMap.getAttribute("country"), expectedGarden.getGardenCountry());
         gardenName = expectedGarden.getGardenName();
         gardenCity = expectedGarden.getGardenCity();
         gardenCountry = expectedGarden.getGardenCountry();
@@ -143,7 +145,8 @@ public class U10_Acceptance_Testing {
     }
 
     @Given("I enter valid garden values for the {string}, {string}, {string} and {string}")
-    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String city, String country, String size) {
+    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String city, String country,
+            String size) {
         gardenName = name;
         gardenCity = city;
         gardenCountry = country;
@@ -166,6 +169,7 @@ public class U10_Acceptance_Testing {
 
         ).andReturn();
     }
+
     @Then("The garden details have been updated")
     public void the_garden_details_have_been_updated() {
         Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
@@ -181,15 +185,17 @@ public class U10_Acceptance_Testing {
     }
 
     @Then("I am taken back to the garden details page")
-    public void i_am_taken_back_to_the_garden_details_page(){
+    public void i_am_taken_back_to_the_garden_details_page() {
         String redirectedUrl = editGardenResult.getResponse().getRedirectedUrl();
         Assertions.assertEquals(String.format("/my-gardens/%d", expectedGarden.getGardenId()), redirectedUrl);
 
     }
+
     @When("I enter an invalid garden name value {string}")
     public void i_enter_an_invalid_garden_name_value(String string) {
         gardenName = string;
     }
+
     @Then("The garden details are not updated")
     public void the_garden_details_are_not_updated() {
         Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
@@ -203,11 +209,13 @@ public class U10_Acceptance_Testing {
         Assertions.assertEquals(expectedGarden.getGardenCountry(), updatedGarden.getGardenCountry());
         Assertions.assertEquals(expectedGarden.getGardenSize(), updatedGarden.getGardenSize());
     }
+
     @Given("I enter invalid garden location values {string}, {string}")
     public void i_enter_invalid_garden_location_values(String city, String country) {
         gardenCity = city;
         gardenCountry = country;
     }
+
     @When("I enter an invalid garden size value {string}")
     public void i_enter_an_invalid_garden_size_value_for_the(String string) {
         gardenSize = string;
@@ -219,7 +227,3 @@ public class U10_Acceptance_Testing {
     }
 
 }
-
-
-
-
