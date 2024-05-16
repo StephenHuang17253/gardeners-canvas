@@ -341,7 +341,7 @@ public class InputValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1", "340282346638528860000000000000000000000" })
+    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1", "8000000.00", "0.01" })
     public void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input)
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(input));
@@ -354,11 +354,11 @@ public class InputValidatorTest {
         assertEquals(ValidationResult.AREA_TOO_SMALL,InputValidator.validateGardenAreaInput(input));
     }
 
-    @Test
-    public void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE()
+    @ParameterizedTest
+    @ValueSource(strings = { "8000000.001", "8000000.01", "340300000000000000000000000000000000000" })
+    public void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE(String input)
     {
-        String sizeOfJavaFloat = "340300000000000000000000000000000000000";
-        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(sizeOfJavaFloat));
+        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(input));
     }
 
     /**
@@ -370,20 +370,13 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateName(name));
     }
 
-    /**
-     * Test for invalid names
-     * @param name
-     */
     @ParameterizedTest
     @ValueSource(strings = { "John1", "John>", "~John" })
     public void InputValidator_validateName_InvalidName_return_INVALID_USERNAME(String name) {
         Assertions.assertEquals(ValidationResult.INVALID_USERNAME, InputValidator.validateName(name));
     }
 
-    /**
-     * Test for valid emails
-     * @param email
-     */
+
     @ParameterizedTest
     @ValueSource(strings = { "test-test@example.com", "user_123@gmail.co.nz", "john.doe@hotmail.com",
             "phlddzoxuomhdkclzinbsqhutjqhzodonrbgyxibpkutddaovmxifypmeksvhkts@mwbmmvndbnvfdskmrmmropbvhdgegssqcengjnfj" +
@@ -397,10 +390,7 @@ public class InputValidatorTest {
     // Todo check if there is an email already in persistence <-- need to mock persistence for this.
     // Todo add foreign scripts
 
-    /**
-     * Test for invalid emails
-     * @param email
-     */
+
     @ParameterizedTest
     @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c", "test@.com", "@test.com",
             "abc-@mail.com","abc..def@mail.com",".abc@mail.com", "abc.def@mail#archive.com","abc.def@mail..com" })
@@ -408,41 +398,25 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
 
-    /**
-     * Test for valid passwords
-     * @param password
-     */
     @ParameterizedTest
     @ValueSource(strings = { "aB0!bbba", "##aBB0hhhhhhhhhh", "Passw0rd!","Pass word1!" })
     public void InputValidator_validatePassword_ValidPassword_return_OK(String password) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password));
-    };
+    }
 
-    /**
-     * Test for invalid passwords
-     * @param password
-     */
     @ParameterizedTest
     @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
     "1D!0", "D!1", "aA!0","Pa!0AAA"})
     public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
         Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password));
-    };
+    }
 
-    /**
-     * Test for valid DOB
-     * @param dob
-     */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     public void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDOB(dob));
-    };
+    }
 
-    /**
-     * Test for invalid DOB age below 13
-     * @param dob
-     */
     @ParameterizedTest
     @ValueSource(strings = {"01/02/2023"})
     public void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {
@@ -450,10 +424,6 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.AGE_BELOW_13, InputValidator.validateDOB(dob));
     }
 
-    /**
-     * Test for invalid DOB age above 120
-     * @param dob
-     */
     @ParameterizedTest
     @ValueSource(strings = {"01/01/1903","01/01/1850"})
     public void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
@@ -461,10 +431,6 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
     }
 
-    /**
-     * Test for invalid DOB format
-     * @param dob
-     */
     @ParameterizedTest
     @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014"})
     public void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
@@ -472,21 +438,12 @@ public class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
 
-
-
-    /**
-     * Test for valid DOB
-     * @param date
-     */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     public void InputValidator_isValidDate_ValidDate_return_OK(String date) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
     }
-    /**
-     * Test for invalid DOB format
-     * @param date
-     */
+
     @ParameterizedTest
     @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
     public void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {

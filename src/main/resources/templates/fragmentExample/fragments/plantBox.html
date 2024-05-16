@@ -2,7 +2,6 @@
     <div class="plantbox" id="plantbox">
         <div class="plant-info">
             <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
-
             <form th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data">
             <div class="plant_picture_container small_pic">
                 <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"

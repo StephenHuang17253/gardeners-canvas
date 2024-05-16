@@ -65,7 +65,6 @@ public class GardenFormControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
-        ;
 
         if (!userService.emailInUse(mockUser.getEmailAddress()))
         {
@@ -986,7 +985,7 @@ public class GardenFormControllerTest {
     //
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", ""})
+    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", "8000000.00", "0.01"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
@@ -1030,7 +1029,7 @@ public class GardenFormControllerTest {
 
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", ""})
+    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", "0.01", "8000000,00"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenSize(String input) throws Exception
     {
@@ -1054,7 +1053,7 @@ public class GardenFormControllerTest {
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)", "0.009", "0", "8000000,01" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
@@ -1101,7 +1100,7 @@ public class GardenFormControllerTest {
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)",  "0", "8000000,01"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
