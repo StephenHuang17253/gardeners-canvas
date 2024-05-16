@@ -8,6 +8,7 @@
         <link th:href="@{/css/tableList.css}" rel="stylesheet">
         <link th:href="@{/css/infoBox.css}" rel="stylesheet">
         <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
+        <link th:href="@{/css/weather.css}" rel="stylesheet">
         <script th:src="@{/js/imagePicker.js}"></script>
     </head>
     <body>
@@ -22,6 +23,22 @@
                 <a th:href="@{__${gardenId}__/edit}">
                     <button class = rounded-button-top-right >Edit</button>
                 </a>
+            </div>
+            <br>
+            <div class="weather">
+                <div th:each="prediction : ${forecast}">
+                    <div th:replace="~{fragmentExample/fragments/weatherBox.html :: weatherBox(
+                        weatherIcon=${prediction.getWeatherIcon()},
+                        date=${prediction.getDate()},
+                        day=${prediction.getDay()},
+                        weatherDescription=${prediction.getDescription()},
+                        minTemp=${prediction.getMinTemp()},
+                        maxTemp=${prediction.getMaxTemp()},
+                        precipitation=${prediction.getPercipitation()},
+                        humidity=${prediction.getHumidity()},
+                        weatherError=${prediction.getWeatherError()})}">
+                    </div>
+                </div>
             </div>
             <br>
             <div class="tableList-table-contain">
@@ -43,7 +60,6 @@
                 </div>
             </div>
             <br>
-
         </div>
     </body>
 </html>
