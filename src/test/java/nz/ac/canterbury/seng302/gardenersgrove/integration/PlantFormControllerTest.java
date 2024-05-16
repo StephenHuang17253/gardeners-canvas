@@ -57,6 +57,7 @@ public class PlantFormControllerTest {
         LocalDate date1 = LocalDate.of(2024, 3, 27);
         Garden test_garden = new Garden(
                 "test",
+                "",
                 "test",
                 "test",
                 "test",

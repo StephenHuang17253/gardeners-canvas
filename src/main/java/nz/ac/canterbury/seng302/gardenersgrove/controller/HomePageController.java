@@ -116,6 +116,7 @@ public class HomePageController {
             for (int i = 0; i < 12; i++) {
                 Garden sampleGarden = new Garden(
                         "John's Garden " + i,
+                        "",
                         "114 Ilam Road",
                         "Ilam",
                         "Christchurch",

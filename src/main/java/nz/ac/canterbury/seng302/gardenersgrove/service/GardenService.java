@@ -89,6 +89,7 @@ public class GardenService {
             Garden targetGarden = optionalGarden.get();
 
             targetGarden.setGardenName(newGardenValues.getGardenName());
+            targetGarden.setGardenDescription(newGardenValues.getGardenDescription());
             targetGarden.setGardenAddress(newGardenValues.getGardenAddress());
             targetGarden.setGardenSuburb(newGardenValues.getGardenSuburb());
             targetGarden.setGardenCity(newGardenValues.getGardenCity());

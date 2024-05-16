@@ -96,7 +96,7 @@ public class U10_Acceptance_Testing {
     @Given("I as user {string} have a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, false, user);
+        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(),
                 userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());

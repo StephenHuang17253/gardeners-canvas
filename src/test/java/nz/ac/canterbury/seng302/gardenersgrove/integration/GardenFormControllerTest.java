@@ -74,6 +74,7 @@ public class GardenFormControllerTest {
                 "test",
                 "test",
                 "test",
+                "test",
                 "80",
                 "test",
                 10.0,
