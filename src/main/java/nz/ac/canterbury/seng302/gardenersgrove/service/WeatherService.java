@@ -66,7 +66,7 @@ public class WeatherService {
             weatherList.add(getCurrentWeather());
             weatherList.add(getForecast());
 
-            logger.info(String.valueOf(jsonObject));
+            logger.info("weather: " + String.valueOf(jsonObject));
 
             return weatherList;
 

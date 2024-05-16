@@ -92,7 +92,7 @@ public class Garden {
      * @param gardenSize the size of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, float gardenSize) {
+                  String gardenPostcode, String gardenCountry, float gardenSize, String gardenLatitude, String gardenLongitude) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -100,6 +100,8 @@ public class Garden {
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
     }
 
     public Long getGardenId() {
@@ -149,7 +151,10 @@ public class Garden {
     }
 
     public String getGardenLongitude() { return gardenLongitude;}
+    public void setGardenLongitude(String gardenLongitude) {this.gardenLongitude = gardenLongitude;}
     public String getGardenLatitude() { return gardenLatitude;}
+    public void setGardenLatitude(String gardenLatitude) {this.gardenLatitude = gardenLatitude;}
+
     public User getOwner() { return owner; }
     public List<Plant> getPlants(){
         return plants;

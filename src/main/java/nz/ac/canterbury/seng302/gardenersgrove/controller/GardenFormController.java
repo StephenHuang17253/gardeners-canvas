@@ -249,6 +249,8 @@ public class GardenFormController {
         model.addAttribute("postcode", garden.getGardenPostcode());
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("latitude", garden.getGardenLatitude());
+        model.addAttribute("longitude", garden.getGardenLongitude());
         double gardenSize = garden.getGardenSize();
         if (Double.isNaN(gardenSize)) {
             model.addAttribute("gardenSize", "");
@@ -283,6 +285,8 @@ public class GardenFormController {
                                        @RequestParam(name = "country") String country,
                                        @RequestParam(name = "postcode") String postcode,
                                        @RequestParam(name = "gardenSize") String gardenSize,
+                                         @RequestParam(name = "longitude") String longitude,
+                                         @RequestParam(name = "latitude") String latitude,
                                        @PathVariable Long gardenId, HttpSession session,
                                        Model model) {
         logger.info("POST / edited garden");
@@ -316,6 +320,8 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
 
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
@@ -328,7 +334,7 @@ public class GardenFormController {
         } else {
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
+        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, latitude, longitude));
         logger.info("Edited Garden Page");
 
         User owner = securityService.getCurrentUser();
