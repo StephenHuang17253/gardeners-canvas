@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -68,7 +69,9 @@ public class FriendshipService {
             List<Friendship> existingFriendship2 = friendshipRepository.findByUser1IdOrUser2Id(user2.getId(), user1.getId());
             if(existingFriendship1.size()>0){
                 Friendship existingFriendship = existingFriendship1.get(0);
-                throw new IllegalArgumentException("Cant re-add a Friendship relation when one already exists");
+                if(Objects.equals(existingFriendship.getUser1().getId(), user1.getId()) && Objects.equals(existingFriendship.getUser2().getId(), user2.getId())){
+                    throw new IllegalArgumentException("Cant re-add a Friendship relation when one already exists");
+                }
 
             }else if(existingFriendship2.size()>0){
                 Friendship existingFriendship = existingFriendship2.get(0);
@@ -78,13 +81,12 @@ public class FriendshipService {
                     existingFriendship.setUser2(user2);
                     existingFriendship.setStatus(FriendshipStatus.PENDING);
                     return friendshipRepository.save(existingFriendship);
-                }else{
+                }else if (Objects.equals(existingFriendship.getUser1().getId(), user2.getId()) && Objects.equals(existingFriendship.getUser2().getId(), user1.getId())){
                     throw new IllegalArgumentException("Cant re-add a Friendship relation when one already exists");
                 }
-            }else{
-                Friendship friendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
-                return friendshipRepository.save(friendship);
             }
+            Friendship friendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
+            return friendshipRepository.save(friendship);
 
         }
     }
@@ -94,6 +96,15 @@ public class FriendshipService {
      * @param friendshipStatus the status to update it to
      */
     public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus) {
-        return null;
+        Optional<Friendship> optionalFriend = friendshipRepository.findById(id);
+        if (optionalFriend.isEmpty()) {
+            throw new IllegalArgumentException("Invalid Friendship ID: " + id);
+        } else if(optionalFriend.get().getStatus()==FriendshipStatus.DECLINED){
+            throw new IllegalArgumentException("Cant update a Friendship relation's status if its declined");
+        }else{
+            Friendship friendship = optionalFriend.get();
+            friendship.setStatus(friendshipStatus);
+            return friendshipRepository.save(friendship);
+        }
     }
 }

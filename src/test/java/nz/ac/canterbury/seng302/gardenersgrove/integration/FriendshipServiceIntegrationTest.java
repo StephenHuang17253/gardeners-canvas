@@ -33,8 +33,7 @@ public class FriendshipServiceIntegrationTest {
     @Autowired
     private FriendshipRepository friendshipRepository;
     private FriendshipService friendshipService;
-    @Captor
-    private ArgumentCaptor<Friendship> friendshipCaptor;
+
 
     private static User user1;
     private static User user2;
@@ -50,6 +49,10 @@ public class FriendshipServiceIntegrationTest {
         userService.addUser(user1,"1es1P@ssword");
         userService.addUser(user2,"1es1P@ssword");
         userService.addUser(user3,"1es1P@ssword");
+    }
+    @BeforeEach
+    public void clear_repo() {
+        friendshipRepository.deleteAll();
     }
 
 
@@ -150,7 +153,6 @@ public class FriendshipServiceIntegrationTest {
     @Test
     public void addFriendship_User1AndUser2BothInPersistence(){
         friendshipService.addFriendship(user1, user2);
-//        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
 
         List<Friendship> friendshipList = friendshipRepository.findByUser1IdOrUser2Id(user1.getId(),user2.getId());
         Assertions.assertEquals(1,friendshipList.size());
@@ -214,8 +216,8 @@ public class FriendshipServiceIntegrationTest {
         friendshipService.addFriendship(user1, user3);
 
         List<Friendship> friendshipList = friendshipRepository.findByUser1IdOrUser2Id(user1.getId(),user3.getId());
-        Assertions.assertEquals(1,friendshipList.size());
-        Friendship savedFriendship = friendshipList.get(0);
+        Assertions.assertEquals(2,friendshipList.size());
+        Friendship savedFriendship = friendshipList.get(1);
 
         Assertions.assertEquals(user1.getId(), savedFriendship.getUser1().getId());
         Assertions.assertEquals(user3.getId(), savedFriendship.getUser2().getId());
@@ -225,9 +227,11 @@ public class FriendshipServiceIntegrationTest {
     public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsANewUser(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
         friendshipService.addFriendship(user2, user3);
-        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
 
-        Friendship savedFriendship = friendshipCaptor.getValue();
+        List<Friendship> friendshipList = friendshipRepository.findByUser1IdOrUser2Id(user2.getId(),user3.getId());
+        Assertions.assertEquals(1,friendshipList.size());
+        Friendship savedFriendship = friendshipList.get(0);
+
         Assertions.assertEquals(user2.getId(), savedFriendship.getUser1().getId());
         Assertions.assertEquals(user3.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());
@@ -240,20 +244,22 @@ public class FriendshipServiceIntegrationTest {
     }
     @Test
     public void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsDeclined_ThrowsIllegalArgumentException(){
-        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
-        friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.DECLINED));
-        Friendship savedFriendship = friendshipCaptor.getValue();
+        Friendship savedFriendship = new Friendship(user1,user2,FriendshipStatus.DECLINED);
+        friendshipRepository.save(savedFriendship);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.updateFriendShipStatus(savedFriendship.getId(),FriendshipStatus.ACCEPTED);
         });
     }
     @Test
     public void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsNotDeclined(){
-        Mockito.verify(friendshipRepository).save(friendshipCaptor.capture());
-        friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.PENDING));
-        Friendship originalFriendship = friendshipCaptor.getValue();
+        Friendship originalFriendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
+        friendshipRepository.save(originalFriendship);
+
         friendshipService.updateFriendShipStatus(originalFriendship.getId(),FriendshipStatus.ACCEPTED);
-        Friendship updatedFriendship = friendshipCaptor.getValue();
+        Optional<Friendship> optionalUpdatedFriendship = friendshipRepository.findById(originalFriendship.getId());
+
+        Assertions.assertTrue(optionalUpdatedFriendship.isPresent());
+        Friendship updatedFriendship = optionalUpdatedFriendship.get();
 
         Assertions.assertEquals(originalFriendship.getId(), updatedFriendship.getId());
         Assertions.assertEquals(user1.getId(), updatedFriendship.getUser1().getId());
