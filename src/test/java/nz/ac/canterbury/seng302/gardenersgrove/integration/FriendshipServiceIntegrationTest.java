@@ -44,7 +44,7 @@ public class FriendshipServiceIntegrationTest {
     private final Long MAX_LONG = 1000L;
 
     @BeforeAll
-    public void before_or_after_all() {
+    void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
@@ -58,19 +58,19 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @BeforeEach
-    public void clear_repo() {
+    void clear_repo() {
         friendshipRepository.deleteAll();
     }
 
     @Test
-    public void getFriendshipById_FriendshipNotInPersistence_returnsOptionalFriendship(){
+    void getFriendshipById_FriendshipNotInPersistence_returnsOptionalFriendship(){
         Optional<Friendship> optionalFriendship = friendshipService.getFriendShipById(MAX_LONG);
 
         Assertions.assertTrue(optionalFriendship.isEmpty());
     }
 
     @Test
-    public void getFriendshipById_FriendshipInPersistence_returnsOptionalFriendship(){
+    void getFriendshipById_FriendshipInPersistence_returnsOptionalFriendship(){
         Friendship expectedFriendShip = new Friendship(user1,user2, FriendshipStatus.PENDING);
         friendshipRepository.save(expectedFriendShip);
 
@@ -85,7 +85,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendshipExists_U1AndU2BothNotInPersistence_ThrowsIllegalArgumentException(){
+    void checkFriendshipExists_U1AndU2BothNotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
                 "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -99,7 +99,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendshipExists_U1NotInPersistenceAndU2InPersistence_ThrowsIllegalArgumentException(){
+    void checkFriendshipExists_U1NotInPersistenceAndU2InPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
                 "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -110,7 +110,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendshipExists_U1InPersistenceAndU2NotInPersistence_ThrowsIllegalArgumentException(){
+    void checkFriendshipExists_U1InPersistenceAndU2NotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser2 = new User("nonExistentUser",
                 "", "nonExistentUser2@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -121,7 +121,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendshipExists_U1AndU2BothInPersistenceButNoRelation_returnFalse(){
+    void checkFriendshipExists_U1AndU2BothInPersistenceButNoRelation_returnFalse(){
         boolean friendshipExists = friendshipService.checkFriendsipExists(user1, user2);
 
         Assertions.assertFalse(friendshipExists);
@@ -129,7 +129,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendshipExists_U1AndU2AndU3AllInPersistenceAndHaveRelations_returnTrue(){
+    void checkFriendshipExists_U1AndU2AndU3AllInPersistenceAndHaveRelations_returnTrue(){
         friendshipRepository.save(new Friendship(user1,user2, FriendshipStatus.PENDING));
         friendshipRepository.save(new Friendship(user1,user3, FriendshipStatus.PENDING));
 
@@ -141,21 +141,21 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void getAllUsersFriends_UserNotInPersistence_ThrowsIllegalArgumentException(){
+    void getAllUsersFriends_UserNotInPersistence_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.getAllUsersFriends(MAX_LONG);
         });
     }
 
     @Test
-    public void getAllUsersFriends_UserInPersistenceAndNoFriendshipRelation_returnsListFriendship(){
+    void getAllUsersFriends_UserInPersistenceAndNoFriendshipRelation_returnsListFriendship(){
         List<Friendship> expectedFriendships = friendshipService.getAllUsersFriends(user3.getId());
 
         Assertions.assertEquals(0,expectedFriendships.size());
     }
 
     @Test
-    public void getAllUsersFriends_UserInPersistenceAndHasSingleFriendshipRelation_returnsListFriendship(){
+    void getAllUsersFriends_UserInPersistenceAndHasSingleFriendshipRelation_returnsListFriendship(){
         List<Friendship> expectedFriendships = List.of(new Friendship(user1,user2, FriendshipStatus.PENDING));
         friendshipRepository.saveAll(expectedFriendships);
 
@@ -172,7 +172,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void getAllUsersFriends_UserInPersistenceAndHasMultipleFriendshipRelations_returnsListFriendship(){
+    void getAllUsersFriends_UserInPersistenceAndHasMultipleFriendshipRelations_returnsListFriendship(){
         List<Friendship> expectedFriendships = List.of(new Friendship(user1,user2, FriendshipStatus.PENDING),
                 new Friendship(user1,user3, FriendshipStatus.PENDING));
         friendshipRepository.saveAll(expectedFriendships);
@@ -190,7 +190,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_BothUser1AndUser2NotInPersistence_ThrowsIllegalArgumentException(){
+    void addFriendship_BothUser1AndUser2NotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
                 "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -204,14 +204,14 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_User1InPersistenceAndAddsThemselves_ThrowsIllegalArgumentException(){
+    void addFriendship_User1InPersistenceAndAddsThemselves_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.addFriendship(user1, user1);
         });
     }
 
     @Test
-    public void addFriendship_User1NotInPersistenceAndUser2InPersistence_ThrowsIllegalArgumentException(){
+    void addFriendship_User1NotInPersistenceAndUser2InPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
                 "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -222,7 +222,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_User1InPersistenceAndUser2NotInPersistence_ThrowsIllegalArgumentException(){
+    void addFriendship_User1InPersistenceAndUser2NotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser2 = new User("nonExistentUser",
                 "", "nonExistentUser2@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -233,7 +233,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_User1AndUser2BothInPersistence_returnsFriendship(){
+    void addFriendship_User1AndUser2BothInPersistence_returnsFriendship(){
         Friendship savedFriendship = friendshipService.addFriendship(user1, user2);
 
         Assertions.assertEquals(user1.getId(), savedFriendship.getUser1().getId());
@@ -242,7 +242,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2DeclinedStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
+    void addFriendship_U1U2DeclinedStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.DECLINED));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -251,7 +251,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2DeclinedStatusFriendShipExistsAndUser2AddsUser1_returnsFriendship(){
+    void addFriendship_U1U2DeclinedStatusFriendShipExistsAndUser2AddsUser1_returnsFriendship(){
         Friendship oldFriendship = new Friendship(user1,user2,FriendshipStatus.DECLINED);
         friendshipRepository.save(oldFriendship);
 
@@ -264,7 +264,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2PendingStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
+    void addFriendship_U1U2PendingStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.PENDING));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -273,7 +273,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2PendingStatusFriendShipExistsAndUser2AddsUser1_ThrowsIllegalArgumentException(){
+    void addFriendship_U1U2PendingStatusFriendShipExistsAndUser2AddsUser1_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.PENDING));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -282,7 +282,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
+    void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -291,7 +291,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsUser1_ThrowsIllegalArgumentException(){
+    void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsUser1_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -300,7 +300,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsANewUser_returnsFriendship(){
+    void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsANewUser_returnsFriendship(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
 
         Friendship savedFriendship = friendshipService.addFriendship(user1, user3);
@@ -311,7 +311,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsANewUser_returnsFriendship(){
+    void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsANewUser_returnsFriendship(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
 
         Friendship savedFriendship = friendshipService.addFriendship(user2, user3);
@@ -322,14 +322,14 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void updateFriendShipStatus_FriendshipNotInPersistence_ThrowsIllegalArgumentException(){
+    void updateFriendShipStatus_FriendshipNotInPersistence_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.updateFriendShipStatus(MAX_LONG,FriendshipStatus.ACCEPTED);
         });
     }
 
     @Test
-    public void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsDeclined_ThrowsIllegalArgumentException(){
+    void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsDeclined_ThrowsIllegalArgumentException(){
         Friendship savedFriendship = new Friendship(user1,user2,FriendshipStatus.DECLINED);
         friendshipRepository.save(savedFriendship);
 
@@ -339,7 +339,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsNotDeclined_returnsFriendship(){
+    void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsNotDeclined_returnsFriendship(){
         Friendship originalFriendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
         friendshipRepository.save(originalFriendship);
 

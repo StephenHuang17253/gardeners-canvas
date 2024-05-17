@@ -53,11 +53,7 @@ public class FriendshipService {
         Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
         Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
 
-        if(optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty()){
-            return false;
-        }else{
-            return true;
-        }
+        return (optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty());
     }
 
     /**
