@@ -1,15 +1,20 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
+
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -415,18 +420,48 @@ public class InputValidatorTest {
     @ParameterizedTest
     @ValueSource(strings = { "aB0!bbba", "##aBB0hhhhhhhhhh", "Passw0rd!","Pass word1!" })
     public void InputValidator_validatePassword_ValidPassword_return_OK(String password) {
-        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password));
+        String firstName = "John";
+        String lastName = "";
+        boolean noLastName = true;
+        LocalDate dateOfBirth = null;
+        String emailAddress = "johndoe@gmail.com";
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password, otherFields));
     };
+
+
 
     /**
      * Test for invalid passwords
      * @param password
      */
     @ParameterizedTest
-    @ValueSource(strings = { "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
-    "1D!0", "D!1", "aA!0","Pa!0AAA"})
+    @CsvSource({ "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
+    "1D!0", "D!1", "aA!0","Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
     public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
-        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password));
+        String firstName = "John";
+        String lastName = "Doe";
+        boolean noLastName = false;
+        LocalDate dateOfBirth = LocalDate.parse("2024-01-01");
+        String emailAddress = "johndoe@gmail.com";
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password, otherFields));
     };
 
     /**
