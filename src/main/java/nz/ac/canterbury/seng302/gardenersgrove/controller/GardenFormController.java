@@ -170,10 +170,7 @@ public class GardenFormController {
         // fields are valid
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
-
-        // Throw error if more than 512 characters long, or contains only special
-        // characters and numbers
-        ValidationResult gardenDescriptionResult = InputValidator.optionalAlphaPlusTextField(gardenDescription);
+        ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
@@ -313,9 +310,7 @@ public class GardenFormController {
         model.addAttribute("loggedIn", loggedIn);
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
-        // Throw error if more than 512 characters long, or contains only special
-        // characters and numbers
-        ValidationResult gardenDescriptionResult = InputValidator.optionalAlphaPlusTextField(gardenDescription);
+        ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
         ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
