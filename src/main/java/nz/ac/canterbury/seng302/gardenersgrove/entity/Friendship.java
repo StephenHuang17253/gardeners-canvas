@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 @Entity
 @Table(name = "friendship_table")
 public class Friendship {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long friendShipId;
@@ -25,6 +26,7 @@ public class Friendship {
      */
     protected Friendship() {
     }
+
     /**
      * Creates a new Friendship object
      * NOTE the ordering
@@ -38,6 +40,7 @@ public class Friendship {
         this.user2 = user2;
         this.status = status;
     }
+
     public Long getId() {
         return friendShipId;
     }
@@ -49,11 +52,13 @@ public class Friendship {
     public void setStatus(FriendshipStatus status) {
         this.status = status;
     }
+
     public User getUser1() {
         return user1;
     }
 
     public void setUser1(User user) { this.user1 = user;}
+
     public void setUser2(User user) { this.user2 = user;}
 
     public User getUser2() {

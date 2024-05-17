@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
@@ -9,9 +8,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.junit.jupiter.api.*;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,16 +27,22 @@ public class FriendshipServiceIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    private UserService userService;
+
     @Autowired
     private FriendshipRepository friendshipRepository;
+
     private FriendshipService friendshipService;
 
+    private UserService userService;
 
     private static User user1;
+
     private static User user2;
+
     private static User user3;
+
     private Long MAX_LONG = 1000L;
+
     @BeforeAll
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
@@ -52,17 +54,18 @@ public class FriendshipServiceIntegrationTest {
         userService.addUser(user2,"1es1P@ssword");
         userService.addUser(user3,"1es1P@ssword");
     }
+
     @BeforeEach
     public void clear_repo() {
         friendshipRepository.deleteAll();
     }
-
 
     @Test
     public void getFriendshipById_FriendshipNotInPersistence_returnsOptionalFriendship(){
         Optional<Friendship> optionalFriendship = friendshipService.getFriendShipById(MAX_LONG);
         Assertions.assertTrue(optionalFriendship.isEmpty());
     }
+
     @Test
     public void getFriendshipById_FriendshipInPersistence_returnsOptionalFriendship(){
         Friendship expectedFriendShip = new Friendship(user1,user2, FriendshipStatus.PENDING);
@@ -76,17 +79,20 @@ public class FriendshipServiceIntegrationTest {
         Assertions.assertEquals(expectedFriendShip.getUser2().getId(), actualFriendship.getUser2().getId());
         Assertions.assertEquals(expectedFriendShip.getStatus(), actualFriendship.getStatus());
     }
+
     @Test
     public void getAllUsersFriends_UserNotInPersistence_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.getAllUsersFriends(MAX_LONG);
         });
     }
+
     @Test
     public void getAllUsersFriends_UserInPersistenceAndNoFriendshipRelation_returnsListFriendship(){
         List<Friendship> expectedFriendships = friendshipService.getAllUsersFriends(user3.getId());
         Assertions.assertEquals(0,expectedFriendships.size());
     }
+
     @Test
     public void getAllUsersFriends_UserInPersistenceAndHasSingleFriendshipRelation(){
         List<Friendship> expectedFriendships = List.of(new Friendship(user1,user2, FriendshipStatus.PENDING));
@@ -101,6 +107,7 @@ public class FriendshipServiceIntegrationTest {
             Assertions.assertEquals(expectedFriendship.getStatus(), actualFriendShip.getStatus());
         }
     }
+
     @Test
     public void getAllUsersFriends_UserInPersistenceAndHasMultipleFriendshipRelations(){
         List<Friendship> expectedFriendships = List.of(new Friendship(user1,user2, FriendshipStatus.PENDING),
@@ -116,6 +123,7 @@ public class FriendshipServiceIntegrationTest {
             Assertions.assertEquals(expectedFriendship.getStatus(), actualFriendShip.getStatus());
         }
     }
+
     @Test
     public void addFriendship_BothUser1AndUser2NotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
@@ -128,12 +136,14 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(nonExistentUser1, nonExistentUser2);
         });
     }
+
     @Test
     public void addFriendship_User1InPersistenceAndAddsThemselves_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.addFriendship(user1, user1);
         });
     }
+
     @Test
     public void addFriendship_User1NotInPersistenceAndUser2InPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
@@ -143,6 +153,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(nonExistentUser1, user2);
         });
     }
+
     @Test
     public void addFriendship_User1InPersistenceAndUser2NotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser2 = new User("nonExistentUser",
@@ -152,6 +163,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(user1, nonExistentUser2);
         });
     }
+
     @Test
     public void addFriendship_User1AndUser2BothInPersistence(){
         Friendship savedFriendship = friendshipService.addFriendship(user1, user2);
@@ -160,6 +172,7 @@ public class FriendshipServiceIntegrationTest {
         Assertions.assertEquals(user2.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());
     }
+
     @Test
     public void addFriendship_U1U2DeclinedStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.DECLINED));
@@ -167,6 +180,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(user1, user2);
         });
     }
+
     @Test
     public void addFriendship_U1U2DeclinedStatusFriendShipExistsAndUser2AddsUser1(){
         Friendship oldFriendship = new Friendship(user1,user2,FriendshipStatus.DECLINED);
@@ -179,6 +193,7 @@ public class FriendshipServiceIntegrationTest {
         Assertions.assertEquals(user1.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());
     }
+
     @Test
     public void addFriendship_U1U2PendingStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.PENDING));
@@ -186,6 +201,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(user1, user2);
         });
     }
+
     @Test
     public void addFriendship_U1U2PendingStatusFriendShipExistsAndUser2AddsUser1_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.PENDING));
@@ -193,6 +209,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(user2, user1);
         });
     }
+
     @Test
     public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsUser2_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
@@ -200,6 +217,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(user1, user2);
         });
     }
+
     @Test
     public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsUser1_ThrowsIllegalArgumentException(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
@@ -207,6 +225,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.addFriendship(user2, user1);
         });
     }
+
     @Test
     public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser1AddsANewUser(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
@@ -217,6 +236,7 @@ public class FriendshipServiceIntegrationTest {
         Assertions.assertEquals(user3.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());
     }
+
     @Test
     public void addFriendship_U1U2AcceptedStatusFriendShipExistsAndUser2AddsANewUser(){
         friendshipRepository.save(new Friendship(user1,user2,FriendshipStatus.ACCEPTED));
@@ -227,12 +247,14 @@ public class FriendshipServiceIntegrationTest {
         Assertions.assertEquals(user3.getId(), savedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.PENDING, savedFriendship.getStatus());
     }
+
     @Test
     public void updateFriendShipStatus_FriendshipNotInPersistence_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.updateFriendShipStatus(MAX_LONG,FriendshipStatus.ACCEPTED);
         });
     }
+
     @Test
     public void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsDeclined_ThrowsIllegalArgumentException(){
         Friendship savedFriendship = new Friendship(user1,user2,FriendshipStatus.DECLINED);
@@ -241,6 +263,7 @@ public class FriendshipServiceIntegrationTest {
             friendshipService.updateFriendShipStatus(savedFriendship.getId(),FriendshipStatus.ACCEPTED);
         });
     }
+
     @Test
     public void updateFriendShipStatus_FriendshipInPersistenceAndCurrentStatusIsNotDeclined(){
         Friendship originalFriendship = new Friendship(user1,user2,FriendshipStatus.PENDING);

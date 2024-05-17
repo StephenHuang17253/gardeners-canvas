@@ -16,11 +16,13 @@ import java.util.Optional;
  */
 @Service
 public class FriendshipService {
-    private UserService userService;
+    private final UserService userService;
+
     /**
-     * Interface for generic CRUD operations on a repository for Garden types.
+     * Interface for generic CRUD operations on a repository for Friendship types.
      */
-    private FriendshipRepository friendshipRepository;
+    private final FriendshipRepository friendshipRepository;
+
     /**
      * FriendshipService constructor with repository.
      * @param friendshipRepository the repository for Gardens
@@ -30,6 +32,7 @@ public class FriendshipService {
         this.friendshipRepository = friendshipRepository;
         this.userService = userService;
     }
+
     /**
      * Retrieves a Friendship by ID
      * @param id the Friendship's ID
@@ -38,6 +41,7 @@ public class FriendshipService {
     public Optional<Friendship> getFriendShipById(long id){
         return friendshipRepository.findById(id);
     }
+
     /**
      * Retrieves all Friendships from persistence where user1 or user2 id matches
      * @param id the user's ID
@@ -50,6 +54,7 @@ public class FriendshipService {
             throw new IllegalArgumentException("Invalid user ID: " + id);
         }
     }
+
     /**
      * Helper function to validate the given users before creating a friendship.
      *
@@ -74,7 +79,9 @@ public class FriendshipService {
      * IMPORTANT: cannot add a new friendship relation between two users if one already exists
      * EXCEPTION: When a users friend request gets declined, the recipient may send a request in return
      * IN THAT CASE: the old relation gets updated to pending instead of declined and the order of users gets switched around
-     * @param user1 the 1st half of the relation
+     * @param user1 the sender of the friendship relation
+     * @param user2 the receiver of the friendship relation
+     * @throws IllegalArgumentException if user prams arnt valid or trying to re-add friendship relation (see above)
      */
     public Friendship addFriendship(User user1, User user2) {
         validateUsers(user1,user2);
@@ -110,10 +117,12 @@ public class FriendshipService {
         Friendship friendship = new Friendship(user1,user2,FriendshipStatus.PENDING);
         return friendshipRepository.save(friendship);
     }
+
     /**
      * Updates a friendship status of an existing friendship
      * @param id the id of the existing friend
      * @param friendshipStatus the status to update it to
+     * @throws IllegalArgumentException if id invalid or trying to update a declined relation
      */
     public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus) {
         Optional<Friendship> optionalFriend = friendshipRepository.findById(id);
@@ -127,4 +136,5 @@ public class FriendshipService {
             return friendshipRepository.save(friendship);
         }
     }
+
 }

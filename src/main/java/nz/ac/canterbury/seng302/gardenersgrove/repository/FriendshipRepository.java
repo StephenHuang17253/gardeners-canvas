@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Friendship object repository accessor using Spring's @link{CrudRepository}.
+ */
 @Repository
 public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
     /**
@@ -21,6 +24,7 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
      * @return list of Friendship objects
      */
     List<Friendship> findAll();
+
     /**
      * Find all Friendship objects where user1_id or user2_id matches userId
      * @param userId1 the user_1's id to match
@@ -28,6 +32,7 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
      * @return list of all Friendship objects matching the requirements
      */
     List<Friendship> findByUser1IdOrUser2Id(long userId1, long userId2);
+
     /**
      * Find Friendship object where user1_id and user2_id matches the input params
      * @param userId1 the user_1's id to match
