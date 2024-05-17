@@ -451,6 +451,11 @@ public class InputValidator {
         return this;
     }
 
+    /**
+     *
+     * @param fields
+     * @return
+     */
     private InputValidator passwordLikenessHelper(List<String> fields) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {

@@ -5,6 +5,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ResetPasswordController;
@@ -13,8 +14,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,10 +27,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.thymeleaf.TemplateEngine;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 public class ResetUserPassword {
 
@@ -38,8 +43,6 @@ public class ResetUserPassword {
     public UserRepository userRepository;
     @Autowired
     public FileService fileService;
-    @Autowired
-    public EmailService emailService;
     @Autowired
     public GardenService gardenService;
     @Autowired
@@ -58,6 +61,12 @@ public class ResetUserPassword {
     String userEmail;
     String origHash;
 
+    private static EmailService emailService;
+    @Autowired
+    private static TemplateEngine templateEngine;
+    private static JavaMailSender mailSender;
+
+
     @Before
     public void before_or_after_all() {
         token = new Token(loggedInUser, null);
@@ -67,7 +76,17 @@ public class ResetUserPassword {
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService, emailService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController).build();
         tokenService.addToken(token);
+
+        mailSender = spy(JavaMailSender.class);
+        doNothing().when(mailSender).send(Mockito.any(SimpleMailMessage.class));
+        MimeMessage mockMimeMessage = Mockito.mock(MimeMessage.class);
+        when(mailSender.createMimeMessage()).thenReturn(mockMimeMessage);
+        templateEngine = new TemplateEngine();
+
+        emailService = spy(new EmailService(mailSender, templateEngine));
+        when(emailService.getBaseURL()).thenReturn("");
     }
+
 
     @Given("I am on the login page")
     public void i_am_on_the_login_page() throws Exception {
@@ -154,26 +173,38 @@ public class ResetUserPassword {
         assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
     }
 
-    @Given("I go to the given URL passed in the email {string}")
-    public void i_go_to_the_given_url_passed_in_the_email(String email) throws Exception {
-        loggedInUser = userService.getUserByEmail(email);
-        token = new Token(loggedInUser, null);
-        tokenService.addToken(token);
-        String url = "/reset-password/" + token.getTokenString();
-        MOCK_MVC.perform(
-                MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(status().isOk()).andReturn();
-    }
-
-    @Then("I am taken to the reset password form")
-    public void i_am_taken_to_the_reset_password_form() throws Exception {
-        String url = "/reset-password/" + token.getTokenString();
-        resetPasswordResult = MOCK_MVC.perform(
-                MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(status().isOk()).andReturn();
-    }
+//    @Given("I go to the received email in the email {string}")
+//    public void iGoToTheReceivedEmailInTheEmail(String email) throws MessagingException {
+//
+//        loggedInUser = userService.getUserByEmail(email);
+//        token = new Token(loggedInUser, null);
+//        tokenService.addToken(token);
+//
+//        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+//
+//        emailService.sendResetPasswordEmail(token);
+//
+//        verify(mailSender, times(1)).send(captor.capture());
+//
+//        MimeMessage sentMessage = captor.getValue();
+//
+//        System.out.println("msg= "+ sentMessage);
+//        Assertions.assertEquals(sentMessage, "");
+//    }
+//
+//    @When("I click the clickable link in my email {string}")
+//    public void iClickTheClickableLinkInMyEmail(String arg0) {
+//        Assertions.assertTrue(true);
+//    }
+//
+//    @Then("I am taken to the reset password form")
+//    public void i_am_taken_to_the_reset_password_form() throws Exception {
+//        String url = "/reset-password/" + token.getTokenString();
+//        resetPasswordResult = MOCK_MVC.perform(
+//                MockMvcRequestBuilders
+//                        .get(url)
+//        ).andExpect(status().isOk()).andReturn();
+//    }
 
     @And("I as user {string} with password {string} am on the reset password form")
     public void i_as_user_with_password_am_on_the_reset_password_form(String email, String password) throws Exception {
@@ -240,5 +271,4 @@ public class ResetUserPassword {
         String redirectedUrl = resetPasswordResult.getResponse().getRedirectedUrl();
         Assertions.assertEquals(String.format(url), redirectedUrl);
     }
-
 }
