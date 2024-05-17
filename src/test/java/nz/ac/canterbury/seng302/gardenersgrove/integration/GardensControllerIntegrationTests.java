@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class MyGardensControllerIntegrationTests {
+public class GardensControllerIntegrationTests {
     @Autowired
     private GardenService gardenService;
     @Autowired
@@ -45,7 +45,7 @@ public class MyGardensControllerIntegrationTests {
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
     @Autowired
-    public MyGardensControllerIntegrationTests(MockMvc mockMvc) {
+    public GardensControllerIntegrationTests(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 

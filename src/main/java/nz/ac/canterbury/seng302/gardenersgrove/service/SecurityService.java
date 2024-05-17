@@ -22,6 +22,8 @@ public class SecurityService {
 
     private final UserService userService;
 
+    private final FriendshipService friendshipService;
+
     private final AuthenticationManager authenticationManager;
 
     Logger logger = LoggerFactory.getLogger(SecurityService.class);
@@ -35,9 +37,13 @@ public class SecurityService {
      * @param authenticationManager to login user after registration
      */
     @Autowired
-    public SecurityService(UserService userService, AuthenticationManager authenticationManager){
+    public SecurityService(UserService userService,
+                           AuthenticationManager authenticationManager,
+                           FriendshipService friendshipService){
+
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.friendshipService = friendshipService;
 
     }
     /**
@@ -62,6 +68,20 @@ public class SecurityService {
         User user = this.userService.getUserByEmail(authentication.getName());
         return user;
     }
+
+    public User checkFriendship(Long userId) {
+        User currentUser = getCurrentUser();
+        User targetUser = userService.getUserById(userId);
+        boolean friends = friendshipService.checkFriendshipExists(currentUser, targetUser);
+
+        if (friends) {
+            return targetUser;
+        } else {
+            return null;
+        }
+
+    }
+
 
     /**
      * Set the security context for the user

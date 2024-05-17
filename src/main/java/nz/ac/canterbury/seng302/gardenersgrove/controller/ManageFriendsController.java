@@ -21,7 +21,7 @@ import java.util.List;
 @SessionAttributes("userGardens")
 public class ManageFriendsController {
 
-    Logger logger = LoggerFactory.getLogger(MyGardensController.class);
+    Logger logger = LoggerFactory.getLogger(GardensController.class);
 
     private final FriendshipService friendshipService;
 

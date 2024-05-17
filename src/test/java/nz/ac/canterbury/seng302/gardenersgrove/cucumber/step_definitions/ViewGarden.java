@@ -2,7 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -47,8 +47,8 @@ public class ViewGarden {
         gardenService = new GardenService(gardenRepository, userService);
         securityService = new SecurityService(userService, authenticationManager);
 
-        MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, fileService);
+        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
 
 
     }
