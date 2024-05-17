@@ -47,13 +47,13 @@ public class FriendshipService {
      * @param user2 other half of the friendship relation
      * @throws IllegalArgumentException if the provided users are not valid
      */
-    public boolean checkFriendsipExists(User user1, User user2) {
+    public boolean checkFriendshipExists(User user1, User user2) {
         validateUsers(user1,user2);
 
         Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
         Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
 
-        return (optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty());
+        return !(optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty());
     }
 
     /**

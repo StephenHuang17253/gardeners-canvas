@@ -94,7 +94,7 @@ public class FriendshipServiceIntegrationTest {
                 LocalDate.of(2003,5,2));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            friendshipService.checkFriendsipExists(nonExistentUser1, nonExistentUser2);
+            friendshipService.checkFriendshipExists(nonExistentUser1, nonExistentUser2);
         });
     }
 
@@ -105,7 +105,7 @@ public class FriendshipServiceIntegrationTest {
                 LocalDate.of(2003,5,2));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            friendshipService.checkFriendsipExists(nonExistentUser1, user2);
+            friendshipService.checkFriendshipExists(nonExistentUser1, user2);
         });
     }
 
@@ -116,13 +116,13 @@ public class FriendshipServiceIntegrationTest {
                 LocalDate.of(2003,5,2));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            friendshipService.checkFriendsipExists(user1, nonExistentUser2);
+            friendshipService.checkFriendshipExists(user1, nonExistentUser2);
         });
     }
 
     @Test
     void checkFriendshipExists_U1AndU2BothInPersistenceButNoRelation_returnFalse(){
-        boolean friendshipExists = friendshipService.checkFriendsipExists(user1, user2);
+        boolean friendshipExists = friendshipService.checkFriendshipExists(user1, user2);
 
         Assertions.assertFalse(friendshipExists);
 
@@ -133,8 +133,8 @@ public class FriendshipServiceIntegrationTest {
         friendshipRepository.save(new Friendship(user1,user2, FriendshipStatus.PENDING));
         friendshipRepository.save(new Friendship(user1,user3, FriendshipStatus.PENDING));
 
-        boolean friendshipExists_withSameOrdering = friendshipService.checkFriendsipExists(user1, user2);
-        boolean friendshipExists_withReverseOrdering = friendshipService.checkFriendsipExists(user3, user1);
+        boolean friendshipExists_withSameOrdering = friendshipService.checkFriendshipExists(user1, user2);
+        boolean friendshipExists_withReverseOrdering = friendshipService.checkFriendshipExists(user3, user1);
 
         Assertions.assertTrue(friendshipExists_withSameOrdering);
         Assertions.assertTrue(friendshipExists_withReverseOrdering);
