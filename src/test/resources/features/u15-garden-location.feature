@@ -60,3 +60,15 @@ Background:
       | ""                    | "Riccarton"        | "Christchurch"   | ""         | "New Zealand"  |
       | ""                    | ""                 | "Christchurch"   | "8041"     | "New Zealand"  |
       | "Science Road"        | "Riccarton"        | "Christchurch"   | "8041"     | "New Zealand"  |
+
+  Scenario Outline: AC5 - If I have not provided a city and country, then
+  an error message tells me “City and Country are required”.
+    Given I specify an invalid address with <streetAddress>, <suburb>, <city>, <postcode>, and <country>
+    When I submit the create garden form
+    Then The garden is not created
+    And An error message tells me 'City and Country are required'
+    Examples:
+      | streetAddress         | suburb             | city             | postcode   | country        |
+      | "Science Road"        | "Riccarton"        | ""               | "8041"     | ""             |
+      | "Science Road"        | "Riccarton"        | "Christchurch"   | "8041"     | ""             |
+      | "Science Road"        | "Riccarton"        | ""               | "8041"     | "New Zealand"  |

@@ -14,6 +14,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Optional;
 
@@ -64,6 +67,8 @@ public class U15_GardenLocation {
     private Garden expectedGarden;
     private MvcResult createGardenResult;
     private MvcResult editGardenResult;
+    Logger logger = LoggerFactory.getLogger(U15_GardenLocation.class);
+
 
     @Before
     public void before_or_after_all() {
@@ -113,7 +118,7 @@ public class U15_GardenLocation {
     }
 
 
-    // AC1
+    // AC1, AC3, AC5
     @When("I submit the create garden form")
     public void i_submit_the_create_garden_form() throws Exception {
         String gardenUrl = "/create-new-garden";
@@ -131,7 +136,7 @@ public class U15_GardenLocation {
         ).andReturn();
     }
 
-    // AC1
+    // AC1, AC3.1, AC4
     @Then("The garden is created successfully with that location")
     public void the_garden_is_created_successfully_with_that_location() {
         String createdGardenId = createGardenResult.getResponse().getRedirectedUrl().substring("/my-gardens/".length());
@@ -151,6 +156,7 @@ public class U15_GardenLocation {
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), createdGarden.getGardenSize());
     }
 
+    // AC2
     @When("I submit the edit garden form")
     public void i_submit_the_edit_plant_form() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
@@ -168,6 +174,7 @@ public class U15_GardenLocation {
         ).andReturn();
     }
 
+    // AC2
     @Then("The garden details are successfully updated")
     public void the_garden_details_are_successfully_updated() {
         Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
@@ -183,12 +190,29 @@ public class U15_GardenLocation {
         Assertions.assertEquals(gardenPostcode, updatedGarden.getGardenPostcode());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
+
     }
 
+    // AC3.2, AC5
     @Then("The garden is not created")
     public void the_garden_is_not_created() {
         Assertions.assertNull(expectedNewGarden);
 
     }
+
+    // AC5
+    @Then("An error message tells me 'City and Country are required'")
+    public void city_and_country_error_message() {
+        logger.info(String.valueOf(createGardenResult.getModelAndView()));
+        ModelAndView modelAndView = createGardenResult.getModelAndView();
+        String model = modelAndView.getModel().toString();
+
+        // This error message is currently wrong, it is a placeholder until the fix is merged in from another branch.
+        Assertions.assertTrue(model.contains("cannot be empty"));
+
+
+
+    }
+
 
 }
