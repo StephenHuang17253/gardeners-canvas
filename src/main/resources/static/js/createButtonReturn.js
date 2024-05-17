@@ -68,5 +68,24 @@ function openLoginPage() {
     if (!previousUrl) {
         localStorage.setItem('previousUrl', '/home');
     }
+}
+
+function openManageFriendsPage() {
+    var currentUrl = window.location.pathname;
+
+    // if currentURL is not manage-friends send them to this page
+    if (currentUrl !== '/manage-friends') {
+        localStorage.setItem('previousUrl', window.location.href);
+
+        // Redirect to manage-friends page
+        let instance = checkInstance(currentUrl)
+        window.location.href = `${instance}/manage-friends`;
+
+    }
+    var previousUrl = localStorage.getItem('previousUrl');
+    // Default the return URL to home page if not set
+    if (!previousUrl) {
+        localStorage.setItem('previousUrl', '/home');
+    }
 
 }
