@@ -26,7 +26,7 @@
             </div>
             <br>
             <div class="weather">
-                <div th:each="prediction : ${forecast}">
+                <div th:each="prediction : ${weather}">
                     <div th:replace="~{fragmentExample/fragments/weatherBox.html :: weatherBox(
                         weatherIcon=${prediction.getWeatherIcon()},
                         date=${prediction.getDate()},
@@ -34,6 +34,7 @@
                         weatherDescription=${prediction.getDescription()},
                         minTemp=${prediction.getMinTemp()},
                         maxTemp=${prediction.getMaxTemp()},
+                        temp=${prediction.getTemp()},
                         precipitation=${prediction.getPercipitation()},
                         humidity=${prediction.getHumidity()},
                         weatherError=${prediction.getWeatherError()})}">
