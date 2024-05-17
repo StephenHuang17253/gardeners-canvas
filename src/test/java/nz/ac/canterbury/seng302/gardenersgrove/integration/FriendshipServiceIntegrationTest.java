@@ -129,15 +129,15 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendsipExists_U1AndU2BothInPersistanceHaveRelation_returnTrue(){
+    public void checkFriendsipExists_U1AndU2AndU3AllInPersistanceAndHaveRelations_returnTrue(){
         friendshipRepository.save(new Friendship(user1,user2, FriendshipStatus.PENDING));
         friendshipRepository.save(new Friendship(user1,user3, FriendshipStatus.PENDING));
 
-        boolean friendshipExists1 = friendshipService.checkFriendsipExists(user1, user2);
-        boolean friendshipExists2 = friendshipService.checkFriendsipExists(user3, user1);
+        boolean friendshipExists_withSameOrdering = friendshipService.checkFriendsipExists(user1, user2);
+        boolean friendshipExists_withReverseOrdering = friendshipService.checkFriendsipExists(user3, user1);
 
-        Assertions.assertFalse(friendshipExists1);
-        Assertions.assertFalse(friendshipExists2);
+        Assertions.assertTrue(friendshipExists_withSameOrdering);
+        Assertions.assertTrue(friendshipExists_withReverseOrdering);
     }
 
     @Test
