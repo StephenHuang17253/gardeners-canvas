@@ -12,6 +12,7 @@ import java.util.Optional;
  */
 @Repository
 public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
+
     /**
      * Finds a Friendship object by id
      * @param id the Friendship's id
@@ -27,16 +28,16 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
 
     /**
      * Find all Friendship objects where user1_id or user2_id matches userId
-     * @param userId1 the user_1's id to match
-     * @param userId2 the user_2's id to match
+     * @param userId1 the id to match the user1 column
+     * @param userId2 the id to match the user2 column
      * @return list of all Friendship objects matching the requirements
      */
     List<Friendship> findByUser1IdOrUser2Id(long userId1, long userId2);
 
     /**
      * Find Friendship object where user1_id and user2_id matches the input params
-     * @param userId1 the user_1's id to match
-     * @param userId2 the user_2's id to match
+     * @param userId1 the id to match the user1 column
+     * @param userId2 the id to match the user2 column
      * @return list of all Friendship objects matching the requirements
      */
     Optional<Friendship> findByUser1IdAndUser2Id(long userId1, long userId2);
