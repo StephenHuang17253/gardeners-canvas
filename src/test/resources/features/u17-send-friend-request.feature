@@ -7,5 +7,5 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
 
   Scenario: AC1 - nav bar takes me to manage friends page
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
-    When I click on 'manage friends' button
-    Then I am shown a “manage friends” page
+    When I click on the 'Manage Friends' button
+    Then I am shown a 'Manage Friends' page

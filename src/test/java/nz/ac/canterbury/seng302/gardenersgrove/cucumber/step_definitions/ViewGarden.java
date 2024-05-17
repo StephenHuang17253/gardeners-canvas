@@ -4,6 +4,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
@@ -21,6 +22,9 @@ public class ViewGarden {
 
     @Autowired
     public GardenRepository gardenRepository;
+
+    @Autowired
+    public FriendshipRepository friendshipRepository;
 
     @Autowired
     public UserRepository userRepository;
@@ -41,11 +45,14 @@ public class ViewGarden {
 
     private static FileService fileService;
 
+    private static FriendshipService friendshipService;
+
     @Before
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager);
+        friendshipService = new FriendshipService(friendshipRepository, userService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService);
 
         GardensController gardensController = new GardensController(gardenService, securityService, plantService, fileService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
