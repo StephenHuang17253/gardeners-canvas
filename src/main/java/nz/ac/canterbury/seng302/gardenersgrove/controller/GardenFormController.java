@@ -177,19 +177,20 @@ public class GardenFormController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
+        if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
             return "createNewGardenForm";
         }
 
-        float floatGardenSize;
-        if(gardenSize == null){
-            floatGardenSize = Float.NaN;
+        Double doubleGardenSize;
+        if (gardenSize == null) {
+            doubleGardenSize = 0.0;
         }else{
-            floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
+            doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
+        boolean isPublic = false;
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, owner);
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize, isPublic, owner);
 
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
@@ -238,7 +239,7 @@ public class GardenFormController {
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         double gardenSize = garden.getGardenSize();
-        if (Double.isNaN(gardenSize)) {
+        if (gardenSize == 0.0) {
             model.addAttribute("gardenSize", "");
         } else {
             model.addAttribute("gardenSize", gardenSize);
@@ -310,13 +311,13 @@ public class GardenFormController {
             return "editGardenForm";
 
         }
-        float floatGardenSize;
+        double doubleGardenSize;
         if (gardenSize == null) {
-            floatGardenSize = Float.NaN;
+            doubleGardenSize = 0.0;
         } else {
-            floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
+            doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
+        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize));
         logger.info("Edited Garden Page");
 
         User owner = securityService.getCurrentUser();
@@ -431,7 +432,14 @@ public class GardenFormController {
         // notifies the user that the garden Size is invalid (if applicable)
         if(!gardenSizeResult.valid())
         {
-            model.addAttribute("GSErrorText","Garden size " + gardenSizeResult);
+            String message;
+            if (gardenSizeResult == ValidationResult.AREA_TOO_LARGE) {
+                message = " is too large. \n\r Must be smaller than or equal to 8000000";
+            } else {
+                message = " is too small. \n\r Must be larger than or equal to 0.01";
+            }
+            gardenSizeResult.updateMessage(message);
+            model.addAttribute("GSErrorText","Garden size" + gardenSizeResult);
             model.addAttribute("GSErrorClass","errorBorder");
             logger.info("Garden Size failed validation");
 

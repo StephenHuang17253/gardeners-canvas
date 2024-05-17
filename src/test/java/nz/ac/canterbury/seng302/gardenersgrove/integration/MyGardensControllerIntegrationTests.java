@@ -1,10 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -22,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,7 +45,7 @@ public class MyGardensControllerIntegrationTests {
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
     @Autowired
-    public MyGardensControllerIntegrationTests(MockMvc mockMvc){
+    public MyGardensControllerIntegrationTests(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
@@ -57,12 +53,12 @@ public class MyGardensControllerIntegrationTests {
     void ClearRepository_AddUsersAndGardens() {
         gardenList = new ArrayList<>();
         userRepository.deleteAll();
-        User user1 = new User("John","Doe","johnDoe@email.com", date);
-        User user2 = new User("Jane","Doe","janeDoe@email.com", date);
-        User user3 = new User("Bruce","Wayne","bruceWyane@email.com", date);
-        userService.addUser(user1,"1es1P@ssword");
-        userService.addUser(user2,"1es1P@ssword");
-        userService.addUser(user3,"1es1P@ssword");
+        User user1 = new User("John", "Doe", "johnDoe@email.com", date);
+        User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);
+        User user3 = new User("Bruce", "Wayne", "bruceWyane@email.com", date);
+        userService.addUser(user1, "1es1P@ssword");
+        userService.addUser(user2, "1es1P@ssword");
+        userService.addUser(user3, "1es1P@ssword");
         Garden garden1 = new Garden(
                 "John's Garden",
                 "114 Ilam Road",
@@ -70,7 +66,8 @@ public class MyGardensControllerIntegrationTests {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                10,
+                10.0,
+                false,
                 user1);
         Garden garden2 = new Garden(
                 "Jane's Garden",
@@ -79,12 +76,13 @@ public class MyGardensControllerIntegrationTests {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20,
+                20.0,
+                false,
                 user2);
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);
-        plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());
-        plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());
+        plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
+        plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
         gardenList.add(gardenService.getGardenById(1L).get());
         gardenList.add(gardenService.getGardenById(2L).get());
 
@@ -96,6 +94,7 @@ public class MyGardensControllerIntegrationTests {
                 .perform(MockMvcRequestBuilders.get("/my-gardens"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
+
     @Test
     @WithMockUser(username = "johnDoe@email.com")
     public void GetMyGardens_UserAuthorized_Return200() throws Exception {
@@ -105,6 +104,7 @@ public class MyGardensControllerIntegrationTests {
                 .perform(MockMvcRequestBuilders.get("/my-gardens").session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
     @Test
     @WithAnonymousUser
     public void GetGardenDetailsPage_UserNotAuthenticated_Return403() throws Exception {
@@ -112,6 +112,7 @@ public class MyGardensControllerIntegrationTests {
                 .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
+
     @Test
     @WithMockUser(username = "janeDoe@email.com")
     public void GetGardenDetailsPage_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
@@ -119,6 +120,7 @@ public class MyGardensControllerIntegrationTests {
                 .perform(MockMvcRequestBuilders.get("/my-gardens/4"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
     @Test
     @WithMockUser(username = "bruceWyane@email.com")
     public void GetGardenDetailsPage_UserNotAuthorizedAndGardenExists_Return403() throws Exception {
@@ -126,6 +128,7 @@ public class MyGardensControllerIntegrationTests {
                 .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
+
     @Test
     @WithMockUser(username = "johnDoe@email.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExists_Return200() throws Exception {
@@ -138,6 +141,7 @@ public class MyGardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
                 .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())));
     }
+
     @Test
     @WithMockUser(username = "janeDoe@email.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsWithPlants_Return200() throws Exception {
