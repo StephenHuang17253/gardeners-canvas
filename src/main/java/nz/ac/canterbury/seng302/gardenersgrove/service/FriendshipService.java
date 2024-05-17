@@ -41,6 +41,24 @@ public class FriendshipService {
     public Optional<Friendship> getFriendShipById(long id){
         return friendshipRepository.findById(id);
     }
+    /**
+     * Checks if a friendship exists between two users
+     * @param user1 one half of the friendship relation
+     * @param user2 other half of the friendship relation
+     * @throws IllegalArgumentException if the provided users are not valid
+     */
+    public boolean checkFriendsipExists(User user1, User user2) {
+        validateUsers(user1,user2);
+
+        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
+        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
+
+        if(optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty()){
+            return false;
+        }else{
+            return true;
+        }
+    }
 
     /**
      * Retrieves all Friendships from persistence where user1 or user2 id matches

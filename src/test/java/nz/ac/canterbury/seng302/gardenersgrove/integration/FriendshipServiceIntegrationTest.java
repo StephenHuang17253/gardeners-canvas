@@ -85,6 +85,62 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
+    public void checkFriendsipExists_U1AndU2BothNotInPersistence_ThrowsIllegalArgumentException(){
+        User nonExistentUser1 = new User("nonExistentUser",
+                "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
+                LocalDate.of(2003,5,2));
+        User nonExistentUser2 = new User("nonExistentUser",
+                "", "nonExistentUser2@FriendshipServiceIntegrationTest.com",
+                LocalDate.of(2003,5,2));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            friendshipService.checkFriendsipExists(nonExistentUser1, nonExistentUser2);
+        });
+    }
+
+    @Test
+    public void checkFriendsipExists_U1NotInPersistenceAndU2InPersistance_ThrowsIllegalArgumentException(){
+        User nonExistentUser1 = new User("nonExistentUser",
+                "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
+                LocalDate.of(2003,5,2));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            friendshipService.checkFriendsipExists(nonExistentUser1, user2);
+        });
+    }
+
+    @Test
+    public void checkFriendsipExists_U1InPersistenceAndU2NotInPersistance_ThrowsIllegalArgumentException(){
+        User nonExistentUser2 = new User("nonExistentUser",
+                "", "nonExistentUser2@FriendshipServiceIntegrationTest.com",
+                LocalDate.of(2003,5,2));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            friendshipService.checkFriendsipExists(user1, nonExistentUser2);
+        });
+    }
+
+    @Test
+    public void checkFriendsipExists_U1AndU2BothInPersistanceButNoRelation_returnFalse(){
+        boolean friendshipExists = friendshipService.checkFriendsipExists(user1, user2);
+
+        Assertions.assertFalse(friendshipExists);
+
+    }
+
+    @Test
+    public void checkFriendsipExists_U1AndU2BothInPersistanceHaveRelation_returnTrue(){
+        friendshipRepository.save(new Friendship(user1,user2, FriendshipStatus.PENDING));
+        friendshipRepository.save(new Friendship(user1,user3, FriendshipStatus.PENDING));
+
+        boolean friendshipExists1 = friendshipService.checkFriendsipExists(user1, user2);
+        boolean friendshipExists2 = friendshipService.checkFriendsipExists(user3, user1);
+
+        Assertions.assertFalse(friendshipExists1);
+        Assertions.assertFalse(friendshipExists2);
+    }
+
+    @Test
     public void getAllUsersFriends_UserNotInPersistence_ThrowsIllegalArgumentException(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             friendshipService.getAllUsersFriends(MAX_LONG);
