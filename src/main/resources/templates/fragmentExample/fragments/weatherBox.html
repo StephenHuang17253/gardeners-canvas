@@ -1,7 +1,7 @@
-<div th:fragment="weatherBox(weatherIcon, date, day, weatherDescription, minTemp, maxTemp, precipitation, humidity, weatherError)">
+<div th:fragment="weatherBox(weatherIcon, date, day, weatherDescription, minTemp, maxTemp, temp, precipitation, humidity, weatherError)">
     <div class="weather-box" id=weather-box"">
         <div class="weather-icon-container">
-            <img id="weatherIcon" th:src="${weatherIcon == null ? '/images/no_data.png' : '/images/' + weatherIcon}" alt="Weather" class="weather-icon">
+            <img id="weatherIcon" th:src="${weatherIcon == null ? '/images/not_found.png' : '/images/' + weatherIcon}" alt="Weather" class="weather-icon">
         </div>
         <div class="weather-date">
             <span th:text="${date}">N/A</span>
@@ -12,23 +12,25 @@
         <span th:text="${weatherDescription}" class="weather-text">N/A</span>
         <div class="weather-details">
             <div>
-                <img id="minTempIcon" th:src="${minTemp == null ? null : '/images/min_temp_icon.png'}" alt="Min Temperature" class="weather-detail-icon">
-
-                <span th:if="${minTemp != null}" th:text="${minTemp}+'°C'" class="weather-text">N/A</span>
+                <img id="tempIcon" th:if="${temp != null}" th:src="${'/images/temp.png'}" alt="Temperature" class="weather-detail-icon">
+                <span th:if="${temp != null}" th:text="${temp}+'°C'" class="weather-text">N/A</span>
             </div>
             <div>
-                <img id="maxTempIcon" th:src="${maxTemp == null ? null : '/images/max_temp_icon.png'}" alt="Max Temperature" class="weather-detail-icon">
+                <img id="maxTempIcon" th:if="${maxTemp != null}" th:src="${'/images/max_temp.png'}" alt="Max Temperature" class="weather-detail-icon">
                 <span th:if="${maxTemp != null}" th:text="${maxTemp}+'°C'" class="weather-text">N/A</span>
             </div>
             <div>
-                <img id="precipitationIcon" th:src="${precipitation == null ? null : '/images/precipitation_icon.png'}" alt="Precipitation" class="weather-detail-icon">
+                <img id="minTempIcon" th:if="${minTemp != null}" th:src="${'/images/min_temp.png'}" alt="Min Temperature" class="weather-detail-icon">
+                <span th:if="${minTemp != null}" th:text="${minTemp}+'°C'" class="weather-text">N/A</span>
+            </div>
+            <div>
+                <img id="precipitationIcon"  th:src="${'/images/precipitation.png'}" alt="Precipitation" class="weather-detail-icon">
                 <span th:if="${precipitation != null}" th:text="${precipitation}+'mm'" class="weather-text">N/A</span>
             </div>
             <div>
-                <img id="humidityIcon" th:src="${humidity == null ? null : '/images/humidity_icon.png'}" alt="Humidity" class="weather-detail-icon">
+                <img id="humidityIcon" th:if="${humidity != null}" th:src="${'/images/precipitation.png'}" alt="Humidity" class="weather-detail-icon">
                 <span th:if="${humidity != null}" th:text="${humidity}+'%'" class="weather-text">N/A</span>
             </div>
-
         </div>
     </div>
 
