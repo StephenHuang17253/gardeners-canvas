@@ -85,7 +85,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendsipExists_U1AndU2BothNotInPersistence_ThrowsIllegalArgumentException(){
+    public void checkFriendshipExists_U1AndU2BothNotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
                 "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -99,7 +99,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendsipExists_U1NotInPersistenceAndU2InPersistance_ThrowsIllegalArgumentException(){
+    public void checkFriendshipExists_U1NotInPersistenceAndU2InPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser1 = new User("nonExistentUser",
                 "", "nonExistentUser1@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -110,7 +110,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendsipExists_U1InPersistenceAndU2NotInPersistance_ThrowsIllegalArgumentException(){
+    public void checkFriendshipExists_U1InPersistenceAndU2NotInPersistence_ThrowsIllegalArgumentException(){
         User nonExistentUser2 = new User("nonExistentUser",
                 "", "nonExistentUser2@FriendshipServiceIntegrationTest.com",
                 LocalDate.of(2003,5,2));
@@ -121,7 +121,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendsipExists_U1AndU2BothInPersistanceButNoRelation_returnFalse(){
+    public void checkFriendshipExists_U1AndU2BothInPersistenceButNoRelation_returnFalse(){
         boolean friendshipExists = friendshipService.checkFriendsipExists(user1, user2);
 
         Assertions.assertFalse(friendshipExists);
@@ -129,7 +129,7 @@ public class FriendshipServiceIntegrationTest {
     }
 
     @Test
-    public void checkFriendsipExists_U1AndU2AndU3AllInPersistanceAndHaveRelations_returnTrue(){
+    public void checkFriendshipExists_U1AndU2AndU3AllInPersistenceAndHaveRelations_returnTrue(){
         friendshipRepository.save(new Friendship(user1,user2, FriendshipStatus.PENDING));
         friendshipRepository.save(new Friendship(user1,user3, FriendshipStatus.PENDING));
 
