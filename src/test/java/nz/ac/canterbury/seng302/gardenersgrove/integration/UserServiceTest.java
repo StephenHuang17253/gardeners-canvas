@@ -90,7 +90,7 @@ public class UserServiceTest {
         String fName = "John";
         String lName = "Doe";
         String email = "john@email.com";
-        long id = userRepository.findByEmailAddress("johnDoe@email.com")[0].getId();
+        long id = userRepository.findByEmailAddressIgnoreCase("johnDoe@email.com")[0].getId();
         userService.updateUser(id, fName, lName, email, date);
         Assertions.assertEquals(userRepository.findAll().size(), 1);
     }
@@ -105,7 +105,7 @@ public class UserServiceTest {
         String lName = "Ode";
         String email = "janeOde@email.com";
         LocalDate newDate = LocalDate.parse("01/01/2000", formatter);
-        long id = userRepository.findByEmailAddress("johnDoe@email.com")[0].getId();
+        long id = userRepository.findByEmailAddressIgnoreCase("johnDoe@email.com")[0].getId();
         userService.updateUser(id, fName, lName, email, newDate);
         List<User> allUsers = userRepository.findAll();
         Assertions.assertEquals(allUsers.get(0).getFirstName(), "Jane");

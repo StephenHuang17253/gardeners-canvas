@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -27,10 +26,9 @@ import java.util.Optional;
  * of @DataJpaTest fixed the tests
  */
 @SpringBootTest
-@Import({GardenService.class, PlantService.class})
+@Import({ GardenService.class, PlantService.class })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PlantServiceTest {
-
 
     private static PlantRepository plantRepository;
     private static GardenService gardenService;
@@ -43,8 +41,8 @@ public class PlantServiceTest {
     public static void setup() {
         gardenService = Mockito.mock(GardenService.class);
         plantRepository = Mockito.mock(PlantRepository.class);
-        plantService = new PlantService(plantRepository,gardenService,fileService);
-        owner =  new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
+        plantService = new PlantService(plantRepository, gardenService, fileService);
+        owner = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003, 5, 2));
     }
 
     // TODO
@@ -61,7 +59,8 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                15,
+                15.0,
+                false,
                 owner);
         List<Plant> mockPlantsList = new ArrayList<>();
 
@@ -80,11 +79,11 @@ public class PlantServiceTest {
         Plant resultPlant = plantService.getPlants().get(0);
 
         // Then
-        Assertions.assertEquals(resultPlant.getPlantName(),"John's Plant");
-        Assertions.assertEquals(resultPlant.getPlantCount(),3);
-        Assertions.assertEquals(resultPlant.getPlantDescription(),"Plant owned by John");
-        Assertions.assertEquals(resultPlant.getPlantDate(),dateOfPlanting);
-        Assertions.assertEquals(resultPlant.getGarden(),garden);
+        Assertions.assertEquals(resultPlant.getPlantName(), "John's Plant");
+        Assertions.assertEquals(resultPlant.getPlantCount(), 3);
+        Assertions.assertEquals(resultPlant.getPlantDescription(), "Plant owned by John");
+        Assertions.assertEquals(resultPlant.getPlantDate(), dateOfPlanting);
+        Assertions.assertEquals(resultPlant.getGarden(), garden);
 
     }
 
@@ -100,9 +99,9 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                15,
-                owner
-                );
+                15.0,
+                false,
+                owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         List<Plant> mockPlantsList = new ArrayList<>();
         mockPlantsList.add(plant);
@@ -118,11 +117,11 @@ public class PlantServiceTest {
         Plant resultPlant = plantService.getPlants().get(0);
 
         // Then
-        Assertions.assertEquals(resultPlant.getPlantName(),"John's Plant");
-        Assertions.assertEquals(resultPlant.getPlantCount(),3);
-        Assertions.assertEquals(resultPlant.getPlantDescription(),"Plant owned by John");
-        Assertions.assertEquals(resultPlant.getPlantDate(),dateOfPlanting);
-        Assertions.assertEquals(resultPlant.getGarden(),garden);
+        Assertions.assertEquals(resultPlant.getPlantName(), "John's Plant");
+        Assertions.assertEquals(resultPlant.getPlantCount(), 3);
+        Assertions.assertEquals(resultPlant.getPlantDescription(), "Plant owned by John");
+        Assertions.assertEquals(resultPlant.getPlantDate(), dateOfPlanting);
+        Assertions.assertEquals(resultPlant.getGarden(), garden);
 
     }
 
@@ -138,7 +137,8 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                15,
+                15.0,
+                false,
                 owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
@@ -150,17 +150,18 @@ public class PlantServiceTest {
 
         // When
         plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
-        Optional <Plant> resultOptionalPlant = plantService.findById(1L);
+        Optional<Plant> resultOptionalPlant = plantService.findById(1L);
 
         // Then
         Assertions.assertTrue(resultOptionalPlant.isPresent());
         Plant resultPlant = resultOptionalPlant.get();
-        Assertions.assertEquals(resultPlant.getPlantName(),"John's Plant");
-        Assertions.assertEquals(resultPlant.getPlantCount(),3);
-        Assertions.assertEquals(resultPlant.getPlantDescription(),"Plant owned by John");
-        Assertions.assertEquals(resultPlant.getPlantDate(),dateOfPlanting);
-        Assertions.assertEquals(resultPlant.getGarden(),garden);
+        Assertions.assertEquals(resultPlant.getPlantName(), "John's Plant");
+        Assertions.assertEquals(resultPlant.getPlantCount(), 3);
+        Assertions.assertEquals(resultPlant.getPlantDescription(), "Plant owned by John");
+        Assertions.assertEquals(resultPlant.getPlantDate(), dateOfPlanting);
+        Assertions.assertEquals(resultPlant.getGarden(), garden);
     }
+
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePlant() {
@@ -174,7 +175,8 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                15,
+                15.0,
+                false,
                 owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden);
@@ -210,7 +212,8 @@ public class PlantServiceTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                15,
+                15.0,
+                false,
                 owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
