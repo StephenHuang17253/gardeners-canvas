@@ -208,7 +208,7 @@ public class U15_GardenLocation {
         String model = modelAndView.getModel().toString();
 
         // This error message is currently wrong, it is a placeholder until the fix is merged in from another branch.
-        Assertions.assertTrue(model.contains("cannot be empty"));
+        Assertions.assertTrue(model.contains("City and Country are required"));
 
 
 
