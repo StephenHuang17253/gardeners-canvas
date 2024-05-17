@@ -59,6 +59,7 @@ public class U10_Acceptance_Testing {
     public static UserService userService;
 
     String gardenName;
+    String gardenDescription;
     String gardenCity;
     String gardenCountry;
     String gardenSize;
@@ -144,13 +145,14 @@ public class U10_Acceptance_Testing {
         gardenSize = String.valueOf(expectedGarden.getGardenSize());
     }
 
-    @Given("I enter valid garden values for the {string}, {string}, {string} and {string}")
-    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String city, String country,
+    @Given("I enter valid garden values for the {string}, {string}, {string}, {string} and {string}")
+    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String description, String city, String country,
             String size) {
         gardenName = name;
         gardenCity = city;
         gardenCountry = country;
         gardenSize = size;
+        gardenDescription = description;
     }
 
     @When("I click the Submit button on the edit garden form")
@@ -160,6 +162,7 @@ public class U10_Acceptance_Testing {
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
+                        .param("gardenDescription", gardenDescription)
                         .param("streetAddress", "")
                         .param("suburb", "")
                         .param("city", gardenCity)
@@ -179,6 +182,7 @@ public class U10_Acceptance_Testing {
         }
         Garden updatedGarden = optionalUpdatedGarden.get();
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
+        Assertions.assertEquals(gardenDescription, updatedGarden.getGardenDescription());
         Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());

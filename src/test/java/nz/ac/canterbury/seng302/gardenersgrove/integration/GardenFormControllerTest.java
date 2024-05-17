@@ -125,6 +125,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "Hi")
                     .param("suburb", "Hi")
                     .param("city", "Hi")
@@ -150,6 +151,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "Hi")
                 .param("suburb", "Hi")
                 .param("city", "Hi")
@@ -197,6 +199,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", input)
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "Hi")
                     .param("suburb", "Hi")
                     .param("city", "Hi")
@@ -226,6 +229,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", input)
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "Hi")
                 .param("suburb", "Hi")
                 .param("city", "Hi")
@@ -257,6 +261,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", input)
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "Hi")
                     .param("suburb", "Hi")
                     .param("city", "Hi")
@@ -284,6 +289,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", input)
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "Hi")
                 .param("suburb", "Hi")
                 .param("city", "Hi")
@@ -322,6 +328,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", input)
                     .param("suburb", "Hi")
                     .param("city", "Hi")
@@ -351,6 +358,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", input)
                 .param("suburb", "Hi")
                 .param("city", "Hi")
@@ -383,6 +391,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", input)
                     .param("suburb", "Hi")
                     .param("city", "Hi")
@@ -411,6 +420,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "input")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", input)
                 .param("suburb", "Hi")
                 .param("city", "Hi")
@@ -449,6 +459,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", input)
                     .param("city", "Hi")
@@ -477,6 +488,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", input)
                 .param("city", "Hi")
@@ -508,6 +520,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", input)
                     .param("city", "Hi")
@@ -535,6 +548,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "input")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", input)
                 .param("city", "Hi")
@@ -573,6 +587,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", input)
@@ -601,6 +616,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", input)
@@ -632,6 +648,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", input)
@@ -659,6 +676,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "input")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", input)
@@ -697,6 +715,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", "input")
@@ -726,6 +745,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", "input")
@@ -757,6 +777,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", "input")
@@ -784,6 +805,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "input")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", "input")
@@ -822,6 +844,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", "input")
@@ -850,6 +873,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", "input")
@@ -882,6 +906,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", "input")
@@ -910,6 +935,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "input")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", "input")
@@ -946,6 +972,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", "input")
@@ -974,6 +1001,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", "input")
@@ -1009,6 +1037,7 @@ public class GardenFormControllerTest {
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
+                    .param("gardenDescription", "Hi")
                     .param("streetAddress", "input")
                     .param("suburb", "input")
                     .param("city", "input")
@@ -1040,6 +1069,7 @@ public class GardenFormControllerTest {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "input")
+                .param("gardenDescription", "Hi")
                 .param("streetAddress", "input")
                 .param("suburb", "input")
                 .param("city", "input")
