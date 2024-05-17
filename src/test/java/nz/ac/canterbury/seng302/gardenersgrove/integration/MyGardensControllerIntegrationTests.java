@@ -71,6 +71,8 @@ public class MyGardensControllerIntegrationTests {
                 "8041",
                 "New Zealand",
                 10,
+                "-43.5214643",
+                "172.5796159",
                 user1);
         Garden garden2 = new Garden(
                 "Jane's Garden",
@@ -80,6 +82,8 @@ public class MyGardensControllerIntegrationTests {
                 "8041",
                 "New Zealand",
                 20,
+                "-43.5214643",
+                "172.5796159",
                 user2);
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);

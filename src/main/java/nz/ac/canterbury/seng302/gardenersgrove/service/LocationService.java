@@ -43,7 +43,7 @@ public class LocationService {
         //System.out.println("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&key=" + locationIqAccessToken);
         logger.info("API request with query = '" + query + "'");
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        // System.out.println(response.body());
+        System.out.println(response.body());
         return response.body();
     }
 }

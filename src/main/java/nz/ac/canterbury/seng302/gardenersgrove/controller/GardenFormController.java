@@ -99,6 +99,8 @@ public class GardenFormController {
                                  @RequestParam(name = "country", required = false) String country,
                                  @RequestParam(name = "postcode", required = false )String postcode,
                                  @RequestParam(name = "gardenSize", required = false) String gardenSize,
+                                 @RequestParam(name = "longitude", required = false) String longitude,
+                                 @RequestParam(name = "latitude", required = false) String latitude,
                                  Model model) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -113,6 +115,8 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
 
         logger.info("GET /create-new-garden");
         return "createNewGardenForm";
@@ -142,6 +146,8 @@ public class GardenFormController {
                                       @RequestParam(name = "country") String country,
                                       @RequestParam(name = "postcode") String postcode,
                                       @RequestParam(name = "gardenSize") String gardenSize,
+                                      @RequestParam(name = "longitude") String longitude,
+                                      @RequestParam(name = "latitude") String latitude,
                                       HttpSession session,
                                       Model model,
                                       RedirectAttributes redirectAttributes) {
@@ -172,6 +178,8 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -188,8 +196,12 @@ public class GardenFormController {
         }else{
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
+
+        logger.info("Latitude" + latitude);
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, owner);
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize,latitude,longitude, owner);
+
+        System.out.println(garden);
 
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
@@ -237,6 +249,8 @@ public class GardenFormController {
         model.addAttribute("postcode", garden.getGardenPostcode());
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("latitude", garden.getGardenLatitude());
+        model.addAttribute("longitude", garden.getGardenLongitude());
         double gardenSize = garden.getGardenSize();
         if (Double.isNaN(gardenSize)) {
             model.addAttribute("gardenSize", "");
@@ -271,6 +285,8 @@ public class GardenFormController {
                                        @RequestParam(name = "country") String country,
                                        @RequestParam(name = "postcode") String postcode,
                                        @RequestParam(name = "gardenSize") String gardenSize,
+                                         @RequestParam(name = "longitude") String longitude,
+                                         @RequestParam(name = "latitude") String latitude,
                                        @PathVariable Long gardenId, HttpSession session,
                                        Model model) {
         logger.info("POST / edited garden");
@@ -304,6 +320,8 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
 
         if(!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()) {
@@ -316,7 +334,7 @@ public class GardenFormController {
         } else {
             floatGardenSize = Float.parseFloat(gardenSize.replace(",","."));
         }
-        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize));
+        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,floatGardenSize, latitude, longitude));
         logger.info("Edited Garden Page");
 
         User owner = securityService.getCurrentUser();

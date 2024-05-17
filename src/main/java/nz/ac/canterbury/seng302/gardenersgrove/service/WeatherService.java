@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 
 
 /**
@@ -35,12 +36,13 @@ public class WeatherService {
 
     /**
      * This method calls the Open-Meteo.com API, and receives the response as a JSON object.
-     * @param gardenLatitude - the latitude of the user's garden
+     *
+     * @param gardenLatitude  - the latitude of the user's garden
      * @param gardenLongitude - the longitude of the user's garden
      * @return the response from the API
      */
 
-    public String getWeather(String gardenLatitude, String gardenLongitude) {
+    public ArrayList<JsonNode> getWeather(String gardenLatitude, String gardenLongitude) {
         String url = "https://api.open-meteo.com/v1/forecast?latitude="
                 + gardenLatitude
                 + "&longitude=" + gardenLongitude
@@ -59,11 +61,14 @@ public class WeatherService {
             daily = jsonObject.get("daily");
 
             getDailyWeather();
-            getPastWeather();
+            ArrayList<JsonNode> weatherList = new ArrayList<>();
+            weatherList.add(getPastWeather());
+            weatherList.add(getCurrentWeather());
+            weatherList.add(getForecast());
 
-            logger.info(String.valueOf(jsonObject));
+            logger.info("weather: " + String.valueOf(jsonObject));
 
-            return response.body();
+            return weatherList;
 
         } catch (Exception e) {
             logger.error(e.toString());

@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
@@ -26,8 +27,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -108,6 +109,13 @@ public class MyGardensController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
+
+        try {
+            ArrayList<JsonNode> gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
+        } catch (Error error) {
+            return (error.toString());
+        }
+
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         model.addAttribute("gardenSize", garden.getGardenSize());
@@ -212,10 +220,8 @@ public class MyGardensController {
     }
 
 
-    @GetMapping("/my-gardens/{gardenId}/weather")
-    public String showGardenWeather(@PathVariable("gardenId") String gardenIdString,
-                                    Model model) {
-        logger.info("GET /my-gardens/{}/weather", gardenIdString);
+    public ArrayList<JsonNode> showGardenWeather(String gardenLatitude, String gardenLongitude) {
+
         long currentTime = Instant.now().getEpochSecond();
         long timeElapsed = currentTime - lastRequestTime;
 
@@ -233,7 +239,7 @@ public class MyGardensController {
         // Check if rate limit exceeded
         if (!semaphore.tryAcquire()) {
             logger.info("Exceeded location API rate limit of 2 requests per second.");
-            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
+            throw new Error("429");
         }
         logger.info("Permits left after request: " + semaphore.availablePermits());
 
@@ -241,7 +247,7 @@ public class MyGardensController {
         WeatherService weatherService = new WeatherService();
 
 
-        return weatherService.getWeather("-43.532055","172.636230");
+        return weatherService.getWeather(gardenLatitude,gardenLongitude);
 
     }
 

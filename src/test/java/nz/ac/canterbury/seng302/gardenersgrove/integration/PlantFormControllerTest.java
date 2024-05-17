@@ -63,6 +63,8 @@ public class PlantFormControllerTest {
                 "80",
                 "test",
                 1.0f,
+                "",
+                "",
                 mockUser
         );
         gardenService.addGarden(test_garden);
