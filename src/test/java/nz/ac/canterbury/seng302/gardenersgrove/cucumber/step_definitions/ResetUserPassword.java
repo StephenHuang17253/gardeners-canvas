@@ -150,7 +150,7 @@ public class ResetUserPassword {
     }
 
     @Then("an error message tells me {string}")
-    public void an_error_message_tells_me(String errorMessage) throws Exception {
+    public void an_error_message_tells_me(String errorMessage) {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         Object errorObject = modelMap.get("emailError");
         String givenErrorMessage = errorObject.toString();
@@ -182,7 +182,7 @@ public class ResetUserPassword {
     }
 
     @Given("I go to the received email in the email {string}")
-    public void iGoToTheReceivedEmailInTheEmail(String email) throws Exception {
+    public void i_go_to_the_received_email_in_my_email(String email) throws Exception {
         loggedInUser = userService.getUserByEmail(email);
         token = new Token(loggedInUser, null);
         tokenService.addToken(token);
@@ -193,12 +193,12 @@ public class ResetUserPassword {
         emailService.sendResetPasswordEmail(token);
 
         Context context = contextCaptor.getValue();
-        // Sets the resetLink to the url variable captured from email sending in email service
+        // Sets the resetLink to the url variable captured
         resetLink = (String) context.getVariable("url");
     }
 
-    @When("I click the clickable link in my email {string}")
-    public void iClickTheClickableLinkInMyEmail(String email) throws Exception {
+    @When("I click the clickable link in the email")
+    public void i_click_the_clickable_link_in_the_email() throws Exception {
         // Simulates clicking because it parses the link from the sent email directly into the request
         resetPasswordResult = MOCK_MVC.perform(MockMvcRequestBuilders.get(resetLink))
                 .andExpect(status().isOk())

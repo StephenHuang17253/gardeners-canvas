@@ -32,9 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Controller for the profile and edit profile pages, handles viewing and
@@ -448,7 +446,16 @@ public class ProfileController {
             valid = false;
         }
 
-        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, firstName, lastName, noLastName, dateOfBirth, currentEmail);;
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(currentEmail);
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, otherFields);;
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);

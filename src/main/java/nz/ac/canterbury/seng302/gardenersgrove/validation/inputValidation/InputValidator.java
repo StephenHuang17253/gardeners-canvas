@@ -285,24 +285,11 @@ public class InputValidator {
      * Checks if the given password is valid
      *
      * @param password
-     * @param firstName
-     * @param lastName
-     * @param noLastName
-     * @param dateOfBirth
-     * @param emailAddress
+     * @param otherFields other input fields to test likeness with password
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
      */
-    public static ValidationResult validatePassword(String password, String firstName, String lastName, boolean noLastName, LocalDate dateOfBirth, String emailAddress) {
-        List<String> otherFields = new ArrayList<>();
-        otherFields.add(firstName);
-        if (noLastName == false) {
-            otherFields.add(lastName);
-        }
-        if (!(dateOfBirth == null)) {
-            otherFields.add(dateOfBirth.toString());
-        }
-        otherFields.add(emailAddress);
+    public static ValidationResult validatePassword(String password, List<String> otherFields) {
         ValidationResult result = new InputValidator(password)
                 .passwordLikenessHelper(otherFields)
                 .passwordSyntaxHelper()
@@ -452,9 +439,12 @@ public class InputValidator {
     }
 
     /**
+     * Checks if a string representing an password is like any other user inputs
+     * updates local variables with results
+     * ignored if string failed any previous validation
      *
-     * @param fields
-     * @return
+     * @param fields the list of fields to test likeness with password
+     * @return the calling object
      */
     private InputValidator passwordLikenessHelper(List<String> fields) {
         // if this validators input has already failed once, this test wont be run

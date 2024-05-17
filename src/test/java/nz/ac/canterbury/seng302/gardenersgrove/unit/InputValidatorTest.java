@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -423,7 +425,16 @@ public class InputValidatorTest {
         boolean noLastName = true;
         LocalDate dateOfBirth = null;
         String emailAddress = "johndoe@gmail.com";
-        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress));
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password, otherFields));
     };
 
 
@@ -441,7 +452,16 @@ public class InputValidatorTest {
         boolean noLastName = false;
         LocalDate dateOfBirth = LocalDate.parse("2024-01-01");
         String emailAddress = "johndoe@gmail.com";
-        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress));
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password, otherFields));
     };
 
     /**

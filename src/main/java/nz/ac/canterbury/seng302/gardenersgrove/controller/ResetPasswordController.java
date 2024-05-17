@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -142,7 +144,16 @@ public class ResetPasswordController {
         }
         LocalDate dateOfBirth = user.getDateOfBirth();
 
-        ValidationResult passwordValidation = InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress);
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        ValidationResult passwordValidation = InputValidator.validatePassword(password, otherFields);
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);

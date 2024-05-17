@@ -39,7 +39,7 @@ Feature: U16 As Sarah, I want to be able to change my password over email, so th
 
   Scenario: AC5 - I reset password using the received email link
     Given I go to the received email in the email "sarah@email.com"
-    When I click the clickable link in my email "sarah@email.com"
+    When I click the clickable link in the email
     Then I am taken to the reset password form
 
   Scenario Outline: AC6 - I enter mismatching passwords on the reset form
