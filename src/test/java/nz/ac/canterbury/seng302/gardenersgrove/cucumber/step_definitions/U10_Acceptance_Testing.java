@@ -137,9 +137,11 @@ public class U10_Acceptance_Testing {
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
+        Assertions.assertEquals(modelMap.getAttribute("gardenDescription"), expectedGarden.getGardenDescription());
         Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
         Assertions.assertEquals(modelMap.getAttribute("country"), expectedGarden.getGardenCountry());
         gardenName = expectedGarden.getGardenName();
+        gardenDescription = expectedGarden.getGardenDescription();
         gardenCity = expectedGarden.getGardenCity();
         gardenCountry = expectedGarden.getGardenCountry();
         gardenSize = String.valueOf(expectedGarden.getGardenSize());
