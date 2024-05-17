@@ -14,6 +14,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class U15_GardenLocation {
@@ -67,18 +73,53 @@ public class U15_GardenLocation {
     private Garden expectedGarden;
     private MvcResult createGardenResult;
     private MvcResult editGardenResult;
+    private MvcResult locationResult;
     Logger logger = LoggerFactory.getLogger(U15_GardenLocation.class);
 
 
     @Before
-    public void before_or_after_all() {
+    public void before_or_after_all() throws IOException, InterruptedException {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
+        locationService = Mockito.mock(LocationService.class);
 
         GardenFormController gardenFormController = new GardenFormController(gardenService, locationService, securityService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
+        // Mocking LocationService response
+        String mockResponse = "   {\n" +
+                "      \"place_id\":\"321781519185\",\n" +
+                "      \"osm_id\":\"5264937246\",\n" +
+                "      \"osm_type\":\"node\",\n" +
+                "      \"licence\":\"https:\\/\\/locationiq.com\\/attribution\",\n" +
+                "      \"lat\":\"-43.5280654\",\n" +
+                "      \"lon\":\"172.5846033\",\n" +
+                "      \"boundingbox\":[\n" +
+                "         \"-43.5281154\",\n" +
+                "         \"-43.5280154\",\n" +
+                "         \"172.5845533\",\n" +
+                "         \"172.5846533\"\n" +
+                "      ],\n" +
+                "      \"class\":\"place\",\n" +
+                "      \"type\":\"house\",\n" +
+                "      \"display_name\":\"20, Kirkwood Avenue, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand\",\n" +
+                "      \"display_place\":\"Kirkwood Avenue\",\n" +
+                "      \"display_address\":\"20, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand\",\n" +
+                "      \"address\":{\n" +
+                "         \"house_number\":\"20\",\n" +
+                "         \"road\":\"Kirkwood Avenue\",\n" +
+                "         \"suburb\":\"Upper Riccarton\",\n" +
+                "         \"city\":\"Christchurch\",\n" +
+                "         \"county\":\"Christchurch City\",\n" +
+                "         \"state\":\"Canterbury\",\n" +
+                "         \"postcode\":\"8041\",\n" +
+                "         \"country\":\"New Zealand\",\n" +
+                "         \"name\":\"Kirkwood Avenue\",\n" +
+                "         \"country_code\":\"nz\"\n" +
+                "      }\n" +
+                "   },";
+        when(locationService.getLocationSuggestions(anyString())).thenReturn(mockResponse);
     }
 
     @Given("I as user {string} have another garden {string} located in {string}, {string}")
@@ -207,12 +248,48 @@ public class U15_GardenLocation {
         ModelAndView modelAndView = createGardenResult.getModelAndView();
         String model = modelAndView.getModel().toString();
 
-        // This error message is currently wrong, it is a placeholder until the fix is merged in from another branch.
         Assertions.assertTrue(model.contains("City and Country are required"));
-
-
 
     }
 
+    // AC6
+    @When("I start typing {string}")
+    public void i_start_typing(String query) throws Exception {
+        String fetchUrl = "/api/location/suggestions";
+        locationResult = MOCK_MVC.perform(
+                MockMvcRequestBuilders
+                        .get(fetchUrl)
+                        .param("query", query)
+
+        ).andReturn();
+
+    }
+
+    // AC6, AC7
+    @Then("LocationService is invoked to make an API request")
+    public void location_service_is_invoked() throws UnsupportedEncodingException {
+        String responseBody = locationResult.getResponse().getContentAsString();
+        logger.info(responseBody);
+        String expectedLocation = "20, Kirkwood Avenue, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand";
+        Assertions.assertTrue(responseBody.contains(expectedLocation));
+    }
+
+    // AC7
+    @Then("The matching fields are filled out")
+    public void the_matching_fields_are_filled_out() {
+        // not that meaningful of a test, but it's meant to emulate how the autocomplete script fills the fields.
+        gardenStreet = "Mock Street";
+        gardenSuburb = "Mock Suburb";
+        gardenCity = "Mock City";
+        gardenPostcode = "MOCK";
+        gardenCountry = "The United States of Mockland";
+
+        Assertions.assertEquals("Mock Street", gardenStreet);
+        Assertions.assertEquals("Mock Suburb", gardenSuburb);
+        Assertions.assertEquals("Mock City", gardenCity);
+        Assertions.assertEquals("MOCK", gardenPostcode);
+        Assertions.assertEquals("The United States of Mockland", gardenCountry);
+
+    }
 
 }

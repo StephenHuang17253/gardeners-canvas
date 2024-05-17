@@ -72,3 +72,14 @@ Background:
       | "Science Road"        | "Riccarton"        | ""               | "8041"     | ""             |
       | "Science Road"        | "Riccarton"        | "Christchurch"   | "8041"     | ""             |
       | "Science Road"        | "Riccarton"        | ""               | "8041"     | "New Zealand"  |
+
+  Scenario: AC6 - Given I submit a form with a required address, when I start typing a location, then I receive
+  reasonable suggestions of locations matching the current entry I have provided.
+    When I start typing '20 Kirkwood Avenue'
+    Then LocationService is invoked to make an API request
+
+  Scenario: AC7 - Given I am shown autocomplete suggestions for a location, when I select one of the suggestions,
+  then the matching fields on the form are filled out with the corresponding info from the suggestion.
+    When I start typing '20 Kirkwood Avenue'
+    And LocationService is invoked to make an API request
+    Then The matching fields are filled out
