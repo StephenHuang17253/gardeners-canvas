@@ -82,6 +82,8 @@ public class GardenFormControllerTest {
                 "80",
                 "test",
                 1.0f,
+                "-43.5214643",
+                "172.5796159",
                 mockUser
 
         );
@@ -134,7 +136,9 @@ public class GardenFormControllerTest {
                             .param("city","Hi")
                             .param("country","Hi")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -165,7 +169,9 @@ public class GardenFormControllerTest {
                 .param("city","Hi")
                 .param("country","Hi")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -207,7 +213,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -242,7 +250,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -272,7 +282,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -305,7 +317,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -342,7 +356,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -377,7 +393,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -407,7 +425,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -440,7 +460,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -476,7 +498,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -511,7 +535,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -541,7 +567,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -574,7 +602,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -609,7 +639,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -644,7 +676,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -674,7 +708,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -707,7 +743,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -743,7 +781,9 @@ public class GardenFormControllerTest {
                             .param("country",input)
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -778,7 +818,9 @@ public class GardenFormControllerTest {
                 .param("country",input)
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -808,7 +850,9 @@ public class GardenFormControllerTest {
                             .param("country",input)
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -841,7 +885,9 @@ public class GardenFormControllerTest {
                 .param("country",input)
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
@@ -877,7 +923,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode",input)
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -911,7 +959,9 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode",input)
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -942,7 +992,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode",input)
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -976,7 +1028,9 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode",input)
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
@@ -1010,7 +1064,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode","123")
-                            .param("gardenSize",input))
+                            .param("gardenSize",input)
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -1044,7 +1100,9 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode","123")
-                .param("gardenSize",input)).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize",input)
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -1078,7 +1136,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode","123")
-                            .param("gardenSize",input))
+                            .param("gardenSize",input)
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -1115,7 +1175,9 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode","123")
-                .param("gardenSize",input)).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize",input)
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
