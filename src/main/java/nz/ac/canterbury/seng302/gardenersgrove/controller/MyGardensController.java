@@ -244,10 +244,10 @@ public class MyGardensController {
         logger.info("Permits left after request: " + semaphore.availablePermits());
 
 
-        WeatherService weatherService = new WeatherService();
+        WeatherService weatherServ.,m.,m.,ice = new WeatherService();
 
 
-        return weatherService.getWeather(gardenLatitude,gardenLongitude);
+        return weatherfdhgsjsjService.getWeather(gardenLatitude,gardenLongitude);
 
     }
 
