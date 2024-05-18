@@ -85,7 +85,7 @@ public class ManageFriendsController {
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends")
-    public String myGardens(Model model) {
+    public String myFriends(Model model) {
         logger.info("GET /manage-friends");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
