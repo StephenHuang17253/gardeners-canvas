@@ -69,6 +69,11 @@ public class SecurityService {
         return user;
     }
 
+    /**
+     * Helper to check if a user is friends with the current user.
+     * @param userId - id of the user being checked.
+     * @return the user if they're a friend.
+     */
     public User checkFriendship(Long userId) {
         User currentUser = getCurrentUser();
         User targetUser = userService.getUserById(userId);

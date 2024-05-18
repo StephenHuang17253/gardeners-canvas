@@ -43,6 +43,15 @@ public class GardensController {
 
     private final FileService fileService;
 
+    /**
+     * Constructor for the GardensController with {@link Autowired} to
+     * connect this controller with other services
+     *
+     * @param gardenService service to access garden repository
+     * @param securityService service to access security methods
+     * @param plantService service to access plant repository
+     * @param fileService service to manage files
+     */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService) {
         this.gardenService = gardenService;

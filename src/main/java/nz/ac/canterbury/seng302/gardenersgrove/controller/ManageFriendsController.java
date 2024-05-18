@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for the Manage Friends page
+ */
 @Controller
 @SessionAttributes("userGardens")
 public class ManageFriendsController {
@@ -29,6 +32,14 @@ public class ManageFriendsController {
 
     private final FileService fileService;
 
+    /**
+     * Constructor for the ManageFriendsController with {@link Autowired} to
+     * connect this controller with other services
+     *
+     * @param securityService service to access security methods
+     * @param friendshipService service to access plant repository
+     * @param fileService service to manage files
+     */
     @Autowired
     public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService) {
         this.friendshipService = friendshipService;
@@ -37,20 +48,25 @@ public class ManageFriendsController {
 
     }
 
-    private List<FriendModel> createFriendModel(){
+    /**
+     * Helper function to create a list of friend models.
+     * Used for adding to the model of the Manage Friends page.
+     * @return friendModels
+     */
+    private List<FriendModel> createFriendModel() {
         User currentUser = securityService.getCurrentUser();
         List<FriendModel> friendModels = new ArrayList<>();
         List<Friendship> friendships = friendshipService.getAllUsersFriends(currentUser.getId());
         List<User> userTypeFriends = new ArrayList<>();
 
-        for(Friendship friendship : friendships){
-            if(friendship.getUser1().getId() == currentUser.getId()){
+        for (Friendship friendship : friendships) {
+            if (friendship.getUser1().getId() == currentUser.getId()) {
                 userTypeFriends.add(friendship.getUser2());
-            }else{
+            } else {
                 userTypeFriends.add(friendship.getUser1());
             }
         }
-        for(User userTypeFriend : userTypeFriends){
+        for (User userTypeFriend : userTypeFriends) {
             String friendProfilePicture = userTypeFriend.getProfilePictureFilename();
             String fName = userTypeFriend.getFirstName();
             String lName = userTypeFriend.getLastName();
