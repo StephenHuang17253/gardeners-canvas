@@ -44,4 +44,13 @@ public class FriendModel {
     public void setFriendGardenLink(String friendGardenLink) {
         this.friendGardenLink = friendGardenLink;
     }
+
+    @Override
+    public String toString() {
+        return "FriendModel{" +
+                "friendProfilePicture='" + friendProfilePicture + '\'' +
+                ", friendName='" + friendName + '\'' +
+                ", friendGardenLink='" + friendGardenLink + '\'' +
+                '}';
+    }
 }
