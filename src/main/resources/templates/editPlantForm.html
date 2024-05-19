@@ -19,7 +19,7 @@
 
             <!-- Some things are still named 'profile_picture', this is so I can reuse the existing css and js. -->
             <div class="plant_picture_container small_pic">
-                <img id="imageToChange" th:src="@{${plantPicture}}" alt="Plant image">
+                <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}" alt="Plant image">
                 <label for="plantPictureInput">+</label>
                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                     onChange="handleFileSelect(event)">
@@ -56,11 +56,12 @@
             </div>
 
             <div th:if="${PCErrorText!=''}">
-                <h3 class = "error" th:text="${PDErrorText}"></h3>
+                <h3 class = "error" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
             </div>
 
             <label for="plantDate"> Plant Date </label>
             <input type="date" class="form-control"  id="plantDate" placeholder=""
+                   max="9999-12-30" min="0000-01-01"
                    th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
                    autofocus >
 
@@ -75,5 +76,6 @@
     </div>
 </div>
 <script th:src="@{/js/preventEnterSubmit.js}"></script>
+<script th:src="@{/js/editPlantForm.js}"></script>
 </body>
 </html>

@@ -72,7 +72,7 @@ public class UserService {
      * @return user if found, null otherwise
      */
     public User getUserByEmailAndPassword(String email, String password) {
-        User[] users = userRepository.findByEmailAddress(email);
+        User[] users = userRepository.findByEmailAddressIgnoreCase(email);
         if (users.length == 0) {
             return null;
         }
@@ -95,7 +95,7 @@ public class UserService {
      * @return user if found, null otherwise
      */
     public User getUserByEmail(String email) {
-        User[] users = userRepository.findByEmailAddress(email);
+        User[] users = userRepository.findByEmailAddressIgnoreCase(email);
         if (users.length == 0) {
             return null;
         }
@@ -133,7 +133,7 @@ public class UserService {
      * @return true if a user with the given email exists, false otherwise
      */
     public boolean emailInUse(String email) {
-        return userRepository.countDistinctByEmailAddress(email) > 0;
+        return userRepository.countDistinctByEmailAddressIgnoreCase(email) > 0;
     }
 
     /**
@@ -202,7 +202,9 @@ public class UserService {
         User user = getUserById(id);
         user.getGardens().add(garden);
         userRepository.save(user);
+
     }
+
 
 
 }
