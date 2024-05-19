@@ -1,11 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jdk.jshell.spi.ExecutionControl;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -64,7 +59,7 @@ public class WeatherResponseData {
         currentWeather.setCurrentTemp(current.get("temperature_2m").asDouble());
         currentWeather.setHumidity(current.get("relative_humidity_2m").asInt());
         currentWeather.setPrecipitation(current.get("precipitation").asDouble());
-    };
+    }
 
     /**
      * This method separates the API response for daily weather into specific JsonNodes

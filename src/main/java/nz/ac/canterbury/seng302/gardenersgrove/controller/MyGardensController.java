@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
@@ -32,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -80,7 +80,7 @@ public class MyGardensController {
         logger.info("GET /my-gardens");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
         return "myGardensPage";
@@ -97,15 +97,15 @@ public class MyGardensController {
     public String showGardenDetails(@PathVariable Long gardenId,
                                     HttpServletResponse response,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenId);
+        logger.info("GET /my-gardens/{}", gardenId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-        if (!optionalGarden.isPresent()) {
+        if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
@@ -160,12 +160,12 @@ public class MyGardensController {
 
         Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));
         model.addAttribute("plantToEditId", (Long.parseLong(plantId)));
-        if (!plantToUpdate.isPresent()) {
+        if (plantToUpdate.isEmpty()) {
             return "404";
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
 
@@ -220,7 +220,7 @@ public class MyGardensController {
 
         String plantPictureString = "/images/default_plant.png";
 
-        if (filename != null && filename.length() != 0) {
+        if (filename != null && !filename.isEmpty()) {
             plantPictureString = MvcUriComponentsBuilder
                     .fromMethodName(PlantFormController.class, "serveFile", filename)
                     .build()

@@ -1,7 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.component;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
