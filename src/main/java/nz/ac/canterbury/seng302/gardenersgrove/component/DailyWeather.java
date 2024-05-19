@@ -82,7 +82,7 @@ public class DailyWeather {
         return error;
     }
 
-    public void setMinTemp(String error) {
+    public void setError(String error) {
         this.error = error;
     }
 }

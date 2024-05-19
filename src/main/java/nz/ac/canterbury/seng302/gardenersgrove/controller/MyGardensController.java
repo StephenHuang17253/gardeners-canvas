@@ -2,6 +2,8 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
@@ -29,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -48,6 +51,7 @@ public class MyGardensController {
     private final PlantService plantService;
 
     private final FileService fileService;
+    private final WeatherService weatherService;
 
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 
@@ -58,11 +62,12 @@ public class MyGardensController {
 
 
     @Autowired
-    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService) {
+    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService, WeatherService weatherService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.fileService = fileService;
         this.securityService = securityService;
+        this.weatherService = weatherService;
     }
 
     /**
@@ -110,10 +115,15 @@ public class MyGardensController {
             return "403";
         }
 
+        List<DailyWeather> weather = new ArrayList<>();
         try {
-            ArrayList<JsonNode> gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
+           WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
+           weather.add(gardenWeather.getCurrentWeather());
+           weather.addAll(gardenWeather.getForecastWeather());
         } catch (Error error) {
-            return (error.toString());
+           DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
+           noWeather.setError("Location not found, please update your location to see the weather");
+           weather.add(noWeather);
         }
 
         model.addAttribute("gardenName", garden.getGardenName());
@@ -122,6 +132,7 @@ public class MyGardensController {
         model.addAttribute("gardenId", gardenId);
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
+        model.addAttribute("weather", weather);
         return "gardenDetailsPage";
 
     }
@@ -220,7 +231,7 @@ public class MyGardensController {
     }
 
 
-    public ArrayList<JsonNode> showGardenWeather(String gardenLatitude, String gardenLongitude) {
+    WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) {
 
         long currentTime = Instant.now().getEpochSecond();
         long timeElapsed = currentTime - lastRequestTime;
@@ -242,12 +253,7 @@ public class MyGardensController {
             throw new Error("429");
         }
         logger.info("Permits left after request: " + semaphore.availablePermits());
-
-
-        WeatherService weatherServ.,m.,m.,ice = new WeatherService();
-
-
-        return weatherfdhgsjsjService.getWeather(gardenLatitude,gardenLongitude);
+        return weatherService.getWeather(gardenLatitude,gardenLongitude);
 
     }
 

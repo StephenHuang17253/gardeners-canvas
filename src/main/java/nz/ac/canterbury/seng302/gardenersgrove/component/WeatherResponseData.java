@@ -6,143 +6,137 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jdk.jshell.spi.ExecutionControl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This entity class is a collection of weather data
  * Note: This is about past, current and future weather data
  */
 public class WeatherResponseData {
-
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode weather = mapper.createObjectNode();
-    ArrayNode tempMax = mapper.createArrayNode();
-    ArrayNode tempMin =  mapper.createArrayNode();
-    ArrayNode weatherCodes = mapper.createArrayNode();
-    ArrayNode rain  = mapper.createArrayNode();
-    ArrayNode dates  = mapper.createArrayNode();
-
-
-
+    List<Integer> SUNNY_WEATHER_CODES = List.of(0, 1);
+    List<Integer> OVERCAST_WEATHER_CODES = List.of(2, 3);
     JsonNode current;
     JsonNode daily;
-
     JsonNode jsonTempMax;
     JsonNode jsonTempMin;
     JsonNode jsonDailyWeatherCodes;
-    JsonNode jsonDailyRain;
+    JsonNode jsonDailyPrecipitationSum;
     JsonNode jsonDates;
+    DailyWeather currentWeather;
+    List<DailyWeather> forecastWeather;
+    List<DailyWeather> pastWeather;
+
+
 
     public WeatherResponseData(JsonNode jsonWeatherData) {
         current = jsonWeatherData.get("current");
         daily = jsonWeatherData.get("daily");
-
         setDailyWeather();
-
-        WeatherResponseData forecastData = getForecast();
-        List<DailyWeather> weatherList = forecastData.getDailyWeather();
-        weatherList.add(0, getCurrentWeather());
-
-
-
+        setCurrentWeather();
+        setForecastWeather();
+        setPastWeather();
     }
 
-    public void addTempMax(Double temp) {
-        this.tempMax.add(temp);
+    public DailyWeather getCurrentWeather() {
+        return currentWeather;
     }
 
-    public void addTempMin(Double temp) {
-        this.tempMin.add(temp);
+    public List<DailyWeather> getForecastWeather() {
+        return forecastWeather;
     }
 
-    public void addWeatherCode(Integer code) {
-        this.weatherCodes.add(code);
-    }
-
-    public void addRain(Double rain) {
-        this.rain.add(rain);
-    }
-
-    public void addDate(String date) {
-        this.dates.add(date);
-    }
-
-    public List<DailyWeather> getDailyWeather() {
-       List<DailyWeather> days = new ArrayList<>();
-       return ExecutionControl.NotImplementedException;
-    }
-
-    /**
-     * getWeather() creates and returns the weather as a JsonNode Object
-     * @return weather - a JsonNode of the weather data
-     */
-    public JsonNode getWeather() {
-
-        ((ObjectNode) weather).put("temperature_max", tempMax);
-        ((ObjectNode) weather).put("temperature_min", tempMin);
-        ((ObjectNode) weather).put("weather_code", weatherCodes);
-        ((ObjectNode) weather).put("rain", rain);
-        ((ObjectNode) weather).put("date", dates);
-
-        return weather;
-    }
-
-    /**
-     * This method separates the API response for daily weather into specific JsonNodes
-     * @return the daily section of the API response as a JsonNode
-     */
-    public JsonNode setDailyWeather() {
-        jsonTempMax =  daily.get("temperature_2m_max");
-        jsonTempMin = daily.get("temperature_2m_min");
-        jsonDailyWeatherCodes = daily.get("weather_code");
-        jsonDailyRain = daily.get("rain_sum");
-        jsonDates = daily.get("time");
-
-        return daily;
-    }
-
-    /**
-     * This method collects the API response for the past 2 days from daily weather JsonNode
-     * @return the past weather section of the daily weather as JsonNode
-     */
-    public WeatherResponseData getPastWeather() {
-        WeatherResponseData pastWeather = new WeatherRespodjdjdjdnseData();
-
-        for (int i = 0; i < 2; i++) {
-            addValuesToWeatherData(pastWeather, i);
-        }
-
+    public List<DailyWeather> getPastWeather() {
         return pastWeather;
     }
 
     /**
-     * This method collects the API response for the next 7 days from daily weather JsonNode
-     * @return the forecast weather section of the daily weather as JsonNode
+     * Creates a DailyWeather object containing all details of current weather.
      */
-    public WeatherResponseData getForecast() {
+    void setCurrentWeather() {
+        int weatherCode = current.get("weather_code").asInt();
+        List<String> weatherDescriptionAndIcon = getWeatherDescriptionAndIcon(weatherCode);
+        LocalDate currentTime = LocalDate.now();
+        this.currentWeather = new DailyWeather(weatherDescriptionAndIcon.get(1), currentTime, weatherDescriptionAndIcon.get(0));
+        currentWeather.setCurrentTemp(current.get("temperature_2m").asDouble());
+        currentWeather.setHumidity(current.get("relative_humidity_2m").asInt());
+        currentWeather.setPrecipitation(current.get("precipitation").asDouble());
+    };
 
-        WeatherResponseData forecastWeather = new WeatherResponseDatajfzkskkssks();
-        for (int i = 2; i < tempMax.size(); i++) {
-            addValuesToWeatherData(forecastWeather, i);
-        }
-        return forecastWeather;
+    /**
+     * This method separates the API response for daily weather into specific JsonNodes
+     */
+    void setDailyWeather() {
+        jsonTempMax =  daily.get("temperature_2m_max");
+        jsonTempMin = daily.get("temperature_2m_min");
+        jsonDailyWeatherCodes = daily.get("weather_code");
+        jsonDailyPrecipitationSum = daily.get("precipitation_sum");
+        jsonDates = daily.get("time");
     }
 
     /**
-     * This helper method adds values to the specific data sections of a WeatherResponseData entity.
-     * @param weather - the WeatherResponseData entity
-     * @param i - the index to be parsed into each array node.
+     * This method collects the API response for the past 2 days and adds them to the pastWeather
      */
-    private void addValuesToWeatherData(WeatherResponseData weather, int i) {
-        weather.addTempMax(tempMax.get(i).asDouble());
-        weather.addTempMin(tempMin.get(i).asDouble());
-        weather.addWeatherCode(jsonDailyWeatherCodes.get(i).asInt());
-        weather.addRain(jsonDailyRain.get(i).asDouble());
-        weather.addDate(dates.get(i).toString());
+    void setPastWeather() {
+        List<DailyWeather> pastWeather = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            pastWeather.add(getWeatherDay(i));
+        }
+        this.pastWeather = pastWeather;
     }
 
+    /**
+     * This method collects the API response for the next 6 days and adds them to forecastWeather
+     */
+    void setForecastWeather() {
+        List<DailyWeather> forecastWeather = new ArrayList<>();
+        for (int i = 3; i < jsonTempMax.size(); i++) {
+            forecastWeather.add(getWeatherDay(i));
+        }
+        this.forecastWeather = forecastWeather;
+    }
 
+    /**
+     * This helper method creates a day with all weather details entered
+     * @param i - the index of json weather details
+     * @return the day with all weather details set
+     */
+    DailyWeather getWeatherDay(int i) {
+        int weatherCode = jsonDailyWeatherCodes.get(i).asInt();
+        List<String> weatherDescriptionAndIcon = getWeatherDescriptionAndIcon(weatherCode);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formatter = formatter.withLocale(Locale.getDefault());
+        LocalDate date = LocalDate.parse(jsonDates.get(i).asText(), formatter);
+        DailyWeather day = new DailyWeather(weatherDescriptionAndIcon.get(1), date, weatherDescriptionAndIcon.get(0));
+        day.setMaxTemp(jsonTempMax.get(i).asDouble());
+        day.setMinTemp(jsonTempMin.get(i).asDouble());
+        day.setPrecipitation(jsonDailyPrecipitationSum.get(i).asDouble());
+        return day;
+    }
+
+    /**
+     * This helper methods identifies the weather description and icon based on weather code
+     * @param weatherCode integer that is part of WMO Weather interpretation codes (WW)
+     * @return list of weather description and the name of icon file
+     */
+    List<String> getWeatherDescriptionAndIcon(int weatherCode) {
+        String weatherDescription;
+        String iconFileName;
+        if (SUNNY_WEATHER_CODES.contains(weatherCode)) {
+            weatherDescription = "Sunny";
+            iconFileName = "sunny.png";
+        }  else if (OVERCAST_WEATHER_CODES.contains(weatherCode)) {
+            weatherDescription = "Overcast";
+            iconFileName = "overcast.png";
+        } else {
+            weatherDescription = "Rainy";
+            iconFileName = "rainy.png";
+        }
+        return List.of(weatherDescription, iconFileName);
+    }
 
 
 }
