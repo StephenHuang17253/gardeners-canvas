@@ -2,7 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
 
 
 /**
@@ -49,7 +47,7 @@ public class WeatherService {
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             JsonNode jsonObject = objectMapper.readTree(response.body());
             WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
-            logger.info("weather: " + String.valueOf(jsonObject));
+            logger.info("weather: " + jsonObject);
             return weatherData;
 
         } catch (Exception e) {
