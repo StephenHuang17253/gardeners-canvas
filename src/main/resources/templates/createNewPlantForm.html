@@ -50,8 +50,8 @@
                        th:name="plantDescription" th:text="*{plantDescription}" data-cy="plantDescription"
                        autofocus></textarea>
             </div>
-            <div th:if="${PCErrorText!=''}">
-                <h3 class = "error" th:text="${PDErrorText}"></h3>
+            <div th:if="${PDErrorText!=''}">
+                <h3 class = "error" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
             </div>
 
             <label for="plantDate"> Plant Date: </label>
