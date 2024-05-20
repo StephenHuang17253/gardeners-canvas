@@ -266,7 +266,7 @@ public class InputValidator {
     public static ValidationResult validateDescription(String text) {
         ValidationResult result = new InputValidator(text)
                 .lengthHelper(512)
-                .minimumOneLetter()
+                .NotOnlyNumOrSpecChar()
                 .getResult();
         if (!result.valid()) {
             result.updateMessage(ValidationResult.INVALID_DESCRIPTION.toString());
@@ -727,12 +727,12 @@ public class InputValidator {
         return this;
     }
 
-    private InputValidator minimumOneLetter() {
+    private InputValidator NotOnlyNumOrSpecChar() {
         if (!this.passState) {
             return this;
         }
 
-        if (!testedValue.equals("") && !testedValue.matches(".*[a-zA-Z].*")) {
+        if (!testedValue.equals("") && testedValue.replace(" ", "").matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
