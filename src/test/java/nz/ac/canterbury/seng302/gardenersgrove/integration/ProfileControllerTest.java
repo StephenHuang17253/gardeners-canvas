@@ -114,11 +114,9 @@ public class ProfileControllerTest {
             "UsersDOBis2003-05-02!", "1backslash/" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePasswordFailCases(String input) throws Exception {
-        mockUser.setId(1L);
-        System.out.println(mockUser.getId());
-
         String currentPassword = "currentPassword1!";
         mockUser.setPassword(currentPassword);
+        mockUser.setId(1L);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
         mockMvc.perform(post("/profile/editPassword").with(csrf())
@@ -135,10 +133,9 @@ public class ProfileControllerTest {
             "1Percent%", "1Uparrow^", "1Andsymbol&", "1Starsymbol*", "1Bracket(", "1Hyphen-", "1Underscore_"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePasswordPassCases(String input) throws Exception {
-        mockUser.setId(1L);
         String currentPassword = "currentPassword1!";
-
         mockUser.setPassword(currentPassword);
+        mockUser.setId(1L);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
         mockMvc.perform(post("/profile/editPassword").with(csrf())
