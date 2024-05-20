@@ -25,7 +25,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param emailAddress
      * @return User or null if not found
      */
-    User[] findByEmailAddress(String emailAddress);
+    User[] findByEmailAddressIgnoreCase(String emailAddress);
 
     /**
      * Returns all users
@@ -38,7 +38,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param emailAddress
      * @return number of users with the given email address
      */
-    int countDistinctByEmailAddress(String emailAddress);
+    int countDistinctByEmailAddressIgnoreCase(String emailAddress);
 
 
     /**

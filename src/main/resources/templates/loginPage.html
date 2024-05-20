@@ -16,13 +16,14 @@
     <form th:action="@{login}" method="POST">
       <div>
         <label for="emailAddress">Email</label>
-        <input type="email" class="form-control" id="emailAddress" placeholder="email" th:name="emailAddress" required
-          autofocus />
+        <input type="email" class="form-control" id="emailAddress" placeholder="email" th:name="emailAddress"
+          th:value="*{emailAddress}" required autofocus />
         <p th:if="${emailAddressError}" class="error" th:text="${emailAddressError}"></p>
       </div>
       <div>
         <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" placeholder="password" th:name="password" required />
+        <input type="password" class="form-control" id="password" placeholder="password" th:name="password"
+          th:value="*{password}" required />
         <p th:if="${loginError}" class="error" th:text="${loginError}"></p>
       </div>
       <div class="buttons">
