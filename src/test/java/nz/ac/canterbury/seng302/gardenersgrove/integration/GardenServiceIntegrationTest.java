@@ -48,7 +48,7 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                10,
+                10.0,
                 "-43.5214643",
                 "172.5796159",
                 user1);
@@ -59,7 +59,7 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                10,
+                10.0,
                 "-43.5214643",
                 "172.5796159",
                 user1);
@@ -70,7 +70,7 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20,
+                20.0,
                 "-43.5214643",
                 "172.5796159",
                 user2);
@@ -154,7 +154,7 @@ public class GardenServiceIntegrationTest {
                 "Gotham City",
                 "8041",
                 "United States of America",
-                20,
+                20.0,
                 "-43.5214643",
                 "172.5796159",
                 userService.getUserById(3L));
@@ -180,7 +180,7 @@ public class GardenServiceIntegrationTest {
                 "Gotham City",
                 "8041",
                 "United States of America",
-                20,
+                20.0,
                 "-43.5214643",
                 "172.5796159",
                 user);
@@ -198,7 +198,7 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20,
+                20.0,
                 "-43.5214643",
                 "172.5796159");
 
@@ -220,7 +220,7 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20,
+                20.0,
                 "-43.5214643",
                 "172.5796159");
 
@@ -258,7 +258,7 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20,
+                20.0,
                 "-43.5214643",
                 "172.5796159");
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);

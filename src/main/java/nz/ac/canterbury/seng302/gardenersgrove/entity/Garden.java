@@ -34,15 +34,15 @@ public class Garden {
     @Column(columnDefinition = "TEXT")
     private String gardenCountry;
 
+    @Column(nullable = true)
+    private Double gardenSize;
+
     @Column(columnDefinition = "TEXT")
     private String gardenLongitude;
 
     @Column(columnDefinition = "TEXT")
     private String gardenLatitude;
 
-    @Column
-    private double gardenSize;
-    
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -68,7 +68,7 @@ public class Garden {
      * @param owner the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, float gardenSize, String gardenLatitude, String gardenLongitude, User owner) {
+                  String gardenPostcode, String gardenCountry, Double gardenSize,  String gardenLatitude, String gardenLongitude, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -92,7 +92,7 @@ public class Garden {
      * @param gardenSize the size of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, float gardenSize, String gardenLatitude, String gardenLongitude) {
+                  String gardenPostcode, String gardenCountry, Double gardenSize, String gardenLatitude, String gardenLongitude) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;

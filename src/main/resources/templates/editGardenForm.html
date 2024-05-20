@@ -80,7 +80,7 @@
                 <h3 class="error" th:text="${CountryErrorText}"></h3>
             </div>
 
-            <label for="gardenSize"> Garden Size(m^2): </label>
+            <label for="gardenSize"> Garden Size (m<sup>2</sup>): </label>
             <br>
             <input type="text" class="form-control" th:class = "${GSErrorClass}" id="gardenSize" placeholder="7.5"
                    th:name="gardenSize" th:value="${gardenSize}" data-cy="gardenSize"
@@ -114,6 +114,7 @@
 </div>
 <script th:src="@{/js/preventEnterSubmit.js}"></script>
 <script th:src="@{/js/locationIQAutocomplete.js}"></script>
+<script th:src="@{/js/editGardenForm.js}"></script>
 
 </body>
 </html>
