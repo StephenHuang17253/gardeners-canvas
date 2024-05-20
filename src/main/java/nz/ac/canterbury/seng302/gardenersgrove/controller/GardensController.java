@@ -194,18 +194,28 @@ public class GardensController {
      * @return thymeleaf gardensPage
      */
     @GetMapping("{userId}/gardens")
-    public String friendsGardens(Model model, @PathVariable("userId") Long userId) {
+    public String friendsGardens(Model model,
+                                 @PathVariable("userId") Long userId,
+                                 HttpServletResponse response) {
         logger.info("GET /my-gardens");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-
-        User friend = securityService.checkFriendship(userId);
-        if (friend == null) {
-            return "404"; // Forbidden might be more suitable, check later.
+        User friend;
+        try {
+            friend = securityService.checkFriendship(userId);
+            if (friend == null) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return "403";
+            }
+        } catch(Exception exception) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
         }
+
+
 
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
         List<Garden> gardenList = friend.getGardens();
