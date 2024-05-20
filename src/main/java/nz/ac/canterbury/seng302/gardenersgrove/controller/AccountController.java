@@ -31,7 +31,9 @@ import org.springframework.ui.Model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -197,8 +199,17 @@ public class AccountController {
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
 
-        InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress);
-        validationMap.put("password", InputValidator.validatePassword(password, firstName, lastName, noLastName, dateOfBirth, emailAddress));
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        InputValidator.validatePassword(password, otherFields);
+        validationMap.put("password", InputValidator.validatePassword(password, otherFields));
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -218,10 +229,6 @@ public class AccountController {
             }
         }
 
-//        if(password.contains(firstName) || password.contains(lastName) || password.contains(dateOfBirth.toString()) || password.contains(emailAddress)) {
-//            model.addAttribute("passwordMatchingError", "Passwords do not have first name match");
-//            valid = false;
-//        }
         if (!password.equals(repeatPassword)) {
             model.addAttribute("passwordMatchingError", "Passwords do not match");
             valid = false;
