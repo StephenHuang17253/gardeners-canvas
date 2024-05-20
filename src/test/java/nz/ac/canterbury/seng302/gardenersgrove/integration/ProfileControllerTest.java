@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -115,9 +114,9 @@ public class ProfileControllerTest {
             "UsersDOBis2003-05-02!", "1backslash/" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePasswordFailCases(String input) throws Exception {
-        Field idField = User.class.getDeclaredField("id");
-        idField.setAccessible(true);
-        idField.set(mockUser, 1L);
+        mockUser.setId(1L);
+        System.out.println(mockUser.getId());
+
         String currentPassword = "currentPassword1!";
         mockUser.setPassword(currentPassword);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
@@ -136,10 +135,9 @@ public class ProfileControllerTest {
             "1Percent%", "1Uparrow^", "1Andsymbol&", "1Starsymbol*", "1Bracket(", "1Hyphen-", "1Underscore_"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void testUpdatePasswordPassCases(String input) throws Exception {
-        Field idField = User.class.getDeclaredField("id");
-        idField.setAccessible(true);
-        idField.set(mockUser, 1L);
+        mockUser.setId(1L);
         String currentPassword = "currentPassword1!";
+
         mockUser.setPassword(currentPassword);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
