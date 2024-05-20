@@ -93,7 +93,6 @@ label {
 
 /* For location autocomplete */
 #autocompleteSuggestions {
-    position: absolute;
     z-index: 9999;
     width: 25vw; /* Adjust the width as needed */
     background-color: #fff;

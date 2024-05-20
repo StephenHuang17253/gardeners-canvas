@@ -38,11 +38,14 @@
 
             <label for="streetAddress"> Street Address </label>
 
-            <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress"
-                placeholder="Start typing for autocomplete suggestions" th:name="streetAddress"
-                th:value="${streetAddress}" data-cy="streetAddress" autofocus>
+            <div>
+                <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress"
+                       placeholder="Start typing for autocomplete suggestions" th:name="streetAddress"
+                       th:value="${streetAddress}" data-cy="streetAddress" autofocus>
 
-            <ul id="autocompleteSuggestions"></ul>
+                <ul id="autocompleteSuggestions"></ul>
+            </div>
+
 
             <div id="rateLimitMessage">
                 <h3 class="error">Exceeded limit of 2 autocomplete requests per second. Please try again</h3>
