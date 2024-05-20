@@ -27,16 +27,28 @@ public class DailyWeather {
         return urlToWeatherIcon;
     }
     public String getDate() {
+        if (date == null) {
+            return "";
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
         return date.format(formatter);
     }
     public String getDay() {
+        if (date == null) {
+            return "";
+        }
         return date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.getDefault());
     }
     public String getDescription() {
+        if (description == null) {
+            return "";
+        }
         return description;
     }
     public String getMinTemp() {
+        if (minTemp == null) {
+            return "";
+        }
         return minTemp.toString();
     }
 
@@ -45,6 +57,9 @@ public class DailyWeather {
     }
 
     public String getMaxTemp() {
+        if (maxTemp == null) {
+            return "";
+        }
         return maxTemp.toString();
     }
 
@@ -53,6 +68,9 @@ public class DailyWeather {
     }
 
     public String getTemp() {
+        if (currentTemp == null) {
+            return "";
+        }
         return currentTemp.toString();
     }
 
@@ -61,6 +79,9 @@ public class DailyWeather {
     }
 
     public String getPrecipitation() {
+        if (precipitation == null) {
+            return "";
+        }
         return precipitation.toString();
     }
 
@@ -69,6 +90,9 @@ public class DailyWeather {
     }
 
     public String getHumidity() {
+        if (humidity == null) {
+            return "";
+        }
         return humidity.toString();
     }
 
@@ -77,6 +101,9 @@ public class DailyWeather {
     }
 
     public String getWeatherError() {
+        if (error == null) {
+            return "";
+        }
         return error;
     }
 
