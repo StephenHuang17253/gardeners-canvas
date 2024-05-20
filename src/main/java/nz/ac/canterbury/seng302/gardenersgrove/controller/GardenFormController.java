@@ -407,25 +407,34 @@ public class GardenFormController {
         }
 
         // notifies the user that the city input is invalid (if applicable)
-        if (!cityResult.valid()) {
-            if (cityResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                cityResult.updateMessage("cannot be longer than 96 characters");
-            }
-            model.addAttribute("CityErrorText", "City " + cityResult);
+        if(!cityResult.valid())
+        {
 
-            model.addAttribute("CityErrorClass", "errorBorder");
+            if (cityResult == ValidationResult.BLANK) {
+                model.addAttribute("CityErrorText", "City and Country are required");
+            } else {
+                model.addAttribute("CityErrorText","City " + cityResult);
+            }
+
+            model.addAttribute("CityErrorClass","errorBorder");
             logger.info("Garden City failed validation");
-        } else {
-            model.addAttribute("CountryErrorClass", "noErrorBorder");
+        }
+        else
+        {
+            model.addAttribute("CityErrorClass","noErrorBorder");
         }
 
         // notifies the user that the country input is invalid (if applicable)
-        if (!countryResult.valid()) {
-            if (countryResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                countryResult.updateMessage("cannot be longer than 96 characters");
+        if(!countryResult.valid())
+        {
+
+            if (countryResult == ValidationResult.BLANK) {
+                model.addAttribute("CountryErrorText", "City and Country are required");
+            } else {
+                model.addAttribute("CountryErrorText","Country " + countryResult);
             }
-            model.addAttribute("CountryErrorText", "Country " + countryResult);
-            model.addAttribute("CountryErrorClass", "errorBorder");
+
+            model.addAttribute("CountryErrorClass","errorBorder");
             logger.info("Garden Country failed validation");
         } else {
             model.addAttribute("CountryErrorClass", "noErrorBorder");
@@ -440,8 +449,10 @@ public class GardenFormController {
             model.addAttribute("PostCodeErrorText", "Postcode " + postcodeResult);
             model.addAttribute("PostCodeErrorClass", "errorBorder");
             logger.info("Garden Postcode failed validation");
-        } else {
-            model.addAttribute("CountryErrorClass", "noErrorBorder");
+        }
+        else
+        {
+            model.addAttribute("PostCodeErrorClass","noErrorBorder");
         }
         // notifies the user that the garden Size is invalid (if applicable)
         if (!gardenSizeResult.valid()) {
