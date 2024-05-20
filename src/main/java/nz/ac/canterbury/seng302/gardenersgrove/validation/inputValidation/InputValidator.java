@@ -732,7 +732,9 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.equals("") && testedValue.replace(" ", "").matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
+        String filteredValue = testedValue.replace(" ", "");
+
+        if (!filteredValue.equals("") && filteredValue.matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
