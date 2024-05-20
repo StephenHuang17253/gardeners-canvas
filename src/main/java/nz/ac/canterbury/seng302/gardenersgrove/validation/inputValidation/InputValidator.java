@@ -732,7 +732,7 @@ public class InputValidator {
             return this;
         }
         try {
-            String returnedResult = profanityService.sendPostRequest(testedValue);
+            String returnedResult = profanityService.moderateContent(testedValue);
             boolean containsProfanity = profanityService.containsProfanity(returnedResult);
 
             if (containsProfanity) {
