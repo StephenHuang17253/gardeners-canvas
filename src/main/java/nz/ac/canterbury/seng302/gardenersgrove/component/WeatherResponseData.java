@@ -84,11 +84,11 @@ public class WeatherResponseData {
     }
 
     /**
-     * This method collects the API response for the next 6 days and adds them to forecastWeather
+     * This method collects the API response for the next 3 days and adds them to forecastWeather
      */
     void setForecastWeather() {
         List<DailyWeather> forecastWeather = new ArrayList<>();
-        for (int i = 3; i < jsonTempMax.size(); i++) {
+        for (int i = 4; i < 7; i++) {
             forecastWeather.add(getWeatherDay(i));
         }
         this.forecastWeather = forecastWeather;

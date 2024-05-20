@@ -28,28 +28,19 @@ public class DailyWeather {
     }
     public String getDate() {
         if (date == null) {
-            return "";
+            return null;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
         return date.format(formatter);
     }
     public String getDay() {
-        if (date == null) {
-            return "";
-        }
-        return date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.getDefault());
+        return (date == null) ? null : date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.getDefault());
     }
     public String getDescription() {
-        if (description == null) {
-            return "";
-        }
-        return description;
+        return (description == null) ? null : description;
     }
     public String getMinTemp() {
-        if (minTemp == null) {
-            return "";
-        }
-        return minTemp.toString();
+        return (minTemp == null) ? null : minTemp.toString();
     }
 
     public void setMinTemp(Double minTemp) {
@@ -57,10 +48,7 @@ public class DailyWeather {
     }
 
     public String getMaxTemp() {
-        if (maxTemp == null) {
-            return "";
-        }
-        return maxTemp.toString();
+        return (maxTemp == null) ? null : maxTemp.toString();
     }
 
     public void setMaxTemp(Double maxTemp) {
@@ -68,10 +56,7 @@ public class DailyWeather {
     }
 
     public String getTemp() {
-        if (currentTemp == null) {
-            return "";
-        }
-        return currentTemp.toString();
+        return (currentTemp == null) ? null : currentTemp.toString();
     }
 
     public void setCurrentTemp(Double currentTemp) {
@@ -79,10 +64,7 @@ public class DailyWeather {
     }
 
     public String getPrecipitation() {
-        if (precipitation == null) {
-            return "";
-        }
-        return precipitation.toString();
+        return (precipitation == null) ? null : precipitation.toString();
     }
 
     public void setPrecipitation(Double precipitation) {
@@ -90,10 +72,7 @@ public class DailyWeather {
     }
 
     public String getHumidity() {
-        if (humidity == null) {
-            return "";
-        }
-        return humidity.toString();
+        return (humidity == null) ? null : humidity.toString();
     }
 
     public void setHumidity(Integer humidity) {
@@ -101,10 +80,7 @@ public class DailyWeather {
     }
 
     public String getWeatherError() {
-        if (error == null) {
-            return "";
-        }
-        return error;
+        return (error == null) ? null : error;
     }
 
     public void setError(String error) {
