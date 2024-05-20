@@ -12,8 +12,8 @@ import java.util.Locale;
  * Note: This is about past, current and future weather data
  */
 public class WeatherResponseData {
-    List<Integer> SUNNY_WEATHER_CODES = List.of(0, 1);
-    List<Integer> OVERCAST_WEATHER_CODES = List.of(2, 3);
+    List<Integer> SUNNY_WEATHER_CODES = List.of(0, 1, 2);
+    List<Integer> OVERCAST_WEATHER_CODES = List.of(3, 45, 48, 51);
     JsonNode current;
     JsonNode daily;
     JsonNode jsonTempMax;
@@ -88,7 +88,7 @@ public class WeatherResponseData {
      */
     void setForecastWeather() {
         List<DailyWeather> forecastWeather = new ArrayList<>();
-        for (int i = 4; i < 7; i++) {
+        for (int i = 4; i < jsonDates.size(); i++) {
             forecastWeather.add(getWeatherDay(i));
         }
         this.forecastWeather = forecastWeather;
