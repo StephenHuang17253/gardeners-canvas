@@ -59,6 +59,7 @@ public class U10_Acceptance_Testing {
     public static UserService userService;
 
     String gardenName;
+    String gardenDescription;
     String gardenCity;
     String gardenCountry;
     String gardenSize;
@@ -96,7 +97,7 @@ public class U10_Acceptance_Testing {
     @Given("I as user {string} have a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, false, user);
+        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(),
                 userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
@@ -136,21 +137,24 @@ public class U10_Acceptance_Testing {
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
+        Assertions.assertEquals(modelMap.getAttribute("gardenDescription"), expectedGarden.getGardenDescription());
         Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
         Assertions.assertEquals(modelMap.getAttribute("country"), expectedGarden.getGardenCountry());
         gardenName = expectedGarden.getGardenName();
+        gardenDescription = expectedGarden.getGardenDescription();
         gardenCity = expectedGarden.getGardenCity();
         gardenCountry = expectedGarden.getGardenCountry();
         gardenSize = String.valueOf(expectedGarden.getGardenSize());
     }
 
-    @Given("I enter valid garden values for the {string}, {string}, {string} and {string}")
-    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String city, String country,
+    @Given("I enter valid garden values for the {string}, {string}, {string}, {string} and {string}")
+    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String description, String city, String country,
             String size) {
         gardenName = name;
         gardenCity = city;
         gardenCountry = country;
         gardenSize = size;
+        gardenDescription = description;
     }
 
     @When("I click the Submit button on the edit garden form")
@@ -160,6 +164,7 @@ public class U10_Acceptance_Testing {
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
+                        .param("gardenDescription", gardenDescription)
                         .param("streetAddress", "")
                         .param("suburb", "")
                         .param("city", gardenCity)
@@ -179,6 +184,7 @@ public class U10_Acceptance_Testing {
         }
         Garden updatedGarden = optionalUpdatedGarden.get();
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
+        Assertions.assertEquals(gardenDescription, updatedGarden.getGardenDescription());
         Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());

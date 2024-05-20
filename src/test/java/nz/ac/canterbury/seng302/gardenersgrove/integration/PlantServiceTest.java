@@ -54,6 +54,7 @@ public class PlantServiceTest {
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         Garden garden = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -94,6 +95,7 @@ public class PlantServiceTest {
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         Garden garden = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -132,6 +134,7 @@ public class PlantServiceTest {
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         Garden garden = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -170,6 +173,7 @@ public class PlantServiceTest {
         LocalDate newDateOfPlanting = LocalDate.of(2023, 2, 13);
         Garden garden = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -207,6 +211,7 @@ public class PlantServiceTest {
         LocalDate newDateOfPlanting = LocalDate.of(2023, 2, 13);
         Garden garden = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",

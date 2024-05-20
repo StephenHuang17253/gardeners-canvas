@@ -61,6 +61,7 @@ public class MyGardensControllerIntegrationTests {
         userService.addUser(user3, "1es1P@ssword");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -71,6 +72,7 @@ public class MyGardensControllerIntegrationTests {
                 user1);
         Garden garden2 = new Garden(
                 "Jane's Garden",
+                "",
                 "20 Kirkwood Avenue",
                 "Upper Riccarton",
                 "Christchurch",
