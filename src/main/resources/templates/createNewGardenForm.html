@@ -30,6 +30,7 @@
                 <textarea class="form-control" th:class="${PDErrorClass}" id="gardenDescription"
                     th:name="gardenDescription" th:value="${gardenDescription}" th:text="*{gardenDescription}"
                     data-cy="gardenDescription"></textarea>
+                <p id="gardenDescriptionCounter"></p>
             </div>
 
             <div th:if="${GDErrorText!=''}">
@@ -126,6 +127,7 @@
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/locationIQAutocomplete.js}"></script>
     <script th:src="@{/js/editGardenForm.js}"></script>
+    <script th:src="@{/js/GardenDescriptionCounter.js}"></script>
 </body>
 
 </html>
