@@ -1,13 +1,20 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,36 +36,73 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class GardensControllerIntegrationTests {
+
     @Autowired
     private GardenService gardenService;
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FriendshipRepository friendshipRepository;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private PlantService plantService;
+
+    @Autowired
+    private FriendshipService friendshipService;
+
     private final MockMvc mockMvc;
+
     private List<Garden> gardenList = new ArrayList<>();
+
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
+
+    User user1;
+
+    User user2;
+
+    User user3;
+
+    User user4;
+
+    List<FriendModel> friendsList;
+
+    private final Long MAX_LONG = 10000L;
 
     @Autowired
     public GardensControllerIntegrationTests(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
-    @BeforeEach
-    void ClearRepository_AddUsersAndGardens() {
+    @BeforeAll
+    void before_or_after_all() {
         gardenList = new ArrayList<>();
         userRepository.deleteAll();
-        User user1 = new User("John", "Doe", "johnDoe@email.com", date);
-        User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);
-        User user3 = new User("Bruce", "Wayne", "bruceWyane@email.com", date);
-        userService.addUser(user1, "1es1P@ssword");
-        userService.addUser(user2, "1es1P@ssword");
-        userService.addUser(user3, "1es1P@ssword");
+
+        user1 =  new User("John", "Doe", "johnDoe@GardensControllerIntegrationTest.com", LocalDate.of(2003,5,2));
+        user2 =  new User("Jane", "Doe", "janeDoe@GardensControllerIntegrationTest.com", LocalDate.of(2003,5,2));
+        user3 =  new User("Bruce", "Wayne", "bruceWayne@GardensControllerIntegrationTest.com", LocalDate.of(2003,5,2));
+        user4 =  new User("Test", "Doe", "testDoe@GardensControllerIntegrationTest.com", LocalDate.of(2003,5,2));
+
+        userService.addUser(user1,"1es1P@ssword");
+        userService.addUser(user2,"1es1P@ssword");
+        userService.addUser(user3,"1es1P@ssword");
+        userService.addUser(user4,"1es1P@ssword");
+
+        Friendship friendship1 = friendshipService.addFriendship(user1,user2);
+        Friendship friendship2 = friendshipService.addFriendship(user3,user1);
+        friendshipService.updateFriendShipStatus(friendship1.getId(), FriendshipStatus.ACCEPTED);
+        friendshipService.updateFriendShipStatus(friendship2.getId(), FriendshipStatus.ACCEPTED);
+
         Garden garden1 = new Garden(
                 "John's Garden",
                 "114 Ilam Road",
@@ -88,6 +132,11 @@ public class GardensControllerIntegrationTests {
 
     }
 
+    @BeforeEach
+    void clear_repo() {
+        friendsList = new ArrayList<>();
+    }
+
     @Test
     public void GetMyGardens_UserNotAuthorized_Return403() throws Exception {
         mockMvc
@@ -96,7 +145,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "johnDoe@email.com")
+    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
     public void GetMyGardens_UserAuthorized_Return200() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(1L));
@@ -114,7 +163,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "janeDoe@email.com")
+    @WithMockUser(username = "janeDoe@GardensControllerIntegrationTest.com")
     public void GetGardenDetailsPage_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
         mockMvc
                 .perform(MockMvcRequestBuilders.get("/my-gardens/4"))
@@ -122,7 +171,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "bruceWyane@email.com")
+    @WithMockUser(username = "bruceWayne@GardensControllerIntegrationTest.com")
     public void GetGardenDetailsPage_UserNotAuthorizedAndGardenExists_Return403() throws Exception {
         mockMvc
                 .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
@@ -130,7 +179,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "johnDoe@email.com")
+    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExists_Return200() throws Exception {
         Garden garden = gardenList.get(0);
         mockMvc
@@ -143,7 +192,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "janeDoe@email.com")
+    @WithMockUser(username = "janeDoe@GardensControllerIntegrationTest.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsWithPlants_Return200() throws Exception {
         Garden garden = gardenList.get(1);
         mockMvc
@@ -154,5 +203,38 @@ public class GardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
                 .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())));
     }
+
+    @Test
+    public void GetFriendGardens_UserNotAuthorized_Return403() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders.get(String.format("/%d/gardens", user1.getId())))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
+    public void GetFriendGardens_UserAuthorizedNotFriend_Return403() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders.get(String.format("/%d/gardens", user4.getId())))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
+    public void GetFriendGardens_UserAuthorizedFriendIdInvalid_Return404() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders.get(String.format("/%d/gardens", MAX_LONG)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
+    public void GetFriendGardens_UserAuthorizedIsFriend_Return200() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders.get(String.format("/%d/gardens", user2.getId())))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
 
 }
