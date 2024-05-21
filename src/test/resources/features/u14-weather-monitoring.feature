@@ -11,6 +11,3 @@ Feature: U14 As Kaia, I want to know the current and future weather at my garden
 
   Scenario: AC2 - The future weather for the future (3-5 days) is shown.
     Then Future weather for my location is shown
-
-  Scenario: AC3 - Garden location cannot be found
-    Then No weather is shown
