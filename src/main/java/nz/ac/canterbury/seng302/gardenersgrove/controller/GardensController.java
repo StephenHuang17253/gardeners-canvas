@@ -220,7 +220,7 @@ public class GardensController {
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
         List<Garden> gardenList = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("userGardens", gardenList);
+        model.addAttribute("friendGardens", gardenList);
 
         return "gardensPage";
     }
