@@ -19,12 +19,12 @@
             </div>
             <div class="tableList-table-contain">
                 <div th:each="garden : ${publicGardens}">
-                    <div th:replace="fragmentExample/fragments/gardenBox.html ::
+                    <div th:replace="~{fragmentExample/fragments/gardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},
                         gardenLocation=${garden.getGardenLocation},
                         gardenSize=${garden.getGardenSize},
-                        numberOfPlants=${garden.getPlants?.size()})">
+                        numberOfPlants=${garden.getPlants?.size()})}">
                     </div>
 
                 </div>

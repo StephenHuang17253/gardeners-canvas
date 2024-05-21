@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  * Controller for viewing all the created Gardens
  */
 @Controller
-@SessionAttributes("userGardens")
 public class PublicGardensController {
 
     Logger logger = LoggerFactory.getLogger(PublicGardensController.class);
@@ -32,15 +31,10 @@ public class PublicGardensController {
 
     private final SecurityService securityService;
 
-    private final PlantService plantService;
-
-    private final FileService fileService;
 
     @Autowired
-    public PublicGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService) {
+    public PublicGardensController(GardenService gardenService, SecurityService securityService) {
         this.gardenService = gardenService;
-        this.plantService = plantService;
-        this.fileService = fileService;
         this.securityService = securityService;
 
     }
