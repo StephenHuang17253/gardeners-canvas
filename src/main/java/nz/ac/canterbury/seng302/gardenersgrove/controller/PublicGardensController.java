@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller for viewing all the created Gardens
+ * Controller for viewing all public gardens
  */
 @Controller
 public class PublicGardensController {
@@ -40,9 +40,9 @@ public class PublicGardensController {
     }
 
     /**
-     * Maps the myGardensPage html file to /my-gardens url
+     * returns a page with 10 most recent public gardens
      *
-     * @return thymeleaf createNewGardenForm
+     * @return thymeleaf BrowsePublicGardens html element
      */
     @GetMapping("/public-gardens")
     public String publicGardens(Model model) {
