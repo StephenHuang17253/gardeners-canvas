@@ -24,7 +24,7 @@ public enum ValidationResult {
     INVALID_FILE_SIZE("Image must be less than 10MB"),
     AREA_TOO_SMALL("Area (meters squared) is too small"),
     AREA_TOO_LARGE("Area (meters squared) is too large"),
-    TEXT_CONTAINS_PROFANITY("Field contains Profanity"),
+    DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
     INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text");
 
     private String message;

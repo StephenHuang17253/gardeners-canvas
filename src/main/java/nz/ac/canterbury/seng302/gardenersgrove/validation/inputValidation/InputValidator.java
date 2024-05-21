@@ -265,7 +265,6 @@ public class InputValidator {
      * either case
      *
      * @param text
-     * @param length
      * @return
      */
     public static ValidationResult validateDescription(String text) {
@@ -273,10 +272,21 @@ public class InputValidator {
                 .lengthHelper(512)
                 .NotOnlyNumOrSpecChar()
                 .getResult();
+
         if (!result.valid()) {
             result.updateMessage(ValidationResult.INVALID_DESCRIPTION.toString());
+            return result;
         }
+
+        ValidationResult result2 = new InputValidator(text)
+                .profanityHelper()
+                .getResult();
+        if (!result2.valid()) {
+            return result2;
+        }
+
         return result;
+
     }
 
     /**
@@ -772,7 +782,7 @@ public class InputValidator {
             boolean containsProfanity = profanityService.containsProfanity(returnedResult);
 
             if (containsProfanity) {
-                this.validationResult = ValidationResult.TEXT_CONTAINS_PROFANITY;
+                this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
                 this.passState = false;
                 return this;
             }
