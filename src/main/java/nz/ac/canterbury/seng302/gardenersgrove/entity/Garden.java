@@ -1,6 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +39,11 @@ public class Garden {
 
     @Column(nullable = true)
     private Double gardenSize;
-    
+
+    @Column(name="creation_date")
+    @CreatedDate
+    private LocalDateTime creationDate;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -71,6 +78,7 @@ public class Garden {
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
         this.owner = owner;
+        this.creationDate = LocalDateTime.now();
     }
 
     /**
@@ -136,10 +144,15 @@ public class Garden {
     public double getGardenSize() {
         return gardenSize;
     }
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
-    public User getOwner() { return owner; }
+    public User getOwner() {
+        return owner;
+    }
     public List<Plant> getPlants(){
         return plants;
     }
