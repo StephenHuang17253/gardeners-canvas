@@ -50,7 +50,6 @@ public class MyGardensController {
         this.plantService = plantService;
         this.fileService = fileService;
         this.securityService = securityService;
-
     }
 
     /**

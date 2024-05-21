@@ -119,4 +119,8 @@ public class GardenService {
             throw new IllegalArgumentException("Invalid garden ID");
         }
     }
+
+    public List<Garden> getGardenByName(String gardenName) {
+        return gardenRepository.findByGardenName(gardenName);
+    }
 }
