@@ -1,0 +1,57 @@
+.weather {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+}
+.weather-box {
+    flex:1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.weather-detail-icon {
+    position: relative;
+    display: block;
+    transition: background-color 0.3s;
+    height: 30px;
+    width: 30px;
+}
+
+.weather-icon {
+    position: relative;
+    display: block;
+    transition: background-color 0.3s;
+    height: 60px;
+    width: 60px;
+}
+
+.weather-date {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.weather-text {
+    align-items: center;
+}
+
+.weather-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.weather-detail-pair {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.attribution {
+    float: right;
+    margin-right: 20px;
+    font-size: smaller;
+}

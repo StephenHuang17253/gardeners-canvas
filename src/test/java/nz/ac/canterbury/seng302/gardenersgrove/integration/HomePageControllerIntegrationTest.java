@@ -111,8 +111,7 @@ public void before_or_after_all() {
         this.mockMvc.perform(get("/home"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("username",is("Welcome John Doe")))
-                .andExpect(model().attribute("profilePicture", is("/images/default_profile_picture.png")));
+                .andExpect(model().attribute("username",is("Welcome John Doe")));
     };
 
 

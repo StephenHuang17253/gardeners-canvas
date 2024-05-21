@@ -1,10 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -22,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -70,7 +66,9 @@ public class MyGardensControllerIntegrationTests {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                10,
+                10.0,
+                "-43.5214643",
+                "172.5796159",
                 user1);
         Garden garden2 = new Garden(
                 "Jane's Garden",
@@ -79,7 +77,9 @@ public class MyGardensControllerIntegrationTests {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20,
+                20.0,
+                "-43.5214643",
+                "172.5796159",
                 user2);
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);

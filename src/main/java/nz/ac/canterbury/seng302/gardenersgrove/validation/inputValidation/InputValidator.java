@@ -222,7 +222,7 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(Float.MAX_VALUE, 0.01F)
+                .areaHelper(8000000.0, 0.01)
                 .getResult();
     }
 
@@ -667,26 +667,26 @@ public class InputValidator {
      * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(float maxArea, float minArea) {
+    private InputValidator areaHelper(Double maxArea, Double minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
         }
 
-        float floatGardenSize;
+        double doubleGardenSize;
         if(testedValue.isBlank()){
             this.validationResult = ValidationResult.OK;
             return this;
         } else{
-            floatGardenSize = Float.parseFloat(testedValue.replace(",","."));
+            doubleGardenSize = Double.parseDouble(testedValue.replace(",","."));
         }
 
-        if (floatGardenSize < minArea) {
+        if (doubleGardenSize < minArea) {
             this.validationResult = ValidationResult.AREA_TOO_SMALL;
             this.passState = false;
             return this;
         }
-        if (floatGardenSize > maxArea) {
+        if (doubleGardenSize > maxArea) {
             this.validationResult = ValidationResult.AREA_TOO_LARGE;
             this.passState = false;
             return this;

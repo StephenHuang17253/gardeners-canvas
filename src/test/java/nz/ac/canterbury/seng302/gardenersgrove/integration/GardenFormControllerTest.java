@@ -65,7 +65,6 @@ public class GardenFormControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
-        ;
 
         if (!userService.emailInUse(mockUser.getEmailAddress()))
         {
@@ -81,7 +80,9 @@ public class GardenFormControllerTest {
                 "test",
                 "80",
                 "test",
-                1.0f,
+                10.0,
+                "-43.5214643",
+                "172.5796159",
                 mockUser
 
         );
@@ -98,14 +99,14 @@ public class GardenFormControllerTest {
     }
 
     @Test
-    public void controllerLoads()
+    void controllerLoads()
     {
         assertNotNull(gardenFormController);
     }
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void mvcMockIsAlive() throws Exception
+    void mvcMockIsAlive() throws Exception
     {
         mockMvc.perform(get("/create-new-garden"))
                 .andExpect(status().isOk());
@@ -113,7 +114,7 @@ public class GardenFormControllerTest {
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postBasicNewGarden_AtLeastOneGardenAdded() throws Exception
+    void gardenFormController_postBasicNewGarden_AtLeastOneGardenAdded() throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -134,7 +135,9 @@ public class GardenFormControllerTest {
                             .param("city","Hi")
                             .param("country","Hi")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -154,7 +157,7 @@ public class GardenFormControllerTest {
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postBasicGardenEdit_gardenEdited() throws Exception
+    void gardenFormController_postBasicGardenEdit_gardenEdited() throws Exception
     {
 
 
@@ -165,7 +168,9 @@ public class GardenFormControllerTest {
                 .param("city","Hi")
                 .param("country","Hi")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -185,7 +190,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
     "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenName(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -207,7 +212,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -230,7 +237,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenName(String input) throws Exception
     {
 
 
@@ -242,15 +249,17 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenName(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -272,7 +281,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -291,9 +302,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenName(String input) throws Exception
     {
 
 
@@ -305,7 +316,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -320,7 +333,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ","son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_streetAddress(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -342,7 +355,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -365,7 +380,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ","son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_StreetAddress(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_StreetAddress(String input) throws Exception
     {
 
 
@@ -377,15 +392,17 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -407,7 +424,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -426,9 +445,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
 
 
@@ -440,7 +459,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -454,7 +475,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ", "son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_suburb(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -476,7 +497,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -499,7 +522,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ", "son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_suburb(String input) throws Exception
     {
 
 
@@ -511,15 +534,17 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_suburb(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -541,7 +566,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -560,9 +587,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_suburb(String input) throws Exception
     {
 
 
@@ -574,7 +601,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -587,7 +616,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_city(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -609,7 +638,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -632,7 +663,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_city(String input) throws Exception
     {
 
 
@@ -644,15 +675,17 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -674,7 +707,9 @@ public class GardenFormControllerTest {
                             .param("country","Hi")
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -693,9 +728,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_city(String input) throws Exception
     {
 
 
@@ -707,7 +742,9 @@ public class GardenFormControllerTest {
                 .param("country","Hi")
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
@@ -721,7 +758,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_country(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -743,7 +780,9 @@ public class GardenFormControllerTest {
                             .param("country",input)
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -766,7 +805,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_country(String input) throws Exception
     {
 
 
@@ -778,15 +817,17 @@ public class GardenFormControllerTest {
                 .param("country",input)
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_country(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -808,7 +849,9 @@ public class GardenFormControllerTest {
                             .param("country",input)
                             .param("gardenLocation","My Home")
                             .param("postcode","123")
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -827,9 +870,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_country(String input) throws Exception
     {
 
 
@@ -841,7 +884,9 @@ public class GardenFormControllerTest {
                 .param("country",input)
                 .param("gardenLocation","My Home")
                 .param("postcode","123")
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
@@ -855,7 +900,7 @@ public class GardenFormControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"", " ","son", " input", "More name", "123", "123 123", "12S 34E", "12345321" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_postCode(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -877,7 +922,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode",input)
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -899,7 +946,7 @@ public class GardenFormControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {""," ", "son", " input", "More name", "123", "123 123", "12S 34E", "12345321" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_postCode(String input) throws Exception
     {
 
 
@@ -911,16 +958,18 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode",input)
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_postCode(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -942,7 +991,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode",input)
-                            .param("gardenSize","123"))
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -961,10 +1012,10 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_postCode(String input) throws Exception
     {
 
 
@@ -976,7 +1027,9 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode",input)
-                .param("gardenSize","123")).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
@@ -986,9 +1039,9 @@ public class GardenFormControllerTest {
     //
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", ""})
+    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", "8000000.00", "0.01"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -1010,7 +1063,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode","123")
-                            .param("gardenSize",input))
+                            .param("gardenSize",input)
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -1030,9 +1085,9 @@ public class GardenFormControllerTest {
 
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", ""})
+    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", "0.01", "8000000,00"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenSize(String input) throws Exception
     {
 
 
@@ -1044,19 +1099,21 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode","123")
-                .param("gardenSize",input)).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize",input)
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)", "0.009", "0", "8000000,01" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -1078,7 +1135,9 @@ public class GardenFormControllerTest {
                             .param("country","input")
                             .param("gardenLocation","input")
                             .param("postcode","123")
-                            .param("gardenSize",input))
+                            .param("gardenSize",input)
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -1097,13 +1156,13 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)",  "0", "8000000,01"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
 
 
@@ -1115,7 +1174,9 @@ public class GardenFormControllerTest {
                 .param("country","input")
                 .param("gardenLocation","input")
                 .param("postcode","123")
-                .param("gardenSize",input)).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize",input)
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 

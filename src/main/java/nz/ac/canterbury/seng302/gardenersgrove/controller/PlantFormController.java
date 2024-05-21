@@ -189,13 +189,14 @@ public class PlantFormController {
 
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
-        String plantPicture = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+        String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
+        logger.info(plantPicture);
         return "editPlantForm"; // Return the view for creating a new plant
     }
 
@@ -244,7 +245,7 @@ public class PlantFormController {
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
 
-        String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+        String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPictureString);
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
