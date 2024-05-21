@@ -56,13 +56,6 @@ public class ViewGarden {
     @Given("I as user {string} is on my garden details page for {string}")
     public void iAsUserIsOnMyGardenDetailsPageFor(String userEmail, String gardenName) throws Exception {
         User user = userService.getUserByEmail(userEmail);
-//        Garden garden = null;
-//        for (Garden g : user.getGardens()) {
-//            if (g.getGardenName().equals(gardenName)) {
-//                garden = g;
-//                break;
-//            }
-//        }
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
