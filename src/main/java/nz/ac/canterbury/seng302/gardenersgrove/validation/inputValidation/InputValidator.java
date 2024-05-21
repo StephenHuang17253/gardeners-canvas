@@ -364,12 +364,6 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult validateProfanity(String text) {
-        return new InputValidator(text)
-                .profanityHelper()
-                .getResult();
-    }
-
 
     /**
      * Checks if a string is blank or not if a string is
@@ -794,7 +788,6 @@ public class InputValidator {
         this.validationResult = ValidationResult.OK;
         return this;
     }
-
 
     /**
      * returns this objects validation result

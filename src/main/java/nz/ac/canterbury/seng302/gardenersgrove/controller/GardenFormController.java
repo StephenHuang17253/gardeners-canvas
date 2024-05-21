@@ -181,7 +181,6 @@ public class GardenFormController {
         gardenFormErrorText(model, gardenNameResult, streetAddressResult, suburbResult, cityResult, countryResult,
                 postcodeResult, gardenSizeResult, gardenDescriptionResult);
 
-        ValidationResult gardenNameProfaintyResult = InputValidator.validateProfanity(gardenName);
 
         if (gardenSize.isBlank()) {
             gardenSize = null;
