@@ -1,6 +1,6 @@
 :root {
-    --half-scrollable-container-width: calc(50%);
-    --container-width: calc(100%);
+    --half-scrollable-container-width: 50%;
+    --container-width: 100%;
 }
 
 .tableList-header-button-contain {
@@ -15,7 +15,7 @@
     gap: 20px;
     min-height: 100vh;
     padding-bottom: 20px;
-    --container-width: 100%
+    --container-width: 100%;
 }
 
 .content-container {
@@ -23,6 +23,7 @@
     gap: 20px;
     align-items: flex-start;
     margin-top: 20px;
+    margin-left: 20px;
 }
 
 .tableList-header {
@@ -33,7 +34,7 @@
 }
 
 .tableList-header-title {
-    max-width: calc(var(--container-width));
+    max-width: var(--container-width);
     white-space: pre-wrap;
     word-wrap: break-word;
 }
@@ -41,15 +42,15 @@
 .scrollable-container {
     flex: 2;
     max-height: 100vh;
-    max-width: 60vw;
+    max-width: 57vw;
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 1rem;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
     white-space: normal !important;
-    --half-scrollable-container-width: 50%;
 }
+
 .plants-grid {
     display: flex;
     flex-wrap: wrap;
@@ -64,9 +65,8 @@
     box-sizing: border-box;
 }
 
-
 .plant-description {
-    max-width: calc(var(--half-scrollable-container-width) + 10vw);
+    max-width: 15vw;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
@@ -84,4 +84,3 @@
     word-wrap: break-word;
     white-space: normal;
 }
-
