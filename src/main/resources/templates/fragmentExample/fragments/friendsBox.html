@@ -1,0 +1,13 @@
+<div th:fragment="friendsBox(friendsProfilePicture, friendsName,  friendsGardenLink)">
+    <div class="gardenbox" id="gardenbox">
+        <div class="garden-details">
+            <img id="imageToChange" th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/plants/' + friendsProfilePicture}}"
+                 alt="Plant Image" class="plant-image">
+            <br>
+            <span th:text="${friendsName}" class="garden-name"></span>
+            <br>
+            <a th:href="@{${friendsGardenLink}}"> Their Gardens</a>
+        </div>
+    </div>
+    <br>
+</div>
