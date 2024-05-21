@@ -13,7 +13,7 @@ Editing content below will change the nav bar on all pages where it is implement
 
 
 <nav th:fragment = "navBar(activeParam)" id="navbar">
-    <ul>
+    <ul class="navbarContainer">
         <li th:class="${activeParam == 'home' ? 'active' : ''}">
             <a th:href="@{/home}">Home</a>
         </li>
@@ -33,15 +33,27 @@ Editing content below will change the nav bar on all pages where it is implement
             </button>
         </li>
         <li th:class="${activeParam == 'gardens' ? 'active' : ''}" th:if="${loggedIn == null ? false : loggedIn}" id = "gardenDropDown" >
-            <a th:href="@{/my-gardens}">My Gardens</a>
-            <ul>
-                <li th:each="garden : ${session.userGardens}">
-                    <a th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}">
-                        <span th:text="${garden.getGardenName}">Garden Name</span>
-                    </a>
-                </li>
-             </ul>
+
+            <div class="dropdownContainer">
+                <a th:href="@{/my-gardens}">My Gardens</a>
+
+                <ul>
+                    <li th:each="garden : ${session.userGardens}">
+                        <a th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}">
+                            <span th:text="${garden.getGardenName}">Garden Name</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+
          </li>
+
+        <li th:class="${activeParam == 'browsePublic' ? 'active' : ''}" th:if="${loggedIn == null ? false : loggedIn}">
+            <button id="browsePublicGardensButton" class =  "navBarButton" onclick="openPublicGardens()">
+                <a>Browse Gardens</a>
+            </button>
+        </li>
 
 
      </ul>
