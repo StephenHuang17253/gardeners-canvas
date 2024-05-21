@@ -1,15 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +12,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Controller for viewing all the created Gardens
@@ -56,16 +51,21 @@ public class PublicGardensController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/public-gardens")
-    public String myGardens(Model model) {
+    public String publicGardens(Model model) {
         logger.info("GET /public-gardens");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        List<Garden> publicGardens = gardenService.getGardens();
+        List<Garden> allGardens = gardenService.getGardens();
 
-        model.addAttribute("publicGardens", publicGardens);
+        List<Garden> tenSortedPublicGardens = allGardens.stream()
+                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
+                .limit(10L) // Temporary limit until pagination is implemented.
+                .collect(Collectors.toList());
+
+        model.addAttribute("publicGardens", tenSortedPublicGardens);
 
         return "BrowsePublicGardens";
     }
