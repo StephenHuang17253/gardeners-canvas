@@ -12,7 +12,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import org.hibernate.query.SyntaxException;
 import org.junit.jupiter.api.Assertions;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +26,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 import org.mockito.Mockito;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.doThrow;
+
 
 @SpringBootTest
 public class WeatherMonitoring {
