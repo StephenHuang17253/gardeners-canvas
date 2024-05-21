@@ -144,13 +144,15 @@ public class Garden {
     public double getGardenSize() {
         return gardenSize;
     }
-
     public LocalDateTime getCreationDate() {
-        return creationDate;}
+        return creationDate;
+    }
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
-    public User getOwner() { return owner; }
+    public User getOwner() {
+        return owner;
+    }
     public List<Plant> getPlants(){
         return plants;
     }

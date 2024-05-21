@@ -1,10 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,18 +25,16 @@ public class PublicGardensController {
 
     private final GardenService gardenService;
 
-    private final SecurityService securityService;
-
 
     @Autowired
-    public PublicGardensController(GardenService gardenService, SecurityService securityService) {
+    public PublicGardensController(GardenService gardenService) {
         this.gardenService = gardenService;
-        this.securityService = securityService;
+
 
     }
 
     /**
-     * returns a page with 10 most recent public gardens
+     * returns a page with the 10 most recent public gardens
      *
      * @return thymeleaf BrowsePublicGardens html element
      */
