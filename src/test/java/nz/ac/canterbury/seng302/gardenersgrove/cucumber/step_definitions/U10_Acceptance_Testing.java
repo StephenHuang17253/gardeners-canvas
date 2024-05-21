@@ -64,8 +64,8 @@ public class U10_Acceptance_Testing {
     String gardenCountry;
     String gardenSize;
 
-    String gardenLongitude;
-    String gardenLatitude;
+    String gardenLongitude = "";
+    String gardenLatitude = "";
 
     private Garden expectedGarden;
 
@@ -169,7 +169,7 @@ public class U10_Acceptance_Testing {
                         .param("postcode", "")
                         .param("gardenSize", gardenSize)
                         .param("latitude", gardenLatitude)
-                        .param("longitude", gardenLongitude)// must be present, but is overridden immediately in controller
+                        .param("longitude", gardenLongitude)
 
         ).andReturn();
     }
