@@ -35,7 +35,7 @@
 
             <label for="plantCount"> Plant Count: </label>
             <br>
-            <input type="text" class="form-control" th:class = "${PCErrorClass}" id="plantCount" placeholder="Number of plants"
+            <input type="number" class="form-control" th:class = "${PCErrorClass}" id="plantCount" placeholder="Number of plants"
                    th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount" autofocus>
 
             <div th:if="${PCErrorText!=''}">
