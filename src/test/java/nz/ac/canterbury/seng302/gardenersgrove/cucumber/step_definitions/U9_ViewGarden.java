@@ -6,6 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+
+import java.util.List;
 
 @SpringBootTest
 public class U9_ViewGarden {
@@ -79,9 +82,8 @@ public class U9_ViewGarden {
     @When("I try to visit user {string}'s garden, {string}")
     public void iTryToVisitGarden(String userEmail, String gardenName) throws Exception {
         User user = userService.getUserByEmail(userEmail);
-        String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
         resultActions = MOCK_MVC.perform(
-                get("/my-gardens/{gardenId}", gardenId));
+                get("/my-gardens/{gardenId}", user.getGardens().get(0).getGardenId()));
     }
 
     @Then("I am unable to visit the page")
