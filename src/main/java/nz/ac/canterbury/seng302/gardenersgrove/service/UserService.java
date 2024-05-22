@@ -202,7 +202,9 @@ public class UserService {
         User user = getUserById(id);
         user.getGardens().add(garden);
         userRepository.save(user);
+
     }
+
 
 
 }

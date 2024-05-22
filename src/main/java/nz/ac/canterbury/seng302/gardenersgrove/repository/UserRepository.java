@@ -46,4 +46,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param id The id of the user to delete
      */
     void deleteById(long id);
+
+
 }
