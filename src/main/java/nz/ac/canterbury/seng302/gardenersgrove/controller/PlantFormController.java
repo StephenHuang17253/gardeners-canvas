@@ -128,9 +128,6 @@ public class PlantFormController {
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
 
-        System.out.println(plantCountResult.valid());
-        System.out.println(plantCountResult.toString());
-
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
@@ -242,9 +239,6 @@ public class PlantFormController {
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
         }
-
-        System.out.println(plantCountResult.valid());
-        System.out.println(plantCountResult.toString());
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
 
