@@ -32,11 +32,4 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
      * @return list of garden objects
      */
     List<Garden> findByOwnerId(long userId);
-
-    /**
-     * Find all Garden objects in repo where garden name matches gardenName
-     * @param gardenName the garden's name
-     * @return list of garden objects
-     */
-    List<Garden> findByGardenName(String gardenName);
 }

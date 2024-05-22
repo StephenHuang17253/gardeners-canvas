@@ -7,16 +7,16 @@
 
    Scenario: AC1 - A logged in user can view gardens which they own
      Given I as user "kaia@email.com" am logged in with "TestPassword10!"
-     When I try to visit garden "Kaia's Garden"
+     When I try to visit user "kaia@email.com"'s garden, "Kaia's Garden" 
      Then I am able to visit the page
      And The garden's name "Kaia's Garden" and location "Christchurch", "New Zealand" are visible
 
    Scenario: AC4 - A logged in user cannot view gardens which they don't own
      Given I as user "kaia@email.com" am logged in with "TestPassword10!"
-     When I try to visit garden "Jeff's Money Trees"
+     When I try to visit user "jeffbezos@email.com"'s garden, "Jeff's Money Trees" 
      Then I am unable to visit the page
-#
+
    Scenario: AC5 - A non-logged in user cannot view any gardens
      Given I am not logged in
-     When I try to visit garden "Jeff's Money Trees"
+     When I try to visit user "jeffbezos@email.com"'s garden, "Jeff's Money Trees" 
      Then I am unable to visit the page

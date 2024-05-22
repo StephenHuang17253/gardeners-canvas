@@ -6,7 +6,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -20,8 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -78,16 +75,13 @@ public class U9_ViewGarden {
 
     }
 
-    @When("I try to visit garden {string}")
-    public void iTryToVisitGarden(String gardenName) throws Exception {
-        List<Garden> gardens = gardenService.getGardenByName(gardenName);
-        if (gardens.size() == 0) {
-            throw new IllegalArgumentException("No garden with name " + gardenName);
-        }
-        Long gardenId = gardens.get(0).getGardenId();
 
+    @When("I try to visit user {string}'s garden, {string}")
+    public void iTryToVisitGarden(String userEmail, String gardenName) throws Exception {
+        User user = userService.getUserByEmail(userEmail);
+        String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
         resultActions = MOCK_MVC.perform(
-                get("/my-gardens/{gardenId}", gardenId.toString()));
+                get("/my-gardens/{gardenId}", gardenId));
     }
 
     @Then("I am unable to visit the page")
