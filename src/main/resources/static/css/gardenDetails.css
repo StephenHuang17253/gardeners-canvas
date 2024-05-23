@@ -1,0 +1,86 @@
+:root {
+    --half-scrollable-container-width: 50%;
+    --container-width: 100%;
+}
+
+.tableList-header-button-contain {
+    display: flex;
+    gap: 0;
+    margin-top: 10px;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 100vh;
+    padding-bottom: 20px;
+    --container-width: 100%;
+}
+
+.content-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.tableList-header {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tableList-header-title {
+    max-width: var(--container-width);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.scrollable-container {
+    flex: 2;
+    max-height: 100vh;
+    max-width: 57vw;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+.plants-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.plant-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 1 calc(33.33%);
+    box-sizing: border-box;
+}
+
+.plant-description {
+    max-width: 15vw;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.plant-image {
+    align-self: flex-start;
+}
+
+.edit-button-container {
+    margin-top: 10px;
+    gap: 0;
+}
+
+.break-word {
+    word-wrap: break-word;
+    white-space: normal;
+}
