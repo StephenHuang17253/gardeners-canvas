@@ -31,8 +31,7 @@ class InputValidatorTest {
     static void setup() {
         userServiceMock = Mockito.mock(UserService.class);
         profanityServiceMock = Mockito.mock(ProfanityService.class);
-        InputValidator testValidator = new InputValidator();
-        testValidator.UserService(userServiceMock, profanityServiceMock);
+        InputValidator testValidator = new InputValidator(userServiceMock, profanityServiceMock);
     }
 
     @BeforeEach

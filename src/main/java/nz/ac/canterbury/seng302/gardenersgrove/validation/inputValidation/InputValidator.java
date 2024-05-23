@@ -39,11 +39,6 @@ public class InputValidator {
      *
      * @param inputUserService
      */
-    @Autowired
-    public void UserService(UserService inputUserService, ProfanityService inputProfanityService) {
-        userService = inputUserService;
-        profanityService = inputProfanityService;
-    }
 
     /**
      * Warning, constructor only for automated use, for manual use, use
@@ -54,7 +49,10 @@ public class InputValidator {
      * Creating an object of this type manually will have no effect and no use
      * except when testing
      */
-    public InputValidator() {
+    @Autowired
+    public InputValidator(UserService inputUserService, ProfanityService inputProfanityService) {
+        userService = inputUserService;
+        profanityService = inputProfanityService;
     }
 
     /**
@@ -767,7 +765,7 @@ public class InputValidator {
      *
      * @return the calling object
      */
-    private InputValidator profanityHelper() {
+    public InputValidator profanityHelper() {
         if (!this.passState) {
             return this;
         }
