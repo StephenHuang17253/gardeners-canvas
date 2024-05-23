@@ -19,7 +19,12 @@
             <div class="tableList-table-contain">
                 <div class="buttons">
                     <button class="user_button" id="addFriendButton"> Add Friend</button>
-                    <div id="searchBarContainer" th:class=""></div>
+                    <div id="searchBarContainer" style="display: none;">
+                        <form th:action="@{/manage-friends/search}" method="get">
+                            <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search" />
+                            <button type="submit" class="user_button">Search</button>
+                        </form>
+                    </div>
                 </div>
                 <div class="tableList-table-count">
                     <br>
