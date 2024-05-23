@@ -185,12 +185,13 @@ public class U17_SendFriendRequest {
         throw new io.cucumber.java.PendingException();
     }
 
-    @Then("I can see a list of users of the app not matching {string} {string} {string}")
-    public void i_can_see_a_list_of_users_of_the_app_not_matching(String fname, String lname, String email
-    ) {
+    @Then("I can see the error {string}")
+    public void i_can_see_the_error(String error) {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }
+
+
 
 
 

@@ -58,7 +58,7 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     And I have opened the search bar
     And I enter in <differentFName>, <differentLName>, <differentEmail>
     And I hit the search button
-    Then I can see a list of users of the app not matching <fname> <lname> <email>
+    Then I can see the error "There is nobody with that name or email in Gardener’s Grove"
     Examples:
       | fname   | lname   | email           | differentFName | differentLName | differentEmail |
       | "Amy"   | "Doe"   | "doe@gmail.com" | "Andy"         | ""             | ""             |
