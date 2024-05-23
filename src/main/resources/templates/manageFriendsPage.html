@@ -17,6 +17,10 @@
             </div>
             <br>
             <div class="tableList-table-contain">
+                <div class="buttons">
+                    <button class="user_button" id="addFriendButton"> Add Friend</button>
+                    <div id="searchBarContainer" th:class=""></div>
+                </div>
                 <div class="tableList-table-count">
                     <br>
                     <span th:text="${userFriends?.size() ?: 0} + ' Friends'"> </span>
@@ -27,10 +31,9 @@
                         friendsName=${friend.getFriendName},
                         friendsGardenLink=${friend.getFriendGardenLink})">
                     </div>
-
                 </div>
             </div>
         </div>
+    <script th:src="@{/js/manageFriendsPage.js}"></script>
     </body>
-
 </html>
