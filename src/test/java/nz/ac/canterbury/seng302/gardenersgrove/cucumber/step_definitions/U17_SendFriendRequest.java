@@ -85,7 +85,7 @@ public class U17_SendFriendRequest {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
-                securityService, fileService);
+                securityService, fileService, userService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 

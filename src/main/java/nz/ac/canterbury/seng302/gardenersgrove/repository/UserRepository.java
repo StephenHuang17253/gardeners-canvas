@@ -1,7 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -46,4 +48,20 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param id The id of the user to delete
      */
     void deleteById(long id);
+
+
+    /**
+     * Finds matching users. Based on examples found on chatgpt and on research on https://www.baeldung.com/spring-data-jpa-query
+     * @param email Email address to match
+     * @param firstName First name to match
+     * @param lastName Last name to match
+     * @return list of matching users
+     */
+    @Query("SELECT u FROM User u WHERE " +
+            "(u.firstName = :firstName AND u.lastName = :lastName) OR " +
+            "u.emailAddress = :email")
+    User[] findUsersByEmailAddressOrFirstNameAndLastName(
+            @Param("firstName") String firstName,
+            @Param("lastName") String lastName,
+            @Param("email") String email);
 }

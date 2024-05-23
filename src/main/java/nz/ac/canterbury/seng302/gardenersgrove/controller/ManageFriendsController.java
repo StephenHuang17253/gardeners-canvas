@@ -4,6 +4,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.ArrayList;
@@ -32,6 +35,8 @@ public class ManageFriendsController {
 
     private final FileService fileService;
 
+    private final UserService userService;
+
     /**
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
@@ -41,10 +46,11 @@ public class ManageFriendsController {
      * @param fileService service to manage files
      */
     @Autowired
-    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService) {
+    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
         this.friendshipService = friendshipService;
         this.fileService = fileService;
         this.securityService = securityService;
+        this.userService = userService;
 
     }
 
@@ -97,4 +103,43 @@ public class ManageFriendsController {
 
         return "manageFriendsPage";
     }
+
+    /**
+     * Gets results of search for other users
+     *
+     * @return thymeleaf manageFriendsPage
+     */
+    @GetMapping("/manage-friends/search")
+    public String searchForUsers(@RequestParam("searchInput") String searchInput, Model model) {
+        logger.info("GET /manage-friends/search");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+        //preparing input for validation
+        searchInput = searchInput.strip();
+        ValidationResult validEmail = InputValidator.validateEmail(searchInput);
+        String[] seperated = searchInput.split(" ");
+
+        //validating input
+        ValidationResult validFName = InputValidator.validateName(seperated[0]);
+        ValidationResult validLName = InputValidator.validateName((seperated.length > 1) ? seperated[1] : "");
+
+        //getting results
+        if (validEmail.valid() || validFName.valid() || validLName.valid()) {
+            User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
+            List<FriendModel> friendModels = new ArrayList<>();
+
+            for (User user : searchResults) {
+                String friendProfilePicture = user.getProfilePictureFilename();
+                String friendsName = user.getFirstName() + " " + user.getLastName();
+                String friendGardenLink = "/" + user.getId() + "/gardens";
+                FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+                friendModels.add(friendModel);
+            }
+            model.addAttribute("userFriends", friendModels);
+        }
+        return "manageFriendsPage";
+    }
+
 }

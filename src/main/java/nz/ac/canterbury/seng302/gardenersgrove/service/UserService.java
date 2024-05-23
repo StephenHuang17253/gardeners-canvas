@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,6 +203,28 @@ public class UserService {
         User user = getUserById(id);
         user.getGardens().add(garden);
         userRepository.save(user);
+    }
+
+    /**
+     * Seperates input into firstname, lastname or identifies it as email
+     * @param input search box input to match users with
+     * @param emailValidation ValidationResult regarding email check on input
+     * @return users with emails or first and last names that match the input.
+     */
+    public User[] getMatchingUsers(String input, ValidationResult emailValidation) {
+        String fName = "";
+        String lName = "";
+        String email = "";
+        if (emailValidation.valid()) {
+            email = input;
+        } else {
+            String[] seperated = input.strip().split(" ");
+            fName = seperated[0];
+            if (seperated.length > 1) {
+                lName = seperated[1];
+            }
+        }
+        return userRepository.findUsersByEmailAddressOrFirstNameAndLastName(fName, lName, email);
     }
 
 
