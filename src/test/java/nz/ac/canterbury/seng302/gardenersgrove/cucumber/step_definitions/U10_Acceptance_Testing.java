@@ -78,10 +78,6 @@ public class U10_Acceptance_Testing {
     public void before_or_after_all() throws IOException, InterruptedException {
         profanityService = Mockito.mock(ProfanityService.class);
         inputValidator = new InputValidator(userService, profanityService);
-        String mockResponse = "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":null,\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}";
-
-        Mockito.doReturn(mockResponse).when(profanityService).moderateContent(Mockito.anyString());
-        Mockito.doReturn(false).when(profanityService).containsProfanity(Mockito.anyString());
 
         Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
 

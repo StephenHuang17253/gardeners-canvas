@@ -769,18 +769,12 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
-        try {
-            String returnedResult = profanityService.moderateContent(testedValue);
-            boolean containsProfanity = profanityService.containsProfanity(returnedResult);
+        boolean containsProfanity = profanityService.containsProfanity(testedValue);
 
-            if (containsProfanity) {
-                this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
-                this.passState = false;
-                return this;
-            }
-        } catch (IOException | InterruptedException IE) {
-            // Log the fail in the system,
-            System.err.println("Error while sending post request: " + IE.getMessage());
+        if (containsProfanity) {
+            this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
+            this.passState = false;
+            return this;
         }
 
         this.validationResult = ValidationResult.OK;
