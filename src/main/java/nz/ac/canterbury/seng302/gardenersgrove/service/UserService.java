@@ -45,7 +45,7 @@ public class UserService {
     /**
      * Returns a user found by id
      * 
-     * @param id
+     * @param id unique user id
      * @return user if found, null otherwise
      */
     public User getUserById(Long id) {
@@ -68,8 +68,8 @@ public class UserService {
     /**
      * Returns a user found by email and password
      * 
-     * @param email
-     * @param password
+     * @param email user email
+     * @param password user raw password
      * @return user if found, null otherwise
      */
     public User getUserByEmailAndPassword(String email, String password) {
@@ -82,7 +82,7 @@ public class UserService {
                 || Objects.equals(password, user.getEncodedPassword())) {
             return user;
         }
-        if (users.length != 0 && passwordEncoder.matches(password, users[0].getEncodedPassword())) {
+        if (passwordEncoder.matches(password, users[0].getEncodedPassword())) {
             logger.info(users[0].toString());
             return users[0];
         }
@@ -92,7 +92,7 @@ public class UserService {
     /**
      * Returns a user found by email
      * 
-     * @param email
+     * @param email user email to search by
      * @return user if found, null otherwise
      */
     public User getUserByEmail(String email) {
@@ -115,8 +115,8 @@ public class UserService {
     /**
      * Takes a user instance and copies the fields to the user with the given id
      *
-     * @param id
-     * @return
+     * @param id unique id of user
+     * @return updated user
      */
     public User updateUser(long id, String firstName, String lastName, String emailAddress, LocalDate dateOfBirth) {
         User user = getUserById(id);
@@ -130,7 +130,7 @@ public class UserService {
     /**
      * Checks if a user with the given email exists
      * 
-     * @param email
+     * @param email user email
      * @return true if a user with the given email exists, false otherwise
      */
     public boolean emailInUse(String email) {
@@ -187,7 +187,7 @@ public class UserService {
     /**
      * Deletes a user
      *
-     * @param user
+     * @param user User object
      */
     public void deleteUser(User user) {
         userRepository.deleteById(user.getId());

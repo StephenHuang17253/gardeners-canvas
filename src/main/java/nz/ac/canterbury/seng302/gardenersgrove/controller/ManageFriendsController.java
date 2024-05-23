@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Controller for the Manage Friends page
@@ -66,7 +67,7 @@ public class ManageFriendsController {
         List<User> userTypeFriends = new ArrayList<>();
 
         for (Friendship friendship : friendships) {
-            if (friendship.getUser1().getId() == currentUser.getId()) {
+            if (Objects.equals(friendship.getUser1().getId(), currentUser.getId())) {
                 userTypeFriends.add(friendship.getUser2());
             } else {
                 userTypeFriends.add(friendship.getUser1());
@@ -95,7 +96,7 @@ public class ManageFriendsController {
         logger.info("GET /manage-friends");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
         List<FriendModel> friendModels = createFriendModel();
@@ -114,7 +115,7 @@ public class ManageFriendsController {
         logger.info("GET /manage-friends/search");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
         //preparing input for validation
         searchInput = searchInput.strip();
