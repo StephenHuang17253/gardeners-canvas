@@ -4,7 +4,6 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ManageFriendsController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -27,8 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -64,8 +61,6 @@ public class U17_SendFriendRequest {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
-    private LocationService locationService;
 
     public static GardenService gardenService;
 
@@ -161,5 +156,43 @@ public class U17_SendFriendRequest {
 
 
     }
+
+    @Given("A user with first name {string}, last name {string}, and email {string} exists")
+    public void a_user_with_first_name_last_name_and_email_exists(String fname, String lname, String email) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @When("I enter in {string}, {string}, {string}")
+    public void i_enter_in(String fname, String lname, String email) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+    @When("I hit the search button")
+    public void i_hit_the_search_button() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+    @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
+    public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @When("I have opened the search bar")
+    public void i_have_opened_the_search_bar() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("I can see a list of users of the app not matching {string} {string} {string}")
+    public void i_can_see_a_list_of_users_of_the_app_not_matching(String fname, String lname, String email
+    ) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+
+
 
 }
