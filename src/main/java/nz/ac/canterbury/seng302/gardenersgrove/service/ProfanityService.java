@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +69,8 @@ public class ProfanityService {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();
         } catch (IOException | InterruptedException errorException) {
-            logger.error("Automatic Moderation Failure, Moderate Manually " + errorException.getMessage());
+            Thread.currentThread().interrupt();
+            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
             return "Automatic Moderation Failure, Moderate Manually";
         }
 
