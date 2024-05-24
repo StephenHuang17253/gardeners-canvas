@@ -6,6 +6,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation;
  */
 public enum ValidationResult {
     OK("valid"),
+    INVALID("invalid"),
     BLANK("cannot be empty"),
     NOT_PARSABLE("cannot be parsed to a number"),
     NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
@@ -23,7 +24,8 @@ public enum ValidationResult {
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
     INVALID_FILE_SIZE("Image must be less than 10MB"),
     AREA_TOO_SMALL(" (meters squared) is too small."),
-    AREA_TOO_LARGE(" (meters squared) is too large.");
+    AREA_TOO_LARGE(" (meters squared) is too large."),
+    INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
 
     private String message;
 

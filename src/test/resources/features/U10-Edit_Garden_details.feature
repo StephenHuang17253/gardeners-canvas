@@ -1,8 +1,8 @@
 Feature: U10 (Edit garden details): As Kaia, I want to edit information about my garden so I can keep it up to date
 
 Background:
-  Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
-  And I as user "kaia@email.com" have a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
+  Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
+  And User "kaia@email.com" has a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
   And I as user "kaia@email.com" am logged in with "TestPassword10!"
 
   Scenario: AC1 - “Edit” button takes you to prepopulated edit garden form
