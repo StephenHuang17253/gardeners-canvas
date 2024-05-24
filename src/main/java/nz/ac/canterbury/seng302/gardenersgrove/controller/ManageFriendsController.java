@@ -43,9 +43,9 @@ public class ManageFriendsController {
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
-     * @param securityService service to access security methods
+     * @param securityService   service to access security methods
      * @param friendshipService service to access plant repository
-     * @param fileService service to manage files
+     * @param fileService       service to manage files
      */
     @Autowired
     public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
@@ -59,6 +59,7 @@ public class ManageFriendsController {
     /**
      * Helper function to create a list of friend models.
      * Used for adding to the model of the Manage Friends page.
+     *
      * @return friendModels
      */
     private List<FriendModel> createFriendModel() {
@@ -116,7 +117,6 @@ public class ManageFriendsController {
     @GetMapping("/manage-friends/search")
     public String searchForUsers(@RequestParam("searchInput") String searchInput, Model model) {
         logger.info("GET /manage-friends/search");
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
@@ -128,26 +128,26 @@ public class ManageFriendsController {
         //validating input
         ValidationResult validFName = InputValidator.validateName(seperated[0]);
         ValidationResult validLName = InputValidator.validateName((seperated.length > 1) ? seperated[1] : "");
-
+        List<FriendModel> friendModels = new ArrayList<>();
         //getting results
-        if (validEmail.valid() || validFName.valid() || validLName.valid()) {
+        if ((validEmail.valid() || validFName.valid() || validLName.valid()) && searchInput != "") {
             User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
             if (searchResults.length >= 1) {
-                List<FriendModel> friendModels = new ArrayList<>();
-
                 for (User user : searchResults) {
-                    String friendProfilePicture = user.getProfilePictureFilename();
-                    String friendsName = user.getFirstName() + " " + user.getLastName();
-                    String friendGardenLink = "/" + user.getId() + "/gardens";
-                    FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
-                    friendModels.add(friendModel);
+                    if (!Objects.equals(user.getId(), userService.getUserByEmail(authentication.getName()).getId())) {
+                        String friendProfilePicture = user.getProfilePictureFilename();
+                        String friendsName = user.getFirstName() + " " + user.getLastName();
+                        String friendGardenLink = "/" + user.getId() + "/gardens";
+                        FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+                        friendModels.add(friendModel);
+                    }
                 }
-                model.addAttribute("userFriends", friendModels);
-            } else {
-                model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
             }
+            model.addAttribute("userFriends", friendModels);
+        }
 
-
+        if (friendModels.isEmpty()) {
+            model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
         }
         return "manageFriendsPage";
     }
