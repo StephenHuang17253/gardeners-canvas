@@ -147,7 +147,7 @@ public class ManageFriendsController {
     }
     @PostMapping("/manage-friends")
     public String acceptedFriendRequest(@RequestParam(name = "acceptedFriend", required = true) boolean acceptedFriend,
-                                        @RequestParam(name = "pendingFriend", required = true) PendingFriendModel pendingFriendModel,
+                                        @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
                                Model model) {
         logger.info("POST /manage-friends");
 
@@ -155,9 +155,9 @@ public class ManageFriendsController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        Long userId = pendingFriendModel.getUserId();
-        securityService.changeFriendship(userId, FriendshipStatus.ACCEPTED);
+//      Long userId = pendingFriendModel.getUserId();
+        securityService.changeFriendship(pendingFriendId, FriendshipStatus.ACCEPTED);
 
-        return "manageFriendsPage";
+        return "redirect:/manage-friends";
     }
 }

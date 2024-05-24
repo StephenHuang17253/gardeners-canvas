@@ -10,8 +10,13 @@
                 <button class="cancel-request-button">Cancel Friend Request</button>
             </div>
             <div th:if="${!isSender}">
-                <button class="accept-request-button">Accept Friend Request</button>
-                <button class="decline-request-button">Decline Friend Request</button>
+                <form class="manage-friends-form" method="post" th:action="@{/manage-friends}">
+                    <input type="hidden" name="pendingFriendId" th:value="${friendId}">
+                    <input type="hidden" name="acceptedFriend" th:value="false">
+                    <button class="accept-request-button" onclick="manageRequest(this)">Accept Friend Request</button>
+                    <button class="decline-request-button" onclick="manageRequest(this)">Decline Friend Request</button>
+
+                </form>
             </div>
 
 
