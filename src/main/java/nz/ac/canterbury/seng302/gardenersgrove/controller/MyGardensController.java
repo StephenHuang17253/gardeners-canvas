@@ -120,6 +120,7 @@ public class MyGardensController {
            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
            weather.add(gardenWeather.getCurrentWeather());
            weather.addAll(gardenWeather.getForecastWeather());
+           model.addAttribute("message", gardenWeather.getForecastWeather());
         } catch (Error error) {
            DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
            noWeather.setError("Location not found, please update your location to see the weather");
