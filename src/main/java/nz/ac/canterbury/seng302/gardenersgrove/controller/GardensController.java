@@ -5,6 +5,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -205,7 +206,7 @@ public class GardensController {
 
         User friend;
         try {
-            friend = securityService.checkFriendship(userId);
+            friend = securityService.checkFriendship(userId, FriendshipStatus.ACCEPTED);
             if (friend == null) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return "403";
