@@ -51,10 +51,10 @@
                         <div class="tableList-table-contain">
                             <div class="tableList-table-count">
                                 <br>
-                                <span th:text="${pendingFriends?.size() ?: 0} + ' Friends'"> </span>
+                                <span th:text="${pendingFriends?.size() ?: 0} + ' Requests'"> </span>
                             </div>
                             <div th:each="friend : ${pendingFriends}">
-                                <div th:replace="fragmentExample/fragments/friendsBox ::
+                                <div th:replace="fragmentExample/fragments/pendingFriendsBox ::
                                     pendingFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                     friendsName=${friend.getFriendName},
                                     isSender=${friend.isSender})"

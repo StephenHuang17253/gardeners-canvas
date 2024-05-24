@@ -64,10 +64,12 @@ public class ManageFriendsController {
         List<User> userTypeFriends = new ArrayList<>();
 
         for (Friendship friendship : friendships) {
-            if (friendship.getUser1().getId() == currentUser.getId()) {
-                userTypeFriends.add(friendship.getUser2());
-            } else {
-                userTypeFriends.add(friendship.getUser1());
+            if(friendship.getStatus().equals(FriendshipStatus.ACCEPTED)){
+                if (friendship.getUser1().getId().equals(currentUser.getId())) {
+                    userTypeFriends.add(friendship.getUser2());
+                } else {
+                    userTypeFriends.add(friendship.getUser1());
+                }
             }
         }
         for (User userTypeFriend : userTypeFriends) {
