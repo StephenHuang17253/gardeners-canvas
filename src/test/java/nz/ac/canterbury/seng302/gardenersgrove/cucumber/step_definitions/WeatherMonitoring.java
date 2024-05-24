@@ -161,7 +161,7 @@ public class WeatherMonitoring {
         Assertions.assertEquals("9.6", weather.get(0).getTemp());
         Assertions.assertEquals("92", weather.get(0).getHumidity());
         Assertions.assertEquals("0.0", weather.get(0).getPrecipitation());
-        Assertions.assertEquals("", weather.get(0).getWeatherError());
+        Assertions.assertNull( weather.get(0).getWeatherError());
     }
 
     @Then("Future weather for my location is shown")
@@ -173,7 +173,7 @@ public class WeatherMonitoring {
         Assertions.assertEquals("1.4", weather.get(1).getPrecipitation());
         Assertions.assertEquals("11.1", weather.get(1).getMaxTemp());
         Assertions.assertEquals("7.8", weather.get(1).getMinTemp());
-        Assertions.assertEquals("", weather.get(0).getWeatherError());
+        Assertions.assertNull(weather.get(0).getWeatherError());
 
     }
 
