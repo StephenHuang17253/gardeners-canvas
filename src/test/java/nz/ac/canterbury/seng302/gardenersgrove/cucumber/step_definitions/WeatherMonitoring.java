@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
@@ -14,6 +15,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -64,8 +66,61 @@ public class WeatherMonitoring {
 
     private List<DailyWeather> weather;
 
+    private MvcResult mvcResult;
+
     @MockBean
     private WeatherService weatherService;
+
+    private String mockResponse ="{\n" +
+            "  \"latitude\": -43.5,\n" +
+            "  \"longitude\": 172.625,\n" +
+            "  \"generationtime_ms\": 0.07200241088867188,\n" +
+            "  \"utc_offset_seconds\": 0,\n" +
+            "  \"timezone\": \"GMT\",\n" +
+            "  \"timezone_abbreviation\": \"GMT\",\n" +
+            "  \"elevation\": 7.0,\n" +
+            "  \"current_units\": {\n" +
+            "    \"time\": \"iso8601\",\n" +
+            "    \"interval\": \"seconds\",\n" +
+            "    \"temperature_2m\": \"°C\",\n" +
+            "    \"relative_humidity_2m\": \"%\",\n" +
+            "    \"precipitation\": \"mm\",\n" +
+            "    \"weather_code\": \"wmo code\"\n" +
+            "  },\n" +
+            "  \"current\": {\n" +
+            "    \"time\": \"2024-05-21T06:15\",\n" +
+            "    \"interval\": 900,\n" +
+            "    \"temperature_2m\": 9.6,\n" +
+            "    \"relative_humidity_2m\": 92,\n" +
+            "    \"precipitation\": 0.00,\n" +
+            "    \"weather_code\": 3\n" +
+            "  },\n" +
+            "  \"daily_units\": {\n" +
+            "    \"time\": \"iso8601\",\n" +
+            "    \"weather_code\": \"wmo code\",\n" +
+            "    \"temperature_2m_max\": \"°C\",\n" +
+            "    \"temperature_2m_min\": \"°C\",\n" +
+            "    \"precipitation_sum\": \"mm\"\n" +
+            "  },\n" +
+            "  \"daily\": {\n" +
+            "    \"time\": [\n" +
+            "      \"2024-05-19\",\n" +
+            "      \"2024-05-20\",\n" +
+            "      \"2024-05-21\",\n" +
+            "      \"2024-05-22\",\n" +
+            "      \"2024-05-23\",\n" +
+            "      \"2024-05-24\",\n" +
+            "      \"2024-05-25\",\n" +
+            "      \"2024-05-26\",\n" +
+            "      \"2024-05-27\"\n" +
+            "    ],\n" +
+            "    \"weather_code\": [45, 63, 80, 80, 45, 45, 3, 3, 61],\n" +
+            "    \"temperature_2m_max\": [11.1, 12.3, 10.3, 11.1, 11.2, 11.0, 13.1, 9.7, 10.9],\n" +
+            "    \"temperature_2m_min\": [7.0, 8.2, 7.9, 7.8, 2.8, 3.5, 7.7, 2.5, 6.6],\n" +
+            "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
+            "  }\n" +
+            "}\n";
+
     @Before
     public void before_or_after_all() throws IOException, InterruptedException {
         userService = new UserService(passwordEncoder, userRepository);
@@ -73,63 +128,13 @@ public class WeatherMonitoring {
         securityService = new SecurityService(userService, authenticationManager);
         weatherService = Mockito.mock(WeatherService.class);
 
+
+
         MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService, weatherService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
-        String mockResponse ="{\n" +
-                "  \"latitude\": -43.5,\n" +
-                "  \"longitude\": 172.625,\n" +
-                "  \"generationtime_ms\": 0.07200241088867188,\n" +
-                "  \"utc_offset_seconds\": 0,\n" +
-                "  \"timezone\": \"GMT\",\n" +
-                "  \"timezone_abbreviation\": \"GMT\",\n" +
-                "  \"elevation\": 7.0,\n" +
-                "  \"current_units\": {\n" +
-                "    \"time\": \"iso8601\",\n" +
-                "    \"interval\": \"seconds\",\n" +
-                "    \"temperature_2m\": \"°C\",\n" +
-                "    \"relative_humidity_2m\": \"%\",\n" +
-                "    \"precipitation\": \"mm\",\n" +
-                "    \"weather_code\": \"wmo code\"\n" +
-                "  },\n" +
-                "  \"current\": {\n" +
-                "    \"time\": \"2024-05-21T06:15\",\n" +
-                "    \"interval\": 900,\n" +
-                "    \"temperature_2m\": 9.6,\n" +
-                "    \"relative_humidity_2m\": 92,\n" +
-                "    \"precipitation\": 0.00,\n" +
-                "    \"weather_code\": 3\n" +
-                "  },\n" +
-                "  \"daily_units\": {\n" +
-                "    \"time\": \"iso8601\",\n" +
-                "    \"weather_code\": \"wmo code\",\n" +
-                "    \"temperature_2m_max\": \"°C\",\n" +
-                "    \"temperature_2m_min\": \"°C\",\n" +
-                "    \"precipitation_sum\": \"mm\"\n" +
-                "  },\n" +
-                "  \"daily\": {\n" +
-                "    \"time\": [\n" +
-                "      \"2024-05-19\",\n" +
-                "      \"2024-05-20\",\n" +
-                "      \"2024-05-21\",\n" +
-                "      \"2024-05-22\",\n" +
-                "      \"2024-05-23\",\n" +
-                "      \"2024-05-24\",\n" +
-                "      \"2024-05-25\",\n" +
-                "      \"2024-05-26\",\n" +
-                "      \"2024-05-27\"\n" +
-                "    ],\n" +
-                "    \"weather_code\": [45, 63, 80, 80, 45, 45, 3, 3, 61],\n" +
-                "    \"temperature_2m_max\": [11.1, 12.3, 10.3, 11.1, 11.2, 11.0, 13.1, 9.7, 10.9],\n" +
-                "    \"temperature_2m_min\": [7.0, 8.2, 7.9, 7.8, 2.8, 3.5, 7.7, 2.5, 6.6],\n" +
-                "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
-                "  }\n" +
-                "}\n";
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonObject = objectMapper.readTree(mockResponse);
-        WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
 
-        when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
+
     }
 
     @Given("I as user {string} is on my garden details page")
@@ -144,6 +149,7 @@ public class WeatherMonitoring {
 
         ModelAndView modelAndView = result.getModelAndView();
 
+        mvcResult = result;
         model = modelAndView.getModel();
         weather = (List<DailyWeather>) model.get("weather");
 
@@ -155,17 +161,43 @@ public class WeatherMonitoring {
         Assertions.assertEquals("9.6", weather.get(0).getTemp());
         Assertions.assertEquals("92", weather.get(0).getHumidity());
         Assertions.assertEquals("0.0", weather.get(0).getPrecipitation());
+        Assertions.assertEquals("", weather.get(0).getWeatherError());
     }
 
     @Then("Future weather for my location is shown")
     public void futureWeatherForMyLocationIsShown() {
         Assertions.assertNotNull(weather);
-        Assertions.assertTrue(weather.size() == 6);
-        Assertions.assertEquals(null, weather.get(1).getTemp());
-        Assertions.assertEquals(null, weather.get(1).getHumidity());
+        Assertions.assertEquals(6, weather.size());
+        Assertions.assertNull(weather.get(1).getTemp());
+        Assertions.assertNull(weather.get(1).getHumidity());
         Assertions.assertEquals("1.4", weather.get(1).getPrecipitation());
         Assertions.assertEquals("11.1", weather.get(1).getMaxTemp());
         Assertions.assertEquals("7.8", weather.get(1).getMinTemp());
+        Assertions.assertEquals("", weather.get(0).getWeatherError());
 
     }
+
+    @Given("My garden is not set to a location that the location service can find")
+    public void myGardenIsNotSetToALocationThatTheLocationServiceCanFind() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonObject = objectMapper.readTree(mockResponse);
+        WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
+        when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
+    }
+
+    @Given("My garden is not set to a location that the location service can not find")
+    public void myGardenIsNotSetToALocationThatTheLocationServiceCanNotFind() {
+        WeatherResponseData mockResponseData = Mockito.mock(WeatherResponseData.class);
+        Mockito.when(mockResponseData.getCurrentWeather()).thenThrow(new NullPointerException("No such location"));
+        Mockito.when(mockResponseData.getForecastWeather()).thenThrow(new NullPointerException("No such location"));
+        Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
+    }
+
+    @Then("A Weather error message tells me “Location not found, please update your location to see the weather”")
+    public void aWeatherErrorMessageTellsMeLocationNotFoundPleaseUpdateYourLocationToSeeTheWeather() {
+        Assertions.assertNotNull(weather.get(0));
+        Assertions.assertEquals("Location not found, please update your location to see the weather", weather.get(0).getWeatherError());
+    }
+
+
 }
