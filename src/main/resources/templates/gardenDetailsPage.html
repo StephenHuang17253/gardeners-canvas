@@ -16,7 +16,6 @@
             <div class="tableList-header">
                 <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
                 <p th:text="'Garden Location: ' + ${gardenLocation}"> Name </p>
-                <p> | </p>
                 <p th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </p>
                 <p th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
 
