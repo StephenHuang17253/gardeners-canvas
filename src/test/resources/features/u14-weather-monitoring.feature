@@ -1,7 +1,7 @@
 Feature: U14 As Kaia, I want to know the current and future weather at my gardens, so I know if I need to water them
   Background:
-    Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
-    And I as user "kaia@email.com" have a garden "Kaia's Other Garden" located in "Christchurch", "New Zealand"
+    Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
+    And User "kaia@email.com" has a garden "Kaia's Other Garden" located in "Christchurch", "New Zealand"
     And I as user "kaia@email.com" am logged in with "TestPassword10!"
     Given I as user "kaia@email.com" is on my garden details page
 
