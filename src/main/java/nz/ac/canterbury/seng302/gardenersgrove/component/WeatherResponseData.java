@@ -88,7 +88,7 @@ public class WeatherResponseData {
      */
     void setForecastWeather() {
         List<DailyWeather> forecastWeather = new ArrayList<>();
-        for (int i = 3; i < jsonDates.size(); i++) {
+        for (int i = 3; i < jsonDates.size()-1; i++) {
             forecastWeather.add(getWeatherDay(i));
         }
         this.forecastWeather = forecastWeather;
