@@ -1,8 +1,8 @@
 Feature: U10 (Edit garden details): As Kaia, I want to edit information about my garden so I can keep it up to date
 
 Background:
-  Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
-  And I as user "kaia@email.com" have a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
+  Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
+  And User "kaia@email.com" has a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
   And I as user "kaia@email.com" am logged in with "TestPassword10!"
 
   Scenario: AC1 - “Edit” button takes you to prepopulated edit garden form
@@ -25,6 +25,8 @@ Background:
       | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
       | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
       | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
+      | "ward-connect"  | "Súnset City"   | "Brazil"       | "0.01"     |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "8000000"  |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
     Given I am on the garden edit form
@@ -56,6 +58,9 @@ Background:
       | "six"             |
       | "12,4.3"          |
       | "Null"            |
+      | "0.009"           |
+      | "8000000.01"      |
+      | "0.00"            |
 
 
   Scenario Outline: AC5 - cannot submit invalid location

@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,13 +93,14 @@ public class InputValidator {
                 .lengthHelper(length)
                 .getResult();
     }
+
     /**
      * Checks input against a criteria:
      * This function allows blank strings.
      * The string can contain any characters.
      * It checks the string against a default character limit.
      *
-     * @param text   - text to validate
+     * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
     public static ValidationResult optionalTextField(String text) {
@@ -108,6 +108,7 @@ public class InputValidator {
                 .lengthHelper(200)
                 .getResult();
     }
+
     /**
      * Checks input against a criteria:
      * This function allows blank strings.
@@ -168,7 +169,7 @@ public class InputValidator {
      * This function only allows non blank strings containing only alphanumeric
      * characters and select punctuation
      *
-     * @param text text to validate
+     * @param text   text to validate
      * @param length max number of characters in text
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -198,7 +199,7 @@ public class InputValidator {
      * This function only allows alphanumeric characters and select punctuation
      * Checks input against character limit of param length.
      *
-     * @param text text to validate
+     * @param text   text to validate
      * @param length int, the character limit of input
      * @return ValidationResult enum state (Enum explains pass/Fail and why if fail)
      */
@@ -219,7 +220,7 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(Float.MAX_VALUE, 0.01F)
+                .areaHelper(8000000.0, 0.01)
                 .getResult();
     }
 
@@ -229,8 +230,7 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult numberCommaSingleTextField(String text, int length)
-    {
+    public static ValidationResult numberCommaSingleTextField(String text, int length) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
                 .lengthHelper(length)
@@ -329,6 +329,25 @@ public class InputValidator {
     }
 
     /**
+     * Checks if the given plantCount is a valid integer between 1 and 1,000,000
+     * 
+     * @param plantCount the plant count to validate
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validatePlantCount(String plantCount) {
+        ValidationResult result = new InputValidator(plantCount)
+                .validIntegerHelper()
+                .maxNumberHelper(1000000)
+                .minNumberHelper(1)
+                .getResult();
+        if (!result.valid()) {
+            result = ValidationResult.INVALID_PLANT_COUNT;
+        }
+        return result;
+    }
+
+    /**
      * Checks if a string is blank or not if a string is
      * updates local variables with results
      * ignored if string failed any previous validation
@@ -343,6 +362,30 @@ public class InputValidator {
 
         if (testedValue.isBlank()) {
             this.validationResult = ValidationResult.BLANK;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string is a valid integer
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator validIntegerHelper() {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        try {
+            Integer.parseInt(testedValue);
+        } catch (NumberFormatException error) {
+            this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
         }
@@ -385,7 +428,8 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[\\p{L}\\p{M}\\p{N}]{1,64}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,255}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$")) {
+        if (!testedValue.matches(
+                "^[\\p{L}\\p{M}\\p{N}]{1,64}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,255}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$")) {
             this.validationResult = ValidationResult.INVALID_EMAIL;
             this.passState = false;
             return this;
@@ -471,8 +515,7 @@ public class InputValidator {
             return this;
         }
 
-        if (testedValue.length() < minimumNumberOfDigits)
-        {
+        if (testedValue.length() < minimumNumberOfDigits) {
             this.passState = false;
             this.validationResult = ValidationResult.LENGTH_UNDER_MINIMUM;
             return this;
@@ -638,8 +681,7 @@ public class InputValidator {
         // checks if string contains only numbers and up to 1 comma or full stop
         for (Character letter : testedValue.toCharArray()) {
             if (!Character.isDigit(letter)) {
-                if (Character.toLowerCase(letter) == 'e')
-                {  
+                if (Character.toLowerCase(letter) == 'e') {
                     continue;
                 }
 
@@ -692,26 +734,26 @@ public class InputValidator {
      * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(float maxArea, float minArea) {
+    private InputValidator areaHelper(Double maxArea, Double minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
         }
 
-        float floatGardenSize;
-        if(testedValue.isBlank()){
+        double doubleGardenSize;
+        if (testedValue.isBlank()) {
             this.validationResult = ValidationResult.OK;
             return this;
-        } else{
-            floatGardenSize = Float.parseFloat(testedValue.replace(",","."));
+        } else {
+            doubleGardenSize = Double.parseDouble(testedValue.replace(",", "."));
         }
 
-        if (floatGardenSize < minArea) {
+        if (doubleGardenSize < minArea) {
             this.validationResult = ValidationResult.AREA_TOO_SMALL;
             this.passState = false;
             return this;
         }
-        if (floatGardenSize > maxArea) {
+        if (doubleGardenSize > maxArea) {
             this.validationResult = ValidationResult.AREA_TOO_LARGE;
             this.passState = false;
             return this;
@@ -735,6 +777,52 @@ public class InputValidator {
     }
 
     /**
+     * Checks if a string is a valid integer less than the given minValue
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @param minValue the minimum value the number can be
+     * @return the calling object
+     */
+    private InputValidator minNumberHelper(int minValue) {
+        if (!this.passState) {
+            return this;
+        }
+
+        if (Integer.parseInt(testedValue) < minValue) {
+            this.validationResult = ValidationResult.INVALID;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string is a valid integer less than the given maxValue
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @param maxValue the maximum value the number can be
+     * @return the calling object
+     */
+    private InputValidator maxNumberHelper(int maxValue) {
+        if (!this.passState) {
+            return this;
+        }
+
+        if (Integer.parseInt(testedValue) > maxValue) {
+            this.validationResult = ValidationResult.INVALID;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
      * returns this objects validation result
      *
      * @return validationResult variable of object
@@ -742,14 +830,5 @@ public class InputValidator {
     private ValidationResult getResult() {
         return this.validationResult;
     }
-
-
-
-
-
-
-
-
-
 
 }

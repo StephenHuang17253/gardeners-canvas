@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class InputValidatorTest {
+class InputValidatorTest {
 
     /**
      * Setup a mock userService class for testing that email uniqueness validation works
@@ -26,20 +26,20 @@ public class InputValidatorTest {
     private static UserService userServiceMock;
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         userServiceMock = Mockito.mock(UserService.class);
         InputValidator testValidator = new InputValidator();
         testValidator.UserService(userServiceMock);
     }
 
     @BeforeEach
-    public void resetInterface()
+    void resetInterface()
     {
         Mockito.when(userServiceMock.emailInUse(Mockito.any())).thenReturn(false);
     }
 
     @Test
-    public void InputValidator_validateUniqueEmail_uniqueEmail_return_OK()
+    void InputValidator_validateUniqueEmail_uniqueEmail_return_OK()
     {
         Mockito.when(userServiceMock.emailInUse(Mockito.any())).thenReturn(false);
         assertEquals(ValidationResult.OK,InputValidator.validateUniqueEmail("jondoe@gmail.com"));
@@ -47,7 +47,7 @@ public class InputValidatorTest {
     }
 
     @Test
-    public void InputValidator_validateUniqueEmail_duplicatedEmail_return_NON_UNIQUE_EMAIL()
+    void InputValidator_validateUniqueEmail_duplicatedEmail_return_NON_UNIQUE_EMAIL()
     {
         Mockito.when(userServiceMock.emailInUse(Mockito.any())).thenReturn(true);
         assertEquals(ValidationResult.NON_UNIQUE_EMAIL,InputValidator.validateUniqueEmail("jondoe@gmail.com"));
@@ -63,307 +63,307 @@ public class InputValidatorTest {
             "अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ऍ ऎ ए ऐ ","ਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜ","અ આ ઇ ઈ ઉ ઊ ઋ ઌ ઍ એ ઐ ","ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ",
             "АБВГДЕЖЗИКЛМН","ЙЩЬЮЯ","ЁЫЭ","ЄꙂꙀЗІЇꙈОуꙊѠ","ΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ","字文化圈","いうえおの","アイウ","ㄈㄉㄊㄋㄌㄍㄎㄏ ",
             "ㄪㄫㄬ"," Է Ը Թ Ժ "," ჱ თ ი კ ლ მ ","ⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎ"})
-    public void InputValidator_compText_validString_return_OK(String input)
+    void InputValidator_compText_validString_return_OK(String input)
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField(input));
     }
 
     @Test
-    public void InputValidator_compText_validStringWSpace_return_OK()
+    void InputValidator_compText_validStringWSpace_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("Hello World"));
     }
 
     @Test
-    public void InputValidator_optText_validString_return_OK()
+    void InputValidator_optText_validString_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("Hello"));
     }
 
     @Test
-    public void InputValidator_optText_validStringWSpace_return_OK()
+    void InputValidator_optText_validStringWSpace_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("Hello World"));
     }
 
     @Test
-    public void InputValidator_compText_validStringwNum_return_OK()
+    void InputValidator_compText_validStringwNum_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("Hello123"));
     }
 
     @Test
-    public void InputValidator_compText_validStringWSpaceWNum_return_OK()
+    void InputValidator_compText_validStringWSpaceWNum_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("Hello World123"));
     }
 
     @Test
-    public void InputValidator_optText_validStringWNum_return_OK()
+    void InputValidator_optText_validStringWNum_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("Hello123"));
     }
 
     @Test
-    public void InputValidator_optText_validStringWSpaceWNum_return_OK()
+    void InputValidator_optText_validStringWSpaceWNum_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("Hello World123"));
     }
 
     @Test
-    public void InputValidator_compText_blank_return_blank()
+    void InputValidator_compText_blank_return_blank()
     {
         assertEquals(ValidationResult.BLANK,InputValidator.compulsoryAlphaPlusTextField(""));
     }
 
     @Test
-    public void InputValidator_optText_blank_return_OK()
+    void InputValidator_optText_blank_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField(""));
     }
 
     @Test
-    public void InputValidator_compText_validPunct_return_OK()
+    void InputValidator_compText_validPunct_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("."));
     }
 
     @Test
-    public void InputValidator_optText_validPunct_return_OK()
+    void InputValidator_optText_validPunct_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("."));
     }
 
     @Test
-    public void InputValidator_compText_validPunctWText_return_OK()
+    void InputValidator_compText_validPunctWText_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("Hello World."));
     }
 
     @Test
-    public void InputValidator_optText_validPunctWText_return_OK()
+    void InputValidator_optText_validPunctWText_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("Hello World."));
     }
 
     @Test
-    public void InputValidator_compText_invalidPunct_return_NONALPHAPLUS()
+    void InputValidator_compText_invalidPunct_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.compulsoryAlphaPlusTextField("!"));
     }
 
     @Test
-    public void InputValidator_compText_Quotes_return_NONALPHAPLUS()
+    void InputValidator_compText_Quotes_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.compulsoryAlphaPlusTextField(" \" "));
     }
 
     @Test
-    public void InputValidator_optText_invalidPunct_return_NONALPHAPLUS()
+    void InputValidator_optText_invalidPunct_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("!"));
     }
 
     @Test
-    public void InputValidator_compText_invalidPunctWText_return_NONALPHAPLUS()
+    void InputValidator_compText_invalidPunctWText_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.compulsoryAlphaPlusTextField("Hello World!"));
     }
 
     @Test
-    public void InputValidator_optText_invalidPunctWText_return_NONALPHAPLUS()
+    void InputValidator_optText_invalidPunctWText_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("Hello World!"));
     }
 
     @Test
-    public void InputValidator_compText_NonAlphaText_return_NONALPHAPLUS()
+    void InputValidator_compText_NonAlphaText_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.compulsoryAlphaPlusTextField("ÙýµFB¬"));
     }
 
     @Test
-    public void InputValidator_optText_NonAlphaTextt_return_NONALPHAPLUS()
+    void InputValidator_optText_NonAlphaTextt_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("ÙýµFB¬"));
     }
 
     @Test
-    public void InputValidator_optText_NonAlphaText2_return_NONALPHAPLUS()
+    void InputValidator_optText_NonAlphaText2_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("Seng ! "));
     }
 
     @Test
-    public void InputValidator_optText_NonAlphaText3_return_NONALPHAPLUS()
+    void InputValidator_optText_NonAlphaText3_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("Henson & Hedges"));
     }
 
     @Test
-    public void InputValidator_optText_NonAlphaText4_return_NONALPHAPLUS()
+    void InputValidator_optText_NonAlphaText4_return_NONALPHAPLUS()
     {
         assertEquals(ValidationResult.NON_ALPHA_PLUS,InputValidator.optionalAlphaPlusTextField("Water & Buffalo"));
     }
 
 
     @Test
-    public void InputValidator_numCommSingle_blank_return_OK()
+    void InputValidator_numCommSingle_blank_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(""));
     }
 
     @Test
-    public void InputValidator_numCommSingle_number_return_OK()
+    void InputValidator_numCommSingle_number_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("123"));
     }
 
     @Test
-    public void InputValidator_numCommSingle_numberWComma_return_OK()
+    void InputValidator_numCommSingle_numberWComma_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("123,23"));
     }
 
     @Test
-    public void InputValidator_numCommSingle_numberW2Comma_return_NONNUMERICCOMMA()
+    void InputValidator_numCommSingle_numberW2Comma_return_NONNUMERICCOMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("12,23,23"));
     }
     @Test
-    public void InputValidator_numCommSingle_letters_return_NONNUMERICCOMMA()
+    void InputValidator_numCommSingle_letters_return_NONNUMERICCOMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("Abc"));
     }
     @Test
-    public void InputValidator_numCommSingle_numbersWletters_return_NONNUMERICCOMMA()
+    void InputValidator_numCommSingle_numbersWletters_return_NONNUMERICCOMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("12JK23"));
     }
     @Test
-    public void InputValidator_numCommSingle_NonAlpha_return_NONNUMERICCOMMA()
+    void InputValidator_numCommSingle_NonAlpha_return_NONNUMERICCOMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("~ÉI3Á┌1&"));
     }
     @Test
-    public void InputValidator_numCommSingle_onlyComma_return_NONNUMERICCOMMA()
+    void InputValidator_numCommSingle_onlyComma_return_NONNUMERICCOMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput(","));
     }
     @Test
-    public void InputValidator_numCommSingle_singleNumber_return_OK()
+    void InputValidator_numCommSingle_singleNumber_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("1"));
     }
 
     @Test
-    public void InputValidator_optText_TextWHyphen_return_OK()
+    void InputValidator_optText_TextWHyphen_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalAlphaPlusTextField("Hello-World"));
     }
 
     @Test
-    public void InputValidator_compText_return_OK()
+    void InputValidator_compText_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryTextField("Hello-World#$%"));
     }
     @Test
-    public void InputValidator_compText_return_BLANK()
+    void InputValidator_compText_return_BLANK()
     {
         assertEquals(ValidationResult.BLANK,InputValidator.compulsoryTextField(""));
     }
 
     @Test
-    public void InputValidator_compTextWithLengthLimit_return_OK()
+    void InputValidator_compTextWithLengthLimit_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryTextField("12345", 5));
     }
 
     @Test
-    public void InputValidator_compTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
+    void InputValidator_compTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
         assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryTextField("123456789", 2));
     }
 
     @Test
-    public void InputValidator_compAlphaTestWithLengthLimit_return_OK()
+    void InputValidator_compAlphaTestWithLengthLimit_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.compulsoryAlphaPlusTextField("12345", 5));
     }
 
     @Test
-    public void InputValidator_compAlphaTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
+    void InputValidator_compAlphaTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
         assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.compulsoryAlphaPlusTextField("123456789", 2));
     }
 
     @Test
-    public void InputValidator_optTextWithLengthLimit_return_OK()
+    void InputValidator_optTextWithLengthLimit_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalTextField("123", 4));
     }
 
     @Test
-    public void InputValidator_optTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
+    void InputValidator_optTextWithLengthLimit_return_LENGTH_OVER_LIMIT()
     {
         assertEquals(ValidationResult.LENGTH_OVER_LIMIT,InputValidator.optionalTextField("123456789", 2));
     }
 
     @Test
-    public void InputValidator_optTextWithLengthLimit_blankInput_return_OK()
+    void InputValidator_optTextWithLengthLimit_blankInput_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.optionalTextField("", 5));
     }
 
     @Test
-    public void InputValidator_numCommSingle_1comma0_return_OK()
+    void InputValidator_numCommSingle_1comma0_return_OK()
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput("1,0"));
     }
 
     @Test
-    public void InputValidator_numCommSingle_negative1comma0_return_NON_NUMERIC_COMMA()
+    void InputValidator_numCommSingle_negative1comma0_return_NON_NUMERIC_COMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("-1,0"));
     }
 
     @Test
-    public void InputValidator_numCommSingle_InvalidFormat1_return_NON_NUMERIC_COMMA()
+    void InputValidator_numCommSingle_InvalidFormat1_return_NON_NUMERIC_COMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("1-0,0"));
     }
 
     @Test
-    public void InputValidator_numCommSingle_InvalidFormat2_return_NON_NUMERIC_COMMA()
+    void InputValidator_numCommSingle_InvalidFormat2_return_NON_NUMERIC_COMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("!9,0"));
     }
 
     @Test
-    public void InputValidator_numCommSingle_InvalidFormat3_return_NON_NUMERIC_COMMA()
+    void InputValidator_numCommSingle_InvalidFormat3_return_NON_NUMERIC_COMMA()
     {
         assertEquals(ValidationResult.NON_NUMERIC_COMMA,InputValidator.validateGardenAreaInput("1 ! 0"));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1", "340282346638528860000000000000000000000" })
-    public void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input)
+    @ValueSource(strings = { "1000.0", "1.00000000023", "23", "1", "8000000.00", "0.01" })
+    void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input)
     {
         assertEquals(ValidationResult.OK,InputValidator.validateGardenAreaInput(input));
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "0.0000001", "0.009", "0" })
-    public void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input)
+    void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input)
     {
         assertEquals(ValidationResult.AREA_TOO_SMALL,InputValidator.validateGardenAreaInput(input));
     }
 
-    @Test
-    public void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE()
+    @ParameterizedTest
+    @ValueSource(strings = { "8000000.001", "8000000.01", "340300000000000000000000000000000000000" })
+    void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE(String input)
     {
-        String sizeOfJavaFloat = "340300000000000000000000000000000000000";
-        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(sizeOfJavaFloat));
+        assertEquals(ValidationResult.AREA_TOO_LARGE,InputValidator.validateGardenAreaInput(input));
     }
 
     /**
@@ -371,7 +371,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "John Doe", "John-Doe", "John Doe's" })
-    public void InputValidator_validateName_ValidName_return_OK(String name) {
+    void InputValidator_validateName_ValidName_return_OK(String name) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateName(name));
     }
 
@@ -381,7 +381,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "John1", "John>", "~John" })
-    public void InputValidator_validateName_InvalidName_return_INVALID_USERNAME(String name) {
+    void InputValidator_validateName_InvalidName_return_INVALID_USERNAME(String name) {
         Assertions.assertEquals(ValidationResult.INVALID_USERNAME, InputValidator.validateName(name));
     }
 
@@ -395,21 +395,18 @@ public class InputValidatorTest {
                     "oavhccefauucivfpthrucoyhlxfgkcdurlffpoacnhhysprommslgxmusevvpxdgkkifsgpbpiljrcxjwejestmgvnsevszck" +
                     "ujiglsrihnpblwmiculgtxodopsthkdzzpgjhznkcsarvzvubnyhutxhyyecsvjjykzxhdqlaxooxqnfbuewmajwlmvhklhzy" +
                     "wxuhsxwtnshoxuw.com" })
-    public void InputValidator_validateUniqueEmail_ValidEmail_return_OK(String email) {
+    void InputValidator_validateUniqueEmail_ValidEmail_return_OK(String email) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateUniqueEmail(email));
     }
 
     // Todo check if there is an email already in persistence <-- need to mock persistence for this.
     // Todo add foreign scripts
 
-    /**
-     * Test for invalid emails
-     * @param email
-     */
+
     @ParameterizedTest
     @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.","test@test.c", "test@.com", "@test.com",
             "abc-@mail.com","abc..def@mail.com",".abc@mail.com", "abc.def@mail#archive.com","abc.def@mail..com" })
-    public void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
+    void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
 
@@ -470,9 +467,9 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
-    public void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
+    void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDOB(dob));
-    };
+    }
 
     /**
      * Test for invalid DOB age below 13
@@ -480,7 +477,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {"01/02/2023"})
-    public void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {
+    void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.AGE_BELOW_13, InputValidator.validateDOB(dob));
     }
@@ -491,7 +488,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {"01/01/1903","01/01/1850"})
-    public void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
+    void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
     }
@@ -502,7 +499,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014"})
-    public void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
+    void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
@@ -515,7 +512,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
-    public void InputValidator_isValidDate_ValidDate_return_OK(String date) {
+    void InputValidator_isValidDate_ValidDate_return_OK(String date) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
     }
     /**
@@ -523,8 +520,8 @@ public class InputValidatorTest {
      * @param date
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
-    public void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
+    @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004","\""})
+    void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
     }
 
@@ -534,7 +531,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road" })
-    public void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
+    void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalAlphaPlusTextField(streetAddress));
     }
     /**
@@ -543,12 +540,12 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenea" })
-    public void InputValidator_isValidStreetAddress_invalidStreetAddress_return_LENGTH_OVER_LIMIT(String streetAddress) {
+    void InputValidator_isValidStreetAddress_invalidStreetAddress_return_LENGTH_OVER_LIMIT(String streetAddress) {
         Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
     }
     @ParameterizedTest
-    @ValueSource(strings = { "116 !@#$%^&*()_+-=[]{};:',.<>/?| Road" })
-    public void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
+    @ValueSource(strings = { "116 !@#$%^&*()_+-=[]{};:',.<>/?| Road","\"" })
+    void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
         Assertions.assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
     }
     /**
@@ -557,7 +554,7 @@ public class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = { "8041", "23020392", "SN6 8TL"})
-    public void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
+    void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode));
     }
     /**
@@ -565,8 +562,8 @@ public class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = { "THIS IS NOT A POSTC*DE", "8041!@#$"})
-    public void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
+    @ValueSource(strings = { "THIS IS NOT A POSTC*DE", "8041!@#$", "\""})
+    void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
         Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode));
     }
 }
