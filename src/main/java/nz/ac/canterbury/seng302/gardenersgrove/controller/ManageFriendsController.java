@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -101,6 +102,8 @@ public class ManageFriendsController {
 
         List<FriendModel> friendModels = createFriendModel();
         model.addAttribute("userFriends", friendModels);
+        model.addAttribute("SearchErrorText", "");
+
 
         return "manageFriendsPage";
     }
@@ -129,16 +132,22 @@ public class ManageFriendsController {
         //getting results
         if (validEmail.valid() || validFName.valid() || validLName.valid()) {
             User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
-            List<FriendModel> friendModels = new ArrayList<>();
+            if (searchResults.length >= 1) {
+                List<FriendModel> friendModels = new ArrayList<>();
 
-            for (User user : searchResults) {
-                String friendProfilePicture = user.getProfilePictureFilename();
-                String friendsName = user.getFirstName() + " " + user.getLastName();
-                String friendGardenLink = "/" + user.getId() + "/gardens";
-                FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
-                friendModels.add(friendModel);
+                for (User user : searchResults) {
+                    String friendProfilePicture = user.getProfilePictureFilename();
+                    String friendsName = user.getFirstName() + " " + user.getLastName();
+                    String friendGardenLink = "/" + user.getId() + "/gardens";
+                    FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+                    friendModels.add(friendModel);
+                }
+                model.addAttribute("userFriends", friendModels);
+            } else {
+                model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
             }
-            model.addAttribute("userFriends", friendModels);
+
+
         }
         return "manageFriendsPage";
     }

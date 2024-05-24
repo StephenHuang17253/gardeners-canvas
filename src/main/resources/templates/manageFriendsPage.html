@@ -26,9 +26,8 @@
                         </form>
                     </div>
                 </div>
-                <div class="tableList-table-count">
-                    <br>
-                    <span th:text="${userFriends?.size() ?: 0} + ' Friends'"> </span>
+                <div th:if="${SearchErrorText!=''}">
+                    <h3 class = "error" th:text="${SearchErrorText}"></h3>
                 </div>
                 <div th:each="friend : ${userFriends}">
                     <div th:replace="fragmentExample/fragments/friendsBox ::
