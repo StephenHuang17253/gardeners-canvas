@@ -123,7 +123,7 @@ public class MyGardensController {
            weather.addAll(gardenWeather.getForecastWeather());
         } catch (NullPointerException error) {
            DailyWeather noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
-           noWeather.setError("Unfortunately we cannot find weather information for this location, try setting a different location");
+           noWeather.setError("Location not found, please update your location to see the weather");
            weather.add(noWeather);
         }
 
