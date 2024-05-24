@@ -1,12 +1,20 @@
-<div th:fragment="friendsBox(friendsProfilePicture, friendsName,  friendsGardenLink)">
+<div th:fragment="friendsBox(friendsProfilePicture, friendsName,  friendsGardenLink, friendshipStatus, isPotentialFriend, friendId)">
     <div class="gardenbox" id="gardenbox">
         <div class="garden-details">
-            <img id="imageToChange" th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/plants/' + friendsProfilePicture}}"
+            <img id="imageToChange"
+                 th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/plants/' + friendsProfilePicture}}"
                  alt="Plant Image" class="plant-image">
             <br>
             <span th:text="${friendsName}" class="garden-name"></span>
             <br>
             <a th:href="@{${friendsGardenLink}}"> Their Gardens</a>
+            <br>
+            <div th:if="${isPotentialFriend} and ${friendshipStatus} != 'DENIED'">
+                <form th:action="@{/manage-friends/send-invite}" method="post">
+                    <input type="hidden" th:name="friendId" th:value="${friendId}"/>
+                    <button type="submit" class="user_button">Invite as friend</button>
+                </form>
+            </div>
         </div>
     </div>
     <br>

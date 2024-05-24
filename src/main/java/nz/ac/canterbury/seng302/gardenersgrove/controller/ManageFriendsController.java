@@ -141,6 +141,7 @@ public class ManageFriendsController {
                         FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
                         // add status of friendship from current user to other user
                         friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, user));
+                        friendModel.setFriendId(user.getId());
                         // ensure there is not friendship from other user to this user
                         if (!friendshipService.checkFriendshipExists(user, currentUser)) {
                             friendModels.add(friendModel);
@@ -151,11 +152,37 @@ public class ManageFriendsController {
             }
             model.addAttribute("userFriends", friendModels);
         }
-
         if (friendModels.isEmpty()) {
             model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
         }
+        model.addAttribute("isPotentialFriend", true);
         return "manageFriendsPage";
     }
+
+    /**
+     * Creates a new friendship with pending status
+     *
+     * @return thymeleaf manageFriendsPage
+     */
+    @GetMapping("/manage-friends/send-invite")
+    public String createFriendship(@RequestParam("friendId") Long friendId, Model model) {
+        logger.info("GET /manage-friends/send-invite");
+        model.addAttribute("searchInput", "");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
+        model.addAttribute("loggedIn", loggedIn);
+
+        User currentUser = userService.getUserByEmail(Objects.requireNonNull(authentication).getName());
+        User potentialFriend = userService.getUserById(friendId);
+        try {
+            friendshipService.addFriendship(currentUser, potentialFriend);
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("SearchErrorText", exception.getMessage());
+            return "manageFriendsPage";
+        }
+
+        return "redirect:/manage-friends";
+    }
+
 
 }
