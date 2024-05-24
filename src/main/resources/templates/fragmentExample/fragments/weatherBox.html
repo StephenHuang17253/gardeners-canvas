@@ -7,7 +7,9 @@
         <div class="weather-date">
             <span th:if="${date != null}" th:text="${date}"></span>
             <span th:if="${day != null}" th:text="${day}"></span>
-            <span th:if="${weatherDescription == null}" class="error-message" th:text="${weatherError}"></span>
+            <div class="error_chip" th:if="${weatherDescription == null}">
+                <span th:if="${weatherDescription == null}" class="weather_error_text" th:text="${weatherError}"></span>
+            </div>
             <br>
         </div>
         <h3 th:text="${weatherDescription}" class="weather-text"></h3>
