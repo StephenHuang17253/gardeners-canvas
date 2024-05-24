@@ -121,8 +121,8 @@ public class MyGardensController {
            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
            weather.add(gardenWeather.getCurrentWeather());
            weather.addAll(gardenWeather.getForecastWeather());
-        } catch (Error weatherError) {
-           DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
+        } catch (NullPointerException error) {
+           DailyWeather noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
            noWeather.setError("Location not found, please update your location to see the weather");
            weather.add(noWeather);
         }
@@ -250,7 +250,7 @@ public class MyGardensController {
 
         // Check if rate limit exceeded
         if (!semaphore.tryAcquire()) {
-            logger.info("Exceeded location API rate limit of 2 requests per second.");
+            logger.info("Exceeded Weather API rate limit of 10 requests per second.");
             throw new Error("429");
         }
         logger.info("Permits left after request: " + semaphore.availablePermits());

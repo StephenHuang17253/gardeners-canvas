@@ -55,3 +55,20 @@
     margin-right: 20px;
     font-size: smaller;
 }
+
+.error_chip {
+    display: inline-block;
+    padding: 15px;
+    height: auto;
+    max-width: 20vw;
+    word-wrap: break-word;
+    font-size: 14px;
+    background-color: lightpink;
+}
+
+.weather_error_text {
+    color: black;
+    font-family: Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+}
