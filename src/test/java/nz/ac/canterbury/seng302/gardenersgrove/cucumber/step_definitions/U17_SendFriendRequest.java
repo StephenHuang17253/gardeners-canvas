@@ -28,11 +28,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import static nz.ac.canterbury.seng302.gardenersgrove.integration.AccountControllerTest.userPassword;
+import java.util.*;
+;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -73,9 +70,7 @@ public class U17_SendFriendRequest {
 
     private MvcResult mvcResult;
 
-    private String fname;
-    private String lname;
-    private String email;
+    private String input;
 
     private List<FriendModel> friendsList = new ArrayList<>();
 
@@ -97,7 +92,7 @@ public class U17_SendFriendRequest {
     // Setup
     @Given("I {string} am friends with {string} {string}, {int}, a user with email {string} and password {string}")
     public void friends_with(String userEmail, String firstName, String lastName, Integer age, String friendEmail,
-                                             String friendPassword) {
+                             String friendPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
@@ -124,6 +119,7 @@ public class U17_SendFriendRequest {
 
         Assertions.assertTrue(friends);
     }
+
     @Given("I {string} {string}, {int} am a user with email {string} and password {string}")
     public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail,
                                              String userPassword) {
@@ -182,38 +178,40 @@ public class U17_SendFriendRequest {
         Assertions.assertNotNull(userService.getUserByEmail(email));
     }
 
-    @When("I enter in {string}, {string}, {string}")
-    public void i_enter_in(String fname, String lname, String email) {
-       this.fname = fname;
-       this.lname = lname;
-       this.email = email;
+    @When("I enter in {string}")
+    public void i_enter_in(String input) {
+        this.input = input;
     }
+
     @When("I hit the search button")
-    public void i_hit_the_search_button() {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends/search")).p
+    public void i_hit_the_search_button() throws Exception {
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get("/manage-friends/search")
+                                .param("searchInput", input))
                 .andExpect(status().isOk()).andReturn();
 
     }
+
     @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
     public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
-    }
+        assert result != null;
+        for (FriendModel friendModel : result) {
+            String matchFullName = friendModel.getFriendName();
+            Long matchId = Long.parseLong(friendModel.getFriendGardenLink().split("/")[1]);
+            User matchUser = userRepository.findById(matchId).orElseThrow(() -> new NoSuchElementException("User not found"));
 
-    @When("I have opened the search bar")
-    public void i_have_opened_the_search_bar() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+            Assertions.assertNotNull(matchUser);
+            Assertions.assertTrue((Objects.equals(matchFullName, fname + " " + lname) || Objects.equals(matchUser.getEmailAddress(), email)));
+        }
     }
 
     @Then("I can see the error {string}")
     public void i_can_see_the_error(String error) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("SearchErrorText");
+        Assertions.assertEquals(error, searchError);
     }
-
-
-
-
 
 
 }
