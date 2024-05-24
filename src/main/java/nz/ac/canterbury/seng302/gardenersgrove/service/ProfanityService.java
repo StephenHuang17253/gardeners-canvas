@@ -53,8 +53,8 @@ public class ProfanityService {
      * response.
      * 
      * @param content The string for which profanity is checked.
-     * @return A JSON string containing any bad words found, deviations and a
-     *         censored version
+     * @return A return string form the api that has been processed. The return format contains: Original text string,
+     * NormalizedText string, Misrepresentation boolean, Language string, Terms list, Status object and TrackingID string
      */
     public String moderateContent(String content) {
         try {
@@ -76,10 +76,10 @@ public class ProfanityService {
 
 
     }
-    /** do later
-     * Checks a returned json string to see if it contains any bad words, if so return True.
-     * @param inputString The string to check if the api found any bad words.
-     * @return True if the json contains terms 0, False if bad word count is 0.
+    /**
+     * Checks a string to see if it contains any bad words, if so return True.
+     * @param inputString The string to send to the content moderator API Which will check for any profanity.
+     * @return True if terms has one or more bad words. If not found return false
      */
     public boolean containsProfanity (String inputString) {
         String returnedString = moderateContent(inputString);

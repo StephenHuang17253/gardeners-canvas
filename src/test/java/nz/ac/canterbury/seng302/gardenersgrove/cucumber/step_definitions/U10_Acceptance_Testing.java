@@ -75,7 +75,7 @@ public class U10_Acceptance_Testing {
     private MvcResult editGardenResult;
 
     @Before
-    public void before_or_after_all() throws IOException, InterruptedException {
+    public void before_or_after_all() {
         profanityService = Mockito.mock(ProfanityService.class);
         inputValidator = new InputValidator(userService, profanityService);
 
