@@ -131,14 +131,21 @@ public class ManageFriendsController {
         //getting results
         if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
             User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
+            User currentUser = userService.getUserByEmail(Objects.requireNonNull(authentication).getName());
             if (searchResults.length >= 1) {
                 for (User user : searchResults) {
-                    if (!Objects.equals(user.getId(), userService.getUserByEmail(Objects.requireNonNull(authentication).getName()).getId())) {
+                    if (!Objects.equals(user.getId(), currentUser.getId())) {
                         String friendProfilePicture = user.getProfilePictureFilename();
                         String friendsName = user.getFirstName() + " " + user.getLastName();
                         String friendGardenLink = "/" + user.getId() + "/gardens";
                         FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
-                        friendModels.add(friendModel);
+                        // add status of friendship from current user to other user
+                        friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, user));
+                        // ensure there is not friendship from other user to this user
+                        if (!friendshipService.checkFriendshipExists(user, currentUser)) {
+                            friendModels.add(friendModel);
+                        }
+
                     }
                 }
             }

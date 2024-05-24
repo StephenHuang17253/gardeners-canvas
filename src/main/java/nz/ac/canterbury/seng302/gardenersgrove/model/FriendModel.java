@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.model;
 
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+
 /**
  * Model class for storing friend data for the Manage Friends page.
  */
@@ -7,6 +9,7 @@ public class FriendModel {
     private String friendProfilePicture;
     private String friendName;
     private String friendGardenLink;
+    private FriendshipStatus friendRequestStatus;
 
     /**
      * Constructor for a FriendModel
@@ -40,7 +43,12 @@ public class FriendModel {
     public String getFriendGardenLink() {
         return friendGardenLink;
     }
-
+    public void setFriendRequestStatus(FriendshipStatus status) {
+        this.friendRequestStatus = status;
+    }
+    public String getFriendRequestStatus() {
+        return friendRequestStatus.name();
+    }
     public void setFriendGardenLink(String friendGardenLink) {
         this.friendGardenLink = friendGardenLink;
     }
