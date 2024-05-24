@@ -177,6 +177,76 @@ public class HomePageController {
                 Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
                 friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
             }
+            if (!userService.emailInUse("brucewayne@email.com")) {
+
+                // Add a default user to speed up manual testing.
+                User bruceWayne = new User("Bruce",
+                        "Wayne",
+                        "brucewayne@email.com",
+                        date);
+                userService.addUser(bruceWayne, "Password1!");
+                userService.verifyUser(bruceWayne);
+                onStart = true;
+
+
+                for (int i = 0; i < 1; i++) {
+                    Garden sampleGarden = new Garden(
+                            "Bat Cave " + i,
+                            "114 Ilam Road",
+                            "Ilam",
+                            "Christchurch",
+                            "8041",
+                            "New Zealand",
+                            15.0,
+                            false,
+                            bruceWayne);
+                    sampleGarden = gardenService.addGarden(sampleGarden);
+
+                    for(int k = 0; k < 1; k++)
+                    {
+                        plantService.addPlant("Test Plant #" + k,2,
+                                "test", LocalDate.now(),sampleGarden.getGardenId());
+                    }
+
+                }
+                Friendship friendship = friendshipService.addFriendship(johnDoe, bruceWayne);
+//                friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
+            }
+            if (!userService.emailInUse("jimgorden@email.com")) {
+
+                // Add a default user to speed up manual testing.
+                User jimGorden = new User("Jim",
+                        "Gorden",
+                        "jimgorden@email.com",
+                        date);
+                userService.addUser(jimGorden, "Password1!");
+                userService.verifyUser(jimGorden);
+                onStart = true;
+
+
+                for (int i = 0; i < 1; i++) {
+                    Garden sampleGarden = new Garden(
+                            "GCPD HQ " + i,
+                            "114 Ilam Road",
+                            "Ilam",
+                            "Christchurch",
+                            "8041",
+                            "New Zealand",
+                            15.0,
+                            false,
+                            jimGorden);
+                    sampleGarden = gardenService.addGarden(sampleGarden);
+
+                    for(int k = 0; k < 1; k++)
+                    {
+                        plantService.addPlant("Test Plant #" + k,2,
+                                "test", LocalDate.now(),sampleGarden.getGardenId());
+                    }
+
+                }
+                Friendship friendship = friendshipService.addFriendship(jimGorden, johnDoe);
+//                friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
+            }
         }
 
 
