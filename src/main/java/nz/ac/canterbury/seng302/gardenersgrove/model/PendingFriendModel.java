@@ -8,16 +8,20 @@ public class PendingFriendModel {
     private String friendName;
     private boolean isSender;
 
+    private long userId;
+
     /**
      * Constructor for a PendingFriendModel
      * @param friendProfilePicture filename for the friend's profile picture.
      * @param friendName first and last name of the friend.
      * @param isSender whether they sent the request
+     * @param userId to have a reference to retrieve the user from the repo later
      */
-    public PendingFriendModel(String friendProfilePicture, String friendName, boolean isSender){
+    public PendingFriendModel(String friendProfilePicture, String friendName, boolean isSender, long userId){
         this.friendProfilePicture = friendProfilePicture;
         this.friendName = friendName;
         this.isSender = isSender;
+        this.userId = userId;
 
     }
 
@@ -45,12 +49,21 @@ public class PendingFriendModel {
         isSender = sender;
     }
 
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
     @Override
     public String toString() {
         return "FriendModel{" +
                 "friendProfilePicture='" + friendProfilePicture + '\'' +
                 ", friendName='" + friendName + '\'' +
                 ", isSender='" + isSender + '\'' +
+                ", userId='" + userId + '\'' +
                 '}';
     }
 

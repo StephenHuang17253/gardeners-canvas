@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import java.util.ArrayList;
@@ -114,7 +116,7 @@ public class ManageFriendsController {
             String fName = userTypeFriend.getFirstName();
             String lName = userTypeFriend.getLastName();
             String friendsName = fName + ' ' + lName;
-            PendingFriendModel pendingFriendModel = new PendingFriendModel(friendProfilePicture, friendsName, isSender);
+            PendingFriendModel pendingFriendModel = new PendingFriendModel(friendProfilePicture, friendsName, isSender, userTypeFriend.getId());
             pendingFriendModels.add(pendingFriendModel);
         }
 
@@ -140,6 +142,21 @@ public class ManageFriendsController {
         model.addAttribute("pendingFriends", pendingFriendModels);
 
 
+
+        return "manageFriendsPage";
+    }
+    @PostMapping("/manage-friends")
+    public String acceptedFriendRequest(@RequestParam(name = "acceptedFriend", required = true) boolean acceptedFriend,
+                                        @RequestParam(name = "pendingFriend", required = true) PendingFriendModel pendingFriendModel,
+                               Model model) {
+        logger.info("POST /manage-friends");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        Long userId = pendingFriendModel.getUserId();
+        securityService.changeFriendship(userId, FriendshipStatus.ACCEPTED);
 
         return "manageFriendsPage";
     }

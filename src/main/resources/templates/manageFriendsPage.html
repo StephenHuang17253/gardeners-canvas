@@ -57,7 +57,8 @@
                                 <div th:replace="fragmentExample/fragments/pendingFriendsBox ::
                                     pendingFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                     friendsName=${friend.getFriendName},
-                                    isSender=${friend.isSender})"
+                                    isSender=${friend.isSender},
+                                    friendId=${friend.getUserId})"
                                 >
                                 </div>
                             </div>

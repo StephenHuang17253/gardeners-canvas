@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
@@ -85,6 +86,16 @@ public class SecurityService {
 
     }
 
+    public void changeFriendship(Long userId, FriendshipStatus friendshipStatus) {
+        User currentUser = getCurrentUser();
+        User targetUser = userService.getUserById(userId);
+        Friendship friendship = friendshipService.findFriendship(currentUser, targetUser);
+
+        if (friendship != null) {
+            friendshipService.updateFriendShipStatus(friendship.getId(), friendshipStatus);
+        }
+
+    }
 
     /**
      * Set the security context for the user

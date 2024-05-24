@@ -56,6 +56,22 @@ public class FriendshipService {
         return !(optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty());
     }
 
+    public Friendship findFriendship(User user1, User user2) {
+        validateUsers(user1,user2);
+
+        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
+        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
+
+        if (optionalFriendshipUser1IsSender.isPresent()) {
+            return optionalFriendshipUser1IsSender.get();
+        }
+        if (optionalFriendshipUser2IsSender.isPresent()) {
+            return optionalFriendshipUser2IsSender.get();
+        }
+
+        return null;
+    }
+
     /**
      * Checks the friendship status betweeen two users
      * @param user1 one half of the friendship relation
@@ -72,7 +88,7 @@ public class FriendshipService {
             return optionalFriendshipUser1IsSender.get().getStatus();
         }
         if (optionalFriendshipUser2IsSender.isPresent()) {
-            return optionalFriendshipUser1IsSender.get().getStatus();
+            return optionalFriendshipUser2IsSender.get().getStatus();
         }
 
         return null;
