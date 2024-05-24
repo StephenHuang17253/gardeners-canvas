@@ -119,6 +119,20 @@ public class U17_SendFriendRequest {
 
         Assertions.assertTrue(friends);
     }
+    @Given("I {string} {string}, {int} am a user with email {string} and password {string}")
+    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail,
+                                             String userPassword) {
+        int birthYear = 2024 - age;
+        String dob = "01/01/" + birthYear;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
+        LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
+
+        User user = new User(firstName, LastName, userEmail, dateOfBirth);
+        user.setVerified(true);
+        userService.addUser(user, userPassword);
+        Assertions.assertNotNull(userService.getUserByEmail(userEmail));
+    }
+
 
     // AC1
     @When("I click on the 'Manage Friends' button")

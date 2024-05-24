@@ -6,7 +6,7 @@ import io.cucumber.java.en.Given;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
