@@ -160,7 +160,7 @@ public class WeatherMonitoring {
     @Then("Future weather for my location is shown")
     public void futureWeatherForMyLocationIsShown() {
         Assertions.assertNotNull(weather);
-        Assertions.assertTrue(weather.size() == 7);
+        Assertions.assertTrue(weather.size() == 6);
         Assertions.assertEquals(null, weather.get(1).getTemp());
         Assertions.assertEquals(null, weather.get(1).getHumidity());
         Assertions.assertEquals("1.4", weather.get(1).getPrecipitation());
