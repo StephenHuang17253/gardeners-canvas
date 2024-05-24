@@ -37,9 +37,10 @@
                             </div>
                             <div th:each="friend : ${userFriends}">
                                 <div th:replace="fragmentExample/fragments/friendsBox ::
-                        friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
-                        friendsName=${friend.getFriendName},
-                        friendsGardenLink=${friend.getFriendGardenLink})">
+                                    friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                                    friendsName=${friend.getFriendName},
+                                    friendsGardenLink=${friend.getFriendGardenLink})"
+                                >
                                 </div>
                             </div>
                         </div>
@@ -50,13 +51,14 @@
                         <div class="tableList-table-contain">
                             <div class="tableList-table-count">
                                 <br>
-                                <span th:text="${userFriends?.size() ?: 0} + ' Friends'"> </span>
+                                <span th:text="${pendingFriends?.size() ?: 0} + ' Friends'"> </span>
                             </div>
-                            <div th:each="friend : ${userFriends}">
+                            <div th:each="friend : ${pendingFriends}">
                                 <div th:replace="fragmentExample/fragments/friendsBox ::
-                        friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
-                        friendsName=${friend.getFriendName},
-                        friendsGardenLink=${friend.getFriendGardenLink})">
+                                    pendingFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                                    friendsName=${friend.getFriendName},
+                                    isSender=${friend.isSender})"
+                                >
                                 </div>
                             </div>
                         </div>

@@ -133,7 +133,9 @@ public class ManageFriendsController {
         model.addAttribute("loggedIn", loggedIn);
 
         List<FriendModel> friendModels = createFriendModel();
+        List<PendingFriendModel> pendingFriendModels = createPendingFriendModel();
         model.addAttribute("userFriends", friendModels);
+        model.addAttribute("pendingFriends", pendingFriendModels);
 
 
 
