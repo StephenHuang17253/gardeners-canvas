@@ -3,7 +3,7 @@ Feature: U15 (Garden location API and autocomplete):
   so that I can get consistent information relevant to my area
 
 Background:
-  Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
+  Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
   And I as user "kaia@email.com" am logged in with "TestPassword10!"
   And I as user "kaia@email.com" have another garden "Kaia's Second Garden" located in "Dunedin", "New Zealand"
 
