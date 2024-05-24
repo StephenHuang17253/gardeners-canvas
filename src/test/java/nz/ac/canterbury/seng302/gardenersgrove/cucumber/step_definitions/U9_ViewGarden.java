@@ -6,8 +6,6 @@ import io.cucumber.java.en.Given;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
@@ -27,8 +25,6 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
-
-import java.util.List;
 
 @SpringBootTest
 public class U9_ViewGarden {

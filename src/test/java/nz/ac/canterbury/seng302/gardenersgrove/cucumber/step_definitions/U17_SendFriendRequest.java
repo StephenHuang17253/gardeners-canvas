@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static nz.ac.canterbury.seng302.gardenersgrove.integration.AccountControllerTest.userPassword;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -71,6 +72,10 @@ public class U17_SendFriendRequest {
     public FileService fileService;
 
     private MvcResult mvcResult;
+
+    private String fname;
+    private String lname;
+    private String email;
 
     private List<FriendModel> friendsList = new ArrayList<>();
 
@@ -171,24 +176,27 @@ public class U17_SendFriendRequest {
 
     @Given("A user with first name {string}, last name {string}, and email {string} exists")
     public void a_user_with_first_name_last_name_and_email_exists(String fname, String lname, String email) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+        User user = new User(fname, lname, email, null);
+        user.setVerified(true);
+        userService.addUser(user, "Password!0");
+        Assertions.assertNotNull(userService.getUserByEmail(email));
     }
 
     @When("I enter in {string}, {string}, {string}")
     public void i_enter_in(String fname, String lname, String email) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+       this.fname = fname;
+       this.lname = lname;
+       this.email = email;
     }
     @When("I hit the search button")
     public void i_hit_the_search_button() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends/search")).p
+                .andExpect(status().isOk()).andReturn();
+
     }
     @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
     public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
     }
 
     @When("I have opened the search bar")
