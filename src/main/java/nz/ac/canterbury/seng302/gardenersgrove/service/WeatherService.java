@@ -50,8 +50,8 @@ public class WeatherService {
             logger.info("weather: " + jsonObject);
             return weatherData;
 
-        } catch (Exception e) {
-            logger.error(e.toString());
+        } catch (Exception weatherApiError) {
+            logger.error(weatherApiError.toString());
         }
         return null;
     }

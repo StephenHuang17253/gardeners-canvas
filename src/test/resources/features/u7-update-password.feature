@@ -1,6 +1,6 @@
 Feature: U7 As Sarah, I want to be able to change my password, so that I can keep my account secured with a new password in case my password gets leaked
   Background:
-    Given I "Sarah" "Thompson", 36 am a user with email "sarah@email.com" and password "TestPassword10!"
+    Given "Sarah" "Thompson", 36 is a user with email "sarah@email.com" and password "TestPassword10!"
     And I as user "sarah@email.com" am logged in with "TestPassword10!"
     Given I as user "sarah@email.com" with password "TestPassword10!" am on the edit password page
 

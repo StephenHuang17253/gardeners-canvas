@@ -82,7 +82,7 @@ public class U10_Acceptance_Testing {
 
     }
 
-    @Given("I {string} {string}, {int} am a user with email {string} and password {string}")
+    @Given("{string} {string}, {int} is a user with email {string} and password {string}")
     public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail, String userPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
@@ -95,7 +95,7 @@ public class U10_Acceptance_Testing {
         Assertions.assertNotNull(userService.getUserByEmail(userEmail));
     }
 
-    @Given("I as user {string} have a garden {string} located in {string}, {string}")
+    @Given("User {string} has a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
         Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, "","", user);
