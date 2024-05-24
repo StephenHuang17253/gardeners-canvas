@@ -4,6 +4,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,9 @@ public class GardenFormControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
+    private ProfanityService profanityService;
+
+    @MockBean
     private GardenService gardenService;
 
     @Autowired
@@ -60,6 +65,9 @@ public class GardenFormControllerTest {
 
     @BeforeEach
     public void setup() {
+
+        Mockito.when(profanityService.containsProfanity(Mockito.any())).thenReturn(false);
+
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())

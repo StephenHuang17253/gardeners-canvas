@@ -9,11 +9,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -35,6 +36,10 @@ import java.util.Optional;
 public class U10_Acceptance_Testing {
 
     public static MockMvc MOCK_MVC;
+
+    private ProfanityService profanityService;
+
+    private InputValidator inputValidator;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -54,6 +59,7 @@ public class U10_Acceptance_Testing {
     @MockBean
     private LocationService locationService;
 
+
     public static GardenService gardenService;
 
     public static UserService userService;
@@ -70,6 +76,11 @@ public class U10_Acceptance_Testing {
 
     @Before
     public void before_or_after_all() {
+        profanityService = Mockito.mock(ProfanityService.class);
+        inputValidator = new InputValidator(userService, profanityService);
+
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
 

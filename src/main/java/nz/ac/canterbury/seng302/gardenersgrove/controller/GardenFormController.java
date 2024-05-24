@@ -56,7 +56,7 @@ public class GardenFormController {
      * provided by frontend JS.
      * Also handles rate limiting to prevent exceeding 2 requests per second, to
      * match our free tier.
-     * 
+     *
      * @param query The search query for location autocomplete suggestions.
      * @return A JSON response string containing location suggestions, or a "429"
      *         string if rate limit is exceeded.
@@ -95,7 +95,7 @@ public class GardenFormController {
 
     /**
      * Maps the createNewGardenForm html page to /create-new-garden url
-     * 
+     *
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/create-new-garden")
@@ -131,7 +131,7 @@ public class GardenFormController {
      * Logic to handle the confirm new garden form button
      * also validates inputs into form and informs the user if their input is
      * invalid
-     * 
+     *
      * @param gardenName         The user-entered garden name
      * @param gardenDescription  The user-entered garden description
      * @param streetAddress      The user-entered street address of the garden
@@ -181,6 +181,7 @@ public class GardenFormController {
         gardenFormErrorText(model, gardenNameResult, streetAddressResult, suburbResult, cityResult, countryResult,
                 postcodeResult, gardenSizeResult, gardenDescriptionResult);
 
+
         if (gardenSize.isBlank()) {
             gardenSize = null;
         }
@@ -226,7 +227,7 @@ public class GardenFormController {
 
     /**
      * Maps the editGardenForm html page to /my-gardens/{gardenId}/edit url
-     * 
+     *
      * @return thymeleaf editGardenForm
      */
     @GetMapping("/my-gardens/{gardenId}/edit")
@@ -271,7 +272,7 @@ public class GardenFormController {
      * Logic to handle the confirm new garden form button
      * also validates inputs into form and informs the user if their input is
      * invalid
-     * 
+     *
      * @param gardenName        The user-entered garden name
      * @param gardenDescription The user-entered garden description
      * @param streetAddress     The user-entered street address of the garden
@@ -347,7 +348,7 @@ public class GardenFormController {
         } else {
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",", "."));
         }
-        
+
         Garden newGarden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
                 doubleGardenSize);
         gardenService.updateGarden(gardenId, newGarden);

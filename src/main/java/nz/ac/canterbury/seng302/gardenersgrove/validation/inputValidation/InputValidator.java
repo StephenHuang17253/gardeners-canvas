@@ -1,10 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
+
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -27,6 +30,7 @@ public class InputValidator {
     String testedValue;
 
     private static UserService userService;
+    private static ProfanityService profanityService;
 
     /**
      * Constructor for the Validation with {@link Autowired} to
@@ -35,10 +39,6 @@ public class InputValidator {
      *
      * @param inputUserService
      */
-    @Autowired
-    public void UserService(UserService inputUserService) {
-        userService = inputUserService;
-    }
 
     /**
      * Warning, constructor only for automated use, for manual use, use
@@ -49,7 +49,10 @@ public class InputValidator {
      * Creating an object of this type manually will have no effect and no use
      * except when testing
      */
-    public InputValidator() {
+    @Autowired
+    public InputValidator(UserService inputUserService, ProfanityService inputProfanityService) {
+        userService = inputUserService;
+        profanityService = inputProfanityService;
     }
 
     /**
@@ -258,9 +261,8 @@ public class InputValidator {
      * Checks if the given decsription is valid 512 char or less and contains at
      * least one letter if not empty will return invalid description message in
      * either case
-     * 
+     *
      * @param text
-     * @param length
      * @return
      */
     public static ValidationResult validateDescription(String text) {
@@ -268,10 +270,21 @@ public class InputValidator {
                 .lengthHelper(512)
                 .NotOnlyNumOrSpecChar()
                 .getResult();
+
         if (!result.valid()) {
             result.updateMessage(ValidationResult.INVALID_DESCRIPTION.toString());
+            return result;
         }
+
+        ValidationResult result2 = new InputValidator(text)
+                .profanityHelper()
+                .getResult();
+        if (!result2.valid()) {
+            return result2;
+        }
+
         return result;
+
     }
 
     /**
@@ -348,6 +361,7 @@ public class InputValidator {
                 .dateFormatHelper()
                 .getResult();
     }
+
 
     /**
      * Checks if a string is blank or not if a string is
@@ -742,6 +756,29 @@ public class InputValidator {
         this.validationResult = ValidationResult.OK;
         return this;
 
+    }
+
+    /**
+     * Sends A string to the bad words API, then checks if the return has
+     * bad word count over 0, if so set to TEXT_CONTAINS_PROFANITY
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    public InputValidator profanityHelper() {
+        if (!this.passState) {
+            return this;
+        }
+        boolean containsProfanity = profanityService.containsProfanity(testedValue);
+
+        if (containsProfanity) {
+            this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
     }
 
     /**

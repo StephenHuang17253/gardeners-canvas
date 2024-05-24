@@ -22,8 +22,9 @@ public enum ValidationResult {
     LENGTH_UNDER_MINIMUM("must be more than minimum number of characters"),
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
     INVALID_FILE_SIZE("Image must be less than 10MB"),
-    AREA_TOO_SMALL(" (meters squared) is too small."),
-    AREA_TOO_LARGE(" (meters squared) is too large."),
+    AREA_TOO_SMALL("Area (meters squared) is too small"),
+    AREA_TOO_LARGE("Area (meters squared) is too large"),
+    DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
     INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text");
 
     private String message;

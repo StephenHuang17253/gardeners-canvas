@@ -1,4 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -16,15 +17,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class InputValidatorTest {
 
     /**
-     * Setup a mock userService class for testing that email uniqueness validation works
+     * Setup a mock userService class for testing that email uniqueness validation
+     * works
      */
     private static UserService userServiceMock;
+
+    /**
+     * Setup a mock profanityService class for testing
+     */
+    private static ProfanityService profanityServiceMock;
 
     @BeforeAll
     static void setup() {
         userServiceMock = Mockito.mock(UserService.class);
-        InputValidator testValidator = new InputValidator();
-        testValidator.UserService(userServiceMock);
+        profanityServiceMock = Mockito.mock(ProfanityService.class);
+        InputValidator testValidator = new InputValidator(userServiceMock, profanityServiceMock);
     }
 
     @BeforeEach
