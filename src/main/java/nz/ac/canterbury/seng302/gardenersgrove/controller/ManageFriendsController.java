@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -130,11 +129,11 @@ public class ManageFriendsController {
         ValidationResult validLName = InputValidator.validateName((seperated.length > 1) ? seperated[1] : "");
         List<FriendModel> friendModels = new ArrayList<>();
         //getting results
-        if ((validEmail.valid() || validFName.valid() || validLName.valid()) && searchInput != "") {
+        if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
             User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
             if (searchResults.length >= 1) {
                 for (User user : searchResults) {
-                    if (!Objects.equals(user.getId(), userService.getUserByEmail(authentication.getName()).getId())) {
+                    if (!Objects.equals(user.getId(), userService.getUserByEmail(Objects.requireNonNull(authentication).getName()).getId())) {
                         String friendProfilePicture = user.getProfilePictureFilename();
                         String friendsName = user.getFirstName() + " " + user.getLastName();
                         String friendGardenLink = "/" + user.getId() + "/gardens";
