@@ -120,9 +120,9 @@ public class MyGardensController {
            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
            weather.add(gardenWeather.getCurrentWeather());
            weather.addAll(gardenWeather.getForecastWeather());
-        } catch (Error error) {
+        } catch (NullPointerException error) {
            DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
-           noWeather.setError("Location not found, please update your location to see the weather");
+           noWeather.setError("Unfortunatly we cannot find weather information for this location, try setting a different location");
            weather.add(noWeather);
         }
 
