@@ -36,7 +36,7 @@
                  friendsName=${friend.getFriendName},
                  friendsGardenLink=${friend.getFriendGardenLink},
                  friendshipStatus=${friend.getFriendRequestStatusString()},
-                 isPotentialFriend=${isPotentialFriend},
+                 isPotentialFriend=${isPotentialFriend != null ? isPotentialFriend : false},
                  friendId=${friend.getFriendId()})}">
             </div>
         </div>
