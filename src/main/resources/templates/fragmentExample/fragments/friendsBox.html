@@ -7,7 +7,7 @@
             <br>
             <span th:text="${friendsName}" class="friend-name"></span>
             <br>
-            <form th:action="@{${friendsGardenLink}}" method="get">
+            <form th:action="@{${friendsGardenLink}}" th:if="${!isPotentialFriend}" method="get">
                 <button type="submit" class="garden-button">Their Gardens</button>
             </form>
             <br>
