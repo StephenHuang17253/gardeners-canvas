@@ -17,14 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.awt.*;
 import java.util.Optional;
 
 /**
@@ -79,6 +76,7 @@ public class MyGardensController {
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
                                     HttpServletResponse response,
+                                    @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") Boolean makeGardenPublic,
                                     Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId);
 
@@ -97,12 +95,17 @@ public class MyGardensController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
+
+        garden.setIsPublic(makeGardenPublic);
+        logger.error("Testing is public: {}", garden.getIsPublic());
+
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         model.addAttribute("gardenSize", garden.getGardenSize());
         model.addAttribute("gardenId", gardenId);
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
+        model.addAttribute("makeGardenPublic", garden.getIsPublic());
         return "gardenDetailsPage";
 
     }
@@ -155,11 +158,13 @@ public class MyGardensController {
             model.addAttribute("gardenId", gardenIdString);
             model.addAttribute("plants", garden.getPlants());
             model.addAttribute("totalPlants", garden.getPlants().size());
+            model.addAttribute("makeGardenPublic", garden.getIsPublic());
 
 
         } else {
             return "404";
         }
+
 
         if (!plantPictureResult.valid()) {
             logger.info("Plant picture validation failed");

@@ -23,7 +23,10 @@
                     <button class = rounded-button-top-right >Edit</button>
                 </a>
                 <div class="checkbox_container">
-                    <input type="checkbox" class="checkbox"/>Make my garden public
+                    <form th:action="@{/my-gardens/__${gardenId}__}" method="get" enctype="multipart/form-data">
+                        <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic" th:value="true" th:checked="${makeGardenPublic}"
+                                onChange="this.form.submit()">Make my garden public
+                    </form>
                 </div>
             </div>
         </div>
