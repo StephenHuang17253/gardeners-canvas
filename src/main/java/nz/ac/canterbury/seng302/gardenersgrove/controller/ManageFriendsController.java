@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -164,7 +165,7 @@ public class ManageFriendsController {
      *
      * @return thymeleaf manageFriendsPage
      */
-    @GetMapping("/manage-friends/send-invite")
+    @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId, Model model) {
         logger.info("GET /manage-friends/send-invite");
         model.addAttribute("searchInput", "");
