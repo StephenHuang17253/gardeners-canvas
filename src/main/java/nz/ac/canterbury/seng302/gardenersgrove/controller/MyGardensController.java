@@ -5,15 +5,10 @@ import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
@@ -121,14 +112,19 @@ public class MyGardensController {
            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
            weather.add(gardenWeather.getCurrentWeather());
            weather.addAll(gardenWeather.getForecastWeather());
+
+
            DailyWeather currentWeather = gardenWeather.getCurrentWeather();
            List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
            DailyWeather yesterdayWeather = pastWeather.get(0);
            DailyWeather beforeYesterdayWeather = pastWeather.get(1);
 
-           if (currentWeather.getDescription() == "Rainy") {
+//           WeatherResponseData dummyWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
+//           String sunnyDescription = dummyWeather.getWeatherDescriptionAndIcon(0).get(0);
+
+           if (currentWeather.getDescription().equals("Rainy")) {
                model.addAttribute("message","Outdoor plants don’t need any water today");
-           } else if (yesterdayWeather.getDescription() == "Sunny" && beforeYesterdayWeather.getDescription() == "Sunny") {
+           } else if ("Sunny".equals(yesterdayWeather.getDescription()) && "Sunny".equals(beforeYesterdayWeather.getDescription())) {
                model.addAttribute("message","There hasn’t been any rain recently, make sure to water your plants if they need it");
            }
 

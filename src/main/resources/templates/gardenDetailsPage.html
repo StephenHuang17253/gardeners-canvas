@@ -46,10 +46,15 @@
                 <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
             </div>
 
-            <div class="watering">
-                <p th:if="${message}" th:text="${message}"></p>
-                <p>Water plant message</p>
+            <div class="watering" th:if="${message}" id="messageBox">
+                <p th:text="${message}"></p>
+                <span class="close" onclick="closeMessageBox()">×</span>
             </div>
+            <script>
+                function closeMessageBox() {
+                    document.getElementById('messageBox').style.display = 'none';
+                }
+            </script>
             <br>
             <br>
             <div class="tableList-table-contain">
