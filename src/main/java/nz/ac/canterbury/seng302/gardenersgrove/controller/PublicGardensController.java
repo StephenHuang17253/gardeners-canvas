@@ -35,7 +35,8 @@ public class PublicGardensController {
     }
 
     /**
-     * returns a page with the 10 most recent public gardens
+     * returns a page with the 10 most recent public gardens based on current page in pagination
+     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
      *
      * @return thymeleaf BrowsePublicGardens html element
      */
@@ -55,7 +56,7 @@ public class PublicGardensController {
         int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
 
         List<Garden> tenSortedPublicGardens = allGardens.stream()
-                .sorted(Comparator.comparing(Garden::getCreationDate))
+                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .collect(Collectors.toList());
@@ -70,6 +71,10 @@ public class PublicGardensController {
         return "BrowsePublicGardens";
     }
 
+    /**
+     * Redirects to pagination page one
+     * @return redirect to page/1
+     */
     @GetMapping("/public-gardens")
     public String publicGardens(Model model) {
         logger.info("GET /public-gardens");
