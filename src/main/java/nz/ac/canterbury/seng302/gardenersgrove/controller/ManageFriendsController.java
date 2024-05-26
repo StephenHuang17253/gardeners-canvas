@@ -144,7 +144,7 @@ public class ManageFriendsController {
         List<FriendModel> friendModels = createFriendModel();
         List<PendingFriendModel> pendingFriendModels = createPendingFriendModel();
         model.addAttribute("userFriends", friendModels);
-        model.addAttribute("pendingFriends", pendingFriendModels)
+        model.addAttribute("pendingFriends", pendingFriendModels);
         model.addAttribute("SearchErrorText", "");
 
 
