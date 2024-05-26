@@ -18,3 +18,52 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     When I am on the 'Manage Friends' page
     Then I see a list of my friends with their names, profile pictures, and link to their gardens list
+
+  Scenario Outline: AC4 - Given I am on the manage friends page and I have opened the search bar, when I enter a full
+  name (first and last name, if any) and I hit the search button, then I can see a list of users of the app exactly matching the name I provided.
+
+    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    And A user with first name <fname>, last name <lname>, and email <email> exists
+    When I am on the 'Manage Friends' page
+    And I enter in <input>
+    And I hit the search button
+    Then I can see a list of users of the app exactly matching <fname> <lname> <email>
+    Examples:
+      | fname  | lname | email            | input     |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "Amy Doe" |
+      | "Andy" | ""    | "andy@gmail.com" | "Andy"    |
+
+  Scenario Outline: AC5 - Given I am on the manage friends page and I have opened the search bar, when I enter an email
+  address and I hit the search button, then I can see a list of users of the app exactly matching the email provided.
+
+    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    And A user with first name <fname>, last name <lname>, and email <email> exists
+    When I am on the 'Manage Friends' page
+    And I enter in <input>
+    And I hit the search button
+    Then I can see a list of users of the app exactly matching <fname> <lname> <email>
+    Examples:
+      | fname  | lname | email            | input            |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "doe@gmail.com"  |
+      | "Andy" | ""    | "andy@gmail.com" | "andy@gmail.com" |
+
+  Scenario Outline: AC6 - Given I am on the manage friends page and I have opened the search bar, when I enter a search
+  string and I press the search button and there are no perfect matches, then I see a message saying "There is nobody with that name or email in Gardener's Grove".
+
+    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    And A user with first name <fname>, last name <lname>, and email <email> exists
+    When I am on the 'Manage Friends' page
+    And I enter in <input>
+    And I hit the search button
+    Then I can see the error "There is nobody with that name or email in Gardener's Grove"
+    Examples:
+      | fname  | lname | email            | input              |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "Andy"             |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "random@gmail.com" |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "liam@email.com"   |
+      | "Andy" | ""    | "andy@gmail.com" | "Andy Doe"         |
+      | "Andy" | ""    | "andy@gmail.com" | "sjdlkfjaljlf;"    |
+      | "Andy" | ""    | "andy@gmail.com" | ""                 |
+
+
+

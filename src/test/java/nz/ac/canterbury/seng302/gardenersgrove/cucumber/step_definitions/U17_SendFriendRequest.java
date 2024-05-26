@@ -4,7 +4,6 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ManageFriendsController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -19,24 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -64,8 +57,6 @@ public class U17_SendFriendRequest {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
-    private LocationService locationService;
 
     public static GardenService gardenService;
 
@@ -79,6 +70,8 @@ public class U17_SendFriendRequest {
 
     private MvcResult mvcResult;
 
+    private String input;
+
     private List<FriendModel> friendsList = new ArrayList<>();
 
     // Setup
@@ -90,7 +83,7 @@ public class U17_SendFriendRequest {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
-                securityService, fileService);
+                securityService, fileService, userService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 
@@ -99,7 +92,7 @@ public class U17_SendFriendRequest {
     // Setup
     @Given("I {string} am friends with {string} {string}, {int}, a user with email {string} and password {string}")
     public void friends_with(String userEmail, String firstName, String lastName, Integer age, String friendEmail,
-                                             String friendPassword) {
+                             String friendPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
@@ -126,6 +119,21 @@ public class U17_SendFriendRequest {
 
         Assertions.assertTrue(friends);
     }
+
+    @Given("I {string} {string}, {int} am a user with email {string} and password {string}")
+    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail,
+                                             String userPassword) {
+        int birthYear = 2024 - age;
+        String dob = "01/01/" + birthYear;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
+        LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
+
+        User user = new User(firstName, LastName, userEmail, dateOfBirth);
+        user.setVerified(true);
+        userService.addUser(user, userPassword);
+        Assertions.assertNotNull(userService.getUserByEmail(userEmail));
+    }
+
 
     // AC1
     @When("I click on the 'Manage Friends' button")
@@ -161,5 +169,49 @@ public class U17_SendFriendRequest {
 
 
     }
+
+    @Given("A user with first name {string}, last name {string}, and email {string} exists")
+    public void a_user_with_first_name_last_name_and_email_exists(String fname, String lname, String email) {
+        User user = new User(fname, lname, email, null);
+        user.setVerified(true);
+        userService.addUser(user, "Password!0");
+        Assertions.assertNotNull(userService.getUserByEmail(email));
+    }
+
+    @When("I enter in {string}")
+    public void i_enter_in(String input) {
+        this.input = input;
+    }
+
+    @When("I hit the search button")
+    public void i_hit_the_search_button() throws Exception {
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get("/manage-friends/search")
+                                .param("searchInput", input))
+                .andExpect(status().isOk()).andReturn();
+
+    }
+
+    @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
+    public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        assert result != null;
+        for (FriendModel friendModel : result) {
+            String matchFullName = friendModel.getFriendName();
+            Long matchId = Long.parseLong(friendModel.getFriendGardenLink().split("/")[1]);
+            User matchUser = userRepository.findById(matchId).orElseThrow(() -> new NoSuchElementException("User not found"));
+
+            Assertions.assertNotNull(matchUser);
+            Assertions.assertTrue((Objects.equals(matchFullName, fname + " " + lname) || Objects.equals(matchUser.getEmailAddress(), email)));
+        }
+    }
+
+    @Then("I can see the error {string}")
+    public void i_can_see_the_error(String error) {
+        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("SearchErrorText");
+        Assertions.assertEquals(error, searchError);
+    }
+
 
 }

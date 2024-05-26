@@ -7,6 +7,7 @@
         <link th:href="@{/css/navBar.css}" rel="stylesheet">
         <link th:href="@{/css/tableList.css}" rel="stylesheet">
         <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+        <link th:href="@{/css/friendBox.css}" rel="stylesheet">
         <link th:href="@{/css/manageFriends.css}" rel="stylesheet">
 
     </head>
@@ -18,6 +19,32 @@
                 <h1 class="tableList-header-title"> Manage Friends </h1>
             </div>
             <br>
+
+
+            <div class="tableList-table-contain">
+                <div class="buttons">
+                    <button class="user_button" id="addFriendButton"> Add Friend</button>
+                    <div id="searchBarContainer" style="display: none;">
+                        <form th:action="@{/manage-friends/search}" method="get">
+                            <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"/>
+                            <button type="submit" class="user_button">Search</button>
+                        </form>
+                    </div>
+                </div>
+                <div th:if="${SearchErrorText!=''}">
+                    <h3 class="error" th:text="${SearchErrorText}"></h3>
+                </div>
+                <div th:each="friend : ${userFriends}">
+                    <div th:replace="~{fragmentExample/fragments/friendsBox ::
+                 friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                 friendsName=${friend.getFriendName},
+                 friendsGardenLink=${friend.getFriendGardenLink},
+                 friendshipStatus=${friend.getFriendRequestStatusString()},
+                 isPotentialFriend=${isPotentialFriend != null ? isPotentialFriend : false},
+                 friendId=${friend.getFriendId()})}">
+                    </div>
+                </div>
+            </div>
 
             <div class="tabs">
                 <ul class="tab-links">
@@ -73,5 +100,6 @@
 
         </div>
     </body>
+    <script th:src="@{/js/manageFriends.js}"></script>
     <script th:src="@{/js/manageFriends.js}"></script>
 </html>
