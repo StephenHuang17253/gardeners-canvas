@@ -120,7 +120,18 @@ public class MyGardensController {
            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
            weather.add(gardenWeather.getCurrentWeather());
            weather.addAll(gardenWeather.getForecastWeather());
-           model.addAttribute("message", gardenWeather.getForecastWeather());
+           DailyWeather currentWeather = gardenWeather.getCurrentWeather();
+           List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
+           DailyWeather yesterdayWeather = pastWeather.get(0);
+           DailyWeather beforeYesterdayWeather = pastWeather.get(1);
+
+           if (currentWeather.getDescription() == "Rainy") {
+               model.addAttribute("message","Outdoor plants don’t need any water today");
+           } else if (yesterdayWeather.getDescription() == "Sunny" && beforeYesterdayWeather.getDescription() == "Sunny") {
+               model.addAttribute("message","There hasn’t been any rain recently, make sure to water your plants if they need it");
+           }
+
+
         } catch (Error error) {
            DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
            noWeather.setError("Location not found, please update your location to see the weather");
