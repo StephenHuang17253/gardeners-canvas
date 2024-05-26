@@ -14,8 +14,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
-
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,13 +26,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
-import org.mockito.Mockito;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
@@ -68,9 +69,12 @@ public class WeatherMonitoring {
 
     private MvcResult mvcResult;
 
+    private String weatherDescription;
+
     @MockBean
     private WeatherService weatherService;
 
+    private List<DailyWeather> pastWeather;
     private String mockResponse ="{\n" +
             "  \"latitude\": -43.5,\n" +
             "  \"longitude\": 172.625,\n" +
@@ -126,7 +130,7 @@ public class WeatherMonitoring {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         securityService = new SecurityService(userService, authenticationManager);
-        weatherService = Mockito.mock(WeatherService.class);
+        weatherService = mock(WeatherService.class);
 
 
 
@@ -162,6 +166,7 @@ public class WeatherMonitoring {
         Assertions.assertEquals("92", weather.get(0).getHumidity());
         Assertions.assertEquals("0.0", weather.get(0).getPrecipitation());
         Assertions.assertNull( weather.get(0).getWeatherError());
+        System.out.println(model);
     }
 
     @Then("Future weather for my location is shown")
@@ -174,6 +179,7 @@ public class WeatherMonitoring {
         Assertions.assertEquals("11.1", weather.get(1).getMaxTemp());
         Assertions.assertEquals("7.8", weather.get(1).getMinTemp());
         Assertions.assertNull(weather.get(0).getWeatherError());
+        System.out.println(model);
 
     }
 
@@ -187,7 +193,7 @@ public class WeatherMonitoring {
 
     @Given("My garden is not set to a location that the location service can not find")
     public void myGardenIsNotSetToALocationThatTheLocationServiceCanNotFind() {
-        WeatherResponseData mockResponseData = Mockito.mock(WeatherResponseData.class);
+        WeatherResponseData mockResponseData = mock(WeatherResponseData.class);
         Mockito.when(mockResponseData.getCurrentWeather()).thenThrow(new NullPointerException("No such location"));
         Mockito.when(mockResponseData.getForecastWeather()).thenThrow(new NullPointerException("No such location"));
         Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
@@ -195,9 +201,49 @@ public class WeatherMonitoring {
 
     @Then("A Weather error message tells me “Location not found, please update your location to see the weather”")
     public void aWeatherErrorMessageTellsMeLocationNotFoundPleaseUpdateYourLocationToSeeTheWeather() {
+        System.out.println(model);
         Assertions.assertNotNull(weather.get(0));
         Assertions.assertEquals("Location not found, please update your location to see the weather", weather.get(0).getWeatherError());
     }
 
 
+    @Given("The past two days have been sunny in my location")
+    public void thePastTwoDaysHaveBeenSunnyInMyLocation() throws Exception {
+        WeatherResponseData mockedWeatherData = mock(WeatherResponseData.class);
+
+        DailyWeather sunnyWeatherToday = new DailyWeather("sunny.png", LocalDate.now(), "Sunny");
+        DailyWeather sunnyWeatherYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(1), "Sunny");
+        DailyWeather sunnyWeatherBeforeYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(2), "Sunny");
+
+        List<DailyWeather> pastWeather = new ArrayList<>();
+        pastWeather.add(sunnyWeatherBeforeYesterday);
+        pastWeather.add(sunnyWeatherYesterday);
+
+        Mockito.when(mockedWeatherData.getPastWeather()).thenReturn(pastWeather);
+        Mockito.when(mockedWeatherData.getCurrentWeather()).thenReturn(sunnyWeatherToday);
+        Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);
+    }
+
+    @Given("The current weather is rainy")
+    public void theCurrentWeatherIsRainy() {
+        WeatherResponseData mockedWeatherData = mock(WeatherResponseData.class);
+
+        DailyWeather rainyWeatherToday = new DailyWeather("rainy.png", LocalDate.now(), "Rainy");
+        DailyWeather sunnyWeatherYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(1), "Sunny");
+        DailyWeather sunnyWeatherBeforeYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(2), "Sunny");
+
+        List<DailyWeather> pastWeather = new ArrayList<>();
+        pastWeather.add(sunnyWeatherBeforeYesterday);
+        pastWeather.add(sunnyWeatherYesterday);
+
+        Mockito.when(mockedWeatherData.getPastWeather()).thenReturn(pastWeather);
+        Mockito.when(mockedWeatherData.getCurrentWeather()).thenReturn(rainyWeatherToday);
+        Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);
+    }
+
+    @Then("An element tells me {string}")
+    public void anElementTellsMe(String message) {
+        String modelMessage = (String) model.get("message");
+        Assertions.assertEquals(modelMessage, message);
+    }
 }

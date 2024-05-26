@@ -119,9 +119,6 @@ public class MyGardensController {
            DailyWeather yesterdayWeather = pastWeather.get(0);
            DailyWeather beforeYesterdayWeather = pastWeather.get(1);
 
-//           WeatherResponseData dummyWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
-//           String sunnyDescription = dummyWeather.getWeatherDescriptionAndIcon(0).get(0);
-
            if (currentWeather.getDescription().equals("Rainy")) {
                model.addAttribute("message","Outdoor plants don’t need any water today");
            } else if ("Sunny".equals(yesterdayWeather.getDescription()) && "Sunny".equals(beforeYesterdayWeather.getDescription())) {
