@@ -14,11 +14,15 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
 public class PubliciseGarden {
@@ -37,6 +41,7 @@ public class PubliciseGarden {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
     public SecurityService securityService;
 
     private static GardenService gardenService;
@@ -56,7 +61,6 @@ public class PubliciseGarden {
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager);
 
         MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
@@ -64,20 +68,27 @@ public class PubliciseGarden {
     }
 
     @Given("User {string} is on my garden details page for {string}")
-    public void userIsOnMyGardenDetailsPageFor(String userEmail, String garden) throws Exception {
+    public void userIsOnMyGardenDetailsPageFor(String userEmail, String garden) {
        user = userService.getUserByEmail(userEmail);
        userGarden = user.getGardens().get(0);
+       Assertions.assertEquals(garden, userGarden.getGardenName());
     }
 
     @When("I mark a checkbox labelled \"Make my garden public\"")
     public void iMarkACheckboxLabelledMakeMyGardenPublic() throws Exception {
         Boolean isPublic = true;
-        String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
+        System.out.println(SecurityContextHolder.getContext());
+        System.out.println(user.getId());
+
+       String myGardenUrl = String.format("/my-gardens/%d", userGarden.getGardenId());
         MOCK_MVC.perform(
-                MockMvcRequestBuilders
-                        .get("/my-gardens/{gardenId}", gardenId)
-                        .param("isPublic", String.valueOf(isPublic)))
+                        MockMvcRequestBuilders
+                                .get(myGardenUrl)
+                                .param("makeGardenPublic", String.valueOf(isPublic))
+                                .with(csrf())
+                                )
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
     }
 
     @Then("My garden will be visible in search results")

@@ -90,7 +90,16 @@ public class MyGardensController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
+
         Garden garden = optionalGarden.get();
+        logger.info("Garden owner ID: {}, Authenticated user ID: {}",
+                garden.getOwner().getId(),
+                authentication.getName());
+
+
+
+
+
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
