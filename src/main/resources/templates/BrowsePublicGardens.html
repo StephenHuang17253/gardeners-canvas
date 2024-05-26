@@ -29,6 +29,8 @@
 
                 </div>
             </div>
+            <div th:replace="fragmentExample/fragments/paginationNav.html"
+                 th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}"></div>
         </div>
     </body>
 

@@ -48,14 +48,22 @@ public class PublicGardensController {
         model.addAttribute("loggedIn", loggedIn);
 
         List<Garden> allGardens = gardenService.getGardens();
+        int totalGardens = allGardens.size();
+        int pageSize = 10;
+        int startIndex = Math.toIntExact(selection * pageSize);
+        int endIndex = Math.min(startIndex + pageSize, totalGardens);
 
         List<Garden> tenSortedPublicGardens = allGardens.stream()
                 .sorted(Comparator.comparing(Garden::getCreationDate))
-                .skip(selection * 10L)
-                .limit(10L) // Temporary limit until pagination is implemented.
+                .skip(selection * pageSize)
+                .limit(pageSize)
                 .collect(Collectors.toList());
 
         model.addAttribute("publicGardens", tenSortedPublicGardens);
+        model.addAttribute("currentPage", selection);
+        model.addAttribute("totalGardens", totalGardens);
+        model.addAttribute("startIndex", startIndex); // To convert from 0-based index to 1-based
+        model.addAttribute("endIndex", endIndex);
 
         return "BrowsePublicGardens";
     }
@@ -76,6 +84,7 @@ public class PublicGardensController {
                 .collect(Collectors.toList());
 
         model.addAttribute("publicGardens", tenSortedPublicGardens);
+
 
         return "BrowsePublicGardens";
     }

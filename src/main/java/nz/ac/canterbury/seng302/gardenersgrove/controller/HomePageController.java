@@ -113,7 +113,7 @@ public class HomePageController {
 
             ArrayList<Plant> samplePlants = new ArrayList<>();
 
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < 100; i++) {
                 Garden sampleGarden = new Garden(
                         "John's Garden " + i,
                         "114 Ilam Road",

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<div class="pagination">
+    <span th:text="'Showing results ' + ${startIndex} + ' to ' + ${endIndex} + ' of ' + ${totalGardens}"></span>
+    <br>
+    <a th:href="@{'/public-gardens/page/0'}">First</a>
+    <!-- If not on page one -->
+    <a th:href="@{'/public-gardens/page/1'}"th:if="${currentPage != 1}">1</a>
+    <!-- If on page one -->
+    <a th:href="@{'/public-gardens/page/1'}"th:if="${currentPage == 1}">>1</a>
+
+    <a th:href="@{'/public-gardens/page/2'}"th:if="${currentPage != 2}">2</a>
+    <a th:href="@{'/public-gardens/page/2'}"th:if="${currentPage == 2}">>2</a>
+
+    <a th:href="@{'/public-gardens/page/3'}"th:if="${currentPage == 1}${currentPage == 2}" th:text="'Current page: ' + (${currentPage})"></a>
+    <a th:href="@{'/public-gardens/page/' + ${currentPage}}"th:if="${currentPage != 1}${currentPage != 2}" th:text="'Current page: ' + (${currentPage})"></a>
+    <a th:href="@{'/public-gardens/page/4'}">4</a>
+    <a th:href="@{'/public-gardens/page/5'}">5</a>
+    <a th:href="@{'/public-gardens/page/'+ endIndex}">Last</a>
+
+</div>
