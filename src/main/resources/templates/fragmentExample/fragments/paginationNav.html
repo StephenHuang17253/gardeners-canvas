@@ -2,19 +2,18 @@
 <div class="pagination">
     <span th:text="'Showing results ' + ${startIndex} + ' to ' + ${endIndex} + ' of ' + ${totalGardens}"></span>
     <br>
-    <a th:href="@{'/public-gardens/page/0'}">First</a>
-    <!-- If not on page one -->
-    <a th:href="@{'/public-gardens/page/1'}"th:if="${currentPage != 1}">1</a>
-    <!-- If on page one -->
-    <a th:href="@{'/public-gardens/page/1'}"th:if="${currentPage == 1}">>1</a>
+    <a th:href="@{'/public-gardens/page/1'}">First</a>
 
-    <a th:href="@{'/public-gardens/page/2'}"th:if="${currentPage != 2}">2</a>
-    <a th:href="@{'/public-gardens/page/2'}"th:if="${currentPage == 2}">>2</a>
+    <a th:href="'/public-gardens/page/' + (${currentPage - 2})"th:if="${currentPage - 2 > 0}"th:text="(${currentPage -2})">a</a>
 
-    <a th:href="@{'/public-gardens/page/3'}"th:if="${currentPage == 1}${currentPage == 2}" th:text="'Current page: ' + (${currentPage})"></a>
-    <a th:href="@{'/public-gardens/page/' + ${currentPage}}"th:if="${currentPage != 1}${currentPage != 2}" th:text="'Current page: ' + (${currentPage})"></a>
-    <a th:href="@{'/public-gardens/page/4'}">4</a>
-    <a th:href="@{'/public-gardens/page/5'}">5</a>
-    <a th:href="@{'/public-gardens/page/'+ endIndex}">Last</a>
+    <a th:href="'/public-gardens/page/' + (${currentPage - 1})"th:if="${currentPage - 1 > 0}"th:text="(${currentPage -1})">b</a>
+
+    <a th:text="'>' + (${currentPage}) + '<'"></a>
+
+    <a th:href="'/public-gardens/page/' + (${currentPage + 1})"th:if="${currentPage + 1 < lastPage}"th:text="(${currentPage + 1})">c</a>
+
+    <a th:href="'/public-gardens/page/' + (${currentPage + 2})"th:if="${currentPage + 2 < lastPage}"th:text="(${currentPage + 2})">d</a>
+
+    <a th:href="'/public-gardens/page/' + (${lastPage})">Last</a>
 
 </div>
