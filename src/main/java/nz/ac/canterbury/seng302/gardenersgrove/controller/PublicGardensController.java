@@ -39,8 +39,8 @@ public class PublicGardensController {
      *
      * @return thymeleaf BrowsePublicGardens html element
      */
-    @GetMapping("/public-gardens/page/{selection}")
-    public String publicGardensPagination(@PathVariable Long selection, Model model) {
+    @GetMapping("/public-gardens/page/{pageNumber}")
+    public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
         logger.info("GET /public-gardens");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,18 +50,18 @@ public class PublicGardensController {
         List<Garden> allGardens = gardenService.getGardens();
         int totalGardens = allGardens.size();
         int pageSize = 10;
-        int startIndex = Math.toIntExact((selection - 1) * pageSize);
+        int startIndex = Math.toIntExact((pageNumber - 1) * pageSize);
         int endIndex = Math.min(startIndex + pageSize, totalGardens);
         int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
 
         List<Garden> tenSortedPublicGardens = allGardens.stream()
                 .sorted(Comparator.comparing(Garden::getCreationDate))
-                .skip((selection - 1) * pageSize)
+                .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .collect(Collectors.toList());
 
         model.addAttribute("publicGardens", tenSortedPublicGardens);
-        model.addAttribute("currentPage", selection);
+        model.addAttribute("currentPage", pageNumber);
         model.addAttribute("totalGardens", totalGardens);
         model.addAttribute("startIndex", startIndex+1);
         model.addAttribute("endIndex", endIndex);
@@ -78,17 +78,7 @@ public class PublicGardensController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        List<Garden> allGardens = gardenService.getGardens();
-
-        List<Garden> tenSortedPublicGardens = allGardens.stream()
-                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                .limit(10L) // Temporary limit until pagination is implemented.
-                .collect(Collectors.toList());
-
-        model.addAttribute("publicGardens", tenSortedPublicGardens);
-
-
-        return "BrowsePublicGardens";
+        return "redirect:/public-gardens/page/1";
     }
 
 
