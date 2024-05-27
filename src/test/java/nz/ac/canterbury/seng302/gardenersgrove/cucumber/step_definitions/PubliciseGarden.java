@@ -22,6 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Optional;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
@@ -61,6 +63,7 @@ public class PubliciseGarden {
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
+//        securityService = new SecurityService(userService, authenticationManager);
 
         MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
@@ -80,19 +83,19 @@ public class PubliciseGarden {
         System.out.println(SecurityContextHolder.getContext());
         System.out.println(user.getId());
 
-       String myGardenUrl = String.format("/my-gardens/%d", userGarden.getGardenId());
+       String myGardenUrl = String.format("/my-gardens/%d/public", userGarden.getGardenId());
         MOCK_MVC.perform(
                         MockMvcRequestBuilders
-                                .get(myGardenUrl)
-                                .param("makeGardenPublic", String.valueOf(isPublic))
-                                .with(csrf())
-                                )
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                                .post(myGardenUrl)
+                                .param("makeGardenPublic", String.valueOf(true))
+                                .with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 
     }
 
     @Then("My garden will be visible in search results")
     public void myGardenWillBeVisibleInSearchResults() {
-        Assertions.assertTrue(userGarden.getIsPublic());
+        Optional<Garden> testGarden = gardenService.getGardenById(userGarden.getGardenId());
+        Assertions.assertTrue(testGarden.get().getIsPublic());
     }
 }

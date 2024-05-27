@@ -76,7 +76,6 @@ public class MyGardensController {
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
                                     HttpServletResponse response,
-                                    @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") Boolean makeGardenPublic,
                                     Model model) {
         logger.info("GET /my-gardens/{}-{}", gardenId);
 
@@ -96,16 +95,12 @@ public class MyGardensController {
                 garden.getOwner().getId(),
                 authentication.getName());
 
-
-
-
-
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
 
-        garden.setIsPublic(makeGardenPublic);
+//        gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
         logger.error("Testing is public: {}", garden.getIsPublic());
 
         model.addAttribute("gardenName", garden.getGardenName());
@@ -116,6 +111,56 @@ public class MyGardensController {
         model.addAttribute("totalPlants", garden.getPlants().size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
         return "gardenDetailsPage";
+
+    }
+
+    /**
+     * Gets all the users created gardens
+     * and maps them all and there attributes to the gardenDetailsPage
+     * but with the custom url of /my-gardens/{gardenId}
+     *
+     * @return thymeleaf createNewGardenForm
+     */
+    @PostMapping("/my-gardens/{gardenId}/public")
+    public String updateGardenPublicStatus(@PathVariable Long gardenId,
+                                           @RequestParam(name = "makeGardenPublic", required=false) boolean makeGardenPublic,
+                                    HttpServletResponse response,
+                                    Model model) {
+        logger.info("POST /my-gardens/{gardenId}/public", gardenId);
+        logger.info("Value of makeGardenPublic: {}", makeGardenPublic);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (!optionalGarden.isPresent()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Garden garden = optionalGarden.get();
+        logger.info("Garden owner ID: {}, Authenticated user ID: {}",
+                garden.getOwner().getId(),
+                authentication.getName());
+
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+
+        gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
+        logger.error("Status of Garden publicity: {}", garden.getIsPublic());
+
+        model.addAttribute("gardenName", garden.getGardenName());
+        model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("gardenSize", garden.getGardenSize());
+        model.addAttribute("gardenId", gardenId);
+        model.addAttribute("plants", garden.getPlants());
+        model.addAttribute("totalPlants", garden.getPlants().size());
+        model.addAttribute("makeGardenPublic", garden.getIsPublic());
+        return "redirect:/my-gardens/{gardenId}";
 
     }
 

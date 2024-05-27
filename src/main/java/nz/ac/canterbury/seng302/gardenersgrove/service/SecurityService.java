@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service("securityService")
 public class SecurityService {
 
@@ -50,7 +52,7 @@ public class SecurityService {
         logger.info("Security check");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByEmail(authentication.getName());
-        return user.getId() == ownerId;
+        return Objects.equals(user.getId(), ownerId);
     }
     /**
      * Helper to get the current logged, in user
