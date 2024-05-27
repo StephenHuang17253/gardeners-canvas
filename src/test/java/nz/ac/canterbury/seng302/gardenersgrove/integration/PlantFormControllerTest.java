@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +20,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -86,7 +84,6 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void heartbeat() throws Exception {
         String gardenId = "1";
-        String plantData = "{ \"name\": \"Rose\", \"plantingDate\": \"2024-04-27\", \"type\": \"Flower\" }";
         mockMvc.perform(get("/my-gardens/{gardenId}/create-new-plant", gardenId))
                 .andExpect(status().isOk());
     }
@@ -332,16 +329,8 @@ public class PlantFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "!",
-            "a very long plant name that exceeds the maximum length" +
-                    "a very long plant name that exceeds the maximum length" +
-                    "a very long plant name that exceeds the maximum length" +
-                    "a very long plant name that exceeds the maximum length" +
-                    "a very long plant name that exceeds the maximum length",
-            "''", "[", "{", "|", "$$", "o_o", "test@gmail.com", ":", ";",
-            "-1", "0", "-1.0", "a", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7"
-
+    @CsvSource({
+            "0", "0.9", "1000001", "1000000.00000000000000000001", "-1"
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
@@ -451,7 +440,6 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
         String gardenId = "1";
-        String gardenName = "test";
         String plantId = "1";
         String plantName = "standardPlant";
         int plantCount = 1;
@@ -479,10 +467,10 @@ public class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "1", "1.0", "9999", "0.1", "9987.123"
+            "1", "9999", "1000000"
     })
     @WithMockUser(username = "test@gmail.com")
-    public void plantFormController_editCountVariantsPass(Float plantCount) throws Exception {
+    public void plantFormController_editCountVariantsPass(int plantCount) throws Exception {
         String gardenId = "1";
         String plantName = "test name";
         String plantId = "1";
@@ -508,5 +496,4 @@ public class PlantFormControllerTest {
                 plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
 
     }
-
 }

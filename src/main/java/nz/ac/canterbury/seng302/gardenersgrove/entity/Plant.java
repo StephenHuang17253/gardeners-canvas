@@ -20,7 +20,7 @@ public class Plant {
     private String plantName;
 
     @Column
-    private float plantCount;
+    private int plantCount;
 
     @Column(length = 512)
     private String plantDescription;
@@ -48,7 +48,7 @@ public class Plant {
      * @param plantDate the date of planting
      * @param garden the Garden object that the plant belongs to
      */
-    public Plant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Garden garden) {
+    public Plant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Garden garden) {
         this.plantName = plantName;
         this.plantCount = plantCount;
         this.plantDescription = plantDescription;
@@ -64,8 +64,8 @@ public class Plant {
     }
     public void setPlantName(String plantName) {this.plantName = plantName;}
     public String getPlantDescription() {return plantDescription;}
-    public Float getPlantCount() {return plantCount;}
-    public void setPlantCount(Float plantCount) {this.plantCount = plantCount;}
+    public int getPlantCount() {return plantCount;}
+    public void setPlantCount(int plantCount) {this.plantCount = plantCount;}
     public void setPlantDescription(String plantDescription) {
         this.plantDescription = plantDescription;
     }

@@ -362,6 +362,24 @@ public class InputValidator {
                 .getResult();
     }
 
+    /**
+     * Checks if the given plantCount is a valid integer between 1 and 1,000,000
+     *
+     * @param plantCount the plant count to validate
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *         otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validatePlantCount(String plantCount) {
+        ValidationResult result = new InputValidator(plantCount)
+                .validIntegerHelper()
+                .maxNumberHelper(1000000)
+                .minNumberHelper(1)
+                .getResult();
+        if (!result.valid()) {
+            result = ValidationResult.INVALID_PLANT_COUNT;
+        }
+        return result;
+    }
 
     /**
      * Checks if a string is blank or not if a string is
@@ -378,6 +396,30 @@ public class InputValidator {
 
         if (testedValue.isBlank()) {
             this.validationResult = ValidationResult.BLANK;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string is a valid integer
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator validIntegerHelper() {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        try {
+            Integer.parseInt(testedValue);
+        } catch (NumberFormatException error) {
+            this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
         }
@@ -773,6 +815,52 @@ public class InputValidator {
 
         if (containsProfanity) {
             this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string is a valid integer less than the given minValue
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @param minValue the minimum value the number can be
+     * @return the calling object
+     */
+    private InputValidator minNumberHelper(int minValue) {
+        if (!this.passState) {
+            return this;
+        }
+
+        if (Integer.parseInt(testedValue) < minValue) {
+            this.validationResult = ValidationResult.INVALID;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
+     * Checks if a string is a valid integer less than the given maxValue
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @param maxValue the maximum value the number can be
+     * @return the calling object
+     */
+    private InputValidator maxNumberHelper(int maxValue) {
+        if (!this.passState) {
+            return this;
+        }
+
+        if (Integer.parseInt(testedValue) > maxValue) {
+            this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
         }

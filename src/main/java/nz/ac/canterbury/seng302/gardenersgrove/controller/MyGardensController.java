@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -45,7 +46,6 @@ public class MyGardensController {
         this.plantService = plantService;
         this.fileService = fileService;
         this.securityService = securityService;
-
     }
 
     /**
@@ -75,7 +75,7 @@ public class MyGardensController {
     public String showGardenDetails(@PathVariable Long gardenId,
                                     HttpServletResponse response,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenId);
+        logger.info("GET /my-gardens/{}", gardenId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
