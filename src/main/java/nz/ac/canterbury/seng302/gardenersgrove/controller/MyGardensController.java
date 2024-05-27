@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -12,6 +13,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileVal
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -78,6 +81,13 @@ public class MyGardensController {
         return "myGardensPage";
     }
 
+    @PostMapping("/my-gardens/{gardenId}/dismiss-message")
+    public ResponseEntity<Void> dismissMessage(@PathVariable Long gardenId, HttpSession session) {
+        // Store the dismissal in the session or another storage mechanism
+        session.setAttribute("dismissedMessage_" + gardenId, LocalDate.now());
+        return ResponseEntity.ok().build();
+    }
+
     /**
      * Gets all the users created gardens
      * and maps them all and there attributes to the gardenDetailsPage
@@ -106,7 +116,6 @@ public class MyGardensController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
-
         List<DailyWeather> weather = new ArrayList<>();
         try {
            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());

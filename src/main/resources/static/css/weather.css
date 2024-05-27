@@ -58,22 +58,23 @@
 
 .watering {
     position: relative;
-    border: 1px solid #ccc;
-    padding: 15px;
+    border: 1px solid gray;
+    padding: 7px;
     border-radius: 5px;
-    background-color: #f9f9f9;
-    max-width: 300px;
+    background-color: ghostwhite;
+    width: 30vw;
     margin: 20px auto;
+    text-align: center;
 }
 
 .watering .close {
     position: absolute;
-    top: 10px;
+    top: 3px;
     right: 10px;
     cursor: pointer;
     font-size: 18px;
     font-weight: bold;
-    color: #333;
+    color: black;
 }
 .error_chip {
     display: inline-block;

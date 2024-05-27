@@ -10,6 +10,7 @@
         <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
         <link th:href="@{/css/weather.css}" rel="stylesheet">
         <script th:src="@{/js/imagePicker.js}"></script>
+        <script th:src="@{/js/wateringBox.js}"></script>
     </head>
     <body>
     <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
@@ -45,16 +46,11 @@
             <div class="attribution">
                 <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
             </div>
-
             <div class="watering" th:if="${message}" id="messageBox">
                 <p th:text="${message}"></p>
                 <span class="close" onclick="closeMessageBox()">×</span>
             </div>
-            <script>
-                function closeMessageBox() {
-                    document.getElementById('messageBox').style.display = 'none';
-                }
-            </script>
+            <input type="hidden" id="gardenId" th:value="${gardenId}" />
             <br>
             <br>
             <div class="tableList-table-contain">
