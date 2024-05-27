@@ -369,6 +369,9 @@ public class AccountController {
 
         ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
 
+        model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("password", password);
+
         if (!validEmail.valid()) {
             model.addAttribute("emailAddressError", validEmail);
             return "loginPage";

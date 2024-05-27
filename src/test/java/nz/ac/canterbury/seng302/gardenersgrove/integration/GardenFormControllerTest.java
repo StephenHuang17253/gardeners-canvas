@@ -65,7 +65,6 @@ public class GardenFormControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
-        ;
 
         if (!userService.emailInUse(mockUser.getEmailAddress()))
         {
@@ -98,14 +97,14 @@ public class GardenFormControllerTest {
     }
 
     @Test
-    public void controllerLoads()
+    void controllerLoads()
     {
         assertNotNull(gardenFormController);
     }
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void mvcMockIsAlive() throws Exception
+    void mvcMockIsAlive() throws Exception
     {
         mockMvc.perform(get("/create-new-garden"))
                 .andExpect(status().isOk());
@@ -113,7 +112,7 @@ public class GardenFormControllerTest {
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postBasicNewGarden_AtLeastOneGardenAdded() throws Exception
+    void gardenFormController_postBasicNewGarden_AtLeastOneGardenAdded() throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -154,7 +153,7 @@ public class GardenFormControllerTest {
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postBasicGardenEdit_gardenEdited() throws Exception
+    void gardenFormController_postBasicGardenEdit_gardenEdited() throws Exception
     {
 
 
@@ -185,7 +184,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
     "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenName(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -230,7 +229,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenName(String input) throws Exception
     {
 
 
@@ -248,9 +247,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenName(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -291,9 +290,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenName(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenName(String input) throws Exception
     {
 
 
@@ -320,7 +319,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ","son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_streetAddress(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -365,7 +364,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ","son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_StreetAddress(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_StreetAddress(String input) throws Exception
     {
 
 
@@ -383,9 +382,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -426,9 +425,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_streetAddress(String input) throws Exception
     {
 
 
@@ -454,7 +453,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ", "son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_suburb(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -499,7 +498,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {" ", "son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_suburb(String input) throws Exception
     {
 
 
@@ -517,9 +516,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_suburb(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -560,9 +559,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_suburb(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_suburb(String input) throws Exception
     {
 
 
@@ -587,7 +586,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_city(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -632,7 +631,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_city(String input) throws Exception
     {
 
 
@@ -650,9 +649,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -693,9 +692,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_city(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_city(String input) throws Exception
     {
 
 
@@ -721,7 +720,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_country(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -766,7 +765,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = {"son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.","Numbers ok 123", "apostrophee's","some-mix's "})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_country(String input) throws Exception
     {
 
 
@@ -784,9 +783,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_country(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -827,9 +826,9 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! "})
+    @ValueSource(strings = {" ", "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\""})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_country(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_country(String input) throws Exception
     {
 
 
@@ -855,7 +854,7 @@ public class GardenFormControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"", " ","son", " input", "More name", "123", "123 123", "12S 34E", "12345321" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_postCode(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -899,7 +898,7 @@ public class GardenFormControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {""," ", "son", " input", "More name", "123", "123 123", "12S 34E", "12345321" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_postCode(String input) throws Exception
     {
 
 
@@ -917,10 +916,10 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_postCode(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -961,10 +960,10 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = {"!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_postCode(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_postCode(String input) throws Exception
     {
 
 
@@ -986,9 +985,9 @@ public class GardenFormControllerTest {
     //
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", ""})
+    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", "8000000.00", "0.01"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -1030,9 +1029,9 @@ public class GardenFormControllerTest {
 
 
     @ParameterizedTest
-    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", ""})
+    @ValueSource(strings = {"12345","1.0","1,0","0.1","123123.2", "0.01", "8000000,00"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenSize(String input) throws Exception
     {
 
 
@@ -1050,13 +1049,13 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)", "0.009", "0", "8000000,01" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
@@ -1097,13 +1096,13 @@ public class GardenFormControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ",
+    @ValueSource(strings = { "!",";", "Surely•this","{Null}","@Value()","::"," ! ", "\"",
             "son", "basic input", "More name", "123 123", "12S 34E",
             "1234531222222222212212312321331211222222222222222222222222222222222222222222222222222222222222222222222222",
             "1.2.3", "1,2.3", "-123.2","-0.1", "-2.0",
-            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)"})
+            "any.", "puntuation,", "is bad:", "{bracket?}", "(no)",  "0", "8000000,01"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
+    void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception
     {
 
 

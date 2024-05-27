@@ -39,7 +39,7 @@
 
             <label for="plantCount"> Plant Count: </label>
             <br>
-            <input type="text" class="form-control" th:class = "${PCErrorClass}" id="plantCount" placeholder="Number of plants"
+            <input type="number" class="form-control" th:class = "${PCErrorClass}" id="plantCount" placeholder="Number of plants"
                    th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount" autofocus>
 
             <div th:if="${PCErrorText!=''}">
@@ -61,6 +61,7 @@
 
             <label for="plantDate"> Plant Date </label>
             <input type="date" class="form-control"  id="plantDate" placeholder=""
+                   max="9999-12-30" min="0000-01-01"
                    th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
                    autofocus >
 
