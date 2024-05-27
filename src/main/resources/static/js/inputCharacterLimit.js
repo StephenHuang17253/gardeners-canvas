@@ -1,7 +1,12 @@
-var inputs = document.getElementsByTagName('input');
 var textAreas = document.getElementsByTagName('textarea');
-var allInputs = Array.from(inputs).concat(Array.from(textAreas));
+var inputs = document.getElementsByTagName('input');
 
-for (var i = 0; i < inputsArray.length; i++) {
-    inputsArray[i].maxLength = 5000;
+const maxLength = 5000;
+
+for (var i = 0; i < textAreas.length; i++) {
+    textAreas[i].maxLength = maxLength;
+}
+
+for (var i = 0; i < inputs.length; i++) {
+    inputs[i].maxLength = maxLength;
 }
