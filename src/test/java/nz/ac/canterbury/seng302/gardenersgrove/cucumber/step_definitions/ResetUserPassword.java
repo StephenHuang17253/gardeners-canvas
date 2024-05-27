@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -102,6 +103,7 @@ public class ResetUserPassword {
 
     @Given("I am on the login page")
     public void i_am_on_the_login_page() throws Exception {
+        SecurityContextHolder.clearContext();
         String url = "/login";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
