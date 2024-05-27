@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.ManageFriendsControlle
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 
@@ -195,7 +197,7 @@ public class U17_SendFriendRequest {
 
     @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
     public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("searchResults");
         assert result != null;
         for (FriendModel friendModel : result) {
             String matchFullName = friendModel.getFriendName();
@@ -212,6 +214,52 @@ public class U17_SendFriendRequest {
         String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("SearchErrorText");
         Assertions.assertEquals(error, searchError);
     }
+
+    @Given("I search for a user {string}")
+    public void i_search_for_a_user(String email) throws Exception {
+
+        User user = userService.getUserByEmail(email);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get("/manage-friends/search")
+                                .param("searchInput", email))
+                .andExpect(status().isOk())
+                .andReturn();
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("searchResults");
+        FriendModel friendModel = result.get(0);
+        Assertions.assertEquals(friendProfilePicture,friendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName,friendModel.getFriendName());
+    }
+    @When("I hit the 'invite as friend' button for user with {string}")
+    public void i_hit_the_invite_as_friend_button_for_user_with(String email) throws Exception {
+        User user = userService.getUserByEmail(email);
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .post("/manage-friends/send-invite")
+                                .param("friendId", String.valueOf(user.getId()))
+                                .param("activeTab", "search"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+    }
+    @Then("user {string} sees the invite from {string}")
+    public void user_sees_the_invite_from(String receiverEmail, String senderEmail) throws Exception {
+        User user = userService.getUserByEmail(senderEmail);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
+        RequestFriendModel requestFriendModel = result.get(0);
+        Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName, requestFriendModel.getFriendName());
+        Assertions.assertEquals(false, requestFriendModel.isSender());
+    }
+
 
 
 }
