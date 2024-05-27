@@ -44,9 +44,9 @@
 
                 <div class="tab-content">
                     <div id="friends" class="tab active">
-                        <h1>Friends</h1>
-
-
+                        <div class="tableList-header">
+                            <h1>Friends</h1>
+                        </div>
                             <div th:each="friend : ${userFriends}">
                                 <div th:replace="~{fragmentExample/fragments/friendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
@@ -58,15 +58,15 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
 
                     <div id="search" class="tab">
-                        <h1>Search gardeners</h1>
+                        <div class="tableList-header">
+                            <h1>Add Friends</h1>
+                        </div>
                         <div id="searchBarContainer">
                             <form th:action="@{/manage-friends/search}" method="get">
-                                <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"/>
+                                <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Enter a users name or email"/>
                                 <button type="submit" class="user_button">Search</button>
                             </form>
                         </div>
@@ -74,7 +74,11 @@
                         <div th:if="${SearchErrorText!=''}">
                             <h3 class="error" th:text="${SearchErrorText}"></h3>
                         </div>
-
+                        <div th:if="${searchResults?.size()>0}">
+                            <div class="tableList-table-count">
+                                <span th:text="${searchResults?.size() ?: 0} + ' Requests'"> </span>
+                            </div>
+                        </div>
                         <div th:each="friend : ${searchResults}">
                             <div th:replace="~{fragmentExample/fragments/friendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
@@ -90,7 +94,9 @@
                     </div>
 
                     <div id="pending" class="tab">
-                        <h1>Pending Friend Requests</h1>
+                        <div class="tableList-header">
+                            <h1>Pending Requests</h1>
+                        </div>
                         <div class="tableList-table-contain">
                             <div class="tableList-table-count">
                                 <br>
@@ -107,6 +113,23 @@
                             </div>
                         </div>
                     </div>
+                    <div id="declined" class="tab">
+                        <div class="tableList-header">
+                            <h1>Declined Requests</h1>
+                        </div>
+                        <div th:each="friend : ${userFriends}">
+                            <div th:replace="~{fragmentExample/fragments/friendsBox ::
+                                         friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                                         friendsName=${friend.getFriendName},
+                                         friendsGardenLink=${friend.getFriendGardenLink},
+                                         friendshipStatus=${friend.getFriendRequestStatusString()},
+                                         isPotentialFriend=${isPotentialFriend != null ? isPotentialFriend : false},
+                                         friendId=${friend.getFriendId()})}">
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
 
                 </div>
             </div>
