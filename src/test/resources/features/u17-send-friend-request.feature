@@ -8,6 +8,7 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     And I "Sarah" "Thompson", 36 am a user with email "sarah@email.com" and password "TestPassword10!"
 
 
+
   Scenario: AC1 - nav bar takes me to manage friends page
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     When I click on the 'Manage Friends' button
@@ -66,7 +67,7 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
       | "Andy" | ""    | "andy@gmail.com" | "sjdlkfjaljlf;"    |
       | "Andy" | ""    | "andy@gmail.com" | ""                 |
 
-  Scenario Outline: AC7 - Given I see a matching person for the search I made, when I hit the “invite as friend ” button,
+  Scenario: AC7 - Given I see a matching person for the search I made, when I hit the “invite as friend ” button,
   then the other user receives an invite that will be shown in their “manage friends” page.
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
@@ -75,35 +76,35 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     And I as user "sarah@email.com" am logged in with "TestPassword10!"
     Then user "sarah@email.com" sees the invite from "liam@email.com"
 
-  Scenario Outline: AC8 - Given I am on the manage friends page, and I have pending invites, when I accept an invite, then
+  Scenario: AC8 - Given I am on the manage friends page, and I have pending invites, when I accept an invite, then
   that person is added to my list of friends, and I can see their profile, and I am added to that person’s friends list, and that person can see my profile.
-    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    Given I as user "sarah@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
-    And I have a pending invite from <email>
-    When I accept the pending invite from <email>
-    Then <email> is added to my friends list
+    And I "sarah@email.com" have a pending invite from "liam@email.com"
+    When I accept the pending invite from "liam@email.com"
+    Then "liam@email.com" is added to my friends list
 
-  Scenario Outline: AC9 - Given I am on the manage friends page, and I have pending invites, when I decline an invite, then
+  Scenario: AC9 - Given I am on the manage friends page, and I have pending invites, when I decline an invite, then
   that person is not added to my list of friends, and they cannot invite me anymore.
-    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    Given I as user "sarah@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
-    And I have a pending invite from <email>
-    When I decline the pending invite from <email>
-    Then <email> are not added to friends list
-    And <email> can not add me
+    And I "sarah@email.com" have a pending invite from "liam@email.com"
+    When I decline the pending invite from "liam@email.com"
+    Then "liam@email.com" are not added to friends list
+    And "liam@email.com" can not add me "sarah@email.com"
 
-  Scenario Outline: AC10.1 - Given I have sent an invite, when it has been declined then I can see the status of the invite as “declined”.
+  Scenario: AC10.1 - Given I have sent an invite, when it has been declined then I can see the status of the invite as “declined”.
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
-    And I have sent an invite to <email>
-    When <email> declines my request
-    Then I see the request as declined
+    And I "liam@email.com" have sent an invite to "sarah@email.com"
+    When "sarah@email.com" declines my "liam@email.com" request
+    Then I see the request as declined by "sarah@email.com"
 
-  Scenario Outline: AC10.2 - Given I have sent an invite, when it has been left pending then I can see the status of the invite as “pending”.
+  Scenario: AC10.2 - Given I have sent an invite, when it has been left pending then I can see the status of the invite as “pending”.
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
-    And I have sent an invite to <email>
-    When <email> has not accepted or declined my request
-    Then I see the request as pending
+    And I "liam@email.com" have sent an invite to "sarah@email.com"
+    When "sarah@email.com" has not accepted or declined my "liam@email.com" request
+    Then I see the request to "sarah@email.com" as pending
 
 
