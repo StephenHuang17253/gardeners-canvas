@@ -77,7 +77,7 @@ public class MyGardensController {
     public String showGardenDetails(@PathVariable Long gardenId,
                                     HttpServletResponse response,
                                     Model model) {
-        logger.info("GET /my-gardens/{}-{}", gardenId);
+        logger.info("GET /my-gardens/{}", gardenId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -96,13 +96,22 @@ public class MyGardensController {
                 authentication.getName());
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return "403";
+            if (!garden.getIsPublic()) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return "403";
+            }
+            model.addAttribute("isOwner", false);
+            model.addAttribute("gardenName", garden.getGardenName());
+            model.addAttribute("gardenLocation", garden.getGardenLocation());
+            model.addAttribute("gardenSize", garden.getGardenSize());
+            model.addAttribute("gardenId", gardenId);
+            model.addAttribute("plants", garden.getPlants());
+            model.addAttribute("totalPlants", garden.getPlants().size());
+            model.addAttribute("makeGardenPublic", garden.getIsPublic());
+            return "gardenDetailsPage";
         }
 
-//        gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
-        logger.error("Testing is public: {}", garden.getIsPublic());
-
+        model.addAttribute("isOwner", true);
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         model.addAttribute("gardenSize", garden.getGardenSize());
