@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,8 +62,6 @@ public class PubliciseGarden {
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-//        securityService = new SecurityService(userService, authenticationManager);
-
         MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
@@ -79,7 +76,6 @@ public class PubliciseGarden {
 
     @When("I mark a checkbox labelled \"Make my garden public\"")
     public void iMarkACheckboxLabelledMakeMyGardenPublic() throws Exception {
-        Boolean isPublic = true;
         System.out.println(SecurityContextHolder.getContext());
         System.out.println(user.getId());
 
