@@ -141,7 +141,9 @@ public class MyGardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())));
+                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", is(garden.getIsPublic())));
+        ;
     }
 
     @Test
@@ -154,7 +156,23 @@ public class MyGardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())));
+                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", is(garden.getIsPublic())));
+        ;
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
+        Garden garden = gardenList.get(0);
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1").param("makeGardenPublic", "true"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
+                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
+                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
+                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", true));
     }
 
 }
