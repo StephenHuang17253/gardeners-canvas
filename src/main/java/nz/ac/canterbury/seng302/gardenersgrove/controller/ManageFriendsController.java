@@ -217,6 +217,7 @@ public class ManageFriendsController {
         model.addAttribute("pendingFriends", pendingFriendModels);
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("isPotentialFriend", true);
+        model.addAttribute("searchInput", searchInput);
         return "manageFriendsPage";
     }
 
@@ -229,10 +230,11 @@ public class ManageFriendsController {
     @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId,
                                    @RequestParam("activeTab") String activeTab,
+                                   @RequestParam(value = "searchInput", required = false) String searchInput,
                                    Model model) {
         logger.info("GET /manage-friends/send-invite");
         logger.info("activeTab: {}", activeTab);
-        model.addAttribute("searchInput", "");
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
@@ -247,6 +249,10 @@ public class ManageFriendsController {
         }
 
         model.addAttribute("activeTab", activeTab);
+
+        if (searchInput != null) {
+            return "redirect:/manage-friends/search?searchInput=" + searchInput + "#" + activeTab;
+        }
 
         return "redirect:/manage-friends#" + activeTab;
     }
