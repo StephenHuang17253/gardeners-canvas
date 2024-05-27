@@ -3,7 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.model;
 /**
  * Model class for storing pending request data for the Manage Friends page.
  */
-public class PendingFriendModel {
+public class RequestFriendModel {
     private String friendProfilePicture;
     private String friendName;
     private boolean isSender;
@@ -17,7 +17,7 @@ public class PendingFriendModel {
      * @param isSender whether they sent the request
      * @param userId to have a reference to retrieve the user from the repo later
      */
-    public PendingFriendModel(String friendProfilePicture, String friendName, boolean isSender, long userId){
+    public RequestFriendModel(String friendProfilePicture, String friendName, boolean isSender, long userId){
         this.friendProfilePicture = friendProfilePicture;
         this.friendName = friendName;
         this.isSender = isSender;

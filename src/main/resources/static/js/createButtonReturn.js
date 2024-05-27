@@ -79,7 +79,7 @@ function openManageFriendsPage() {
 
         // Redirect to manage-friends page
         let instance = checkInstance(currentUrl)
-        window.location.href = `${instance}/manage-friends`;
+        window.location.href = `${instance}/manage-friends#friends`;
 
     }
     var previousUrl = localStorage.getItem('previousUrl');
