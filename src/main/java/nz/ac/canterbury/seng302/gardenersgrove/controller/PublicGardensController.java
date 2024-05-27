@@ -79,7 +79,7 @@ public class PublicGardensController {
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("lastPage", lastPage);
         model.addAttribute("SearchErrorText", "");
-
+        model.addAttribute("searchValue", "");
         return "browsePublicGardens";
     }
 
@@ -149,6 +149,7 @@ public class PublicGardensController {
             model.addAttribute("endIndex", endIndex);
             model.addAttribute("lastPage", lastPage);
             model.addAttribute("SearchErrorText", "");
+            model.addAttribute("searchValue", searchInput);
         } else {
             model = resetModel(model);
             model.addAttribute("SearchErrorText", "No gardens match your search");
@@ -166,6 +167,7 @@ public class PublicGardensController {
         model.addAttribute("endIndex", 0);
         model.addAttribute("lastPage", 1);
         model.addAttribute("SearchErrorText", "");
+        model.addAttribute("searchValue", "");
         return model;
     }
 

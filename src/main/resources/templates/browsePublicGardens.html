@@ -41,9 +41,14 @@
             </div>
         </div>
     </div>
-    <div th:if="${SearchErrorText==''}">
+    <div th:if="${SearchErrorText=='' and searchValue == ''}">
         <div th:replace="~{fragmentExample/fragments/paginationNav.html}"
              th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+        </div>
+    </div>
+    <div th:if="${SearchErrorText=='' and searchValue != ''}">
+        <div th:replace="~{fragmentExample/fragments/searchPaginationNav.html}"
+             th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, searchValue=${searchValue}">
         </div>
     </div>
 </div>
