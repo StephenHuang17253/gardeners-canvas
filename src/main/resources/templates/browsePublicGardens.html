@@ -16,9 +16,9 @@
 <div class="main-container">
     <div class="tableList-header">
         <h1 class="tableList-header-title"> Public Gardens </h1>
-        <div th:if="${SearchErrorText.length() == 0}"
-             th:replace="~{fragmentExample/fragments/paginationPageOverview.html}"
-             th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}"></div>
+        <div th:replace="~{fragmentExample/fragments/paginationPageOverview.html}"
+             th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
+        </div>
         <br>
     </div>
     <div id="searchBarContainer">
@@ -42,7 +42,7 @@
         </div>
     </div>
     <div th:if="${SearchErrorText==''}">
-        <div th:replace="fragmentExample/fragments/paginationNav.html"
+        <div th:replace="~{fragmentExample/fragments/paginationNav.html}"
              th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
         </div>
     </div>

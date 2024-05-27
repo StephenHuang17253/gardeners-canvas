@@ -48,7 +48,7 @@ public class PublicGardensController {
         logger.info("GET /public-gardens");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
         List<Garden> allGardens = gardenService.getGardens();
@@ -93,7 +93,7 @@ public class PublicGardensController {
         logger.info("GET /public-gardens");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
         return "redirect:/public-gardens/page/1";
@@ -107,15 +107,17 @@ public class PublicGardensController {
      * @return thymeleaf BrowsePublicGardens html element
      */
     @GetMapping("/public-gardens/search/{pageNumber}")
-    public String publicGardens(@RequestParam("searchInput") String searchInput, @PathVariable Long pageNumber, Model model) {
+    public String publicGardens(@RequestParam(name = "searchInput", defaultValue = "", required = false) String searchInput,
+                                @PathVariable Long pageNumber,
+                                Model model) {
         logger.info("GET /public-gardens/search");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
         if (Objects.equals(searchInput, "")) {
-            return "redirect:/public-gardens";
+            return "redirect:/public-gardens/page/1";
         }
 
         List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput);
@@ -156,7 +158,7 @@ public class PublicGardensController {
 
 
     Model resetModel(Model model) {
-        List<Garden> emptyGardensList = new ArrayList<Garden>();
+        List<Garden> emptyGardensList = new ArrayList<>();
         model.addAttribute("publicGardens", emptyGardensList);
         model.addAttribute("currentPage", 1);
         model.addAttribute("totalGardens", 0);
