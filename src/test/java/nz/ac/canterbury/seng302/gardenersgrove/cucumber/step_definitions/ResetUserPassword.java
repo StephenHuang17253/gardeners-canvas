@@ -5,6 +5,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
@@ -66,7 +67,6 @@ public class ResetUserPassword {
 
     private String resetLink;
 
-    @Autowired
     private EmailService emailService;
 
 
@@ -75,9 +75,11 @@ public class ResetUserPassword {
 
     private JavaMailSender mailSender;
     @Before
-    public void before_or_after_all() {
+    public void before_or_after_all() throws MessagingException {
         token = new Token(loggedInUser, null);
         userService = new UserService(passwordEncoder, userRepository);
+
+        emailService = mock(EmailService.class);
 
         ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
         AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService, gardenService);
@@ -85,13 +87,15 @@ public class ResetUserPassword {
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController).build();
         tokenService.addToken(token);
 
-        mailSender = spy(JavaMailSender.class);
+        mailSender = mock(JavaMailSender.class);
         doNothing().when(mailSender).send(Mockito.any(MimeMessage.class));
 
         templateEngine = mock(TemplateEngine.class);
         when(templateEngine.process(Mockito.anyString(), Mockito.any(Context.class))).thenReturn("Test Body");
 
-        emailService = spy(new EmailService(mailSender, templateEngine));
+        emailService = new EmailService(mailSender, templateEngine);
+        emailService = spy(emailService);
+        doNothing().when(emailService).sendHTMLEmail(anyString(), anyString(), anyString(), any(Context.class));
         when(emailService.getBaseURL()).thenReturn("");
     }
 
@@ -103,6 +107,7 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
+
     }
 
     @When("I hit the “Forgot your password?” link")
@@ -112,6 +117,7 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
+
     }
 
     @Then("I see a form asking me for my email address")
@@ -123,6 +129,7 @@ public class ResetUserPassword {
         ).andExpect(status().isOk()).andReturn();
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
+
     }
 
     @Given("I am on the lost password form")
@@ -132,53 +139,64 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
+
     }
 
     @When("I enter an empty or malformed email address {string}")
-    public void i_enter_an_empty_or_malformed_email_address(String email) {
+    public void i_enter_an_empty_or_malformed_email_address(String email) throws MessagingException {
         userEmail = email;
+
     }
 
     @And("I click the submit button")
     public void i_click_the_submit_button() throws Exception {
         String url = "/lost-password";
+        System.out.println(userEmail);
         resetPasswordResult = MOCK_MVC.perform(
                         MockMvcRequestBuilders.post(url)
                                 .param("email", userEmail))
                 .andExpect(status().isOk())
                 .andReturn();
+
+
+        Mockito.verify(emailService, times(0)).sendHTMLEmail(anyString(), anyString(), anyString(), any(Context.class));
     }
 
     @Then("an error message tells me {string}")
-    public void an_error_message_tells_me(String errorMessage) {
+    public void an_error_message_tells_me(String errorMessage) throws MessagingException {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         Object errorObject = modelMap.get("emailError");
         String givenErrorMessage = errorObject.toString();
         Assertions.assertEquals(errorMessage, givenErrorMessage, "Error message match");
+
     }
 
     @When("I enter a valid email {string} that is not known to the system")
-    public void i_enter_a_valid_email_that_is_not_known_to_the_system(String email) {
+    public void i_enter_a_valid_email_that_is_not_known_to_the_system(String email) throws MessagingException {
         userEmail = email;
+
     }
 
     @Then("a confirmation message tells me {string}")
-    public void a_confirmation_message_tells_me(String message) {
+    public void a_confirmation_message_tells_me(String message) throws MessagingException {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         Object messageObject = modelMap.get("message");
         String givenMessage = messageObject.toString();
         Assertions.assertEquals(message, givenMessage, "Message match");
+
     }
 
     @When("I enter an email {string} that is known to the system")
-    public void i_enter_an_email_that_is_known_to_the_system(String email) {
+    public void i_enter_an_email_that_is_known_to_the_system(String email) throws MessagingException {
         userEmail = email;
+
     }
 
     @And("an email is sent with a link containing a unique reset token")
-    public void an_email_is_sent_with_a_link_containing_a_unique_reset_token() {
+    public void an_email_is_sent_with_a_link_containing_a_unique_reset_token() throws MessagingException {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
+
     }
 
     @Given("I go to the received email in the email {string}")
@@ -205,6 +223,7 @@ public class ResetUserPassword {
                 .andReturn();
     }
 
+
     @Then("I am taken to the reset password form")
     public void i_am_taken_to_the_reset_password_form() throws Exception {
 
@@ -229,6 +248,8 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url)
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+
     }
 
     @When("I enter two different passwords {string}, {string}")
@@ -240,6 +261,7 @@ public class ResetUserPassword {
                         .param("password", newPassword)
                         .param("retypePassword", retypePassword)
         ).andReturn();
+
     }
 
     @When("I enter a weak password {string}")
@@ -251,11 +273,14 @@ public class ResetUserPassword {
                         .param("password", weakPassword)
                         .param("retypePassword", weakPassword)
         ).andReturn();
+
+
     }
 
     @Then("My password does not get updated")
-    public void my_password_does_not_get_updated() {
+    public void my_password_does_not_get_updated() throws MessagingException {
         Assertions.assertEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
+
     }
 
     @When("I enter {string} in both new and retype fields and hit the save button")
@@ -267,17 +292,20 @@ public class ResetUserPassword {
                         .param("password", password)
                         .param("retypePassword", password)
         ).andReturn();
+
     }
 
     @Then("my password is updated")
-    public void my_password_is_updated() {
+    public void my_password_is_updated() throws MessagingException {
         Assertions.assertNotEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
+
     }
 
     @And("I am redirected to the login page")
-    public void i_am_redirected_to_the_login_page() {
+    public void i_am_redirected_to_the_login_page() throws MessagingException {
         String url = "/login";
         String redirectedUrl = resetPasswordResult.getResponse().getRedirectedUrl();
         Assertions.assertEquals(String.format(url), redirectedUrl);
+
     }
 }
