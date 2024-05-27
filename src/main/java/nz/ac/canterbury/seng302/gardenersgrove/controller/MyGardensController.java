@@ -123,7 +123,7 @@ public class MyGardensController {
      */
     @PostMapping("/my-gardens/{gardenId}/public")
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
-                                           @RequestParam(name = "makeGardenPublic", required=false) boolean makeGardenPublic,
+                                           @RequestParam(name = "makeGardenPublic") boolean makeGardenPublic,
                                     HttpServletResponse response,
                                     Model model) {
         logger.info("POST /my-gardens/{gardenId}/public", gardenId);
