@@ -79,6 +79,19 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    white-space: nowrap;
+}
+
+.search-bar {
+    margin: 10px;
+    padding: 10px 20px;
+    width: 80%;
+    border-radius: 5px;
+}
+
+.search-form {
+    display: flex;
+    flex-direction: row;
 }
 
 

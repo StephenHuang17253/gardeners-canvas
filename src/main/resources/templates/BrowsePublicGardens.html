@@ -1,39 +1,45 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
-    <head>
-        <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-        <title>My Gardens</title>
-        <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-        <link th:href="@{/css/navBar.css}" rel="stylesheet">
-        <link th:href="@{/css/gridTableList.css}" rel="stylesheet">
-        <link th:href="@{/css/infoBox.css}" rel="stylesheet">
-        <link th:href="@{/css/paginationNavBar.css}" rel="stylesheet">
-    </head>
+<head>
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
+    <title>My Gardens</title>
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <link th:href="@{/css/gridTableList.css}" rel="stylesheet">
+    <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+    <link th:href="@{/css/paginationNavBar.css}" rel="stylesheet">
+</head>
 
-    <body>
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('browsePublic')" th:with="loggedIn=${loggedIn}"></div>
-        <div class = "main-container">
-            <div class="tableList-header">
-                <h1 class="tableList-header-title"> Public Gardens </h1>
-                <div th:replace="fragmentExample/fragments/paginationPageOverview.html"
-                     th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}"></div>
-                <br>
-            </div>
-            <div class="tableList-table-contain">
-                <div th:each="garden : ${publicGardens}">
-                    <div th:replace="~{fragmentExample/fragments/gardenBox.html ::
+<body>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('browsePublic')" th:with="loggedIn=${loggedIn}"></div>
+<div class="main-container">
+    <div class="tableList-header">
+        <h1 class="tableList-header-title"> Public Gardens </h1>
+        <div th:replace="fragmentExample/fragments/paginationPageOverview.html"
+             th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}"></div>
+        <br>
+    </div>
+    <div id="searchBarContainer">
+        <form th:action="@{/public-gardens/search}" method="get" class="search-form">
+            <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"/>
+            <button type="submit" class="user_button">Search</button>
+        </form>
+    </div>
+    <div class="tableList-table-contain">
+        <div th:each="garden : ${publicGardens}">
+            <div th:replace="~{fragmentExample/fragments/gardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},
                         gardenLocation=${garden.getGardenLocation},
                         gardenSize=${garden.getGardenSize},
                         numberOfPlants=${garden.getPlants?.size()})}">
-                    </div>
-
-                </div>
             </div>
-            <div th:replace="fragmentExample/fragments/paginationNav.html"
-                 th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}"></div>
+
         </div>
-    </body>
+    </div>
+    <div th:replace="fragmentExample/fragments/paginationNav.html"
+         th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}"></div>
+</div>
+</body>
 
 </html>
