@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,9 +35,53 @@ public class PublicGardensController {
     }
 
     /**
-     * returns a page with the 10 most recent public gardens
+     * returns a page with the 10 most recent public gardens based on current page in pagination
+     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
      *
      * @return thymeleaf BrowsePublicGardens html element
+     */
+    @GetMapping("/public-gardens/page/{pageNumber}")
+    public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
+        logger.info("GET /public-gardens");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        List<Garden> allGardens = gardenService.getGardens();
+        int totalGardens = allGardens.size();
+        int pageSize = 10;
+        int startIndex = Math.toIntExact((pageNumber - 1) * pageSize);
+        int endIndex = Math.min(startIndex + pageSize, totalGardens);
+        int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
+
+        if (pageNumber > lastPage) {
+            return "redirect:/public-gardens/page/" + lastPage;
+        }
+        if (pageNumber < 1) {
+            return "redirect:/public-gardens/page/1";
+        }
+
+
+        List<Garden> tenSortedPublicGardens = allGardens.stream()
+                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
+                .skip((pageNumber - 1) * pageSize)
+                .limit(pageSize)
+                .collect(Collectors.toList());
+
+        model.addAttribute("publicGardens", tenSortedPublicGardens);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("totalGardens", totalGardens);
+        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("lastPage", lastPage);
+
+        return "BrowsePublicGardens";
+    }
+
+    /**
+     * Redirects to pagination page one
+     * @return redirect to page/1
      */
     @GetMapping("/public-gardens")
     public String publicGardens(Model model) {
@@ -46,16 +91,7 @@ public class PublicGardensController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        List<Garden> allGardens = gardenService.getGardens();
-
-        List<Garden> tenSortedPublicGardens = allGardens.stream()
-                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                .limit(10L) // Temporary limit until pagination is implemented.
-                .collect(Collectors.toList());
-
-        model.addAttribute("publicGardens", tenSortedPublicGardens);
-
-        return "BrowsePublicGardens";
+        return "redirect:/public-gardens/page/1";
     }
 
 
