@@ -5,14 +5,27 @@ document.addEventListener('DOMContentLoaded', function () {
     tabs.forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
-            const target = this.getAttribute('href').substring(1);
-            tabs.forEach(tab => tab.parentElement.classList.remove('active'));
-            tabContents.forEach(tabContent => tabContent.classList.remove('active'));
+            activateTab(this);
+        });
+    });
 
-            this.parentElement.classList.add('active');
-            document.getElementById(target).classList.add('active');
-        })
-    })
+    // Function to activate a tab and its content
+    function activateTab(tab) {
+        const target = tab.getAttribute('href').substring(1);
+        tabs.forEach(tab => tab.parentElement.classList.remove('active'));
+        tabContents.forEach(tabContent => tabContent.classList.remove('active'));
+
+        tab.parentElement.classList.add('active');
+        document.getElementById(target).classList.add('active');
+    }
+
+    // Check if the URL contains '/search' so we can change the tab
+    if (window.location.pathname.includes('/search')) {
+        const searchTab = document.querySelector('.tab-links a[href="#search"]');
+        if (searchTab) {
+            activateTab(searchTab);
+        }
+    }
 })
 
 /**

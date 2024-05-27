@@ -4,10 +4,13 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PendingFriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,14 +196,19 @@ public class ManageFriendsController {
                     }
                 }
             }
-            model.addAttribute("userFriends", friendModels);
+            model.addAttribute("searchResults", friendModels);
         }
         if (friendModels.isEmpty()) {
             model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
         }
+        List<FriendModel> acceptedFriendModels = createFriendModel();
+        List<PendingFriendModel> pendingFriendModels = createPendingFriendModel();
+        model.addAttribute("userFriends", acceptedFriendModels);
+        model.addAttribute("pendingFriends", pendingFriendModels);
         model.addAttribute("isPotentialFriend", true);
         return "manageFriendsPage";
     }
+
 
     /**
      * Creates a new friendship with pending status

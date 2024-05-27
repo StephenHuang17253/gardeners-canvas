@@ -20,32 +20,33 @@
             </div>
             <br>
 
+<!--            <div class="tableList-table-contain">-->
+            <div class="tableList-table-contain">
+<!--                <ul class="tab-links">-->
+<!--                    <li class="active"><a href="#friends">Friends</a></li>-->
+<!--                    <li><a href="#find">Add Friend</a></li>-->
+<!--                    <li><a href="#pending">Pending</a></li>-->
+<!--                    <li><a href="#declined">Declined</a></li>-->
+<!--                </ul>-->
 
-            <div class="tabs">
-                <ul class="tab-links">
-                    <li class="active"><a href="#friends">Friends</a></li>
-                    <li><a href="#find">Add Friend</a></li>
-                    <li><a href="#pending">Pending</a></li>
-                    <li><a href="#declined">Declined</a></li>
-                </ul>
+
+                <div class="tab-links">
+                    <a href="#friends">
+                        <button class="user_button" id="viewFriendButton"> Friends</button></a>
+                    <a href="#search">
+                        <button class="user_button" id="searchFriendButton"> Add Friend</button></a>
+                    <a href="#pending">
+                        <button class="user_button" id="viewPendingButton"> Pending</button></a>
+                    <a href="#declined">
+                        <button class="user_button" id="viewDeclinedButton"> Declined</button></a>
+
+                </div>
 
                 <div class="tab-content">
                     <div id="friends" class="tab active">
                         <h1>Friends</h1>
 
-                        <div class="tableList-table-contain">
-                            <div class="buttons">
-                                <button class="user_button" id="addFriendButton"> Add Friend</button>
-                                <div id="searchBarContainer" style="display: none;">
-                                    <form th:action="@{/manage-friends/search}" method="get">
-                                        <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"/>
-                                        <button type="submit" class="user_button">Search</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div th:if="${SearchErrorText!=''}">
-                                <h3 class="error" th:text="${SearchErrorText}"></h3>
-                            </div>
+
                             <div th:each="friend : ${userFriends}">
                                 <div th:replace="~{fragmentExample/fragments/friendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
@@ -59,23 +60,33 @@
                         </div>
 
 
-<!--                        <div class="tableList-table-contain">-->
-<!--                            <div class="tableList-table-count">-->
-<!--                                <br>-->
-<!--                                <span th:text="${userFriends?.size() ?: 0} + ' Friends'"> </span>-->
-<!--                            </div>-->
-<!--                            <div th:each="friend : ${userFriends}">-->
-<!--                                <div th:replace="fragmentExample/fragments/friendsBox ::-->
-<!--                                    friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},-->
-<!--                                    friendsName=${friend.getFriendName},-->
-<!--                                    friendId=${friend.getFriendId()},-->
-<!--                                    friendshipStatus=${friend.getFriendRequestStatusString()},-->
-<!--                                    isPotentialFriend=${isPotentialFriend != null ? isPotentialFriend : false},-->
-<!--                                    friendsGardenLink=${friend.getFriendGardenLink})"-->
-<!--                                >-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
+                    </div>
+
+                    <div id="search" class="tab">
+                        <h1>Search gardeners</h1>
+                        <div id="searchBarContainer">
+                            <form th:action="@{/manage-friends/search}" method="get">
+                                <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"/>
+                                <button type="submit" class="user_button">Search</button>
+                            </form>
+                        </div>
+
+                        <div th:if="${SearchErrorText!=''}">
+                            <h3 class="error" th:text="${SearchErrorText}"></h3>
+                        </div>
+
+                        <div th:each="friend : ${searchResults}">
+                            <div th:replace="~{fragmentExample/fragments/friendsBox ::
+                                     friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                                     friendsName=${friend.getFriendName},
+                                     friendsGardenLink=${friend.getFriendGardenLink},
+                                     friendshipStatus=${friend.getFriendRequestStatusString()},
+                                     isPotentialFriend=${isPotentialFriend != null ? isPotentialFriend : false},
+                                     friendId=${friend.getFriendId()})}">
+                            </div>
+                        </div>
+
+
                     </div>
 
                     <div id="pending" class="tab">
@@ -102,8 +113,6 @@
 
 
 
-
-        </div>
     </body>
     <script th:src="@{/js/manageFriendsPage.js}"></script>
     <script th:src="@{/js/manageFriends.js}"></script>
