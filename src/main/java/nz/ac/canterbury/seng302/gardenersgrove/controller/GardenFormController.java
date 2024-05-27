@@ -303,8 +303,23 @@ public class GardenFormController {
             @RequestParam(name = "postcode") String postcode,
             @RequestParam(name = "gardenSize") String gardenSize,
             @PathVariable Long gardenId, HttpSession session,
+            HttpServletResponse response,
             Model model) {
         logger.info("POST / edited garden");
+
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (!optionalGarden.isPresent()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
