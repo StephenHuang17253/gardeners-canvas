@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -165,8 +164,8 @@ public class PubliciseGarden {
                         .param("city", userGarden.getGardenCity())
                         .param("country", userGarden.getGardenCountry())
                         .param("postcode", userGarden.getGardenPostcode())
-                        .param("gardenSize", String.valueOf(userGarden.getGardenSize()))
-        ).andExpect(MockMvcResultMatchers.status().isOk());
+                        .param("gardenSize", String.valueOf(1))
+        ).andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 
 
     }
