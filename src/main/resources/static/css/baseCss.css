@@ -94,6 +94,13 @@ body {
     flex-direction: row;
 }
 
+.search-bar {
+    margin: 10px;
+    padding: 10px 20px;
+    width: 80%;
+    border-radius: 5px;
+}
+
 
 @media screen and (max-width: 1310px) {
 

@@ -2,13 +2,13 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entity class of a Garden, reflecting an entry of garden name, location and size (optional)
+ * Entity class of a Garden, reflecting an entry of garden name, location and
+ * size (optional)
  * and any plant entity objects that is associated with
  * Based off the SENG202 demo FormResult entity
  */
@@ -52,27 +52,27 @@ public class Garden {
     @JoinColumn(name = "garden_id")
     private List<Plant> plants = new ArrayList<>();
 
+    @Column(nullable = false)
+    private boolean isPublic;
 
     /**
      * JPA required no-args constructor
      */
-    public Garden() {
-    }
-
+    public Garden() {}
     /**
      * Creates a new Garden object.
-     *
-     * @param gardenName     the name of the garden
-     * @param gardenAddress  the address of the garden
-     * @param gardenSuburb   the suburb of the garden
-     * @param gardenCity     the city of the garden
+     * @param gardenName the name of the garden
+     * @param gardenAddress the address of the garden
+     * @param gardenSuburb the suburb of the garden
+     * @param gardenCity the city of the garden
      * @param gardenPostcode the postcode of the garden
      * @param gardenCountry  the country of the garden
      * @param gardenSize     the size of the garden
+     * @param isPublic       the visibility of the garden
      * @param owner          the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, Double gardenSize, User owner) {
+            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -80,6 +80,7 @@ public class Garden {
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.isPublic = isPublic;
         this.owner = owner;
         this.creationDate = LocalDateTime.now();
     }
@@ -96,7 +97,7 @@ public class Garden {
      * @param gardenSize     the size of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, double gardenSize) {
+            String gardenPostcode, String gardenCountry, double gardenSize) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -165,7 +166,6 @@ public class Garden {
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
-
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
@@ -178,10 +178,20 @@ public class Garden {
         return plants;
     }
 
+    public boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     /**
-     * Retrieves a garden's location which is a concatenation of its address components.
+     * Retrieves a garden's location which is a concatenation of its address
+     * components.
      *
-     * @return garden location string in the format: {address}, {suburb}, {city} {postcode}, {country}
+     * @return garden location string in the format: {address}, {suburb}, {city}
+     *         {postcode}, {country}
      */
     public String getGardenLocation() {
         // Concatenate address components to form the complete location string
@@ -219,6 +229,7 @@ public class Garden {
                 ", size='" + gardenSize + '\'' +
                 ", owner_id='" + owner.getId() + '\'' +
                 ", plants='" + plants + '\'' +
+                ", isPublic='" + isPublic + '\'' +
                 '}';
     }
 
