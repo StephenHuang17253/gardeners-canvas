@@ -58,12 +58,17 @@ public class PublicGardensController {
         int endIndex = Math.min(startIndex + pageSize, totalGardens);
         int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
 
+        if (lastPage == 0) {
+            return "redirect:/home";
+        }
+
         if (pageNumber > lastPage) {
             return "redirect:/public-gardens/page/" + lastPage;
         }
         if (pageNumber < 1) {
             return "redirect:/public-gardens/page/1";
         }
+
 
 
         List<Garden> tenSortedPublicGardens = allGardens.stream()
