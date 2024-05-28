@@ -40,14 +40,15 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
     List<Garden> findByOwnerId(long userId);
 
     /**
-     * Find all gardens whose name or one of their plant names includes searchValue
+     * Find all gardens whose name or one of their plant names or descriptions includes searchValue
      *
      * @param searchValue string to be included in garden or plant name
      * @return list of garden objects
      */
     @Query("SELECT DISTINCT garden FROM Garden garden JOIN garden.plants plant " +
             "WHERE LOWER(garden.gardenName) LIKE :searchValue" +
-            " OR LOWER(plant.plantName) LIKE :searchValue")
+            " OR LOWER(plant.plantName) LIKE :searchValue" +
+            " OR LOWER(plant.plantDescription) LIKE :searchValue")
     List<Garden> findByGardenNameOrPlantNameContainingIgnoreCase(@Param("searchValue") String searchValue);
 
 

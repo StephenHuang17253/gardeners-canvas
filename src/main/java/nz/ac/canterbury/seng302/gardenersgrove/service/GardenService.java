@@ -132,7 +132,7 @@ public class GardenService {
 
     /**
      * Prepares searchValue for Like and IgnoreCase query.
-     * Finds all gardens whose name includes searchValue, or whose plantNames include the search value
+     * Finds all gardens whose name includes searchValue, or whose plantNames or plantDescriptions include the search value
      *
      * @param searchValue string input to match
      * @return List of Garden Objects
