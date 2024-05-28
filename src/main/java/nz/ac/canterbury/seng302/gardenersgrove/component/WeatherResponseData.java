@@ -117,7 +117,7 @@ public class WeatherResponseData {
      * @param weatherCode integer that is part of WMO Weather interpretation codes (WW)
      * @return list of weather description and the name of icon file
      */
-    List<String> getWeatherDescriptionAndIcon(int weatherCode) {
+    public List<String> getWeatherDescriptionAndIcon(int weatherCode) {
         String weatherDescription;
         String iconFileName;
         if (SUNNY_WEATHER_CODES.contains(weatherCode)) {
