@@ -169,6 +169,11 @@ nav
     /* Add any additional styling you need */
 }
 
+
+#navbar #manageFriends.active {
+    background-color: #45a049;
+    float: right;
+}
 #manageFriendsBtn {
     float: right;
 }

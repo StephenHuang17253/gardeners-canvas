@@ -43,7 +43,7 @@ Editing content below will change the nav bar on all pages where it is implement
              </ul>
          </li>
 
-        <li th:class="${activeParam == 'manageFriends' ? 'active' : ''}" th:if="${loggedIn == null ? false : loggedIn}">
+        <li th:class="${activeParam == 'manageFriends' ? 'active' : ''}" th:if="${loggedIn == null ? false : loggedIn}" id="manageFriends">
             <button id="manageFriendsBtn" class =  "navBarButton" onclick="openManageFriendsPage()">
                 <a>Manage Friends</a>
             </button>
@@ -52,5 +52,5 @@ Editing content below will change the nav bar on all pages where it is implement
 
      </ul>
      <div id = "divider"></div>
-    <script th:src="@{/js/createButtonReturn.js}"></script>
+    <script th:src="@{/js/navBar.js}"></script>
  </nav>
