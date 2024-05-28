@@ -1,7 +1,7 @@
 .scrollable-container {
     flex: 2;
     max-height: 100vh;
-    max-width: 87vw;
+    width: 87vw;
     overflow-y: auto;
     border: 1px solid lightgray;
     padding: 1rem;
