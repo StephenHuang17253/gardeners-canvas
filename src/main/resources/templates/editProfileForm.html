@@ -55,11 +55,16 @@
                 <button type="submit" formnovalidate>Submit</button>
                 <a th:href="@{/profile}"><button type="button">Cancel</button></a>
             </div>
+            <div class="buttons">
+                <a th:href="@{/profile/editPassword}"><button type="button"> Change Password</button></a>
+            </div>
         </form>
+
     </div>
 <script th:src="@{/js/preventEnterSubmit.js}"></script>
 <script th:src="@{/js/editProfileForm.js}"></script>
 <script th:src="@{/js/imagePicker.js}"></script>
+<script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 
 </html>

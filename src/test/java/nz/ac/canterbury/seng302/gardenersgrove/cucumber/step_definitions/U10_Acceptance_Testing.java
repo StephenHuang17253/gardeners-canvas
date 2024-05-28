@@ -159,7 +159,7 @@ public class U10_Acceptance_Testing {
 
     @Given("I enter valid garden values for the {string}, {string}, {string}, {string} and {string}")
     public void i_enter_valid_garden_values_for_the_and_optionally(String name, String description, String city, String country,
-            String size) {
+                                                                   String size) {
         gardenName = name;
         gardenCity = city;
         gardenCountry = country;

@@ -169,6 +169,25 @@ nav
     /* Add any additional styling you need */
 }
 
+
+#navbar #manageFriends.active {
+    background-color: #45a049;
+    float: right;
+}
+#manageFriendsBtn {
+    float: right;
+}
+#manageFriendsBtn .active {
+    background-color: #45a049;
+}
+#manageFriendsBtn .active a:hover
+{
+    background-color: #4CAF50;
+}
+#manageFriendsBtn a:hover {
+    background-color: #45a049;
+}
+
 /*adjust nav bar based on screen size*/
 @Media screen and (max-width: 1310px)
 {

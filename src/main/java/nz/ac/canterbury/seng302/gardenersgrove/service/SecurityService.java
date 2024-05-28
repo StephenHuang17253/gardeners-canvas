@@ -2,6 +2,12 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -19,6 +28,8 @@ public class SecurityService {
 
 
     private final UserService userService;
+
+    private final FriendshipService friendshipService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -33,9 +44,13 @@ public class SecurityService {
      * @param authenticationManager to login user after registration
      */
     @Autowired
-    public SecurityService(UserService userService, AuthenticationManager authenticationManager){
+    public SecurityService(UserService userService,
+                           AuthenticationManager authenticationManager,
+                           FriendshipService friendshipService){
+
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.friendshipService = friendshipService;
 
     }
     /**
@@ -61,6 +76,36 @@ public class SecurityService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = this.userService.getUserByEmail(authentication.getName());
         return user;
+    }
+
+    /**
+     * Helper to check if a user is friends with the current user.
+     * @param userId - id of the user being checked.
+     * @return the user if they're a friend.
+     */
+    public User checkFriendship(Long userId, FriendshipStatus expectedStatus) {
+        User currentUser = getCurrentUser();
+        User targetUser = userService.getUserById(userId);
+        FriendshipStatus status = friendshipService.checkFriendshipStatus(currentUser, targetUser);
+
+
+        if (status.equals(expectedStatus)) {
+            return targetUser;
+        } else {
+            return null;
+        }
+
+    }
+
+    public void changeFriendship(Long userId, FriendshipStatus friendshipStatus) {
+        User currentUser = getCurrentUser();
+        User targetUser = userService.getUserById(userId);
+        Friendship friendship = friendshipService.findFriendship(currentUser, targetUser);
+
+        if (friendship != null) {
+            friendshipService.updateFriendShipStatus(friendship.getId(), friendshipStatus);
+        }
+
     }
 
     /**
