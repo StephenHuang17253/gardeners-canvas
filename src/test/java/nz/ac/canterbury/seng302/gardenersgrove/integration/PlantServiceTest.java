@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -27,9 +28,10 @@ import java.util.Optional;
  * of @DataJpaTest fixed the tests
  */
 @SpringBootTest
-@Import({ GardenService.class, PlantService.class })
+@Import({GardenService.class, PlantService.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PlantServiceTest {
+
 
     private static PlantRepository plantRepository;
     private static GardenService gardenService;
@@ -44,8 +46,8 @@ public class PlantServiceTest {
     public static void setup() {
         gardenService = Mockito.mock(GardenService.class);
         plantRepository = Mockito.mock(PlantRepository.class);
-        plantService = new PlantService(plantRepository, gardenService, fileService);
-        owner = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003, 5, 2));
+        plantService = new PlantService(plantRepository,gardenService,fileService);
+        owner =  new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
     }
 
     @Test
@@ -104,7 +106,8 @@ public class PlantServiceTest {
                 "New Zealand",
                 15.0,
                 false,
-                owner);
+                owner
+                );
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         List<Plant> mockPlantsList = new ArrayList<>();
         mockPlantsList.add(plant);
@@ -154,7 +157,7 @@ public class PlantServiceTest {
 
         // When
         plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
-        Optional<Plant> resultOptionalPlant = plantService.findById(1L);
+        Optional <Plant> resultOptionalPlant = plantService.findById(1L);
 
         // Then
         Assertions.assertTrue(resultOptionalPlant.isPresent());
@@ -165,7 +168,6 @@ public class PlantServiceTest {
         Assertions.assertEquals(dateOfPlanting, resultPlant.getPlantDate());
         Assertions.assertEquals(garden, resultPlant.getGarden());
     }
-
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     void testUpdatePlant() {

@@ -49,6 +49,10 @@ public class EmailService {
     @Value("${spring.base.url}")
     private String baseURL;
 
+    public String getBaseURL() {
+        return baseURL;
+    }
+
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
@@ -128,7 +132,7 @@ public class EmailService {
         String tokenString = token.getTokenString();
         int lifetime = (int) token.getLifetime().toMinutes();
 
-        String url = UriComponentsBuilder.fromUriString(baseURL)
+        String url = UriComponentsBuilder.fromUriString(getBaseURL())
                 .path("/reset-password/{token}")
                 .buildAndExpand(tokenString)
                 .toUriString();

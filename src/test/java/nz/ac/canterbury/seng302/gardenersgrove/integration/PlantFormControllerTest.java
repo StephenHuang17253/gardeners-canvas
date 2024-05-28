@@ -23,8 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +30,6 @@ import java.time.format.DateTimeParseException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,7 +55,6 @@ public class PlantFormControllerTest {
         LocalDate date1 = LocalDate.of(2024, 3, 27);
         Garden test_garden = new Garden(
                 "test",
-                "",
                 "test",
                 "test",
                 "test",
@@ -111,8 +107,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", date.toString()));
 
         Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
         Assertions.assertEquals(plantDescription,
@@ -147,8 +142,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", date.toString()));
 
         Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
         Assertions.assertEquals(plantDescription,
@@ -185,8 +179,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", date.toString()));
 
         Assertions.assertNotEquals(plantName,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantName());
@@ -222,8 +215,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", date.toString()));
 
         Assertions.assertNotEquals(plantName,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantName());
@@ -274,8 +266,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", date.toString()));
 
         Assertions.assertNotEquals(plantDescription,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
@@ -324,8 +315,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", String.valueOf(formattedDate)))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", String.valueOf(formattedDate)));
 
         Assertions.assertNotEquals(formattedDate,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantDate());
@@ -352,10 +342,9 @@ public class PlantFormControllerTest {
                 .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
-                .param("plantCount", String.valueOf(plantCount))
+                .param("plantCount", plantCount)
                 .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", date.toString()));
 
         Assertions.assertNotEquals(plantCount,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
@@ -388,8 +377,7 @@ public class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", String.valueOf(formattedDate)))
-                .andDo(MockMvcResultHandlers.print());
+                .param("plantDate", String.valueOf(formattedDate)));
 
         Assertions.assertEquals(formattedDate,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantDate());
@@ -419,11 +407,7 @@ public class PlantFormControllerTest {
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId)) // Assert the
-                                                                                           // expected
-                                                                                           // HTTP
-                                                                                           // status
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId));
 
         Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
 
@@ -460,8 +444,7 @@ public class PlantFormControllerTest {
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId));
 
         Assertions.assertEquals(plantDescription,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
@@ -492,8 +475,7 @@ public class PlantFormControllerTest {
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId));
 
         Assertions.assertEquals(plantCount,
                 plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
