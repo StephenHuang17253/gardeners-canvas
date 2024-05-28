@@ -19,7 +19,6 @@ const fetchLocationIQData = async(query) => {
         } else {
             hideRateLimitMessage();
         }
-        console.log(data);
         return data
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
@@ -167,6 +166,9 @@ function fillAddressFields(data) {
     document.getElementById('city').value = data.address.city || "";
     document.getElementById('postcode').value = data.address.postcode || "";
     document.getElementById('country').value = data.address.country || "";
+    document.getElementById('longitude').value = data.lon || "";
+    document.getElementById("latitude").value = data.lat || "";
+
     // updateGardenLocation();
 }
 

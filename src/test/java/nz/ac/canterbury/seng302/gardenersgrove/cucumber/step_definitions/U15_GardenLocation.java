@@ -69,6 +69,8 @@ public class U15_GardenLocation {
     public String gardenPostcode;
     public String gardenCountry;
     public String gardenSize;
+    public String gardenLongitude;
+    public String gardenLatitude;
     private Garden expectedNewGarden;
     private Garden expectedGarden;
     private MvcResult createGardenResult;
@@ -125,7 +127,7 @@ public class U15_GardenLocation {
     @Given("I as user {string} have another garden {string} located in {string}, {string}")
     public void i_as_user_have_another_garden_located_in(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, false, user);
+        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, false, "", "", user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
@@ -135,8 +137,8 @@ public class U15_GardenLocation {
     }
 
     // AC1
-    @Given("I specify a valid address with {string}, {string}, {string}, {string}, and {string}")
-    public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country) {
+    @Given("I specify a valid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
+    public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country, String latitude, String longitude) {
         gardenName = "UC Garden";
         gardenStreet = street;
         gardenSuburb = suburb;
@@ -144,11 +146,13 @@ public class U15_GardenLocation {
         gardenPostcode = postcode;
         gardenCountry = country;
         gardenSize = "15";
+        gardenLongitude = longitude;
+        gardenLatitude = latitude;
     }
 
     // AC3
-    @Given("I specify an invalid address with {string}, {string}, {string}, {string}, and {string}")
-    public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country) {
+    @Given("I specify an invalid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
+    public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country, String latitude, String longitude) {
         gardenName = "UC Garden";
         gardenStreet = street;
         gardenSuburb = suburb;
@@ -156,6 +160,8 @@ public class U15_GardenLocation {
         gardenPostcode = postcode;
         gardenCountry = country;
         gardenSize = "15";
+        gardenLongitude = latitude;
+        gardenLatitude = longitude;
     }
 
 
@@ -173,7 +179,8 @@ public class U15_GardenLocation {
                         .param("country", gardenCountry)
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize)
-
+                        .param("longitude", gardenLongitude)
+                        .param("latitude", gardenLatitude)
         ).andReturn();
     }
 
@@ -182,6 +189,7 @@ public class U15_GardenLocation {
     public void the_garden_is_created_successfully_with_that_location() {
         String createdGardenId = createGardenResult.getResponse().getRedirectedUrl().substring("/my-gardens/".length());
         expectedNewGarden = gardenService.getGardenById(Long.parseLong(createdGardenId)).orElse(null);
+        assert expectedNewGarden != null;
         Optional<Garden> optionalGarden = gardenService.getGardenById(expectedNewGarden.getGardenId());
         if (optionalGarden.isEmpty()) {
             Assertions.fail();
@@ -194,6 +202,8 @@ public class U15_GardenLocation {
         Assertions.assertEquals(gardenCity, createdGarden.getGardenCity());
         Assertions.assertEquals(gardenPostcode, createdGarden.getGardenPostcode());
         Assertions.assertEquals(gardenCountry, createdGarden.getGardenCountry());
+        Assertions.assertEquals(gardenLatitude, createdGarden.getGardenLatitude());
+        Assertions.assertEquals(gardenLongitude, createdGarden.getGardenLongitude());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), createdGarden.getGardenSize());
     }
 
@@ -211,7 +221,8 @@ public class U15_GardenLocation {
                         .param("country", gardenCountry)
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
-
+                        .param("longitude", gardenLongitude)
+                        .param("latitude", gardenLatitude)
         ).andReturn();
     }
 
@@ -230,6 +241,8 @@ public class U15_GardenLocation {
         Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
         Assertions.assertEquals(gardenPostcode, updatedGarden.getGardenPostcode());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
+        Assertions.assertEquals(gardenLatitude, updatedGarden.getGardenLatitude());
+        Assertions.assertEquals(gardenLongitude, updatedGarden.getGardenLongitude());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
 
     }
@@ -238,7 +251,6 @@ public class U15_GardenLocation {
     @Then("The garden is not created")
     public void the_garden_is_not_created() {
         Assertions.assertNull(expectedNewGarden);
-
     }
 
     // AC5

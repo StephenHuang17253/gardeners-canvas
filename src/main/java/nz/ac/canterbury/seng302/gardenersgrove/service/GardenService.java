@@ -95,7 +95,8 @@ public class GardenService {
             targetGarden.setGardenPostcode(newGardenValues.getGardenPostcode());
             targetGarden.setGardenCountry(newGardenValues.getGardenCountry());
             targetGarden.setGardenSize(newGardenValues.getGardenSize());
-
+            targetGarden.setGardenLongitude(newGardenValues.getGardenLongitude());
+            targetGarden.setGardenLatitude(newGardenValues.getGardenLatitude());
             return gardenRepository.save(targetGarden);
 
         } else {

@@ -3,9 +3,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -69,7 +68,6 @@ public class HomePageController {
     @GetMapping("/")
     public String home() throws IOException {
         logger.info("GET /");
-
         return "redirect:./home";
     }
 
@@ -131,6 +129,8 @@ public class HomePageController {
                         "New Zealand",
                         15.0,
                         false,
+                        "-43.5214643",
+                        "172.5796159",
                         johnDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
 
@@ -164,7 +164,9 @@ public class HomePageController {
                             "New Zealand",
                             15.0,
                             false,
-                            janeDoe);
+                            "-43.5214643",
+                            "172.5796159",
+                            johnDoe);
                     sampleGarden = gardenService.addGarden(sampleGarden);
 
                     for(int k = 0; k < 1; k++)

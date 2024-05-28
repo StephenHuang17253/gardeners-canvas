@@ -31,11 +31,71 @@
                 <a th:href="@{__${gardenId}__/create-new-plant}">
                     <button class="rounded-button">Create New Plant</button>
                 </a>
+    <head>
+        <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
+        <title>Garden Details</title>
+        <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+        <link th:href="@{/css/navBar.css}" rel="stylesheet">
+        <link th:href="@{/css/tableList.css}" rel="stylesheet">
+        <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+        <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
+        <link th:href="@{/css/weather.css}" rel="stylesheet">
+        <script th:src="@{/js/imagePicker.js}"></script>
+        <script th:src="@{/js/wateringBox.js}"></script>
+    </head>
+    <body>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+        <div class = "main-container">
+            <div class="tableList-header">
+                    <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
+                    <p th:text="${gardenLocation}"> Address </p>
+                    <p th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </p>
+                    <p th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Garden size </p>
+                    <br>
+                <a th:href="@{__${gardenId}__/edit}">
+                    <button class = rounded-button-top-right >Edit</button>
+                </a>
+            </div>
+            <br>
+            <div class="weather">
+                <div th:each="prediction : ${weather}">
+                    <div th:replace="~{fragmentExample/fragments/weatherBox.html :: weatherBox(
+                        weatherIcon=${prediction.getWeatherIcon()},
+                        date=${prediction.getDate()},
+                        day=${prediction.getDay()},
+                        weatherDescription=${prediction.getDescription()},
+                        minTemp=${prediction.getMinTemp()},
+                        maxTemp=${prediction.getMaxTemp()},
+                        temp=${prediction.getTemp()},
+                        precipitation=${prediction.getPrecipitation()},
+                        humidity=${prediction.getHumidity()},
+                        weatherError=${prediction.getWeatherError()})}">
+                    </div>
+                </div>
             </div>
         </div>
         <div class="scrollable-container">
             <div class="plants-grid">
                 <div th:each="plant : ${plants}" class="plant-box">
+            <br>
+            <div class="attribution">
+                <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
+            </div>
+            <div class="watering" th:if="${message}" id="messageBox">
+                <p th:text="${message}"></p>
+                <span class="close" onclick="closeMessageBox()">×</span>
+            </div>
+            <input type="hidden" id="gardenId" th:value="${gardenId}" />
+            <br>
+            <br>
+            <div class="tableList-table-contain">
+                <div class="tableList-table-count">
+                    <span th:text="${totalPlants} + ' Plants'"> # Plants </span>
+                    <a th:href="@{__${gardenId}__/create-new-plant}">
+                        <button class="rounded-button">Create New Plant</button>
+                    </a>
+                </div>
+                <div th:each="plant : ${plants}">
                     <div th:replace="~{fragmentExample/fragments/plantBox.html :: plantBox(
                         plantId=${plant.getPlantId()},
                         plantName=${plant.getPlantName()},
@@ -46,6 +106,7 @@
                     </div>
                 </div>
             </div>
+            <br>
         </div>
     </div>
 </div>
