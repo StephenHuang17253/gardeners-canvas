@@ -10,13 +10,21 @@
         <link th:href="@{/css/friendBox.css}" rel="stylesheet">
         <link th:href="@{/css/manageFriends.css}" rel="stylesheet">
 
-    </head>
-
-    <body>
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('manageFriends')" th:with="loggedIn=${loggedIn}"></div>
-        <div class = "main-container">
-            <div class="tableList-header">
-                <h1 class="tableList-header-title"> Manage Friends </h1>
+<body>
+<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+<div class="main-container">
+    <div class="tableList-header">
+        <h1 class="tableList-header-title"> Manage Friends </h1>
+    </div>
+    <br>
+    <div class="tableList-table-contain">
+        <div class="buttons">
+            <button class="user_button" id="addFriendButton"> Add Friend</button>
+            <div id="searchBarContainer" style="display: none;">
+                <form th:action="@{/manage-friends/search}" method="get">
+                    <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"/>
+                    <button type="submit" class="user_button">Search</button>
+                </form>
             </div>
             <br>
 
@@ -121,14 +129,10 @@
                         </div>
                     </div>
             </div>
-
-
-                </div>
-            </div>
-
-
-
-    </body>
-    <script th:src="@{/js/manageFriendsPage.js}"></script>
-    <script th:src="@{/js/manageFriends.js}"></script>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/manageFriendsPage.js}"></script>
+<script th:src="@{/js/inputCharacterLimit.js}"></script>
+</body>
 </html>
