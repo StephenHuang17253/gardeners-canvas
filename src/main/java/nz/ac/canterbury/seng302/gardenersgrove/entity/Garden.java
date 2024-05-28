@@ -40,7 +40,7 @@ public class Garden {
     @Column(nullable = true)
     private Double gardenSize;
 
-    @Column(name="creation_date")
+    @Column(name = "creation_date")
     @CreatedDate
     private LocalDateTime creationDate;
 
@@ -48,25 +48,28 @@ public class Garden {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "garden_id")
-    private List<Plant> plants =  new ArrayList<>();
+    private List<Plant> plants = new ArrayList<>();
 
 
     /**
      * JPA required no-args constructor
      */
-    public Garden() {}
+    public Garden() {
+    }
+
     /**
      * Creates a new Garden object.
-     * @param gardenName the name of the garden
-     * @param gardenAddress the address of the garden
-     * @param gardenSuburb the suburb of the garden
-     * @param gardenCity the city of the garden
+     *
+     * @param gardenName     the name of the garden
+     * @param gardenAddress  the address of the garden
+     * @param gardenSuburb   the suburb of the garden
+     * @param gardenCity     the city of the garden
      * @param gardenPostcode the postcode of the garden
-     * @param gardenCountry the country of the garden
-     * @param gardenSize the size of the garden
-     * @param owner the User object that owns the garden
+     * @param gardenCountry  the country of the garden
+     * @param gardenSize     the size of the garden
+     * @param owner          the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
                   String gardenPostcode, String gardenCountry, Double gardenSize, User owner) {
@@ -83,13 +86,14 @@ public class Garden {
 
     /**
      * Creates a new Garden object without owner used for update Garden.
-     * @param gardenName the name of the garden
-     * @param gardenAddress the address of the garden
-     * @param gardenSuburb the suburb of the garden
-     * @param gardenCity the city of the garden
+     *
+     * @param gardenName     the name of the garden
+     * @param gardenAddress  the address of the garden
+     * @param gardenSuburb   the suburb of the garden
+     * @param gardenCity     the city of the garden
      * @param gardenPostcode the postcode of the garden
-     * @param gardenCountry the country of the garden
-     * @param gardenSize the size of the garden
+     * @param gardenCountry  the country of the garden
+     * @param gardenSize     the size of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
                   String gardenPostcode, String gardenCountry, double gardenSize) {
@@ -105,55 +109,72 @@ public class Garden {
     public Long getGardenId() {
         return gardenId;
     }
+
     public String getGardenName() {
         return gardenName;
     }
+
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
     }
+
     public String getGardenAddress() {
         return gardenAddress;
     }
+
     public void setGardenAddress(String gardenAddress) {
         this.gardenAddress = gardenAddress;
     }
+
     public String getGardenSuburb() {
         return gardenSuburb;
     }
+
     public void setGardenSuburb(String gardenSuburb) {
         this.gardenSuburb = gardenSuburb;
     }
+
     public String getGardenPostcode() {
         return gardenPostcode;
     }
+
     public void setGardenPostcode(String gardenPostcode) {
         this.gardenPostcode = gardenPostcode;
     }
+
     public String getGardenCity() {
         return gardenCity;
     }
+
     public void setGardenCity(String gardenCity) {
         this.gardenCity = gardenCity;
     }
+
     public String getGardenCountry() {
         return gardenCountry;
     }
+
     public void setGardenCountry(String gardenCountry) {
         this.gardenCountry = gardenCountry;
     }
+
     public double getGardenSize() {
         return gardenSize;
     }
+
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
+
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
+
     public User getOwner() {
         return owner;
     }
-    public List<Plant> getPlants(){
+
+    public List<Plant> getPlants() {
         return plants;
     }
 
@@ -188,6 +209,7 @@ public class Garden {
 
         return locationString;
     }
+
     @Override
     public String toString() {
         return "Garden{" +

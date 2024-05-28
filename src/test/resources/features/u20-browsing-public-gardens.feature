@@ -18,7 +18,6 @@ Feature: U20 (Browsing public gardens): As Inaya, I want to be able to browse ga
     Given I enter the search string <input>
     When I hit the search button with page <page>
     Then I am shown only gardens whose names or plants include my search string <input>
-    And I clear the persistence
     Examples:
       | input    | page |
       | "1"      | 1    |
@@ -32,7 +31,6 @@ Feature: U20 (Browsing public gardens): As Inaya, I want to be able to browse ga
     Given I enter the search string <input>
     When I hit the search button with page <page>
     Then A message tells me "No gardens match your search"
-    And I clear the persistence
     Examples:
       | input   | page |
       | "Emily" | 1    |

@@ -29,7 +29,7 @@ public class Plant {
     private LocalDate plantDate;
 
     @ManyToOne
-    @JoinColumn(name = "garden_id",nullable = false)
+    @JoinColumn(name = "garden_id")
     private Garden garden;
 
     @Column
@@ -39,14 +39,17 @@ public class Plant {
     /**
      * JPA required no-args constructor
      */
-    protected Plant() {}
+    protected Plant() {
+    }
+
     /**
      * Creates a new plant object.
-     * @param plantName the name of the plant
-     * @param plantCount the count of the plant
+     *
+     * @param plantName        the name of the plant
+     * @param plantCount       the count of the plant
      * @param plantDescription the description of the plant
-     * @param plantDate the date of planting
-     * @param garden the Garden object that the plant belongs to
+     * @param plantDate        the date of planting
+     * @param garden           the Garden object that the plant belongs to
      */
     public Plant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Garden garden) {
         this.plantName = plantName;
@@ -59,17 +62,34 @@ public class Plant {
     public Long getPlantId() {
         return plantId;
     }
+
     public String getPlantName() {
         return plantName;
     }
-    public void setPlantName(String plantName) {this.plantName = plantName;}
-    public String getPlantDescription() {return plantDescription;}
-    public int getPlantCount() {return plantCount;}
-    public void setPlantCount(int plantCount) {this.plantCount = plantCount;}
+
+    public void setPlantName(String plantName) {
+        this.plantName = plantName;
+    }
+
+    public String getPlantDescription() {
+        return plantDescription;
+    }
+
+    public int getPlantCount() {
+        return plantCount;
+    }
+
+    public void setPlantCount(int plantCount) {
+        this.plantCount = plantCount;
+    }
+
     public void setPlantDescription(String plantDescription) {
         this.plantDescription = plantDescription;
     }
-    public LocalDate getPlantDate() {return plantDate;}
+
+    public LocalDate getPlantDate() {
+        return plantDate;
+    }
 
     public String getFormattedPlantDate() {
         String formattedDate = "";
@@ -79,9 +99,14 @@ public class Plant {
         }
         return formattedDate;
     }
-    public void setPlantDate(LocalDate plantDate) {this.plantDate = plantDate;}
 
-    public Garden getGarden() {return garden;}
+    public void setPlantDate(LocalDate plantDate) {
+        this.plantDate = plantDate;
+    }
+
+    public Garden getGarden() {
+        return garden;
+    }
 
     public String getPlantPictureFilename() {
         return this.plantPictureFilename;
@@ -90,6 +115,7 @@ public class Plant {
     public void setPlantPictureFilename(String plantPictureFilename) {
         this.plantPictureFilename = plantPictureFilename;
     }
+
     @Override
     public String toString() {
         return "Plant{" +

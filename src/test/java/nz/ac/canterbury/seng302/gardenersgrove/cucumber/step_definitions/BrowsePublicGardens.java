@@ -14,13 +14,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -140,13 +138,6 @@ public class BrowsePublicGardens {
                 plantService.addPlant(plantName, 2, gardenName, LocalDate.now(), garden.getGardenId());
             }
         }
-
-    }
-
-    @Transactional
-    @And("I clear the persistence")
-    public void i_clear_the_persistence() {
-
 
     }
 }
