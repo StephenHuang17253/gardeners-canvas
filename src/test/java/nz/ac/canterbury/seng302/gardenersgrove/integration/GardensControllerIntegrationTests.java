@@ -115,7 +115,7 @@ public class GardensControllerIntegrationTests {
                 "New Zealand",
                 10.0,
                 false,
-                user1);
+                userService.getUserByEmail("johnDoe@GardensControllerIntegrationTest.com"));
         Garden garden2 = new Garden(
                 "Jane's Garden",
                 "",
@@ -126,7 +126,7 @@ public class GardensControllerIntegrationTests {
                 "New Zealand",
                 20.0,
                 false,
-                user2);
+                userService.getUserByEmail("janeDoe@GardensControllerIntegrationTest.com"));
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);
         plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
@@ -213,7 +213,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "johnDoe@email.com")
+    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
         Garden garden = gardenList.get(0);
         // make an initial request to ensure garden is private as set in @before

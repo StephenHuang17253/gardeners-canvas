@@ -6,7 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
@@ -88,7 +88,7 @@ public class PubliciseGarden {
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
         MOCK_MVC_MY_GARDEN = MockMvcBuilders.standaloneSetup(myGardensController).build();

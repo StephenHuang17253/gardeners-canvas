@@ -158,6 +158,7 @@ public class HomePageController {
                 for (int i = 0; i < 1; i++) {
                     Garden sampleGarden = new Garden(
                             "John's Garden " + i,
+                            "Description",
                             "114 Ilam Road",
                             "Ilam",
                             "Christchurch",
