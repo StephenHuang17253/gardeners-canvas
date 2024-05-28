@@ -116,7 +116,7 @@ public class BrowsePublicGardens {
         List<Garden> searchResults = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("publicGardens");
         assert searchResults != null;
         for (Garden result : searchResults) {
-            Assertions.assertTrue(result.getGardenName().contains(input) || result.getPlants().stream().anyMatch(plant -> plant.getPlantName().contains(input)));
+            Assertions.assertTrue(result.getGardenName().contains(input) || result.getPlants().stream().anyMatch(plant -> plant.getPlantName().contains(input) || plant.getPlantDescription().contains(input)));
         }
 
     }

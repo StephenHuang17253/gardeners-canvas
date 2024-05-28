@@ -19,10 +19,11 @@ Feature: U20 (Browsing public gardens): As Inaya, I want to be able to browse ga
     When I hit the search button with page <page>
     Then I am shown only gardens whose names or plants include my search string <input>
     Examples:
-      | input    | page |
-      | "1"      | 1    |
-      | "Jerry"  | 1    |
-      | "Garden" | 1    |
+      | input         | page |
+      | "1"           | 1    |
+      | "Jerry"       | 1    |
+      | "Garden"      | 1    |
+      | "jerry@email" | 1    |
 
   @NotRequiresSetup
   Scenario Outline: AC5 - Given I enter a search string that has no matches, then a message tells me
