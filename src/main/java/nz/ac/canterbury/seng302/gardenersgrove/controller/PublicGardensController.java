@@ -70,7 +70,6 @@ public class PublicGardensController {
         }
 
 
-
         List<Garden> tenSortedPublicGardens = allGardens.stream()
                 .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
                 .skip((pageNumber - 1) * pageSize)
