@@ -51,12 +51,16 @@ public class PublicGardensController {
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
-        List<Garden> allGardens = gardenService.getGardens();
+        List<Garden> allGardens = gardenService.getAllPublicGardens();
         int totalGardens = allGardens.size();
         int pageSize = 10;
         int startIndex = Math.toIntExact((pageNumber - 1) * pageSize);
         int endIndex = Math.min(startIndex + pageSize, totalGardens);
         int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
+
+        if (lastPage == 0) {
+            return "redirect:/home";
+        }
 
         if (pageNumber > lastPage) {
             return "redirect:/public-gardens/page/" + lastPage;

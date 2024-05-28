@@ -143,5 +143,9 @@ public class GardenService {
         return gardenRepository.findByGardenNameOrPlantNameContainingIgnoreCase(searchValue);
     }
 
+    public List<Garden> getAllPublicGardens() {
+        return gardenRepository.findAllPublicGardens();
+    }
+
 
 }
