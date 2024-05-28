@@ -99,7 +99,7 @@ public class FriendshipService {
      * @param id the user's ID
      * @throws IllegalArgumentException if the provided user ID is invalid
      */
-    public List<Friendship> getAllUsersFriends(long id) {
+    public List<Friendship> getAllUsersFriends(long id) throws IllegalArgumentException {
         if (userService.getUserById(id) != null) {
             return friendshipRepository.findByUser1IdOrUser2Id(id, id);
         } else {
@@ -114,7 +114,7 @@ public class FriendshipService {
      * @param user2 the second user
      * @throws IllegalArgumentException if user IDs are null or refer to the same user
      */
-    private void validateUsers(User user1, User user2) {
+    private void validateUsers(User user1, User user2) throws IllegalArgumentException {
         if (user1.getId() == null || user2.getId() == null) {
             throw new IllegalArgumentException("Invalid user ID");
         }
@@ -135,7 +135,7 @@ public class FriendshipService {
      * @param user2 the receiver of the friendship relation
      * @throws IllegalArgumentException if user prams arnt valid or trying to re-add friendship relation (see above)
      */
-    public Friendship addFriendship(User user1, User user2) {
+    public Friendship addFriendship(User user1, User user2) throws IllegalArgumentException {
         validateUsers(user1,user2);
 
         Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
@@ -176,7 +176,7 @@ public class FriendshipService {
      * @param friendshipStatus the status to update it to
      * @throws IllegalArgumentException if id invalid or trying to update a declined relation
      */
-    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus)
+    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus) throws IllegalArgumentException
     {
         Optional<Friendship> optionalFriend = friendshipRepository.findById(id);
         if (optionalFriend.isEmpty())
