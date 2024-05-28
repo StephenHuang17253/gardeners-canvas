@@ -172,14 +172,14 @@ public class PubliciseGarden {
 
     @Then("the new description is persisted")
     public void theNewDescriptionIsPersisted() {
-        newGarden = gardenService.getAllUsersGardens(user.getId()).getLast();
+        newGarden = gardenService.getAllUsersGardens(user.getId()).get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
         Assertions.assertEquals(description, newGarden.getGardenDescription());
 
     }
 
     @Then("the new description is deleted")
     public void theNewDescriptionIsDeleted() {
-        newGarden = gardenService.getAllUsersGardens(user.getId()).getLast();
+        newGarden = gardenService.getAllUsersGardens(user.getId()).get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
         Assertions.assertEquals("", newGarden.getGardenDescription());
     }
 

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,11 +86,12 @@ public class GardenFormControllerTest {
                 "test",
                 10.0,
                 false,
-                mockUser
+                userService.getUserByEmail("profile.user.test@ProfileController.com")
 
         );
         Optional<Garden> gardenOptional = Mockito.mock(Optional.class);
         Mockito.when(gardenOptional.get()).thenReturn(test_garden);
+        Mockito.when(gardenOptional.isEmpty()).thenReturn(false);
         when(gardenService.getGardenById(Mockito.anyLong())).thenReturn(gardenOptional);
 
     }
@@ -116,7 +116,7 @@ public class GardenFormControllerTest {
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    void gardenFormController_postBasicNewGarden_AtLeastOneGardenAdded() throws Exception {
+    void gardenFormController_postBasicNewGarden_AtLeastOneGardenAdded(){
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
 
@@ -129,7 +129,7 @@ public class GardenFormControllerTest {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
             });
-            when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
+            when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
@@ -189,8 +189,7 @@ public class GardenFormControllerTest {
     @ValueSource(strings = { "son", "basic input", "More name", "some-puntiuation ", "commas,",
             "full stops.", "Numbers ok 123", "apostrophee's", "some-mix's " })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenName(String input)
-            throws Exception {
+    void gardenFormController_postNewGarden_AtLeastOneGardenAdded_parameterisedOn_gardenName(String input) {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
 
@@ -644,7 +643,7 @@ public class GardenFormControllerTest {
     @ParameterizedTest
     @ValueSource(strings = { " ", "!", ";", "Surely•this", "{Null}", "@Value()", "::", " ! " })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) throws Exception {
+    void gardenFormController_postNewGarden_NotAdded_parameterisedOn_city(String input) {
         Garden mockGarden = Mockito.spy(Garden.class);
         when(mockGarden.getGardenId()).thenReturn(1L);
 
@@ -657,7 +656,7 @@ public class GardenFormControllerTest {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
             });
-            when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
+            when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
@@ -722,7 +721,7 @@ public class GardenFormControllerTest {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
             });
-            when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
+            when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "Hi")
@@ -879,7 +878,6 @@ public class GardenFormControllerTest {
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_postCode(String input)
             throws Exception {
-
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
                 .param("gardenName", "Hi")
                 .param("gardenDescription", "Hi")
@@ -910,7 +908,7 @@ public class GardenFormControllerTest {
             mockGardenConstruction = Mockito.mockConstruction(Garden.class, (mock, context) -> {
                 when(mock.getGardenId()).thenReturn(1L);
             });
-            when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
+            when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
                     .param("gardenName", "input")
@@ -1014,7 +1012,8 @@ public class GardenFormControllerTest {
                 .param("city", "input")
                 .param("country", "input")
                 .param("postcode", "123")
-                .param("gardenSize", input)).andDo(MockMvcResultHandlers.print());
+                .param("gardenSize", input)
+        ).andDo(MockMvcResultHandlers.print());
         Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
 
     }
