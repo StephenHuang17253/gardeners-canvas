@@ -130,7 +130,7 @@ public class ResetUserPassword {
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
-        assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
+        assertNotNull("emailAddress attribute exists", modelMap.get("email"));
 
     }
 
