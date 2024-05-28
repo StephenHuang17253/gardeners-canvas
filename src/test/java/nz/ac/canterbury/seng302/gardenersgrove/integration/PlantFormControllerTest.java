@@ -62,7 +62,10 @@ public class PlantFormControllerTest {
                 "test",
                 10.0,
                 false,
-                mockUser);
+                "",
+                "",
+                mockUser
+        );
         gardenService.addGarden(test_garden);
 
         plantService.addPlant("test",

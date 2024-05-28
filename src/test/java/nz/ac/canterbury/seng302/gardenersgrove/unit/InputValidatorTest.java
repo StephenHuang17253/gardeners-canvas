@@ -435,14 +435,13 @@ class InputValidatorTest {
     };
 
 
-
     /**
      * Test for invalid passwords
      * @param password
      */
     @ParameterizedTest
     @CsvSource({ "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
-    "1D!0", "D!1", "aA!0","Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
+            "1D!0", "D!1", "aA!0","Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
     public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
         String firstName = "John";
         String lastName = "Doe";

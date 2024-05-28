@@ -40,9 +40,16 @@ public class Garden {
     @Column(nullable = true)
     private Double gardenSize;
 
+    @Column(columnDefinition = "TEXT")
+    private String gardenLongitude;
+
+    @Column(columnDefinition = "TEXT")
+    private String gardenLatitude;
+
     @Column(name = "creation_date")
     @CreatedDate
     private LocalDateTime creationDate;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
@@ -61,10 +68,11 @@ public class Garden {
     public Garden() {}
     /**
      * Creates a new Garden object.
-     * @param gardenName the name of the garden
-     * @param gardenAddress the address of the garden
-     * @param gardenSuburb the suburb of the garden
-     * @param gardenCity the city of the garden
+     * 
+     * @param gardenName     the name of the garden
+     * @param gardenAddress  the address of the garden
+     * @param gardenSuburb   the suburb of the garden
+     * @param gardenCity     the city of the garden
      * @param gardenPostcode the postcode of the garden
      * @param gardenCountry  the country of the garden
      * @param gardenSize     the size of the garden
@@ -72,7 +80,7 @@ public class Garden {
      * @param owner          the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, User owner) {
+            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -80,6 +88,8 @@ public class Garden {
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
         this.isPublic = isPublic;
         this.owner = owner;
         this.creationDate = LocalDateTime.now();
@@ -95,9 +105,10 @@ public class Garden {
      * @param gardenPostcode the postcode of the garden
      * @param gardenCountry  the country of the garden
      * @param gardenSize     the size of the garden
+     * @param isPublic       the visibility of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-            String gardenPostcode, String gardenCountry, double gardenSize) {
+                  String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -105,7 +116,12 @@ public class Garden {
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
+        this.isPublic = isPublic;
+        this.owner = owner;
     }
+
 
     public Long getGardenId() {
         return gardenId;
@@ -169,6 +185,11 @@ public class Garden {
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
+
+    public String getGardenLongitude() { return gardenLongitude;}
+    public void setGardenLongitude(String gardenLongitude) {this.gardenLongitude = gardenLongitude;}
+    public String getGardenLatitude() { return gardenLatitude;}
+    public void setGardenLatitude(String gardenLatitude) {this.gardenLatitude = gardenLatitude;}
 
     public User getOwner() {
         return owner;

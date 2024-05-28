@@ -97,6 +97,10 @@ public class User {
         this.verified = verified;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 
     public Long getId() {
         return id;

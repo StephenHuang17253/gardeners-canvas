@@ -96,6 +96,13 @@
             <button type="submit" class = "submit-button">Create</button>
             <button type="button" onclick="window.location.href = localStorage.getItem('previousUrl')" class="cancel-button" >Cancel</button>
 
+
+            <!-- These are hidden values to send lat. and long. to the backend -->
+            <div>
+                <input type="hidden" id="latitude" th:name="latitude">
+                <input type="hidden" id="longitude" th:name="longitude">
+            </div>
+
         </form>
     </div>
 
@@ -104,6 +111,8 @@
         <br>
         <p>Location Services powered by <a href="https://locationiq.com/?ref=link-back">LocationIQ</a></p>
     </div>
+
+
 
 </div>
 
