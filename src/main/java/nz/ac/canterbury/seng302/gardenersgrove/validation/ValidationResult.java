@@ -13,6 +13,7 @@ public enum ValidationResult {
     INVALID_POSTCODE("must only contain numbers, letters, and spaces"),
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
     INVALID_EMAIL("Email must be in the form 'jane@doe.nz'"),
+    EMAIL_TO_LONG("Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters"),
     INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
     AGE_BELOW_13("You must be 13 years or older to create an account"),
     AGE_ABOVE_120("The maximum age allowed is 120 years"),

@@ -26,6 +26,8 @@ public class InputValidator {
     private boolean passState = true;
     String testedValue;
 
+    private static final int MAX_EMAIL_LENGTH = 320;
+
     private static UserService userService;
 
     /**
@@ -265,7 +267,6 @@ public class InputValidator {
 
         return new InputValidator(email)
                 .emailSyntaxHelper()
-                .lengthHelper(320)
                 .emailUniquenessHelper()
                 .getResult();
     }
@@ -280,7 +281,6 @@ public class InputValidator {
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
                 .emailSyntaxHelper()
-                .lengthHelper(320)
                 .getResult();
     }
 
@@ -428,13 +428,29 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
+        if (testedValue.length() > MAX_EMAIL_LENGTH) {
+            this.validationResult = ValidationResult.EMAIL_TO_LONG;
+            this.passState = false;
+            return this;
+        }
 
-        if (!testedValue.matches(
-                "^[\\p{L}\\p{M}\\p{N}]{1,64}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,255}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$")) {
+        String emailRegex = "^[\\p{L}\\p{M}\\p{N}]{1,}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$";
+
+        if (!testedValue.matches(emailRegex)) {
+
             this.validationResult = ValidationResult.INVALID_EMAIL;
             this.passState = false;
             return this;
         }
+        String[] parts = testedValue.split("@", 2);
+        String localPart = parts[0];
+        String domainPart = parts[1];
+        if (localPart.length() > 64 || domainPart.length() > 255) {
+            this.validationResult = ValidationResult.EMAIL_TO_LONG;
+            this.passState = false;
+            return this;
+        }
+
         this.validationResult = ValidationResult.OK;
         return this;
     }
