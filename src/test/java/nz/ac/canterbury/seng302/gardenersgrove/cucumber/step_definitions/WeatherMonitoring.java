@@ -8,8 +8,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
@@ -54,6 +55,9 @@ public class WeatherMonitoring {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
+    public FriendshipRepository friendshipRepository;
+
     public SecurityService securityService;
 
     private static GardenService gardenService;
@@ -63,6 +67,8 @@ public class WeatherMonitoring {
     private static PlantService plantService;
 
     private static FileService fileService;
+
+    private static FriendshipService friendshipService;
 
     private Map<String, Object> model;
 
@@ -130,9 +136,10 @@ public class WeatherMonitoring {
     public void before_or_after_all() throws IOException, InterruptedException {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager);
+        friendshipService = new FriendshipService(friendshipRepository, userService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService);
         weatherService = mock(WeatherService.class);
-        MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService, fileService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
 

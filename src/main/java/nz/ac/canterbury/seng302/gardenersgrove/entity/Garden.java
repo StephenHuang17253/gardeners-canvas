@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entity class of a Garden, reflecting an entry of garden name, location and size (optional)
+ * Entity class of a Garden, reflecting an entry of garden name, location and
+ * size (optional)
  * and any plant entity objects that is associated with
  * Based off the SENG202 demo FormResult entity
  */
@@ -49,26 +50,32 @@ public class Garden {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "garden_id")
-    private List<Plant> plants =  new ArrayList<>();
+    private List<Plant> plants = new ArrayList<>();
 
+    @Column(nullable = false)
+    private boolean isPublic;
 
     /**
      * JPA required no-args constructor
      */
-    public Garden() {}
+    public Garden() {
+    }
+
     /**
      * Creates a new Garden object.
-     * @param gardenName the name of the garden
-     * @param gardenAddress the address of the garden
-     * @param gardenSuburb the suburb of the garden
-     * @param gardenCity the city of the garden
+     *
+     * @param gardenName     the name of the garden
+     * @param gardenAddress  the address of the garden
+     * @param gardenSuburb   the suburb of the garden
+     * @param gardenCity     the city of the garden
      * @param gardenPostcode the postcode of the garden
-     * @param gardenCountry the country of the garden
-     * @param gardenSize the size of the garden
-     * @param owner the User object that owns the garden
+     * @param gardenCountry  the country of the garden
+     * @param gardenSize     the size of the garden
+     * @param isPublic       the visibility of the garden
+     * @param owner          the User object that owns the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, Double gardenSize,  String gardenLatitude, String gardenLongitude, User owner) {
+            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude, User owner) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -78,21 +85,24 @@ public class Garden {
         this.gardenSize = gardenSize;
         this.gardenLatitude = gardenLatitude;
         this.gardenLongitude = gardenLongitude;
+        this.isPublic = isPublic;
         this.owner = owner;
     }
 
     /**
      * Creates a new Garden object without owner used for update Garden.
-     * @param gardenName the name of the garden
-     * @param gardenAddress the address of the garden
-     * @param gardenSuburb the suburb of the garden
-     * @param gardenCity the city of the garden
+     *
+     * @param gardenName     the name of the garden
+     * @param gardenAddress  the address of the garden
+     * @param gardenSuburb   the suburb of the garden
+     * @param gardenCity     the city of the garden
      * @param gardenPostcode the postcode of the garden
-     * @param gardenCountry the country of the garden
-     * @param gardenSize the size of the garden
+     * @param gardenCountry  the country of the garden
+     * @param gardenSize     the size of the garden
+     * @param isPublic       the visibility of the garden
      */
     public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, Double gardenSize, String gardenLatitude, String gardenLongitude) {
+                  String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude) {
         this.gardenName = gardenName;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
@@ -102,50 +112,67 @@ public class Garden {
         this.gardenSize = gardenSize;
         this.gardenLatitude = gardenLatitude;
         this.gardenLongitude = gardenLongitude;
+        this.isPublic = isPublic;
+        this.owner = owner;
     }
+
 
     public Long getGardenId() {
         return gardenId;
     }
+
     public String getGardenName() {
         return gardenName;
     }
+
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
     }
+
     public String getGardenAddress() {
         return gardenAddress;
     }
+
     public void setGardenAddress(String gardenAddress) {
         this.gardenAddress = gardenAddress;
     }
+
     public String getGardenSuburb() {
         return gardenSuburb;
     }
+
     public void setGardenSuburb(String gardenSuburb) {
         this.gardenSuburb = gardenSuburb;
     }
+
     public String getGardenPostcode() {
         return gardenPostcode;
     }
+
     public void setGardenPostcode(String gardenPostcode) {
         this.gardenPostcode = gardenPostcode;
     }
+
     public String getGardenCity() {
         return gardenCity;
     }
+
     public void setGardenCity(String gardenCity) {
         this.gardenCity = gardenCity;
     }
+
     public String getGardenCountry() {
         return gardenCountry;
     }
+
     public void setGardenCountry(String gardenCountry) {
         this.gardenCountry = gardenCountry;
     }
+
     public double getGardenSize() {
         return gardenSize;
     }
+
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
@@ -155,15 +182,28 @@ public class Garden {
     public String getGardenLatitude() { return gardenLatitude;}
     public void setGardenLatitude(String gardenLatitude) {this.gardenLatitude = gardenLatitude;}
 
-    public User getOwner() { return owner; }
-    public List<Plant> getPlants(){
+    public User getOwner() {
+        return owner;
+    }
+
+    public List<Plant> getPlants() {
         return plants;
     }
 
+    public boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     /**
-     * Retrieves a garden's location which is a concatenation of its address components.
+     * Retrieves a garden's location which is a concatenation of its address
+     * components.
      *
-     * @return garden location string in the format: {address}, {suburb}, {city} {postcode}, {country}
+     * @return garden location string in the format: {address}, {suburb}, {city}
+     *         {postcode}, {country}
      */
     public String getGardenLocation() {
         // Concatenate address components to form the complete location string
@@ -191,6 +231,7 @@ public class Garden {
 
         return locationString;
     }
+
     @Override
     public String toString() {
         return "Garden{" +
@@ -200,6 +241,7 @@ public class Garden {
                 ", size='" + gardenSize + '\'' +
                 ", owner_id='" + owner.getId() + '\'' +
                 ", plants='" + plants + '\'' +
+                ", isPublic='" + isPublic + '\'' +
                 '}';
     }
 

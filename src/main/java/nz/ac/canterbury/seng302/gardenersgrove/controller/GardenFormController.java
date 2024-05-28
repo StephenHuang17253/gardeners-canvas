@@ -115,8 +115,6 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
-        model.addAttribute("latitude", latitude);
-        model.addAttribute("longitude", longitude);
 
         logger.info("GET /create-new-garden");
         return "createNewGardenForm";
@@ -196,11 +194,13 @@ public class GardenFormController {
         }else{
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
+        boolean isPublic = false;
 
         logger.info("Latitude" + latitude);
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize,latitude,longitude, owner);
-        
+
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize,isPublic,latitude,longitude, owner);
+
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
@@ -333,10 +333,11 @@ public class GardenFormController {
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
 
-        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize, latitude, longitude));
+        User owner = securityService.getCurrentUser();
+        boolean isPublic = false;
+        gardenService.updateGarden(gardenId, new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize,isPublic,latitude,longitude, owner));
         logger.info("Edited Garden Page");
 
-        User owner = securityService.getCurrentUser();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 

@@ -61,6 +61,7 @@ public class PlantFormControllerTest {
                 "80",
                 "test",
                 10.0,
+                false,
                 "",
                 "",
                 mockUser

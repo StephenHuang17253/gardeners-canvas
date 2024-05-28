@@ -35,7 +35,11 @@ public class LocationService {
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&key=" + locationIqAccessToken))
+                .uri(URI.create("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&tag=place:house"
+                        + ",building:*"
+                        + "&normalizecity=1" + "&key=" + locationIqAccessToken
+
+                ))
                 .header("accept", "application/json")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();

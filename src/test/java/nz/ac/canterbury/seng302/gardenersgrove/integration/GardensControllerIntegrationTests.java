@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class MyGardensControllerIntegrationTests {
+public class GardensControllerIntegrationTests {
     @Autowired
     private GardenService gardenService;
     @Autowired
@@ -58,7 +58,7 @@ public class MyGardensControllerIntegrationTests {
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
     @Autowired
-    public MyGardensControllerIntegrationTests(MockMvc mockMvc){
+    public GardensControllerIntegrationTests(MockMvc mockMvc){
         this.mockMvc = mockMvc;
     }
 
@@ -80,6 +80,7 @@ public class MyGardensControllerIntegrationTests {
                 "8041",
                 "New Zealand",
                 10.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 user1);
@@ -91,6 +92,7 @@ public class MyGardensControllerIntegrationTests {
                 "8041",
                 "New Zealand",
                 20.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 user2);
@@ -139,6 +141,7 @@ public class MyGardensControllerIntegrationTests {
                 "8041",
                 "New Zealand",
                 10.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 addedUser);
@@ -223,6 +226,7 @@ public class MyGardensControllerIntegrationTests {
                 "8041",
                 "New Zealand",
                 10.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 addedUser);

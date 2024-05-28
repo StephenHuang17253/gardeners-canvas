@@ -2,29 +2,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-        <title>My Gardens</title>
+        <title th:text="${friendName} + '\'s Gardens'"></title>
         <link th:href="@{/css/baseCss.css}" rel="stylesheet">
         <link th:href="@{/css/navBar.css}" rel="stylesheet">
         <link th:href="@{/css/tableList.css}" rel="stylesheet">
         <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+        <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
     </head>
 
     <body>
     <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
         <div class = "main-container">
             <div class="tableList-header">
-                <h1 class="tableList-header-title"> Your Gardens </h1>
-                <span> Public Gardens: 0 </span>
-                <span th:text="'Private Gardens: ' + ${session.userGardens?.size() ?: 0}"> Private Gardens: 0 </span>
+                <h1 class="tableList-header-title" th:text="${friendName} + '\'s Gardens'">  </h1>
+                <span th:text="'Public Gardens: 0 | Private Gardens: ' + ${friendGardens?.size() ?: 0}"> Private Gardens: 0 </span>
                 <br>
             </div>
             <br>
             <div class="tableList-table-contain">
                 <div class="tableList-table-count">
                     <br>
-                    <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
+                    <span th:text="${friendGardens?.size() ?: 0} + ' Gardens'"> </span>
                 </div>
-                <div th:each="garden : ${session.userGardens}">
+                <div th:each="garden : ${friendGardens}">
                     <div th:replace="fragmentExample/fragments/gardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},

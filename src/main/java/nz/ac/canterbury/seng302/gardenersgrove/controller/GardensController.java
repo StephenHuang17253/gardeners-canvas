@@ -1,19 +1,19 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -23,21 +23,21 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
+
 /**
  * Controller for viewing all the created Gardens
  */
 @Controller
 @SessionAttributes("userGardens")
-public class MyGardensController {
+public class GardensController {
 
-    Logger logger = LoggerFactory.getLogger(MyGardensController.class);
+    Logger logger = LoggerFactory.getLogger(GardensController.class);
 
     private final GardenService gardenService;
 
@@ -46,6 +46,7 @@ public class MyGardensController {
     private final PlantService plantService;
 
     private final FileService fileService;
+
     private final WeatherService weatherService;
 
     private static final int MAX_REQUESTS_PER_SECOND = 10;
@@ -53,11 +54,17 @@ public class MyGardensController {
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
 
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
-
-
-
+    /**
+     * Constructor for the GardensController with {@link Autowired} to
+     * connect this controller with other services
+     *
+     * @param gardenService service to access garden repository
+     * @param securityService service to access security methods
+     * @param plantService service to access plant repository
+     * @param fileService service to manage files
+     */
     @Autowired
-    public MyGardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService, WeatherService weatherService) {
+    public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService, WeatherService weatherService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.fileService = fileService;
@@ -216,6 +223,46 @@ public class MyGardensController {
         }
 
     }
+
+    /**
+     * This function is called when trying to access another user's gardens.
+     * @param model - the model
+     * @param userId - id of the user being viewed
+     * @return thymeleaf gardensPage
+     */
+    @GetMapping("{userId}/gardens")
+    public String friendsGardens(Model model,
+                                 @PathVariable("userId") Long userId,
+                                 HttpServletResponse response) {
+        logger.info("GET /my-gardens");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        User friend;
+        try {
+            friend = securityService.checkFriendship(userId, FriendshipStatus.ACCEPTED);
+            if (friend == null) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return "403";
+            }
+        } catch(Exception exception) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+
+
+
+        String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
+        List<Garden> gardenList = friend.getGardens();
+        model.addAttribute("friendName", friendName);
+        model.addAttribute("friendGardens", gardenList);
+
+        return "gardensPage";
+    }
+
+
 
     /**
      * Gets the resource url for the plant picture, or the default plant picture

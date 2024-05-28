@@ -63,6 +63,7 @@ public class PlantServiceTest {
                 "8041",
                 "New Zealand",
                 15.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 owner);
@@ -104,6 +105,7 @@ public class PlantServiceTest {
                 "8041",
                 "New Zealand",
                 15.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 owner
@@ -144,6 +146,7 @@ public class PlantServiceTest {
                 "8041",
                 "New Zealand",
                 15.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 owner);
@@ -182,6 +185,7 @@ public class PlantServiceTest {
                 "8041",
                 "New Zealand",
                 15.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 owner);
@@ -220,6 +224,7 @@ public class PlantServiceTest {
                 "8041",
                 "New Zealand",
                 15.0,
+                false,
                 "-43.5214643",
                 "172.5796159",
                 owner);
