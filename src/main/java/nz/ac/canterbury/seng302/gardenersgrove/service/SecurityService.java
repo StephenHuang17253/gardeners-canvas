@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import jakarta.servlet.http.HttpSession;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,9 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -43,7 +39,7 @@ public class SecurityService {
 
     }
     /**
-     * Cheeks if the owner id matches the current logged, in user
+     * Checks if the owner id matches the current logged, in user
      *
      * @param ownerId user id of the user entity associated with a given garden entity
      * @return boolean of if the current logged, in user matches the owner id of a garden
@@ -54,6 +50,8 @@ public class SecurityService {
         User user = userService.getUserByEmail(authentication.getName());
         return Objects.equals(user.getId(), ownerId);
     }
+
+
     /**
      * Helper to get the current logged, in user
      *

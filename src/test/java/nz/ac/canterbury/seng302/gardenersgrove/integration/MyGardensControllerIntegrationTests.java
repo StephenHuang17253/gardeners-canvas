@@ -16,6 +16,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -165,8 +167,19 @@ public class MyGardensControllerIntegrationTests {
     @WithMockUser(username = "johnDoe@email.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
         Garden garden = gardenList.get(0);
+        // make an initial request to ensure garden is private as set in @before
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1").param("makeGardenPublic", "true"))
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", false));
+
+        // set the garden to public
+        mockMvc.perform(MockMvcRequestBuilders.post("/my-gardens/1/public").with(csrf()).param("makeGardenPublic", "true"))
+                        .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+
+        // check the garden is now public
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))

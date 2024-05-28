@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -20,8 +21,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import java.awt.*;
 import java.util.Optional;
 
 /**
@@ -47,7 +46,6 @@ public class MyGardensController {
         this.plantService = plantService;
         this.fileService = fileService;
         this.securityService = securityService;
-
     }
 
     /**
@@ -111,6 +109,7 @@ public class MyGardensController {
             return "gardenDetailsPage";
         }
 
+
         model.addAttribute("isOwner", true);
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
@@ -124,15 +123,16 @@ public class MyGardensController {
     }
 
     /**
-     * Gets all the users created gardens
-     * and maps them all and there attributes to the gardenDetailsPage
-     * but with the custom url of /my-gardens/{gardenId}
+     * This function creates a post mapping for updating the garden's isPublic boolean.
      *
-     * @return thymeleaf createNewGardenForm
+     * @param gardenId - the id of the garden being edited
+     * @param makeGardenPublic - the new status of the garden isPublic
+     *
+     * @return thymeleaf garden detail page
      */
     @PostMapping("/my-gardens/{gardenId}/public")
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
-                                           @RequestParam(name = "makeGardenPublic", required=false) boolean makeGardenPublic,
+                                           @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
                                     HttpServletResponse response,
                                     Model model) {
         logger.info("POST /my-gardens/{gardenId}/public", gardenId);
