@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import jakarta.persistence.EntityNotFoundException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
@@ -349,6 +350,24 @@ public class FriendshipServiceIntegrationTest {
         Assertions.assertEquals(user1.getId(), updatedFriendship.getUser1().getId());
         Assertions.assertEquals(user2.getId(), updatedFriendship.getUser2().getId());
         Assertions.assertEquals(FriendshipStatus.ACCEPTED, updatedFriendship.getStatus());
+    }
+
+    @Test
+    void deleteFriendship_DeleteValidFriendship_deletesFriendship(){
+        Friendship originalFriendship = new Friendship(user1,user2,FriendshipStatus.ACCEPTED);
+        friendshipRepository.save(originalFriendship);
+
+        Assertions.assertTrue(friendshipService.getFriendShipById(originalFriendship.getId()).isPresent());
+
+        friendshipService.deleteFriendship(originalFriendship.getId());
+
+        Assertions.assertTrue(friendshipService.getFriendShipById(originalFriendship.getId()).isEmpty());
+    }
+
+    @Test
+    void deleteFriendship_NoSuchFriendship_ThrowsException(){
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {friendshipService.deleteFriendship(-1L);});
     }
 
 }
