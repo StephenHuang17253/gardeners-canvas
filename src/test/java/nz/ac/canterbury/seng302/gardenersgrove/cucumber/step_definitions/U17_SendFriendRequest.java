@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.ManageFriendsControlle
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -25,12 +26,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class U17_SendFriendRequest {
@@ -195,7 +195,7 @@ public class U17_SendFriendRequest {
 
     @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
     public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("searchResults");
         assert result != null;
         for (FriendModel friendModel : result) {
             String matchFullName = friendModel.getFriendName();
@@ -212,6 +212,188 @@ public class U17_SendFriendRequest {
         String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("SearchErrorText");
         Assertions.assertEquals(error, searchError);
     }
+
+    @Given("I search for a user {string}")
+    public void i_search_for_a_user(String email) throws Exception {
+
+        User user = userService.getUserByEmail(email);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get("/manage-friends/search")
+                                .param("searchInput", email))
+                .andExpect(status().isOk())
+                .andReturn();
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("searchResults");
+        FriendModel friendModel = result.get(0);
+        Assertions.assertEquals(friendProfilePicture,friendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName,friendModel.getFriendName());
+    }
+    @When("I hit the 'invite as friend' button for user with {string}")
+    public void i_hit_the_invite_as_friend_button_for_user_with(String email) throws Exception {
+        User user = userService.getUserByEmail(email);
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .post("/manage-friends/send-invite")
+                                .param("friendId", String.valueOf(user.getId()))
+                                .param("activeTab", "search"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+    }
+    @Then("user {string} sees the invite from {string}")
+    public void user_sees_the_invite_from(String receiverEmail, String senderEmail) throws Exception {
+        User user = userService.getUserByEmail(senderEmail);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
+        RequestFriendModel requestFriendModel = result.get(0);
+        Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName, requestFriendModel.getFriendName());
+        Assertions.assertFalse(requestFriendModel.isSender());
+    }
+
+
+    @Given("I {string} have a pending invite from {string}")
+    public void i_have_a_pending_invite_from(String receiverEmail, String senderEmail) {
+        User liam = userService.getUserByEmail(senderEmail);
+        User sarah = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = friendshipService.addFriendship(liam, sarah);
+        Assertions.assertEquals(FriendshipStatus.PENDING, friendship.getStatus());
+    }
+
+    @When("I accept the pending invite from {string}")
+    public void i_accept_the_pending_invite_from(String email) throws Exception {
+        User user = userService.getUserByEmail(email);
+
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .post("/manage-friends")
+                                .param("pendingFriendId", String.valueOf(user.getId()))
+                                .param("acceptedFriend", "true")
+                                .param("activeTab", "pending"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+    }
+
+    @Then("{string} is added to my friends list")
+    public void is_added_to_my_friends_list(String email) throws Exception {
+        User user = userService.getUserByEmail(email);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        Assertions.assertNotNull(result);
+        FriendModel friendModel = result.get(result.size() - 1);
+        Assertions.assertEquals(friendProfilePicture, friendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName, friendModel.getFriendName());
+
+    }
+
+    @When("I decline the pending invite from {string}")
+    public void i_decline_the_pending_invite_from(String email) throws Exception {
+        User user = userService.getUserByEmail(email);
+
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .post("/manage-friends")
+                                .param("pendingFriendId", String.valueOf(user.getId()))
+                                .param("acceptedFriend", "false")
+                                .param("activeTab", "pending"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+    }
+    @Then("{string} are not added to friends list")
+    public void are_not_added_to_friends_list(String email) throws Exception {
+        User user = userService.getUserByEmail(email);
+
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        System.out.println(result);
+        Assertions.assertEquals(0, result.size());
+    }
+    @Then("{string} can not add me {string}")
+    public void can_not_add_me(String senderEmail, String receiverEmail) {
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> friendshipService.addFriendship(sender, receiver));
+    }
+
+    @Given("I {string} have sent an invite to {string}")
+    public void i_have_sent_an_invite_to(String senderEmail, String receiverEmail) {
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = friendshipService.addFriendship(sender, receiver);
+        Assertions.assertEquals(FriendshipStatus.PENDING, friendship.getStatus());
+    }
+    @When("{string} declines my {string} request")
+    public void declines_my_request(String receiverEmail, String senderEmail) {
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = friendshipService.findFriendship(sender, receiver);
+        Assertions.assertNotNull(friendship);
+        Friendship updatedFriendship = friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.DECLINED);
+        Assertions.assertEquals(FriendshipStatus.DECLINED, updatedFriendship.getStatus());
+    }
+    @Then("I see the request as declined by {string}")
+    public void i_see_the_request_as_declined_by(String receiver) throws Exception {
+        User user = userService.getUserByEmail(receiver);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+
+        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("declinedFriends");
+        Assertions.assertNotNull(result);
+        RequestFriendModel requestFriendModel = result.get(result.size() - 1);
+        Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName, requestFriendModel.getFriendName());
+    }
+
+    @When("{string} has not accepted or declined my {string} request")
+    public void leaves_my_request_pending(String receiverEmail, String senderEmail) {
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = friendshipService.findFriendship(sender, receiver);
+        Assertions.assertNotNull(friendship);
+        Assertions.assertEquals(FriendshipStatus.PENDING, friendship.getStatus());
+    }
+
+    @Then("I see the request to {string} as pending")
+    public void i_see_the_request_as_pending_by(String receiver) throws Exception {
+        User user = userService.getUserByEmail(receiver);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+
+        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
+        Assertions.assertNotNull(result);
+        RequestFriendModel requestFriendModel = result.get(result.size() - 1);
+        Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName, requestFriendModel.getFriendName());
+    }
+
 
 
 }

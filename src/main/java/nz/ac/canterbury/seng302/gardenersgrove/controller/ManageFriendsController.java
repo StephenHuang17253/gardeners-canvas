@@ -3,7 +3,12 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
@@ -69,10 +74,12 @@ public class ManageFriendsController {
         List<User> userTypeFriends = new ArrayList<>();
 
         for (Friendship friendship : friendships) {
-            if (Objects.equals(friendship.getUser1().getId(), currentUser.getId())) {
-                userTypeFriends.add(friendship.getUser2());
-            } else {
-                userTypeFriends.add(friendship.getUser1());
+            if(friendship.getStatus().equals(FriendshipStatus.ACCEPTED)){
+                if (friendship.getUser1().getId().equals(currentUser.getId())) {
+                    userTypeFriends.add(friendship.getUser2());
+                } else {
+                    userTypeFriends.add(friendship.getUser1());
+                }
             }
         }
         for (User userTypeFriend : userTypeFriends) {
@@ -89,6 +96,49 @@ public class ManageFriendsController {
     }
 
     /**
+     * Helper function for creating a list of request (pending or declined) models.
+     * Used for adding friend requests to the model of the Manage Friends page.
+     * @param friendshipStatus pending or declined
+     * @return requestFriendModels
+     */
+    private List<RequestFriendModel> createRequestFriendModel(FriendshipStatus friendshipStatus) {
+        User currentUser = securityService.getCurrentUser();
+        List<RequestFriendModel> requestFriendModels = new ArrayList<>();
+        List<Friendship> targetFriendships = new ArrayList<>();
+        List<Friendship> friendships = friendshipService.getAllUsersFriends(currentUser.getId());
+        List<User> userTypeFriends = new ArrayList<>();
+
+        for (Friendship friendship : friendships) {
+            if (friendship.getStatus().equals(friendshipStatus)) {
+                userTypeFriends.add(friendship.getUser2());
+                targetFriendships.add(friendship);
+            }
+        }
+
+        for (Friendship friendship : targetFriendships) {
+
+            User userTypeFriend;
+            boolean isSender = false;
+            if (friendship.getUser1().getId().equals(currentUser.getId())) {
+                userTypeFriend = friendship.getUser2();
+                isSender = true;
+            } else {
+                userTypeFriend = friendship.getUser1();
+            }
+
+            String friendProfilePicture = userTypeFriend.getProfilePictureFilename();
+            String fName = userTypeFriend.getFirstName();
+            String lName = userTypeFriend.getLastName();
+            String friendsName = fName + ' ' + lName;
+            RequestFriendModel requestFriendModel = new RequestFriendModel(friendProfilePicture, friendsName, isSender, userTypeFriend.getId());
+            requestFriendModels.add(requestFriendModel);
+        }
+
+        return requestFriendModels;
+    }
+
+
+    /**
      * Maps the manageFriendsPage html file to /manage-friends url
      *
      * @return thymeleaf manageFriendsPage
@@ -101,8 +151,12 @@ public class ManageFriendsController {
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
 
-        List<FriendModel> friendModels = createFriendModel();
-        model.addAttribute("userFriends", friendModels);
+        List<FriendModel> acceptedFriendModels = createFriendModel();
+        List<RequestFriendModel> pendingFriendModels = createRequestFriendModel(FriendshipStatus.PENDING);
+        List<RequestFriendModel> declinedFriendModels = createRequestFriendModel(FriendshipStatus.DECLINED);
+        model.addAttribute("userFriends", acceptedFriendModels);
+        model.addAttribute("pendingFriends", pendingFriendModels);
+        model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("SearchErrorText", "");
 
 
@@ -151,14 +205,22 @@ public class ManageFriendsController {
                     }
                 }
             }
-            model.addAttribute("userFriends", friendModels);
+            model.addAttribute("searchResults", friendModels);
         }
         if (friendModels.isEmpty()) {
             model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
         }
+        List<FriendModel> acceptedFriendModels = createFriendModel();
+        List<RequestFriendModel> pendingFriendModels = createRequestFriendModel(FriendshipStatus.PENDING);
+        List<RequestFriendModel> declinedFriendModels = createRequestFriendModel(FriendshipStatus.DECLINED);
+        model.addAttribute("userFriends", acceptedFriendModels);
+        model.addAttribute("pendingFriends", pendingFriendModels);
+        model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("isPotentialFriend", true);
+        model.addAttribute("searchInput", searchInput);
         return "manageFriendsPage";
     }
+
 
     /**
      * Creates a new friendship with pending status
@@ -166,9 +228,13 @@ public class ManageFriendsController {
      * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends/send-invite")
-    public String createFriendship(@RequestParam("friendId") Long friendId, Model model) {
+    public String createFriendship(@RequestParam("friendId") Long friendId,
+                                   @RequestParam("activeTab") String activeTab,
+                                   @RequestParam(value = "searchInput", required = false) String searchInput,
+                                   Model model) {
         logger.info("GET /manage-friends/send-invite");
-        model.addAttribute("searchInput", "");
+        logger.info("activeTab: {}", activeTab);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
@@ -182,8 +248,38 @@ public class ManageFriendsController {
             return "manageFriendsPage";
         }
 
-        return "redirect:/manage-friends";
+        model.addAttribute("activeTab", activeTab);
+
+        if (searchInput != null) {
+            return "redirect:/manage-friends/search?searchInput=" + searchInput + "#" + activeTab;
+        }
+
+        return "redirect:/manage-friends#" + activeTab;
     }
+
+    @PostMapping("/manage-friends")
+    public String managePendingRequest(@RequestParam(name = "acceptedFriend", required = true) boolean acceptedFriend,
+                                        @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
+                                        @RequestParam("activeTab") String activeTab,
+                                        Model model) {
+        logger.info("POST /manage-friends");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        if (acceptedFriend) {
+            securityService.changeFriendship(pendingFriendId, FriendshipStatus.ACCEPTED);
+        } else {
+            securityService.changeFriendship(pendingFriendId, FriendshipStatus.DECLINED);
+        }
+
+
+        model.addAttribute("activeTab", activeTab);
+
+        return "redirect:/manage-friends#" + activeTab;
+    }
+
 
 
 }

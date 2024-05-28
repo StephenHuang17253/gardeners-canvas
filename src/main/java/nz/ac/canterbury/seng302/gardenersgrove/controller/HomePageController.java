@@ -177,6 +177,7 @@ public class HomePageController {
                 Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
                 friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
             }
+
         }
 
 
