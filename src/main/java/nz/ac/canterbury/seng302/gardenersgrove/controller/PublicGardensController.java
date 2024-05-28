@@ -101,7 +101,7 @@ public class PublicGardensController {
 
 
     /**
-     * returns a page with the 10 most recent public gardens based on current page in pagination
+     * returns a page with the 10 most recent public gardens based on search and on current page in pagination
      * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
      *
      * @return thymeleaf BrowsePublicGardens html element
@@ -158,6 +158,12 @@ public class PublicGardensController {
     }
 
 
+    /**
+     * Resets model send to Browse gardens page
+     *
+     * @param model model to reset
+     * @return model with default values
+     */
     Model resetModel(Model model) {
         List<Garden> emptyGardensList = new ArrayList<>();
         model.addAttribute("publicGardens", emptyGardensList);
