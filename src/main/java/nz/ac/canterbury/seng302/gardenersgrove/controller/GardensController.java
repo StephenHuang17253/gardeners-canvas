@@ -112,6 +112,7 @@ public class GardensController {
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("gardenSize", garden.getGardenSize());
+            model.addAttribute("gardenDescription", garden.getGardenDescription());
             model.addAttribute("gardenId", gardenId);
             model.addAttribute("plants", garden.getPlants());
             model.addAttribute("totalPlants", garden.getPlants().size());
@@ -124,6 +125,7 @@ public class GardensController {
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
         model.addAttribute("gardenSize", garden.getGardenSize());
+        model.addAttribute("gardenDescription", garden.getGardenDescription());
         model.addAttribute("gardenId", gardenId);
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
