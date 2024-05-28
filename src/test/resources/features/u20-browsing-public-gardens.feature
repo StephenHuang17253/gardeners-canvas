@@ -51,9 +51,9 @@ Feature: U20 (Browsing public gardens): As Inaya, I want to be able to browse ga
   Scenario: AC9 - Given I click any page navigation button, then I am never taken before the first page, or beyond the last page.
     Given I am browsing gardens
     When I try to access a page less than first page
-    Then I am taken to the first page
+    Then I am redirected to the first page
 
   Scenario: AC9.2 - Given I click any page navigation button, then I am never taken before the first page, or beyond the last page.
     Given I am browsing gardens
     When I try to access a page greater than the last page
-    Then I am taken to the first page
+    Then I am redirected to the last page

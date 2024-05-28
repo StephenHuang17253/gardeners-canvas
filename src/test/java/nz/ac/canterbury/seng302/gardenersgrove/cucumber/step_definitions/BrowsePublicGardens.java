@@ -64,7 +64,8 @@ public class BrowsePublicGardens {
 
     private MvcResult mvcResult;
 
-    private String currentPage;
+    private String currentPageUrl;
+    private int lastPage;
 
 
     @Given("I am browsing gardens")
@@ -146,16 +147,7 @@ public class BrowsePublicGardens {
 
     @When("I click the \"first\" button")
     public void i_click_the_first_button() {
-         currentPage = "/public-gardens/page/1";
-    }
-
-    @Then("I am taken to the first page")
-    public void i_am_taken_to_the_first_page() throws Exception {
-        mvcResult = MOCK_MVC.perform(
-                        MockMvcRequestBuilders
-                                .get(currentPage))
-                .andExpect(status().isOk())
-                .andReturn();
+        currentPageUrl = "/public-gardens/page/1";
     }
 
     @When("I click the \"last\" button")
@@ -163,28 +155,31 @@ public class BrowsePublicGardens {
         List<Garden> allGardens = gardenService.getGardens();
         int totalGardens = allGardens.size();
         int pageSize = 10;
-        int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
-        currentPage = "/public-gardens/page/" +lastPage;
+        lastPage = (int) Math.ceil((double) totalGardens / pageSize);
+        currentPageUrl = "/public-gardens/page/" +lastPage;
+    }
+
+    @Then("I am taken to the first page")
+    public void i_am_taken_to_the_first_page() throws Exception {
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get(currentPageUrl))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Then("I am taken to the last page")
     public void i_am_taken_to_last_page() throws Exception {
         mvcResult = MOCK_MVC.perform(
                         MockMvcRequestBuilders
-                                .get("/public-gardens/page/0"))
+                                .get(currentPageUrl))
                 .andExpect(status().isOk())
                 .andReturn();
     }
 
     @When("I try to access a page less than first page")
     public void i_try_to_access_a_page_less_than_first_page() throws Exception {
-        currentPage = "/public-gardens/page/0";
-        mvcResult = MOCK_MVC.perform(
-                        MockMvcRequestBuilders
-                                .get(currentPage))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/public-gardens/page/1"))
-                .andReturn();
+        currentPageUrl = "/public-gardens/page/0";
     }
 
     @When("I try to access a page greater than the last page")
@@ -192,14 +187,28 @@ public class BrowsePublicGardens {
         List<Garden> allGardens = gardenService.getGardens();
         int totalGardens = allGardens.size();
         int pageSize = 10;
-        int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
-        currentPage = "/public-gardens/page/" +lastPage + 1; // Add one to access page greater than last page
+        lastPage = (int) Math.ceil((double) totalGardens / pageSize);
+        currentPageUrl = "/public-gardens/page/" + (lastPage + 1); // Add one to access page greater than last page
+        System.out.println(currentPageUrl);
+    }
+
+    @Then("I am redirected to the first page")
+    public void i_am_redirected_to_the_first_page() throws Exception {
         mvcResult = MOCK_MVC.perform(
                         MockMvcRequestBuilders
-                                .get(currentPage))
+                                .get(currentPageUrl))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/public-gardens/page/" +lastPage))
+                .andExpect(redirectedUrl("/public-gardens/page/1"))
                 .andReturn();
     }
+
+    @Then("I am redirected to the last page")
+    public void i_am_redirected_to_the_last_page() throws Exception {
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get(currentPageUrl))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/public-gardens/page/" + lastPage))
+                .andReturn();
     }
 }
