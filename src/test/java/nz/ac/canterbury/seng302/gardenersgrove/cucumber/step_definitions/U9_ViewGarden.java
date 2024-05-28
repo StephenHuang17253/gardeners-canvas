@@ -3,11 +3,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.MyGardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,14 +27,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 
-import java.util.List;
-
 @SpringBootTest
 public class U9_ViewGarden {
     public static MockMvc MOCK_MVC;
 
     @Autowired
     public GardenRepository gardenRepository;
+
+    @Autowired
+    public FriendshipRepository friendshipRepository;
 
     @Autowired
     public UserRepository userRepository;
@@ -54,6 +56,8 @@ public class U9_ViewGarden {
 
     private static FileService fileService;
 
+    private static FriendshipService friendshipService;
+
     private ResultActions resultActions;
 
     private MvcResult mvcResult;
@@ -62,11 +66,13 @@ public class U9_ViewGarden {
     public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager);
+        friendshipService = new FriendshipService(friendshipRepository, userService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService);
 
-        MyGardensController myGardensController = new MyGardensController(gardenService, securityService, plantService,
-                fileService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, fileService);
+        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
+
+
     }
 
     @Given("I as user {string} is on my garden details page for {string}")

@@ -31,7 +31,9 @@ import org.springframework.ui.Model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -132,8 +134,16 @@ public class AccountController {
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword, Model model) {
         logger.info("GET /register");
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        if(loggedIn)
+        {
+            return "redirect:/home";
+        }
+
+
+
         model.addAttribute("loggedIn", loggedIn);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
@@ -173,6 +183,9 @@ public class AccountController {
             Model model) {
         logger.info("POST /register");
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
 
@@ -197,8 +210,17 @@ public class AccountController {
         }
         validationMap.put("dateOfBirth", dateOfBirthValidation);
 
-        InputValidator.validatePassword(password);
-        validationMap.put("password", InputValidator.validatePassword(password));
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(emailAddress);
+        InputValidator.validatePassword(password, otherFields);
+        validationMap.put("password", InputValidator.validatePassword(password, otherFields));
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -317,6 +339,12 @@ public class AccountController {
             @RequestParam(name = "password", defaultValue = "") String password, Model model,
             HttpServletRequest request) {
         logger.info("GET /login");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        if(loggedIn)
+        {
+            return "redirect:/home";
+        }
 
         // Check if there is a message in the flash map and add it to the model
         // Used for displaying messages after a redirect e.g. from the verify page
@@ -344,6 +372,9 @@ public class AccountController {
     public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
             @RequestParam String password, HttpSession session, Model model) {
         logger.info("POST /login");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
 
         removeIfExpired(emailAddress);
 
