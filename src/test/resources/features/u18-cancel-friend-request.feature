@@ -24,3 +24,9 @@ Feature: U18 (Cancel friend request): As Liam, I want to cancel friends on Garde
     list, and I have confirmed that I want to remove that friend, then that friend is removed from my list
     of friends, and I cannot see this friend’s gardens, and this friend cannot see my gardens, and I am
     removed from the list of friends of that user.
+      Given I as user "liam@email.com" am logged in with "TestPassword10!"
+      When I hit the 'Remove Friend' button for user "kaia@email.com"
+      Then That friend "kaia@email.com" is removed from my friends list
+      And I cannot see their "kaia@gmail.com" gardens
+      And I as user "sarah@email.com" am logged in with "TestPassword10!"
+      And "liam@email.com" is removed from my friends list

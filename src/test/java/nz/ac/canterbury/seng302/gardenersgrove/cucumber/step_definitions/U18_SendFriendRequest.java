@@ -124,8 +124,30 @@ public class U18_SendFriendRequest {
         RequestFriendModel requestFriendModel = result.get(result.size() - 1);
         Assertions.assertNotEquals(userName, requestFriendModel.getFriendName());
     }
-
-
+    // AC2
+    @When("I hit the {string} button for user {string}")
+    public void i_hit_the_button_for_user(String string, String string2) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+    // AC2
+    @Then("That friend {string} is removed from my friends list")
+    public void that_friend_is_removed_from_my_friends_list(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+    // AC2
+    @Then("I cannot see their {string} gardens")
+    public void i_cannot_see_their_kaia_gmail_com_gardens() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+    // AC2
+    @Then("{string} is removed from my friends list")
+    public void is_removed_from_my_friends_list(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
 
 
 }
