@@ -1,0 +1,11 @@
+.tabs {
+    display: inline-block;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}

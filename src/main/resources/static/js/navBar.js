@@ -23,7 +23,7 @@ function createGarden() {
         window.location.href = `${instance}/create-new-garden`;
 
     }
-    var previousUrl = localStorage.getItem('previousUrl');
+    const previousUrl = localStorage.getItem('previousUrl');
     // Default the return URL to home page if not set
     if (!previousUrl) {
         localStorage.setItem('previousUrl', '/home');
@@ -32,7 +32,7 @@ function createGarden() {
 }
 
 function openRegisterPage() {
-    var currentUrl = window.location.pathname;
+    const currentUrl = window.location.pathname;
 
     // if currentURL is not register send them to this page
     if (currentUrl !== '/register') {
@@ -43,7 +43,7 @@ function openRegisterPage() {
         window.location.href = `${instance}/register`;
 
     }
-    var previousUrl = localStorage.getItem('previousUrl');
+    const previousUrl = localStorage.getItem('previousUrl');
     // Default the return URL to home page if not set
     if (!previousUrl) {
         localStorage.setItem('previousUrl', '/home');
@@ -52,7 +52,7 @@ function openRegisterPage() {
 }
 
 function openLoginPage() {
-    var currentUrl = window.location.pathname;
+    const currentUrl = window.location.pathname;
 
     // if currentURL is not login send them to this page
     if (currentUrl !== '/login') {
@@ -64,6 +64,25 @@ function openLoginPage() {
 
     }
     var previousUrl = localStorage.getItem('previousUrl');
+    // Default the return URL to home page if not set
+    if (!previousUrl) {
+        localStorage.setItem('previousUrl', '/home');
+    }
+}
+
+function openManageFriendsPage() {
+    const currentUrl = window.location.pathname;
+
+    // if currentURL is not manage-friends send them to this page
+    if (currentUrl !== '/manage-friends') {
+        localStorage.setItem('previousUrl', window.location.href);
+
+        // Redirect to manage-friends page
+        let instance = checkInstance(currentUrl)
+        window.location.href = `${instance}/manage-friends#friends`;
+
+    }
+    const previousUrl = localStorage.getItem('previousUrl');
     // Default the return URL to home page if not set
     if (!previousUrl) {
         localStorage.setItem('previousUrl', '/home');

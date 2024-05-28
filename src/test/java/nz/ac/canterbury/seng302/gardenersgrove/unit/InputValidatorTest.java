@@ -375,13 +375,20 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateName(name));
     }
 
+    /**
+     * Test for invalid names
+     * @param name
+     */
     @ParameterizedTest
     @ValueSource(strings = { "John1", "John>", "~John" })
     void InputValidator_validateName_InvalidName_return_INVALID_USERNAME(String name) {
         Assertions.assertEquals(ValidationResult.INVALID_USERNAME, InputValidator.validateName(name));
     }
 
-
+    /**
+     * Test for valid emails
+     * @param email
+     */
     @ParameterizedTest
     @ValueSource(strings = { "test-test@example.com", "user_123@gmail.co.nz", "john.doe@hotmail.com",
             "phlddzoxuomhdkclzinbsqhutjqhzodonrbgyxibpkutddaovmxifypmeksvhkts@mwbmmvndbnvfdskmrmmropbvhdgegssqcengjnfj" +
@@ -453,13 +460,20 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password, otherFields));
     };
 
-
+    /**
+     * Test for valid DOB
+     * @param dob
+     */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDOB(dob));
     }
 
+    /**
+     * Test for invalid DOB age below 13
+     * @param dob
+     */
     @ParameterizedTest
     @ValueSource(strings = {"01/02/2023"})
     void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {
@@ -467,6 +481,10 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.AGE_BELOW_13, InputValidator.validateDOB(dob));
     }
 
+    /**
+     * Test for invalid DOB age above 120
+     * @param dob
+     */
     @ParameterizedTest
     @ValueSource(strings = {"01/01/1903","01/01/1850"})
     void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
@@ -474,6 +492,10 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
     }
 
+    /**
+     * Test for invalid DOB format
+     * @param dob
+     */
     @ParameterizedTest
     @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014"})
     void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
@@ -481,12 +503,21 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
 
+
+
+    /**
+     * Test for valid DOB
+     * @param date
+     */
     @ParameterizedTest
     @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     void InputValidator_isValidDate_ValidDate_return_OK(String date) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
     }
-
+    /**
+     * Test for invalid DOB format
+     * @param date
+     */
     @ParameterizedTest
     @ValueSource(strings = {"1960/3/2", "Steve","12122013","12:12:2014","12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004","\""})
     void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {

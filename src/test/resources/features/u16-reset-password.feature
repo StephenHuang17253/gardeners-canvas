@@ -1,7 +1,7 @@
 Feature: U16 As Sarah, I want to be able to change my password over email, so that I can still access my account even if I forget my password.
 
   Background:
-    Given I "Sarah" "Thompson", 28 am a user with email "sarah@email.com" and password "TestPassword10!"
+    Given "Sarah" "Thompson", 28 is a user with email "sarah@email.com" and password "TestPassword10!"
 
   Scenario: AC1 - I can access the lost password form
     Given I am on the login page
