@@ -24,7 +24,7 @@
     <div id="searchBarContainer">
         <form th:action="@{/public-gardens/search/1}" method="get" class="search-form">
             <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"
-                   maxlength="5000"/>
+                   maxlength="5000" th:value="${searchValue}"/>
             <button type="submit" class="user_button">Search</button>
         </form>
     </div>

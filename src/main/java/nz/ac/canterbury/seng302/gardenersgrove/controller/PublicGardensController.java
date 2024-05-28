@@ -33,8 +33,6 @@ public class PublicGardensController {
     @Autowired
     public PublicGardensController(GardenService gardenService) {
         this.gardenService = gardenService;
-
-
     }
 
     /**
@@ -156,6 +154,7 @@ public class PublicGardensController {
             model.addAttribute("searchValue", searchInput);
         } else {
             model = resetModel(model);
+            model.addAttribute("searchValue", searchInput);
             model.addAttribute("SearchErrorText", "No gardens match your search");
         }
         return "browsePublicGardens";
