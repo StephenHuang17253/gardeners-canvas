@@ -274,6 +274,28 @@ public class ManageFriendsController {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.DECLINED);
         }
 
+        model.addAttribute("activeTab", activeTab);
+
+        return "redirect:/manage-friends#" + activeTab;
+    }
+
+    @PostMapping("/manage-friends/cancel")
+    public String cancelSentRequest(@RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
+                                       @RequestParam("activeTab") String activeTab,
+                                       Model model) {
+        logger.info("POST /manage-friends");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        User currentUser = securityService.getCurrentUser();
+        User pendingFriend = userService.getUserById(pendingFriendId);
+        Friendship friendship = friendshipService.findFriendship(currentUser, pendingFriend);
+
+        if (friendship != null) {
+            friendshipService.deleteFriendship(friendship.getId());
+        }
 
         model.addAttribute("activeTab", activeTab);
 

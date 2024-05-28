@@ -41,4 +41,6 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
      * @return list of all Friendship objects matching the requirements
      */
     Optional<Friendship> findByUser1IdAndUser2Id(long userId1, long userId2);
+
+
 }

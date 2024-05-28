@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
@@ -171,21 +172,43 @@ public class FriendshipService {
 
     /**
      * Updates a friendship status of an existing friendship
-     * @param id the id of the existing friend
+     * @param id the id of the existing friendship
      * @param friendshipStatus the status to update it to
      * @throws IllegalArgumentException if id invalid or trying to update a declined relation
      */
-    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus) {
+    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus)
+    {
         Optional<Friendship> optionalFriend = friendshipRepository.findById(id);
-        if (optionalFriend.isEmpty()) {
+        if (optionalFriend.isEmpty())
+        {
             throw new IllegalArgumentException("Invalid Friendship ID: " + id);
-        } else if(optionalFriend.get().getStatus()==FriendshipStatus.DECLINED){
+        }
+        else if (optionalFriend.get().getStatus()==FriendshipStatus.DECLINED)
+        {
             throw new IllegalArgumentException("Cant update a Friendship relation's status if its declined");
-        }else{
+        }
+        else
+        {
             Friendship friendship = optionalFriend.get();
             friendship.setStatus(friendshipStatus);
             return friendshipRepository.save(friendship);
         }
+    }
+
+    /**
+     * Deletes a friendship by the id of the friendship
+     *
+     * @param friendshipId the id of the friendship to delete
+     * @throws EntityNotFoundException thrown if the friendship does not exist
+     */
+    public void deleteFriendship(Long friendshipId) throws EntityNotFoundException
+    {
+        Optional<Friendship> friendshipToDeleteOptional = friendshipRepository.findById(friendshipId);
+        if (friendshipToDeleteOptional.isEmpty())
+        {
+            throw new EntityNotFoundException("No such friendship");
+        }
+        friendshipRepository.deleteById(friendshipId);
     }
 
 }
