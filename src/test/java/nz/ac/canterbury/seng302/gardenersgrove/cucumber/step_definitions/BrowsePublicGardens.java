@@ -153,7 +153,7 @@ public class BrowsePublicGardens {
 
     @When("I click the \"last\" button")
     public void i_click_the_last_button() {
-        List<Garden> allGardens = gardenService.getGardens();
+        List<Garden> allGardens = gardenService.getAllPublicGardens();
         int totalGardens = allGardens.size();
         int pageSize = 10;
         lastPage = (int) Math.ceil((double) totalGardens / pageSize);
@@ -185,7 +185,7 @@ public class BrowsePublicGardens {
 
     @When("I try to access a page greater than the last page")
     public void i_try_to_access_a_page_greater_than_the_last_page() throws Exception {
-        List<Garden> allGardens = gardenService.getGardens();
+        List<Garden> allGardens = gardenService.getAllPublicGardens();
         int totalGardens = allGardens.size();
         int pageSize = 10;
         lastPage = (int) Math.ceil((double) totalGardens / pageSize);
