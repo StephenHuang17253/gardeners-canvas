@@ -81,13 +81,6 @@ public class MyGardensController {
         return "myGardensPage";
     }
 
-    @PostMapping("/my-gardens/{gardenId}/dismiss-message")
-    public ResponseEntity<Void> dismissMessage(@PathVariable Long gardenId, HttpSession session) {
-        // Store the dismissal in the session or another storage mechanism
-        session.setAttribute("dismissedMessage_" + gardenId, LocalDate.now());
-        return ResponseEntity.ok().build();
-    }
-
     /**
      * Gets all the users created gardens
      * and maps them all and there attributes to the gardenDetailsPage
@@ -122,7 +115,6 @@ public class MyGardensController {
            weather.add(gardenWeather.getCurrentWeather());
            weather.addAll(gardenWeather.getForecastWeather());
 
-
            DailyWeather currentWeather = gardenWeather.getCurrentWeather();
            List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
            DailyWeather yesterdayWeather = pastWeather.get(0);
@@ -133,7 +125,6 @@ public class MyGardensController {
            } else if ("Sunny".equals(yesterdayWeather.getDescription()) && "Sunny".equals(beforeYesterdayWeather.getDescription())) {
                model.addAttribute("message","There hasn’t been any rain recently, make sure to water your plants if they need it");
            }
-
 
         } catch (Error error) {
            DailyWeather noWeather = new DailyWeather("not_found.png", null, null);

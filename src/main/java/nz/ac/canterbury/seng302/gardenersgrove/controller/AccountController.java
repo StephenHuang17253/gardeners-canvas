@@ -140,8 +140,6 @@ public class AccountController {
             return "redirect:/home";
         }
 
-
-
         model.addAttribute("loggedIn", loggedIn);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
