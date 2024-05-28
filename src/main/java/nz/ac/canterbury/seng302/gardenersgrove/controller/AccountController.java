@@ -132,8 +132,16 @@ public class AccountController {
             @RequestParam(name = "password", defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword, Model model) {
         logger.info("GET /register");
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        if(loggedIn)
+        {
+            return "redirect:/home";
+        }
+
+
+
         model.addAttribute("loggedIn", loggedIn);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
@@ -172,6 +180,9 @@ public class AccountController {
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
             Model model) {
         logger.info("POST /register");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
 
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
@@ -317,6 +328,12 @@ public class AccountController {
             @RequestParam(name = "password", defaultValue = "") String password, Model model,
             HttpServletRequest request) {
         logger.info("GET /login");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        if(loggedIn)
+        {
+            return "redirect:/home";
+        }
 
         // Check if there is a message in the flash map and add it to the model
         // Used for displaying messages after a redirect e.g. from the verify page
@@ -344,6 +361,9 @@ public class AccountController {
     public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
             @RequestParam String password, HttpSession session, Model model) {
         logger.info("POST /login");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
 
         removeIfExpired(emailAddress);
 
