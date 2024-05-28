@@ -115,7 +115,7 @@ public class ManageFriendsController {
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends/search")
-    public String searchForUsers(@RequestParam("searchInput") String searchInput, Model model) {
+    public String searchForUsers(@RequestParam(name = "searchInput", defaultValue = "") String searchInput, Model model) {
         logger.info("GET /manage-friends/search");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
