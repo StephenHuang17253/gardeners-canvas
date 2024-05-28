@@ -68,6 +68,8 @@ public class BrowsePublicGardensControllerTest {
                     "New Zealand",
                     10.0,
                     true,
+                    "-43.5214643",
+                    "172.5796159",
                     user1);
             gardenService.addGarden(newGarden);
             if (i > 4)

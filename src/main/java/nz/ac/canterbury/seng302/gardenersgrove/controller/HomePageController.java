@@ -129,6 +129,8 @@ public class HomePageController {
                         "New Zealand",
                         15.0,
                         true,
+                        "-43.5214643",
+                        "172.5796159",
                         johnDoe);
                 Garden sampleGarden2 = new Garden(
                         "John's Private Garden " + i,
