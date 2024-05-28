@@ -215,6 +215,9 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;

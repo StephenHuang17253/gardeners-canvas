@@ -63,7 +63,7 @@ public class PlantService {
      * @param gardenId id of garden the plant belongs to
      * @throws IllegalArgumentException if invalid garden ID
      */
-    public Plant addPlant(String plantName, float plantCount, String plantDescription, LocalDate plantDate, Long gardenId) {
+    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId) {
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isPresent()) {
             Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get());
@@ -102,7 +102,7 @@ public class PlantService {
      * @param newDesc new plant description
      * @param newDate new plant date
      */
-    public Plant updatePlant(Long id, String newName, Float newCount, String newDesc, LocalDate newDate) {
+    public Plant updatePlant(Long id, String newName, int newCount, String newDesc, LocalDate newDate) {
         Optional<Plant> targetPlant = findById(id);
         if (targetPlant.isPresent()) {
             Plant oldPlant = targetPlant.get();
