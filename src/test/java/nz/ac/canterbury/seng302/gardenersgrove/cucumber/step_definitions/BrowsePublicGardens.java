@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -62,6 +63,8 @@ public class BrowsePublicGardens {
     private String searchValue;
 
     private MvcResult mvcResult;
+
+    private String currentPage;
 
 
     @Given("I am browsing gardens")
@@ -139,5 +142,64 @@ public class BrowsePublicGardens {
             }
         }
 
+    }
+
+    @When("I click the \"first\" button")
+    public void i_click_the_first_button() {
+         currentPage = "/public-gardens/page/1";
+    }
+
+    @Then("I am taken to the first page")
+    public void i_am_taken_to_the_first_page() throws Exception {
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get(currentPage))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @When("I click the \"last\" button")
+    public void i_click_the_last_button() {
+        List<Garden> allGardens = gardenService.getGardens();
+        int totalGardens = allGardens.size();
+        int pageSize = 10;
+        int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
+        currentPage = "/public-gardens/page/" +lastPage;
+    }
+
+    @Then("I am taken to the last page")
+    public void i_am_taken_to_last_page() throws Exception {
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get("/public-gardens/page/0"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @When("I try to access a page less than first page")
+    public void i_try_to_access_a_page_less_than_first_page() throws Exception {
+        currentPage = "/public-gardens/page/0";
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get(currentPage))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/public-gardens/page/1"))
+                .andReturn();
+    }
+
+    @When("I try to access a page greater than the last page")
+    public void i_try_to_access_a_page_greater_than_the_last_page() throws Exception {
+        List<Garden> allGardens = gardenService.getGardens();
+        int totalGardens = allGardens.size();
+        int pageSize = 10;
+        int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
+        currentPage = "/public-gardens/page/" +lastPage + 1; // Add one to access page greater than last page
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .get(currentPage))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/public-gardens/page/" +lastPage))
+                .andReturn();
+    }
     }
 }
