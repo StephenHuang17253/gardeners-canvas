@@ -133,8 +133,6 @@ public class ResetPasswordController {
                                   Model model) {
         logger.info("POST /reset-password");
 
-        model.addAttribute("password", password);
-        model.addAttribute("retypePassword", retypePassword);
         Token token = tokenService.getTokenByTokenString(resetToken);
         User user = token.getUser();
         String emailAddress = user.getEmailAddress();
