@@ -293,7 +293,8 @@ public class U17_SendFriendRequest {
                 .andExpect(status().isOk()).andReturn();
 
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
-        FriendModel friendModel = result.getLast();
+        Assertions.assertNotNull(result);
+        FriendModel friendModel = result.get(result.size() - 1);
         Assertions.assertEquals(friendProfilePicture, friendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, friendModel.getFriendName());
 
@@ -360,7 +361,8 @@ public class U17_SendFriendRequest {
                 .andExpect(status().isOk()).andReturn();
 
         List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("declinedFriends");
-        RequestFriendModel requestFriendModel = result.getLast();
+        Assertions.assertNotNull(result);
+        RequestFriendModel requestFriendModel = result.get(result.size() - 1);
         Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, requestFriendModel.getFriendName());
     }
@@ -386,7 +388,8 @@ public class U17_SendFriendRequest {
                 .andExpect(status().isOk()).andReturn();
 
         List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
-        RequestFriendModel requestFriendModel = result.getLast();
+        Assertions.assertNotNull(result);
+        RequestFriendModel requestFriendModel = result.get(result.size() - 1);
         Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, requestFriendModel.getFriendName());
     }

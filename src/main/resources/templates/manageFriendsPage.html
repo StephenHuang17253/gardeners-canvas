@@ -45,10 +45,8 @@
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
                                      friendsGardenLink=${friend.getFriendGardenLink},
-                                     friendshipStatus=${friend.getFriendRequestStatusString()},
-                                     isPotentialFriend=${isPotentialFriend != null ? isPotentialFriend : false},
-                                     searchQuery=${''},
-                                     friendId=${friend.getFriendId()})}">
+                                     friendshipStatus=${friend.getFriendRequestStatusString()})}
+                                     ">
                                 </div>
                             </div>
                         </div>
@@ -74,7 +72,7 @@
                             </div>
                         </div>
                         <div th:each="friend : ${searchResults}">
-                            <div th:replace="~{fragmentExample/fragments/friendsBox ::
+                            <div th:replace="~{fragmentExample/fragments/searchFriendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
                                      friendsGardenLink=${friend.getFriendGardenLink},
