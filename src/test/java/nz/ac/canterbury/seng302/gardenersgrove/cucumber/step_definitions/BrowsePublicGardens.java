@@ -135,7 +135,7 @@ public class BrowsePublicGardens {
     public void user_has_a_garden_located_in_with_plants(String email, String gardenName, String city, String country, int plantNo) {
         User user = userService.getUserByEmail(email);
         if (user.getGardens().stream().noneMatch(garden -> Objects.equals(garden.getGardenName(), gardenName))) {
-            Garden garden = new Garden(gardenName, "", "", city, "", country, 3.0, user);
+            Garden garden = new Garden(gardenName, "", "", city, "", country, 3.0,true, user);
             garden = gardenService.addGarden(garden);
             for (int i = 0; i < plantNo; i++) {
                 String plantName = gardenName + " " + (i + 1);
