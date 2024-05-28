@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -68,7 +69,10 @@ public class EditAUser {
 
 
     @Before
-    public void before_or_after_all() {
+    public void before_or_after_all(Scenario scenario) {
+        if (scenario.getSourceTagNames().contains("@NotRequiresSetup")) {
+            return;
+        }
         userService = new UserService(passwordEncoder, userRepository);
         tokenRepository.deleteAll();
         userRepository.deleteAll();
@@ -91,8 +95,8 @@ public class EditAUser {
 
     @Given("There exists an old user with email {string}")
     public void there_exists_an_old_user_with_email(String email) {
-        User user = new User("Admin","Test",email,null);
-        userService.addUser(user,"AlphabetSoup10!");
+        User user = new User("Admin", "Test", email, null);
+        userService.addUser(user, "AlphabetSoup10!");
         Assertions.assertNotNull(userService.getUserByEmail(email));
 
     }
@@ -130,6 +134,7 @@ public class EditAUser {
         dateOfBirth = LocalDate.parse(date, formatter);
 
     }
+
     @Then("No details are changed")
     public void no_details_are_changed() {
         Assertions.assertNotNull(userService.getUserByEmail(emailAddress));
@@ -160,8 +165,9 @@ public class EditAUser {
     }
 
     @When("I check the check box marked \"I have no surname\"")
-    public void i_click_the_check_box_marked_I_have_no_surname(){
+    public void i_click_the_check_box_marked_I_have_no_surname() {
         noLastName = true;
     }
+
 
 }

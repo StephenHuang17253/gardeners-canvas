@@ -223,7 +223,7 @@ public class PlantServiceTest {
 
         // When
         plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
-        Plant resultPlant = plantService.updatePlant(1L, "Jane's Plant", 4f, "Plant owned by Jane", newDateOfPlanting);
+        Plant resultPlant = plantService.updatePlant(1L, "Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting);
 
         // Then
         Assertions.assertEquals("Jane's Plant", resultPlant.getPlantName() );
