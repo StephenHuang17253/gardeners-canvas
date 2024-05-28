@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<div class="pagination">
+
+    <a th:href="@{'/public-gardens/page/1'}" class="first">First</a>
+
+    <span th:if="${currentPage > 3}" class="dots">...</span>
+
+    <a th:href="'/public-gardens/page/' + (${currentPage - 2})"th:if="${currentPage - 2 > 0}"th:text="(${currentPage -2})">a</a>
+
+    <a th:href="'/public-gardens/page/' + (${currentPage - 1})"th:if="${currentPage - 1 > 0}"th:text="(${currentPage -1})">b</a>
+
+    <a th:text="(${currentPage})" class="current-page"></a>
+
+    <a th:href="'/public-gardens/page/' + (${currentPage + 1})"th:if="${currentPage + 1 <= lastPage}"th:text="(${currentPage + 1})">c</a>
+
+    <a th:href="'/public-gardens/page/' + (${currentPage + 2})"th:if="${currentPage + 2 <= lastPage}"th:text="(${currentPage + 2})">d</a>
+
+    <span th:if="${currentPage < lastPage - 2}" class="dots">...</span>
+
+    <a th:href="'/public-gardens/page/' + (${lastPage})" class="first">Last</a>
+    <br>
+</div>

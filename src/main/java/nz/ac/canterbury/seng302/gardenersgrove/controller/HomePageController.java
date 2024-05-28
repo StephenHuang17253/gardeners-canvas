@@ -119,9 +119,21 @@ public class HomePageController {
 
             ArrayList<Plant> samplePlants = new ArrayList<>();
 
-            for (int i = 0; i < 12; i++) {
+            for (int i = 1; i < 60; i++) {
                 Garden sampleGarden = new Garden(
                         "John's Garden " + i,
+                        "114 Ilam Road",
+                        "Ilam",
+                        "Christchurch",
+                        "8041",
+                        "New Zealand",
+                        15.0,
+                        true,
+                        "-43.5214643",
+                        "172.5796159",
+                        johnDoe);
+                Garden sampleGarden2 = new Garden(
+                        "John's Private Garden " + i,
                         "114 Ilam Road",
                         "Ilam",
                         "Christchurch",
@@ -133,6 +145,8 @@ public class HomePageController {
                         "172.5796159",
                         johnDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
+                sampleGarden2 = gardenService.addGarden(sampleGarden2);
+
 
                 for(int k = 0; k < 12; k++)
                 {
