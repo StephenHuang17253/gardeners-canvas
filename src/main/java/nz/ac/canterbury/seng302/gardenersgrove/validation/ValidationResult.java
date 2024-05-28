@@ -6,6 +6,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation;
  */
 public enum ValidationResult {
     OK("valid"),
+    INVALID("invalid"),
     BLANK("cannot be empty"),
     NOT_PARSABLE("cannot be parsed to a number"),
     NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
@@ -25,7 +26,8 @@ public enum ValidationResult {
     AREA_TOO_SMALL("Area (meters squared) is too small"),
     AREA_TOO_LARGE("Area (meters squared) is too large"),
     DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
-    INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text");
+    INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text"),
+    INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
 
     private String message;
 

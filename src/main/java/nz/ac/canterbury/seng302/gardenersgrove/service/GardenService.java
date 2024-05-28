@@ -103,6 +103,27 @@ public class GardenService {
             throw new IllegalArgumentException("Invalid garden ID");
         }
     }
+
+    /**
+     * Updates the status of the garden's publicity (isPublic)
+     * @param id - the garden's id
+     * @param publicStatus - whether isPublic should be made true or false
+     * @return the updated garden as saved in the repository
+     */
+    public Garden updateGardenPublicity(Long id, boolean publicStatus) {
+        Optional<Garden> optionalGarden = getGardenById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setIsPublic(publicStatus);
+
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
     /**
      * Adds plant entity to garden entity plant list
      * @param gardenId the id of the garden we wish to add plant to

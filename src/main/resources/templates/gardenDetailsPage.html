@@ -15,26 +15,29 @@
         <div class = "main-container">
             <div class="tableList-header">
                 <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
-                <p th:text="'Garden Location: ' + ${gardenLocation}"> Name </p>
-                <p> | </p>
+                <p th:text="'Garden Location: ' + ${gardenLocation}"> Address </p>
                 <p th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </p>
-                <p th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
-
+                <p th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Garden size </p>
                 <br>
-                <div class="tableList-header-button-contain">
-                    <a th:href="@{__${gardenId}__/edit}">
-                        <button class = rounded-button >Edit</button>
-                    </a>
-                    <a th:href="@{__${gardenId}__/create-new-plant}">
-                        <button class="rounded-button">Create New Plant</button>
-                    </a>
+                <a th:href="@{__${gardenId}__/edit}">
+                    <button class = rounded-button-top-right >Edit</button>
+                </a>
+                <div class="checkbox_container">
+                    <form th:action="@{/my-gardens/__${gardenId}__/public}" method="post" enctype="multipart/form-data">
+<!--                        <input type="hidden" name="makeGardenPublic" th:value="false" />-->
+                        <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic" th:checked="${makeGardenPublic}"
+                                onChange="this.form.submit()">Make my garden public
+                    </form>
                 </div>
             </div>
+        </div>
             <br>
             <div class="tableList-table-contain">
                 <div class="tableList-table-count">
-                    <br>
                     <span th:text="${totalPlants} + ' Plants'"> # Plants </span>
+                    <a th:href="@{__${gardenId}__/create-new-plant}">
+                        <button class="rounded-button">Create New Plant</button>
+                    </a>
                 </div>
                 <div th:each="plant : ${plants}">
                     <div th:replace="~{fragmentExample/fragments/plantBox.html :: plantBox(
