@@ -188,8 +188,9 @@ public class GardenFormController {
         }else{
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",","."));
         }
+        boolean isPublic = false;
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize, owner);
+        Garden garden = new Garden(gardenName,streetAddress,suburb,city,postcode,country,doubleGardenSize, isPublic, owner);
 
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));

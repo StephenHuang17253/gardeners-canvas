@@ -1,9 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,8 @@ public class HomePageController {
 
     private GardenService gardenService;
 
+    private FriendshipService friendshipService;
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -47,10 +52,12 @@ public class HomePageController {
      * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService) {
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService,
+                              FriendshipService friendshipService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
+        this.friendshipService = friendshipService;
     }
 
     /**
@@ -97,6 +104,7 @@ public class HomePageController {
 
         model.addAttribute("myGardens", gardenService.getGardens());
 
+
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
@@ -122,6 +130,7 @@ public class HomePageController {
                         "8041",
                         "New Zealand",
                         15.0,
+                        false,
                         johnDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
 
@@ -132,7 +141,45 @@ public class HomePageController {
                 }
 
             }
+
+            if (!userService.emailInUse("janedoe@email.com")) {
+
+                // Add a default user to speed up manual testing.
+                User janeDoe = new User("Jane",
+                        "Doe",
+                        "janedoe@email.com",
+                        date);
+                userService.addUser(janeDoe, "Password1!");
+                userService.verifyUser(janeDoe);
+                onStart = true;
+
+
+                for (int i = 0; i < 1; i++) {
+                    Garden sampleGarden = new Garden(
+                            "John's Garden " + i,
+                            "114 Ilam Road",
+                            "Ilam",
+                            "Christchurch",
+                            "8041",
+                            "New Zealand",
+                            15.0,
+                            false,
+                            janeDoe);
+                    sampleGarden = gardenService.addGarden(sampleGarden);
+
+                    for(int k = 0; k < 1; k++)
+                    {
+                        plantService.addPlant("Test Plant #" + k,2,
+                                "test", LocalDate.now(),sampleGarden.getGardenId());
+                    }
+
+                }
+                Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
+                friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
+            }
+
         }
+
 
         // If no users exist then clear the security context,
         // useful for testing without persistent storage,
