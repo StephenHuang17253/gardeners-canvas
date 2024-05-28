@@ -48,10 +48,10 @@ public class ResetPasswordController {
      * @return lostPasswordForm
      */
     @GetMapping("/lost-password")
-    public String lostPassword(@RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
+    public String lostPassword(@RequestParam(name = "email", defaultValue = "") String emailAddress,
                                Model model) {
         logger.info("GET /lost-password");
-        model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute("email", emailAddress);
         return "lostPasswordForm";
     }
 
@@ -69,7 +69,7 @@ public class ResetPasswordController {
         logger.info("POST /lost-password");
         boolean isRegistered = userService.emailInUse(email);
         ValidationResult emailValidation = InputValidator.validateEmail(email);
-
+        model.addAttribute("email", email);
         if (!emailValidation.valid()){
             model.addAttribute("emailError", emailValidation);
         } else  {
@@ -102,6 +102,7 @@ public class ResetPasswordController {
                                 RedirectAttributes redirectAttributes) {
         logger.info("GET /reset-password");
 
+
         Token token = tokenService.getTokenByTokenString(resetToken);
         if (token == null || token.isExpired()) {
             if (token != null) {
@@ -132,7 +133,8 @@ public class ResetPasswordController {
                                   Model model) {
         logger.info("POST /reset-password");
 
-
+        model.addAttribute("password", password);
+        model.addAttribute("retypePassword", retypePassword);
         Token token = tokenService.getTokenByTokenString(resetToken);
         User user = token.getUser();
         String emailAddress = user.getEmailAddress();
