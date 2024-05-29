@@ -276,7 +276,7 @@ public class U17_SendFriendRequest {
                         MockMvcRequestBuilders
                                 .post("/manage-friends")
                                 .param("pendingFriendId", String.valueOf(user.getId()))
-                                .param("acceptedFriend", "true")
+                                .param("friendAccepted", "true")
                                 .param("activeTab", "pending"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
@@ -308,7 +308,7 @@ public class U17_SendFriendRequest {
                         MockMvcRequestBuilders
                                 .post("/manage-friends")
                                 .param("pendingFriendId", String.valueOf(user.getId()))
-                                .param("acceptedFriend", "false")
+                                .param("friendAccepted", "false")
                                 .param("activeTab", "pending"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
