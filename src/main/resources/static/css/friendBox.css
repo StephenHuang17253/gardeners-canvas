@@ -68,6 +68,48 @@
     background-color: #ca1c2e;
 }
 
+.accept-request-button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.accept-request-button:hover {
+    background-color: #23548d;
+}
+
+.decline-request-button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.decline-request-button:hover {
+    background-color: #ca1c2e;
+}
+
+.cancel-request-button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-request-button:hover {
+    background-color: #ca1c2e;
+}
+
 .invite_button {
     background-color: #ffffff;
     border: 2px solid black;
