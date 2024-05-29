@@ -11,7 +11,7 @@
         <script th:src="@{/js/imagePicker.js}"></script>
     </head>
     <body>
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
         <div class = "main-container">
             <div class="tableList-header">
                 <h1 class = "tableList-header-title" th:text="${gardenName}"> Name </h1>
