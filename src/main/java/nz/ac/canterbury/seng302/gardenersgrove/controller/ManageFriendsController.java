@@ -211,6 +211,8 @@ public class ManageFriendsController {
         }
         if (friendModels.isEmpty()) {
             model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
+            model.addAttribute("userSearch", searchInput);
+
         }
         List<FriendModel> acceptedFriendModels = createFriendModel();
         List<RequestFriendModel> pendingFriendModels = createRequestFriendModel(FriendshipStatus.PENDING);
@@ -219,7 +221,7 @@ public class ManageFriendsController {
         model.addAttribute("pendingFriends", pendingFriendModels);
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("isPotentialFriend", true);
-        model.addAttribute("searchInput", searchInput);
+        model.addAttribute("userSearch", searchInput);
         return "manageFriendsPage";
     }
 
@@ -246,6 +248,8 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("SearchErrorText", exception.getMessage());
+            model.addAttribute("searchQuery", searchInput);
+
             return "manageFriendsPage";
         }
 
