@@ -80,3 +80,14 @@ function manageRequest(button) {
     }
     form.submit();
 }
+
+function showModal(id) {
+    const modal = document.getElementById("confirm-remove-form-"+id);
+    modal.className = "then-show";
+}
+
+
+function closeModal(id) {
+    const modal = document.getElementById("confirm-remove-form-"+id);
+    modal.className = "initially-hidden";
+}

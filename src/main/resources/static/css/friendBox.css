@@ -83,3 +83,12 @@
 .invite_button:hover {
     background-color: #E64A19;
 }
+
+
+.initially-hidden {
+    display:none;
+}
+
+.then-show {
+    display: block;
+}
