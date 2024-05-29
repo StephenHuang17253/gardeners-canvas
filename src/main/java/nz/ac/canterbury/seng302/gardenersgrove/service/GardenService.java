@@ -5,6 +5,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class GardenService {
 
     /**
      * GardenService constructor with repository.
+     *
      * @param gardenRepository the repository for Gardens
      */
     @Autowired
@@ -33,14 +35,17 @@ public class GardenService {
 
     /**
      * Retrieves all gardens from persistence
+     *
      * @return a list of all garden objects saved in persistence
      */
     //might be irrlevant for this sprint
     public List<Garden> getGardens() {
         return gardenRepository.findAll();
     }
+
     /**
      * Retrieves all gardens from persistence where the owner id matches the inputted id
+     *
      * @param id the user's ID
      * @throws IllegalArgumentException if the provided user ID is invalid
      */
@@ -54,6 +59,7 @@ public class GardenService {
 
     /**
      * Retrieves a garden by ID
+     *
      * @param id the garden's ID
      * @return the garden or Optional#empty() if none found
      */
@@ -63,6 +69,7 @@ public class GardenService {
 
     /**
      * Adds a new garden
+     *
      * @param garden the garden to add
      * @throws IllegalArgumentException if the user associated with the garden is not in the db
      */
@@ -79,7 +86,8 @@ public class GardenService {
 
     /**
      * Updates a garden values
-     * @param id the id of the existing garden
+     *
+     * @param id              the id of the existing garden
      * @param newGardenValues the new garden values
      * @throws IllegalArgumentException if invalid garden id
      */
@@ -96,7 +104,8 @@ public class GardenService {
             targetGarden.setGardenPostcode(newGardenValues.getGardenPostcode());
             targetGarden.setGardenCountry(newGardenValues.getGardenCountry());
             targetGarden.setGardenSize(newGardenValues.getGardenSize());
-
+            targetGarden.setGardenLongitude(newGardenValues.getGardenLongitude());
+            targetGarden.setGardenLatitude(newGardenValues.getGardenLatitude());
             return gardenRepository.save(targetGarden);
 
         } else {
@@ -126,8 +135,9 @@ public class GardenService {
 
     /**
      * Adds plant entity to garden entity plant list
+     *
      * @param gardenId the id of the garden we wish to add plant to
-     * @param plant the new plant to be added to the garden
+     * @param plant    the new plant to be added to the garden
      * @throws IllegalArgumentException if invalid garden ID
      */
     public void addPlantToGarden(Long gardenId, Plant plant) {
@@ -141,4 +151,23 @@ public class GardenService {
             throw new IllegalArgumentException("Invalid garden ID");
         }
     }
+
+    /**
+     * Prepares searchValue for Like and IgnoreCase query.
+     * Finds all gardens whose name includes searchValue, or whose plantNames include the search value
+     *
+     * @param searchValue string input to match
+     * @return List of Garden Objects
+     */
+    public List<Garden> getMatchingGardens(String searchValue) {
+        searchValue = searchValue.toLowerCase();
+        searchValue = "%" + searchValue + "%";
+        return gardenRepository.findByGardenNameOrPlantNameContainingIgnoreCase(searchValue);
+    }
+
+    public List<Garden> getAllPublicGardens() {
+        return gardenRepository.findAllPublicGardens();
+    }
+
+
 }

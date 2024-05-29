@@ -86,6 +86,8 @@ public class GardenFormControllerTest {
                 "test",
                 10.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 userService.getUserByEmail("profile.user.test@ProfileController.com")
 
         );
@@ -132,14 +134,16 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "Hi")
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName","Hi")
+                            .param("gardenDescription", "Hi")
+                            .param("streetAddress","Hi")
+                            .param("suburb","Hi")
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -158,15 +162,17 @@ public class GardenFormControllerTest {
     void gardenFormController_postBasicGardenEdit_gardenEdited() throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
+                .param("gardenName","Hi")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "Hi")
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("streetAddress","Hi")
+                .param("suburb","Hi")
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -205,15 +211,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", input)
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "Hi")
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName",input)
+                            .param("gardenDescription", "Hi")
+                            .param("streetAddress","Hi")
+                            .param("suburb","Hi")
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -234,15 +242,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_gardenName(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", input)
+                .param("gardenName",input)
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "Hi")
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("streetAddress","Hi")
+                .param("suburb","Hi")
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -265,15 +276,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", input)
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "Hi")
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName",input)
+                            .param("gardenDescription", "Hi")
+                            .param("streetAddress","Hi")
+                            .param("suburb","Hi")
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -293,15 +306,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenName(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", input)
+                .param("gardenName",input)
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "Hi")
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("streetAddress","Hi")
+                .param("suburb","Hi")
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -331,15 +347,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", input)
-                    .param("streetAddress", "Hi")
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName", "Hi")
+                            .param("gardenDescription", "test")
+                            .param("streetAddress",input)
+                            .param("suburb","Hi")
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -360,15 +378,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_StreetAddress(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
-                .param("gardenDescription", input)
-                .param("streetAddress", "Hi")
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("gardenName","Hi")
+                .param("streetAddress",input)
+                .param("gardenDescription", "test")
+                .param("suburb","Hi")
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -397,15 +418,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "input")
-                    .param("gardenDescription", input)
-                    .param("streetAddress", "Hi")
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName","input")
+                            .param("streetAddress",input)
+                            .param("gardenDescription", "test")
+                            .param("suburb","Hi")
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -431,15 +454,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_streetAddress(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "input")
-                .param("gardenDescription", input)
-                .param("streetAddress", "Hi")
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("gardenName","input")
+                .param("streetAddress",input
+                .param("gardenDescription", "test")
+                .param("suburb","Hi")
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -469,15 +495,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", input)
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName", "Hi")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb",input)
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -498,15 +526,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_suburb(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
+                .param("gardenName","Hi")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", input)
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb",input)
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -529,15 +560,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "input")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", input)
-                    .param("suburb", "Hi")
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName","input")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb",input)
+                            .param("city","Hi")
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -557,15 +590,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_suburb(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "input")
+                .param("gardenName","input")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", input)
-                .param("suburb", "Hi")
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb",input)
+                .param("city","Hi")
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -594,15 +630,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", input)
-                    .param("city", "Hi")
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName", "Hi")
+                            .param("streetAddress","input")
+                            .param("suburb","input")
+                            .param("gardenDescription", "Hi")
+                            .param("city",input)
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -628,15 +666,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_city(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
+                .param("gardenName","Hi")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", input)
-                .param("city", "Hi")
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city",input)
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -659,15 +700,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "input")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", input)
-                    .param("country", "Hi")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName","input")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb","input")
+                            .param("city",input)
+                            .param("country","Hi")
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -686,15 +729,18 @@ public class GardenFormControllerTest {
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_city(String input) throws Exception {
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "input")
+                .param("gardenName","input")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", input)
-                .param("country", "Hi")
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city",input)
+                .param("country","Hi")
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -724,15 +770,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", "input")
-                    .param("country", input)
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName", "Hi")
+                            .param("streetAddress","input")
+                            .param("suburb","input")
+                            .param("gardenDescription", "Hi")
+                            .param("city","input")
+                            .param("country",input)
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -754,15 +802,18 @@ public class GardenFormControllerTest {
             throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
+                .param("gardenName","Hi")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", "input")
-                .param("country", input)
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city","input")
+                .param("country",input)
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -785,15 +836,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "input")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", "input")
-                    .param("country", input)
-
-                    .param("postcode", "123")
-                    .param("gardenSize", "123"))
+                            .param("gardenName","input")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb","input")
+                            .param("city","input")
+                            .param("country",input)
+                            .param("gardenLocation","My Home")
+                            .param("postcode","123")
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -813,15 +866,18 @@ public class GardenFormControllerTest {
     void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_country(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "input")
+                .param("gardenName","input")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", "input")
-                .param("country", input)
-                .param("postcode", "123")
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city","input")
+                .param("country",input)
+                .param("gardenLocation","My Home")
+                .param("postcode","123")
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
     // Note: there is no parameterization on location,
@@ -851,15 +907,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", "input")
-                    .param("country", "input")
-
-                    .param("postcode", input)
-                    .param("gardenSize", "123"))
+                            .param("gardenName", "Hi")
+                            .param("streetAddress","input")
+                            .param("suburb","input")
+                            .param("gardenDescription", "Hi")
+                            .param("city","input")
+                            .param("country","input")
+                            .param("gardenLocation","input")
+                            .param("postcode",input)
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -879,15 +937,18 @@ public class GardenFormControllerTest {
     public void gardenFormController_postGardenEdit_gardenEdited_parameterisedOn_postCode(String input)
             throws Exception {
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
+                .param("gardenName","Hi")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", "input")
-                .param("country", "input")
-                .param("postcode", input)
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city","input")
+                .param("country","input")
+                .param("gardenLocation","input")
+                .param("postcode",input)
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -911,15 +972,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "input")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", "input")
-                    .param("country", "input")
-
-                    .param("postcode", input)
-                    .param("gardenSize", "123"))
+                            .param("gardenName","input")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb","input")
+                            .param("city","input")
+                            .param("country","input")
+                            .param("gardenLocation","input")
+                            .param("postcode",input)
+                            .param("gardenSize","123")
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -940,15 +1003,18 @@ public class GardenFormControllerTest {
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_postCode(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "input")
+                .param("gardenName","input")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", "input")
-                .param("country", "input")
-                .param("postcode", input)
-                .param("gardenSize", "123")).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city","input")
+                .param("country","input")
+                .param("gardenLocation","input")
+                .param("postcode",input)
+                .param("gardenSize","123")
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
     //
@@ -976,15 +1042,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "Hi")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", "input")
-                    .param("country", "input")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", input))
+                            .param("gardenName", "Hi")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb","input")
+                            .param("city","input")
+                            .param("country","input")
+                            .param("gardenLocation","input")
+                            .param("postcode","123")
+                            .param("gardenSize",input)
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.times(1)).addGarden(Mockito.any());
 
@@ -1005,16 +1073,18 @@ public class GardenFormControllerTest {
             throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "Hi")
+                .param("gardenName","Hi")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", "input")
-                .param("country", "input")
-                .param("postcode", "123")
-                .param("gardenSize", input)
-        ).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city","input")
+                .param("country","input")
+                .param("gardenLocation","input")
+                .param("postcode","123")
+                .param("gardenSize",input)
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.times(1)).updateGarden(Mockito.anyLong(),Mockito.any());
 
     }
 
@@ -1041,15 +1111,17 @@ public class GardenFormControllerTest {
             when(gardenService.getGardens()).thenReturn(new ArrayList<Garden>());
 
             mockMvc.perform(post("/create-new-garden").with(csrf())
-                    .param("gardenName", "input")
-                    .param("gardenDescription", "Hi")
-                    .param("streetAddress", "input")
-                    .param("suburb", "input")
-                    .param("city", "input")
-                    .param("country", "input")
-
-                    .param("postcode", "123")
-                    .param("gardenSize", input))
+                            .param("gardenName","input")
+                            .param("streetAddress","input")
+                            .param("gardenDescription", "Hi")
+                            .param("suburb","input")
+                            .param("city","input")
+                            .param("country","input")
+                            .param("gardenLocation","input")
+                            .param("postcode","123")
+                            .param("gardenSize",input)
+                            .param("latitude","-43.5214643")
+                            .param("longitude", "172.5796159"))
                     .andDo(MockMvcResultHandlers.print());
             Mockito.verify(gardenService, Mockito.never()).addGarden(Mockito.any());
 
@@ -1073,15 +1145,18 @@ public class GardenFormControllerTest {
     public void gardenFormController_postGardenEdit_NotAdded_parameterisedOn_gardenSize(String input) throws Exception {
 
         mockMvc.perform(post("/my-gardens/123/edit").with(csrf())
-                .param("gardenName", "input")
+                .param("gardenName","input")
+                .param("streetAddress","input")
                 .param("gardenDescription", "Hi")
-                .param("streetAddress", "input")
-                .param("suburb", "input")
-                .param("city", "input")
-                .param("country", "input")
-                .param("postcode", "123")
-                .param("gardenSize", input)).andDo(MockMvcResultHandlers.print());
-        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(), Mockito.any());
+                .param("suburb","input")
+                .param("city","input")
+                .param("country","input")
+                .param("gardenLocation","input")
+                .param("postcode","123")
+                .param("gardenSize",input)
+                .param("latitude","-43.5214643")
+                .param("longitude", "172.5796159")).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(gardenService, Mockito.never()).updateGarden(Mockito.anyLong(),Mockito.any());
     }
 
 }

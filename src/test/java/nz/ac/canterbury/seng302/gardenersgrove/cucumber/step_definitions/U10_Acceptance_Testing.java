@@ -70,6 +70,9 @@ public class U10_Acceptance_Testing {
     String gardenCountry;
     String gardenSize;
 
+    String gardenLongitude = "";
+    String gardenLatitude = "";
+
     private Garden expectedGarden;
 
     private MvcResult editGardenResult;
@@ -107,7 +110,7 @@ public class U10_Acceptance_Testing {
     @Given("User {string} has a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, user);
+        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, "","", user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(),
                 userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
@@ -115,6 +118,8 @@ public class U10_Acceptance_Testing {
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
+        gardenLongitude = garden.getGardenLongitude();
+        gardenLatitude = garden.getGardenLatitude();
     }
 
     @When("I click the edit garden button")
@@ -180,7 +185,9 @@ public class U10_Acceptance_Testing {
                         .param("city", gardenCity)
                         .param("country", gardenCountry)
                         .param("postcode", "")
-                        .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
+                        .param("gardenSize", gardenSize)
+                        .param("latitude", gardenLatitude)
+                        .param("longitude", gardenLongitude)
 
         ).andReturn();
     }

@@ -1,17 +1,15 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation;
 
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
-
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 /**
  * Tests MultipartFiles on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes
  * and if not, why it failed
  */
 public class FileValidator {
-
 
     Logger logger = LoggerFactory.getLogger(FileValidator.class);
 

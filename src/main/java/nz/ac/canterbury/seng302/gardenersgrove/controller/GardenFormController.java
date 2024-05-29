@@ -100,16 +100,17 @@ public class GardenFormController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/create-new-garden")
-    public String newGardenForm(
-            @RequestParam(name = "gardenName", required = false) String gardenName,
-            @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
-            @RequestParam(name = "streetAddress", required = false) String streetAddress,
-            @RequestParam(name = "suburb", required = false) String suburb,
-            @RequestParam(name = "city", required = false) String city,
-            @RequestParam(name = "country", required = false) String country,
-            @RequestParam(name = "postcode", required = false) String postcode,
-            @RequestParam(name = "gardenSize", required = false) String gardenSize,
-            Model model) {
+    public String newGardenForm( @RequestParam(name="gardenName", required = false) String gardenName,
+                                 @RequestParam(name = "streetAddress", required = false) String streetAddress ,
+                                 @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
+                                 @RequestParam(name = "suburb", required = false) String suburb,
+                                 @RequestParam(name = "city", required = false) String city,
+                                 @RequestParam(name = "country", required = false) String country,
+                                 @RequestParam(name = "postcode", required = false )String postcode,
+                                 @RequestParam(name = "gardenSize", required = false) String gardenSize,
+                                 @RequestParam(name = "longitude", required = false) String longitude,
+                                 @RequestParam(name = "latitude", required = false) String latitude,
+                                 Model model) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
@@ -152,18 +153,19 @@ public class GardenFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/create-new-garden")
-    public String submitNewGardenForm(
-            @RequestParam(name = "gardenName") String gardenName,
-            @RequestParam(name = "gardenDescription") String gardenDescription,
-            @RequestParam(name = "streetAddress") String streetAddress,
-            @RequestParam(name = "suburb") String suburb,
-            @RequestParam(name = "city") String city,
-            @RequestParam(name = "country") String country,
-            @RequestParam(name = "postcode") String postcode,
-            @RequestParam(name = "gardenSize") String gardenSize,
-            HttpSession session,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+    public String submitNewGardenForm(@RequestParam(name="gardenName") String gardenName,
+                                      @RequestParam(name = "gardenDescription") String gardenDescription,
+                                      @RequestParam(name = "streetAddress") String streetAddress,
+                                      @RequestParam(name = "suburb") String suburb,
+                                      @RequestParam(name = "city") String city,
+                                      @RequestParam(name = "country") String country,
+                                      @RequestParam(name = "postcode") String postcode,
+                                      @RequestParam(name = "gardenSize") String gardenSize,
+                                      @RequestParam(name = "longitude") String longitude,
+                                      @RequestParam(name = "latitude") String latitude,
+                                      HttpSession session,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
 
         logger.info("POST /create-new-garden");
 
@@ -195,6 +197,8 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
@@ -213,9 +217,11 @@ public class GardenFormController {
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",", "."));
         }
         boolean isPublic = false;
+
+        logger.info("Latitude" + latitude);
         User owner = securityService.getCurrentUser();
-        Garden garden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
-                doubleGardenSize, isPublic, owner);
+
+        Garden garden = new Garden(gardenName, gardenDescription, streetAddress,suburb,city,postcode,country,doubleGardenSize,isPublic,latitude,longitude, owner);
 
         gardenService.addGarden(garden);
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
@@ -260,6 +266,8 @@ public class GardenFormController {
         model.addAttribute("postcode", garden.getGardenPostcode());
         model.addAttribute("country", garden.getGardenCountry());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("latitude", garden.getGardenLatitude());
+        model.addAttribute("longitude", garden.getGardenLongitude());
         double gardenSize = garden.getGardenSize();
         if (gardenSize == 0.0) {
             model.addAttribute("gardenSize", "");
@@ -294,18 +302,19 @@ public class GardenFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}/edit")
-    public String submitEditedGardenForm(
-            @RequestParam(name = "gardenName") String gardenName,
-            @RequestParam(name = "gardenDescription") String gardenDescription,
-            @RequestParam(name = "streetAddress") String streetAddress,
-            @RequestParam(name = "suburb") String suburb,
-            @RequestParam(name = "city") String city,
-            @RequestParam(name = "country") String country,
-            @RequestParam(name = "postcode") String postcode,
-            @RequestParam(name = "gardenSize") String gardenSize,
-            @PathVariable Long gardenId, HttpSession session,
-            HttpServletResponse response,
-            Model model) {
+    public String submitEditedGardenForm(@RequestParam(name="gardenName") String gardenName,
+                                         @RequestParam(name = "gardenDescription") String gardenDescription,
+                                         @RequestParam(name = "streetAddress") String streetAddress,
+                                       @RequestParam(name = "suburb") String suburb,
+                                       @RequestParam(name = "city") String city,
+                                       @RequestParam(name = "country") String country,
+                                       @RequestParam(name = "postcode") String postcode,
+                                       @RequestParam(name = "gardenSize") String gardenSize,
+                                         @RequestParam(name = "longitude") String longitude,
+                                         @RequestParam(name = "latitude") String latitude,
+                                       @PathVariable Long gardenId, HttpSession session,
+                                         HttpServletResponse response,
+                                         Model model) {
         logger.info("POST / edited garden");
 
 
@@ -351,26 +360,26 @@ public class GardenFormController {
         model.addAttribute("country", country);
         model.addAttribute("postcode", postcode);
         model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute("latitude", latitude);
+        model.addAttribute("longitude", longitude);
 
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid()
                 || !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
                 || !gardenDescriptionResult.valid()) {
             return "editGardenForm";
         }
-
-        double doubleGardenSize;
+        Double doubleGardenSize;
         if (gardenSize == null) {
             doubleGardenSize = 0.0;
         } else {
             doubleGardenSize = Double.parseDouble(gardenSize.replace(",", "."));
         }
 
-        Garden newGarden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
-                doubleGardenSize);
-        gardenService.updateGarden(gardenId, newGarden);
+        User owner = securityService.getCurrentUser();
+        boolean isPublic = false;
+        gardenService.updateGarden(gardenId, new Garden(gardenName,gardenDescription,streetAddress,suburb,city,postcode,country,doubleGardenSize,isPublic,latitude,longitude, owner));
         logger.info("Edited Garden Page");
 
-        User owner = securityService.getCurrentUser();
         session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 

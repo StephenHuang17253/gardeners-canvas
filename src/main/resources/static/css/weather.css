@@ -1,0 +1,94 @@
+.weather {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+}
+.weather-box {
+    flex:1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.weather-detail-icon {
+    position: relative;
+    display: block;
+    transition: background-color 0.3s;
+    height: 30px;
+    width: 30px;
+}
+
+.weather-icon {
+    position: relative;
+    display: block;
+    transition: background-color 0.3s;
+    height: 60px;
+    width: 60px;
+}
+
+.weather-date {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.weather-text {
+    align-items: center;
+}
+
+.weather-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.weather-detail-pair {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.attribution {
+    float: right;
+    margin-right: 20px;
+    font-size: smaller;
+}
+
+.watering {
+    position: relative;
+    border: 1px solid gray;
+    padding: 7px;
+    border-radius: 5px;
+    background-color: ghostwhite;
+    width: 30vw;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.watering .close {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+.error_chip {
+    display: inline-block;
+    padding: 15px;
+    height: auto;
+    max-width: 20vw;
+    word-wrap: break-word;
+    font-size: 14px;
+    background-color: lightpink;
+}
+
+.weather_error_text {
+    color: black;
+    font-family: Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+}

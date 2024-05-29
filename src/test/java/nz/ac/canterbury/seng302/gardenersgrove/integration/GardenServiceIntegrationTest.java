@@ -52,6 +52,8 @@ public class GardenServiceIntegrationTest {
                 "New Zealand",
                 10.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 user1);
         Garden garden2 = new Garden(
                 "John's Garden",
@@ -63,6 +65,8 @@ public class GardenServiceIntegrationTest {
                 "New Zealand",
                 10.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 user1);
         Garden garden3 = new Garden(
                 "Jane's Garden",
@@ -74,6 +78,8 @@ public class GardenServiceIntegrationTest {
                 "New Zealand",
                 20.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 user2);
         gardenList.add(garden1);
         gardenList.add(garden2);
@@ -164,6 +170,8 @@ public class GardenServiceIntegrationTest {
                 "United States of America",
                 20.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 userService.getUserById(3L));
         gardenService.addGarden(garden);
         Optional<Garden> optionalGarden = gardenService.getGardenById(4L);
@@ -191,6 +199,8 @@ public class GardenServiceIntegrationTest {
                 "United States of America",
                 20.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 user);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gardenService.addGarden(garden);
@@ -207,7 +217,10 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20);
+                20.0,
+                false,
+                "-43.5214643",
+                "172.5796159");
 
         gardenService.updateGarden(1L, gardenWithUpdatedValues);
         User user = userService.getUserById(1L);
@@ -220,6 +233,7 @@ public class GardenServiceIntegrationTest {
 
     @Test
     public void UpdateGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
+        User user = userService.getUserById(4L);
         Garden gardenWithUpdatedValues = new Garden(
                 "Jane's Garden",
                 "",
@@ -228,7 +242,11 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20.0);
+                20.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                user);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gardenService.updateGarden(4L, gardenWithUpdatedValues);
@@ -258,6 +276,7 @@ public class GardenServiceIntegrationTest {
 
     @Test
     public void AddPlantToGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
+        User user = userService.getUserById(4L);
         Garden garden = new Garden(
                 "Jane's Garden",
                 "",
@@ -266,7 +285,11 @@ public class GardenServiceIntegrationTest {
                 "Christchurch",
                 "8041",
                 "New Zealand",
-                20);
+                20.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                user);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 

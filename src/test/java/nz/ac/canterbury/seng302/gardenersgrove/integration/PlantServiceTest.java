@@ -65,6 +65,8 @@ public class PlantServiceTest {
                 "New Zealand",
                 15.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 owner);
         List<Plant> mockPlantsList = new ArrayList<>();
 
@@ -106,6 +108,8 @@ public class PlantServiceTest {
                 "New Zealand",
                 15.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 owner
                 );
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
@@ -146,6 +150,8 @@ public class PlantServiceTest {
                 "New Zealand",
                 15.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 
@@ -184,6 +190,8 @@ public class PlantServiceTest {
                 "New Zealand",
                 15.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden);
@@ -222,6 +230,8 @@ public class PlantServiceTest {
                 "New Zealand",
                 15.0,
                 false,
+                "-43.5214643",
+                "172.5796159",
                 owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
 

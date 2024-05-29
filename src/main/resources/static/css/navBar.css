@@ -17,9 +17,9 @@ nav
 }
 
 /*make navbar horizontal list*/
-#navbar ul
-{
-    display: inline;
+#navbar ul {
+    margin: 0;
+    display: flex;
     padding: 0;
 
 }
@@ -88,7 +88,7 @@ nav
 }
 
 #navbar #gardenDropDown {
-    position: absolute;
+
     display: inline;
     align-self: center;
 
@@ -96,14 +96,20 @@ nav
 }
 
 /* Dropdown contents */
+#dropdownContainer {
+    display: inline-block;
+    float: left;
+    overflow: hidden;
+}
+
 #navbar #gardenDropDown:hover ul {
     color: white;
-    position: absolute;
+
     display: block;
     padding: 0;
     margin-top: -2px;
     max-height: 400px;
-    overflow: auto;
+    /*overflow: auto;*/
     border: 1px solid #a4a0a0;
 }
 
@@ -119,7 +125,7 @@ nav
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 400px; /* Adjust the width as needed */
+    width: 311px; /* Adjust the width as needed */
     padding: 0;
     margin: 0;
     border-top: 1px solid #f1f1f1;
