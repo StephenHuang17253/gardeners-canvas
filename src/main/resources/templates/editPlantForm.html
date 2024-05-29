@@ -8,7 +8,6 @@
     <link th:href="@{/css/form.css}" rel="stylesheet">
     <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
     <script th:src="@{/js/imagePicker.js}"></script>
-    <script th:src="@{/js/editPlantForm.js}"></script>
 </head>
 <body>
 <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
@@ -81,5 +80,7 @@
     </div>
 </div>
 <script th:src="@{/js/preventEnterSubmit.js}"></script>
+<script th:src="@{/js/editPlantForm.js}"></script>
+<script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 </html>
