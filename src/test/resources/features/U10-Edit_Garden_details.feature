@@ -1,8 +1,8 @@
 Feature: U10 (Edit garden details): As Kaia, I want to edit information about my garden so I can keep it up to date
 
 Background:
-  Given I "Kaia" "Pene", 67 am a user with email "kaia@email.com" and password "TestPassword10!"
-  And I as user "kaia@email.com" have a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
+  Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
+  And User "kaia@email.com" has a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
   And I as user "kaia@email.com" am logged in with "TestPassword10!"
 
   Scenario: AC1 - “Edit” button takes you to prepopulated edit garden form
@@ -13,18 +13,20 @@ Background:
 
   Scenario Outline: AC2 can submit valid values
     Given I am on the garden edit form
-    And  I enter valid garden values for the <name>, <city>, <country> and <size>
+    And  I enter valid garden values for the <name>, <description>, <city>, <country> and <size>
     When I click the Submit button on the edit garden form
     Then The garden details have been updated
     And I am taken back to the garden details page
     Examples:
-      | name            | city            | country        | size       |
-      | "gard"          | "Townsville"    | "France"       | "7"        |
-      | "ward"          | "Läkeside"      | "Switzerland"  | "15"       |
-      | "Everywhere"    | "Rivèrdale"     | "Italy"        | "7.9"      |
-      | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
-      | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
-      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
+      | name            | description     | city            | country        | size       |
+      | "gard"          | "Info"          | "Townsville"    | "France"       | "7"        |
+      | "ward"          | "Lä Info"       | "Läkeside"      | "Switzerland"  | "15"       |
+      | "Everywhere"    | "Rivèndel"      | "Rivèrdale"     | "Italy"        | "7.9"      |
+      | "ward"          | "Hí there"      | "Hílltop"       | "Spain"        | "7.9"      |
+      | "ward-connect"  | "Súnny Sun"     | "Súnset City"   | "Brazil"       | "7.9"      |
+      | "ward-cÁÕăect"  | "Ocëlot  "      | "Ocëanview"     | "Portugal"     | "0.1"      |
+      | "ward-connect"  | "Súnset City"   | "Súnset City"   | "Brazil"       | "0.01"     |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Ocëanview"     | "Portugal"     | "8000000"  |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
     Given I am on the garden edit form
@@ -56,6 +58,9 @@ Background:
       | "six"             |
       | "12,4.3"          |
       | "Null"            |
+      | "0.009"           |
+      | "8000000.01"      |
+      | "0.00"            |
 
 
   Scenario Outline: AC5 - cannot submit invalid location

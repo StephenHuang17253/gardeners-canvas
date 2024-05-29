@@ -29,7 +29,6 @@ public class FileService {
     /**
      * Constructor for FileService which initialises the rootLocation directory
      */
-    @Autowired
     public FileService() {
         String uploadDir = "./uploads";
         this.rootLocation = Paths.get(uploadDir);

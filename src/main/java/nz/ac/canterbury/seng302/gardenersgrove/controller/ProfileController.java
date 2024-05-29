@@ -32,9 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Controller for the profile and edit profile pages, handles viewing and
@@ -182,8 +180,7 @@ public class ProfileController {
         String userName = user.getFirstName() + " " + user.getLastName();
 
         String filename = user.getProfilePictureFilename();
-        String profilePicture = getProfilePictureString(filename);
-        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("profilePicture", filename);
         model.addAttribute("userName", userName);
 
         String formattedDateOfBirth = "";
@@ -194,6 +191,8 @@ public class ProfileController {
         }
         model.addAttribute("dateOfBirth", formattedDateOfBirth);
         model.addAttribute("emailAddress", user.getEmailAddress());
+
+        logger.info(filename);
 
         return "profilePage";
     }
@@ -216,6 +215,9 @@ public class ProfileController {
         String email = authentication.getName();
         User user = userService.getUserByEmail(email);
 
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
@@ -228,8 +230,7 @@ public class ProfileController {
             model.addAttribute("dateOfBirth", user.getDateOfBirth());
             model.addAttribute("emailAddress", user.getEmailAddress());
             String filename = user.getProfilePictureFilename();
-            String currentProfilePicture = getProfilePictureString(filename);
-            model.addAttribute("profilePicture", currentProfilePicture);
+            model.addAttribute("profilePicture", filename);
             return "profilePage";
         }
 
@@ -263,8 +264,7 @@ public class ProfileController {
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
-        String profilePicture = getProfilePictureString(filename);
-        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("profilePicture", filename);
 
         return "editProfileForm";
     }
@@ -359,8 +359,7 @@ public class ProfileController {
             model.addAttribute("dateOfBirth", dateOfBirth);
             model.addAttribute("noLastName", noLastName);
             String filename = currentUser.getProfilePictureFilename();
-            String profilePictureString = getProfilePictureString(filename);
-            model.addAttribute("profilePicture", profilePictureString);
+            model.addAttribute("profilePicture", filename);
             return "editProfileForm";
         }
 
@@ -426,6 +425,14 @@ public class ProfileController {
         model.addAttribute("loggedIn", loggedIn);
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
+        String firstName = currentUser.getFirstName();
+        String lastName = currentUser.getLastName();
+        boolean noLastName = false;
+        if (lastName == null) {
+            noLastName = true;
+        }
+        LocalDate dateOfBirth = currentUser.getDateOfBirth();
+
 
         boolean valid = true;
 
@@ -440,7 +447,16 @@ public class ProfileController {
             valid = false;
         }
 
-        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword);
+        List<String> otherFields = new ArrayList<>();
+        otherFields.add(firstName);
+        if (noLastName == false) {
+            otherFields.add(lastName);
+        }
+        if (!(dateOfBirth == null)) {
+            otherFields.add(dateOfBirth.toString());
+        }
+        otherFields.add(currentEmail);
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, otherFields);;
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);

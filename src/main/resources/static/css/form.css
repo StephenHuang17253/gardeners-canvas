@@ -1,16 +1,15 @@
 .submit-button
 {
     padding: 10px 20px;
+    cursor: pointer;
     border: none;
     border-radius: 20px;
     background-color: #4CAF50;
     color: white;
     font-size: 16px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Verdana", sans-serif;
     display: inline-block;
-    margin-top: -4px;
 
 }
 
@@ -25,16 +24,23 @@
 .cancel-button
 {
     padding: 10px 20px;
+    cursor: pointer;
     border: none;
     border-radius: 20px;
     background-color: #eeeeee;
     color: black;
     font-size: 16px;
-    cursor: pointer;
     transition: background-color 0.3s ease;
     font-family: "Verdana", sans-serif;
     display: inline-block;
-    margin-top: -4px;
+}
+
+.button-group {
+    display: flex;
+    width: full;
+    justify-content: space-around;
+    align-items: center;
+    gap: 50px;
 }
 
 .form-description textarea
@@ -44,12 +50,13 @@
     resize: none; /* Disable resizing */
     overflow: auto; /* Enable scrollbars when content exceeds the size */
     border: 1px solid #ccc; /* Add a border for visual appeal */
-    padding: 9px 15px;; /* Add some padding for better readability */
+    padding: 9px 15px; /* Add some padding for better readability */
     border-radius: 4px;
+    box-sizing: border-box;
     font-family: "Roboto", sans-serif;
 }
 
-input[type=text] {
+input[type=text], input[type=number] {
     width: 25vw;
     padding: 9px 15px;
     margin: 8px 0;
@@ -67,6 +74,14 @@ input[type=text] {
     font-family: "Roboto", sans-serif;
 }
 
+.main-container form {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 30vw;
+}
+
 h1 {
     text-align: center;
     padding-bottom: 1.5vh;
@@ -78,7 +93,6 @@ label {
 
 /* For location autocomplete */
 #autocompleteSuggestions {
-    position: absolute;
     z-index: 9999;
     width: 25vw; /* Adjust the width as needed */
     background-color: #fff;

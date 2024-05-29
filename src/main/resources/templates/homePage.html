@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
+<div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
     <div class="container">
         <h2>Gardener's Grove</h2>
 
@@ -18,7 +18,7 @@
 
         <div th:if="${loggedIn}" class="profile_info">
             <div class="profile_picture_container small_pic">
-                <img id="profilePicture" th:src="@{${profilePicture}}" alt="User's profile picture">
+                <img id="profilePicture" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}" alt="User's profile picture">
             </div>
 
             <p th:text="${username}"></p>

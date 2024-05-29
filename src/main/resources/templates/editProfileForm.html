@@ -17,7 +17,7 @@
         <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data">
 
             <div class="profile_picture_container">
-                <img id="imageToChange" th:src="@{${profilePicture}}" alt="User's profile picture">
+                <img id="imageToChange" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}" alt="User's profile picture">
                 <label for="profilePictureInput">+</label>
                 <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
                     onChange="handleFileSelect(event)">
@@ -42,7 +42,7 @@
 
             <label for="dateOfBirth">Date of Birth (Optional)</label>
             <input type="date" class="form-control"  id="dateOfBirth" placeholder=""
-                   th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth"
+                   th:name="dateOfBirth" th:value="*{dateOfBirth}" data-cy="dateOfBirth" max="9999-12-30" min="0000-01-01"
                    autofocus >
             <span th:if="${dateOfBirthError}" class="error-message" th:text="${dateOfBirthError}"></span>
 
@@ -55,11 +55,16 @@
                 <button type="submit" formnovalidate>Submit</button>
                 <a th:href="@{/profile}"><button type="button">Cancel</button></a>
             </div>
+            <div class="buttons">
+                <a th:href="@{/profile/editPassword}"><button type="button"> Change Password</button></a>
+            </div>
         </form>
+
     </div>
 <script th:src="@{/js/preventEnterSubmit.js}"></script>
 <script th:src="@{/js/editProfileForm.js}"></script>
 <script th:src="@{/js/imagePicker.js}"></script>
+<script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 
 </html>

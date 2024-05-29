@@ -6,15 +6,18 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation;
  */
 public enum ValidationResult {
     OK("valid"),
+    INVALID("invalid"),
     BLANK("cannot be empty"),
     NOT_PARSABLE("cannot be parsed to a number"),
     NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
     INVALID_POSTCODE("must only contain numbers, letters, and spaces"),
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
     INVALID_EMAIL("Email must be in the form 'jane@doe.nz'"),
+    EMAIL_TO_LONG("Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters"),
     INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
     AGE_BELOW_13("You must be 13 years or older to create an account"),
     AGE_ABOVE_120("The maximum age allowed is 120 years"),
+    PLANT_AGE_ABOVE_120("The maximum age for a plants date is 120 years"),
     INVALID_DATE_FORMAT("Date in not in valid format, DD/MM/YYYY"),
     NON_UNIQUE_EMAIL("Email is already in use"),
     NON_NUMERIC_COMMA("must be a positive number"),
@@ -23,7 +26,10 @@ public enum ValidationResult {
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
     INVALID_FILE_SIZE("Image must be less than 10MB"),
     AREA_TOO_SMALL("Area (meters squared) is too small"),
-    AREA_TOO_LARGE("Area (meters squared) is too large");
+    AREA_TOO_LARGE("Area (meters squared) is too large"),
+    DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
+    INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text"),
+    INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
 
     private String message;
 

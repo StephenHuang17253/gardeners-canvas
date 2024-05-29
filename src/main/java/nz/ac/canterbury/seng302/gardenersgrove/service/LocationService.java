@@ -35,15 +35,17 @@ public class LocationService {
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&key=" + locationIqAccessToken))
+                .uri(URI.create("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&tag=place:house"
+                        + ",building:*"
+                        + "&normalizecity=1" + "&key=" + locationIqAccessToken
+
+                ))
                 .header("accept", "application/json")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        //System.out.println("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&key=" + locationIqAccessToken);
-        logger.info("API request with query = '" + query + "'");
+        logger.info("Location API request, query = '" + query + "'");
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        // System.out.println(response.body());
         return response.body();
     }
 }

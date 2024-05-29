@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.net.MalformedURLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
@@ -42,35 +43,38 @@ public class PlantFormController {
     private final SecurityService securityService;
 
     @Autowired
-    public PlantFormController(PlantService plantService, GardenService gardenService, FileService fileService, SecurityService securityService) {
+    public PlantFormController(PlantService plantService, GardenService gardenService, FileService fileService,
+            SecurityService securityService) {
         this.plantService = plantService;
         this.gardenService = gardenService;
         this.fileService = fileService;
         this.securityService = securityService;
     }
+
     /**
      * Maps the createNewPlantForm html page to /create-new-plant url
+     * 
      * @return thymeleaf createNewPlantForm
      */
     @GetMapping("/my-gardens/{gardenId}/create-new-plant")
     public String newPlantForm(@PathVariable Long gardenId,
-                               @RequestParam(name = "plantName", required = false) String plantName,
-                               @RequestParam(name = "plantCount", required = false) Float plantCount,
-                               @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                               @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                               Model model) {
+            @RequestParam(name = "plantName", required = false) String plantName,
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            Model model) {
+        logger.info("GET /create-new-plant");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
-
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
             return "404";
         }
         Garden garden = optionalGarden.get();
-        if(!securityService.isOwner(garden.getOwner().getId())){
+        if (!securityService.isOwner(garden.getOwner().getId())) {
             return "403";
         }
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
@@ -85,45 +89,52 @@ public class PlantFormController {
         String plantPictureString = getPlantPictureString("");
         model.addAttribute("plantPicture", plantPictureString);
 
-        logger.info("GET /create-new-plant");
         return "createNewPlantForm"; // Return the view for creating a new plant
     }
 
     /**
      * Logic to handle the confirm new plant form button
-     * also validates inputs into form and informs the user if their input is invalid
+     * also validates inputs into form and informs the user if their input is
+     * invalid
+     * 
      * @param plantName        user entered plant name
      * @param plantCount       user entered plant count
      * @param plantDescription user entered plant description
      * @param plantDate        user entered date plant is planted
-     * @param model            (map-like) representation of plantName, plantCount, plantDescription and plantDate for use in thymeleaf,
+     * @param model            (map-like) representation of plantName, plantCount,
+     *                         plantDescription and plantDate for use in thymeleaf,
      *                         with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}/create-new-plant")
     public String submitNewPlantForm(@RequestParam(name = "plantName") String plantName,
-                                     @RequestParam(name = "plantCount", required = false) String plantCount,
-                                     @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                                     @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
-                                     @PathVariable("gardenId") Long gardenId,
-                                     Model model) {
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+            @PathVariable("gardenId") Long gardenId,
+            Model model) {
         logger.info("POST /create-new-plant");
-
-
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
+        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDateResult;
+        if (plantDate == null) {
+            plantDateResult = ValidationResult.OK;
+        } else {
+            String dateString = plantDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            plantDateResult = InputValidator.validatePlantDate(dateString);
+        }
 
         // Plant image is optional
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
         }
 
-        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
@@ -138,36 +149,32 @@ public class PlantFormController {
         String plantPictureString = getPlantPictureString("");
         model.addAttribute("plantPicture", plantPictureString);
 
-        logger.info("Validating form inputs");
-        if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
-            logger.info("Validation checks failed.");
+        if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "createNewPlantForm";
         }
-        if(plantCount.isBlank()) {plantCount = "1.0";}
-        float floatPlantCount = Float.parseFloat(plantCount.replace(",", "."));
-        logger.info("Creating new Plant");
-        Plant newPlant = plantService.addPlant(plantName, floatPlantCount, plantDescription, plantDate, gardenId);
+
+        int integerPlantCount = Integer.parseInt(plantCount);
+        Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
-            logger.info("Setting plant image");
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
 
-        logger.info("Created new Plant");
         return "redirect:/my-gardens/{gardenId}";
     }
-
-
 
     /**
      * Maps the editPlantForm html page to /create-new-plant url
      * Pre populates the values with the plants record from the database,
      * sends user to 404 page if plant is not found
+     * 
      * @return thymeleaf createNewPlantForm
      */
     @GetMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
-                                @PathVariable("plantId") Long plantId,
-                               Model model) {
+            @PathVariable("plantId") Long plantId,
+            Model model) {
+        logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -178,61 +185,68 @@ public class PlantFormController {
             return "404";
         }
         Garden garden = optionalGarden.get();
-        if(!securityService.isOwner(garden.getOwner().getId())){
+        if (!securityService.isOwner(garden.getOwner().getId())) {
             return "403";
         }
-        Optional<Plant> plantToUpdate =  plantService.findById(plantId);
-        if(plantToUpdate.isEmpty())
-        {
+        Optional<Plant> plantToUpdate = plantService.findById(plantId);
+        if (plantToUpdate.isEmpty()) {
             return "404";
         }
 
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
-        String plantPicture = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+        String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
-        logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
         return "editPlantForm"; // Return the view for creating a new plant
     }
 
     /**
-     * Logic to handle the confirmation of the edit  plant form button
-     * also validates inputs into form and informs the user if their input is invalid
+     * Logic to handle the confirmation of the edit plant form button
+     * also validates inputs into form and informs the user if their input is
+     * invalid
      *
      * @param plantName        user entered plant name
      * @param plantCount       user entered plant count
      * @param plantDescription user entered plant description
      * @param plantDate        user entered date plant is planted
-     * @param model            (map-like) representation of plantName, plantCount, plantDescription and plantDate for use in thymeleaf,
+     * @param model            (map-like) representation of plantName, plantCount,
+     *                         plantDescription and plantDate for use in thymeleaf,
      *                         with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String submiteditPlantForm(@RequestParam(name = "plantName") String plantName,
-                                     @RequestParam(name = "plantCount", required = false) String plantCount,
-                                     @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                                     @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                     @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
-                                     @PathVariable("gardenId") Long gardenId,
-                                      @PathVariable("plantId") Long plantId,
-                                     Model model) {
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
+            @PathVariable("gardenId") Long gardenId,
+            @PathVariable("plantId") Long plantId,
+            Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
-        Optional<Plant> plantToUpdate =  plantService.findById(plantId);
-        if(plantToUpdate.isEmpty())
-        {
+        Optional<Plant> plantToUpdate = plantService.findById(plantId);
+        if (plantToUpdate.isEmpty()) {
             return "404";
         }
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantCountResult = InputValidator.validateGardenAreaInput(plantCount);
+        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDateResult;
+        if (plantDate == null) {
+            plantDateResult = ValidationResult.OK;
+        } else {
+            String dateString = plantDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            plantDateResult = InputValidator.validatePlantDate(dateString);
+        }
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -242,46 +256,41 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
 
-        String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
+        String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPictureString);
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
 
-        logger.info("Validating form inputs");
-        if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid() || !plantDescriptionResult.valid()){
-            logger.info("Validation checks failed");
+        if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-
-        if(plantCount.isBlank()) {plantCount = "1.0";}
-        float floatPlantCount = Float.parseFloat(plantCount.replace(",", "."));
-        logger.info("Updating plant");
-        plantService.updatePlant(plantId, plantName, floatPlantCount, plantDescription, plantDate);
+        int integerPlantCount = Integer.parseInt(plantCount);
+        plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
-            logger.info("Updating plant picture");
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
-        logger.info("Plant updated successfully");
         return "redirect:/my-gardens/{gardenId}";
     }
 
-
-
-
     /**
-     * Takes as an input the result of validating the plant name, count, description and date,
+     * Takes as an input the result of validating the plant name, count, description
+     * and date,
      * and prints the appropriate messages.
-     * @param plantNameResult result of validating name (OK or appropriate error)
-     * @param plantCountResult result of validating count (OK or appropriate error)
-     * @param plantDescriptionResult result of validating description (OK or appropriate error)
+     * 
+     * @param plantNameResult        result of validating name (OK or appropriate
+     *                               error)
+     * @param plantCountResult       result of validating count (OK or appropriate
+     *                               error)
+     * @param plantDescriptionResult result of validating description (OK or
+     *                               appropriate error)
      */
-    private void plantFormErrorText (Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
-            ValidationResult plantCountResult, ValidationResult plantDescriptionResult){
-
+    private void plantFormErrorText(Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
+            ValidationResult plantCountResult, ValidationResult plantDescriptionResult, ValidationResult plantDateResult) {
 
         if (!plantPictureResult.valid()) {
             model.addAttribute("plantPictureError", plantPictureResult);
@@ -292,21 +301,19 @@ public class PlantFormController {
             if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
                 plantNameResult.updateMessage("cannot be greater than 64 characters in length");
             } else {
-                plantNameResult.updateMessage("cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
+                plantNameResult.updateMessage(
+                        "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
             model.addAttribute("PNErrorClass", "errorBorder");
-            logger.info("Plant Name failed validation");
         } else {
             model.addAttribute("PNErrorClass", "noErrorBorder");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
-            model.addAttribute("PCErrorText", "Plant count " + plantCountResult);
+            model.addAttribute("PCErrorText", plantCountResult);
             model.addAttribute("PCErrorClass", "errorBorder");
-            logger.info("Plant Count failed validation");
-
 
         } else {
             model.addAttribute("PCErrorClass", "noErrorBorder");
@@ -314,12 +321,21 @@ public class PlantFormController {
 
         // notifies the user that the plant Description is invalid (if applicable)
         if (!plantDescriptionResult.valid()) {
+            if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
+                plantNameResult.updateMessage("cannot be greater than 512 characters in length");
+            }
             model.addAttribute("PDErrorText", "Plant description " + plantDescriptionResult);
             model.addAttribute("PDErrorClass", "errorBorder");
-            logger.info("Plant Description failed validation");
 
         } else {
             model.addAttribute("PDErrorClass", "noErrorBorder");
+        }
+
+        if (!plantDateResult.valid()) {
+            model.addAttribute("PAErrorText", plantDateResult);
+            model.addAttribute("PAErrorClass", "errorBorder");
+        } else {
+            model.addAttribute("PAErrorClass", "noErrorBorder");
         }
 
     }
@@ -366,7 +382,5 @@ public class PlantFormController {
         return null;
 
     }
-
-
 
 }

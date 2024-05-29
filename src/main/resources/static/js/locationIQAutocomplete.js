@@ -3,7 +3,14 @@ let addressInput = ''; // Store the current address entered by the user
 // Function to make a LocationIQ API request
 const fetchLocationIQData = async(query) => {
     try {
-        const response = await fetch(`/api/location/suggestions?query=${query}`);
+        const path = window.location.pathname
+        let instance = "";
+        if (path.includes('/test/')) {
+            instance = 'test/';
+        } else if (path.includes('/prod/')) {
+            instance = 'prod/';
+        }
+        const response = await fetch(`/${instance}api/location/suggestions?query=${query}`);
         const data = await response.json();
 
         if (data === 429) {
@@ -12,7 +19,6 @@ const fetchLocationIQData = async(query) => {
         } else {
             hideRateLimitMessage();
         }
-        console.log(data);
         return data
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
@@ -160,6 +166,9 @@ function fillAddressFields(data) {
     document.getElementById('city').value = data.address.city || "";
     document.getElementById('postcode').value = data.address.postcode || "";
     document.getElementById('country').value = data.address.country || "";
+    document.getElementById('longitude').value = data.lon || "";
+    document.getElementById("latitude").value = data.lat || "";
+
     // updateGardenLocation();
 }
 

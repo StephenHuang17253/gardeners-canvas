@@ -1,17 +1,19 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,17 +26,20 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 public class U10_Acceptance_Testing {
 
     public static MockMvc MOCK_MVC;
+
+    private ProfanityService profanityService;
+
+    private InputValidator inputValidator;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -60,9 +65,13 @@ public class U10_Acceptance_Testing {
     public static UserService userService;
 
     String gardenName;
+    String gardenDescription;
     String gardenCity;
     String gardenCountry;
     String gardenSize;
+
+    String gardenLongitude = "";
+    String gardenLatitude = "";
 
     private Garden expectedGarden;
 
@@ -70,16 +79,22 @@ public class U10_Acceptance_Testing {
 
     @Before
     public void before_or_after_all() {
+        profanityService = Mockito.mock(ProfanityService.class);
+        inputValidator = new InputValidator(userService, profanityService);
+
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
-        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService, securityService);
+        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
+                securityService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
     }
 
-    @Given("I {string} {string}, {int} am a user with email {string} and password {string}")
+    @Given("{string} {string}, {int} is a user with email {string} and password {string}")
     public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail, String userPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
@@ -92,16 +107,19 @@ public class U10_Acceptance_Testing {
         Assertions.assertNotNull(userService.getUserByEmail(userEmail));
     }
 
-    @Given("I as user {string} have a garden {string} located in {string}, {string}")
+    @Given("User {string} has a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, Float.NaN, user);
+        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, "","", user);
         gardenService.addGarden(garden);
-        Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
+        Assertions.assertEquals(garden.getGardenId(),
+                userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
+        gardenLongitude = garden.getGardenLongitude();
+        gardenLatitude = garden.getGardenLatitude();
     }
 
     @When("I click the edit garden button")
@@ -118,9 +136,9 @@ public class U10_Acceptance_Testing {
     public void iSeeTheEditGardenFormWhereAllTheDetailsArePrepopulated() {
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"),expectedGarden.getGardenName());
-        Assertions.assertEquals(modelMap.getAttribute("city"),expectedGarden.getGardenCity());
-        Assertions.assertEquals(modelMap.getAttribute("country"),expectedGarden.getGardenCountry());
+        Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
+        Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
+        Assertions.assertEquals(modelMap.getAttribute("country"), expectedGarden.getGardenCountry());
     }
 
     @Given("I am on the garden edit form")
@@ -133,21 +151,25 @@ public class U10_Acceptance_Testing {
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"),expectedGarden.getGardenName());
-        Assertions.assertEquals(modelMap.getAttribute("city"),expectedGarden.getGardenCity());
-        Assertions.assertEquals(modelMap.getAttribute("country"),expectedGarden.getGardenCountry());
+        Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
+        Assertions.assertEquals(modelMap.getAttribute("gardenDescription"), expectedGarden.getGardenDescription());
+        Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
+        Assertions.assertEquals(modelMap.getAttribute("country"), expectedGarden.getGardenCountry());
         gardenName = expectedGarden.getGardenName();
+        gardenDescription = expectedGarden.getGardenDescription();
         gardenCity = expectedGarden.getGardenCity();
         gardenCountry = expectedGarden.getGardenCountry();
         gardenSize = String.valueOf(expectedGarden.getGardenSize());
     }
 
-    @Given("I enter valid garden values for the {string}, {string}, {string} and {string}")
-    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String city, String country, String size) {
+    @Given("I enter valid garden values for the {string}, {string}, {string}, {string} and {string}")
+    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String description, String city, String country,
+                                                                   String size) {
         gardenName = name;
         gardenCity = city;
         gardenCountry = country;
         gardenSize = size;
+        gardenDescription = description;
     }
 
     @When("I click the Submit button on the edit garden form")
@@ -157,15 +179,19 @@ public class U10_Acceptance_Testing {
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
+                        .param("gardenDescription", gardenDescription)
                         .param("streetAddress", "")
                         .param("suburb", "")
                         .param("city", gardenCity)
                         .param("country", gardenCountry)
                         .param("postcode", "")
-                        .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
+                        .param("gardenSize", gardenSize)
+                        .param("latitude", gardenLatitude)
+                        .param("longitude", gardenLongitude)
 
         ).andReturn();
     }
+
     @Then("The garden details have been updated")
     public void the_garden_details_have_been_updated() {
         Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
@@ -175,21 +201,24 @@ public class U10_Acceptance_Testing {
         }
         Garden updatedGarden = optionalUpdatedGarden.get();
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
+        Assertions.assertEquals(gardenDescription, updatedGarden.getGardenDescription());
         Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
-        Assertions.assertEquals(Float.parseFloat(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
+        Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
     }
 
     @Then("I am taken back to the garden details page")
-    public void i_am_taken_back_to_the_garden_details_page(){
+    public void i_am_taken_back_to_the_garden_details_page() {
         String redirectedUrl = editGardenResult.getResponse().getRedirectedUrl();
         Assertions.assertEquals(String.format("/my-gardens/%d", expectedGarden.getGardenId()), redirectedUrl);
 
     }
+
     @When("I enter an invalid garden name value {string}")
     public void i_enter_an_invalid_garden_name_value(String string) {
         gardenName = string;
     }
+
     @Then("The garden details are not updated")
     public void the_garden_details_are_not_updated() {
         Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
@@ -203,23 +232,21 @@ public class U10_Acceptance_Testing {
         Assertions.assertEquals(expectedGarden.getGardenCountry(), updatedGarden.getGardenCountry());
         Assertions.assertEquals(expectedGarden.getGardenSize(), updatedGarden.getGardenSize());
     }
+
     @Given("I enter invalid garden location values {string}, {string}")
     public void i_enter_invalid_garden_location_values(String city, String country) {
         gardenCity = city;
         gardenCountry = country;
     }
+
     @When("I enter an invalid garden size value {string}")
     public void i_enter_an_invalid_garden_size_value_for_the(String string) {
         gardenSize = string;
     }
 
-    @When("I enter {float} as a size")
-    public void i_enter_a_size_using_a_comma(float size) {
+    @When("I enter {double} as a size")
+    public void i_enter_a_size_using_a_comma(double size) {
         gardenSize = String.valueOf(size);
     }
 
 }
-
-
-
-

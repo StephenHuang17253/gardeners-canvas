@@ -1,11 +1,10 @@
-<div th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture)">
+<div th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner)">
     <div class="plantbox" id="plantbox">
         <div class="plant-info">
             <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
-
             <form th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data">
             <div class="plant_picture_container small_pic">
-                <img id="imageToChange" th:src="${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}"
+                <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
                      alt="Plant Image" class="plant-image">
                 <label for="plantPictureInput">+</label>
                 <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden"/>
@@ -25,7 +24,7 @@
     </div>
 
     <div class="edit-button-container">
-        <a th:href="@{__${gardenId}__/__${plantId}__/edit}">
+        <a th:if="${isOwner}"  th:href="@{__${gardenId}__/__${plantId}__/edit}">
             <button class="rounded-button">Edit Plant</button>
         </a>
     </div>
