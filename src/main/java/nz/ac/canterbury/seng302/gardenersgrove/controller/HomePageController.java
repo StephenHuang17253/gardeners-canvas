@@ -117,12 +117,11 @@ public class HomePageController {
             userService.verifyUser(johnDoe);
             onStart = true;
 
-            ArrayList<Plant> samplePlants = new ArrayList<>();
 
-            for (int i = 1; i < 60; i++) {
+            for (int i = 1; i < 12; i ++) {
                 Garden sampleGarden = new Garden(
                         "John's Garden " + i,
-                        "",
+                        "Some Description here",
                         "114 Ilam Road",
                         "Ilam",
                         "Christchurch",
@@ -133,30 +132,29 @@ public class HomePageController {
                         "-43.5214643",
                         "172.5796159",
                         johnDoe);
-                Garden sampleGarden2 = new Garden(
-                        "John's Private Garden " + i,
-                        "Some description",
-                        "114 Ilam Road",
-                        "Ilam",
-                        "Christchurch",
-                        "8041",
-                        "New Zealand",
-                        15.0,
-                        false,
-                        "-43.5214643",
-                        "172.5796159",
-                        johnDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
-                sampleGarden2 = gardenService.addGarden(sampleGarden2);
-
 
                 for(int k = 0; k < 12; k++)
                 {
                     plantService.addPlant("Test Plant #" + k,2,
                             "test", LocalDate.now(),sampleGarden.getGardenId());
                 }
-
             }
+
+            Garden sampleGarden2 = new Garden(
+                    "John's Private garden ",
+                    "Some Description here",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    false,
+                    "-43.5214643",
+                    "172.5796159",
+                    johnDoe);
+            sampleGarden2 = gardenService.addGarden(sampleGarden2);
 
             if (!userService.emailInUse("janedoe@email.com")) {
 
@@ -172,18 +170,18 @@ public class HomePageController {
 
                 for (int i = 0; i < 1; i++) {
                     Garden sampleGarden = new Garden(
-                            "John's Garden " + i,
-                            "Description",
+                            "Jane's Garden " + i,
+                            "Some Description here",
                             "114 Ilam Road",
                             "Ilam",
                             "Christchurch",
                             "8041",
                             "New Zealand",
                             15.0,
-                            false,
+                            true,
                             "-43.5214643",
                             "172.5796159",
-                            johnDoe);
+                            janeDoe);
                     sampleGarden = gardenService.addGarden(sampleGarden);
 
                     for(int k = 0; k < 1; k++)
