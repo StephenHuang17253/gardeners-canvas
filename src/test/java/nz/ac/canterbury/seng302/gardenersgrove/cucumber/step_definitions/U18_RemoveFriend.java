@@ -31,9 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class U18_SendFriendRequest {
+public class U18_RemoveFriend {
 
-    Logger logger = LoggerFactory.getLogger(U18_SendFriendRequest.class);
+    Logger logger = LoggerFactory.getLogger(U18_RemoveFriend.class);
 
     public static MockMvc MOCK_MVC;
 
@@ -94,9 +94,8 @@ public class U18_SendFriendRequest {
 
         mvcResult = MOCK_MVC.perform(
                         MockMvcRequestBuilders
-                                .post("/manage-friends")
-                                .param("pendingFriendId", String.valueOf(user.getId()))
-                                .param("acceptedFriend", "false")
+                                .post("/manage-friends/remove")
+                                .param("friendId", String.valueOf(user.getId()))
                                 .param("activeTab", "pending"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
@@ -125,29 +124,37 @@ public class U18_SendFriendRequest {
         Assertions.assertNotEquals(userName, requestFriendModel.getFriendName());
     }
     // AC2
-    @When("I hit the {string} button for user {string}")
-    public void i_hit_the_button_for_user(String string, String string2) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    @When("I hit the 'Remove Friend' button for user {string}")
+    public void i_hit_remove_friend_button_for_user(String email) throws Exception {
+
+        User user = userService.getUserByEmail(email);
+
+        mvcResult = MOCK_MVC.perform(
+                        MockMvcRequestBuilders
+                                .post("/manage-friends/remove")
+                                .param("friendId", String.valueOf(user.getId()))
+                                  .param("activeTab", "pending"))
+                .andExpect(status().is3xxRedirection()).andReturn();
     }
     // AC2
     @Then("That friend {string} is removed from my friends list")
-    public void that_friend_is_removed_from_my_friends_list(String string) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    public void that_friend_is_removed_from_my_friends_list(String email) throws Exception {
+
+        User user = userService.getUserByEmail(email);
+
+        String friendProfilePicture = user.getProfilePictureFilename();
+        String userName = user.getFirstName() + ' ' + user.getLastName();
+
+        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+                .andExpect(status().isOk()).andReturn();
+
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        Assertions.assertNotNull(result);
+        FriendModel friendModel = result.get(result.size() - 1);
+        Assertions.assertNotEquals(userName, friendModel.getFriendName());
     }
-    // AC2
-    @Then("I cannot see their {string} gardens")
-    public void i_cannot_see_their_kaia_gmail_com_gardens() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
-    // AC2
-    @Then("{string} is removed from my friends list")
-    public void is_removed_from_my_friends_list(String string) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
+
+
 
 
 }
