@@ -248,7 +248,6 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("SearchErrorText", exception.getMessage());
-            model.addAttribute("searchQuery", searchInput);
 
             return "manageFriendsPage";
         }
