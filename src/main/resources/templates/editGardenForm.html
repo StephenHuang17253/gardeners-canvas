@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Edit Garden</title>
@@ -7,26 +8,39 @@
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/form.css}" rel="stylesheet">
 </head>
+
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}" ></div>
-<div class = main-container>
-    <h1>Edit Garden</h1>
-    <br>
-    <div>
+    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+    <div class=main-container>
+        <h1>Edit Garden</h1>
+
         <form th:action="@{edit}" method="post">
-            <label for="gardenName"> Garden Name: </label>
-            <br>
-            <input type="text" class="form-control" th:class = "${GNErrorClass}" id="gardenName" placeholder="Username's Garden"
-                   th:name="gardenName" th:value="${gardenName}" data-cy="gardenName" autofocus>
+            <label for="gardenName"> Name </label>
+
+            <input type="text" class="form-control" th:class="${GNErrorClass}" id="gardenName" th:name="gardenName"
+                th:value="${gardenName}" data-cy="gardenName" autofocus>
 
             <div th:if="${GNErrorText!=''}">
-                <h3 class = "error" th:text="${GNErrorText}"></h3>
+                <h3 class="error" th:text="${GNErrorText}"></h3>
             </div>
 
-            <label for="streetAddress"> Street Address: </label>
-            <br>
-            <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress" placeholder="e.g. 20 Kirkwood Avenue (Optional)"
-                   th:name="streetAddress" th:value="${streetAddress}" data-cy="streetAddress" autofocus>
+            <label for="gardenDescription"> Description </label>
+
+            <div class="form-description">
+                <textarea class="form-control" th:class="${PDErrorClass}" id="gardenDescription"
+                    th:name="gardenDescription" th:value="${gardenDescription}" th:text="*{gardenDescription}"
+                    data-cy="gardenDescription"></textarea>
+                    <p id="gardenDescriptionCounter"></p>
+            </div>
+
+            <div th:if="${GDErrorText!=''}">
+                <h3 class="error" th:text="${GDErrorText}"></h3>
+            </div>
+
+            <label for="streetAddress"> Street Address </label>
+
+            <input type="text" class="form-control" th:class="${AddressErrorClass}" id="streetAddress"
+                th:name="streetAddress" th:value="${streetAddress}" data-cy="streetAddress" autofocus>
 
             <ul id="autocompleteSuggestions"></ul>
 
@@ -44,58 +58,59 @@
                 <h3 class="error" th:text="${AddressErrorText}"></h3>
             </div>
 
-            <label for="suburb"> Suburb: </label>
-            <br>
-            <input type="text" class="form-control" th:class="${SuburbErrorClass}" id="suburb" placeholder="e.g. Upper Riccarton (Optional)"
-                   th:name="suburb" th:value="${suburb}" data-cy="suburb" autofocus>
+            <label for="suburb"> Suburb </label>
+
+            <input type="text" class="form-control" th:class="${SuburbErrorClass}" id="suburb" th:name="suburb"
+                th:value="${suburb}" data-cy="suburb" autofocus>
 
             <div th:if="${SuburbErrorText!=''}">
                 <h3 class="error" th:text="${SuburbErrorText}"></h3>
             </div>
 
-            <label for="city"> City: </label>
-            <br>
-            <input type="text" class="form-control" th:class="${CityErrorClass}" id="city" placeholder="e.g. Christchurch (City is required)"
-                   th:name="city" th:value="${city}" data-cy="city" autofocus>
+            <label for="city"> City (Required) </label>
+
+            <input type="text" class="form-control" th:class="${CityErrorClass}" id="city" th:name="city"
+                th:value="${city}" data-cy="city" autofocus>
 
             <div th:if="${CityErrorText!=''}">
                 <h3 class="error" th:text="${CityErrorText}"></h3>
             </div>
 
-            <label for="postcode"> Postcode: </label>
-            <br>
-            <input type="text" class="form-control" th:class="${PostCodeErrorClass}" id="postcode" placeholder="e.g. 8041 (Optional)"
-                   th:name="postcode" th:value="${postcode}" data-cy="postcode" autofocus>
+            <label for="postcode"> Postcode </label>
+
+            <input type="text" class="form-control" th:class="${PostCodeErrorClass}" id="postcode" th:name="postcode"
+                th:value="${postcode}" data-cy="postcode" autofocus>
 
             <div th:if="${PostCodeErrorText!=''}">
                 <h3 class="error" th:text="${PostCodeErrorText}"></h3>
             </div>
 
-            <label for="country"> Country: </label>
-            <br>
-            <input type="text" class="form-control" th:class="${CountryErrorClass}" id="country" placeholder="e.g. New Zealand (Country is required)"
-                   th:name="country" th:value="${country}" data-cy="country" autofocus>
+            <label for="country"> Country (Required) </label>
+
+            <input type="text" class="form-control" th:class="${CountryErrorClass}" id="country" th:name="country"
+                th:value="${country}" data-cy="country" autofocus>
 
             <div th:if="${CountryErrorText!=''}">
                 <h3 class="error" th:text="${CountryErrorText}"></h3>
             </div>
 
-            <label for="gardenSize"> Garden Size (m<sup>2</sup>): </label>
-            <br>
-            <input type="text" class="form-control" th:class = "${GSErrorClass}" id="gardenSize" placeholder="7.5"
-                   th:name="gardenSize" th:value="${gardenSize}" data-cy="gardenSize"
-                   autofocus>
+            <label for="gardenSize"> Garden Size (m<sup>2</sup>) </label>
+
+            <input type="text" class="form-control" th:class="${GSErrorClass}" id="gardenSize" th:name="gardenSize"
+                th:value="${gardenSize}" data-cy="gardenSize" autofocus>
             <div th:if="${GSErrorText!=''}">
-                <h3 class = "error" th:text="${GSErrorText}"></h3>
+                <h3 class="error" th:text="${GSErrorText}"></h3>
             </div>
-            <br/>
 
             <input type="hidden" th:name="gardenLocation" id="gardenLocation" data-cy="gardenLocation">
-            <button type="submit" class = "submit-button">Submit</button>
-            <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
-                <button type="button" class="cancel-button" >Cancel</button>
-            </a>
 
+            <div class="button-group">
+
+                <button type="submit" class="submit-button">Submit</button>
+                <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
+                    <button type="button" class="cancel-button">Cancel</button>
+                </a>
+            </div>
             <!-- These are hidden values to send lat. and long. to the backend -->
             <div>
                 <input type="hidden" id="latitude" th:name="latitude">
@@ -105,16 +120,21 @@
         </form>
     </div>
 
-    <!-- This is a licensing term for our free plan -->
-    <div class="location-footer">
-        <br>
-        <p>Location Services powered by <a href="https://locationiq.com/?ref=link-back">LocationIQ</a></p>
-    </div>
+        </form>
 
-</div>
-<script th:src="@{/js/preventEnterSubmit.js}"></script>
-<script th:src="@{/js/locationIQAutocomplete.js}"></script>
-<script th:src="@{/js/editGardenForm.js}"></script>
-<script th:src="@{/js/inputCharacterLimit.js}"></script>
+        <!-- This is a licensing term for our free plan -->
+        <div class="location-footer">
+
+            <p>Location Services powered by <a href="https://locationiq.com/?ref=link-back">LocationIQ</a></p>
+        </div>
+
+    </div>
+    <script th:src="@{/js/preventEnterSubmit.js}"></script>
+    <script th:src="@{/js/locationIQAutocomplete.js}"></script>
+    <script th:src="@{/js/editGardenForm.js}"></script>
+    <script th:src="@{/js/GardenDescriptionCounter.js}"></script>
+    <script th:src="@{/js/inputCharacterLimit.js}"></script>
+
 </body>
+
 </html>

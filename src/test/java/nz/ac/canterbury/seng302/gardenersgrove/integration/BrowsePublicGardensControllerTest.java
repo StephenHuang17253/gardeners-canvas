@@ -61,6 +61,7 @@ public class BrowsePublicGardensControllerTest {
         {
             Garden newGarden = new Garden(
                     "Garden" + i,
+                    "",
                     "114 Ilam Road",
                     "Ilam",
                     "Christchurch",

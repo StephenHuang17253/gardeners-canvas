@@ -97,6 +97,7 @@ public class GardenService {
             Garden targetGarden = optionalGarden.get();
 
             targetGarden.setGardenName(newGardenValues.getGardenName());
+            targetGarden.setGardenDescription(newGardenValues.getGardenDescription());
             targetGarden.setGardenAddress(newGardenValues.getGardenAddress());
             targetGarden.setGardenSuburb(newGardenValues.getGardenSuburb());
             targetGarden.setGardenCity(newGardenValues.getGardenCity());
@@ -105,6 +106,26 @@ public class GardenService {
             targetGarden.setGardenSize(newGardenValues.getGardenSize());
             targetGarden.setGardenLongitude(newGardenValues.getGardenLongitude());
             targetGarden.setGardenLatitude(newGardenValues.getGardenLatitude());
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+    /**
+     * Updates the status of the garden's publicity (isPublic)
+     * @param id - the garden's id
+     * @param publicStatus - whether isPublic should be made true or false
+     * @return the updated garden as saved in the repository
+     */
+    public Garden updateGardenPublicity(Long id, boolean publicStatus) {
+        Optional<Garden> optionalGarden = getGardenById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setIsPublic(publicStatus);
+
             return gardenRepository.save(targetGarden);
 
         } else {

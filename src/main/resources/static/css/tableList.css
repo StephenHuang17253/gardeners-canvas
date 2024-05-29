@@ -62,3 +62,17 @@
     align-items: center;
     font-size: large;
 }
+
+.checkbox_container {
+    border: 2px solid #000;
+    padding: 7px;
+    margin-top: 10px;
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+.checkbox {
+    margin-right: 8px;
+    accent-color: #4CAF50;
+}

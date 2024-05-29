@@ -7,7 +7,7 @@ spring.datasource.password=${DB_PASSWORD:}
 spring.jpa.database-platform=org.hibernate.dialect.MariaDB106Dialect
 
 #If using local file as database uncomment next line
-spring.datasource.url=jdbc:mariadb://db2.csse.canterbury.ac.nz:3306/seng302-2024-team500-prod
+spring.datasource.url=jdbc:mariadb://db2.csse.canterbury.ac.nz:3306/seng302-2024-team500-test
 spring.jpa.hibernate.ddl-auto=update
 
 #Inititalize data into database on startup (Will run sql file to populate DB)
@@ -19,10 +19,7 @@ spring.h2.console.enabled=true
 spring.h2.console.path=/h2
 # LocationIQ API Key
 locationiq.access.token = ${LOCATIONIQ_API_KEY:}
-#Azure Services
-azure.service.endpoint = ${AZURE_ENDPOINT:}
-azure.moderator.token = ${AZURE_MODERATOR_KEY:}
-
+profanity.access.token = ${PROFANITY_API_KEY:}
 
 # Email Configuration
 spring.mail.username=${EMAIL_USERNAME:}

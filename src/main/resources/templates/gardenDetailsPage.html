@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Garden Details</title>
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/navBar.css}" rel="stylesheet">
@@ -15,24 +15,28 @@
 </head>
 <body>
 <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-<div class="main-container">
+<div class = "main-container">
     <div class="content-container">
         <div class="tableList-header">
             <h1 class="tableList-header-title" th:text="${gardenName}"> Name </h1>
-            <p class="break-word" th:text="'Garden Location: ' + ${gardenLocation}"> Name </p>
+            <p th:text="${gardenDescription}" />
+            <p class="break-word" th:text="'Garden Location: ' + ${gardenLocation}"> Address </p>
             <p th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </p>
             <p th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </p>
             <div class="tableList-table-count">
                 <br>
                 <span th:text="'This garden has: ' + ${totalPlants} + ' Plants'"> # Plants </span>
             </div>
-            <div class="tableList-header-button-contain">
+            <div th:if="${isOwner}" class="tableList-header-button-contain">
                 <a th:href="@{__${gardenId}__/edit}">
-                    <button class="rounded-button">Edit</button>
+                    <button class="rounded-button-top-right">Edit</button>
                 </a>
-                <a th:href="@{__${gardenId}__/create-new-plant}">
-                    <button class="rounded-button">Create New Plant</button>
-                </a>
+                <div class="checkbox_container" th:if="${isOwner}">
+                    <form th:action="@{/my-gardens/__${gardenId}__/public}" method="post" enctype="multipart/form-data">
+                        <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic" th:checked="${makeGardenPublic}"
+                               onChange="this.form.submit()">Make my garden public
+                    </form>
+                </div>
             </div>
         </div>
         <br>
@@ -62,6 +66,12 @@
     </div>
     <input type="hidden" id="gardenId" th:value="${gardenId}" />
     <div class="scrollable-container">
+        <div class="tableList-table-count">
+            <span th:text="${totalPlants} + ' Plants'"> # Plants </span>
+            <a th:if="${isOwner}" th:href="@{__${gardenId}__/create-new-plant}">
+                <button class="rounded-button">Create New Plant</button>
+            </a>
+        </div>
         <div class="plants-grid">
             <div th:each="plant : ${plants}" class="plant-box">
                 <div th:replace="~{fragmentExample/fragments/plantBox.html :: plantBox(
@@ -70,7 +80,8 @@
                     plantCount=${plant.getPlantCount()},
                     plantDescription=${plant.getPlantDescription()},
                     plantDate=${plant.getFormattedPlantDate()},
-                    plantPicture=${plant.getPlantPictureFilename()})}">
+                    plantPicture=${plant.getPlantPictureFilename()},
+                    isOwner=${isOwner})}">
                 </div>
             </div>
         </div>

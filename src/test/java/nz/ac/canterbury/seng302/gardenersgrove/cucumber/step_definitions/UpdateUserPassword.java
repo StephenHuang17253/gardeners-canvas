@@ -12,6 +12,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +37,7 @@ public class UpdateUserPassword {
     public UserRepository userRepository;
     @Autowired
     public FileService fileService;
-
+    @Mock
     public EmailService emailService;
 
     public static MockMvc MOCK_MVC;
@@ -51,8 +52,7 @@ public class UpdateUserPassword {
 
     @Before
     public void before_or_after_all() {
-        emailService = mock(EmailService.class);
-
+        emailService = Mockito.mock(EmailService.class);
         userService = new UserService(passwordEncoder, userRepository);
         ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(profileController).build();

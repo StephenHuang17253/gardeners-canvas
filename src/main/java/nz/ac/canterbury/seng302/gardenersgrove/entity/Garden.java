@@ -9,6 +9,8 @@ import java.util.List;
 /**
  * Entity class of a Garden, reflecting an entry of garden name, location and
  * size (optional)
+ * Entity class of a Garden, reflecting an entry of garden name, location and
+ * size (optional)
  * and any plant entity objects that is associated with
  * Based off the SENG202 demo FormResult entity
  */
@@ -21,6 +23,9 @@ public class Garden {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String gardenName;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String gardenDescription;
 
     @Column(columnDefinition = "TEXT")
     private String gardenAddress;
@@ -79,9 +84,10 @@ public class Garden {
      * @param isPublic       the visibility of the garden
      * @param owner          the User object that owns the garden
      */
-    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
+    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb, String gardenCity,
             String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude, User owner) {
         this.gardenName = gardenName;
+        this.gardenDescription = gardenDescription;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
         this.gardenCity = gardenCity;
@@ -107,9 +113,10 @@ public class Garden {
      * @param gardenSize     the size of the garden
      * @param isPublic       the visibility of the garden
      */
-    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
+    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb, String gardenCity,
                   String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude) {
         this.gardenName = gardenName;
+        this.gardenDescription = gardenDescription;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
         this.gardenCity = gardenCity;
@@ -133,6 +140,14 @@ public class Garden {
 
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
+    }
+
+    public String getGardenDescription() {
+        return gardenDescription;
+    }
+
+    public void setGardenDescription(String gardenDescription) {
+        this.gardenDescription = gardenDescription;
     }
 
     public String getGardenAddress() {
@@ -246,6 +261,7 @@ public class Garden {
         return "Garden{" +
                 "id=" + gardenId +
                 ", name='" + gardenName + '\'' +
+                ", description='" + gardenDescription + '\'' +
                 ", location='" + getGardenLocation() + '\'' +
                 ", size='" + gardenSize + '\'' +
                 ", owner_id='" + owner.getId() + '\'' +

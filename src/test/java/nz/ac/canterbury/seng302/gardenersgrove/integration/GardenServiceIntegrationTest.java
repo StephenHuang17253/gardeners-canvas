@@ -44,6 +44,7 @@ public class GardenServiceIntegrationTest {
         userService.addUser(user3, "1es1P@ssword");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -56,6 +57,7 @@ public class GardenServiceIntegrationTest {
                 user1);
         Garden garden2 = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -68,6 +70,7 @@ public class GardenServiceIntegrationTest {
                 user1);
         Garden garden3 = new Garden(
                 "Jane's Garden",
+                "",
                 "20 Kirkwood Avenue",
                 "Upper Riccarton",
                 "Christchurch",
@@ -159,6 +162,7 @@ public class GardenServiceIntegrationTest {
     public void AddGarden_UserInPersistence() {
         Garden garden = new Garden(
                 "Bat Cave",
+                "",
                 "1 Wayne Manor",
                 "Wayne Island",
                 "Gotham City",
@@ -187,6 +191,7 @@ public class GardenServiceIntegrationTest {
         User user = new User("Boogie", "Man", "boogieMan@email.com", date);
         Garden garden = new Garden(
                 "Bat Cave",
+                "",
                 "1 Wayne Manor",
                 "Wayne Island",
                 "Gotham City",
@@ -206,6 +211,7 @@ public class GardenServiceIntegrationTest {
     public void UpdateGarden_GardenInPersistence() {
         Garden gardenWithUpdatedValues = new Garden(
                 "Jane's Garden",
+                "",
                 "20 Kirkwood Avenue",
                 "Upper Riccarton",
                 "Christchurch",
@@ -230,6 +236,7 @@ public class GardenServiceIntegrationTest {
         User user = userService.getUserById(4L);
         Garden gardenWithUpdatedValues = new Garden(
                 "Jane's Garden",
+                "",
                 "20 Kirkwood Avenue",
                 "Upper Riccarton",
                 "Christchurch",
@@ -272,6 +279,7 @@ public class GardenServiceIntegrationTest {
         User user = userService.getUserById(4L);
         Garden garden = new Garden(
                 "Jane's Garden",
+                "",
                 "20 Kirkwood Avenue",
                 "Upper Riccarton",
                 "Christchurch",

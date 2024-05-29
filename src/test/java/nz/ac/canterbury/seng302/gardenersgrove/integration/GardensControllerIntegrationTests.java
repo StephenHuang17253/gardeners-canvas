@@ -24,6 +24,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -37,6 +38,7 @@ import java.util.Locale;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -74,6 +76,7 @@ public class GardensControllerIntegrationTests {
         userService.addUser(user3,"1es1P@ssword");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "",
                 "114 Ilam Road",
                 "Ilam",
                 "Christchurch",
@@ -83,9 +86,11 @@ public class GardensControllerIntegrationTests {
                 false,
                 "-43.5214643",
                 "172.5796159",
-                user1);
+                userService.getUserByEmail(user1.getEmailAddress()));
+
         Garden garden2 = new Garden(
                 "Jane's Garden",
+                "",
                 "20 Kirkwood Avenue",
                 "Upper Riccarton",
                 "Christchurch",
@@ -95,7 +100,7 @@ public class GardensControllerIntegrationTests {
                 false,
                 "-43.5214643",
                 "172.5796159",
-                user2);
+                userService.getUserByEmail(user2.getEmailAddress()));
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);
         plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());
@@ -135,6 +140,7 @@ public class GardensControllerIntegrationTests {
         User addedUser = userService.getUserByEmail("johnDoe1234@email.com");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "A Description",
                 "Some Fake Address",
                 "Ilam",
                 "Christchurch",
@@ -220,6 +226,7 @@ public class GardensControllerIntegrationTests {
         User addedUser = userService.getUserByEmail("johnDoe1234@email.com");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "Some description",
                 "Some Real Address",
                 "Ilam",
                 "Christchurch",
@@ -236,7 +243,7 @@ public class GardensControllerIntegrationTests {
                 MockMvcRequestBuilders
                         .get("/my-gardens/{gardenId}", addedGarden.getGardenId())
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        String expectedErrorMessage = "Location not found, please update your location to see the weather";
+
         Assertions.assertNull(((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0).getWeatherError());
     }
     @Test
@@ -270,7 +277,9 @@ public class GardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())));
+                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", is(garden.getIsPublic())));
+        ;
     }
     @Test
     @WithMockUser(username = "janeDoe@email.com")
@@ -282,7 +291,34 @@ public class GardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
                 .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())));
+                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", is(garden.getIsPublic())));
+        ;
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
+        Garden garden = gardenList.get(0);
+        // make an initial request to ensure garden is private as set in @before
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", false));
+
+        // set the garden to public
+        mockMvc.perform(MockMvcRequestBuilders.post("/my-gardens/1/public").with(csrf()).param("makeGardenPublic", "true"))
+                        .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+
+        // check the garden is now public
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
+                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
+                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
+                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
+                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", true));
     }
 
 }
