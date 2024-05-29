@@ -14,6 +14,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,6 +57,9 @@ public class PubliciseGarden {
     @MockBean
     private LocationService locationService;
 
+    @Mock
+    private WeatherService weatherService;
+
     private static GardenService gardenService;
 
     private static UserService userService;
@@ -82,13 +86,14 @@ public class PubliciseGarden {
     public void before_or_after_all() {
 
         profanityService = Mockito.mock(ProfanityService.class);
+        weatherService = Mockito.mock(WeatherService.class);
         inputValidator = new InputValidator(userService, profanityService);
 
         Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
         MOCK_MVC_MY_GARDEN = MockMvcBuilders.standaloneSetup(myGardensController).build();
@@ -146,6 +151,8 @@ public class PubliciseGarden {
                         .param("country", "New Zealand")
                         .param("postcode", "")
                         .param("gardenSize", "")
+                        .param("latitude", "")
+                        .param("longitude", "")
                         .with(csrf())
         ).andReturn();
     }
@@ -165,6 +172,8 @@ public class PubliciseGarden {
                         .param("country", userGarden.getGardenCountry())
                         .param("postcode", userGarden.getGardenPostcode())
                         .param("gardenSize", String.valueOf(1))
+                        .param("latitude", "")
+                        .param("longitude", "")
         ).andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 
 

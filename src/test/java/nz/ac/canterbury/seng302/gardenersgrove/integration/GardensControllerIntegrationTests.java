@@ -86,8 +86,8 @@ public class GardensControllerIntegrationTests {
                 false,
                 "-43.5214643",
                 "172.5796159",
-                userService.getUserByEmail("johnDoe@GardensControllerIntegrationTest.com"));
-                );
+                userService.getUserByEmail(user1.getEmailAddress()));
+
         Garden garden2 = new Garden(
                 "Jane's Garden",
                 "",
@@ -100,7 +100,7 @@ public class GardensControllerIntegrationTests {
                 false,
                 "-43.5214643",
                 "172.5796159",
-                userService.getUserByEmail("janeDoe@GardensControllerIntegrationTest.com"));
+                userService.getUserByEmail(user2.getEmailAddress()));
         gardenService.addGarden(garden1);
         gardenService.addGarden(garden2);
         plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());
@@ -140,6 +140,7 @@ public class GardensControllerIntegrationTests {
         User addedUser = userService.getUserByEmail("johnDoe1234@email.com");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "A Description",
                 "Some Fake Address",
                 "Ilam",
                 "Christchurch",
@@ -225,6 +226,7 @@ public class GardensControllerIntegrationTests {
         User addedUser = userService.getUserByEmail("johnDoe1234@email.com");
         Garden garden1 = new Garden(
                 "John's Garden",
+                "Some description",
                 "Some Real Address",
                 "Ilam",
                 "Christchurch",
@@ -241,7 +243,7 @@ public class GardensControllerIntegrationTests {
                 MockMvcRequestBuilders
                         .get("/my-gardens/{gardenId}", addedGarden.getGardenId())
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        String expectedErrorMessage = "Location not found, please update your location to see the weather";
+
         Assertions.assertNull(((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0).getWeatherError());
     }
     @Test
@@ -295,7 +297,7 @@ public class GardensControllerIntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "johnDoe@GardensControllerIntegrationTest.com")
+    @WithMockUser(username = "johnDoe@email.com")
     public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
         Garden garden = gardenList.get(0);
         // make an initial request to ensure garden is private as set in @before

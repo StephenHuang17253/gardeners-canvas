@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
@@ -157,6 +158,7 @@ public class GardensController {
             model.addAttribute("plants", garden.getPlants());
             model.addAttribute("totalPlants", garden.getPlants().size());
             model.addAttribute("makeGardenPublic", garden.getIsPublic());
+            model.addAttribute("weather", weather);
             return "gardenDetailsPage";
         }
 
@@ -194,6 +196,7 @@ public class GardensController {
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
+        model.addAttribute("weather", weather);
         return "gardenDetailsPage";
 
     }

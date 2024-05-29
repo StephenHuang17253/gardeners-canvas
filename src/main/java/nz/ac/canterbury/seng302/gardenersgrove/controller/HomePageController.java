@@ -135,6 +135,7 @@ public class HomePageController {
                         johnDoe);
                 Garden sampleGarden2 = new Garden(
                         "John's Private Garden " + i,
+                        "Some description",
                         "114 Ilam Road",
                         "Ilam",
                         "Christchurch",
