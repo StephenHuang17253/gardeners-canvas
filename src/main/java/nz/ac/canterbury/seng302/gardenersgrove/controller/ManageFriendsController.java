@@ -89,6 +89,7 @@ public class ManageFriendsController {
             String friendsName = fName + ' ' + lName;
             String friendGardenLink = "/" + userTypeFriend.getId() + "/gardens";
             FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+            friendModel.setFriendId(userTypeFriend.getId());
             friendModels.add(friendModel);
         }
 
@@ -194,6 +195,7 @@ public class ManageFriendsController {
                         String friendsName = user.getFirstName() + " " + user.getLastName();
                         String friendGardenLink = "/" + user.getId() + "/gardens";
                         FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+                        friendModel.setFriendId(user.getId());
                         // add status of friendship from current user to other user
                         friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, user));
                         friendModel.setFriendId(user.getId());
@@ -232,8 +234,7 @@ public class ManageFriendsController {
                                    @RequestParam("activeTab") String activeTab,
                                    @RequestParam(value = "searchInput", required = false) String searchInput,
                                    Model model) {
-        logger.info("GET /manage-friends/send-invite");
-        logger.info("activeTab: {}", activeTab);
+        logger.info("POST /manage-friends/send-invite");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
@@ -257,8 +258,15 @@ public class ManageFriendsController {
         return "redirect:/manage-friends#" + activeTab;
     }
 
+    /**
+     * Changes the status of a pending request, based on whether it was accepted or declined
+     * @param friendAccepted    boolean, whether the friend request was accepted or declined
+     * @param pendingFriendId   the id of the user who sent the request
+     * @param activeTab         the tab which the user is on ( #pending for this endpoint )
+     * @return                  thymeleaf manageFriendsPage
+     */
     @PostMapping("/manage-friends")
-    public String managePendingRequest(@RequestParam(name = "acceptedFriend", required = true) boolean acceptedFriend,
+    public String managePendingRequest(@RequestParam(name = "friendAccepted", required = true) boolean friendAccepted,
                                         @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
                                         @RequestParam("activeTab") String activeTab,
                                         Model model) {
@@ -268,12 +276,41 @@ public class ManageFriendsController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        if (acceptedFriend) {
+        if (friendAccepted) {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.ACCEPTED);
         } else {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.DECLINED);
         }
 
+        model.addAttribute("activeTab", activeTab);
+
+        return "redirect:/manage-friends#" + activeTab;
+    }
+
+    /**
+     * This function removes a friendship entity. It is called when the user cancels a pending friend request,
+     * or when they remove a friend from their friends list.
+     * @param friendId          the user they sent the request to, or removed from friends
+     * @param activeTab         the tab which the user is on ( #pending for this endpoint )
+     * @return                  thymeleaf manageFriendsPage
+     */
+    @PostMapping("/manage-friends/remove")
+    public String cancelSentRequest(@RequestParam(name = "friendId", required = true) Long friendId,
+                                       @RequestParam("activeTab") String activeTab,
+                                       Model model) {
+        logger.info("POST /manage-friends/remove");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+
+        User currentUser = securityService.getCurrentUser();
+        User friend = userService.getUserById(friendId);
+        Friendship friendship = friendshipService.findFriendship(currentUser, friend);
+
+        if (friendship != null) {
+            friendshipService.deleteFriendship(friendship.getId());
+        }
 
         model.addAttribute("activeTab", activeTab);
 

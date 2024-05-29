@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Function to activate a tab and its content
+    /**
+    * This function handles the friend request.
+    * It changes the value of the thymeleaf variable 'friendAccepted' to true when the user presses submit.
+    * Then the form is submitted
+    * @param tab the tab button the user pressed, for example 'Friends'
+    */
     function activateTab(tab) {
         const target = tab.getAttribute('href').substring(1);
         tabs.forEach(tab => tab.parentElement.classList.remove('active'));
@@ -59,18 +64,30 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
 /**
  * This function handles the friend request.
- * @param button accept or decline
+ * It changes the value of the thymeleaf variable 'friendAccepted' to true when the user presses submit.
+ * Then the form is submitted
+ * @param button the button pressed by the user, either accept or decline.
  */
 function manageRequest(button) {
     const form = button.closest('form');
-    const acceptedInput = form.querySelector('input[name="acceptedFriend"][type="hidden"]');
+    const acceptedInput = form.querySelector('input[name="friendAccepted"][type="hidden"]');
     if (button.classList.contains('accept-request-button')) {
         acceptedInput.value = "true";
     } else if (button.classList.contains('decline-request-button')) {
         acceptedInput.value = "false";
     }
     form.submit();
+}
+
+function showModal(id) {
+    const modal = document.getElementById("confirm-remove-form-"+id);
+    modal.className = "then-show";
+}
+
+
+function closeModal(id) {
+    const modal = document.getElementById("confirm-remove-form-"+id);
+    modal.className = "initially-hidden";
 }

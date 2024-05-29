@@ -38,7 +38,6 @@ public class GardenService {
      *
      * @return a list of all garden objects saved in persistence
      */
-    //might be irrlevant for this sprint
     public List<Garden> getGardens() {
         return gardenRepository.findAll();
     }
@@ -49,7 +48,7 @@ public class GardenService {
      * @param id the user's ID
      * @throws IllegalArgumentException if the provided user ID is invalid
      */
-    public List<Garden> getAllUsersGardens(long id) {
+    public List<Garden> getAllUsersGardens(long id) throws IllegalArgumentException {
         if (userService.getUserById(id) != null) {
             return gardenRepository.findByOwnerId(id);
         } else {
@@ -73,7 +72,7 @@ public class GardenService {
      * @param garden the garden to add
      * @throws IllegalArgumentException if the user associated with the garden is not in the db
      */
-    public Garden addGarden(Garden garden) {
+    public Garden addGarden(Garden garden) throws IllegalArgumentException {
         if (garden.getOwner().getId() != null && userService.getUserById(garden.getOwner().getId()) != null) {
             userService.addGardenToGardenList(garden, garden.getOwner().getId());
             return gardenRepository.save(garden);
@@ -91,7 +90,7 @@ public class GardenService {
      * @param newGardenValues the new garden values
      * @throws IllegalArgumentException if invalid garden id
      */
-    public Garden updateGarden(Long id, Garden newGardenValues) {
+    public Garden updateGarden(Long id, Garden newGardenValues) throws IllegalArgumentException {
         Optional<Garden> optionalGarden = getGardenById(id);
         if (optionalGarden.isPresent()) {
             Garden targetGarden = optionalGarden.get();
@@ -140,7 +139,7 @@ public class GardenService {
      * @param plant    the new plant to be added to the garden
      * @throws IllegalArgumentException if invalid garden ID
      */
-    public void addPlantToGarden(Long gardenId, Plant plant) {
+    public void addPlantToGarden(Long gardenId, Plant plant) throws IllegalArgumentException  {
         Optional<Garden> optionalGarden = getGardenById(gardenId);
 
         if (optionalGarden.isPresent()) {

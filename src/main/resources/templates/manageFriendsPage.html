@@ -13,7 +13,7 @@
 </head>
 
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('manageFriends')" th:with="loggedIn=${loggedIn}"></div>
+<div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('manageFriends')}" th:with="loggedIn=${loggedIn}"></div>
 <div class = "main-container">
     <div class="tableList-header">
         <h1 class="tableList-header-title"> Manage Friends </h1>
@@ -45,6 +45,7 @@
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
                                      friendsGardenLink=${friend.getFriendGardenLink},
+                                     friendId=${friend.getFriendId},
                                      friendshipStatus=${friend.getFriendRequestStatusString()})}
                                      ">
                     </div>

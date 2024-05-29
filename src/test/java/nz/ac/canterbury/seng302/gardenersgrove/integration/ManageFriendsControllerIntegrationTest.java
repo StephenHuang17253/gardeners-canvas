@@ -1,44 +1,29 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -64,6 +49,7 @@ public class ManageFriendsControllerIntegrationTest {
     User user2;
     User user3;
     User user4;
+    User user5;
 
     List<FriendModel> friendsList;
 
@@ -80,16 +66,20 @@ public class ManageFriendsControllerIntegrationTest {
         user2 =  new User("Jane", "Doe", "janeDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
         user3 =  new User("Bruce", "Wayne", "bruceWayne@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
         user4 =  new User("Test", "Doe", "testDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
+        user5 =  new User("Walter", "Doe", "pending@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
 
         userService.addUser(user1,"1es1P@ssword");
         userService.addUser(user2,"1es1P@ssword");
         userService.addUser(user3,"1es1P@ssword");
         userService.addUser(user4,"1es1P@ssword");
+        userService.addUser(user5,"1es1P@ssword");
 
         Friendship friendship1 = friendshipService.addFriendship(user1,user2);
         Friendship friendship2 = friendshipService.addFriendship(user3,user1);
+        Friendship friendship3 = friendshipService.addFriendship(user5, user1);
         friendshipService.updateFriendShipStatus(friendship1.getId(), FriendshipStatus.ACCEPTED);
         friendshipService.updateFriendShipStatus(friendship2.getId(), FriendshipStatus.ACCEPTED);
+        friendshipService.updateFriendShipStatus(friendship3.getId(), FriendshipStatus.PENDING);
 
     }
 
@@ -156,6 +146,33 @@ public class ManageFriendsControllerIntegrationTest {
                 .andExpect(status().isOk()).andReturn();
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
         Assertions.assertEquals(0,result.size());
+
+    }
+
+
+    @Test
+    @WithMockUser(username = "pending@ManageFriendsControllerIntegrationTest.com")
+    public void cancelFriendRequest_cancelFriendRequestValidUser_DeletesFriendship() throws Exception {
+
+        Assertions.assertTrue(friendshipService.checkFriendshipExists(user5, user1));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/manage-friends/remove")
+                        .param("friendId", user1.getId().toString()).with(csrf())
+                        .param("activeTab","friends"))
+                .andExpect(status().is3xxRedirection()).andReturn();
+
+        Assertions.assertFalse(friendshipService.checkFriendshipExists(user5, user1));
+    }
+
+
+    @Test
+    @WithMockUser(username = "pending@ManageFriendsControllerIntegrationTest.com")
+    public void cancelFriendRequest_cancelFriendRequestNoFriendship_NoAction() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/manage-friends/remove")
+                        .param("friendId", user3.getId().toString()).with(csrf())
+                        .param("activeTab","friends"))
+                .andExpect(status().is3xxRedirection()).andReturn();
 
     }
 
