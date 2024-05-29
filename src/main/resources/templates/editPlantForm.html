@@ -47,7 +47,7 @@
             </div>
 
 
-            <label for="plantDescription"> Plant Description </label>
+            <label for="plantDescription"> Plant Description (Optional)</label>
             <br>
             <div class="form-description" >
                 <textarea class="form-control" th:class = "${PDErrorClass}" id="plantDescription" placeholder="Description"
@@ -55,15 +55,19 @@
                           autofocus></textarea>
             </div>
 
-            <div th:if="${PCErrorText!=''}">
+            <div th:if="${PDErrorText!=''}">
                 <h3 class = "error" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
             </div>
 
-            <label for="plantDate"> Plant Date </label>
-            <input type="date" class="form-control"  id="plantDate" placeholder=""
+            <label for="plantDate"> Plant Date (Optional)</label>
+            <input type="date" class="form-control" th:class="${PAErrorClass}" id="plantDate" placeholder=""
                    max="9999-12-30" min="0000-01-01"
                    th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
                    autofocus >
+
+            <div th:if="${PAErrorText!=''}">
+                <h3 class = "error" th:text="${PAErrorText}" id="plantDateError"></h3>
+            </div>
 
             <br/>
             <br>

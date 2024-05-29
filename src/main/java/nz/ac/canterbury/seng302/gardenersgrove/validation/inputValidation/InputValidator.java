@@ -315,6 +315,13 @@ public class InputValidator {
                 .getResult();
     }
 
+    public static ValidationResult validatePlantDate(String date) {
+        return new InputValidator(date)
+                .dateFormatHelper()
+                .plantAgeHelper()
+                .getResult();
+    }
+
     /**
      * Checks if the given date is in a valid format
      *
@@ -624,6 +631,36 @@ public class InputValidator {
             return this;
         } else if (yearsDifference > 120) {
             this.validationResult = ValidationResult.AGE_ABOVE_120;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    private InputValidator plantAgeHelper() {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
+
+        long yearsDifference = ChronoUnit.YEARS.between(
+                inputtedDate,
+                LocalDate.now());
+
+        long daysDifference = ChronoUnit.DAYS.between(
+                inputtedDate,
+                LocalDate.now());
+
+        if (daysDifference < 0) {
+            this.validationResult = ValidationResult.PLANT_AGE_FUTURE;
+            this.passState = false;
+            return this;
+        } else if (yearsDifference > 120) {
+            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_120;
             this.passState = false;
             return this;
         }
