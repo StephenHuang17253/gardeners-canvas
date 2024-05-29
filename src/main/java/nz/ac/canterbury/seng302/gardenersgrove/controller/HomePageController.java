@@ -3,9 +3,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -69,7 +68,6 @@ public class HomePageController {
     @GetMapping("/")
     public String home() throws IOException {
         logger.info("GET /");
-
         return "redirect:./home";
     }
 
@@ -119,18 +117,20 @@ public class HomePageController {
             userService.verifyUser(johnDoe);
             onStart = true;
 
-            ArrayList<Plant> samplePlants = new ArrayList<>();
 
-            for (int i = 0; i < 12; i++) {
+            for (int i = 1; i < 12; i ++) {
                 Garden sampleGarden = new Garden(
                         "John's Garden " + i,
+                        "Some Description here",
                         "114 Ilam Road",
                         "Ilam",
                         "Christchurch",
                         "8041",
                         "New Zealand",
                         15.0,
-                        false,
+                        true,
+                        "-43.5214643",
+                        "172.5796159",
                         johnDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
 
@@ -139,8 +139,22 @@ public class HomePageController {
                     plantService.addPlant("Test Plant #" + k,2,
                             "test", LocalDate.now(),sampleGarden.getGardenId());
                 }
-
             }
+
+            Garden sampleGarden2 = new Garden(
+                    "John's Private garden ",
+                    "Some Description here",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    false,
+                    "-43.5214643",
+                    "172.5796159",
+                    johnDoe);
+            sampleGarden2 = gardenService.addGarden(sampleGarden2);
 
             if (!userService.emailInUse("janedoe@email.com")) {
 
@@ -156,14 +170,17 @@ public class HomePageController {
 
                 for (int i = 0; i < 1; i++) {
                     Garden sampleGarden = new Garden(
-                            "John's Garden " + i,
+                            "Jane's Garden " + i,
+                            "Some Description here",
                             "114 Ilam Road",
                             "Ilam",
                             "Christchurch",
                             "8041",
                             "New Zealand",
                             15.0,
-                            false,
+                            true,
+                            "-43.5214643",
+                            "172.5796159",
                             janeDoe);
                     sampleGarden = gardenService.addGarden(sampleGarden);
 

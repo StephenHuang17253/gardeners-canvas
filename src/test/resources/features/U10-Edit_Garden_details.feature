@@ -13,20 +13,20 @@ Background:
 
   Scenario Outline: AC2 can submit valid values
     Given I am on the garden edit form
-    And  I enter valid garden values for the <name>, <city>, <country> and <size>
+    And  I enter valid garden values for the <name>, <description>, <city>, <country> and <size>
     When I click the Submit button on the edit garden form
     Then The garden details have been updated
     And I am taken back to the garden details page
     Examples:
-      | name            | city            | country        | size       |
-      | "gard"          | "Townsville"    | "France"       | "7"        |
-      | "ward"          | "Läkeside"      | "Switzerland"  | "15"       |
-      | "Everywhere"    | "Rivèrdale"     | "Italy"        | "7.9"      |
-      | "ward"          | "Hílltop"       | "Spain"        | "7.9"      |
-      | "ward-connect"  | "Súnset City"   | "Brazil"       | "7.9"      |
-      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "0.1"      |
-      | "ward-connect"  | "Súnset City"   | "Brazil"       | "0.01"     |
-      | "ward-cÁÕăect"  | "Ocëanview"     | "Portugal"     | "8000000"  |
+      | name            | description     | city            | country        | size       |
+      | "gard"          | "Info"          | "Townsville"    | "France"       | "7"        |
+      | "ward"          | "Lä Info"       | "Läkeside"      | "Switzerland"  | "15"       |
+      | "Everywhere"    | "Rivèndel"      | "Rivèrdale"     | "Italy"        | "7.9"      |
+      | "ward"          | "Hí there"      | "Hílltop"       | "Spain"        | "7.9"      |
+      | "ward-connect"  | "Súnny Sun"     | "Súnset City"   | "Brazil"       | "7.9"      |
+      | "ward-cÁÕăect"  | "Ocëlot  "      | "Ocëanview"     | "Portugal"     | "0.1"      |
+      | "ward-connect"  | "Súnset City"   | "Súnset City"   | "Brazil"       | "0.01"     |
+      | "ward-cÁÕăect"  | "Ocëanview"     | "Ocëanview"     | "Portugal"     | "8000000"  |
 
   Scenario Outline: AC3 can't submit non-alphanumeric names
     Given I am on the garden edit form

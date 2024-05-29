@@ -63,16 +63,18 @@ public class U15_GardenLocation {
     public static UserService userService;
 
     public String gardenName;
+    public String gardenDescription;
     public String gardenStreet;
     public String gardenSuburb;
     public String gardenCity;
     public String gardenPostcode;
     public String gardenCountry;
     public String gardenSize;
+    public String gardenLongitude;
+    public String gardenLatitude;
     private Garden expectedNewGarden;
     private Garden expectedGarden;
     private MvcResult createGardenResult;
-    private MvcResult editGardenResult;
     private MvcResult locationResult;
     Logger logger = LoggerFactory.getLogger(U15_GardenLocation.class);
 
@@ -125,37 +127,44 @@ public class U15_GardenLocation {
     @Given("I as user {string} have another garden {string} located in {string}, {string}")
     public void i_as_user_have_another_garden_located_in(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", city, "", country, 0.0, false, user);
+        Garden garden = new Garden(gardenName, "A garden for UC students", "", "", city, "", country, 0.0, false, "", "", user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
         this.gardenName = gardenName;
+        gardenDescription = garden.getGardenDescription();
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
     }
 
     // AC1
-    @Given("I specify a valid address with {string}, {string}, {string}, {string}, and {string}")
-    public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country) {
+    @Given("I specify a valid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
+    public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country, String latitude, String longitude) {
         gardenName = "UC Garden";
+        gardenDescription = "A garden for UC students";
         gardenStreet = street;
         gardenSuburb = suburb;
         gardenCity = city;
         gardenPostcode = postcode;
         gardenCountry = country;
         gardenSize = "15";
+        gardenLongitude = longitude;
+        gardenLatitude = latitude;
     }
 
     // AC3
-    @Given("I specify an invalid address with {string}, {string}, {string}, {string}, and {string}")
-    public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country) {
+    @Given("I specify an invalid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
+    public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country, String latitude, String longitude) {
         gardenName = "UC Garden";
+        gardenDescription = "A garden for UC students";
         gardenStreet = street;
         gardenSuburb = suburb;
         gardenCity = city;
         gardenPostcode = postcode;
         gardenCountry = country;
         gardenSize = "15";
+        gardenLongitude = latitude;
+        gardenLatitude = longitude;
     }
 
 
@@ -167,21 +176,26 @@ public class U15_GardenLocation {
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
+                        .param("gardenDescription", gardenDescription)
                         .param("streetAddress", gardenStreet)
                         .param("suburb", gardenSuburb)
                         .param("city", gardenCity)
                         .param("country", gardenCountry)
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize)
-
+                        .param("longitude", gardenLongitude)
+                        .param("latitude", gardenLatitude)
         ).andReturn();
     }
 
     // AC1, AC3.1, AC4
     @Then("The garden is created successfully with that location")
     public void the_garden_is_created_successfully_with_that_location() {
-        String createdGardenId = createGardenResult.getResponse().getRedirectedUrl().substring("/my-gardens/".length());
+        String redirectUrl = createGardenResult.getResponse().getRedirectedUrl();
+        Assertions.assertNotNull(redirectUrl);
+        String createdGardenId = redirectUrl.substring("/my-gardens/".length());
         expectedNewGarden = gardenService.getGardenById(Long.parseLong(createdGardenId)).orElse(null);
+        assert expectedNewGarden != null;
         Optional<Garden> optionalGarden = gardenService.getGardenById(expectedNewGarden.getGardenId());
         if (optionalGarden.isEmpty()) {
             Assertions.fail();
@@ -189,11 +203,14 @@ public class U15_GardenLocation {
         }
         Garden createdGarden = optionalGarden.get();
         Assertions.assertEquals(gardenName, createdGarden.getGardenName());
+        Assertions.assertEquals(gardenDescription, createdGarden.getGardenDescription());
         Assertions.assertEquals(gardenStreet, createdGarden.getGardenAddress());
         Assertions.assertEquals(gardenSuburb, createdGarden.getGardenSuburb());
         Assertions.assertEquals(gardenCity, createdGarden.getGardenCity());
         Assertions.assertEquals(gardenPostcode, createdGarden.getGardenPostcode());
         Assertions.assertEquals(gardenCountry, createdGarden.getGardenCountry());
+        Assertions.assertEquals(gardenLatitude, createdGarden.getGardenLatitude());
+        Assertions.assertEquals(gardenLongitude, createdGarden.getGardenLongitude());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), createdGarden.getGardenSize());
     }
 
@@ -201,17 +218,19 @@ public class U15_GardenLocation {
     @When("I submit the edit garden form")
     public void i_submit_the_edit_plant_form() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
-        editGardenResult = MOCK_MVC.perform(
+        MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
+                        .param("gardenDescription", gardenDescription)
                         .param("streetAddress", gardenStreet)
                         .param("suburb", gardenSuburb)
                         .param("city", gardenCity)
                         .param("country", gardenCountry)
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
-
+                        .param("longitude", gardenLongitude)
+                        .param("latitude", gardenLatitude)
         ).andReturn();
     }
 
@@ -225,11 +244,14 @@ public class U15_GardenLocation {
         }
         Garden updatedGarden = optionalUpdatedGarden.get();
         Assertions.assertEquals(gardenName, updatedGarden.getGardenName());
+        Assertions.assertEquals(gardenDescription, updatedGarden.getGardenDescription());
         Assertions.assertEquals(gardenStreet, updatedGarden.getGardenAddress());
         Assertions.assertEquals(gardenSuburb, updatedGarden.getGardenSuburb());
         Assertions.assertEquals(gardenCity, updatedGarden.getGardenCity());
         Assertions.assertEquals(gardenPostcode, updatedGarden.getGardenPostcode());
         Assertions.assertEquals(gardenCountry, updatedGarden.getGardenCountry());
+        Assertions.assertEquals(gardenLatitude, updatedGarden.getGardenLatitude());
+        Assertions.assertEquals(gardenLongitude, updatedGarden.getGardenLongitude());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
 
     }
@@ -238,7 +260,6 @@ public class U15_GardenLocation {
     @Then("The garden is not created")
     public void the_garden_is_not_created() {
         Assertions.assertNull(expectedNewGarden);
-
     }
 
     // AC5
@@ -246,6 +267,7 @@ public class U15_GardenLocation {
     public void city_and_country_error_message() {
         logger.info(String.valueOf(createGardenResult.getModelAndView()));
         ModelAndView modelAndView = createGardenResult.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
         String model = modelAndView.getModel().toString();
 
         Assertions.assertTrue(model.contains("City and Country are required"));

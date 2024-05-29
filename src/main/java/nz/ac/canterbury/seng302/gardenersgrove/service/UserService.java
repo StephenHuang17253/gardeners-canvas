@@ -203,6 +203,7 @@ public class UserService {
         User user = getUserById(id);
         user.getGardens().add(garden);
         userRepository.save(user);
+
     }
 
     /**
@@ -226,6 +227,7 @@ public class UserService {
         }
         return userRepository.findUsersByEmailAddressOrFirstNameAndLastName(fName, lName, email);
     }
+
 
 
 }

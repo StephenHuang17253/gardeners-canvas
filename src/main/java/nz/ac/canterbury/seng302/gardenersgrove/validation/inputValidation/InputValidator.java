@@ -1,10 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
+
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +29,7 @@ public class InputValidator {
     private static final int MAX_EMAIL_LENGTH = 320;
 
     private static UserService userService;
+    private static ProfanityService profanityService;
 
     /**
      * Constructor for the Validation with {@link Autowired} to
@@ -34,10 +38,6 @@ public class InputValidator {
      *
      * @param inputUserService
      */
-    @Autowired
-    public void UserService(UserService inputUserService) {
-        userService = inputUserService;
-    }
 
     /**
      * Warning, constructor only for automated use, for manual use, use
@@ -48,7 +48,10 @@ public class InputValidator {
      * Creating an object of this type manually will have no effect and no use
      * except when testing
      */
-    public InputValidator() {
+    @Autowired
+    public InputValidator(UserService inputUserService, ProfanityService inputProfanityService) {
+        userService = inputUserService;
+        profanityService = inputProfanityService;
     }
 
     /**
@@ -254,6 +257,36 @@ public class InputValidator {
     }
 
     /**
+     * Checks if the given decsription is valid 512 char or less and contains at
+     * least one letter if not empty will return invalid description message in
+     * either case
+     *
+     * @param text
+     * @return
+     */
+    public static ValidationResult validateDescription(String text) {
+        ValidationResult result = new InputValidator(text)
+                .lengthHelper(512)
+                .NotOnlyNumOrSpecChar()
+                .getResult();
+
+        if (!result.valid()) {
+            result.updateMessage(ValidationResult.INVALID_DESCRIPTION.toString());
+            return result;
+        }
+
+        ValidationResult result2 = new InputValidator(text)
+                .profanityHelper()
+                .getResult();
+        if (!result2.valid()) {
+            return result2;
+        }
+
+        return result;
+
+    }
+
+    /**
      * Checks if the given email is valid and unique
      *
      * @param email
@@ -293,7 +326,7 @@ public class InputValidator {
         ValidationResult result = new InputValidator(password)
                 .passwordLikenessHelper(otherFields)
                 .passwordSyntaxHelper()
-                .minimumLengthHelpter(8)
+                .minimumLengthHelper(8)
                 .getResult();
         if (result == ValidationResult.LENGTH_UNDER_MINIMUM) {
             result = ValidationResult.INVALID_PASSWORD;
@@ -315,6 +348,13 @@ public class InputValidator {
                 .getResult();
     }
 
+    public static ValidationResult validatePlantDate(String date) {
+        return new InputValidator(date)
+                .dateFormatHelper()
+                .plantAgeHelper()
+                .getResult();
+    }
+
     /**
      * Checks if the given date is in a valid format
      *
@@ -330,7 +370,7 @@ public class InputValidator {
 
     /**
      * Checks if the given plantCount is a valid integer between 1 and 1,000,000
-     * 
+     *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
@@ -525,7 +565,7 @@ public class InputValidator {
         return this;
     }
 
-    private InputValidator minimumLengthHelpter(int minimumNumberOfDigits) {
+    private InputValidator minimumLengthHelper(int minimumNumberOfDigits) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
@@ -624,6 +664,28 @@ public class InputValidator {
             return this;
         } else if (yearsDifference > 120) {
             this.validationResult = ValidationResult.AGE_ABOVE_120;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    private InputValidator plantAgeHelper() {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
+
+        long yearsDifference = ChronoUnit.YEARS.between(
+                inputtedDate,
+                LocalDate.now());
+
+        if (yearsDifference > 120) {
+            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_120;
             this.passState = false;
             return this;
         }
@@ -788,6 +850,46 @@ public class InputValidator {
             this.passState = false;
             return this;
         }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    private InputValidator NotOnlyNumOrSpecChar() {
+        if (!this.passState) {
+            return this;
+        }
+
+        String filteredValue = testedValue.replace(" ", "");
+
+        if (!filteredValue.equals("") && filteredValue.matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
+            this.validationResult = ValidationResult.INVALID_DESCRIPTION;
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+
+    }
+
+    /**
+     * Sends A string to the bad words API, then checks if the return has
+     * bad word count over 0, if so set to TEXT_CONTAINS_PROFANITY
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    public InputValidator profanityHelper() {
+        if (!this.passState) {
+            return this;
+        }
+        boolean containsProfanity = profanityService.containsProfanity(testedValue);
+
+        if (containsProfanity) {
+            this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
+            this.passState = false;
+            return this;
+        }
+
         this.validationResult = ValidationResult.OK;
         return this;
     }

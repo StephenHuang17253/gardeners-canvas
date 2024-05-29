@@ -1,0 +1,41 @@
+<div th:fragment="weatherBox(weatherIcon, date, day, weatherDescription, minTemp, maxTemp, temp, precipitation, humidity, weatherError)">
+    <div class="weather-box" id="weather-box">
+        <div class="weather-icon-container">
+            <img id="weatherIcon"
+                 th:src="@{${weatherIcon == null ? '/images/not_found.png' : '/images/' + weatherIcon}}" alt="Weather"
+                 class="weather-icon">
+        </div>
+        <br>
+        <div class="weather-date">
+            <span th:if="${date != null}" th:text="${date}"></span>
+            <span th:if="${day != null}" th:text="${day}"></span>
+            <div class="error_chip" th:if="${weatherDescription == null}">
+                <span th:if="${weatherDescription == null}" class="weather_error_text" th:text="${weatherError}"></span>
+            </div>
+            <br>
+        </div>
+        <h3 th:text="${weatherDescription}" class="weather-text"></h3>
+        <div class="weather-details">
+            <div class="weather-detail-pair">
+                <img id="tempIcon" th:if="${temp != null}" th:src="@{/images/temp.png}" alt="Temperature"
+                     class="weather-detail-icon">
+                <span th:if="${temp != null}" th:text="${temp} + '°C'" class="weather-text"></span>
+            </div>
+            <div class="weather-detail-pair">
+                <img id="maxTempIcon" th:if="${maxTemp != null}" th:src="@{/images/max_temp.png}"
+                     alt="Max Temperature" class="weather-detail-icon">
+                <span th:if="${maxTemp != null}" th:text="${maxTemp} + '°C'" class="weather-text"></span>
+            </div>
+            <div class="weather-detail-pair">
+                <img id="minTempIcon" th:if="${minTemp != null}" th:src="@{/images/min_temp.png}"
+                     alt="Min Temperature" class="weather-detail-icon">
+                <span th:if="${minTemp != null}" th:text="${minTemp} + '°C'" class="weather-text"></span>
+            </div>
+            <div class="weather-detail-pair">
+                <img id="precipitationIcon" th:src="@{/images/precipitation.png}" alt="Precipitation"
+                     class="weather-detail-icon">
+                <span th:if="${precipitation != null}" th:text="${precipitation} + 'mm'" class="weather-text"></span>
+            </div>
+        </div>
+    </div>
+</div>

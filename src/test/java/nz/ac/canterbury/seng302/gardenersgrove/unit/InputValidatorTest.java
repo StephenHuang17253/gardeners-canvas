@@ -1,5 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
-
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -21,15 +21,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class InputValidatorTest {
 
     /**
-     * Setup a mock userService class for testing that email uniqueness validation works
+     * Setup a mock userService class for testing that email uniqueness validation
+     * works
      */
     private static UserService userServiceMock;
+
+    /**
+     * Setup a mock profanityService class for testing
+     */
+    private static ProfanityService profanityServiceMock;
 
     @BeforeAll
     static void setup() {
         userServiceMock = Mockito.mock(UserService.class);
-        InputValidator testValidator = new InputValidator();
-        testValidator.UserService(userServiceMock);
+        profanityServiceMock = Mockito.mock(ProfanityService.class);
+        InputValidator testValidator = new InputValidator(userServiceMock, profanityServiceMock);
     }
 
     @BeforeEach
@@ -435,14 +441,13 @@ class InputValidatorTest {
     };
 
 
-
     /**
      * Test for invalid passwords
      * @param password
      */
     @ParameterizedTest
     @CsvSource({ "aaa", "aaaaaaaa", "000!0000","password1!","Password123", "Password!@#", "PASSWORD1!",
-    "1D!0", "D!1", "aA!0","Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
+            "1D!0", "D!1", "aA!0","Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
     public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password){
         String firstName = "John";
         String lastName = "Doe";

@@ -58,11 +58,15 @@ public class PlantFormControllerTest {
                 "test",
                 "test",
                 "test",
+                "test",
                 "80",
                 "test",
                 10.0,
                 false,
-                mockUser);
+                "",
+                "",
+                mockUser
+        );
         gardenService.addGarden(test_garden);
 
         plantService.addPlant("test",
@@ -353,7 +357,7 @@ public class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "11/11/2000", "07/06/9999"
+            "11/11/2000", "07/06/2023"
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDateVariantsPass(String date) throws Exception {

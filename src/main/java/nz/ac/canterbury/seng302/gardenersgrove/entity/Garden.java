@@ -1,10 +1,14 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Entity class of a Garden, reflecting an entry of garden name, location and
+ * size (optional)
  * Entity class of a Garden, reflecting an entry of garden name, location and
  * size (optional)
  * and any plant entity objects that is associated with
@@ -19,6 +23,9 @@ public class Garden {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String gardenName;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String gardenDescription;
 
     @Column(columnDefinition = "TEXT")
     private String gardenAddress;
@@ -38,11 +45,22 @@ public class Garden {
     @Column(nullable = true)
     private Double gardenSize;
 
+    @Column(columnDefinition = "TEXT")
+    private String gardenLongitude;
+
+    @Column(columnDefinition = "TEXT")
+    private String gardenLatitude;
+
+    @Column(name = "creation_date")
+    @CreatedDate
+    private LocalDateTime creationDate;
+
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "garden_id")
     private List<Plant> plants = new ArrayList<>();
 
@@ -52,9 +70,7 @@ public class Garden {
     /**
      * JPA required no-args constructor
      */
-    public Garden() {
-    }
-
+    public Garden() {}
     /**
      * Creates a new Garden object.
      * 
@@ -68,22 +84,26 @@ public class Garden {
      * @param isPublic       the visibility of the garden
      * @param owner          the User object that owns the garden
      */
-    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, User owner) {
+    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb, String gardenCity,
+            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude, User owner) {
         this.gardenName = gardenName;
+        this.gardenDescription = gardenDescription;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
         this.gardenCity = gardenCity;
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
         this.isPublic = isPublic;
         this.owner = owner;
+        this.creationDate = LocalDateTime.now();
     }
 
     /**
      * Creates a new Garden object without owner used for update Garden.
-     * 
+     *
      * @param gardenName     the name of the garden
      * @param gardenAddress  the address of the garden
      * @param gardenSuburb   the suburb of the garden
@@ -91,17 +111,24 @@ public class Garden {
      * @param gardenPostcode the postcode of the garden
      * @param gardenCountry  the country of the garden
      * @param gardenSize     the size of the garden
+     * @param isPublic       the visibility of the garden
      */
-    public Garden(String gardenName, String gardenAddress, String gardenSuburb, String gardenCity,
-            String gardenPostcode, String gardenCountry, double gardenSize) {
+    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb, String gardenCity,
+                  String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude) {
         this.gardenName = gardenName;
+        this.gardenDescription = gardenDescription;
         this.gardenAddress = gardenAddress;
         this.gardenSuburb = gardenSuburb;
         this.gardenCity = gardenCity;
         this.gardenPostcode = gardenPostcode;
         this.gardenCountry = gardenCountry;
         this.gardenSize = gardenSize;
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
+        this.isPublic = isPublic;
+        this.owner = owner;
     }
+
 
     public Long getGardenId() {
         return gardenId;
@@ -113,6 +140,14 @@ public class Garden {
 
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
+    }
+
+    public String getGardenDescription() {
+        return gardenDescription;
+    }
+
+    public void setGardenDescription(String gardenDescription) {
+        this.gardenDescription = gardenDescription;
     }
 
     public String getGardenAddress() {
@@ -159,9 +194,17 @@ public class Garden {
         return gardenSize;
     }
 
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
+
+    public String getGardenLongitude() { return gardenLongitude;}
+    public void setGardenLongitude(String gardenLongitude) {this.gardenLongitude = gardenLongitude;}
+    public String getGardenLatitude() { return gardenLatitude;}
+    public void setGardenLatitude(String gardenLatitude) {this.gardenLatitude = gardenLatitude;}
 
     public User getOwner() {
         return owner;
@@ -218,6 +261,7 @@ public class Garden {
         return "Garden{" +
                 "id=" + gardenId +
                 ", name='" + gardenName + '\'' +
+                ", description='" + gardenDescription + '\'' +
                 ", location='" + getGardenLocation() + '\'' +
                 ", size='" + gardenSize + '\'' +
                 ", owner_id='" + owner.getId() + '\'' +

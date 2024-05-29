@@ -17,6 +17,7 @@ public enum ValidationResult {
     INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
     AGE_BELOW_13("You must be 13 years or older to create an account"),
     AGE_ABOVE_120("The maximum age allowed is 120 years"),
+    PLANT_AGE_ABOVE_120("The maximum age for a plants date is 120 years"),
     INVALID_DATE_FORMAT("Date in not in valid format, DD/MM/YYYY"),
     NON_UNIQUE_EMAIL("Email is already in use"),
     NON_NUMERIC_COMMA("must be a positive number"),
@@ -24,8 +25,10 @@ public enum ValidationResult {
     LENGTH_UNDER_MINIMUM("must be more than minimum number of characters"),
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
     INVALID_FILE_SIZE("Image must be less than 10MB"),
-    AREA_TOO_SMALL(" (meters squared) is too small."),
-    AREA_TOO_LARGE(" (meters squared) is too large."),
+    AREA_TOO_SMALL("Area (meters squared) is too small"),
+    AREA_TOO_LARGE("Area (meters squared) is too large"),
+    DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
+    INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text"),
     INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
 
     private String message;
