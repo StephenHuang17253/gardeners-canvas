@@ -58,4 +58,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("email") String email);
+    void deleteById(long id);
+
+
 }
