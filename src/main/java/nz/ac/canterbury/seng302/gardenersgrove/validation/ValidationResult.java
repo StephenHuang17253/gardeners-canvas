@@ -17,6 +17,7 @@ public enum ValidationResult {
     INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
     AGE_BELOW_13("You must be 13 years or older to create an account"),
     AGE_ABOVE_120("The maximum age allowed is 120 years"),
+    PLANT_AGE_ABOVE_120("The maximum age for a plants date is 120 years"),
     INVALID_DATE_FORMAT("Date in not in valid format, DD/MM/YYYY"),
     NON_UNIQUE_EMAIL("Email is already in use"),
     NON_NUMERIC_COMMA("must be a positive number"),
