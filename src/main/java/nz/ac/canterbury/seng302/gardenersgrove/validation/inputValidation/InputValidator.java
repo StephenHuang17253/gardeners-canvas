@@ -651,15 +651,7 @@ public class InputValidator {
                 inputtedDate,
                 LocalDate.now());
 
-        long daysDifference = ChronoUnit.DAYS.between(
-                inputtedDate,
-                LocalDate.now());
-
-        if (daysDifference < 0) {
-            this.validationResult = ValidationResult.PLANT_AGE_FUTURE;
-            this.passState = false;
-            return this;
-        } else if (yearsDifference > 120) {
+        if (yearsDifference > 120) {
             this.validationResult = ValidationResult.PLANT_AGE_ABOVE_120;
             this.passState = false;
             return this;
