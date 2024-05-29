@@ -65,6 +65,8 @@ deploy-staging:
     - echo "export LOCATIONIQ_API_KEY=${LOCATIONIQ_API_KEY}" >> /home/gitlab-runner/staging/.env
     - echo "export EMAIL_PASSWORD=${EMAIL_PASSWORD}" >> /home/gitlab-runner/staging/.env
     - echo "export EMAIL_USERNAME=${EMAIL_USERNAME}" >> /home/gitlab-runner/staging/.env
+    - echo "export AZURE_ENDPOINT=${AZURE_ENDPOINT}" >> /home/gitlab-runner/staging/.env
+    - echo "export AZURE_MODERATOR_KEY=${AZURE_MODERATOR_KEY}" >> /home/gitlab-runner/staging/.env
     - echo "export BASE_URL=${BASE_URL}/test" >> /home/gitlab-runner/staging/.env
     - sudo systemctl restart staging
   artifacts:
@@ -88,6 +90,8 @@ deploy-production:
     - echo "export LOCATIONIQ_API_KEY=${LOCATIONIQ_API_KEY}" >> /home/gitlab-runner/production/.env
     - echo "export EMAIL_PASSWORD=${EMAIL_PASSWORD}" >> /home/gitlab-runner/production/.env
     - echo "export EMAIL_USERNAME=${EMAIL_USERNAME}" >> /home/gitlab-runner/production/.env
+    - echo "export AZURE_ENDPOINT=${AZURE_ENDPOINT}" >> /home/gitlab-runner/production/.env
+    - echo "export AZURE_MODERATOR_KEY=${AZURE_MODERATOR_KEY}" >> /home/gitlab-runner/production/.env
     - echo "export BASE_URL=${BASE_URL}/prod" >> /home/gitlab-runner/production/.env
     - sudo systemctl restart production
   artifacts:
