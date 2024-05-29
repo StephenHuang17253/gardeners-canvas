@@ -10,6 +10,7 @@
     margin-left: 10px;
     margin-right: 10px;
     text-decoration: none;
+    word-break: break-word;
 }
 
 .gardenbox:hover {

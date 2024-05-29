@@ -1,0 +1,58 @@
+.tableList-header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+    font-style: normal;
+    text-decoration: none;
+    color: #0d3c00;
+    font-family: "Verdana", sans-serif;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+}
+
+.tableList-header-title
+{
+    display: block;
+    font-size: 36px;
+}
+.tableList-header-button-contain{
+    margin: 10px;
+    display: inline-flex;
+    gap: 3px;
+}
+.rounded-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.rounded-button:hover {
+    background-color: #45a049; /* Darker background color on hover */
+}
+.tableList-table-contain{
+    background-color: #f3f2ed;
+    font-style: normal;
+    text-decoration: none;
+    color: #0d3c00;
+    font-family: "Verdana", sans-serif;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    column-count: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 10px 10px;
+
+}
+.tableList-table-count{
+    margin-left: 10px;
+    margin-bottom: 5px;
+}

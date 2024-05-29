@@ -89,3 +89,24 @@ function openManageFriendsPage() {
     }
 
 }
+
+
+function openPublicGardens() {
+    var currentUrl = window.location.pathname;
+
+    // if currentURL is not /public-gardens send them to this page
+    if (currentUrl !== '/public-gardens') {
+        localStorage.setItem('previousUrl', window.location.href);
+
+        // Redirect to create-new-garden page
+        let instance = checkInstance(currentUrl)
+        window.location.href = `${instance}/public-gardens`;
+
+    }
+    var previousUrl = localStorage.getItem('previousUrl');
+    // Default the return URL to home page if not set
+    if (!previousUrl) {
+        localStorage.setItem('previousUrl', '/home');
+    }
+
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>My Gardens</title>
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <link th:href="@{/css/gridTableList.css}" rel="stylesheet">
+    <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+    <link th:href="@{/css/paginationNavBar.css}" rel="stylesheet">
+</head>
+
+<body>
+<div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('browsePublic')}"
+     th:with="loggedIn=${loggedIn}"></div>
+<div class="main-container">
+    <div class="tableList-header">
+        <h1 class="tableList-header-title"> Public Gardens </h1>
+        <div th:replace="~{fragmentExample/fragments/paginationPageOverview.html}"
+             th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
+        </div>
+        <br>
+    </div>
+    <div id="searchBarContainer">
+        <form th:action="@{/public-gardens/search/1}" method="get" class="search-form">
+            <input type="text" name="searchInput" class="search-bar" id="friendSearchBar" placeholder="Search"
+                   maxlength="5000" th:value="${searchValue}"/>
+            <button type="submit" class="user_button">Search</button>
+        </form>
+    </div>
+    <div th:if="${SearchErrorText!=''}">
+        <h3 class="error" th:text="${SearchErrorText}"></h3>
+    </div>
+    <div class="tableList-table-contain" th:if="${SearchErrorText==''}">
+        <div th:each="garden : ${publicGardens}">
+            <div th:replace="~{fragmentExample/fragments/gardenBox.html ::
+                        gardenBox(gardenId=${garden.gardenId},
+                        gardenName=${garden.gardenName},
+                        gardenLocation=${garden.gardenLocation},
+                        gardenSize=${garden.gardenSize},
+                        numberOfPlants=${garden.plants?.size()})}">
+            </div>
+        </div>
+    </div>
+    <div th:if="${SearchErrorText=='' and searchValue == ''}">
+        <div th:replace="~{fragmentExample/fragments/paginationNav.html}"
+             th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+        </div>
+    </div>
+    <div th:if="${SearchErrorText=='' and searchValue != ''}">
+        <div th:replace="~{fragmentExample/fragments/searchPaginationNav.html}"
+             th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, searchValue=${searchValue}">
+        </div>
+    </div>
+</div>
+</body>
+</html>
