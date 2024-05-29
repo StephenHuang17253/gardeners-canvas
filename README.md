@@ -1,10 +1,5 @@
 # SENG302 The Gardener's Grove
 
-#### Current Deployment Status
-- Deployed version is not fully functional, use local version
-- Currently using in memory database
-
-
 Basic project using ```gradle```, ```Spring Boot```, ```Thymeleaf```, and ```GitLab CI```.
 
 Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruit and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discuss various gardening topics.
@@ -14,6 +9,7 @@ Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise leve
 ## User accounts for testing the application
 
 This project includes user registration, user login, profile view, profile edit, garden view, garden edit, plant view, plant edit, and garden location when running with environment variables.
+This project also includes browsing public gardens, managing friends (adding friends, pending, accepted, and declined invites), and weather monitoring.
 
 For more information, check the user manual in the wiki.
 
@@ -28,6 +24,10 @@ For more information, check the user manual in the wiki.
 
 ## How to run
 ### 1 - Running the project with full functionality
+#### Use the deployed link below
+
+[Deployed Production Server](https://csse-seng302-team500.canterbury.ac.nz/prod/)
+
 #### From the project on IDE...
 
 ##### Set the following environment variables within your IDE to run application with full functionality:
@@ -42,11 +42,17 @@ EMAIL_USERNAME=<your_app_password>
 
 LOCATIONIQ_API_KEY=<your_locationiq_api_key>
 
+AZURE_ENDPOINT=<your_azure_endpoint>
+
+AZURE_MODERATOR_KEY=<your_azure_key>
+
 For running locally on port 8080, <your_base_url> will be http://localhost:8080.
 
 Values for <your_email> and <your_app_password> are located on the repository wiki.
 
 To get <your_locationiq_api_key> you can visit [this link](https://my.locationiq.com/register) and get a key for free (they don't ask for credit card.)
+
+To get <your_azure_endpoint> and <your_azure_key> you can visit [this link] https://azure.microsoft.com/en-us/products/ai-services/ai-content-safety. There is a cost associated unless you are a student, in which case there is a free plan which gives $100 USD credit.
 
 The credentials for the deployed version be found on the repository within the environment variables. 
 
@@ -99,10 +105,11 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --locationiq.access.token=<your_locationiq_api_key>\
 --spring.mail.username=<your_email> \
 --spring.mail.password=<your_app_password> \
---spring.base.url=http://localhost:8080
+--spring.base.url=http://localhost:8080 \
+--azure.service.endpoint=<your_azure_endpoint> \
+--azure.moderator.token=<your_azure_key>
 
 ```
-
 
 Steps without setting environment variables (Partial functionality)
 ```
@@ -132,8 +139,6 @@ gradlew bootRun
 
 ### 3 -  How to run tests with full functionality
 #### From the project open on IDE ...
-
-Ensure you have environment variables setup as metioned in Section 1 of How to run. 
 
 ##### To run unit tests:
 
@@ -183,6 +188,8 @@ gradlew test
 - [Learn resources](https://learn.canterbury.ac.nz/course/view.php?id=17797&section=8)
 - [LocationIQ API Docs](https://docs.locationiq.com/reference/reverse-api)
 - [Spring Boot Starter Mail Starter Guide](https://www.baeldung.com/spring-email)
+- [Weather API (Open-Meteo) Docs](https://open-meteo.com/en/docs)
+- [Profanity API (Azure AI Content Safety) Docs](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview)
 
 ## Licences
 
