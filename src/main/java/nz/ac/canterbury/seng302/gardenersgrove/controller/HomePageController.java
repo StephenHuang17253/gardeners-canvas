@@ -71,6 +71,14 @@ public class HomePageController {
         return "redirect:./home";
     }
 
+    @GetMapping("/bootstrap")
+    public String bootstrap(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
+        model.addAttribute("loggedIn", loggedIn);
+        return "bootstrapTest";
+    }
+
     /**
      * Gets the resource url for the profile picture, or the default profile picture
      * if the user does not have one
