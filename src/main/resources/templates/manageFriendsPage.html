@@ -4,7 +4,9 @@
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Manage Friends</title>
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link th:href="@{/css/bootStrap.css}" rel="stylesheet">
     <link th:href="@{/css/tableList.css}" rel="stylesheet">
     <link th:href="@{/css/infoBox.css}" rel="stylesheet">
     <link th:href="@{/css/friendBox.css}" rel="stylesheet">
@@ -13,7 +15,7 @@
 </head>
 
 <body>
-<div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('manageFriends')}" th:with="loggedIn=${loggedIn}"></div>
+<div th:replace="~{fragments/navBar.html :: navBar('manageFriends')}" th:with="loggedIn=${loggedIn}"></div>
 <div class = "main-container">
     <div class="tableList-header">
         <h1 class="tableList-header-title"> Manage Friends </h1>
@@ -41,7 +43,7 @@
                     <h1>Friends</h1>
                 </div>
                 <div th:each="friend : ${userFriends}">
-                    <div th:replace="~{fragmentExample/fragments/friendsBox ::
+                    <div th:replace="~{fragments/friendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
                                      friendsGardenLink=${friend.getFriendGardenLink},
@@ -73,7 +75,7 @@
                 </div>
             </div>
             <div th:each="friend : ${searchResults}">
-                <div th:replace="~{fragmentExample/fragments/searchFriendsBox ::
+                <div th:replace="~{fragments/searchFriendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
                                      friendsGardenLink=${friend.getFriendGardenLink},
@@ -97,7 +99,7 @@
                     <span th:text="${pendingFriends?.size() ?: 0} + ' Requests'"> </span>
                 </div>
                 <div th:each="friend : ${pendingFriends}">
-                    <div th:replace="~{fragmentExample/fragments/pendingFriendsBox ::
+                    <div th:replace="~{fragments/pendingFriendsBox ::
                                     pendingFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                     friendsName=${friend.getFriendName},
                                     isSender=${friend.isSender},
@@ -112,7 +114,7 @@
                 <h1>Declined Requests</h1>
             </div>
             <div th:each="friend : ${declinedFriends}">
-                <div th:replace="~{fragmentExample/fragments/declinedFriendsBox ::
+                <div th:replace="~{fragments/declinedFriendsBox ::
                                     declinedFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                     friendsName=${friend.getFriendName},
                                     isSender=${friend.isSender},

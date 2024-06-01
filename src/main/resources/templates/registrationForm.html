@@ -6,11 +6,13 @@
     <title>Registration Form</title>
     <link th:href="@{/css/registrationForm.css}" rel="stylesheet">
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link th:href="@{/css/bootStrap.css}" rel="stylesheet">
 </head>
 
 <body th:onload="'hideLastNameOnLoad(' + ${noLastName} + ');'">
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('register')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="fragments/navBar.html :: navBar('register')" th:with="loggedIn=${loggedIn}"></div>
     <h1>Registration Form</h1>
     <div>
         <form th:action="@{/register}" method="post">

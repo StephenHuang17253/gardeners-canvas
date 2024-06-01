@@ -4,7 +4,9 @@
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Garden Details</title>
     <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/navBar.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link th:href="@{/css/bootStrap.css}" rel="stylesheet">
     <link th:href="@{/css/tableList.css}" rel="stylesheet">
     <link th:href="@{/css/infoBox.css}" rel="stylesheet">
     <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
@@ -14,7 +16,7 @@
     <script th:src="@{/js/wateringBox.js}"></script>
 </head>
 <body>
-<div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+<div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 <div class = "main-container">
     <div class="content-container">
         <div class="tableList-header">
@@ -42,7 +44,7 @@
         <br>
         <div class="weather">
             <div th:each="prediction : ${weather}">
-                <div th:replace="~{fragmentExample/fragments/weatherBox.html :: weatherBox(
+                <div th:replace="~{fragments/weatherBox.html :: weatherBox(
                     weatherIcon=${prediction.getWeatherIcon()},
                     date=${prediction.getDate()},
                     day=${prediction.getDay()},
@@ -74,7 +76,7 @@
         </div>
         <div class="plants-grid">
             <div th:each="plant : ${plants}" class="plant-box">
-                <div th:replace="~{fragmentExample/fragments/plantBox.html :: plantBox(
+                <div th:replace="~{fragments/plantBox.html :: plantBox(
                     plantId=${plant.getPlantId()},
                     plantName=${plant.getPlantName()},
                     plantCount=${plant.getPlantCount()},

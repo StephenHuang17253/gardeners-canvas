@@ -4,13 +4,15 @@
 <head>
   <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
   <title>Validate Gardener's Grove Account</title>
-  <link th:href="@{/css/navBar.css}" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link th:href="@{/css/bootStrap.css}" rel="stylesheet">
   <link th:href="@{/css/baseCss.css}" rel="stylesheet">
   <link th:href="@{/css/verificationPage.css}" rel="stylesheet" />
 </head>
 
 <body>
-  <div th:replace="fragmentExample/fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
+  <div th:replace="fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
   <h1>Verify Account</h1>
   <form id="code-form" th:action="@{/verify}" method="post">
     <div>
