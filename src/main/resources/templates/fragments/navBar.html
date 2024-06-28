@@ -8,13 +8,13 @@ insert into the head:
 "
 insert into the HTML body at the top:
 "
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar">
+<div th:replace="fragments/navBar.html :: navBar">
 "
 Editing content below will change the nav bar on all pages where it is implemented
 -->
-    
-<nav th:fragment = "navBar(activeParam)" id="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" th:href="@{/home}">Gardener's Grove</a>
+
+<nav th:fragment="navBar(activeParam)" id="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" onclick="navigateTo('/')">Gardener's Grove</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -22,60 +22,57 @@ Editing content below will change the nav bar on all pages where it is implement
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li  th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'create' ? 'active' : ''}|">
-                <a class="nav-link" th:href="@{/create-new-garden}">Create Garden</a>
+            <li th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'create' ? 'active' : ''}|">
+                <a class="nav-link" onclick="navigateTo('/create-new-garden')">Create Garden</a>
             </li>
 
             <li th:if="${loggedIn}" class="|nav-item dropdown ${activeParam == 'home' ? 'active' : ''}|">
-                <a class="nav-link dropdown-toggle" th:href="/my-gardens" id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" onclick="navigateTo('/my-gardens')">
                     My Gardens
                 </a>
+
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}" th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}"></a>
+                    <a class="dropdown-item" th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}"
+                        th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}"></a>
                 </div>
             </li>
 
             <li th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'browsePublic' ? 'active' : ''}|">
-                <a class="nav-link" th:href="@{/public-gardens}">Browse Gardens</a>
+                <a class="nav-link" onclick="navigateTo('/public-gardens')">Browse Gardens</a>
             </li>
 
-            <li  th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'manageFriends' ? 'active' : ''}|">
-                <a class="nav-link" th:href="@{/manage-friends}">Manage Friends</a>
+            <li th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'manageFriends' ? 'active' : ''}|">
+                <a class="nav-link" onclick="navigateTo('/manage-friends')">Manage Friends</a>
             </li>
         </ul>
 
         <ul class="navbar-nav" th:if="${!loggedIn}">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/login}">Login</a>
+                <a class="nav-link" onclick="navigateTo('/login')">Login</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/register}">Register</a>
+                <a class="nav-link" onclick="navigateTo('/register')">Register</a>
             </li>
         </ul>
 
         <ul class="navbar-nav" th:if="${loggedIn}">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/profile}">Profile</a>
+                <a class="nav-link" onclick="navigateTo('/profile')">Profile</a>
             </li>
 
             <li class="nav-item">
                 <form id="logoutForm" th:action="@{/logout}" method="post">
-                    <a type="submit" class="nav-link" onclick="document.getElementById('logoutForm').submit();">Logout</a>
+                    <a type="submit" class="nav-link"
+                        onclick="document.getElementById('logoutForm').submit()">Logout</a>
                 </form>
             </li>
         </ul>
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
+    <div th:replace="fragments/bootStrapScripts.html"></div>
 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+    <script th:src="@{/js/navBar.js}"></script>
 </nav>

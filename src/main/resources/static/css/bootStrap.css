@@ -4,3 +4,15 @@
     max-height: 200px;
     overflow-y: scroll;
 }
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.nav-link:hover {
+    cursor: pointer;
+}
+
+.navbar-brand:hover {
+    cursor: pointer;
+}
