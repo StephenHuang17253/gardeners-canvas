@@ -1,16 +1,3 @@
-
-// Some jQuery to make the dropdown open on hover instead of on click
-// Found here: https://www.geeksforgeeks.org/how-to-make-menu-dropdown-on-hover-using-bootstrap/
-$(document).ready(() => {
-    $('.dropdown').hover(() => {
-        $(this).addClass('show');
-        $(this).find('.dropdown-menu').addClass('show');
-    }, () => {
-        $(this).removeClass('show');
-        $(this).find('.dropdown-menu').removeClass('show');
-    });
-});
-
 const getBaseUrl = (currentUrl) => {
     // Get the correct base url, taking into account if the app is deployed on test or prod
     let instance = '';
