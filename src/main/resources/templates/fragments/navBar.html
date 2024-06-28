@@ -22,11 +22,11 @@ Editing content below will change the nav bar on all pages where it is implement
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-            <li th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'create' ? 'active' : ''}|">
+            <li th:if="${loggedIn == null ? false : loggedIn}" th:class="|nav-item ${activeParam == 'create' ? 'active' : ''}|">
                 <a class="nav-link" onclick="navigateTo('/create-new-garden')">Create Garden</a>
             </li>
 
-            <li th:if="${loggedIn}" class="|nav-item dropdown ${activeParam == 'home' ? 'active' : ''}|">
+            <li th:if="${loggedIn == null ? false : loggedIn}" class="|nav-item dropdown ${activeParam == 'home' ? 'active' : ''}|">
 
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false" onclick="navigateTo('/my-gardens')">
@@ -39,16 +39,16 @@ Editing content below will change the nav bar on all pages where it is implement
                 </div>
             </li>
 
-            <li th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'browsePublic' ? 'active' : ''}|">
+            <li th:if="${loggedIn == null ? false : loggedIn}" th:class="|nav-item ${activeParam == 'browsePublic' ? 'active' : ''}|">
                 <a class="nav-link" onclick="navigateTo('/public-gardens')">Browse Gardens</a>
             </li>
 
-            <li th:if="${loggedIn}" th:class="|nav-item ${activeParam == 'manageFriends' ? 'active' : ''}|">
+            <li th:if="${loggedIn == null ? false : loggedIn}" th:class="|nav-item ${activeParam == 'manageFriends' ? 'active' : ''}|">
                 <a class="nav-link" onclick="navigateTo('/manage-friends')">Manage Friends</a>
             </li>
         </ul>
 
-        <ul class="navbar-nav" th:if="${!loggedIn}">
+        <ul class="navbar-nav" th:if="${loggedIn == null ? true : !loggedIn}">
             <li class="nav-item">
                 <a class="nav-link" onclick="navigateTo('/login')">Login</a>
             </li>
@@ -58,7 +58,7 @@ Editing content below will change the nav bar on all pages where it is implement
             </li>
         </ul>
 
-        <ul class="navbar-nav" th:if="${loggedIn}">
+        <ul class="navbar-nav" th:if="${loggedIn == null ? false : loggedIn}">
             <li class="nav-item">
                 <a class="nav-link" onclick="navigateTo('/profile')">Profile</a>
             </li>
