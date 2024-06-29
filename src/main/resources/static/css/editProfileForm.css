@@ -47,6 +47,11 @@ form input[type=text] {
     color: red;
 }
 
+.errorbox {
+    border: 1px solid red;
+}
+
+
 
 /* profile picture styling */
 .profile_picture_container {
