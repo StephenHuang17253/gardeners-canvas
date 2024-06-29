@@ -1,7 +1,9 @@
 /**
 Stylises the editForm.html webpage
 */
-
+body {
+    font-family: sans-serif;
+}
 .container {
     position: absolute;
     top: 50%;
