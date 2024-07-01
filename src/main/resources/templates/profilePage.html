@@ -13,7 +13,7 @@
 
 <body>
 <div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="form-container">
+    <div class="main-container">
         <h2>My Profile</h2>
         <div class="profile_info">
             <form th:action="@{profile}" method="post" enctype="multipart/form-data">
@@ -27,9 +27,20 @@
                 </div>
             </form>
             <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
-            <p th:text="'Name: ' + ${userName}">Name: </p>
-            <p th:if="${dateOfBirth}" th:text="'DoB: ' + ${dateOfBirth}"></p>
-            <p th:text="'Email Address: ' + ${emailAddress}">Email: </p>
+            <div class="details">
+                <div class="detail-container">
+                    <sup>Name:</sup>
+                    <p th:text="${userName}"></p>
+                </div>
+                <div class="detail-container">
+                    <sup>Date of Birth:</sup>
+                    <p th:if="${dateOfBirth}" th:text="'Date of Birth: ' + ${dateOfBirth}"></p>
+                </div>
+                <div class="detail-container">
+                    <sup>Email Address:</sup>
+                    <p th:text="${emailAddress}">Email: </p>
+                </div>
+            </div>
             <div class="buttons">
                 <a th:href="@{/profile/edit}"><button class="user_button"> Edit Profile</button></a>
                 <a th:href="@{/home}"><button class="user_button">Home</button></a>

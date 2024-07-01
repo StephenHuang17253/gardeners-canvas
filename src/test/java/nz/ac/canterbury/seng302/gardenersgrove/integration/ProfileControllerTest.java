@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,9 @@ public class ProfileControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
+    private EmailService emailService;
+
+    @MockBean
     private UserService userServiceMock;
 
     private UserService userServiceTestMock;
@@ -74,14 +78,14 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void controllerLoads()
+    void controllerLoads()
     {
         assertNotNull(profileController);
     }
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void mvcMockIsAlive() throws Exception
+    void mvcMockIsAlive() throws Exception
     {
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         mockMvc.perform(get("/profile"))
@@ -89,7 +93,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void getProfilePage_notAuthenticated_Forbidden() throws Exception
+    void getProfilePage_notAuthenticated_Forbidden() throws Exception
     {
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isForbidden());
@@ -97,7 +101,7 @@ public class ProfileControllerTest {
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void getProfilePage_LoggedIn_FilledPage() throws Exception
+    void getProfilePage_LoggedIn_FilledPage() throws Exception
     {
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
 
@@ -113,7 +117,7 @@ public class ProfileControllerTest {
             "UsersNameIsJohnSoThisShouldntWork!1", "UsersLastNameIsTest1!", "UsersEmailIsprofile.user.test@ProfileController.com1",
             "UsersDOBis2003-05-02!", "1backslash/" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void testUpdatePasswordFailCases(String input) throws Exception {
+    void testUpdatePasswordFailCases(String input) throws Exception {
         String currentPassword = "currentPassword1!";
         mockUser.setPassword(currentPassword);
         mockUser.setId(1L);
@@ -132,7 +136,7 @@ public class ProfileControllerTest {
             "1Fullstop.", "1Apostrophe'","1Question?", "1Atsymbol@", "1Hashtag#", "1Moneysign$",
             "1Percent%", "1Uparrow^", "1Andsymbol&", "1Starsymbol*", "1Bracket(", "1Hyphen-", "1Underscore_"})
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    public void testUpdatePasswordPassCases(String input) throws Exception {
+    void testUpdatePasswordPassCases(String input) throws Exception {
         String currentPassword = "currentPassword1!";
         mockUser.setPassword(currentPassword);
         mockUser.setId(1L);
@@ -145,9 +149,6 @@ public class ProfileControllerTest {
                 .andDo(MockMvcResultHandlers.print());
         Mockito.verify(userServiceMock, Mockito.times(1)).updatePassword(1L, input);
     }
-
-
-
 
     // Add tests for posting picture method
     // useful reference: https://stackoverflow.com/questions/38571716/how-to-put-multipart-form-data-using-spring-mockmvc

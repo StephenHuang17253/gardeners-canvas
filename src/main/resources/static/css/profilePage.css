@@ -50,3 +50,24 @@ button a {
     align-items: center;
     gap: 10px;
 }
+.details {
+    text-align: left;
+}
+.detail-container {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.detail-container sup,
+.detail-container p {
+    margin: 0;
+    padding: 0;
+}
+
+.detail-container sup {
+    margin-right: 5px;
+    font-weight: bold;
+}
+.detail-container p {
+    vertical-align: top;
+}
