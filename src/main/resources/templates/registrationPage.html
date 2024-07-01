@@ -18,57 +18,57 @@
         <div class="row justify-content-center my-5">
             <div class="col-lg-6">
                 <form th:action="@{/register}" method="post">
-                        <div class="mb-3">
-                            <label for="firstName" class="form-label">First Name *</label>
-                            <input type="text" class="form-control" th:name="firstName" th:value="*{firstName}"
-                                autofocus>
-                            <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
-                        </div>
-                
-                        <div class="mb-3" id="lastNameDiv">
-                            <label for="lastName" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="lastName" th:name="lastName" th:value="*{lastName}">
-                            <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
-                        </div>
+                    <div class="mb-3">
+                        <label for="firstName" class="form-label">First Name *</label>
+                        <input type="text" class="form-control" th:name="firstName" th:value="*{firstName}"
+                            autofocus>
+                        <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                    </div>
             
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="noLastName" th:value="true" th:checked="${noLastName}"
-                                onchange="hideLastName(event.target.checked)">
-                            <label class="form-check-label" for="lastNameCheck">
-                                I have no Surname
-                            </label>
-                        </div>
-                
-                        <div class="mb-3">
-                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" th:name="dateOfBirth" th:value="*{dateOfBirth}"
-                                max="9999-12-30" min="0000-01-01">
-                            <p th:if="${dateOfBirthError}" class="text-danger fs-6" th:text="${dateOfBirthError}"></p>
-                        </div>
-                
-                        <div class="mb-3">
-                            <label for="emailAddress" class="form-label">Email Address *</label>
-                            <input type="text" class="form-control" th:name="emailAddress" th:value="*{emailAddress}">
-                            <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
-                        </div>
-                
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password *</label>
-                            <input type="password" class="form-control" th:name="password" th:value="*{password}">
-                            <p th:if="${passwordError}" class="text-danger fs-6" th:text="${passwordError}"></p>
-                        </div>
-                
-                        <div class="mb-3">
-                            <label for="repeatPassword" class="form-label">Repeat Password *</label>
-                            <input type="password" class="form-control" th:name="repeatPassword"
-                                th:value="*{repeatPassword}">
-                            <p th:if="${passwordMatchingError}" class="text-danger fs-6" th:text="${passwordMatchingError}"></p>
-                        </div>
-                
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary" formnovalidate onclick="lol()">Sign Up!</button>
-                            <a th:href="@{/home}"><button class="btn btn-secondary" type="button">Cancel :(</button></a>
-                        </div>
+                    <div class="mb-3" id="lastNameDiv">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" th:name="lastName" th:value="*{lastName}">
+                        <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                    </div>
+        
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="noLastName" th:value="true" th:checked="${noLastName}"
+                            onchange="hideLastName(event.target.checked)">
+                        <label class="form-check-label" for="lastNameCheck">
+                            I have no Surname
+                        </label>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" th:name="dateOfBirth" th:value="*{dateOfBirth}"
+                            max="9999-12-30" min="0000-01-01">
+                        <p th:if="${dateOfBirthError}" class="text-danger fs-6" th:text="${dateOfBirthError}"></p>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="emailAddress" class="form-label">Email Address *</label>
+                        <input type="text" class="form-control" th:name="emailAddress" th:value="*{emailAddress}">
+                        <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password *</label>
+                        <input type="password" class="form-control" th:name="password" th:value="*{password}">
+                        <p th:if="${passwordError}" class="text-danger fs-6" th:text="${passwordError}"></p>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="repeatPassword" class="form-label">Repeat Password *</label>
+                        <input type="password" class="form-control" th:name="repeatPassword"
+                            th:value="*{repeatPassword}">
+                        <p th:if="${passwordMatchingError}" class="text-danger fs-6" th:text="${passwordMatchingError}"></p>
+                    </div>
+            
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary" formnovalidate onclick="lol()">Sign Up!</button>
+                        <a th:href="@{/home}"><button class="btn btn-secondary" type="button">Cancel :(</button></a>
+                    </div>
                 </form>
             </div>
         </div>
