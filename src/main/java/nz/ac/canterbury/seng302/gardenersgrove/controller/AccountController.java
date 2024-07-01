@@ -150,7 +150,7 @@ public class AccountController {
         model.addAttribute("emailAddress", emailAddress);
         model.addAttribute("password", password);
         model.addAttribute("repeatPassword", repeatPassword);
-        return "registrationForm";
+        return "registrationPage";
     }
 
     /**
@@ -245,7 +245,7 @@ public class AccountController {
             model.addAttribute("emailAddress", emailAddress);
             model.addAttribute("dateOfBirth", dateOfBirth);
             model.addAttribute("noLastName", noLastName);
-            return "registrationForm";
+            return "registrationPage";
         }
 
         User user = new User(firstName, lastName, emailAddress, dateOfBirth);
