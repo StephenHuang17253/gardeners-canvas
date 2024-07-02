@@ -1,20 +1,11 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
-<head>
-  <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-  <style>
-    table td{
-      vertical-align:top;
-      border:solid 1px #888;
-      padding:10px;
-    }
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-  </style>
-</head>
+<head th:replace="fragments/header.html"></head>
+
 <body>
-<div class = "main-container">
-<h1>403 Forbidden</h1>
-
-</div>
+  <div class="text-center">
+    <h1>403 Forbidden</h1>
+    <p>You shouldn't be trying to go here</p>
+  </div>
 </body>
