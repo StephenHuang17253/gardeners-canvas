@@ -1,4 +1,4 @@
-/* This file is to expand on some already made bootstrap css classes */
+/* This file is for expanding on pre-existing Bootstrap css classes and minimally to create new css classes*/
 
 .dropdown-menu {
     max-height: 200px;
@@ -9,15 +9,10 @@
     display: block;
 }
 
-.nav-link:hover {
-    cursor: pointer;
-}
-
-.navbar-brand:hover {
-    cursor: pointer;
-}
-
 .cursor-pointer {
     cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.darken-on-hover:hover {
+    background-color: rgba(0, 0, 0, 0.25);
 }
