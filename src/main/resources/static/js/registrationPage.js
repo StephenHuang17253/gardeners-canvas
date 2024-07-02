@@ -7,6 +7,4 @@ const hideLastName = (toggle) => {
     }
 }
 
-const lol = () => {
-    console.log(document.getElementById("lastName").value);
-}
+hideLastName(document.getElementById("lastNameCheck").checked);
