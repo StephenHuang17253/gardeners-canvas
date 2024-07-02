@@ -1,16 +1,15 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +23,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 /**
  * Controller for the profile and edit profile pages, handles viewing and
@@ -219,21 +228,17 @@ public class ProfileController {
         model.addAttribute("loggedIn", loggedIn);
 
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
-        if (profilePicture.isEmpty()) {
-            profilePictureValidation = ValidationResult.OK;
-        }
 
         if (!profilePictureValidation.valid()) {
-            model.addAttribute("profilePictureError", profilePictureValidation);
             String userName = user.getFirstName() + " " + user.getLastName();
+            String filename = user.getProfilePictureFilename();
             model.addAttribute("userName", userName);
             model.addAttribute("dateOfBirth", user.getDateOfBirth());
             model.addAttribute("emailAddress", user.getEmailAddress());
-            String filename = user.getProfilePictureFilename();
             model.addAttribute("profilePicture", filename);
+            model.addAttribute("profilePictureError", profilePictureValidation);
             return "profilePage";
         }
-
         updateProfilePicture(user, profilePicture);
 
         return "redirect:/profile";

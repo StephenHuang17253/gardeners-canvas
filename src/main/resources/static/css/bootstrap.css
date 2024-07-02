@@ -16,3 +16,7 @@
 .navbar-brand:hover {
     cursor: pointer;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
