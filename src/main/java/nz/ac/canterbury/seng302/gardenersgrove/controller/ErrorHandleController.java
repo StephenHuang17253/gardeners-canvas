@@ -27,11 +27,11 @@ public class ErrorHandleController implements ErrorController {
 
         Integer statusCode = Integer.valueOf(status.toString());
         switch (statusCode) {
-            case 404 -> {
-                return "404";
-            }
             case 403 -> {
                 return "403";
+            }
+            case 404 -> {
+                return "404";
             }
             default -> {
                 return "500";
