@@ -1,5 +1,11 @@
+
+/**
+ * Handles setting checking if the server is being run on test or prod.
+ * 
+ * @param {String} currentUrl - The current url of the page.
+ * @return {String} - The base url of the page.
+ */
 const getBaseUrl = (currentUrl) => {
-    // Get the correct base url, taking into account if the app is deployed on test or prod
     let instance = '';
     if (currentUrl.includes('/test/')) {
         instance = '/test';
@@ -9,6 +15,12 @@ const getBaseUrl = (currentUrl) => {
     return instance;
 }
 
+/**
+ * Handles navigating to the inputted url, will not change pages to the same page.
+ * 
+ * @param {String} toUrl - The current url of the page.
+ * @return {void} - No return value.
+ */
 const navigateTo = (toUrl) => {
     const currentUrl = window.location.pathname;
 

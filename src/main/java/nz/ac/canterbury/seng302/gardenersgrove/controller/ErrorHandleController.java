@@ -9,14 +9,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Spring boot controller class for handling errors. note the {@link Controller}
+ * annotation which defines this. There must not exist an error.html page in the
+ * resources/templates folder otherwise that will be used instead of this
+ * controller.
+ */
 @Controller
 public class ErrorHandleController implements ErrorController {
 
     Logger logger = LoggerFactory.getLogger(ErrorHandleController.class);
 
+    /**
+     * This method is called when an error occurs in the application. It returns the relevant error page
+     * @param request the request object
+     * @return the error page to display
+     */
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request) {
-        
+
         logger.error("An Error Ocurred");
 
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
