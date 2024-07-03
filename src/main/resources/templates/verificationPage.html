@@ -5,14 +5,14 @@
 
 <body>
     <div th:replace="fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="container-md my-5">
+    <div class="container-lg my-5">
 
         <div class="text-center">
             <h1>Verify Account</h1>
         </div>
 
         <div class="row justify-content-center my-5">
-            <div class="col-md-5 p-3">
+            <div class="col-lg-5 p-3">
                 <form id="code-form" th:action="@{/verify}" method="post" class="border rounded-3 p-3">
 
                     <div class="text-center mb-3">
@@ -22,22 +22,22 @@
 
                     <div class="mb-3 d-flex flex-row gap-2">
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="text-center" type="text" autofocus>
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text" autofocus>
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="text-center" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="text-center" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="text-center" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="text-center" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="text-center" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
                         </div>
                     </div>
 
