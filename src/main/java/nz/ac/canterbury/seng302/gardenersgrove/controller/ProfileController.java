@@ -271,7 +271,7 @@ public class ProfileController {
         String filename = user.getProfilePictureFilename();
         model.addAttribute("profilePicture", filename);
 
-        return "editProfileForm";
+        return "editProfilePage";
     }
 
     /**
@@ -365,7 +365,7 @@ public class ProfileController {
             model.addAttribute("noLastName", noLastName);
             String filename = currentUser.getProfilePictureFilename();
             model.addAttribute("profilePicture", filename);
-            return "editProfileForm";
+            return "editProfilePage";
         }
 
         // Update the user's profile

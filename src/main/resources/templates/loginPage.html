@@ -28,7 +28,7 @@
                         <p th:if="${loginError}" class="text-danger fs-6" th:text="${loginError}"></p>
                     </div>
 
-                    <div class="text-center mb-3">
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3 mb-3">
                         <button type="submit" class="btn btn-primary" formnovalidate>Sign In</button>
                         <a th:href="@{/home}">
                             <button type="button" class="btn btn-secondary">Cancel :(</button>
@@ -37,7 +37,7 @@
 
                     <p th:if="${message}" class="text-warning fs-6 mb-3" th:text="${message}"></p>
 
-                    <div class="text-center d-flex flex-column">
+                    <div class="d-flex flex-column justify-content-center gap-3">
                         <a th:href="@{/register}">Not registered? Create an account</a>
                         <a th:href="@{/lost-password}">Forgot your Password?</a>
                     </div>

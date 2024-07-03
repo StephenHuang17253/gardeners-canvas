@@ -28,7 +28,7 @@
                                 <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
                                 <input th:name="profilePictureInput" type="file" class="visually-hidden"
                                     accept="image/*"
-                                    onChange="handleFileSelect(event); document.getElementById('profilePictureForm').submit()">
+                                    onChange="document.getElementById('profilePictureForm').submit()">
                             </label>
                         </div>
 
@@ -50,7 +50,7 @@
                         <input id="emailAddress" readonly type="text" class="form-control" th:value="*{emailAddress}">
                     </div>
 
-                    <div class="text-center">
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
                         <a th:href="@{/profile/edit}">
                             <button type="button" class="btn btn-primary">Edit Profile</button>
                         </a>
@@ -64,7 +64,6 @@
     </div>
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
-    <script th:src="@{/js/imagePicker.js}"></script>
 </body>
 
 </html>
