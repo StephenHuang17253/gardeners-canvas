@@ -12,11 +12,11 @@
         </div>
 
         <div class="row justify-content-center my-5">
-            <div class="col-lg-3 p-3">
+            <div class="col-lg-5 p-3">
                 <div class="border rounded-3 p-3">
 
                     <form id="profilePictureForm" th:action="@{/profile}" method="post" enctype="multipart/form-data"
-                        class="d-flex flex-row justify-content-center mb-3">
+                        class="w-75 d-flex flex-row justify-content-center mb-3">
 
                         <div class="position-relative w-100">
                             <div class="ratio ratio-1x1">
@@ -36,18 +36,18 @@
                     </form>
 
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input id="name" readonly type="text" class="form-control" th:value="*{userName}">
+                        <p>Name</p>
+                        <p th:text="${userName}"></p>
                     </div>
 
                     <div th:if="${dateOfBirth}" class="mb-3">
-                        <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                        <input id="dateOfBirth" readonly type="text" class="form-control" th:value="*{dateOfBirth}">
+                        <p>Date of Birth</p>
+                        <p th:text="${dateOfBirth}"></p>
                     </div>
 
                     <div class="mb-3">
-                        <label for="emailAddress" class="form-label">Email Address</label>
-                        <input id="emailAddress" readonly type="text" class="form-control" th:value="*{emailAddress}">
+                        <p>Email Address</p>
+                        <p th:text="${emailAddress}"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
