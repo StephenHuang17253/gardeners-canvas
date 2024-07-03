@@ -2,7 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
@@ -23,7 +22,6 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -37,7 +35,6 @@ public class HomePageController {
     private final UserService userService;
 
     private final PlantService plantService;
-    private boolean onStart = false;
 
     private GardenService gardenService;
 
@@ -115,7 +112,6 @@ public class HomePageController {
                     date);
             userService.addUser(johnDoe, "Password1!");
             userService.verifyUser(johnDoe);
-            onStart = true;
 
 
             for (int i = 1; i < 12; i ++) {
@@ -165,7 +161,6 @@ public class HomePageController {
                         date);
                 userService.addUser(janeDoe, "Password1!");
                 userService.verifyUser(janeDoe);
-                onStart = true;
 
 
                 for (int i = 0; i < 1; i++) {

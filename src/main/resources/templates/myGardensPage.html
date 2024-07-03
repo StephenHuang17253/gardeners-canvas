@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
-    <head>
-        <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-        <title>My Gardens</title>
-        <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-        <link th:href="@{/css/navBar.css}" rel="stylesheet">
-        <link th:href="@{/css/tableList.css}" rel="stylesheet">
-        <link th:href="@{/css/infoBox.css}" rel="stylesheet">
-    </head>
 
-    <body>
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-        <div class = "main-container">
-            <div class="tableList-header">
-                <h1 class="tableList-header-title"> Your Gardens </h1>
-                <br>
-            </div>
+<head>
+    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
+    <title>My Gardens</title>
+    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
+    <link th:href="@{/css/tableList.css}" rel="stylesheet">
+    <link th:href="@{/css/infoBox.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+    <div class="main-container">
+        <div class="tableList-header">
+            <h1 class="tableList-header-title"> Your Gardens </h1>
             <br>
-            <div class="tableList-table-contain">
-                <div class="tableList-table-count">
-                    <br>
-                    <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
-                </div>
-                <div th:each="garden : ${session.userGardens}">
-                    <div th:replace="fragmentExample/fragments/gardenBox.html ::
+        </div>
+        <br>
+        <div class="tableList-table-contain">
+            <div class="tableList-table-count">
+                <br>
+                <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
+            </div>
+            <div th:each="garden : ${session.userGardens}">
+                <div th:replace="fragments/gardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},
                         gardenLocation=${garden.getGardenLocation},
                         gardenSize=${garden.getGardenSize},
                         numberOfPlants=${garden.getPlants?.size()})">
-                    </div>
-
                 </div>
+
             </div>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>

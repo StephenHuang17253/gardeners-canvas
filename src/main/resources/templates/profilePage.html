@@ -1,52 +1,69 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <title>My Profile</title>
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/profilePage.css}" rel="stylesheet" type="text/css">
-    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
-    <link th:href="@{/css/navBar.css}" rel="stylesheet">
-    <script th:src="@{/js/imagePicker.js}"></script>
-
-</head>
+<head th:replace="fragments/header.html"></head>
 
 <body>
-<div th:replace="fragmentExample/fragments/navBar.html :: navBar('home')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="main-container">
-        <h2>My Profile</h2>
-        <div class="profile_info">
-            <form th:action="@{profile}" method="post" enctype="multipart/form-data">
-                <div class="profile_picture_container small_pic">
-                    <input type="hidden" th:value="${profilePicture}">
-                    <img id="imageToChange" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}" alt="User's profile picture">
+    <div th:replace="fragments/navBar.html :: navBar('profile')" th:with="loggedIn=${loggedIn}"></div>
+    <div class="container-md my-5">
 
-                    <label for="profilePictureInput">+</label>
-                    <input id="profilePictureInput" type="file" th:name="profilePictureInput" accept="image/*"
-                        onChange="handleFileSelect(event); this.form.submit()">
+        <div class="text-center">
+            <h1>My Profile</h1>
+        </div>
+
+        <div class="row justify-content-center my-5">
+            <div class="col-md-5 p-3">
+                <div class="border rounded-3 p-3">
+
+                    <form id="profilePictureForm" th:action="@{/profile}" method="post" enctype="multipart/form-data"
+                        class="w-100 d-flex flex-row justify-content-center mb-3">
+
+                        <div class="position-relative w-75">
+                            <div class="ratio ratio-1x1">
+                                <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                                    alt="User's Profile Picture" class="image-fluid rounded-circle border">
+                            </div>
+                            <label
+                                class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
+                                <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                <input th:name="profilePictureInput" type="file" class="visually-hidden"
+                                    accept="image/*"
+                                    onChange="document.getElementById('profilePictureForm').submit()">
+                            </label>
+                        </div>
+
+                        <p th:if="${profilePictureError}" class="text-danger fs-6" th:text="${profilePictureError}"></p>
+                    </form>
+
+                    <div class="mb-3 text-center">
+                        <h3>Name</h3>
+                        <p th:text="${userName}"></p>
+                    </div>
+
+                    <div th:if="${dateOfBirth}" class="mb-3 text-center">
+                        <h3>Date of Birth</h3>
+                        <p th:text="${dateOfBirth}"></p>
+                    </div>
+
+                    <div class="mb-3 text-center">
+                        <h3>Email Address</h3>
+                        <p th:text="${emailAddress}"></p>
+                    </div>
+
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                        <a th:href="@{/profile/edit}">
+                            <button type="button" class="btn btn-primary">Edit Profile</button>
+                        </a>
+                        <a th:href="@{/home}">
+                            <button type="button" class="btn btn-secondary">Home</button>
+                        </a>
+                    </div>
                 </div>
-            </form>
-            <span th:if="${profilePictureError}" class="error-message" th:text="${profilePictureError}"></span>
-            <div class="details">
-                <div class="detail-container">
-                    <sup>Name:</sup>
-                    <p th:text="${userName}"></p>
-                </div>
-                <div class="detail-container">
-                    <sup>Date of Birth:</sup>
-                    <p th:if="${dateOfBirth}" th:text="'Date of Birth: ' + ${dateOfBirth}"></p>
-                </div>
-                <div class="detail-container">
-                    <sup>Email Address:</sup>
-                    <p th:text="${emailAddress}">Email: </p>
-                </div>
-            </div>
-            <div class="buttons">
-                <a th:href="@{/profile/edit}"><button class="user_button"> Edit Profile</button></a>
-                <a th:href="@{/home}"><button class="user_button">Home</button></a>
             </div>
         </div>
     </div>
+    <script th:src="@{/js/preventEnterSubmit.js}"></script>
+    <script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 
 </html>
