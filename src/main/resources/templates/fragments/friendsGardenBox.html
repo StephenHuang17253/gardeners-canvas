@@ -1,0 +1,37 @@
+<div th:fragment="gardenBox(gardenId, gardenName, gardenLocation, gardenSize, numberOfPlants, gardenIsPublic)">
+    <a th:if="${gardenIsPublic}" th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}" style="text-decoration: none;">
+        <div class="gardenbox">
+            <div class="garden-details">
+                <span th:text="${gardenName}" class="garden-name"></span>
+                <br>
+                <span th:text="'Garden Location: ' + ${gardenLocation}"></span>
+                <br>
+                <span th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </span>
+                <span th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
+                <br>
+                <span th:text="'Number of Plant types recorded: ' + ${numberOfPlants}"></span>
+                <br>
+                <em> Public Garden</em>
+                <br>
+            </div>
+        </div>
+    </a>
+    <div th:if="!${gardenIsPublic}" style="text-decoration: none;">
+        <div class="greyGardenBox">
+            <div class="garden-details">
+                <span th:text="${gardenName}" class="garden-name"></span>
+                <br>
+                <span th:text="'Garden Location: ' + ${gardenLocation}"></span>
+                <br>
+                <span th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </span>
+                <span th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
+                <br>
+                <span th:text="'Number of Plant types recorded: ' + ${numberOfPlants}"></span>
+                <br>
+                <em>Private Garden</em>
+                <br>
+            </div>
+        </div>
+    </div>
+    <br>
+</div>

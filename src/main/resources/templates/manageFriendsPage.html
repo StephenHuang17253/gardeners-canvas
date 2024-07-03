@@ -56,17 +56,16 @@
                 </div>
             </div>
 
-            <div id="search" class="tab">
-                <div class="tableList-header">
-                    <h1>Add Friends</h1>
-                </div>
-                <div id="searchBarContainer">
-                    <form th:action="@{/manage-friends/search}" method="get">
-                        <input type="text" name="searchInput" class="search-bar" id="friendSearchBar"
-                            placeholder="Enter a users name or email" />
-                        <button type="submit" class="user_button">Search</button>
-                    </form>
-                </div>
+        <div id="search" class="tab">
+            <div class="tableList-header">
+                <h1>Add Friends</h1>
+            </div>
+            <div id="searchBarContainer">
+                <form th:action="@{/manage-friends/search}" method="get">
+                    <input type="text" name="searchInput" th:value="${userSearch}" class="search-bar" id="friendSearchBar" placeholder="Enter a users name or email"/>
+                    <button type="submit" class="user_button">Search</button>
+                </form>
+            </div>
 
                 <div th:if="${SearchErrorText!=''}">
                     <h3 class="error" th:text="${SearchErrorText}"></h3>

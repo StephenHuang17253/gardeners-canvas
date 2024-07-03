@@ -45,9 +45,9 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
      * @param searchValue string to be included in garden or plant name
      * @return list of garden objects
      */
-    @Query("SELECT DISTINCT garden FROM Garden garden JOIN garden.plants plant " +
-            "WHERE (garden.isPublic) = true AND LOWER(garden.gardenName) LIKE :searchValue" +
-            " OR (garden.isPublic) = true AND LOWER(plant.plantName) LIKE :searchValue")
+    @Query("SELECT DISTINCT garden FROM Garden garden LEFT JOIN garden.plants plant " +
+            "WHERE garden.isPublic = true AND (LOWER(garden.gardenName) LIKE LOWER(:searchValue) " +
+            "OR LOWER(plant.plantName) LIKE LOWER(:searchValue))")
     List<Garden> findByGardenNameOrPlantNameContainingIgnoreCase(@Param("searchValue") String searchValue);
 
     /**
@@ -57,6 +57,5 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
      */
     @Query("SELECT DISTINCT garden FROM Garden garden WHERE (garden.isPublic) = true")
     List<Garden> findAllPublicGardens();
-
 
 }

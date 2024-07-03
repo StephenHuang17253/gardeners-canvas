@@ -1,7 +1,9 @@
 /**
 Stylises the editForm.html webpage
 */
-
+body {
+    font-family: sans-serif;
+}
 .container {
     position: absolute;
     top: 50%;
@@ -47,6 +49,9 @@ form input[type=text] {
     color: red;
 }
 
+.errorbox {
+    border: 1px solid red;
+}
 
 /* profile picture styling */
 .profile_picture_container {
