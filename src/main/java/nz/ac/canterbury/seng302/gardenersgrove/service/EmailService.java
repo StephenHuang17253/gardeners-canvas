@@ -1,24 +1,22 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
-
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
 /**
  * This class is a service class for sending emails
@@ -28,7 +26,7 @@ import jakarta.mail.internet.MimeMessage;
 public class EmailService {
     Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
     @Autowired
@@ -137,15 +135,13 @@ public class EmailService {
                 .buildAndExpand(tokenString)
                 .toUriString();
         String urlText = "RESET PASSWORD";
-        String mainBody = String.format("Following is the link to resetting your password. \n This link expires in %s minutes.", lifetime);
-        String signOff = "Regards, Gardeners Grove Team 500";
+        String mainBody = String.format("Click the link below to reset your password. \n This link expires in %s minutes.", lifetime);
 
         Context context = new Context();
         context.setVariable("username", username);
         context.setVariable("mainBody", mainBody);
         context.setVariable("url", url);
         context.setVariable("urlText", urlText);
-        context.setVariable("signOff", signOff);
 
         String toEmail = token.getUser().getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
@@ -163,12 +159,10 @@ public class EmailService {
 
         String username = currentUser.getFirstName() + " " + currentUser.getLastName();
         String mainBody = "This email is to confirm that your Gardeners Grove account's password has been updated";
-        String signOff = "Regards, Gardeners Grove Team 500";
 
         Context context = new Context();
         context.setVariable("username", username);
         context.setVariable("mainBody", mainBody);
-        context.setVariable("signOff", signOff);
 
         String toEmail = currentUser.getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
