@@ -773,7 +773,7 @@ public class InputValidator {
 
                 if (letter.equals("-".toCharArray()[0])) {
                     try {
-                        Double.parseDouble(testedValue);
+                        Double.parseDouble(testedValue.replace(',', '.'));
                     } catch (Exception e) {
                         validationResult = ValidationResult.NON_NUMERIC_COMMA;
                         passState = false;
