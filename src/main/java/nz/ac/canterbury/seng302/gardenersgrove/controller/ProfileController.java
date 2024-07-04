@@ -57,18 +57,18 @@ public class ProfileController {
     private final EmailService emailService;
 
     /**
-     * Constructor for the ProfileController with {@link Autowired} to connect this
-     * controller with services
-     * 
+     * Constructor for the ProfileController with {@link Autowired} to connect
+     * this controller with services
+     *
      * @param userService service to access repository
      * @param authenticationManager manager for user's authentication details
      * @param fileService service to manage files
      */
     @Autowired
     public ProfileController(AuthenticationManager authenticationManager,
-                             UserService userService,
-                             FileService fileService,
-                             EmailService emailService) {
+            UserService userService,
+            FileService fileService,
+            EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.fileService = fileService;
@@ -76,9 +76,9 @@ public class ProfileController {
     }
 
     /**
-     * Gets the resource url for the profile picture, or the default profile picture
-     * if the user does not have one
-     * 
+     * Gets the resource url for the profile picture, or the default profile
+     * picture if the user does not have one
+     *
      * @param filename string filename
      * @return string of the profile picture url
      */
@@ -98,7 +98,7 @@ public class ProfileController {
 
     /**
      * Serves the file from the file service
-     * 
+     *
      * @param filename file to retrieve
      * @return response with the file
      */
@@ -119,13 +119,13 @@ public class ProfileController {
     }
 
     /**
-     * Set the security context for the user
-     * This method is shared functionality between the login and registration pages
-     * possibly should be moved to a different class? As not correct to be here
-     * 
-     * @param email    email of the user
+     * Set the security context for the user This method is shared functionality
+     * between the login and registration pages possibly should be moved to a
+     * different class? As not correct to be here
+     *
+     * @param email email of the user
      * @param password password of the user
-     * @param session  http session to set the cookies with the context key
+     * @param session http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
         User user = userService.getUserByEmail(email);
@@ -145,8 +145,8 @@ public class ProfileController {
 
     /**
      * Update the user's profile picture
-     * 
-     * @param user           user to update
+     *
+     * @param user user to update
      * @param profilePicture new profile picture
      */
     public void updateProfilePicture(User user, MultipartFile profilePicture) {
@@ -171,7 +171,7 @@ public class ProfileController {
 
     /**
      * This function is called when a GET request is made to /profile
-     * 
+     *
      * @param model contains all fields
      * @return The profilePage html page
      */
@@ -207,9 +207,9 @@ public class ProfileController {
     }
 
     /**
-     * This function is called when a POST request is made to /profile
-     * Gets authenticated user and updates their profile picture
-     * 
+     * This function is called when a POST request is made to /profile Gets
+     * authenticated user and updates their profile picture
+     *
      * @param profilePicture user's profile picture
      * @param model contains all field data
      * @return redirect to profile page
@@ -246,7 +246,7 @@ public class ProfileController {
 
     /**
      * This function is called when a GET request is made to /profile/edit
-     * 
+     *
      * @param model contains all field data
      * @return The profileEditPage html page
      */
@@ -275,17 +275,17 @@ public class ProfileController {
     }
 
     /**
-     * Redirects POST url '/profile/edit' to the edit form if invalid input
-     * or to user's profile page '/profile' if edit completed
+     * Redirects POST url '/profile/edit' to the edit form if invalid input or
+     * to user's profile page '/profile' if edit completed
      *
-     * @param firstName      - user's first name
-     * @param lastName       - user's last name
-     * @param noLastName     - checkbox for whether user has a last name
-     * @param dateOfBirth    - user's date of birth (optional)
-     * @param emailAddress   - user's email address
+     * @param firstName - user's first name
+     * @param lastName - user's last name
+     * @param noLastName - checkbox for whether user has a last name
+     * @param dateOfBirth - user's date of birth (optional)
+     * @param emailAddress - user's email address
      * @param profilePicture - user's profile picture
-     * @param model          - (map-like) representation of user's input (above
-     *                       parameters)
+     * @param model - (map-like) representation of user's input (above
+     * parameters)
      * @return redirect to edit form or to profile page
      */
     @PostMapping("/profile/edit")
@@ -301,7 +301,6 @@ public class ProfileController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentEmail = authentication.getName();
         User currentUser = userService.getUserByEmail(currentEmail);
-
 
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
@@ -344,17 +343,20 @@ public class ProfileController {
                 String error = entry.getValue().toString();
 
                 error = switch (entry.getKey()) {
-                    case "firstName" -> "First name " + error;
-                    case "lastName" -> "Last name " + error;
-                    case "emailAddress" -> "Email address " + error;
-                    default -> entry.getValue().toString();
+                    case "firstName" ->
+                        "First name " + error;
+                    case "lastName" ->
+                        "Last name " + error;
+                    case "emailAddress" ->
+                        "Email address " + error;
+                    default ->
+                        entry.getValue().toString();
                 };
 
                 model.addAttribute(entry.getKey() + "Error", error);
                 valid = false;
             }
         }
-
 
         // If any input is invalid, return to the edit form
         if (!valid) {
@@ -380,18 +382,18 @@ public class ProfileController {
     }
 
     /**
-     * This function is called when a GET request is made to /profile/editPassword and processes authentication
+     * This function is called when a GET request is made to
+     * /profile/change-password and processes authentication
      *
-     * @param model          - (map-like) representation of user's input
-     * @return redirect to editPasswordForm form
+     * @param model - (map-like) representation of user's input
+     * @return redirect to changePasswordForm form
      */
-    @GetMapping("profile/editPassword")
-    public String editPassword(Model model,
-                               @RequestParam(name = "currentPassword", required = false) String currentPassword,
-                               @RequestParam(name = "newPassword", required = false) String newPassword,
-                               @RequestParam(name = "retypePassword", required = false) String retypePassword
-                                )
-    {
+    @GetMapping("profile/change-password")
+    public String changePassword(Model model,
+            @RequestParam(name = "currentPassword", required = false) String currentPassword,
+            @RequestParam(name = "newPassword", required = false) String newPassword,
+            @RequestParam(name = "retypePassword", required = false) String retypePassword
+    ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
@@ -402,28 +404,27 @@ public class ProfileController {
         model.addAttribute("newPassword", newPassword);
         model.addAttribute("retypePassword", retypePassword);
 
-        logger.info("GET profile/editPassword");
-        return "editPasswordForm";
+        logger.info("GET profile/change-password");
+        return "changePasswordPage";
     }
 
-
     /**
-     * Redirects POST url '/profile/editPassword' to the edit form if invalid input
-     * or to user's profile page '/profile' if edit completed
+     * Redirects POST url '/profile/change-password' to the edit form if invalid
+     * input or to user's profile page '/profile' if edit completed
      *
-     * @param currentPassword      - user's current password
-     * @param newPassword       - new password user would like to change to
-     * @param retypePassword     - retyped password to see if matches new password
-     * @param model          - (map-like) representation of user's input (above
-     *                       parameters)
-     * @return redirect to editpassword form or to profile page
+     * @param currentPassword - user's current password
+     * @param newPassword - new password user would like to change to
+     * @param retypePassword - retyped password to see if matches new password
+     * @param model - (map-like) representation of user's input (above
+     * parameters)
+     * @return redirect to changePassword form or to profile page
      */
-    @PostMapping("/profile/editPassword")
+    @PostMapping("/profile/change-password")
     public String editProfile(HttpServletRequest request,
-                              @RequestParam(name = "currentPassword") String currentPassword,
-                              @RequestParam(name = "newPassword") String newPassword,
-                              @RequestParam(name = "retypePassword") String retypePassword,
-                              Model model) {
+            @RequestParam(name = "currentPassword") String currentPassword,
+            @RequestParam(name = "newPassword") String newPassword,
+            @RequestParam(name = "retypePassword") String retypePassword,
+            Model model) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -438,14 +439,12 @@ public class ProfileController {
         }
         LocalDate dateOfBirth = currentUser.getDateOfBirth();
 
-
         boolean valid = true;
 
         if (!userService.checkPassword(currentUser.getId(), currentPassword)) {
             model.addAttribute("currentPasswordError", "Your old password is incorrect");
             valid = false;
         }
-
 
         if (!newPassword.equals(retypePassword)) {
             model.addAttribute("passwordMatchingError", "The new passwords do not match");
@@ -472,7 +471,7 @@ public class ProfileController {
             model.addAttribute("currentPassword", currentPassword);
             model.addAttribute("newPassword", newPassword);
             model.addAttribute("retypePassword", retypePassword);
-            return "editPasswordForm";
+            return "changePasswordPage";
         }
 
         // Update user's password

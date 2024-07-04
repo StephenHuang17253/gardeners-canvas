@@ -2,7 +2,7 @@ Feature: U7 As Sarah, I want to be able to change my password, so that I can kee
   Background:
     Given "Sarah" "Thompson", 36 is a user with email "sarah@email.com" and password "TestPassword10!"
     And I as user "sarah@email.com" am logged in with "TestPassword10!"
-    Given I as user "sarah@email.com" with password "TestPassword10!" am on the edit password page
+    Given I as user "sarah@email.com" with password "TestPassword10!" am on the change password page
 
   Scenario: AC2 - Entering passwords that don't match the old password
     When I enter an old password "NewPassword10!" that does not match the current password
