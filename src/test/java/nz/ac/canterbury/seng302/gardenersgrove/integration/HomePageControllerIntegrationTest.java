@@ -111,7 +111,7 @@ public void before_or_after_all() {
         this.mockMvc.perform(get("/home"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("username",is("Welcome John Doe")));
+                .andExpect(model().attribute("username",is("John Doe")));
     };
 
 
