@@ -95,9 +95,9 @@ public class GardenFormController {
     }
 
     /**
-     * Maps the createNewGardenForm html page to /create-new-garden url
+     * Maps the createNewGardenPage html page to /create-new-garden url
      *
-     * @return thymeleaf createNewGardenForm
+     * @return thymeleaf createNewGardenPage
      */
     @GetMapping("/create-new-garden")
     public String newGardenForm( @RequestParam(name="gardenName", required = false) String gardenName,
@@ -126,7 +126,7 @@ public class GardenFormController {
         model.addAttribute("gardenSize", gardenSize);
 
         logger.info("GET /create-new-garden");
-        return "createNewGardenForm";
+        return "createNewGardenPage";
     }
 
     /**
@@ -207,7 +207,7 @@ public class GardenFormController {
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
                 || !gardenDescriptionResult.valid()) {
-            return "createNewGardenForm";
+            return "createNewGardenPage";
         }
 
         Double doubleGardenSize;
@@ -414,10 +414,7 @@ public class GardenFormController {
                 streetAddressResult.updateMessage("cannot be longer than 96 characters");
             }
             model.addAttribute("AddressErrorText", "Address " + streetAddressResult);
-            model.addAttribute("AddressErrorClass", "errorBorder");
             logger.info("Garden Street failed validation");
-        } else {
-            model.addAttribute("AddressErrorClass", "noErrorBorder");
         }
 
         // notifies the user that the suburb is invalid (if applicable)
