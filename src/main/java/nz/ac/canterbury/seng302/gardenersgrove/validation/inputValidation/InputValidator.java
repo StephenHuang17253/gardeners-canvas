@@ -755,7 +755,7 @@ public class InputValidator {
         }
 
         //checks if number is a negative number
-        if (testedValue.strip().charAt(0) == '-') {
+        if (!testedValue.isBlank() && testedValue.strip().charAt(0) == '-') {
             validationResult = ValidationResult.NON_NUMERIC_COMMA;
             passState = false;
             return this;
