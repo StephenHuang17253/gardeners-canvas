@@ -380,13 +380,13 @@ public class ProfileController {
     }
 
     /**
-     * This function is called when a GET request is made to /profile/editPassword and processes authentication
+     * This function is called when a GET request is made to /profile/changePassword and processes authentication
      *
      * @param model          - (map-like) representation of user's input
-     * @return redirect to editPasswordForm form
+     * @return redirect to changePasswordForm form
      */
-    @GetMapping("profile/editPassword")
-    public String editPassword(Model model,
+    @GetMapping("profile/changePassword")
+    public String changePassword(Model model,
                                @RequestParam(name = "currentPassword", required = false) String currentPassword,
                                @RequestParam(name = "newPassword", required = false) String newPassword,
                                @RequestParam(name = "retypePassword", required = false) String retypePassword
@@ -402,13 +402,13 @@ public class ProfileController {
         model.addAttribute("newPassword", newPassword);
         model.addAttribute("retypePassword", retypePassword);
 
-        logger.info("GET profile/editPassword");
-        return "editPasswordPage";
+        logger.info("GET profile/changePassword");
+        return "changePasswordPage";
     }
 
 
     /**
-     * Redirects POST url '/profile/editPassword' to the edit form if invalid input
+     * Redirects POST url '/profile/changePassword' to the edit form if invalid input
      * or to user's profile page '/profile' if edit completed
      *
      * @param currentPassword      - user's current password
@@ -416,9 +416,9 @@ public class ProfileController {
      * @param retypePassword     - retyped password to see if matches new password
      * @param model          - (map-like) representation of user's input (above
      *                       parameters)
-     * @return redirect to editpassword form or to profile page
+     * @return redirect to changePassword form or to profile page
      */
-    @PostMapping("/profile/editPassword")
+    @PostMapping("/profile/changePassword")
     public String editProfile(HttpServletRequest request,
                               @RequestParam(name = "currentPassword") String currentPassword,
                               @RequestParam(name = "newPassword") String newPassword,
@@ -472,7 +472,7 @@ public class ProfileController {
             model.addAttribute("currentPassword", currentPassword);
             model.addAttribute("newPassword", newPassword);
             model.addAttribute("retypePassword", retypePassword);
-            return "editPasswordPage";
+            return "changePasswordPage";
         }
 
         // Update user's password
