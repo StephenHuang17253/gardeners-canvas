@@ -1,11 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,21 +17,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -123,7 +123,7 @@ public class ProfileControllerTest {
         mockUser.setId(1L);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
-        mockMvc.perform(post("/profile/editPassword").with(csrf())
+        mockMvc.perform(post("/profile/change-password").with(csrf())
                 .param("currentPassword", currentPassword)
                 .param("newPassword", input)
                 .param("retypePassword", input))
@@ -142,7 +142,7 @@ public class ProfileControllerTest {
         mockUser.setId(1L);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
-        mockMvc.perform(post("/profile/editPassword").with(csrf())
+        mockMvc.perform(post("/profile/change-password").with(csrf())
                         .param("currentPassword", currentPassword)
                         .param("newPassword", input)
                         .param("retypePassword", input))
