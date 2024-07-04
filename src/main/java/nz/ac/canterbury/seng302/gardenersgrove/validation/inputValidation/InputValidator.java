@@ -247,7 +247,7 @@ public class InputValidator {
      *
      * @param name string input in text field
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateName(String name) {
         return new InputValidator(name)
@@ -291,7 +291,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateUniqueEmail(String email) {
 
@@ -306,7 +306,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
@@ -320,7 +320,7 @@ public class InputValidator {
      * @param password
      * @param otherFields other input fields to test likeness with password
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePassword(String password, List<String> otherFields) {
         ValidationResult result = new InputValidator(password)
@@ -339,7 +339,7 @@ public class InputValidator {
      *
      * @param dob
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDOB(String dob) {
         return new InputValidator(dob)
@@ -360,7 +360,7 @@ public class InputValidator {
      *
      * @param date
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDate(String date) {
         return new InputValidator(date)
@@ -373,7 +373,7 @@ public class InputValidator {
      *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
         ValidationResult result = new InputValidator(plantCount)
@@ -709,7 +709,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-" };
+        String[] allowedPunctuation = new String[]{" ", ",", ".", "'", "-"};
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
@@ -753,6 +753,14 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
+
+        //checks if number is a negative number
+        if (testedValue.strip().charAt(0) == '-') {
+            validationResult = ValidationResult.NON_NUMERIC_COMMA;
+            passState = false;
+            return this;
+        }
+
         boolean stringPasses = true;
         int allowedCommaNumber = 1; // allowed number of commas or full stops
 
@@ -771,10 +779,13 @@ public class InputValidator {
             }
 
             if (letter.equals("-".toCharArray()[0])) {
-                validationResult = ValidationResult.NON_NUMERIC_COMMA;
-                passState = false;
-                return this;
-
+                try {
+                    Double.parseDouble(testedValue);
+                } catch (Exception e) {
+                    validationResult = ValidationResult.NON_NUMERIC_COMMA;
+                    passState = false;
+                    return this;
+                }
             }
 
         }
