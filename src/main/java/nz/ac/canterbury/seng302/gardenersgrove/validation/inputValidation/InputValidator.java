@@ -771,6 +771,17 @@ public class InputValidator {
                     continue;
                 }
 
+                if (letter.equals("-".toCharArray()[0])) {
+                    try {
+                        Double.parseDouble(testedValue);
+                    } catch (Exception e) {
+                        validationResult = ValidationResult.NON_NUMERIC_COMMA;
+                        passState = false;
+                        return this;
+                    }
+                    continue;
+                }
+
                 stringPasses = false;
                 if ((letter.toString().equals(",") || letter.toString().equals(".")) && allowedCommaNumber > 0) {
                     stringPasses = true;
@@ -778,15 +789,6 @@ public class InputValidator {
                 }
             }
 
-            if (letter.equals("-".toCharArray()[0])) {
-                try {
-                    Double.parseDouble(testedValue);
-                } catch (Exception e) {
-                    validationResult = ValidationResult.NON_NUMERIC_COMMA;
-                    passState = false;
-                    return this;
-                }
-            }
 
         }
 
