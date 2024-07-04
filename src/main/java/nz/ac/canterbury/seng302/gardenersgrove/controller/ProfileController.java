@@ -403,7 +403,7 @@ public class ProfileController {
         model.addAttribute("retypePassword", retypePassword);
 
         logger.info("GET profile/editPassword");
-        return "editPasswordForm";
+        return "editPasswordPage";
     }
 
 
@@ -472,7 +472,7 @@ public class ProfileController {
             model.addAttribute("currentPassword", currentPassword);
             model.addAttribute("newPassword", newPassword);
             model.addAttribute("retypePassword", retypePassword);
-            return "editPasswordForm";
+            return "editPasswordPage";
         }
 
         // Update user's password
