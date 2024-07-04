@@ -123,7 +123,7 @@ public class ProfileControllerTest {
         mockUser.setId(1L);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
-        mockMvc.perform(post("/profile/changePassword").with(csrf())
+        mockMvc.perform(post("/profile/change-password").with(csrf())
                 .param("currentPassword", currentPassword)
                 .param("newPassword", input)
                 .param("retypePassword", input))
@@ -142,7 +142,7 @@ public class ProfileControllerTest {
         mockUser.setId(1L);
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
-        mockMvc.perform(post("/profile/changePassword").with(csrf())
+        mockMvc.perform(post("/profile/change-password").with(csrf())
                         .param("currentPassword", currentPassword)
                         .param("newPassword", input)
                         .param("retypePassword", input))

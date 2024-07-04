@@ -57,7 +57,7 @@ public class UpdateUserPassword {
 
     @Given("I as user {string} with password {string} am on the change password page")
     public void iAsUserWithPasswordAmOnTheChangePasswordPage(String userEmail, String currentPassword) throws Exception {
-        String url = "/profile/changePassword";
+        String url = "/profile/change-password";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(url)
@@ -72,7 +72,7 @@ public class UpdateUserPassword {
     public void i_enter_two_different_passwords_in_new(String newPass, String retypePass) throws Exception {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .post("/profile/changePassword")
+                        .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", newPass)
                         .param("retypePassword", retypePass)
@@ -93,7 +93,7 @@ public class UpdateUserPassword {
     public void i_enter_the_weak_password_weak_password(String weakPassword) throws Exception {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .post("/profile/changePassword")
+                        .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", weakPassword)
                         .param("retypePassword", weakPassword)
@@ -104,7 +104,7 @@ public class UpdateUserPassword {
     public void i_enter_fully_compliant_details(String compliantPassword) throws Exception {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .post("/profile/changePassword")
+                        .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", compliantPassword)
                         .param("retypePassword", compliantPassword)
@@ -115,7 +115,7 @@ public class UpdateUserPassword {
     public void i_enter_an_old_password_that_does_not_match_the_current_password(String incorrectOldPassword) throws Exception {
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .post("/profile/changePassword")
+                        .post("/profile/change-password")
                         .param("currentPassword", incorrectOldPassword)
                         .param("newPassword", "NewPassword10!")
                         .param("retypePassword", "NewPassword10!")
