@@ -19,11 +19,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
 /**
- * This class is a service class for sending emails
- * defined by the {@link Service} annotation.
+ * This class is a service class for sending emails defined by the
+ * {@link Service} annotation.
  */
 @Service
 public class EmailService {
+
     Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     private final JavaMailSender mailSender;
@@ -54,10 +55,10 @@ public class EmailService {
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
-     * 
+     *
      * @param toEmail the email recipient
      * @param subject the email subject
-     * @param body    the email body
+     * @param body the email body
      * @throws MailException if the email cannot be sent
      */
     public void sendPlaintextEmail(String toEmail, String subject, String body) throws MailException {
@@ -70,8 +71,9 @@ public class EmailService {
     }
 
     /**
-     * Sends an HTML email to the specified email address with the specified subject
-     * 
+     * Sends an HTML email to the specified email address with the specified
+     * subject
+     *
      * @param recipientEmail email of person to receive message
      * @param subject subject of email
      * @param template html template to fill for email
@@ -90,15 +92,14 @@ public class EmailService {
         mailSender.send(message);
     }
 
-
     /**
      * Sends a registration email to the user with the token
-     * 
+     *
      * @param token the token to send information about
      * @throws MessagingException
      */
     public void sendRegistrationEmail(Token token) throws MessagingException {
-        String subject = "Welcome to Gardeners Grove!";
+        String subject = "Welcome to Gardener's Grove!";
         String template = "registrationEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
@@ -114,16 +115,15 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
-
-
     /**
-     * Sends a reset password email to the user with token in reset password link
+     * Sends a reset password email to the user with token in reset password
+     * link
      *
      * @param token the token to use to reset password
      */
     public void sendResetPasswordEmail(Token token) throws MessagingException {
-        logger.info("Sending reset password email to "+token.getUser().getEmailAddress());
-        String subject = "Link to Reset Password to Gardeners Grove!";
+        logger.info("Sending reset password email to " + token.getUser().getEmailAddress());
+        String subject = "Link to Reset Password to Gardener's Grove!";
         String template = "generalEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
@@ -153,12 +153,12 @@ public class EmailService {
      * @param currentUser user to send confirmation of password reset to
      */
     public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
-        logger.info("Sending confirmation email to "+currentUser.getEmailAddress());
+        logger.info("Sending confirmation email to " + currentUser.getEmailAddress());
         String subject = "Your Password Has Been Updated";
         String template = "generalEmail";
 
         String username = currentUser.getFirstName() + " " + currentUser.getLastName();
-        String mainBody = "This email is to confirm that your Gardeners Grove account's password has been updated";
+        String mainBody = "This email is to confirm that your Gardener's Grove account's password has been updated";
 
         Context context = new Context();
         context.setVariable("username", username);
