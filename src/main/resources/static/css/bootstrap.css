@@ -16,3 +16,7 @@
 .darken-on-hover:hover {
     background-color: rgba(0, 0, 0, 0.25);
 }
+
+.text-bold {
+    font-weight: bold;
+}
