@@ -20,16 +20,18 @@
 .text-bold {
     font-weight: bold;
 }
+
 #homeImage {
     position: relative;
     /*Ignore red underline in editor*/
-    background-image: url("../../images/landingPlant.JPG");
+    background-image: url("/images/landingPlant.JPG");
     background-size: cover;
     background-position: center;
     color: white;
     height: 100vh;
     overflow: hidden;
 }
+
 /*uses before so we can layer a black bg over the homeImage and it matches the size 1:1 of the homeImage*/
 #homeImage::before {
     content: "";
