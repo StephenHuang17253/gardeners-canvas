@@ -4,87 +4,95 @@
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Edit Plant</title>
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/form.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
     <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
     <script th:src="@{/js/imagePicker.js}"></script>
 
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
-    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 </head>
 
 <body>
     <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="main-container">
-        <h1>Edit Plant</h1>
-        <br>
-        <div>
-            <form th:action="@{edit}" method="post" enctype="multipart/form-data">
+    <div class="container-md my-5">
 
-                <!-- Some things are still named 'profile_picture', this is so I can reuse the existing css and js. -->
-                <div class="plant_picture_container small_pic">
-                    <img id="imageToChange"
-                        th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                        alt="Plant image">
-                    <label for="plantPictureInput">+</label>
-                    <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                        onChange="handleFileSelect(event)">
-                </div>
-                <span th:if="${plantPictureError}" class="error-message" th:text="${plantPictureError}"></span>
-                <br>
 
-                <br>
-                <label for="plantName"> Plant Name: </label>
-                <br>
-                <input type="text" class="form-control" th:class="${PNErrorClass}" id="plantName"
-                    placeholder="Name of plant" th:name="plantName" th:value="*{plantName}" data-cy="plantName"
-                    autofocus>
+        <div class="row justify-content-center my-5">
+            <div class="col-md-5 p-3">
 
-                <div th:if="${PNErrorText!=''}">
-                    <h3 class="error" th:text="${PNErrorText}"></h3>
+                <div class="text-center">
+                    <h1>Edit Plant</h1>
                 </div>
 
-                <label for="plantCount"> Plant Count: </label>
-                <br>
-                <input type="number" class="form-control" th:class="${PCErrorClass}" id="plantCount"
-                    placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount"
-                    autofocus>
+            <form th:action="@{edit}" method="post" enctype="multipart/form-data" class="border rounded-3 p-3">
 
-                <div th:if="${PCErrorText!=''}">
-                    <h3 class="error" th:text="${PCErrorText}"></h3>
+                <div class="w-100 d-flex flex-row justify-content-center mb-3">
+                    <!-- Some things are still named 'profile_picture', this is so I can reuse the existing css and js. -->
+                    <div class="plant_picture_container small_pic">
+                        <img id="imageToChange"
+                            th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                            alt="Plant image">
+                        <label for="plantPictureInput">+</label>
+                        <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
+                            onChange="handleFileSelect(event)">
+                    </div>
+                    <span th:if="${plantPictureError}" class="text-danger fs-6" th:text="${plantPictureError}"></span>
+                    <br>
                 </div>
 
+                <div class="mb-3 ">
+                    <label for="plantName" class="form-label"> Plant Name: </label>
+                    <input type="text" class="form-control" th:classappend="${PNErrorClass}" id="plantName"
+                        placeholder="Name of plant" th:name="plantName" th:value="*{plantName}" autofocus>
 
-                <label for="plantDescription"> Plant Description (Optional)</label>
-                <br>
-                <div class="form-description">
-                    <textarea class="form-control" th:class="${PDErrorClass}" id="plantDescription"
-                        placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
-                        data-cy="plantDescription" autofocus></textarea>
+                    <div th:if="${PNErrorText!=''}">
+                        <h3 class="text-danger fs-6" th:text="${PNErrorText}"></h3>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="plantCount" class="form-label"> Plant Count: </label>
+                    <br>
+                    <input type="number" class="form-control" th:classappend="${PCErrorClass}" id="plantCount"
+                        placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount"
+                        autofocus>
+
+                    <div th:if="${PCErrorText!=''}">
+                        <h3 class="text-danger fs-6" th:text="${PCErrorText}"></h3>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="plantDescription" class="form-label"> Plant Description (Optional)</label>
+                    <br>
+                    <div class="form-description">
+                        <textarea class="form-control" th:classappend="${PDErrorClass}" id="plantDescription"
+                            placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
+                            data-cy="plantDescription" autofocus></textarea>
+                    </div>
                 </div>
 
                 <div th:if="${PDErrorText!=''}">
-                    <h3 class="error" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
+                    <h3 class="text-danger fs-6" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
                 </div>
 
-                <label for="plantDate"> Plant Date (Optional)</label>
-                <input type="date" class="form-control" th:class="${PAErrorClass}" id="plantDate" placeholder=""
+                <label for="plantDate" class="form-label"> Plant Date (Optional)</label>
+                <input type="date" class="form-control" th:classappend="${PAErrorClass}" id="plantDate" placeholder=""
                     max="9999-12-30" min="0000-01-01" th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
                     autofocus>
 
                 <div th:if="${PAErrorText!=''}">
-                    <h3 class="error" th:text="${PAErrorText}" id="plantDateError"></h3>
+                    <h3 class="text-danger fs-6" th:text="${PAErrorText}" id="plantDateError"></h3>
                 </div>
 
-                <br />
-                <br>
-                <button type="submit" class="submit-button">Submit</button>
-                <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
-                    <button type="button" class="cancel-button">Cancel</button>
-                </a>
-
-            </form>
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                    <button type="submit" class="btn btn-primary text-nowrap">Submit</button>
+                    <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
+                        <button type="button" class="btn btn-secondary text-nowrap">Cancel</button>
+                    </a>
+                </div>
+                </form>
+            </div>
         </div>
     </div>
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
