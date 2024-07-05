@@ -83,9 +83,9 @@ public class GardensController {
     public String myGardens(Model model) {
         logger.info("GET /my-gardens");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        User user = securityService.getCurrentUser();
+        model.addAttribute("myGardens", gardenService.getAllUsersGardens(user.getId()));
 
         return "myGardensPage";
     }
@@ -103,9 +103,7 @@ public class GardensController {
                                     Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -115,9 +113,6 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        logger.info("Garden owner ID: {}, Authenticated user ID: {}",
-                garden.getOwner().getId(),
-                authentication.getName());
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             if (!garden.getIsPublic()) {
@@ -217,9 +212,7 @@ public class GardensController {
         logger.info("POST /my-gardens/{gardenId}/public", gardenId);
         logger.info("Value of makeGardenPublic: {}", makeGardenPublic);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -229,9 +222,6 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        logger.info("Garden owner ID: {}, Authenticated user ID: {}",
-                garden.getOwner().getId(),
-                authentication.getName());
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -279,9 +269,7 @@ public class GardensController {
             return "404";
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
 
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -338,9 +326,7 @@ public class GardensController {
                                  HttpServletResponse response) {
         logger.info("GET /my-gardens");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
         User friend;
         try {
