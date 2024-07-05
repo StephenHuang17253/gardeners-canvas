@@ -55,6 +55,8 @@ public class GardensController {
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
 
+    private int COUNT_PER_PAGE = 10;
+
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
     /**
      * Constructor for the GardensController with {@link Autowired} to
@@ -80,12 +82,24 @@ public class GardensController {
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
-    public String myGardens(Model model) {
+    public String myGardens(@RequestParam(defaultValue = "1") int page, Model model) {
         logger.info("GET /my-gardens");
 
         model.addAttribute("loggedIn",  securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
-        model.addAttribute("myGardens", gardenService.getAllUsersGardens(user.getId()));
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
+
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
+
+        model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("totalGardens", gardens.size());
+
 
         return "myGardensPage";
     }
