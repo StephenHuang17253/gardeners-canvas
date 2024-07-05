@@ -672,7 +672,7 @@ public class InputValidator {
     }
 
     private InputValidator plantAgeHelper() {
-        // if this validators input has already failed once, this test won't be run
+        // if this validator's input has already failed once, this test won't be run
         if (!this.passState) {
             return this;
         }
