@@ -5,11 +5,11 @@
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="jumbotron jumbotron-fluid">
-        <img id="homeImage" th:src="@{/images/landingPlant.JPG}" alt="Garden" class="img-fluid w-100" style="height: 800px; object-fit: cover;">
+    <div class="jumbotron jumbotron-fluid " id="homeText">
+<!--        <img id="homeImage" th:src="@{/images/landingPlant.JPG}" alt="Garden" class="img-fluid w-100" style="height: 800px; object-fit: cover;">-->
 
         <div th:if="${!loggedIn}" class="content">
-            <h1 class="display-4">Welcome, to Gardeners Grove</h1>
+            <h1 class="display-4">Welcome, to Gardener's Grove</h1>
             <p class="lead">Your one-stop shop for everything garden related.</p>
             <hr class="my-4">
             <p>Start your journey today! Or continue it...</p>
@@ -31,7 +31,8 @@
                  width="200" height="200"
             >
             <div>
-                <h1 class="display-4">Welcome back, <b th:text="${username}"></b> to Gardeners Grove</h1>
+                <h1 class="display-4">Welcome back <b th:text="${username}"></b>, </h1>
+                <h1 class="display-4"> to Gardener's Grove</h1>
                 <p class="lead">Your gardens await!</p>
                 <hr class="my-4">
                 <p>Want to check yourself out? Or need to leave us...</p>
