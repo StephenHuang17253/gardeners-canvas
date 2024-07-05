@@ -5,7 +5,7 @@
 
 <body class="overflow-hidden">
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="jumbotron jumbotron-fluid d-flex align-items-center justify-content-center" id="homeImage">
+    <div class="d-flex align-items-center justify-content-center" id="homeImage">
 
         <div th:if="${!loggedIn}" class="content" style="z-index: 2">
             <h1 class="display-4">Welcome, to Gardener's Grove</h1>
