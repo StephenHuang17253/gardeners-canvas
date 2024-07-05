@@ -21,3 +21,7 @@
     max-height: 200px;
     overflow-y: scroll;
 }
+
+.text-bold {
+    font-weight: bold;
+}

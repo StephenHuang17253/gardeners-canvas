@@ -481,12 +481,14 @@ public class GardenFormController {
         if (!gardenSizeResult.valid()) {
             String message;
             if (gardenSizeResult == ValidationResult.AREA_TOO_LARGE) {
-                message = " is too large. \n\r Must be smaller than or equal to 8000000";
+                message = "is too large. \n\r Must be smaller than or equal to 8000000";
+            } else if (gardenSizeResult == ValidationResult.AREA_TOO_SMALL) {
+                message = "is too small. \n\r Must be larger than or equal to 0.01";
             } else {
-                message = " is too small. \n\r Must be larger than or equal to 0.01";
+                message = gardenSizeResult.toString();
             }
             gardenSizeResult.updateMessage(message);
-            model.addAttribute("GSErrorText", "Garden size" + gardenSizeResult);
+            model.addAttribute("GSErrorText", "Garden size " + gardenSizeResult);
             model.addAttribute("GSErrorClass", "errorBorder");
             logger.info("Garden Size failed validation");
 

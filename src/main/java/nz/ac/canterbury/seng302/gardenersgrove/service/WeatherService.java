@@ -36,7 +36,7 @@ public class WeatherService {
         String url = "https://api.open-meteo.com/v1/forecast?latitude="
                 + gardenLatitude
                 + "&longitude=" + gardenLongitude
-                + "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&past_days=2";
+                + "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&past_days=2";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -55,8 +55,6 @@ public class WeatherService {
         }
         return null;
     }
-
-
 
 
 }
