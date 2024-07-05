@@ -48,10 +48,10 @@ public class ResetPasswordController {
      * @return lostPasswordPage
      */
     @GetMapping("/lost-password")
-    public String lostPassword(@RequestParam(name = "email", defaultValue = "") String emailAddress,
+    public String lostPassword(@RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
                                Model model) {
         logger.info("GET /lost-password");
-        model.addAttribute("email", emailAddress);
+        model.addAttribute("emailAddress", emailAddress);
         return "lostPasswordPage";
     }
 
@@ -63,26 +63,26 @@ public class ResetPasswordController {
      * @return lostPasswordPage
      */
     @PostMapping("/lost-password")
-    public String emailChecker(@RequestParam("email") String email,
+    public String emailChecker(@RequestParam("emailAddress") String emailAddress,
                                Model model) {
 
         logger.info("POST /lost-password");
-        boolean isRegistered = userService.emailInUse(email);
-        ValidationResult emailValidation = InputValidator.validateEmail(email);
-        model.addAttribute("email", email);
+        boolean isRegistered = userService.emailInUse(emailAddress);
+        ValidationResult emailValidation = InputValidator.validateEmail(emailAddress);
+        model.addAttribute("emailAddress", emailAddress);
         if (!emailValidation.valid()){
             model.addAttribute("emailError", emailValidation);
         } else  {
             model.addAttribute("message", "An email was sent to the address if it was recognised");
             if (isRegistered) {
-                User currentUser = userService.getUserByEmail(email);
+                User currentUser = userService.getUserByEmail(emailAddress);
                 Token token = new Token(currentUser, null);
                 tokenService.addToken(token);
                 model.addAttribute("emailSent", "An email was delivered");
                 try {
                     emailService.sendResetPasswordEmail(token);
                 } catch (MessagingException e) {
-                    logger.info("could not send email to " + email);
+                    logger.info("could not send email to " + emailAddress);
                 }
             }
         }
