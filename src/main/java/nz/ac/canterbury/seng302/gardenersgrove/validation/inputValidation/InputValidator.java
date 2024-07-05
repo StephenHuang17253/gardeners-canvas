@@ -7,7 +7,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -247,7 +246,7 @@ public class InputValidator {
      *
      * @param name string input in text field
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateName(String name) {
         return new InputValidator(name)
@@ -291,7 +290,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateUniqueEmail(String email) {
 
@@ -306,7 +305,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
@@ -320,7 +319,7 @@ public class InputValidator {
      * @param password
      * @param otherFields other input fields to test likeness with password
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePassword(String password, List<String> otherFields) {
         ValidationResult result = new InputValidator(password)
@@ -339,7 +338,7 @@ public class InputValidator {
      *
      * @param dob
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDOB(String dob) {
         return new InputValidator(dob)
@@ -360,7 +359,7 @@ public class InputValidator {
      *
      * @param date
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDate(String date) {
         return new InputValidator(date)
@@ -373,7 +372,7 @@ public class InputValidator {
      *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
         ValidationResult result = new InputValidator(plantCount)
@@ -673,19 +672,27 @@ public class InputValidator {
     }
 
     private InputValidator plantAgeHelper() {
-        // if this validators input has already failed once, this test wont be run
+        // if this validator's input has already failed once, this test won't be run
         if (!this.passState) {
             return this;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
 
+        LocalDate oneYearFromNow = LocalDate.now().plusYears(1);
+
+        if (inputtedDate.isAfter(oneYearFromNow)) {
+            this.validationResult = ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE;
+            this.passState = false;
+            return this;
+        }
+
         long yearsDifference = ChronoUnit.YEARS.between(
                 inputtedDate,
                 LocalDate.now());
 
-        if (yearsDifference > 120) {
-            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_120;
+        if (yearsDifference > 400) {
+            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
         }
@@ -709,7 +716,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-" };
+        String[] allowedPunctuation = new String[]{" ", ",", ".", "'", "-"};
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
@@ -753,6 +760,14 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
+
+        //checks if number is a negative number
+        if (!testedValue.isBlank() && testedValue.strip().charAt(0) == '-') {
+            validationResult = ValidationResult.NON_NUMERIC_COMMA;
+            passState = false;
+            return this;
+        }
+
         boolean stringPasses = true;
         int allowedCommaNumber = 1; // allowed number of commas or full stops
 
@@ -763,6 +778,17 @@ public class InputValidator {
                     continue;
                 }
 
+                if (letter.equals("-".toCharArray()[0])) {
+                    try {
+                        Double.parseDouble(testedValue.replace(',', '.'));
+                    } catch (Exception e) {
+                        validationResult = ValidationResult.NON_NUMERIC_COMMA;
+                        passState = false;
+                        return this;
+                    }
+                    continue;
+                }
+
                 stringPasses = false;
                 if ((letter.toString().equals(",") || letter.toString().equals(".")) && allowedCommaNumber > 0) {
                     stringPasses = true;
@@ -770,12 +796,6 @@ public class InputValidator {
                 }
             }
 
-            if (letter.equals("-".toCharArray()[0])) {
-                validationResult = ValidationResult.NON_NUMERIC_COMMA;
-                passState = false;
-                return this;
-
-            }
 
         }
 

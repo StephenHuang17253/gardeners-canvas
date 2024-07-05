@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <title>Gardener's Grove</title>
-    <link th:href="@{${#httpServletRequest.requestURL.root}/css/registrationEmail.css}" rel="stylesheet"
-          type="text/css">
-</head>
+<head th:replace="fragments/emailHeader.html"></head>
 
 <body>
-<p th:text="|Kia ora ${username}!|"></p>
-<p th:text="${mainBody}"></p>
-<a th:href="${url}"><p th:text="${urlText}"></p></a>
-<p th:text="${signOff}"></p>
+    <div class="container">
+        <h1 th:text="|Kia ora ${username}!|"></h1>
+        <p th:text="${mainBody}"></p>
+        <a th:href="${url}">
+            <p th:text="${urlText}"></p>
+        </a>
+        <p th:text="${signOff}"></p>
+    </div>
 </body>
 
 </html>
