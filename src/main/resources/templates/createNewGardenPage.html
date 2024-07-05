@@ -32,7 +32,7 @@
 
                     <div class="mb-3">
                         <label for="gardenSize" class="form-label">Size (m<sup>2</sup>)</label>
-                        <input id="gardenSize" type="number" class="form-control" th:name="gardenSize"
+                        <input id="gardenSize" type="text" class="form-control" th:name="gardenSize"
                             th:value="*{gardenSize}">
                         <p th:if="${GSErrorText}" class="text-danger fs-6" th:text="${GSErrorText}"></p>
                     </div>
