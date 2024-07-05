@@ -7,7 +7,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -673,19 +672,27 @@ public class InputValidator {
     }
 
     private InputValidator plantAgeHelper() {
-        // if this validators input has already failed once, this test wont be run
+        // if this validator's input has already failed once, this test won't be run
         if (!this.passState) {
             return this;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
 
+        LocalDate oneYearFromNow = LocalDate.now().plusYears(1);
+
+        if (inputtedDate.isAfter(oneYearFromNow)) {
+            this.validationResult = ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE;
+            this.passState = false;
+            return this;
+        }
+
         long yearsDifference = ChronoUnit.YEARS.between(
                 inputtedDate,
                 LocalDate.now());
 
-        if (yearsDifference > 120) {
-            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_120;
+        if (yearsDifference > 400) {
+            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
         }
