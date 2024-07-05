@@ -204,13 +204,13 @@ public class HomePageController {
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
         model.addAttribute("loggedIn", loggedIn);
 
-        String welcomeString = "";
+        String username = "";
         String profilePicture = "";
 
         if (loggedIn) {
             User user = userService.getUserByEmail(authentication.getName());
             if (user != null) {
-                welcomeString = "Welcome " + user.getFirstName() + " " + user.getLastName();
+                username = user.getFirstName() + " " + user.getLastName();
                 String filename = user.getProfilePictureFilename();
                 profilePicture = filename;
             }
@@ -218,7 +218,7 @@ public class HomePageController {
 
         model.addAttribute("profilePicture", profilePicture);
 
-        model.addAttribute("username", welcomeString);
+        model.addAttribute("username", username);
 
         return "homePage";
     }
