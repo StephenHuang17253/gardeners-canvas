@@ -1,32 +1,20 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head>
-    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-    <title>My Gardens</title>
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/tableList.css}" rel="stylesheet">
-    <link th:href="@{/css/infoBox.css}" rel="stylesheet">
-
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
-    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
-</head>
+<head th:replace="fragments/header.html"></head>
 
 <body>
     <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="main-container">
-        <div class="tableList-header">
-            <h1 class="tableList-header-title"> Your Gardens </h1>
-            <br>
-        </div>
-        <br>
-        <div class="tableList-table-contain">
-            <div class="tableList-table-count">
-                <br>
-                <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
+    <div class="container mt-4 bg-light border rounded pt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="mb-3">Your Gardens</h1>
             </div>
-            <div th:each="garden : ${session.userGardens}">
+        </div>
+        <div class="row mb-1">
+            <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
+            <div class="row row-cols-1 row-cols-md-1 row-cols-lg-1 g-2"></div>
+            <div class="row g-2" th:each="garden : ${session.userGardens}">
                 <div th:replace="fragments/gardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},
