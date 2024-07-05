@@ -17,6 +17,11 @@
     background-color: rgba(0, 0, 0, 0.25);
 }
 
+.list-group {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
 .text-bold {
     font-weight: bold;
 }
