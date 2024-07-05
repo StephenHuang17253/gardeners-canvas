@@ -1,18 +1,19 @@
 <div th:fragment="gardenBox(gardenId, gardenName, gardenLocation, gardenSize, numberOfPlants)">
-    <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}" style="text-decoration: none;">
-        <div class="gardenbox" id="gardenbox">
-            <div class="garden-details">
-                <span th:text="${gardenName}" class="garden-name"></span>
-                <br>
-                <span th:text="'Garden Location: ' + ${gardenLocation}"></span>
-                <br>
-                <span th:if="${#strings.equals(gardenSize, 0.0)}"> Garden size: not specified </span>
-                <span th:if="${not #strings.equals(gardenSize, 0.0)}" th:text="'Garden Size: ' + ${gardenSize} + ' m&sup2'"> Name </span>
-                <br>
-                <span th:text="'Number of Plant types recorded: ' + ${numberOfPlants}"></span>
-                <br>
+    <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}" class="text-decoration-none">
+        <div class="card h-100 bg-success text-white garden-card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${gardenName}"></h5>
+                <p class="card-text">
+                    <small>Garden Location: <span th:text="${gardenLocation}"></span></small>
+                </p>
+                <p class="card-text">
+                    <small th:if="${#strings.equals(gardenSize, 0.0)}">Garden size: not specified</small>
+                    <small th:if="${not #strings.equals(gardenSize, 0.0)}" th:utext="'Garden Size: ' + ${gardenSize} + ' m&sup2;'"></small>
+                </p>
+                <p class="card-text">
+                    <small th:text="'Number of Plant types recorded: ' + ${numberOfPlants}"></small>
+                </p>
             </div>
         </div>
     </a>
-    <br>
 </div>
