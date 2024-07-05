@@ -3,10 +3,9 @@
 
 <head th:replace="fragments/header.html"></head>
 
-<body>
+<body id="homePage">
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="jumbotron jumbotron-fluid " id="homeText">
-<!--        <img id="homeImage" th:src="@{/images/landingPlant.JPG}" alt="Garden" class="img-fluid w-100" style="height: 800px; object-fit: cover;">-->
+    <div class="jumbotron jumbotron-fluid d-flex align-items-center justify-content-center" id="homeImage">
 
         <div th:if="${!loggedIn}" class="content">
             <h1 class="display-4">Welcome, to Gardener's Grove</h1>
