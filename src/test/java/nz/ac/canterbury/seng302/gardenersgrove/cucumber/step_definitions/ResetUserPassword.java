@@ -232,7 +232,7 @@ public class ResetUserPassword {
         // Verifies the page the resetLink takes you to is the reset password form
         resetPasswordResult = MOCK_MVC.perform(MockMvcRequestBuilders.get(resetLink))
                 .andExpect(status().isOk())
-                .andExpect(view().name("resetPasswordForm")) // Adjust the view name as per your actual view
+                .andExpect(view().name("resetPasswordPage"))
                 .andReturn();
     }
 

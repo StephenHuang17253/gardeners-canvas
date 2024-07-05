@@ -45,14 +45,14 @@ public class ResetPasswordController {
 
     /**
      * Get form for entering email if user has forgotten their password
-     * @return lostPasswordForm
+     * @return lostPasswordPage
      */
     @GetMapping("/lost-password")
     public String lostPassword(@RequestParam(name = "email", defaultValue = "") String emailAddress,
                                Model model) {
         logger.info("GET /lost-password");
         model.addAttribute("email", emailAddress);
-        return "lostPasswordForm";
+        return "lostPasswordPage";
     }
 
     /**
@@ -60,7 +60,7 @@ public class ResetPasswordController {
      * Checks if input values are valid and then sends reset password link to email entered
      * @param email input email to send reset password link to
      * @param model to collect field values and error messages
-     * @return lostPasswordForm
+     * @return lostPasswordPage
      */
     @PostMapping("/lost-password")
     public String emailChecker(@RequestParam("email") String email,
@@ -86,7 +86,7 @@ public class ResetPasswordController {
                 }
             }
         }
-        return "lostPasswordForm";
+        return "lostPasswordPage";
     }
 
 
@@ -112,7 +112,7 @@ public class ResetPasswordController {
             return "redirect:/login";
         }
 
-        return "resetPasswordForm";
+        return "resetPasswordPage";
     }
 
     /**
@@ -124,7 +124,7 @@ public class ResetPasswordController {
      * @param password new password
      * @param retypePassword new password
      * @param model to collect field values and error messages
-     * @return resetPasswordForm or loginPage if reset password is successful
+     * @return resetPasswordPage or loginPage if reset password is successful
      */
     @PostMapping("/reset-password/{token}")
     public String passwordChecker(@PathVariable("token") String resetToken,
@@ -157,10 +157,10 @@ public class ResetPasswordController {
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
-            return "resetPasswordForm";
+            return "resetPasswordPage";
         } else if (!Objects.equals(password, retypePassword)) {
             model.addAttribute("passwordError", "The passwords do not match");
-            return "resetPasswordForm";
+            return "resetPasswordPage";
         } else {
             User currentUser = token.getUser();
             userService.updatePassword(currentUser.getId(), password);
