@@ -29,7 +29,6 @@
 #homeImage {
     position: relative;
     /*Ignore red underline in editor*/
-    background-image: url("/images/landingPlant.JPG");
     background-size: cover;
     background-position: center;
     color: white;
