@@ -1,5 +1,3 @@
-const pattern = /^(\d+\.\d*|\d*\.\d+|\d+)([eE][+\-]?(\d+))?$/
-
 const isNumber = (input) => /^\d+$/.test(input);
 
 const hasDecimalPoint = (input) => /(\.|,)/.test(input);
