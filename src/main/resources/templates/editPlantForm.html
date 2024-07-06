@@ -55,7 +55,7 @@
                     <br>
                     <input type="number" class="form-control" th:classappend="${PCErrorClass}" id="plantCount"
                         placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount"
-                        autofocus>
+                        >
 
                     <div th:if="${PCErrorText!=''}">
                         <h3 class="text-danger fs-6" th:text="${PCErrorText}"></h3>
@@ -68,7 +68,7 @@
                     <div class="form-description">
                         <textarea class="form-control" th:classappend="${PDErrorClass}" id="plantDescription"
                             placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
-                            data-cy="plantDescription" autofocus></textarea>
+                            data-cy="plantDescription" ></textarea>
                     </div>
 
                     <div th:if="${PDErrorText!=''}">
@@ -81,7 +81,7 @@
                     <label for="plantDate" class="form-label"> Plant Date (Optional)</label>
                     <input type="date" class="form-control" th:classappend="${PAErrorClass}" id="plantDate" placeholder=""
                         max="9999-12-30" min="0000-01-01" th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
-                        autofocus>
+                        >
 
                     <div th:if="${PAErrorText!=''}">
                         <h3 class="text-danger fs-6" th:text="${PAErrorText}" id="plantDateError"></h3>
