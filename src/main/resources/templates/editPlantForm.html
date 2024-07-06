@@ -12,7 +12,7 @@
 
 </head>
 
-<body>
+<body class="bg-success">
     <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md my-5">
 
@@ -20,11 +20,11 @@
         <div class="row justify-content-center my-5">
             <div class="col-md-5 p-3">
 
+            <form th:action="@{edit}" method="post" enctype="multipart/form-data" class="bg-white border rounded-3 p-3">
+
                 <div class="text-center">
                     <h1>Edit Plant</h1>
                 </div>
-
-            <form th:action="@{edit}" method="post" enctype="multipart/form-data" class="border rounded-3 p-3">
 
                 <div class="w-100 d-flex flex-row justify-content-center mb-3">
                     <!-- Some things are still named 'profile_picture', this is so I can reuse the existing css and js. -->
@@ -70,25 +70,28 @@
                             placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
                             data-cy="plantDescription" autofocus></textarea>
                     </div>
+
+                    <div th:if="${PDErrorText!=''}">
+                        <h3 class="text-danger fs-6" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
+                    </div>
                 </div>
 
-                <div th:if="${PDErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
+
+                <div class="mb-3">
+                    <label for="plantDate" class="form-label"> Plant Date (Optional)</label>
+                    <input type="date" class="form-control" th:classappend="${PAErrorClass}" id="plantDate" placeholder=""
+                        max="9999-12-30" min="0000-01-01" th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
+                        autofocus>
+
+                    <div th:if="${PAErrorText!=''}">
+                        <h3 class="text-danger fs-6" th:text="${PAErrorText}" id="plantDateError"></h3>
+                    </div>
                 </div>
 
-                <label for="plantDate" class="form-label"> Plant Date (Optional)</label>
-                <input type="date" class="form-control" th:classappend="${PAErrorClass}" id="plantDate" placeholder=""
-                    max="9999-12-30" min="0000-01-01" th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
-                    autofocus>
-
-                <div th:if="${PAErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${PAErrorText}" id="plantDateError"></h3>
-                </div>
-
-                <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                    <button type="submit" class="btn btn-primary text-nowrap">Submit</button>
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
+                    <button type="submit" class="btn btn-success text-nowrap rounded-5">Submit</button>
                     <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
-                        <button type="button" class="btn btn-secondary text-nowrap">Cancel</button>
+                        <button type="button" class="btn btn-danger text-nowrap rounded-5">Cancel</button>
                     </a>
                 </div>
                 </form>
