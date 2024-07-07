@@ -35,6 +35,11 @@
                         gardenName=${garden.gardenName},
                         gardenLocation=${garden.gardenLocation},
                         gardenSize=${garden.gardenSize},
+                        gardenDescription=${garden.gardenDescription},
+                        isPublic=${garden.isPublic},
+                        plantImage1=${garden.plants.size() > 0 ? garden.plants[0].plantPictureFilename : null},
+                        plantImage2=${garden.plants.size() > 1 ? garden.plants[1].plantPictureFilename : null},
+                        plantImage3=${garden.plants.size() > 2 ? garden.plants[2].plantPictureFilename : null},
                         numberOfPlants=${garden.plants?.size()})}">
             </div>
         </div>
