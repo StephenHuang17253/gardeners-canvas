@@ -305,18 +305,18 @@ public class PlantFormController {
                         "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
-            model.addAttribute("PNErrorClass", "border-danger");
+            model.addAttribute("PNErrorClass", "true");
         } else {
-            model.addAttribute("PNErrorClass", "noErrorBorder");
+            model.addAttribute("PNErrorClass", "null");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
             model.addAttribute("PCErrorText", plantCountResult);
-            model.addAttribute("PCErrorClass", "border-danger");
+            model.addAttribute("PCErrorClass", "true");
 
         } else {
-            model.addAttribute("PCErrorClass", "noErrorBorder");
+            model.addAttribute("PCErrorClass", "null");
         }
 
         // notifies the user that the plant Description is invalid (if applicable)
@@ -325,17 +325,17 @@ public class PlantFormController {
                 plantNameResult.updateMessage("cannot be greater than 512 characters in length");
             }
             model.addAttribute("PDErrorText", "Plant description " + plantDescriptionResult);
-            model.addAttribute("PDErrorClass", "border-danger");
+            model.addAttribute("PDErrorClass", "true");
 
         } else {
-            model.addAttribute("PDErrorClass", "noErrorBorder");
+            model.addAttribute("PDErrorClass", "null");
         }
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
-            model.addAttribute("PAErrorClass", "border-danger");
+            model.addAttribute("PAErrorClass", "true");
         } else {
-            model.addAttribute("PAErrorClass", "noErrorBorder");
+            model.addAttribute("PAErrorClass", "null");
         }
 
     }

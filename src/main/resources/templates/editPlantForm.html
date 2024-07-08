@@ -42,7 +42,7 @@
 
                 <div class="mb-3 ">
                     <label for="plantName" class="form-label"> Plant Name: </label>
-                    <input type="text" class="form-control" th:classappend="${PNErrorClass}" id="plantName"
+                    <input type="text" class="form-control"  th:classappend="${PNErrorClass == 'true' ? 'border-danger' : PNErrorClass}" id="plantName"
                         placeholder="Name of plant" th:name="plantName" th:value="*{plantName}" autofocus>
 
                     <div th:if="${PNErrorText!=''}">
@@ -53,7 +53,7 @@
                 <div class="mb-3">
                     <label for="plantCount" class="form-label"> Plant Count: </label>
                     <br>
-                    <input type="number" class="form-control" th:classappend="${PCErrorClass}" id="plantCount"
+                    <input type="number" class="form-control"  th:classappend="${PCErrorClass == 'true' ? 'border-danger' : PCErrorClass}" id="plantCount"
                         placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount"
                         >
 
@@ -66,7 +66,7 @@
                     <label for="plantDescription" class="form-label"> Plant Description (Optional)</label>
                     <br>
                     <div class="form-description">
-                        <textarea class="form-control" th:classappend="${PDErrorClass}" id="plantDescription"
+                        <textarea class="form-control"  th:classappend="${PDErrorClass == 'true' ? 'border-danger' : PDErrorClass}" id="plantDescription"
                             placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
                             data-cy="plantDescription" ></textarea>
                     </div>
@@ -79,7 +79,7 @@
 
                 <div class="mb-3">
                     <label for="plantDate" class="form-label"> Plant Date (Optional)</label>
-                    <input type="date" class="form-control" th:classappend="${PAErrorClass}" id="plantDate" placeholder=""
+                    <input type="date" class="form-control"  th:classappend="${PAErrorClass == 'true' ? 'border-danger' : PAErrorClass}" id="plantDate" placeholder=""
                         max="9999-12-30" min="0000-01-01" th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
                         >
 
