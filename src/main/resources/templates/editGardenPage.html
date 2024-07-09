@@ -4,16 +4,16 @@
 <head th:replace="fragments/header.html"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('create')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md my-5">
 
         <div class="text-center">
-            <h1>Create New Garden</h1>
+            <h1>Edit Garden</h1>
         </div>
 
         <div class="row justify-content-center my-5">
             <div class="col-md-5 p-3">
-                <form th:action="@{/create-new-garden}" method="post" class="border rounded-3 p-3">
+                <form th:action="@{edit}" method="post" class="border rounded-3 p-3">
 
                     <div class="mb-3">
                         <label for="gardenName" class="form-label">Name *</label>
@@ -79,15 +79,14 @@
                         <p th:if="${CountryErrorText}" class="text-danger fs-6" th:text="${CountryErrorText}"></p>
                     </div>
 
-                    <input type="hidden" id="latitude" th:name="latitude">
-                    <input type="hidden" id="longitude" th:name="longitude">
+                    <input id="latitude" type="hidden" th:name="latitude">
+                    <input id="longitude" type="hidden" th:name="longitude">
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success" formnovalidate>Create</button>
-                        <button type="button" class="btn btn-secondary"
-                            onclick="window.location.href = localStorage.getItem('previousUrl')">
-                            Cancel
-                        </button>
+                        <button type="submit" class="btn btn-success" formnovalidate>Submit</button>
+                        <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                        </a>
                     </div>
                 </form>
             </div>

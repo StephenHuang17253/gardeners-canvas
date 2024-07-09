@@ -233,9 +233,9 @@ public class GardenFormController {
     }
 
     /**
-     * Maps the editGardenForm html page to /my-gardens/{gardenId}/edit url
+     * Maps the editGardenPage html page to /my-gardens/{gardenId}/edit url
      *
-     * @return thymeleaf editGardenForm
+     * @return thymeleaf editGardenPage
      */
     @GetMapping("/my-gardens/{gardenId}/edit")
     public String editGardenDetails(@PathVariable Long gardenId,
@@ -265,7 +265,6 @@ public class GardenFormController {
         model.addAttribute("city", garden.getGardenCity());
         model.addAttribute("postcode", garden.getGardenPostcode());
         model.addAttribute("country", garden.getGardenCountry());
-        model.addAttribute("gardenLocation", garden.getGardenLocation());
         model.addAttribute("latitude", garden.getGardenLatitude());
         model.addAttribute("longitude", garden.getGardenLongitude());
         double gardenSize = garden.getGardenSize();
@@ -274,7 +273,7 @@ public class GardenFormController {
         } else {
             model.addAttribute("gardenSize", gardenSize);
         }
-        return "editGardenForm";
+        return "editGardenPage";
     }
 
     /**
@@ -350,22 +349,21 @@ public class GardenFormController {
             gardenSize = null;
         }
 
-        model.addAttribute("loggedIn", loggedIn);
-        model.addAttribute("gardenName", gardenName);
-        model.addAttribute("gardenDescription", gardenDescription);
-        model.addAttribute("streetAddress", streetAddress);
-        model.addAttribute("suburb", suburb);
-        model.addAttribute("city", city);
-        model.addAttribute("country", country);
-        model.addAttribute("postcode", postcode);
-        model.addAttribute("gardenSize", gardenSize);
-        model.addAttribute("latitude", latitude);
-        model.addAttribute("longitude", longitude);
-
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid()
                 || !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
                 || !gardenDescriptionResult.valid()) {
-            return "editGardenForm";
+            model.addAttribute("loggedIn", loggedIn);
+            model.addAttribute("gardenName", gardenName);
+            model.addAttribute("gardenDescription", gardenDescription);
+            model.addAttribute("streetAddress", streetAddress);
+            model.addAttribute("suburb", suburb);
+            model.addAttribute("city", city);
+            model.addAttribute("country", country);
+            model.addAttribute("postcode", postcode);
+            model.addAttribute("gardenSize", gardenSize);
+            model.addAttribute("latitude", latitude);
+            model.addAttribute("longitude", longitude);
+            return "editGardenPage";
         }
         Double doubleGardenSize;
         if (gardenSize == null) {
