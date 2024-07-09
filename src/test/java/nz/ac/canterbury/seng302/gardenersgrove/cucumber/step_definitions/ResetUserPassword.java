@@ -130,7 +130,7 @@ public class ResetUserPassword {
                         .get(url)
         ).andExpect(status().isOk()).andReturn();
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
-        assertNotNull("emailAddress attribute exists", modelMap.get("email"));
+        assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
 
     }
 
@@ -156,7 +156,7 @@ public class ResetUserPassword {
         System.out.println(userEmail);
         resetPasswordResult = MOCK_MVC.perform(
                         MockMvcRequestBuilders.post(url)
-                                .param("email", userEmail))
+                                .param("emailAddress", userEmail))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -232,7 +232,7 @@ public class ResetUserPassword {
         // Verifies the page the resetLink takes you to is the reset password form
         resetPasswordResult = MOCK_MVC.perform(MockMvcRequestBuilders.get(resetLink))
                 .andExpect(status().isOk())
-                .andExpect(view().name("resetPasswordForm")) // Adjust the view name as per your actual view
+                .andExpect(view().name("resetPasswordPage"))
                 .andReturn();
     }
 

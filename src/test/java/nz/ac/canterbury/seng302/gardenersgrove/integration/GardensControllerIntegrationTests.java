@@ -146,9 +146,8 @@ public class GardensControllerIntegrationTests {
     @WithMockUser(username = "johnDoe@email.com")
     public void GetMyGardens_UserAuthorized_Return200() throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("userGardens", gardenService.getAllUsersGardens(1L));
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens").session(session))
+                .perform(MockMvcRequestBuilders.get("/my-gardens"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
