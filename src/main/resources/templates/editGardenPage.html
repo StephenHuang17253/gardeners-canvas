@@ -18,14 +18,16 @@
                     <div class="mb-3">
                         <label for="gardenName" class="form-label">Name *</label>
                         <input id="gardenName" type="text" class="form-control" th:name="gardenName"
-                            th:value="*{gardenName}" autofocus>
+                            th:value="*{gardenName}" autofocus
+                            th:classappend="${GNErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${GNErrorText}" class="text-danger fs-6" th:text="${GNErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="gardenDescription" class="form-label">Description</label>
                         <textarea id="gardenDescription" class="form-control" rows="3" th:name="gardenDescription"
-                            th:text="*{gardenDescription}"></textarea>
+                            th:text="*{gardenDescription}"
+                            th:classappend="${GDErrorText == null ? '' : 'border-danger'}"></textarea>
                         <p id="gardenDescriptionCounter" class="fs-6"></p>
                         <p th:if="${GDErrorText}" class="text-danger fs-6" th:text="${GDErrorText}"></p>
                     </div>
@@ -33,7 +35,7 @@
                     <div class="mb-3">
                         <label for="gardenSize" class="form-label">Size (m<sup>2</sup>)</label>
                         <input id="gardenSize" type="text" class="form-control" th:name="gardenSize"
-                            th:value="*{gardenSize}">
+                            th:value="*{gardenSize}" th:classappend="${GSErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${GSErrorText}" class="text-danger fs-6" th:text="${GSErrorText}"></p>
                     </div>
 
@@ -41,7 +43,7 @@
                         <label for="streetAddress" class="form-label">Street Address</label>
                         <input id="streetAddress" type="text" class="form-control" th:name="streetAddress"
                             th:value="*{streetAddress}" placeholder="Start typing for autocomplete suggestions"
-                            autocomplete="off">
+                            autocomplete="off" th:classappend="${AddressErrorText == null ? '' : 'border-danger'}">
                         <div class="position-relative">
                             <ul id="autocompleteSuggestions" class="list-group position-absolute"></ul>
                         </div>
@@ -51,25 +53,29 @@
 
                     <div class="mb-3">
                         <label for="suburb" class="form-label">Suburb</label>
-                        <input id="suburb" type="text" class="form-control" th:name="suburb" th:value="*{suburb}">
+                        <input id="suburb" type="text" class="form-control" th:name="suburb" th:value="*{suburb}"
+                            th:classappend="${SuburbErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${SuburbErrorText}" class="text-danger fs-6" th:text="${SuburbErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="city" class="form-label">City *</label>
-                        <input id="city" type="text" class="form-control" th:name="city" th:value="*{city}">
+                        <input id="city" type="text" class="form-control" th:name="city" th:value="*{city}"
+                            th:classappend="${CityErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${CityErrorText}" class="text-danger fs-6" th:text="${CityErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="postcode" class="form-label">Postcode</label>
-                        <input id="postcode" type="text" class="form-control" th:name="postcode" th:value="*{postcode}">
+                        <input id="postcode" type="text" class="form-control" th:name="postcode" th:value="*{postcode}"
+                            th:classappend="${PostCodeErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PostCodeErrorText}" class="text-danger fs-6" th:text="${PostCodeErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="country" class="form-label">Country *</label>
-                        <input id="country" type="text" class="form-control" th:name="country" th:value="*{country}">
+                        <input id="country" type="text" class="form-control" th:name="country" th:value="*{country}"
+                            th:classappend="${CountryErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${CountryErrorText}" class="text-danger fs-6" th:text="${CountryErrorText}"></p>
                     </div>
 
@@ -77,7 +83,7 @@
                     <input id="longitude" type="hidden" th:name="longitude">
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-primary" formnovalidate>Submit</button>
+                        <button type="submit" class="btn btn-success" formnovalidate>Submit</button>
                         <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
                             <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>
