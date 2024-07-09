@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,6 +56,8 @@ public class GardensController {
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
 
+    private int COUNT_PER_PAGE = 10;
+
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
     /**
      * Constructor for the GardensController with {@link Autowired} to
@@ -77,15 +80,44 @@ public class GardensController {
     /**
      * Maps the myGardensPage html file to /my-gardens url
      *
+     * @param page page number
+     * @param filter string of filter values: None, Public, Private
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
-    public String myGardens(Model model) {
+    public String myGardens(@RequestParam(defaultValue = "1") int page,
+                            @RequestParam(defaultValue = "All") String filter,
+                            Model model) {
         logger.info("GET /my-gardens");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        User user = securityService.getCurrentUser();
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+
+        long publicGardensCount = gardens.stream().filter(Garden::getIsPublic).count();
+        long privateGardensCount = gardens.stream().filter(garden -> !garden.getIsPublic()).count();
+
+        if (Objects.equals(filter, "Public")) {
+            gardens = gardens.stream().filter(garden -> garden.getIsPublic()).collect(Collectors.toList());
+        } else if (Objects.equals(filter, "Private")) {
+            gardens = gardens.stream().filter(garden -> !garden.getIsPublic()).collect(Collectors.toList());
+        }
+
+        int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
+
+        model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("totalGardens", gardens.size());
+        model.addAttribute("filter", filter);
+        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("privateGardensCount", privateGardensCount);
+        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+        model.addAttribute("profilePicture", user.getProfilePictureFilename());
 
         return "myGardensPage";
     }
@@ -103,9 +135,7 @@ public class GardensController {
                                     Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -115,9 +145,6 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        logger.info("Garden owner ID: {}, Authenticated user ID: {}",
-                garden.getOwner().getId(),
-                authentication.getName());
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             if (!garden.getIsPublic()) {
@@ -217,9 +244,7 @@ public class GardensController {
         logger.info("POST /my-gardens/{gardenId}/public", gardenId);
         logger.info("Value of makeGardenPublic: {}", makeGardenPublic);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -229,9 +254,6 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        logger.info("Garden owner ID: {}, Authenticated user ID: {}",
-                garden.getOwner().getId(),
-                authentication.getName());
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -279,9 +301,7 @@ public class GardensController {
             return "404";
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
 
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -338,9 +358,7 @@ public class GardensController {
                                  HttpServletResponse response) {
         logger.info("GET /my-gardens");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
         User friend;
         try {
