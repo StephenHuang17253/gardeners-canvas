@@ -283,6 +283,7 @@ public class AccountController {
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("message", inputFlashMap.get("message"));
+            model.addAttribute("goodMessage", inputFlashMap.get("goodMessage"));
         }
 
         model.addAttribute("emailAddress", emailAddress);
@@ -311,6 +312,7 @@ public class AccountController {
 
         if (token == null || token.isExpired() || !token.getUser().getEmailAddress().equals(emailAddress)) {
             redirectAttributes.addFlashAttribute("message", "Signup code invalid");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
             return "redirect:/verify/" + emailAddress;
         }
 
@@ -319,6 +321,7 @@ public class AccountController {
         tokenService.deleteToken(token);
 
         redirectAttributes.addFlashAttribute("message", "Your account has been activated, please log in");
+        redirectAttributes.addFlashAttribute("goodMessage", true);
         return "redirect:/login";
     }
 
@@ -345,6 +348,7 @@ public class AccountController {
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("message", inputFlashMap.get("message"));
+            model.addAttribute("goodMessage", inputFlashMap.get("goodMessage"));
         }
 
         model.addAttribute("validEmail", true);
