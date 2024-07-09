@@ -1,44 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <title>Gardener's Grove Home Page</title>
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/homePage.css}" rel="stylesheet" type="text/css">
-    <link th:href="@{/css/profilePicturePicker.css}" rel="stylesheet">
-    
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
-    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
-</head>
+<head th:replace="fragments/header.html"></head>
 
-<body>
+<body class="overflow-hidden">
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="container">
-        <h2>Gardener's Grove</h2>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|">
 
-        <img th:src="@{/images/landingPlant.JPG}" alt="Garden">
-
-        <div th:if="${loggedIn}" class="profile_info">
-            <div class="profile_picture_container small_pic">
-                <img id="profilePicture"
-                    th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                    alt="User's profile picture">
-            </div>
-
-            <p th:text="${username}"></p>
+        <div th:if="${!loggedIn}" class="content" style="z-index: 2">
+            <h1 class="display-4">Welcome, to Gardener's Grove</h1>
+            <p class="lead">Your one-stop shop for everything garden related.</p>
+            <hr class="my-4">
+            <p>Start your journey today! Or continue it...</p>
+            <p class="d-flex flex-row flex-wrap gap-3 mb-3">
+                <a th:href="@{register}">
+                    <button class="btn btn-primary btn-lg">Register</button>
+                </a>
+                <a th:href="@{login}">
+                    <button class="btn btn-primary btn-lg">Login</button>
+                </a>
+            </p>
         </div>
 
-        <div class="buttons">
-            <a th:if="${!loggedIn}" th:href="@{register}"><button class="user_button">Register</button></a>
-
-            <a th:if="${!loggedIn}" th:href="@{login}"><button class="user_button">Sign In</button></a>
-
-            <a th:if="${loggedIn}" th:href="@{profile}"><button class="user_button">View Profile</button></a>
-
-            <form th:if="${loggedIn}" th:action="@{/logout}" method="post">
-                <button type="submit" class="user_button">Logout</button>
-            </form>
+        <div th:if="${loggedIn}" class="content d-flex flex-row gap-3" style="z-index: 2">
+            <img id="profilePicture" th:if="${loggedIn}" class="image-fluid rounded-circle border"
+                th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                alt="User's profile picture" width="200" height="200">
+            <div>
+                <h1 class="display-4">Welcome back <b th:text="${username}"></b>, </h1>
+                <h1 class="display-4">to Gardener's Grove</h1>
+                <p class="lead">Your gardens await!</p>
+                <hr class="my-4">
+                <p>Want to check yourself out? Or need to leave us...</p>
+                <div class="d-flex flex-row flex-wrap gap-3 mb-3">
+                    <a th:href="@{profile}">
+                        <button class="btn btn-primary btn-lg">Profile</button>
+                    </a>
+                    <form id="logoutForm" th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            onclick="document.getElementById('logoutForm').submit()">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </body>
