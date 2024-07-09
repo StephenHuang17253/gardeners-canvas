@@ -9,31 +9,34 @@ const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
 const autocompleteErrorMessage = document.getElementById('autocompleteError');
 const streetAddressField = document.getElementById('streetAddress');
 
+const getDisplayString = (data) => {
+    const address = data.address
+    const streetNumber = address.house_number || '';
+    const streetName = address.road || '';
+    const streetAddress = streetNumber + ' ' + streetName;
+    const addressParts = [
+        streetAddress, address.suburb || '', address.city || '', address.postcode || '', address.country || ''
+    ]
+    return addressParts.filter(addressPart => addressPart !== '').join(', ')
+}
+
+
 /**
  * Fills address fields with provided data.
  * @param {Object} data - Data containing address information.
  * @returns {void}
  */
 const fillAddressFields = (data) => {
-    let streetAddress = '';
-    const streetNumber = data.address.house_number || '';
-    const streetName = data.address.road || '';
-
-    if (streetNumber !== '') {
-        streetAddress += streetNumber;
-    }
-    if (streetName !== '' && streetNumber === '') {
-        streetAddress += streetName
-    }
-    if (streetName !== '' && streetNumber !== '') {
-        streetAddress += ' ' + streetName
-    }
+    const address = data.address
+    const streetNumber = address.house_number || '';
+    const streetName = address.road || '';
+    const streetAddress = streetNumber + ' ' + streetName;
 
     document.getElementById('streetAddress').value = streetAddress;
-    document.getElementById('suburb').value = data.address.suburb || '';
-    document.getElementById('city').value = data.address.city || '';
-    document.getElementById('postcode').value = data.address.postcode || '';
-    document.getElementById('country').value = data.address.country || '';
+    document.getElementById('suburb').value = address.suburb || '';
+    document.getElementById('city').value = address.city || '';
+    document.getElementById('postcode').value = address.postcode || '';
+    document.getElementById('country').value = address.country || '';
     document.getElementById('longitude').value = data.lon || '';
     document.getElementById('latitude').value = data.lat || '';
 }
@@ -79,7 +82,7 @@ const updateAutocompleteDropdown = (suggestions) => {
         listElement.classList.add('list-group-item');
         listElement.classList.add('py-2');
         const div = document.createElement('div');
-        div.textContent = suggestion.display_name;
+        div.textContent = getDisplayString(suggestion);
         div.classList.add('cursor-pointer');
         div.classList.add('darken-on-hover');
         div.classList.add('rounded');
