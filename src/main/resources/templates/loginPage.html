@@ -17,14 +17,15 @@
 
                     <div class="mb-3">
                         <label for="emailAddress" class="form-label">Email Address *</label>
-                        <input id="emailAddress" type="text" class="form-control" th:name="emailAddress" th:value="*{emailAddress}"
-                            autofocus>
+                        <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
+                            th:value="*{emailAddress}" autofocus>
                         <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password *</label>
-                        <input id="password" type="password" class="form-control" th:name="password" th:value="*{password}">
+                        <input id="password" type="password" class="form-control" th:name="password"
+                            th:value="*{password}">
                         <p th:if="${loginError}" class="text-danger fs-6" th:text="${loginError}"></p>
                     </div>
 
@@ -35,7 +36,7 @@
                         </a>
                     </div>
 
-                    <p th:if="${message}" class="text-primary fs-6 mb-3" th:text="${message}"></p>
+                    <div th:replace="fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})">
 
                     <div class="d-flex flex-column justify-content-center gap-3 text-center">
                         <a th:href="@{/register}">Not registered? Create an account</a>

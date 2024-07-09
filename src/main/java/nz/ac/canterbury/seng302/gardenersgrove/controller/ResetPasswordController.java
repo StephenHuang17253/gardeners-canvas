@@ -74,6 +74,7 @@ public class ResetPasswordController {
             model.addAttribute("emailError", emailValidation);
         } else  {
             model.addAttribute("message", "An email was sent to the address if it was recognised");
+            model.addAttribute("goodMessage", true);
             if (isRegistered) {
                 User currentUser = userService.getUserByEmail(emailAddress);
                 Token token = new Token(currentUser, null);
@@ -109,6 +110,7 @@ public class ResetPasswordController {
                 tokenService.deleteToken(token);
             }
             redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
             return "redirect:/login";
         }
 
