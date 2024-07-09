@@ -1,16 +1,22 @@
 let DESCRIPTION_LIMIT = 512
 // Event listener ensuring more than 512 characters not entered.
+const descriptionCounter = document.getElementById('plantDescriptionCounter');
+const plantDescription = document.getElementById('plantDescription');
+const plantDescriptionError = document.getElementById('plantDescriptionError');
 
 const description_limit_function = function() {
     let limit = DESCRIPTION_LIMIT;
-    let input = document.getElementById('plantDescription').value
+    let input = plantDescription.value
 
-    if (input.length >= limit) {
-        document.getElementById('plantDescription').value = input.slice(0, limit);
-        document.getElementById('plantDescriptionError').textContent = "Plant description must be less than " + limit + " characters";
+    if (input.length > limit) {
+        plantDescription.value = input.slice(0, limit);
+        plantDescriptionError.textContent = "Plant description must be less than " + limit + " characters";
+        plantDescription.style.borderColor = "red"
     } else {
-        document.getElementById('plantDescriptionError').textContent = "";
+        plantDescriptionError.textContent = "";
+        plantDescription.style.borderColor = ""
     }
+    descriptionCounter.textContent = plantDescription.value.length + '/' + DESCRIPTION_LIMIT;
 }
 
 
