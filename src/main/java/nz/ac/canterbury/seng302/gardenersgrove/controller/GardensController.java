@@ -116,7 +116,7 @@ public class GardensController {
         model.addAttribute("filter", filter);
         model.addAttribute("publicGardensCount", publicGardensCount);
         model.addAttribute("privateGardensCount", privateGardensCount);
-        model.addAttribute("userName", user.getFirstName() + user.getLastName());
+        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("profilePicture", user.getProfilePictureFilename());
 
         return "myGardensPage";
