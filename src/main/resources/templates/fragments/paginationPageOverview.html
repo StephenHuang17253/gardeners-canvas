@@ -1,4 +1,3 @@
-<!DOCTYPE html>
-<div class="pageOverview">
-    <span th:text="'Showing results ' + ${startIndex} + ' to ' + ${endIndex} + ' of ' + ${totalGardens}"></span>
-</div>
+<p class="text-muted">
+    Showing results <span th:text="${startIndex}"></span> to <span th:text="${endIndex}"></span> of <span th:text="${totalGardens}"></span>
+</p>

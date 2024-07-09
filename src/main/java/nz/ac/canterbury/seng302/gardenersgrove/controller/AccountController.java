@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -398,7 +400,12 @@ public class AccountController {
         }
 
         setSecurityContext(emailAddress, password, request.getSession());
-        session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        List<GardenModel> gardenModels = new ArrayList<>();
+        for(Garden garden : gardens){
+            gardenModels.add(new GardenModel(garden.getGardenId(), garden.getGardenName()));
+        }
+        session.setAttribute("userGardens", gardenModels);
 
         return "redirect:/home";
 
