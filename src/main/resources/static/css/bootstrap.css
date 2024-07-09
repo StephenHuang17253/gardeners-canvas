@@ -17,6 +17,11 @@
     background-color: rgba(0, 0, 0, 0.25);
 }
 
+.list-group {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
 .text-bold {
     font-weight: bold;
 }
@@ -27,7 +32,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("/images/landingPlant.JPG");
     background-size: cover;
     background-position: center;
     z-index: -1;

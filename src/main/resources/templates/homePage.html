@@ -5,7 +5,8 @@
 
 <body class="overflow-hidden">
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
-    <div id="homeImage" class="d-flex align-items-center justify-content-center" style="color: white;">
+    <div id="homeImage" class="d-flex align-items-center justify-content-center"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|">
 
         <div th:if="${!loggedIn}" class="content" style="z-index: 2">
             <h1 class="display-4">Welcome, to Gardener's Grove</h1>
