@@ -26,9 +26,9 @@
                     <div class="mb-3">
                         <label for="gardenDescription" class="form-label">Description</label>
                         <textarea id="gardenDescription" class="form-control" rows="3" th:name="gardenDescription"
-                            th:value="*{gardenDescription}"
+                            th:text="*{gardenDescription}"
                             th:classappend="${GDErrorText == null ? '' : 'border-danger'}"></textarea>
-                        <p id="GDErrorText" class="fs-6"></p>
+                        <p id="gardenDescriptionCounter" class="fs-6"></p>
                         <p th:if="${GDErrorText}" class="text-danger fs-6" th:text="${GDErrorText}"></p>
                     </div>
 
