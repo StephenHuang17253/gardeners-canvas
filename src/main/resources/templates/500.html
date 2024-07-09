@@ -6,6 +6,6 @@
 <body>
   <div class="text-center">
     <h1 class="my-3">500 Server Error</h1>
-    <p>Our server encountered a bug... and it's not the good kind! Please hang tight.</p>
+    <p th:text="${message == null ? 'Our server encountered a bug... and it's not the good kind! Please hang tight.' : message}"></p>
   </div>
 </body>
