@@ -86,7 +86,7 @@ public class GardensController {
      */
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "None") String filter,
+                            @RequestParam(defaultValue = "All") String filter,
                             Model model) {
         logger.info("GET /my-gardens");
 

@@ -37,9 +37,21 @@
                          th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
                     </div>
                     <div class="btn-group mt-3" role="group" aria-label="Filter Gardens">
-                        <a th:href="@{/my-gardens(filter='All')}" class="btn bg-success" style="color: white">All</a>
-                        <a th:href="@{/my-gardens(filter='Public')}" class="btn bg-success" style="color: white">Public</a>
-                        <a th:href="@{/my-gardens(filter='Private')}" class="btn bg-success" style="color: white">Private</a>
+                        <a th:href="@{/my-gardens(filter='All')}"
+                           class="btn"
+                           th:classappend="${filter == 'All'} ? 'bg-success text-white' : 'btn-outline-success'">
+                            All
+                        </a>
+                        <a th:href="@{/my-gardens(filter='Public')}"
+                           class="btn"
+                           th:classappend="${filter == 'Public'} ? 'bg-success text-white' : 'btn-outline-success'">
+                            Public
+                        </a>
+                        <a th:href="@{/my-gardens(filter='Private')}"
+                           class="btn"
+                           th:classappend="${filter == 'Private'} ? 'bg-success text-white' : 'btn-outline-success'">
+                            Private
+                        </a>
                     </div>
                 </div>
             </div>
