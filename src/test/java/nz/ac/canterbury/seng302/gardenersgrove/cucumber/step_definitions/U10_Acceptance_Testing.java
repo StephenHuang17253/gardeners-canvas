@@ -133,7 +133,7 @@ public class U10_Acceptance_Testing {
     }
 
     @Then("I see the edit garden form where all the details are prepopulated")
-    public void iSeeTheEditGardenFormWhereAllTheDetailsArePrepopulated() {
+    public void iSeeTheEditGardenPageWhereAllTheDetailsArePrepopulated() {
         ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());

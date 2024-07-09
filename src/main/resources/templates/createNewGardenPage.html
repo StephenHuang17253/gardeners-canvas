@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header.html"></head>
+
+<body>
+    <div th:replace="fragments/navBar.html :: navBar('create')" th:with="loggedIn=${loggedIn}"></div>
+    <div class="container-md my-5">
+
+        <div class="text-center">
+            <h1>Create New Garden</h1>
+        </div>
+
+        <div class="row justify-content-center my-5">
+            <div class="col-md-5 p-3">
+                <form th:action="@{/create-new-garden}" method="post" class="border rounded-3 p-3">
+
+                    <div class="mb-3">
+                        <label for="gardenName" class="form-label">Name *</label>
+                        <input id="gardenName" type="text" class="form-control" th:name="gardenName"
+                            th:value="*{gardenName}" autofocus
+                            th:classappend="${GNErrorText == null ? '' : 'border-danger'}">
+                        <p th:if="${GNErrorText}" class="text-danger fs-6" th:text="${GNErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gardenDescription" class="form-label">Description</label>
+                        <textarea id="gardenDescription" class="form-control" rows="3" th:name="gardenDescription"
+                            th:text="*{gardenDescription}"
+                            th:classappend="${GDErrorText == null ? '' : 'border-danger'}"></textarea>
+                        <p id="gardenDescriptionCounter" class="fs-6"></p>
+                        <p th:if="${GDErrorText}" class="text-danger fs-6" th:text="${GDErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gardenSize" class="form-label">Size (m<sup>2</sup>)</label>
+                        <input id="gardenSize" type="text" class="form-control" th:name="gardenSize"
+                            th:value="*{gardenSize}" th:classappend="${GSErrorText == null ? '' : 'border-danger'}">
+                        <p th:if="${GSErrorText}" class="text-danger fs-6" th:text="${GSErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="streetAddress" class="form-label">Street Address</label>
+                        <input id="streetAddress" type="text" class="form-control" th:name="streetAddress"
+                            th:value="*{streetAddress}" placeholder="Start typing for autocomplete suggestions"
+                            autocomplete="off" th:classappend="${AddressErrorText == null ? '' : 'border-danger'}">
+                        <div class="position-relative">
+                            <ul id="autocompleteSuggestions" class="list-group position-absolute"></ul>
+                        </div>
+                        <p id="autocompleteError" class="text-danger fs-6 d-none"></p>
+                        <p th:if="${AddressErrorText}" class="text-danger fs-6" th:text="${AddressErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="suburb" class="form-label">Suburb</label>
+                        <input id="suburb" type="text" class="form-control" th:name="suburb" th:value="*{suburb}"
+                            th:classappend="${SuburbErrorText == null ? '' : 'border-danger'}">
+                        <p th:if="${SuburbErrorText}" class="text-danger fs-6" th:text="${SuburbErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City *</label>
+                        <input id="city" type="text" class="form-control" th:name="city" th:value="*{city}"
+                            th:classappend="${CityErrorText == null ? '' : 'border-danger'}">
+                        <p th:if="${CityErrorText}" class="text-danger fs-6" th:text="${CityErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="postcode" class="form-label">Postcode</label>
+                        <input id="postcode" type="text" class="form-control" th:name="postcode" th:value="*{postcode}"
+                            th:classappend="${PostCodeErrorText == null ? '' : 'border-danger'}">
+                        <p th:if="${PostCodeErrorText}" class="text-danger fs-6" th:text="${PostCodeErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country *</label>
+                        <input id="country" type="text" class="form-control" th:name="country" th:value="*{country}"
+                            th:classappend="${CountryErrorText == null ? '' : 'border-danger'}">
+                        <p th:if="${CountryErrorText}" class="text-danger fs-6" th:text="${CountryErrorText}"></p>
+                    </div>
+
+                    <input type="hidden" id="latitude" th:name="latitude">
+                    <input type="hidden" id="longitude" th:name="longitude">
+
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                        <button type="submit" class="btn btn-success" formnovalidate>Create</button>
+                        <button type="button" class="btn btn-secondary"
+                            onclick="window.location.href = localStorage.getItem('previousUrl')">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/locationIQFooter.html"></div>
+
+    <script th:src="@{/js/preventEnterSubmit.js}"></script>
+    <script th:src="@{/js/inputCharacterLimit.js}"></script>
+    <script th:src="@{/js/gardenDescriptionCounter.js}"></script>
+    <script th:src="@{/js/locationIQAutocomplete.js}"></script>
+    <script th:src="@{/js/gardenSizeFormat.js}"></script>
+</body>
+
+</html>
