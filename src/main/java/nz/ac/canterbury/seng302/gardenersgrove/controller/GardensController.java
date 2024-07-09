@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 
 /**
@@ -79,17 +80,30 @@ public class GardensController {
     /**
      * Maps the myGardensPage html file to /my-gardens url
      *
+     * @param page page number
+     * @param filter string of filter values: None, Public, Private
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens")
-    public String myGardens(@RequestParam(defaultValue = "1") int page, Model model) {
+    public String myGardens(@RequestParam(defaultValue = "1") int page,
+                            @RequestParam(defaultValue = "None") String filter,
+                            Model model) {
         logger.info("GET /my-gardens");
 
         model.addAttribute("loggedIn",  securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
 
+        long publicGardensCount = gardens.stream().filter(Garden::getIsPublic).count();
+        long privateGardensCount = gardens.stream().filter(garden -> !garden.getIsPublic()).count();
+
+        if (Objects.equals(filter, "Public")) {
+            gardens = gardens.stream().filter(garden -> garden.getIsPublic()).collect(Collectors.toList());
+        } else if (Objects.equals(filter, "Private")) {
+            gardens = gardens.stream().filter(garden -> !garden.getIsPublic()).collect(Collectors.toList());
+        }
+
+        int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
 
@@ -99,7 +113,11 @@ public class GardensController {
         model.addAttribute("startIndex", startIndex+1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("totalGardens", gardens.size());
-
+        model.addAttribute("filter", filter);
+        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("privateGardensCount", privateGardensCount);
+        model.addAttribute("userName", user.getFirstName() + user.getLastName());
+        model.addAttribute("profilePicture", user.getProfilePictureFilename());
 
         return "myGardensPage";
     }

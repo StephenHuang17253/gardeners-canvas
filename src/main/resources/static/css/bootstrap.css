@@ -22,14 +22,16 @@
 }
 
 #homeImage {
-    position: relative;
-    /*Ignore red underline in editor*/
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url("/images/landingPlant.JPG");
     background-size: cover;
     background-position: center;
-    color: white;
-    height: 100vh;
-    overflow: hidden;
+    z-index: -1;
+
 }
 
 /*uses before so we can layer a black bg over the homeImage and it matches the size 1:1 of the homeImage*/
