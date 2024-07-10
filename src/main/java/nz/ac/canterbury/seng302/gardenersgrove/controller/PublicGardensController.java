@@ -1,7 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,11 +28,13 @@ public class PublicGardensController {
     Logger logger = LoggerFactory.getLogger(PublicGardensController.class);
 
     private final GardenService gardenService;
+    private final SecurityService securityService;
 
 
     @Autowired
-    public PublicGardensController(GardenService gardenService) {
+    public PublicGardensController(GardenService gardenService, SecurityService securityService) {
         this.gardenService = gardenService;
+        this.securityService = securityService;
     }
 
     /**
@@ -160,7 +162,6 @@ public class PublicGardensController {
         return "browsePublicGardens";
     }
 
-
     /**
      * Resets model send to Browse gardens page
      *
@@ -178,6 +179,49 @@ public class PublicGardensController {
         model.addAttribute("SearchErrorText", "");
         model.addAttribute("searchValue", "");
         return model;
+    }
+
+    /**
+     * Get Mapping of the /my-gardens/{gardenId} endpoint
+     * Garden Details page of all the plants belonging to the garden
+     *
+     * @param gardenId id of the garden used in the end-point path
+     * @return thymeleaf createNewGardenForm
+     */
+    @GetMapping("public-gardens/{gardenId}")
+    public String viewPublicGarden(@PathVariable Long gardenId,
+                                   HttpServletResponse response,
+                                   Model model) {
+        logger.info("GET public-gardens/{}", gardenId);
+
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Garden garden = optionalGarden.get();
+
+        if (!garden.getIsPublic()) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+
+        model.addAttribute("isOwner", false);
+        model.addAttribute("gardenName", garden.getGardenName());
+        model.addAttribute("gardenLocation", garden.getGardenLocation());
+        model.addAttribute("gardenSize", garden.getGardenSize());
+        model.addAttribute("gardenDescription", garden.getGardenDescription());
+        model.addAttribute("gardenId", gardenId);
+        model.addAttribute("plants", garden.getPlants());
+        model.addAttribute("totalPlants", garden.getPlants().size());
+        model.addAttribute("makeGardenPublic", garden.getIsPublic());
+        model.addAttribute("weather", null);
+        return "gardenDetailsPage";
+
     }
 
 
