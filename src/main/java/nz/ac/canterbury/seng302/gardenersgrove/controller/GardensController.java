@@ -22,6 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -192,6 +195,12 @@ public class GardensController {
                 Objects.equals(currentWeather.getDescription(), "Sunny")) {
             model.addAttribute("message", "There hasn’t been any rain recently, make sure to water your plants if they need it");
         }
+        int hour = LocalTime.now().getHour();
+        String gradientClass = "g" + hour;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        String formattedTime = LocalDateTime.now().format(formatter);
+
+        User user = garden.getOwner();
 
         model.addAttribute("isOwner", true);
         model.addAttribute("gardenName", garden.getGardenName());
@@ -203,6 +212,10 @@ public class GardensController {
         model.addAttribute("totalPlants", garden.getPlants().size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
         model.addAttribute("weather", weatherList);
+        model.addAttribute("gradientClass", gradientClass);
+        model.addAttribute("currentTime", formattedTime);
+        model.addAttribute("profilePicture",user.getProfilePictureFilename());
+        model.addAttribute("userName",user.getFirstName() + " " + user.getLastName());
         return "gardenDetailsPage";
 
     }

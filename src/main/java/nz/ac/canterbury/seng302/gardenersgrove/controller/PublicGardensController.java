@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
@@ -210,6 +211,8 @@ public class PublicGardensController {
             return "403";
         }
 
+        User user = garden.getOwner();
+
         model.addAttribute("isOwner", false);
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
@@ -220,6 +223,8 @@ public class PublicGardensController {
         model.addAttribute("totalPlants", garden.getPlants().size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
         model.addAttribute("weather", null);
+        model.addAttribute("profilePicture",user.getProfilePictureFilename());
+        model.addAttribute("userName",user.getFirstName() + " " + user.getLastName());
         return "gardenDetailsPage";
 
     }
