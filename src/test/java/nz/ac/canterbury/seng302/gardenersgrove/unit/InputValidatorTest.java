@@ -456,7 +456,7 @@ class InputValidatorTest {
      * @param dob
      */
     @ParameterizedTest
-    @ValueSource(strings = {"01/01/1903", "01/01/1850"})
+    @ValueSource(strings = {"01/01/1903", "01/01/1850", "01/01/0000"})
     void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
         //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
@@ -468,9 +468,8 @@ class InputValidatorTest {
      * @param dob
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014"})
+    @ValueSource(strings = {"1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "31/02/2003", "234/03/0000", "01/01/11111", "01/021/2000", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
     void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
-        //Todo have changing dates so test doesn't fail in 2 years
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
 
