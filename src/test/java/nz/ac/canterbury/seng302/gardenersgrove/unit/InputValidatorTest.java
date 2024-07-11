@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -396,9 +397,6 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password, otherFields));
     }
 
-    ;
-
-
     /**
      * Test for invalid passwords
      *
@@ -415,7 +413,7 @@ class InputValidatorTest {
         String emailAddress = "johndoe@gmail.com";
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
-        if (noLastName == false) {
+        if (!noLastName) {
             otherFields.add(lastName);
         }
         if (!(dateOfBirth == null)) {
@@ -430,7 +428,7 @@ class InputValidatorTest {
     /**
      * Test for valid DOB
      *
-     * @param dob
+     * @param dob string date
      */
     @ParameterizedTest
     @ValueSource(strings = {"01/01/2000", "01/12/1999", "31/12/2000"})
@@ -440,32 +438,26 @@ class InputValidatorTest {
 
     /**
      * Test for invalid DOB age below 13
-     *
-     * @param dob
      */
-    @ParameterizedTest
-    @ValueSource(strings = {"01/02/2023"})
-    void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13(String dob) {
-        //Todo have changing dates so test doesn't fail in 2 years
+    @Test
+    void InputValidator_isValidDOB_AgeBelow13_return_AGE_BELOW_13() {
+        String dob = LocalDate.now().minusYears(13).plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         Assertions.assertEquals(ValidationResult.AGE_BELOW_13, InputValidator.validateDOB(dob));
     }
 
     /**
      * Test for invalid DOB age above 120
-     *
-     * @param dob
      */
-    @ParameterizedTest
-    @ValueSource(strings = {"01/01/1903", "01/01/1850", "01/01/0000"})
-    void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120(String dob) {
-        //Todo have changing dates so test doesn't fail in 2 years
+    @Test
+    void InputValidator_isValidDOB_AgeAbove120_return_AGE_ABOVE_120() {
+        String dob = LocalDate.now().minusYears(121).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         Assertions.assertEquals(ValidationResult.AGE_ABOVE_120, InputValidator.validateDOB(dob));
     }
 
     /**
      * Test for invalid DOB format
      *
-     * @param dob
+     * @param dob string date
      */
     @ParameterizedTest
     @ValueSource(strings = {"1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "31/02/2003", "234/03/0000", "01/01/11111", "01/021/2000", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
