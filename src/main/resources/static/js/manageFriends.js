@@ -68,14 +68,16 @@ document.addEventListener('DOMContentLoaded', function () {
  * This function handles the friend request.
  * It changes the value of the thymeleaf variable 'friendAccepted' to true when the user presses submit.
  * Then the form is submitted
- * @param button the button pressed by the user, either accept or decline.
+ * @param button he button that was pressed
+ * @param accepted true if the accept button was pressed falese otherwise
  */
-function manageRequest(button) {
+function manageRequest(button, accepted) {
+    console.log(accepted)
     const form = button.closest('form');
     const acceptedInput = form.querySelector('input[name="friendAccepted"][type="hidden"]');
-    if (button.classList.contains('accept-request-button')) {
+    if (accepted) {
         acceptedInput.value = "true";
-    } else if (button.classList.contains('decline-request-button')) {
+    } else {
         acceptedInput.value = "false";
     }
     form.submit();
