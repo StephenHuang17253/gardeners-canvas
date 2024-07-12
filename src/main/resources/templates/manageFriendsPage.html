@@ -42,14 +42,16 @@
                 <div class="tableList-header">
                     <h1>Friends</h1>
                 </div>
-                <div th:each="friend : ${userFriends}">
-                    <div th:replace="~{fragments/friendsBox ::
-                                 friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
-                                 friendsName=${friend.getFriendName},
-                                 friendsGardenLink=${friend.getFriendGardenLink},
-                                 friendId=${friend.getFriendId},
-                                 friendshipStatus=${friend.getFriendRequestStatusString()})}
-                                 ">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                    <div class="col" th:each="friend : ${userFriends} ">
+                        <div th:replace="~{fragments/friendsBox ::
+                                     friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                                     friendsName=${friend.getFriendName},
+                                     friendsGardenLink=${friend.getFriendGardenLink},
+                                     friendId=${friend.getFriendId},
+                                     friendshipStatus=${friend.getFriendRequestStatusString()})}
+                                     ">
+                        </div>
                     </div>
                 </div>
             </div>
