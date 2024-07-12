@@ -17,6 +17,35 @@
     background-color: rgba(0, 0, 0, 0.25);
 }
 
+.list-group {
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
 .text-bold {
     font-weight: bold;
+}
+
+#homeImage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+
+}
+
+/*uses before so we can layer a black bg over the homeImage and it matches the size 1:1 of the homeImage*/
+#homeImage::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
 }

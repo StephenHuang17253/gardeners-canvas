@@ -65,7 +65,15 @@ public class SecurityService {
         User user = userService.getUserByEmail(authentication.getName());
         return Objects.equals(user.getId(), ownerId);
     }
-
+    /**
+     * Checks if the current user is logged in or not
+     *
+     * @return true or false
+     */
+    public Boolean isLoggedIn(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
+    }
 
     /**
      * Helper to get the current logged, in user

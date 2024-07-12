@@ -15,7 +15,7 @@
 </head>
 
     <body>
-    <div th:replace="~{fragmentExample/fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{/fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
         <div class = "main-container">
             <div class="tableList-header">
                 <h1 class="tableList-header-title" th:text="${friendName} + '\'s Gardens'">  </h1>
@@ -29,13 +29,13 @@
                     <span th:text="${friendGardens?.size() ?: 0} + ' Gardens'"> </span>
                 </div>
                 <div th:each="garden : ${friendGardens}">
-                    <div th:replace="fragmentExample/fragments/friendsGardenBox.html ::
+                    <div th:replace="~{/fragments/friendsGardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},
                         gardenLocation=${garden.getGardenLocation},
                         gardenSize=${garden.getGardenSize},
                         numberOfPlants=${garden.getPlants?.size()},
-                        gardenIsPublic=${garden.getIsPublic()})">
+                        gardenIsPublic=${garden.getIsPublic()})}">
                     </div>
 
             </div>
