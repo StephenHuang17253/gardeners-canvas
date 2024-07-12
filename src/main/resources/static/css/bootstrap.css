@@ -61,6 +61,35 @@
     background-color: darkgreen !important;
 }
 
-.green-pill:hover {
-    background-color: lightgreen !important;
+.green-pill:hover,
+.green-pill:focus
+{
+    background-color: #d1e7dd !important;
+}
+
+.btn.light_green
+{
+    background-color: #d1e7dd !important;
+    color: black;
+}
+
+.btn.light_green:hover,
+.btn.light_green:focus
+{
+    background-color: #309865 !important;
+    color: white;
+}
+
+
+.btn.light_red
+{
+    background-color: #f8d7da !important;
+    color: black;
+}
+
+.btn.light_red:hover ,
+.btn.light_red:focus
+{
+    background-color: darkred !important;
+    color: white;
 }
