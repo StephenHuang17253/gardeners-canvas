@@ -115,6 +115,7 @@ public class PlantFormController {
             @PathVariable("gardenId") Long gardenId,
             Model model) {
         logger.info("POST /create-new-plant");
+        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -154,7 +155,7 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
@@ -233,6 +234,7 @@ public class PlantFormController {
         if (plantToUpdate.isEmpty()) {
             return "404";
         }
+        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -269,7 +271,7 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
