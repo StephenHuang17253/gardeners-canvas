@@ -115,6 +115,7 @@ public class PlantFormController {
             @PathVariable("gardenId") Long gardenId,
             Model model) {
         logger.info("POST /create-new-plant");
+        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -154,7 +155,7 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
@@ -233,6 +234,7 @@ public class PlantFormController {
         if (plantToUpdate.isEmpty()) {
             return "404";
         }
+        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -269,7 +271,7 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
@@ -305,18 +307,18 @@ public class PlantFormController {
                         "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
-            model.addAttribute("PNErrorClass", "errorBorder");
+            model.addAttribute("PNErrorClass", "true");
         } else {
-            model.addAttribute("PNErrorClass", "noErrorBorder");
+            model.addAttribute("PNErrorClass", "null");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
             model.addAttribute("PCErrorText", plantCountResult);
-            model.addAttribute("PCErrorClass", "errorBorder");
+            model.addAttribute("PCErrorClass", "true");
 
         } else {
-            model.addAttribute("PCErrorClass", "noErrorBorder");
+            model.addAttribute("PCErrorClass", "null");
         }
 
         // notifies the user that the plant Description is invalid (if applicable)
@@ -325,17 +327,17 @@ public class PlantFormController {
                 plantNameResult.updateMessage("cannot be greater than 512 characters in length");
             }
             model.addAttribute("PDErrorText", "Plant description " + plantDescriptionResult);
-            model.addAttribute("PDErrorClass", "errorBorder");
+            model.addAttribute("PDErrorClass", "true");
 
         } else {
-            model.addAttribute("PDErrorClass", "noErrorBorder");
+            model.addAttribute("PDErrorClass", "null");
         }
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
-            model.addAttribute("PAErrorClass", "errorBorder");
+            model.addAttribute("PAErrorClass", "true");
         } else {
-            model.addAttribute("PAErrorClass", "noErrorBorder");
+            model.addAttribute("PAErrorClass", "null");
         }
 
     }
