@@ -1,22 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-    <title>Garden Details</title>
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-    <link th:href="@{/css/tableList.css}" rel="stylesheet">
-    <link th:href="@{/css/infoBox.css}" rel="stylesheet">
-    <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
-    <link th:href="@{/css/gardenDetails.css}" rel="stylesheet">
-    <link th:href="@{/css/weather.css}" rel="stylesheet">
-    <script th:src="@{/js/imagePicker.js}"></script>
-    <script th:src="@{/js/wateringBox.js}"></script>
-
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
-    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
-</head>
+<head th:replace="fragments/header.html"></head>
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>

@@ -17,7 +17,8 @@
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('manageFriends')}" th:with="loggedIn=${loggedIn}"></div>
-    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+        th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-5 pb-5" style="width: 60%;">
         <div class="tableList-header">
             <h1 class="tableList-header-title mb-3"> Manage Friends </h1>
@@ -26,13 +27,17 @@
 
             <div class="tab-links">
                 <a href="#friends">
-                    <button type="button" class="btn bg-success" style="color: white" id="viewFriendButton" tabindex="-1"> Friends</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="viewFriendButton"
+                        tabindex="-1"> Friends</button></a>
                 <a href="#search">
-                    <button type="button" class="btn bg-success" style="color: white" id="searchFriendButton" tabindex="-1"> Add Friend</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="searchFriendButton"
+                        tabindex="-1"> Add Friend</button></a>
                 <a href="#pending">
-                    <button type="button" class="btn bg-success" style="color: white" id="viewPendingButton" tabindex="-1"> Pending</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="viewPendingButton"
+                        tabindex="-1"> Pending</button></a>
                 <a href="#declined">
-                    <button type="button" class="btn bg-success" style="color: white" id="viewDeclinedButton" tabindex="-1"> Declined</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="viewDeclinedButton"
+                        tabindex="-1"> Declined</button></a>
 
             </div>
         </div>
@@ -63,19 +68,22 @@
             </div>
             <div id="searchBarContainer">
                 <form th:action="@{/manage-friends/search}" method="get" class="input-group rounded">
-                    <input type="search" name="searchInput" th:value="${userSearch}" class="form-control rounded col-lg-8" th:classappend="${SearchErrorText != '' && SearchErrorText != null ? 'border-danger' : '' }" id="friendSearchBar" placeholder="Enter a users name or email"/>
+                    <input type="search" name="searchInput" th:value="${userSearch}"
+                        class="form-control rounded col-lg-8"
+                        th:classappend="${SearchErrorText != '' && SearchErrorText != null ? 'border-danger' : '' }"
+                        id="friendSearchBar" placeholder="Enter a users name or email" />
                     <button type="submit" class="btn bg-success col-lg-2" style="color: white">Search</button>
                 </form>
             </div>
 
-                <div th:if="${SearchErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${SearchErrorText}"></h3>
+            <div th:if="${SearchErrorText!=''}">
+                <h3 class="text-danger fs-6" th:text="${SearchErrorText}"></h3>
+            </div>
+            <div th:if="${searchResults?.size()>0}">
+                <div class="text-end">
+                    <span th:text="${searchResults?.size() ?: 0} + ' results'"> </span>
                 </div>
-                <div th:if="${searchResults?.size()>0}">
-                    <div class="text-end">
-                        <span th:text="${searchResults?.size() ?: 0} + ' results'"> </span>
-                    </div>
-                </div>
+            </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
                 <div th:each="friend : ${searchResults}" class="col">
                     <div th:replace="~{fragments/searchFriendsBox ::
@@ -91,43 +99,43 @@
             </div>
 
 
-            </div>
+        </div>
 
-            <div id="pending" class="tab">
-                <div class="text-center">
-                    <h1>Pending Requests</h1>
-                </div>
-                <div class="text-end">
-                    <br>
-                    <span th:text="${pendingFriends?.size() ?: 0} + ' Requests'"> </span>
-                </div>
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                    <div th:each="friend : ${pendingFriends}" class="col">
-                        <div th:replace="~{fragments/pendingFriendsBox ::
+        <div id="pending" class="tab">
+            <div class="text-center">
+                <h1>Pending Requests</h1>
+            </div>
+            <div class="text-end">
+                <br>
+                <span th:text="${pendingFriends?.size() ?: 0} + ' Requests'"> </span>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                <div th:each="friend : ${pendingFriends}" class="col">
+                    <div th:replace="~{fragments/pendingFriendsBox ::
                                     pendingFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                     friendsName=${friend.getFriendName},
                                     isSender=${friend.isSender},
                                     friendId=${friend.getUserId})}">
-                        </div>
                     </div>
                 </div>
             </div>
-            <div id="declined" class="tab">
-                <div class="text-center">
-                    <h1>Declined Requests</h1>
-                </div>
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-    `               <div class="col" th:each="friend : ${declinedFriends}">
-                        <div th:replace="~{fragments/declinedFriendsBox ::
+        </div>
+        <div id="declined" class="tab">
+            <div class="text-center">
+                <h1>Declined Requests</h1>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                <div class="col" th:each="friend : ${declinedFriends}">
+                    <div th:replace="~{fragments/declinedFriendsBox ::
                                         declinedFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                         friendsName=${friend.getFriendName},
                                         isSender=${friend.isSender},
                                         friendId=${friend.getUserId})}">
-                        </div>
-                    </div>`
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
 
 
