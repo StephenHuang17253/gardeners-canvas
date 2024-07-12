@@ -334,6 +334,7 @@ public class GardensController {
             model.addAttribute("plants", garden.getPlants());
             model.addAttribute("totalPlants", garden.getPlants().size());
             model.addAttribute("makeGardenPublic", garden.getIsPublic());
+            model.addAttribute("isOwner", true);
 
 
         } else {
@@ -353,9 +354,11 @@ public class GardensController {
                 plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
             }
             logger.info("Plant updated successfully");
-
             return "redirect:/my-gardens/{gardenId}";
+
+
         }
+
 
     }
 
