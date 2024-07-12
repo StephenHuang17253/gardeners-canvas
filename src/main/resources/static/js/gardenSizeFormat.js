@@ -48,16 +48,16 @@ const handleBlur = (event) => {
         expChar = 'e';
     }
 
-    if (splitChar !== '') {
-        const splitInputByDecimal = gardenSize.split(splitChar);
-        if (expChar !== '') {
-            const splitInputbyExp = splitInputByDecimal[1].split(expChar);
-            event.target.value = splitInputByDecimal[0] + splitChar + splitInputbyExp[0].substring(0, 2) + expChar + splitInputbyExp[1];
-        } else {
-            console.log('here');
-            event.target.value = splitInputByDecimal[0] + splitChar + splitInputByDecimal[1].substring(0, 2);
-        }
+    if (splitChar === '') return;
+
+    const splitInputByDecimal = gardenSize.split(splitChar);
+    if (expChar !== '') {
+        const splitInputbyExp = splitInputByDecimal[1].split(expChar);
+        event.target.value = splitInputByDecimal[0] + splitChar + splitInputbyExp[0].substring(0, 2) + expChar + splitInputbyExp[1];
+    } else {
+        event.target.value = splitInputByDecimal[0] + splitChar + splitInputByDecimal[1].substring(0, 2);
     }
+
 }
 
 document.getElementById('gardenSize').addEventListener('keypress', handleKeyPress);
