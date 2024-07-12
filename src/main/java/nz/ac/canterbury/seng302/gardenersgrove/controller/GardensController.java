@@ -38,7 +38,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 
-
 /**
  * Controller for viewing all the created Gardens
  */
@@ -90,11 +89,11 @@ public class GardensController {
      */
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "All") String filter,
-                            Model model) {
+            @RequestParam(defaultValue = "All") String filter,
+            Model model) {
         logger.info("GET /my-gardens");
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
 
@@ -114,7 +113,7 @@ public class GardensController {
         model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
         model.addAttribute("currentPage", page);
         model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("totalGardens", gardens.size());
         model.addAttribute("filter", filter);
@@ -139,7 +138,7 @@ public class GardensController {
             Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -258,7 +257,6 @@ public class GardensController {
             return "404";
         }
         model.addAttribute("plantToEditId", plantId);
-        
 
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         if (plantPicture.isEmpty()) {
@@ -304,7 +302,7 @@ public class GardensController {
             HttpServletResponse response) {
         logger.info("GET /my-gardens");
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         User friend;
         try {
