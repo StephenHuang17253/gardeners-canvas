@@ -123,6 +123,16 @@ public class PlantFormController {
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            return "403";
+        }
+
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
         } else {
@@ -234,6 +244,17 @@ public class PlantFormController {
         if (plantToUpdate.isEmpty()) {
             return "404";
         }
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            return "403";
+        }
+
+
         int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild

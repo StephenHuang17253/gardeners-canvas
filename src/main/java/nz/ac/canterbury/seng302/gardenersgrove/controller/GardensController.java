@@ -301,6 +301,8 @@ public class GardensController {
             return "404";
         }
 
+
+
         model.addAttribute("loggedIn",  securityService.isLoggedIn());
 
 
@@ -310,8 +312,12 @@ public class GardensController {
         }
 
         if (optionalGarden.isPresent()) {
-
             Garden garden = optionalGarden.get();
+
+            if (!securityService.isOwner(garden.getOwner().getId())) {
+                return "403";
+            }
+
             String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
             model.addAttribute("plantPicture", plantPictureString);
             model.addAttribute("gardenName", garden.getGardenName());
