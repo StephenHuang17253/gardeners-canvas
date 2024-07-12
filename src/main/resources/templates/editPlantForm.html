@@ -50,10 +50,8 @@
 
             <div class="mb-3">
                 <label for="plantCount" class="form-label">Plant Count: </label>
-
-                <input type="number" min="0" step="1" class="form-control" id="plantCount"
-                       placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount"
-                       autofocus>
+                <input type="number" class="form-control"  th:classappend="${PCErrorClass == 'true' ? 'border-danger' : PCErrorClass}" id="plantCount"
+                       placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount">
 
                 <div th:if="${PCErrorText!=''}">
                     <h3 class="text-danger fs-6" th:text="${PCErrorText}"></h3>
