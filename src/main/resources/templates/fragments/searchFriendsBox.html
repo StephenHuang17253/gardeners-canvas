@@ -1,14 +1,12 @@
 <div th:fragment="friendsBox(friendsProfilePicture, friendsName,  friendsGardenLink, friendshipStatus, isPotentialFriend, friendId, searchQuery)">
-    <div class="friends-box" id="friendsBox">
-        <div class="profile-details">
+    <div class="card h-100 bg-success text-white garden-card" id="friendsBox">
+        <div class="card-body pt-1 text-center">
+            <h4 th:text="${friendsName}" class="card-title justify-content-center"></h4>
             <img id="imageToChange"
                  th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + friendsProfilePicture}}"
-                 alt="Profile Image" class="profile-image">
-            <br>
-            <span th:text="${friendsName}" class="friend-name"></span>
-            <br>
+                 alt="Profile Image" class="card-img-top rounded justify-content-center mb-4">
             <form th:action="@{${friendsGardenLink}}" th:if="${!isPotentialFriend}" method="get">
-                <button type="submit" class="garden-button">Their Gardens</button>
+                <button type="submit" class="btn bg-success-subtle mb-2">Their Gardens</button>
             </form>
             <br>
             <div th:if="${isPotentialFriend} and ${friendshipStatus} != 'DENIED'">
@@ -18,7 +16,7 @@
                     <div th:if="${searchQuery != ''}">
                         <input type="hidden" th:name="searchInput" th:value="${searchQuery}">
                     </div>
-                    <button type="submit" class="invite_button">Invite as friend</button>
+                    <button type="submit" class="btn bg-success-subtle mb-2" style="color: black">Invite as friend</button>
                 </form>
             </div>
         </div>
