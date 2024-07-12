@@ -67,6 +67,7 @@
                     <textarea class="form-control"  th:classappend="${PDErrorClass == 'true' ? 'border-danger' : PDErrorClass}" id="plantDescription"
                         placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
                         data-cy="plantDescription" ></textarea>
+                    <p id="plantDescriptionCounter" class="fs-6"></p>
                 </div>
 
                 <div th:if="${PDErrorText!=''}">
