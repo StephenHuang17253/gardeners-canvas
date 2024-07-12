@@ -6,6 +6,6 @@
 <body>
   <div class="text-center">
     <h1 class="my-3">404 Object Not Found</h1>
-    <p>Oops! You've wandered into the weeds. Let's get you back to the garden.</p>
+    <p th:text="${message == null ? 'Oops! You''ve wandered into the weeds. Let''s get you back to the garden.' : message}"></p>
   </div>
 </body>
