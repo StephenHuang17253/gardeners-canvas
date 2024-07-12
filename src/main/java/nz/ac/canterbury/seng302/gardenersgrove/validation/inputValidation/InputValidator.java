@@ -376,7 +376,7 @@ public class InputValidator {
      */
     public static ValidationResult validatePlantCount(String plantCount) {
         ValidationResult result = new InputValidator(String.valueOf(plantCount))
-                .validIntegerHelper()
+                .validWholeNumberHelper()
                 .maxNumberHelper(1000000)
                 .minNumberHelper(1)
                 .getResult();
@@ -384,6 +384,35 @@ public class InputValidator {
             result = ValidationResult.INVALID_PLANT_COUNT;
         }
         return result;
+    }
+
+    /**
+     * Checks if a string represents a valid float that is also a whole number
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator validWholeNumberHelper() {
+        if (!this.passState) {
+            return this;
+        }
+
+        try {
+            float floatValue = Float.parseFloat(testedValue);
+            if (floatValue % 1 != 0) {  // Checks if float isn't a whole number (i.e. its not an integer)
+                this.validationResult = ValidationResult.INVALID_PLANT_COUNT;
+                this.passState = false;
+                return this;
+            }
+        } catch (NumberFormatException e) {
+            this.validationResult = ValidationResult.INVALID;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
     }
 
     /**
@@ -923,11 +952,12 @@ public class InputValidator {
      * @return the calling object
      */
     private InputValidator minNumberHelper(int minValue) {
+        int snippedTestValue = (int) Double.parseDouble(testedValue); // snips decimal value of floats off
         if (!this.passState) {
             return this;
         }
 
-        if (Integer.parseInt(testedValue) < minValue) {
+        if (snippedTestValue < minValue) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
@@ -946,11 +976,12 @@ public class InputValidator {
      * @return the calling object
      */
     private InputValidator maxNumberHelper(int maxValue) {
+        int snippedTestValue = (int) Double.parseDouble(testedValue); // snips decimal value of floats off
         if (!this.passState) {
             return this;
         }
 
-        if (Integer.parseInt(testedValue) > maxValue) {
+        if (snippedTestValue > maxValue) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
