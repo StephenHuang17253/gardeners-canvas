@@ -143,6 +143,7 @@ public class GardensController {
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
 
@@ -150,6 +151,7 @@ public class GardensController {
         boolean isOwner = securityService.isOwner(garden.getOwner().getId());
 
         if (!isOwner && !garden.getIsPublic()) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             model.addAttribute("message", "This isn’t your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
         }
@@ -213,12 +215,14 @@ public class GardensController {
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
         if (!optionalGarden.isPresent()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
 
         Garden garden = optionalGarden.get();
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
 
@@ -241,12 +245,14 @@ public class GardensController {
     public String updatePlantImage(@PathVariable("gardenId") String gardenIdString,
             @RequestParam("plantId") String plantIdString,
             @RequestParam("plantPictureInput") MultipartFile plantPicture,
+            HttpServletResponse response,
             Model model) {
         logger.info("POST /my-gardens/{}", gardenIdString);
 
         long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         model.addAttribute("myGardens", gardenService.getGardens());
@@ -254,6 +260,7 @@ public class GardensController {
         long plantId = Long.parseLong(plantIdString);
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
         if (plantToUpdate.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         model.addAttribute("plantToEditId", plantId);
@@ -308,9 +315,11 @@ public class GardensController {
         try {
             friend = securityService.checkFriendship(userId, FriendshipStatus.ACCEPTED);
             if (friend == null) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return "403";
             }
         } catch (Exception exception) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
 
