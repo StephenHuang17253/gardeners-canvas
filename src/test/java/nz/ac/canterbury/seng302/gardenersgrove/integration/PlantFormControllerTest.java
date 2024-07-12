@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -23,6 +24,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,12 +49,14 @@ public class PlantFormControllerTest {
     private GardenService gardenService;
 
     User mockUser = new User("Test", "Test", "test@gmail.com", LocalDate.now());
+    Garden testGarden;
+    List<Plant> plantList = new ArrayList<>();
 
     @BeforeAll
     void before_or_after_all() {
         userService.addUser(mockUser, "1es1P@ssword");
         LocalDate date1 = LocalDate.of(2024, 3, 27);
-        Garden test_garden = new Garden(
+        testGarden = gardenService.addGarden(new Garden(
                 "test",
                 "test",
                 "test",
@@ -63,34 +69,22 @@ public class PlantFormControllerTest {
                 "",
                 "",
                 mockUser
-        );
-        gardenService.addGarden(test_garden);
+        ));
 
-        plantService.addPlant("testName1",
+        plantList.add(plantService.addPlant("testName1",
                 1,
                 "testDescription1",
                 date1,
-                test_garden.getGardenId());
+                testGarden.getGardenId()));
 
-        plantService.addPlant("testName2",
+        plantList.add(plantService.addPlant("testName2",
                 1,
                 "testDescription2",
                 date1,
-                test_garden.getGardenId());
+                testGarden.getGardenId()));
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
-
-//    @AfterAll
-//    public static void bin() {
-//        SecurityContextHolder.clearContext();
-//    }
-
-//    @BeforeEach
-//    void clear_repo() {
-//        plantRepository.deleteAll();
-//    }
-
 
     @Test
     @WithMockUser(username = "test@gmail.com")
@@ -103,32 +97,29 @@ public class PlantFormControllerTest {
     @Test
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_OnePlantAdded() throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
-        String plantDescription = "testDescription1";
-        int plantCount = 1;
-        String plantName = "testName1";
-        LocalDate date = LocalDate.parse("2024-03-28");
+
+        Plant expectedPlant = plantList.get(0);
+
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // Form field name
                 "default_plant.png", // Filename
                 "image/png", // Content type
                 "image data".getBytes() // File content as byte array
         );
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/create-new-plant", gardenId)
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/create-new-plant", testGarden.getGardenId())
                 .file(mockFile) // Attach the file to the request
-                .param("plantName", plantName)
-                .param("plantCount", String.valueOf(plantCount))
-                .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()));
+                .param("plantName", expectedPlant.getPlantName())
+                .param("plantCount", String.valueOf(expectedPlant.getPlantCount()))
+                .param("plantDescription", expectedPlant.getPlantDescription())
+                .param("plantDate", expectedPlant.getPlantDate().toString()));
 
-        Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
-        Assertions.assertEquals(plantDescription,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
-        Assertions.assertEquals(plantCount,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
-        Assertions.assertEquals(Long.parseLong(plantId),
-                plantService.findById(Long.parseLong(plantId)).get().getPlantId());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(expectedPlant.getPlantName(), actualPlant.getPlantName());
+        Assertions.assertEquals(expectedPlant.getPlantDescription(), actualPlant.getPlantDescription());
+        Assertions.assertEquals(expectedPlant.getPlantCount(), actualPlant.getPlantCount());
 
     }
 
