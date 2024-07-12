@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const today = new Date().toISOString().split('T')[0];
 
     if (closedDate === today) {
-        messageBox.style.display = 'none';
+        messageBox.classList.add('d-none');
     }
 
     window.closeMessageBox = function () {
-        messageBox.style.display = 'none';
+        messageBox.classList.add('d-none');
         localStorage.setItem(key, today);
     };
 });
