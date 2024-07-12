@@ -5,10 +5,7 @@
 
 <body>
     <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-
-    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
-        th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
-
+    
     <div class="container-md my-5">
 
         <div class="text-center">
