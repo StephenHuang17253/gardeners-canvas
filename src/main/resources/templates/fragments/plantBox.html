@@ -1,4 +1,4 @@
-<div th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner)">
+<div th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weather)">
     <div class="card h-100 bg-success text-white garden-card">
         <div class="card-body pt-1">
             <div class="text-end">
@@ -9,23 +9,35 @@
                     </svg>
                 </a>
             </div>
-            <form th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data"
-                  class="w-100 d-flex flex-row justify-content-center mb-3">
+            <div th:if="${isOwner}">
+                <form th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data"
+                      class="w-100 d-flex flex-row justify-content-center mb-3">
 
-                <div class="position-relative w-50">
+                    <div class="position-relative w-50">
+                        <div class="ratio ratio-1x1">
+                            <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                                 alt="Plant Picture" class="image-fluid rounded-circle" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <label
+                                class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
+                            <span class="position-absolute top-50 start-50 translate-middle fs-1">+</span>
+                            <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden"/>
+                            <input id="page" th:name="page" th:value="${page}" type="hidden"/>
+                            <input id="weather" th:name="weather" th:value="${weather}" type="hidden"/>
+                            <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
+                                   class="visually-hidden" onChange="handleFileSelect(event); this.form.submit()">
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div th:if="${!isOwner}">
+                <div class="position-relative w-50 mt-2">
                     <div class="ratio ratio-1x1">
-                        <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                        <img th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
                              alt="Plant Picture" class="image-fluid rounded-circle" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                    <label
-                        class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
-                        <span class="position-absolute top-50 start-50 translate-middle fs-1">+</span>
-                        <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden"/>
-                        <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                               class="visually-hidden" onChange="handleFileSelect(event); this.form.submit()">
-                    </label>
                 </div>
-            </form>
+            </div>
             <div th:if="${plantToEditId == plantId}">
                 <div th:replace="fragments/infoBox.html :: infoBox(message=${plantPictureError}, goodMessage=${false})"></div>
             </div>

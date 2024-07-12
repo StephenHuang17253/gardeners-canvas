@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
@@ -30,7 +31,7 @@ public class PublicGardensController {
 
     private final GardenService gardenService;
     private final SecurityService securityService;
-
+    private int COUNT_PER_PAGE = 10;
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService) {
@@ -191,6 +192,7 @@ public class PublicGardensController {
      */
     @GetMapping("public-gardens/{gardenId}")
     public String viewPublicGarden(@PathVariable Long gardenId,
+                                   @RequestParam(defaultValue = "1") int page,
                                    HttpServletResponse response,
                                    Model model) {
         logger.info("GET public-gardens/{}", gardenId);
@@ -212,6 +214,10 @@ public class PublicGardensController {
         }
 
         User user = garden.getOwner();
+        List<Plant> plants = garden.getPlants();
+        int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
 
         model.addAttribute("isOwner", false);
         model.addAttribute("gardenName", garden.getGardenName());
@@ -219,12 +225,17 @@ public class PublicGardensController {
         model.addAttribute("gardenSize", garden.getGardenSize());
         model.addAttribute("gardenDescription", garden.getGardenDescription());
         model.addAttribute("gardenId", gardenId);
-        model.addAttribute("plants", garden.getPlants());
-        model.addAttribute("totalPlants", garden.getPlants().size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("totalGardens", garden.getPlants().size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
         model.addAttribute("weather", null);
         model.addAttribute("profilePicture",user.getProfilePictureFilename());
         model.addAttribute("userName",user.getFirstName() + " " + user.getLastName());
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("endIndex", endIndex);
         return "gardenDetailsPage";
 
     }
