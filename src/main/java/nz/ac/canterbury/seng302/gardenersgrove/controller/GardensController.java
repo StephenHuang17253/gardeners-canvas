@@ -282,6 +282,7 @@ public class GardensController {
             Garden garden = optionalGarden.get();
 
             if (!securityService.isOwner(garden.getOwner().getId())) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return "403";
             }
 

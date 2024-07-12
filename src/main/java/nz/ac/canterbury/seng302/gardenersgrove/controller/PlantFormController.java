@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +64,7 @@ public class PlantFormController {
             @RequestParam(name = "plantCount", required = false) String plantCount,
             @RequestParam(name = "plantDescription", required = false) String plantDescription,
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            HttpServletResponse response,
             Model model) {
         logger.info("GET /create-new-plant");
 
@@ -71,10 +74,12 @@ public class PlantFormController {
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         Garden garden = optionalGarden.get();
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
@@ -113,6 +118,7 @@ public class PlantFormController {
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
             @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
             @PathVariable("gardenId") Long gardenId,
+            HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
         int value = (int) Double.parseDouble(plantCount);
@@ -126,10 +132,12 @@ public class PlantFormController {
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         Garden garden = optionalGarden.get();
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
 
@@ -184,6 +192,7 @@ public class PlantFormController {
     @GetMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
             @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
             Model model) {
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
 
@@ -193,14 +202,17 @@ public class PlantFormController {
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         Garden garden = optionalGarden.get();
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
         if (plantToUpdate.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
 
@@ -237,6 +249,7 @@ public class PlantFormController {
             @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
             @PathVariable("gardenId") Long gardenId,
             @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
             Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
@@ -247,10 +260,12 @@ public class PlantFormController {
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         Garden garden = optionalGarden.get();
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
 
