@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -21,6 +22,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
@@ -223,8 +226,14 @@ public class GardenFormController {
         Garden garden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
                 doubleGardenSize, isPublic, latitude, longitude, owner);
 
+        User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
-        session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        List<GardenModel> gardenModels = new ArrayList<>();
+        for(Garden g : gardens){
+            gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
+        }
+        session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
@@ -378,7 +387,13 @@ public class GardenFormController {
                 postcode, country, doubleGardenSize, isPublic, latitude, longitude, owner));
         logger.info("Edited Garden Page");
 
-        session.setAttribute("userGardens", gardenService.getAllUsersGardens(owner.getId()));
+        User user = securityService.getCurrentUser();
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        List<GardenModel> gardenModels = new ArrayList<>();
+        for(Garden g : gardens){
+            gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
+        }
+        session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
         return "redirect:/my-gardens/{gardenId}";

@@ -58,4 +58,5 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
     @Query("SELECT DISTINCT garden FROM Garden garden WHERE (garden.isPublic) = true")
     List<Garden> findAllPublicGardens();
 
+
 }
