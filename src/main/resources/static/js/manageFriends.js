@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.tab-links a');
+    const tabs = document.querySelectorAll('.nav-link .a');
     const tabContents = document.querySelectorAll('.tab');
+    console.log("gathered")
 
 
     tabs.forEach(tab => {
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     * @param tab the tab button the user pressed, for example 'Friends'
     */
     function activateTab(tab) {
+        console.log("called")
         const target = tab.getAttribute('href').substring(1);
         tabs.forEach(tab => tab.parentElement.classList.remove('active'));
         tabContents.forEach(tabContent => tabContent.classList.remove('active'));
