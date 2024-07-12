@@ -1,16 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +16,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 /**
  * Controller for the Manage Friends page
@@ -159,6 +160,7 @@ public class ManageFriendsController {
         model.addAttribute("pendingFriends", pendingFriendModels);
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("SearchErrorText", "");
+        model.addAttribute("activeTab", "friends");
 
 
         return "manageFriendsPage";
@@ -222,6 +224,7 @@ public class ManageFriendsController {
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("isPotentialFriend", true);
         model.addAttribute("userSearch", searchInput);
+        model.addAttribute("activeTab", "search");
         return "manageFriendsPage";
     }
 
