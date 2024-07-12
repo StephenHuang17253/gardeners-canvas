@@ -263,6 +263,11 @@ public class GardensController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
+
+
+
+        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+
         model.addAttribute("plantToEditId", plantId);
 
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -275,6 +280,12 @@ public class GardensController {
             boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
             model.addAttribute("loggedIn", loggedIn);
             Garden garden = optionalGarden.get();
+
+            if (!securityService.isOwner(garden.getOwner().getId())) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return "403";
+            }
+
             String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
             model.addAttribute("plantPicture", plantPictureString);
             model.addAttribute("gardenName", garden.getGardenName());
