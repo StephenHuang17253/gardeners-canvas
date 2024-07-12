@@ -6,7 +6,7 @@
                  th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + friendsProfilePicture}}"
                  alt="Profile Image" class="card-img-top rounded justify-content-center mb-4">
             <form th:action="@{${friendsGardenLink}}" th:if="${!isPotentialFriend}" method="get">
-                <button type="submit" class="btn bg-success-subtle mb-2" style="color: black">Their Gardens</button>
+                <button type="submit" class="btn bg-success-subtle mb-2">Their Gardens</button>
             </form>
             <br>
             <div th:if="${isPotentialFriend} and ${friendshipStatus} != 'DENIED'">
