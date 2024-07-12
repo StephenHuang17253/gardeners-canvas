@@ -22,22 +22,28 @@
 
                     <div class="mb-3 d-flex flex-row gap-2">
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text" autofocus>
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text" autofocus
+                                th:classappend="${message == null ? '' : 'border-danger'}">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text"
+                                th:classappend="${message == null ? '' : 'border-danger'}">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text"
+                                th:classappend="${message == null ? '' : 'border-danger'}">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text"
+                                th:classappend="${message == null ? '' : 'border-danger'}">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text"
+                                th:classappend="${message == null ? '' : 'border-danger'}">
                         </div>
                         <div class="ratio ratio-1x1">
-                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text">
+                            <input name="code-box" class="form-control text-center text-bold fs-3" type="text"
+                                th:classappend="${message == null ? '' : 'border-danger'}">
                         </div>
                     </div>
 
@@ -47,7 +53,7 @@
                     <p th:if="${message}" class="text-danger fs-6" th:text="${message}"></p>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-primary" formnovalidate>Verify</button>
+                        <button type="submit" class="btn btn-success" formnovalidate>Verify</button>
                     </div>
                 </form>
             </div>

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-<<<<<<< HEAD
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
@@ -37,17 +37,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-=======
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Semaphore;
-import java.util.stream.Collectors;
 
->>>>>>> dev
 
 /**
  * Controller for viewing all the created Gardens
@@ -70,7 +60,7 @@ public class GardensController {
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
 
-    private int COUNT_PER_PAGE = 10;
+    private final int COUNT_PER_PAGE = 10;
 
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
@@ -158,10 +148,7 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-<<<<<<< HEAD
         boolean isOwner = securityService.isOwner(garden.getOwner().getId());
-=======
->>>>>>> dev
 
         if (!isOwner && !garden.getIsPublic()) {
             model.addAttribute("message", "This isn’t your patch of soil. No peeking at the neighbor's garden without an invite!");
@@ -224,13 +211,6 @@ public class GardensController {
             Model model) {
         logger.info("POST /my-gardens/{gardenId}/public", gardenId);
 
-<<<<<<< HEAD
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-=======
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
->>>>>>> dev
-
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
         if (!optionalGarden.isPresent()) {
@@ -265,24 +245,6 @@ public class GardensController {
             Model model) {
         logger.info("POST /my-gardens/{}", gardenIdString);
 
-<<<<<<< HEAD
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
-=======
-        long gardenId = Long.parseLong(gardenIdString);
-        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-        model.addAttribute("myGardens", gardenService.getGardens());
-
-        Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));
-        model.addAttribute("plantToEditId", (Long.parseLong(plantId)));
-        if (plantToUpdate.isEmpty()) {
-            return "404";
-        }
-
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
->>>>>>> dev
-
         long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -304,6 +266,9 @@ public class GardensController {
         }
 
         if (!plantPictureResult.valid()) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
+            model.addAttribute("loggedIn", loggedIn);
             Garden garden = optionalGarden.get();
             String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
             model.addAttribute("plantPicture", plantPictureString);
