@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +64,7 @@ public class PlantFormController {
             @RequestParam(name = "plantCount", required = false) String plantCount,
             @RequestParam(name = "plantDescription", required = false) String plantDescription,
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            HttpServletResponse response,
             Model model) {
         logger.info("GET /create-new-plant");
 
@@ -71,10 +74,12 @@ public class PlantFormController {
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         Garden garden = optionalGarden.get();
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
@@ -113,8 +118,10 @@ public class PlantFormController {
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
             @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
             @PathVariable("gardenId") Long gardenId,
+            HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
+        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -122,6 +129,18 @@ public class PlantFormController {
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
         } else {
@@ -154,7 +173,7 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
@@ -173,6 +192,7 @@ public class PlantFormController {
     @GetMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
             @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
             Model model) {
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
 
@@ -182,14 +202,17 @@ public class PlantFormController {
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
         Garden garden = optionalGarden.get();
         if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
         if (plantToUpdate.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
 
@@ -226,6 +249,7 @@ public class PlantFormController {
             @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
             @PathVariable("gardenId") Long gardenId,
             @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
             Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
@@ -233,6 +257,20 @@ public class PlantFormController {
         if (plantToUpdate.isEmpty()) {
             return "404";
         }
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+
+
+        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
@@ -269,7 +307,7 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
@@ -305,18 +343,18 @@ public class PlantFormController {
                         "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
-            model.addAttribute("PNErrorClass", "errorBorder");
+            model.addAttribute("PNErrorClass", "true");
         } else {
-            model.addAttribute("PNErrorClass", "noErrorBorder");
+            model.addAttribute("PNErrorClass", "null");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
             model.addAttribute("PCErrorText", plantCountResult);
-            model.addAttribute("PCErrorClass", "errorBorder");
+            model.addAttribute("PCErrorClass", "true");
 
         } else {
-            model.addAttribute("PCErrorClass", "noErrorBorder");
+            model.addAttribute("PCErrorClass", "null");
         }
 
         // notifies the user that the plant Description is invalid (if applicable)
@@ -325,17 +363,17 @@ public class PlantFormController {
                 plantNameResult.updateMessage("cannot be greater than 512 characters in length");
             }
             model.addAttribute("PDErrorText", "Plant description " + plantDescriptionResult);
-            model.addAttribute("PDErrorClass", "errorBorder");
+            model.addAttribute("PDErrorClass", "true");
 
         } else {
-            model.addAttribute("PDErrorClass", "noErrorBorder");
+            model.addAttribute("PDErrorClass", "null");
         }
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
-            model.addAttribute("PAErrorClass", "errorBorder");
+            model.addAttribute("PAErrorClass", "true");
         } else {
-            model.addAttribute("PAErrorClass", "noErrorBorder");
+            model.addAttribute("PAErrorClass", "null");
         }
 
     }

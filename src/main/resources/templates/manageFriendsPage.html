@@ -4,7 +4,6 @@
 <head>
     <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
     <title>Manage Friends</title>
-    <link th:href="@{/css/baseCss.css}" rel="stylesheet">
     <link th:href="@{/css/tableList.css}" rel="stylesheet">
     <link th:href="@{/css/infoBox.css}" rel="stylesheet">
     <link th:href="@{/css/friendBox.css}" rel="stylesheet">
@@ -18,33 +17,33 @@
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('manageFriends')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="main-container">
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded pt-5 pb-5" style="width: 60%;">
         <div class="tableList-header">
-            <h1 class="tableList-header-title"> Manage Friends </h1>
+            <h1 class="tableList-header-title mb-3"> Manage Friends </h1>
         </div>
-        <br>
-
-
-        <div class="tableList-table-contain">
+        <div class="d-flex flex-row flex-wrap justify-content-center gap-3 mb-3">
 
             <div class="tab-links">
                 <a href="#friends">
-                    <button class="user_button" id="viewFriendButton"> Friends</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="viewFriendButton" tabindex="-1"> Friends</button></a>
                 <a href="#search">
-                    <button class="user_button" id="searchFriendButton"> Add Friend</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="searchFriendButton" tabindex="-1"> Add Friend</button></a>
                 <a href="#pending">
-                    <button class="user_button" id="viewPendingButton"> Pending</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="viewPendingButton" tabindex="-1"> Pending</button></a>
                 <a href="#declined">
-                    <button class="user_button" id="viewDeclinedButton"> Declined</button></a>
+                    <button type="button" class="btn bg-success" style="color: white" id="viewDeclinedButton" tabindex="-1"> Declined</button></a>
 
             </div>
+        </div>
 
-            <div class="tab-content">
-                <div id="friends" class="tab active">
-                    <div class="tableList-header">
-                        <h1>Friends</h1>
-                    </div>
-                    <div th:each="friend : ${userFriends}">
+        <div class="tab-content">
+            <div id="friends" class="tab active">
+                <div class="text-center">
+                    <h1>Friends</h1>
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                    <div class="col" th:each="friend : ${userFriends} ">
                         <div th:replace="~{fragments/friendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
@@ -56,27 +55,29 @@
                     </div>
                 </div>
             </div>
+        </div>
 
         <div id="search" class="tab">
-            <div class="tableList-header">
+            <div class="text-center">
                 <h1>Add Friends</h1>
             </div>
             <div id="searchBarContainer">
-                <form th:action="@{/manage-friends/search}" method="get">
-                    <input type="text" name="searchInput" th:value="${userSearch}" class="search-bar" id="friendSearchBar" placeholder="Enter a users name or email"/>
-                    <button type="submit" class="user_button">Search</button>
+                <form th:action="@{/manage-friends/search}" method="get" class="input-group rounded">
+                    <input type="search" name="searchInput" th:value="${userSearch}" class="form-control rounded col-lg-8" th:classappend="${SearchErrorText != '' && SearchErrorText != null ? 'border-danger' : '' }" id="friendSearchBar" placeholder="Enter a users name or email"/>
+                    <button type="submit" class="btn bg-success col-lg-2" style="color: white">Search</button>
                 </form>
             </div>
 
                 <div th:if="${SearchErrorText!=''}">
-                    <h3 class="error" th:text="${SearchErrorText}"></h3>
+                    <h3 class="text-danger fs-6" th:text="${SearchErrorText}"></h3>
                 </div>
                 <div th:if="${searchResults?.size()>0}">
-                    <div class="tableList-table-count">
+                    <div class="text-end">
                         <span th:text="${searchResults?.size() ?: 0} + ' results'"> </span>
                     </div>
                 </div>
-                <div th:each="friend : ${searchResults}">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                <div th:each="friend : ${searchResults}" class="col">
                     <div th:replace="~{fragments/searchFriendsBox ::
                                      friendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                      friendsName=${friend.getFriendName},
@@ -87,20 +88,21 @@
                                      friendId=${friend.getFriendId()})}">
                     </div>
                 </div>
+            </div>
 
 
             </div>
 
             <div id="pending" class="tab">
-                <div class="tableList-header">
+                <div class="text-center">
                     <h1>Pending Requests</h1>
                 </div>
-                <div class="tableList-table-contain">
-                    <div class="tableList-table-count">
-                        <br>
-                        <span th:text="${pendingFriends?.size() ?: 0} + ' Requests'"> </span>
-                    </div>
-                    <div th:each="friend : ${pendingFriends}">
+                <div class="text-end">
+                    <br>
+                    <span th:text="${pendingFriends?.size() ?: 0} + ' Requests'"> </span>
+                </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                    <div th:each="friend : ${pendingFriends}" class="col">
                         <div th:replace="~{fragments/pendingFriendsBox ::
                                     pendingFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
                                     friendsName=${friend.getFriendName},
@@ -111,23 +113,21 @@
                 </div>
             </div>
             <div id="declined" class="tab">
-                <div class="tableList-header">
+                <div class="text-center">
                     <h1>Declined Requests</h1>
                 </div>
-                <div th:each="friend : ${declinedFriends}">
-                    <div th:replace="~{fragments/declinedFriendsBox ::
-                                    declinedFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
-                                    friendsName=${friend.getFriendName},
-                                    isSender=${friend.isSender},
-                                    friendId=${friend.getUserId})}">
-                    </div>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+    `               <div class="col" th:each="friend : ${declinedFriends}">
+                        <div th:replace="~{fragments/declinedFriendsBox ::
+                                        declinedFriendsBox(friendsProfilePicture=${friend.getFriendProfilePicture},
+                                        friendsName=${friend.getFriendName},
+                                        isSender=${friend.isSender},
+                                        friendId=${friend.getUserId})}">
+                        </div>
+                    </div>`
                 </div>
             </div>
         </div>
-
-
-    </div>
-    </div>
 
 
 

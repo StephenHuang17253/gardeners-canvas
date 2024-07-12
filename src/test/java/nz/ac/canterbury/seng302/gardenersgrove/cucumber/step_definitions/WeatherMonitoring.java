@@ -1,21 +1,16 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
-import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,15 +23,27 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 
 
 @SpringBootTest

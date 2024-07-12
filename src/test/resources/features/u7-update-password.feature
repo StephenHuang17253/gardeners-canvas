@@ -1,4 +1,5 @@
 Feature: U7 As Sarah, I want to be able to change my password, so that I can keep my account secured with a new password in case my password gets leaked
+
   Background:
     Given "Sarah" "Thompson", 36 is a user with email "sarah@email.com" and password "TestPassword10!"
     And I as user "sarah@email.com" am logged in with "TestPassword10!"
@@ -16,15 +17,20 @@ Feature: U7 As Sarah, I want to be able to change my password, so that I can kee
     When I enter the weak password: <weakPassword>
     Then The password does not get updated
     Examples:
-      | weakPassword |
-      | "noEight"              |
-      |     "a"                |
-      |     "noNumbersPass!"   |
-      | "noSpecialLetters10"   |
-      | "allllowercase"        |
-      | "ALLUPPERCASE"         |
-      | "10!"                  |
-      | ""                     |
+      | weakPassword          |
+      | "noEight"             |
+      | "a"                   |
+      | "noNumbersPass!"      |
+      | "noSpecialLetters10"  |
+      | "allllowercase"       |
+      | "ALLUPPERCASE"        |
+      | "10!"                 |
+      | ""                    |
+      | "SarahPassword10!"    |
+      | "Passwordsarah10!"    |
+      | "ThompsonPassword10!" |
+      | "thompson10!"         |
+      | "sarah@email.com36"   |
 
   Scenario: AC5 - I enter a fully compliant and then my password is updated
     When I enter fully compliant password: "EpicNewPassword10!"

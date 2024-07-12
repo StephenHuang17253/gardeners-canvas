@@ -179,6 +179,7 @@ public class GardensController {
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            model.addAttribute("message", "This isn’t your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
         }
 
