@@ -93,8 +93,9 @@
                     <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
                 </div>
             </div>
-            <div th:if="${message}" class="text-center w-50">
-                <div th:replace="fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${true})"></div>
+            <div class="watering position-relative w-100 h-40" th:if="${message}" id="messageBox">
+                <div th:replace="fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})"></div>
+                <span class="close position-absolute top-0 end-0" onclick="closeMessageBox()" style="cursor: pointer;">×</span>
             </div>
         </div>
         <div class="container mt-4">
