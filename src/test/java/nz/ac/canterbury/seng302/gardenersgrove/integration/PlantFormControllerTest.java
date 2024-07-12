@@ -5,17 +5,13 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PlantFormControllerTest {
 
     @Autowired
@@ -49,8 +46,8 @@ public class PlantFormControllerTest {
 
     User mockUser = new User("Test", "Test", "test@gmail.com", LocalDate.now());
 
-    @BeforeEach
-    public void initial() {
+    @BeforeAll
+    void before_or_after_all() {
         userService.addUser(mockUser, "1es1P@ssword");
         LocalDate date1 = LocalDate.of(2024, 3, 27);
         Garden test_garden = new Garden(
@@ -69,19 +66,31 @@ public class PlantFormControllerTest {
         );
         gardenService.addGarden(test_garden);
 
-        plantService.addPlant("test",
+        plantService.addPlant("testName1",
                 1,
-                "test",
+                "testDescription1",
+                date1,
+                test_garden.getGardenId());
+
+        plantService.addPlant("testName2",
+                1,
+                "testDescription2",
                 date1,
                 test_garden.getGardenId());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
-    @AfterAll
-    public static void bin() {
-        SecurityContextHolder.clearContext();
-    }
+//    @AfterAll
+//    public static void bin() {
+//        SecurityContextHolder.clearContext();
+//    }
+
+//    @BeforeEach
+//    void clear_repo() {
+//        plantRepository.deleteAll();
+//    }
+
 
     @Test
     @WithMockUser(username = "test@gmail.com")
@@ -96,9 +105,9 @@ public class PlantFormControllerTest {
     public void plantFormController_OnePlantAdded() throws Exception {
         String gardenId = "1";
         String plantId = "1";
-        String plantDescription = "test";
+        String plantDescription = "testDescription1";
         int plantCount = 1;
-        String plantName = "test";
+        String plantName = "testName1";
         LocalDate date = LocalDate.parse("2024-03-28");
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // Form field name
@@ -128,7 +137,7 @@ public class PlantFormControllerTest {
     public void plantFormController_plantEdited() throws Exception {
         String plantName = "test";
         String gardenId = "1";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -203,7 +212,7 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editNameVariantsFail(String plantName) throws Exception {
         String gardenId = "1";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -254,7 +263,7 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsFail(String plantDescription) throws Exception {
         String gardenId = "1";
-        String plantId = "1";
+        String plantId = "2";
         String plantName = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -294,7 +303,7 @@ public class PlantFormControllerTest {
     public void plantFormController_editDateVariantsFail(String date) throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         LocalDate formattedDate;
-        String plantId = "1";
+        String plantId = "2";
         // try catch for different date input types
         try {
             formattedDate = LocalDate.parse(date, formatter);
@@ -333,7 +342,7 @@ public class PlantFormControllerTest {
     public void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
         String gardenId = "1";
         String plantName = "test name";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -365,7 +374,7 @@ public class PlantFormControllerTest {
         LocalDate formattedDate = LocalDate.parse(date, formatter);
 
         String gardenId = "1";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         int plantCount = 1;
         String plantName = "test";
@@ -394,7 +403,7 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editNameVariantsPass(String plantName) throws Exception {
         String gardenId = "1";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -431,7 +440,7 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
         String gardenId = "1";
-        String plantId = "1";
+        String plantId = "2";
         String plantName = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -463,7 +472,7 @@ public class PlantFormControllerTest {
     public void plantFormController_editCountVariantsPass(int plantCount) throws Exception {
         String gardenId = "1";
         String plantName = "test name";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
