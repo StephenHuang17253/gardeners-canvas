@@ -318,6 +318,14 @@ public class AccountController {
             return "redirect:/verify/" + emailAddress;
         }
 
+        if (token.isExpired()) {
+            tokenService.deleteToken(token);
+            redirectAttributes.addFlashAttribute("message", "Signup code has expired. Please request a new one.");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            return "redirect:/verify/" + emailAddress;
+        }
+
+
         User user = token.getUser();
         userService.verifyUser(user);
         tokenService.deleteToken(token);
