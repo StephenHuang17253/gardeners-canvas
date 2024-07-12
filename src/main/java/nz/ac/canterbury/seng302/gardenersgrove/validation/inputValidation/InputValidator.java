@@ -375,7 +375,7 @@ public class InputValidator {
      * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
-        ValidationResult result = new InputValidator(plantCount)
+        ValidationResult result = new InputValidator(String.valueOf(plantCount))
                 .validIntegerHelper()
                 .maxNumberHelper(1000000)
                 .minNumberHelper(1)

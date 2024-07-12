@@ -235,9 +235,10 @@ public class PlantFormController {
         }
 
         // logic to handle checking if fields are vaild
+        int value = (int) Double.parseDouble(plantCount);
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
+        ValidationResult plantCountResult = InputValidator.validatePlantCount(String.valueOf(value));
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
         if (plantDate == null) {
@@ -269,7 +270,7 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(plantCount);
+        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
