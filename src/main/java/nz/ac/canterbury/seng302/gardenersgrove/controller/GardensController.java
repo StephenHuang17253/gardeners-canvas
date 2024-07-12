@@ -142,8 +142,8 @@ public class GardensController {
 
         } catch (Error error) {
             DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
-            noWeather.setError("Error with the weather service");
-            weatherList.add(noWeather);
+//            noWeather.setError("Error with the weather service");
+//            weatherList.add(noWeather);
         } catch (NullPointerException error) {
             DailyWeather noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
             noWeather.setError("Location not found, please update your location to see the weather");
@@ -183,8 +183,7 @@ public class GardensController {
             return "403";
         }
 
-        List<DailyWeather> weatherList;
-        weatherList = getGardenWeatherData(garden);
+        List<DailyWeather> weatherList = getGardenWeatherData(garden);
         if(weatherList.size() >1){
             DailyWeather beforeYesterdayWeather = weatherList.get(0);
             DailyWeather yesterdayWeather = weatherList.get(1);
@@ -222,6 +221,7 @@ public class GardensController {
         model.addAttribute("gardenId", gardenId);
         model.addAttribute("plants", plants.subList(startIndex, endIndex));
         model.addAttribute("totalGardens", plants.size());
+        model.addAttribute("totalPlants", plants.size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
         model.addAttribute("weather", weatherList);
         model.addAttribute("gradientClass", gradientClass);
