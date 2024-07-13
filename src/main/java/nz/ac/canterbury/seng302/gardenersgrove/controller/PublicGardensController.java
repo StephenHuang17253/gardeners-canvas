@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -10,8 +9,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +28,7 @@ public class PublicGardensController {
 
     private final GardenService gardenService;
     private final SecurityService securityService;
-    private int COUNT_PER_PAGE = 10;
+    private final int COUNT_PER_PAGE = 10;
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService) {
@@ -49,9 +46,7 @@ public class PublicGardensController {
     public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
         logger.info("GET /public-gardens");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         List<Garden> allGardens = gardenService.getAllPublicGardens();
         int totalGardens = allGardens.size();
@@ -97,11 +92,6 @@ public class PublicGardensController {
     @GetMapping("/public-gardens")
     public String publicGardens(Model model) {
         logger.info("GET /public-gardens");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
-
         return "redirect:/public-gardens/page/1";
     }
 
@@ -118,9 +108,7 @@ public class PublicGardensController {
                                 Model model) {
         logger.info("GET /public-gardens/search");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         if (Objects.equals(searchInput, "")) {
             return "redirect:/public-gardens/page/1";
@@ -154,7 +142,6 @@ public class PublicGardensController {
             model.addAttribute("startIndex", startIndex + 1);
             model.addAttribute("endIndex", endIndex);
             model.addAttribute("lastPage", lastPage);
-            model.addAttribute("SearchErrorText", "");
             model.addAttribute("searchValue", searchInput);
         } else {
             model = resetModel(model);
@@ -178,7 +165,6 @@ public class PublicGardensController {
         model.addAttribute("startIndex", 0);
         model.addAttribute("endIndex", 0);
         model.addAttribute("lastPage", 1);
-        model.addAttribute("SearchErrorText", "");
         model.addAttribute("searchValue", "");
         return model;
     }
