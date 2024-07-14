@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
     <body>
     <div th:replace="~{/fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>

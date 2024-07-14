@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('create')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('create')}" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md my-5">
 
         <div class="text-center">
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <div th:replace="fragments/locationIQFooter.html"></div>
+    <div th:replace="~{fragments/locationIQFooter.html}"></div>
 
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
