@@ -159,7 +159,6 @@ public class ManageFriendsController {
         model.addAttribute("loggedIn", loggedIn);
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        logger.info("FlashMap: " + inputFlashMap);
         String activeTab;
         if (inputFlashMap != null && inputFlashMap.containsKey("activeTab")) {
             activeTab = (String) inputFlashMap.get("activeTab");
@@ -259,11 +258,10 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("searchErrorText", exception.getMessage());
-            model.addAttribute("loggedIn", true);
+            model.addAttribute("loggedIn", securityService.isLoggedIn());
             return "manageFriendsPage";
         }
 
-        logger.info(activeTab);
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
