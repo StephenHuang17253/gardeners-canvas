@@ -6,17 +6,17 @@
                  th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + friendsProfilePicture}}"
                  alt="Profile Image" class="card-img-top rounded justify-content-center mb-4">
             <form th:action="@{${friendsGardenLink}}" th:if="${!isPotentialFriend}" method="get">
-                <button type="submit" class="btn bg-success-subtle mb-2">Their Gardens</button>
+                <button type="submit" class="btn btn-light mb-3">Their Gardens</button>
             </form>
             <br>
             <div th:if="${isPotentialFriend} and ${friendshipStatus} != 'DENIED'">
                 <form th:action="@{/manage-friends/send-invite}" method="post">
                     <input type="hidden" th:name="friendId" th:value="${friendId}"/>
                     <input type="hidden" th:name="activeTab" th:value="search">
-                    <div th:if="${searchQuery != ''}">
+                    <div th:if="${searchQuery}">
                         <input type="hidden" th:name="searchInput" th:value="${searchQuery}">
                     </div>
-                    <button type="submit" class="btn bg-success-subtle mb-2" style="color: black">Invite as friend</button>
+                    <button type="submit" class="btn btn-light mb-3">Invite as friend</button>
                 </form>
             </div>
         </div>
