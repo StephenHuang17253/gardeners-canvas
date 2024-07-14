@@ -5,7 +5,7 @@
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
-    
+
     <div class="container-md my-5">
 
         <div class="text-center">
@@ -30,7 +30,9 @@
 
                             <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
-                                <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                <div class="position-absolute top-0 end-0 w-50 h-50">
+                                    <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                </div>
                                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                                     onChange="handleFileSelect(event)" class="visually-hidden">
                             </label>
