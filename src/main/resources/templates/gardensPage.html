@@ -29,7 +29,7 @@
                     <span th:text="${friendGardens?.size() ?: 0} + ' Gardens'"> </span>
                 </div>
                 <div th:each="garden : ${friendGardens}">
-                    <div th:replace="~{/fragments/friendsGardenBox.html ::
+                    <div th:replace="~{fragments/friendsGardenBox.html ::
                         gardenBox(gardenId=${garden.getGardenId},
                         gardenName=${garden.getGardenName},
                         gardenLocation=${garden.getGardenLocation},
