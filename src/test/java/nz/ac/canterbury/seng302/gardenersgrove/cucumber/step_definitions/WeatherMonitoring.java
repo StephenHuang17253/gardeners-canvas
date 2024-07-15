@@ -146,7 +146,7 @@ public class WeatherMonitoring {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
         weatherService = mock(WeatherService.class);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
 
@@ -173,24 +173,24 @@ public class WeatherMonitoring {
 
     @Then("Current weather for my location is shown")
     public void currentWeatherForMyLocationIsShown(){
-        Assertions.assertNotNull(weather.get(0));
-        Assertions.assertEquals("9.6", weather.get(0).getTemp());
-        Assertions.assertEquals("92", weather.get(0).getHumidity());
-        Assertions.assertEquals("0.0", weather.get(0).getPrecipitation());
-        Assertions.assertNull( weather.get(0).getWeatherError());
+        Assertions.assertNotNull(weather.get(2));
+        Assertions.assertEquals("10", weather.get(2).getTemp());
+        Assertions.assertEquals("92", weather.get(2).getHumidity());
+        Assertions.assertEquals("0.0", weather.get(2).getPrecipitation());
+        Assertions.assertNull( weather.get(2).getWeatherError());
         System.out.println(model);
     }
 
     @Then("Future weather for my location is shown")
     public void futureWeatherForMyLocationIsShown() {
         Assertions.assertNotNull(weather);
-        Assertions.assertEquals(6, weather.size());
-        Assertions.assertNull(weather.get(1).getTemp());
-        Assertions.assertNull(weather.get(1).getHumidity());
-        Assertions.assertEquals("1.4", weather.get(1).getPrecipitation());
-        Assertions.assertEquals("11.1", weather.get(1).getMaxTemp());
-        Assertions.assertEquals("7.8", weather.get(1).getMinTemp());
-        Assertions.assertNull(weather.get(0).getWeatherError());
+        Assertions.assertEquals(8, weather.size());
+        Assertions.assertNull(weather.get(3).getTemp());
+        Assertions.assertNull(weather.get(3).getHumidity());
+        Assertions.assertEquals("1.4", weather.get(3).getPrecipitation());
+        Assertions.assertEquals("11", weather.get(3).getMaxTemp());
+        Assertions.assertEquals("8", weather.get(3).getMinTemp());
+        Assertions.assertNull( weather.get(0).getWeatherError());
         System.out.println(model);
 
     }
@@ -207,6 +207,7 @@ public class WeatherMonitoring {
     public void myGardenIsNotSetToALocationThatTheLocationServiceCanNotFind() {
         WeatherResponseData mockResponseData = mock(WeatherResponseData.class);
         Mockito.when(mockResponseData.getCurrentWeather()).thenThrow(new NullPointerException("No such location"));
+        Mockito.when(mockResponseData.getPastWeather()).thenThrow(new NullPointerException("No such location"));
         Mockito.when(mockResponseData.getForecastWeather()).thenThrow(new NullPointerException("No such location"));
         Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
     }
