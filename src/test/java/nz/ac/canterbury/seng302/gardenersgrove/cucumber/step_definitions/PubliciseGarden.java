@@ -100,7 +100,7 @@ public class PubliciseGarden {
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
         MOCK_MVC_MY_GARDEN = MockMvcBuilders.standaloneSetup(myGardensController).build();

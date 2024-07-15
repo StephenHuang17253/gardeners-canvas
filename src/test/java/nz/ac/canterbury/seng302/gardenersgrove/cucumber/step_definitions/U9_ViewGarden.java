@@ -89,12 +89,12 @@ public class U9_ViewGarden {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService,fileService, weatherService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
         MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +

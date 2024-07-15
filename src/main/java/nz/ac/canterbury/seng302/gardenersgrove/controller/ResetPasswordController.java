@@ -58,7 +58,7 @@ public class ResetPasswordController {
     /**
      * Post form for entering email if user has forgotten their password
      * Checks if input values are valid and then sends reset password link to email entered
-     * @param email input email to send reset password link to
+     * @param emailAddress input email to send reset password link to
      * @param model to collect field values and error messages
      * @return lostPasswordPage
      */
