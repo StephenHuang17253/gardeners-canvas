@@ -3,7 +3,7 @@
         <div class="card-body pt-1">
             <div class="text-end">
                 <a th:if="${isOwner}"  th:href="@{__${gardenId}__/__${plantId}__/edit}">
-                    <svg width="20" height="20" class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSvgIcon-root MuiSvgIcon-fontSizeLarge css-p79yt4"
+                    <svg width="20" height="20" class="MuiSvgIcon-fontSizeLarge css-p79yt4"
                          focusable="false" aria-hidden="true" viewBox="0 0 24 24" fill="#ffffff" tabindex="-1" title="Edit">
                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"></path>
                     </svg>
@@ -16,9 +16,8 @@
                     <div class="position-relative w-50">
                         <div class="ratio ratio-1x1">
                             <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                                 alt="Plant Picture" class="image-fluid rounded-circle" style="width: 100%; height: 100%; object-fit: cover;">
+                                 alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
                         </div>
-                        <!--                    <div class="position-absolute top-0 start-0 w-100 h-100">-->
                         <label class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
                             <span class="position-absolute top-0 end-0 mt-2 pe-4 fs-1">+</span>
                             <input id="page" th:name="page" th:value="${page}" type="hidden"/>
@@ -42,8 +41,6 @@
             <div th:if="${plantToEditId == plantId}">
                 <div th:replace="fragments/infoBox.html :: infoBox(message=${plantPictureError}, goodMessage=${false})"></div>
             </div>
-<!--            <span th:if="${plantToEditId == plantId}" class="text-danger fs-6" th:text="${plantPictureError}"></span>-->
-
             <h4 class="card-title mt-1" th:text="${plantName} + ' (x' + ${plantCount} +')'"></h4>
             <div class="row">
                 <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>
