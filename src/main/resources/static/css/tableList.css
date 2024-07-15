@@ -1,0 +1,80 @@
+// Needs to be removed after gardensPage is re-engineered
+
+.tableList-header{
+    position: relative; /* Set position to relative */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+    font-style: normal;
+    text-decoration: none;
+    color: #0d3c00;
+    font-family: "Verdana", sans-serif;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+}
+
+.tableList-header-title
+{
+    display: block;
+    font-size: 36px;
+}
+.tableList-header-button-contain{
+    margin: 10px;
+    display: inline-flex;
+    gap: 3px;
+}
+.rounded-button,.rounded-button-top-right {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.rounded-button:hover, .rounded-button-top-right:hover {
+    background-color: #45a049; /* Darker background color on hover */
+}
+
+.rounded-button-top-right {
+    position:absolute;
+    top:0;
+    right:0;
+}
+.tableList-table-contain{
+    background-color: #f3f2ed;
+    font-style: normal;
+    text-decoration: none;
+    color: #0d3c00;
+    font-family: "Verdana", sans-serif;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+}
+.tableList-table-count{
+    margin: 10px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: large;
+}
+
+.checkbox_container {
+    border: 2px solid #000;
+    padding: 7px;
+    margin-top: 10px;
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+.checkbox {
+    margin-right: 8px;
+    accent-color: #4CAF50;
+}
