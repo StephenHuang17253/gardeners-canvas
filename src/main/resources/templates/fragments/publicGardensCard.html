@@ -6,21 +6,21 @@
                     <small th:if="${isPublic}">Public</small>
                     <small th:if="${!isPublic}">Private</small>
                 </p>
-                <div class="collage-container" style="display: flex; max-width: 400px; width: 100%;">
+                <div class="d-flex w-100" style="max-width: 400px;">
                     <!-- First larger image -->
-                    <div class="large-image" style="flex: 3; margin-right: 2px; height: 300px;">
+                    <div class="me-2" style="flex: 3; height: 300px;">
                         <img th:src="@{${plantImage1 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage1}}"
-                             alt="Plant Image" class="img-fluid rounded" style="width: 100%; height: 100%; object-fit: cover;"/>
+                             alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                     </div>
                     <!-- Two smaller images stacked on top of each other -->
-                    <div class="small-images" style="display: flex; flex-direction: column; flex: 2; height: 300px;">
-                        <div class="small-image overflow-hidden rounded" style="margin-bottom: 2px; flex: 1;">
+                    <div class="d-flex flex-column" style="flex: 2; height: 300px;">
+                        <div class="small-image overflow-hidden rounded mb-2" style="flex: 1;">
                             <img th:src="@{${plantImage2 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage2}}"
-                                 alt="Plant Image" class="img-fluid rounded" style="width: 100%; height: 100%; object-fit: cover;"/>
+                                 alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                         </div>
                         <div class="small-image overflow-hidden rounded" style="flex: 1;">
                             <img th:src="@{${plantImage3 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage3}}"
-                                 alt="Plant Image" class="img-fluid rounded" style="width: 100%; height: 100%; object-fit: cover;"/>
+                                 alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                         </div>
                     </div>
                 </div>
