@@ -411,7 +411,7 @@ public class GardensController {
      * @param userId - id of the user being viewed
      * @return thymeleaf gardensPage
      */
-    @GetMapping("{userId}/gardens")
+    @GetMapping("/{userId}/gardens")
     public String friendsGardens(Model model,
             @PathVariable("userId") Long userId,
             @RequestParam(defaultValue = "1") int page,
