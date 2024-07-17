@@ -15,7 +15,7 @@ const descriptionInputs = document.querySelectorAll('[data-description="true"]')
  */
 const updateCounter = (descriptionInput) => {
 
-    const counterId = descriptionInput.getAttribute('data-counter-id')
+    const counterId = descriptionInput.getAttribute('data-counter-id');
 
     const descriptionCounter = document.getElementById(counterId);
 
@@ -27,9 +27,13 @@ const updateCounter = (descriptionInput) => {
     descriptionCounter.textContent = descriptionInput.value.length + '/' + MAX_CHARS;
 }
 
-descriptionInputs.forEach((descriptionInput) => {
-    updateCounter(descriptionInput)
-    descriptionInput.addEventListener('input', () => updateCounter(descriptionInput));
-})
+window.addEventListener('load', () => {
+    descriptionInputs.forEach((descriptionInput) => {
+        updateCounter(descriptionInput);
+        descriptionInput.addEventListener('input', () => updateCounter(descriptionInput));
+    });
+});
+
+
 
 
