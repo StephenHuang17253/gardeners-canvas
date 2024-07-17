@@ -55,6 +55,8 @@ public class EmailService {
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
+     * Actual email is sent asynchronously to make the app more responsive.
+     * (the send email function takes 5 seconds to run)
      *
      * @param toEmail the email recipient
      * @param subject the email subject
@@ -67,12 +69,25 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject(subject);
         message.setText(body);
-        mailSender.send(message);
+
+        Thread asynchronousEmailthread = new Thread(() -> {
+            try
+            {
+                mailSender.send(message);
+                logger.info("Email Sent");
+            }
+            catch (MailException error)
+            {
+                logger.error("Email could not be sent");
+            }
+        });
+        asynchronousEmailthread.start();
     }
 
     /**
      * Sends an HTML email to the specified email address with the specified
-     * subject
+     * subject. Actual email is sent asynchronously to make the app more responsive.
+     * (the send email function takes 5 seconds to run)
      *
      * @param recipientEmail email of person to receive message
      * @param subject subject of email
@@ -89,7 +104,21 @@ public class EmailService {
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
-        mailSender.send(message);
+
+        Thread asynchronousEmailthread = new Thread(() -> {
+            try
+            {
+                mailSender.send(message);
+                logger.info("Email Sent");
+            }
+            catch (MailException error)
+            {
+                logger.error("Email could not be sent");
+            }
+        });
+        asynchronousEmailthread.start();
+
+
     }
 
     /**
