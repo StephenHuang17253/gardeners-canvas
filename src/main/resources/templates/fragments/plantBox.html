@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div th:if="${plantToEditId == plantId}">
-                <div th:replace="fragments/infoBox.html :: infoBox(message=${plantPictureError}, goodMessage=${false})"></div>
+                <div th:replace="~{fragments/infoBox.html :: infoBox(message=${plantPictureError}, goodMessage=${false})}"></div>
             </div>
             <h4 class="card-title mt-1" th:text="${plantName} + ' (x' + ${plantCount} +')'"></h4>
             <div class="row">

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html :: head (includeWeatherStyles=true)"></head>
+<head th:replace="~{fragments/header.html :: head (includeWeatherStyles=true)}"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-3 pb-5" style="width: 60%;">
         <div class="container text-center">
@@ -93,7 +93,7 @@
                 </div>
             </div>
             <div class="watering position-relative w-100 h-40" th:if="${message}" id="messageBox">
-                <div th:replace="fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessagegoodMessage})"></div>
+                <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessagegoodMessage})}"></div>
                 <span class="close position-absolute top-0 end-0" onclick="closeMessageBox()" style="cursor: pointer;">×</span>
             </div>
         </div>
