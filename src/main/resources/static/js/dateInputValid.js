@@ -1,11 +1,11 @@
-const dateOfBirth = document.getElementById('dateOfBirth');
-let dateOfBirthJSError = document.getElementById('dateOfBirthJSError');
+const dateOfBirth = document.getElementById("dateOfBirth");
+let dateOfBirthJSError = document.getElementById("dateOfBirthJSError");
 
 /**
  * If a date is invalid then shows an error
  */
 const handleInvalidDate = () => {
-    dateOfBirth.setCustomValidity(' ');
+    dateOfBirth.setCustomValidity(" ");
     dateOfBirthJSError.style.display = "block";
 }
 
@@ -13,9 +13,9 @@ const handleInvalidDate = () => {
  * Removes invalid date error when a user edits it
  */
 const clearDateError = () => {
-    dateOfBirth.setCustomValidity('');
+    dateOfBirth.setCustomValidity("");
     dateOfBirthJSError.style.display = "none";
-    document.getElementById('dateOfBirthError').textContent = "";
+    document.getElementById("dateOfBirthError").textContent = "";
 }
 
 

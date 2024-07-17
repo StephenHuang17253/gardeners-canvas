@@ -1,5 +1,5 @@
 const MAX_CHARS = 512;
-const descriptionInputs = document.querySelectorAll('[data-description="true"]');
+const descriptionInputs = document.querySelectorAll("[data-description='true']");
 
 
 /**
@@ -15,22 +15,22 @@ const descriptionInputs = document.querySelectorAll('[data-description="true"]')
  */
 const updateCounter = (descriptionInput) => {
 
-    const counterId = descriptionInput.getAttribute('data-counter-id');
+    const counterId = descriptionInput.getAttribute("data-counter-id");
 
     const descriptionCounter = document.getElementById(counterId);
 
     if (descriptionInput.value.length > MAX_CHARS) {
-        descriptionCounter.classList.add('text-danger');
+        descriptionCounter.classList.add("text-danger");
     } else {
-        descriptionCounter.classList.remove('text-danger');
+        descriptionCounter.classList.remove("text-danger");
     }
-    descriptionCounter.textContent = descriptionInput.value.length + '/' + MAX_CHARS;
+    descriptionCounter.textContent = descriptionInput.value.length + "/" + MAX_CHARS;
 }
 
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
     descriptionInputs.forEach((descriptionInput) => {
         updateCounter(descriptionInput);
-        descriptionInput.addEventListener('input', () => updateCounter(descriptionInput));
+        descriptionInput.addEventListener("input", () => updateCounter(descriptionInput));
     });
 });
 

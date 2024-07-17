@@ -1,23 +1,23 @@
-const RATE_LIMIT_MESSAGE = 'Exceeded limit of 2 autocomplete requests per second. Please try again';
-const NO_MATCHING_LOCATION_MESSAGE = 'No matching location found, location-based services may not work';
+const RATE_LIMIT_MESSAGE = "Exceeded limit of 2 autocomplete requests per second. Please try again";
+const NO_MATCHING_LOCATION_MESSAGE = "No matching location found, location-based services may not work";
 const MIN_API_CALL_INPUT_LENGTH = 3;
 const API_CALL_DELAY = 300;
 const TOO_MANY_REQUESTS_CODE = 429;
-const MIN_INPUT_LENGTH_MESSAGE = 'Please enter at least ' + MIN_API_CALL_INPUT_LENGTH + ' characters';
+const MIN_INPUT_LENGTH_MESSAGE = "Please enter at least " + MIN_API_CALL_INPUT_LENGTH + " characters";
 
-const autocompleteDropdown = document.getElementById('autocompleteSuggestions');
-const autocompleteErrorMessage = document.getElementById('autocompleteError');
-const streetAddressField = document.getElementById('streetAddress');
+const autocompleteDropdown = document.getElementById("autocompleteSuggestions");
+const autocompleteErrorMessage = document.getElementById("autocompleteError");
+const streetAddressField = document.getElementById("streetAddress");
 
 const getDisplayString = (data) => {
     const address = data.address
-    const streetNumber = address.house_number || '';
-    const streetName = address.road || '';
-    const streetAddress = streetNumber + ' ' + streetName;
+    const streetNumber = address.house_number || "";
+    const streetName = address.road || "";
+    const streetAddress = streetNumber + " " + streetName;
     const addressParts = [
-        streetAddress, address.suburb || '', address.city || '', address.postcode || '', address.country || ''
+        streetAddress, address.suburb || "", address.city || "", address.postcode || "", address.country || ""
     ]
-    return addressParts.filter(addressPart => addressPart !== '').join(', ')
+    return addressParts.filter(addressPart => addressPart !== "").join(", ")
 }
 
 
@@ -28,36 +28,36 @@ const getDisplayString = (data) => {
  */
 const fillAddressFields = (data) => {
     const address = data.address
-    const streetNumber = address.house_number || '';
-    const streetName = address.road || '';
-    const streetAddress = streetNumber + ' ' + streetName;
+    const streetNumber = address.house_number || "";
+    const streetName = address.road || "";
+    const streetAddress = streetNumber + " " + streetName;
 
-    document.getElementById('streetAddress').value = streetAddress;
-    document.getElementById('suburb').value = address.suburb || '';
-    document.getElementById('city').value = address.city || '';
-    document.getElementById('postcode').value = address.postcode || '';
-    document.getElementById('country').value = address.country || '';
-    document.getElementById('longitude').value = data.lon || '';
-    document.getElementById('latitude').value = data.lat || '';
+    document.getElementById("streetAddress").value = streetAddress;
+    document.getElementById("suburb").value = address.suburb || "";
+    document.getElementById("city").value = address.city || "";
+    document.getElementById("postcode").value = address.postcode || "";
+    document.getElementById("country").value = address.country || "";
+    document.getElementById("longitude").value = data.lon || "";
+    document.getElementById("latitude").value = data.lat || "";
 }
 
 /**
  * Hides the autocomplete dropdown.
  * @returns {void}
  */
-const hideAutocompleteDropdown = () => autocompleteDropdown.classList.add('d-none');
+const hideAutocompleteDropdown = () => autocompleteDropdown.classList.add("d-none");
 
 /**
  * Shows the autocomplete dropdown.
  * @returns {void}
  */
-const showAutocompleteDropdown = () => autocompleteDropdown.classList.remove('d-none');
+const showAutocompleteDropdown = () => autocompleteDropdown.classList.remove("d-none");
 
 /**
  * Clears the autocomplete dropdown.
  * @returns {void}
  */
-const clearAutocompleteDropdown = () => autocompleteDropdown.innerHTML = '';
+const clearAutocompleteDropdown = () => autocompleteDropdown.innerHTML = "";
 
 /**
  * Handles a clicked suggestion, filling address fields and hiding dropdowns.
@@ -78,16 +78,16 @@ const handleSuggestionClicked = (suggestion) => {
 const updateAutocompleteDropdown = (suggestions) => {
     clearAutocompleteDropdown();
     suggestions.forEach(suggestion => {
-        const listElement = document.createElement('li');
-        listElement.classList.add('list-group-item');
-        listElement.classList.add('py-2');
-        const div = document.createElement('div');
+        const listElement = document.createElement("li");
+        listElement.classList.add("list-group-item");
+        listElement.classList.add("py-2");
+        const div = document.createElement("div");
         div.textContent = getDisplayString(suggestion);
-        div.classList.add('cursor-pointer');
-        div.classList.add('darken-on-hover');
-        div.classList.add('rounded');
-        div.classList.add('p-2');
-        div.addEventListener('click', () => handleSuggestionClicked(suggestion));
+        div.classList.add("cursor-pointer");
+        div.classList.add("darken-on-hover");
+        div.classList.add("rounded");
+        div.classList.add("p-2");
+        div.addEventListener("click", () => handleSuggestionClicked(suggestion));
         listElement.appendChild(div);
         autocompleteDropdown.appendChild(listElement);
     });
@@ -97,7 +97,7 @@ const updateAutocompleteDropdown = (suggestions) => {
  * Hides the autocomplete error message.
  * @returns {void}
  */
-const hideAutocompleteErrorMessage = () => autocompleteErrorMessage.classList.add('d-none');
+const hideAutocompleteErrorMessage = () => autocompleteErrorMessage.classList.add("d-none");
 
 /**
  * Sets the text content of the autocomplete error message element.
@@ -106,20 +106,20 @@ const hideAutocompleteErrorMessage = () => autocompleteErrorMessage.classList.ad
  */
 const setAutocompleteErrorMessage = (message) => {
     autocompleteErrorMessage.textContent = message;
-    autocompleteErrorMessage.classList.remove('d-none');
+    autocompleteErrorMessage.classList.remove("d-none");
 };
 
 /**
  * Determines the instance based on the current URL path.
- * @returns {string} The instance ('', 'test/' or 'prod/') based on the URL path.
+ * @returns {string} The instance ("", "test/" or "prod/") based on the URL path.
  */
 const getInstance = () => {
     const path = window.location.pathname
-    let instance = '';
-    if (path.includes('/test/')) {
-        instance = 'test/';
-    } else if (path.includes('/prod/')) {
-        instance = 'prod/';
+    let instance = "";
+    if (path.includes("/test/")) {
+        instance = "test/";
+    } else if (path.includes("/prod/")) {
+        instance = "prod/";
     }
     return instance;
 };
@@ -136,7 +136,7 @@ const fetchLocationIQData = async (query) => {
         const data = await response.json();
         return data
     } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error("There was a problem with the fetch operation:", error);
     }
 };
 
@@ -149,7 +149,7 @@ const handleUpdate = debounce(async (event) => {
 
     hideAutocompleteErrorMessage();
 
-    if (event.target.value === '') {
+    if (event.target.value === "") {
         hideAutocompleteDropdown();
         return;
     }
@@ -200,7 +200,7 @@ const handleClick = (event) => {
 }
 
 /**
- * This is needed, don't remove.
+ * This is needed, don"t remove.
  * Morgan requested a debouncing implementation as a prerequisite to approval for the API.
  * Delays call of a function until after a specified time.
  * @param {Function} func The function to debounce.
@@ -219,12 +219,12 @@ function debounce(func, delay) {
 
 // Event listeners
 
-streetAddressField.addEventListener('input', handleUpdate);
+streetAddressField.addEventListener("input", handleUpdate);
 
-streetAddressField.addEventListener('focus', handleUpdate);
+streetAddressField.addEventListener("focus", handleUpdate);
 
-streetAddressField.addEventListener('blur', handleDeselect);
+streetAddressField.addEventListener("blur", handleDeselect);
 
-document.addEventListener('click', handleClick);
+document.addEventListener("click", handleClick);
 
-autocompleteDropdown.addEventListener('mousedown', event => event.preventDefault());
+autocompleteDropdown.addEventListener("mousedown", event => event.preventDefault());
