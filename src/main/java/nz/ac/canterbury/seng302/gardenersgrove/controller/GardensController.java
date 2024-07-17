@@ -414,6 +414,8 @@ public class GardensController {
     @GetMapping("/{userId}/gardens")
     public String friendsGardens(Model model,
             @PathVariable("userId") Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "All") String filter,
             HttpServletResponse response) {
         logger.info("GET {}/gardens", userId);
 
@@ -430,11 +432,30 @@ public class GardensController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
-
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> gardenList = friend.getGardens();
+        List<Garden> gardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", gardenList);
+        model.addAttribute("friendGardens", gardens);
+
+        long publicGardensCount = gardens.stream().filter(Garden::getIsPublic).count();
+
+        gardens = gardens.stream().filter(garden -> garden.getIsPublic()).collect(Collectors.toList());
+
+        int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
+
+        model.addAttribute("friendId", userId);
+        model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("totalGardens", gardens.size());
+        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("userName", friend.getFirstName() + " " + friend.getLastName());
+        model.addAttribute("firstName", friend.getFirstName());
+        model.addAttribute("profilePicture", friend.getProfilePictureFilename());
 
         return "gardensPage";
     }
