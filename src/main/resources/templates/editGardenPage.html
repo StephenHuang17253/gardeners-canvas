@@ -26,7 +26,8 @@
                     <div class="mb-3">
                         <label for="gardenDescription" class="form-label">Description</label>
                         <textarea id="gardenDescription" class="form-control" rows="3" th:name="gardenDescription"
-                            th:text="*{gardenDescription}"
+                            th:text="*{gardenDescription}" data-description="true"
+                            data-counter-id="gardenDescriptionCounter"
                             th:classappend="${GDErrorText == null ? '' : 'border-danger'}"></textarea>
                         <p id="gardenDescriptionCounter" class="fs-6"></p>
                         <p th:if="${GDErrorText}" class="text-danger fs-6" th:text="${GDErrorText}"></p>
@@ -97,7 +98,7 @@
 
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
-    <script th:src="@{/js/gardenDescriptionCounter.js}"></script>
+    <script th:src="@{/js/descriptionCounter.js}"></script>
     <script th:src="@{/js/locationIQAutocomplete.js}"></script>
     <script th:src="@{/js/gardenSizeFormat.js}"></script>
 </body>
