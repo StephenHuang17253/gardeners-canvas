@@ -27,30 +27,35 @@ const handleFileSelect = (imageInput) => {
     const errorDisplayId = imageInput.getAttribute("data-errored-by");
     const errorDisplayElement = document.getElementById(errorDisplayId);
 
+    const imageDisplayId = imageInput.getAttribute("data-displayed-by");
+    const imageDisplayElement = document.getElementById(imageDisplayId);
+
     if (fileSizeInMB > MAX_FILE_SIZE) {
         errorDisplayElement.textContent = errorMessage;
-        imageInput.classList.add("border-danger");
+        imageDisplayElement.classList.add("border-danger");
         imageInput.value = '';
+
+        // Clear errors after 5 seconds
+        setTimeout(() => {
+            imageDisplayElement.classList.remove("border-danger");
+            errorDisplayElement.textContent = '';
+        }, 5000)
         return;
     }
 
     const submitIfvalid = imageInput.getAttribute("data-submit-if-valid");
 
     if (submitIfvalid !== null) {
-        const formId = imageInput.closest("form").id;
-        const formElement = document.getElementById(formId);
-        formElement.submit();
+        imageInput.closest("form").submit();
         return;
     }
 
-    imageInput.classList.remove("border-danger");
+    imageDisplayElement.classList.remove("border-danger");
     errorDisplayElement.textContent = '';
 
     const reader = new FileReader();
 
     reader.onload = (e) => {
-        const imageDisplayId = imageInput.getAttribute("data-displayed-by");
-        const imageDisplayElement = document.getElementById(imageDisplayId);
         imageDisplayElement.src = e.target.result;
     };
 

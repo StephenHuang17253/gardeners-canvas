@@ -13,27 +13,30 @@
                 </a>
             </div>
             <div th:if="${isOwner}">
-                <form id="plantImageForm" th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data"
-                    class="w-100 d-flex flex-column align-items-center mb-2">
+                <form id="plantImageForm" th:action="@{/my-gardens/__${gardenId}__}" method="post"
+                    enctype="multipart/form-data" class="w-100 d-flex flex-column align-items-center mb-2">
 
                     <div class="position-relative w-50 mb-1">
                         <div class="ratio ratio-1x1">
-                            <img id="imageToChange"
+                            <img th:id="'imageToChange' + ${plantId}"
                                 th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
                                 alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
                         </div>
                         <label
                             class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
-                            <span class="position-absolute top-0 end-0 mt-2 pe-4 fs-1">+</span>
-                            <input id="page" th:name="page" th:value="${page}" type="hidden" />
-                            <input id="weather" th:name="weather" th:value="${weather}" type="hidden" />
-                            <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden" />
+                            <div class="position-absolute top-0 end-0 w-50 h-50">
+                                <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                            </div>
                             <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                                class="visually-hidden" data-image-input data-displayed-by="imageToChange"
-                                data-errored-by="plantPictureError" data-submit-if-valid>
+                                class="visually-hidden" data-image-input th:data-displayed-by="'imageToChange' + ${plantId}"
+                                th:data-errored-by="'plantPictureError' + ${plantId}" data-submit-if-valid>
                         </label>
                     </div>
-                    <p id="plantPictureError" class="text-danger fs-6 text-bold" th:text="${plantToEditId == plantId ? plantPictureError : ''}"></p>
+                    <p th:id="'plantPictureError' + ${plantId}" class="text-danger fs-6 text-bold"
+                        th:text="${plantToEditId == plantId ? plantPictureError : ''}"></p>
+                    <input id="page" th:name="page" th:value="${page}" type="hidden" />
+                    <input id="weather" th:name="weather" th:value="${weather}" type="hidden" />
+                    <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden" />
                 </form>
             </div>
             <div th:if="${!isOwner}">
@@ -47,9 +50,9 @@
             </div>
             <h4 class="card-title mt-1" th:text="${plantName} + ' (x' + ${plantCount} +')'"></h4>
             <div class="row">
-                <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>
-                <span th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </span>
-                <span th:text="${plantDescription}" class="plant-description"></span>
+                <p th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </p>
+                <p th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </p>
+                <p th:text="${plantDescription}" class="plant-description"></p>
             </div>
         </div>
     </div>
