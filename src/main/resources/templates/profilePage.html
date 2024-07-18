@@ -21,7 +21,7 @@
                         <div class="position-relative w-75">
                             <div class="ratio ratio-1x1">
                                 <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                                    alt="User's Profile Picture" class="image-fluid rounded-circle border">
+                                    alt="User's Profile Picture" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
                             <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
