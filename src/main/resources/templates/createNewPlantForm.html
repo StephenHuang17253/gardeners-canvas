@@ -32,10 +32,11 @@
                                     <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
                                 </div>
                                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                                    onChange="handleFileSelect(event)" class="visually-hidden">
+                                    data-image-input data-displayed-by="imageToChange"
+                                    data-errored-by="plantPictureError" class="visually-hidden">
                             </label>
                         </div>
-                        <p th:if="${plantPictureError}" class="text-danger fs-6" th:text="${plantPictureError}"></p>
+                        <p id="plantPictureError" class="text-danger fs-6" th:text="${plantPictureError}"></p>
                     </div>
 
                     <div class="mb-3">
