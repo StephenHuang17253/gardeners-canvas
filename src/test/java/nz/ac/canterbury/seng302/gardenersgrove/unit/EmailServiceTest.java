@@ -119,7 +119,7 @@ class EmailServiceTest {
         Context capturedContex = captor.getValue();
 
         assertEquals("Test User", capturedContex.getVariable("username"));
-        assertEquals("Click the link below to reset your password. \n This link expires in 10 minutes.", capturedContex.getVariable("mainBody"));
+        assertEquals(String.format("Click the link below to reset your password. %n This link expires in 10 minutes."), capturedContex.getVariable("mainBody"));
         assertEquals("http://test/reset-password/TestTokenString", capturedContex.getVariable("url"));
         assertEquals("RESET PASSWORD", capturedContex.getVariable("urlText"));
 

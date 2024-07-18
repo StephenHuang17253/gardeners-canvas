@@ -18,6 +18,7 @@ import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
+
 /**
  * This class is a service class for sending emails defined by the
  * {@link Service} annotation.
@@ -29,6 +30,8 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+
+    private static final String USERNAME_FIELD = "username";
 
     /**
      * The email address of the sender retrieved from the email.properties file.
@@ -159,7 +162,7 @@ public class EmailService {
         int lifetime = (int) token.getLifetime().toMinutes();
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("tokenString", tokenString);
         context.setVariable("lifetime", lifetime);
 
@@ -174,7 +177,7 @@ public class EmailService {
      * @param token the token to use to reset password
      */
     public void sendResetPasswordEmail(Token token) throws MessagingException {
-        logger.info("Sending reset password email to " + token.getUser().getEmailAddress());
+        logger.info("Sending reset password email to {}", token.getUser().getEmailAddress());
         String subject = "Link to Reset Password to Gardener's Grove!";
         String template = "generalEmail";
 
@@ -187,10 +190,10 @@ public class EmailService {
                 .buildAndExpand(tokenString)
                 .toUriString();
         String urlText = "RESET PASSWORD";
-        String mainBody = String.format("Click the link below to reset your password. \n This link expires in %s minutes.", lifetime);
+        String mainBody = String.format("Click the link below to reset your password. %n This link expires in %s minutes.", lifetime);
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
         context.setVariable("url", url);
         context.setVariable("urlText", urlText);
@@ -205,7 +208,10 @@ public class EmailService {
      * @param currentUser user to send confirmation of password reset to
      */
     public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
-        logger.info("Sending confirmation email to " + currentUser.getEmailAddress());
+
+        logger.info("Sending confirmation email to {}",currentUser.getEmailAddress());
+
+
         String subject = "Your Password Has Been Updated";
         String template = "generalEmail";
 
@@ -213,7 +219,7 @@ public class EmailService {
         String mainBody = "This email is to confirm that your Gardener's Grove account's password has been updated";
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
 
         String toEmail = currentUser.getEmailAddress();
