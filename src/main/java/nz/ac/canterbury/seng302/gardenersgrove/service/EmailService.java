@@ -30,12 +30,6 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    @Autowired
-    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
-        this.mailSender = mailSender;
-        this.templateEngine = templateEngine;
-    }
-
     /**
      * The email address of the sender retrieved from the email.properties file.
      */
@@ -47,6 +41,35 @@ public class EmailService {
      */
     @Value("${spring.base.url}")
     private String baseURL;
+
+    /**
+     * Autowired default constructor for Email Service
+     * @param mailSender mail sender bean
+     * @param templateEngine mail sender bean
+     */
+    @Autowired
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
+
+    /**
+     * <h4 style="color:red;"> CONSTRUCTOR FOR TEST USE ONLY </h4>
+     * Overloaded constructor for email service,
+     * Overwrites application properties usually defined at runtime in order to make testing this service easier
+     * @param mailSender mail sender bean
+     * @param templateEngine mail sender bean
+     * @param overwrittenBaseUrl overwritten url basis (where emails are sent to)
+     * @param overwrittenSenderEmail overwritten sending email address (where emails are sent froim)
+     */
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine, String overwrittenSenderEmail, String overwrittenBaseUrl) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+        this.baseURL = overwrittenBaseUrl;
+        this.senderEmail = overwrittenSenderEmail;
+    }
+
+
 
     public String getBaseURL() {
         return baseURL;
