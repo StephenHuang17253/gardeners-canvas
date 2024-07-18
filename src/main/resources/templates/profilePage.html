@@ -20,19 +20,20 @@
 
                         <div class="position-relative w-75">
                             <div class="ratio ratio-1x1">
-                                <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                                <img id="imageToChange" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                                     alt="User's Profile Picture" class="image-fluid rounded-circle border">
                             </div>
                             <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
                                 <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
                                 <input th:name="profilePictureInput" type="file" class="visually-hidden"
-                                    accept="image/*" onChange="document.getElementById('profilePictureForm').submit()"
+                                    accept="image/*" data-image-input data-displayed-by="imageToChange"
+                                    data-errored-by="profilePictureError" data-submit-if-valid="true"
                                     th:classappend="${profilePictureError == null ? '' : 'border-danger'}">
                             </label>
                         </div>
 
-                        <p th:if="${profilePictureError}" class="text-danger fs-6" th:text="${profilePictureError}"></p>
+                        <p id="profilePictureError" class="text-danger fs-6" th:text="${profilePictureError}"></p>
                     </form>
 
                     <div class="mb-3 text-center">
@@ -62,6 +63,7 @@
             </div>
         </div>
     </div>
+    <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
