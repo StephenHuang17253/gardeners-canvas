@@ -36,7 +36,7 @@ Editing content below will change the nav bar on all pages where it is implement
                         My Gardens
                     </a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}"
+                        <a class="dropdown-item overflow-text" th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}"
                             th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}"></a>
                     </div>
                 </li>

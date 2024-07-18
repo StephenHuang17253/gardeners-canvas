@@ -2,6 +2,7 @@
 
 .dropdown-menu {
     max-height: 200px;
+    max-width: 200px;
     overflow-y: scroll;
 }
 
@@ -93,11 +94,12 @@
     background-color: darkred !important;
     color: white;
 }
-.username {
-    display: inline-block;
-    max-width: 100%;
+.overflow-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    vertical-align: middle;
+}
+.break-word {
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
