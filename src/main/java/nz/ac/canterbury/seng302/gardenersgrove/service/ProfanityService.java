@@ -1,5 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nz.ac.canterbury.seng302.gardenersgrove.component.ProfanityResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +29,8 @@ public class ProfanityService {
     Logger logger = LoggerFactory.getLogger(ProfanityService.class);
 
     private HttpClient httpClient;
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * General constructor for profanity service, creates new http client.
@@ -57,6 +63,7 @@ public class ProfanityService {
      */
     public String moderateContent(String content) {
         try {
+            logger.info("Profaintiy service input: "+ content);
             String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -67,14 +74,18 @@ public class ProfanityService {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            JsonNode jsonObject = objectMapper.readTree(response.body());
+            ProfanityResponseData profanityResponse = new ProfanityResponseData(jsonObject);
+            logger.info("weather: " + jsonObject);
+
+            logger.info("Profaintiy service response: : "+ response.body());
             return response.body();
         } catch (IOException | InterruptedException errorException) {
             Thread.currentThread().interrupt();
             logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
             return "Automatic Moderation Failure, Moderate Manually";
         }
-
-
     }
     /**
      * Checks a string to see if it contains any bad words, if so return True.
