@@ -23,13 +23,15 @@
                                 <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                                     alt="User's Profile Picture" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
-                            <label
+                            <div
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
-                                <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
+                                    <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                </div>
                                 <input th:name="profilePictureInput" type="file" class="visually-hidden"
                                     accept="image/*" onChange="document.getElementById('profilePictureForm').submit()"
                                     th:classappend="${profilePictureError == null ? '' : 'border-danger'}">
-                            </label>
+                            </div>
                         </div>
 
                         <p th:if="${profilePictureError}" class="text-danger fs-6" th:text="${profilePictureError}"></p>
