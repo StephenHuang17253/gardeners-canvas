@@ -1,81 +1,98 @@
 package nz.ac.canterbury.seng302.gardenersgrove.component;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-
+import java.util.ArrayList;
 /**
  * This entity class is for representing and processing the response given by the profanity service
  */
 public class ProfanityResponseData {
+    JsonNode originalText;
+    JsonNode normalizedText;
+    JsonNode misrepresentation;
+    JsonNode language;
+    JsonNode terms;
+    JsonNode status;
+    JsonNode trackingId;
+    boolean hasProfanity;
+    List<String> foundTerms;
 
-    @JsonProperty("OriginalText")
-    private String originalText;
+    @JsonCreator
+    public ProfanityResponseData(JsonNode jsonProfanityData){
+        originalText = jsonProfanityData.get("OriginalText");
+        normalizedText = jsonProfanityData.get("NormalizedText");
+        misrepresentation = jsonProfanityData.get("Misrepresentation");
+        language = jsonProfanityData.get("Language");
+        terms = jsonProfanityData.get("Terms");
+        status = jsonProfanityData.get("Status");
+        trackingId = jsonProfanityData.get("TrackingId");
 
-    @JsonProperty("NormalizedText")
-    private String normalizedText;
+        setFoundTerms();
+        setHasProfanity();
+    }
+    public String getOriginalText() {
+        return originalText.asText();
+    }
 
-    @JsonProperty("Misrepresentation")
-    private String misrepresentation;
+    public String getNormalizedText() {
+        return normalizedText.asText();
+    }
 
-    @JsonProperty("Language")
-    private String language;
+    public String getMisrepresentation() {
+        return misrepresentation.asText();
+    }
 
-    @JsonProperty("Terms")
-    private List<Term> terms;
+    public String getLanguage() {
+        return language.asText();
+    }
 
-    @JsonProperty("Status")
-    private Status status;
+    public List<String> getFoundTerms() {
+        return foundTerms;
+    }
 
-    @JsonProperty("TrackingId")
-    private String trackingId;
+    public String getStatus() {
+        return status.asText();
+    }
 
-    private boolean descriptionContainsProfanity;
-    private boolean tagsContainsProfanity;
+    public String getTrackingId() {
+        return trackingId.asText();
+    }
 
-    public ProfanityResponseData(JsonNode jsonProfanityData) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            ProfanityResponseData responseData = objectMapper.treeToValue(jsonProfanityData, ProfanityResponseData.class);
-            this.originalText = responseData.originalText;
-            this.normalizedText = responseData.normalizedText;
-            this.misrepresentation = responseData.misrepresentation;
-            this.language = responseData.language;
-            this.terms = responseData.terms;
-            this.status = responseData.status;
-            this.trackingId = responseData.trackingId;
-            checkForProfanity();
-        } catch (Exception profanityServiceReturnError) {
-            profanityServiceReturnError.printStackTrace();
+    public boolean isHasProfanity() {
+        return hasProfanity;
+    }
+    /**
+     * Sets the list of found terms from the JSON data.
+     */
+    void setFoundTerms() {
+        foundTerms = new ArrayList<>();
+        if (terms.isArray()) {
+            for (JsonNode term : terms) {
+                foundTerms.add(term.get("Term").asText());
+            }
         }
     }
-    private void checkForProfanity() {
-        // TBA
+    /**
+     * Sets the hasProfanity flag based on the presence of terms.
+     */
+    void setHasProfanity() {
+        this.hasProfanity = (terms != null && !terms.isEmpty());
     }
 
-    public static class Term {
-        @JsonProperty("Index")
-        private int index;
-
-        @JsonProperty("OriginalIndex")
-        private int originalIndex;
-
-        @JsonProperty("ListId")
-        private int listId;
-
-        @JsonProperty("Term")
-        private String term;
-    }
-
-    public static class Status {
-        @JsonProperty("Code")
-        private int code;
-
-        @JsonProperty("Description")
-        private String description;
-
-        @JsonProperty("Exception")
-        private String exception;
+    /**
+     * Returns a string representation of the processed profanity
+     */
+    public String toString() {
+        return "ProfanityResponseData{" +
+                "originalText='" + getOriginalText() + '\'' +
+                ", normalizedText='" + getNormalizedText() + '\'' +
+                ", misrepresentation='" + getMisrepresentation() + '\'' +
+                ", language='" + getLanguage() + '\'' +
+                ", terms=" + getFoundTerms() +
+                ", status=" + getStatus() +
+                ", trackingId='" + getTrackingId() + '\'' +
+                ", hasProfanity=" + isHasProfanity() +
+                '}';
     }
 }

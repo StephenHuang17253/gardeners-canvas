@@ -3,7 +3,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.component.ProfanityResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +60,7 @@ public class ProfanityService {
      * @return A return string form the api that has been processed. The return format contains: Original text string,
      * NormalizedText string, Misrepresentation boolean, Language string, Terms list, Status object and TrackingID string
      */
-    public String moderateContent(String content) {
+    public ProfanityResponseData moderateContent(String content) {
         try {
             logger.info("Profaintiy service input: "+ content);
             String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
@@ -74,17 +73,17 @@ public class ProfanityService {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            logger.info("Profaintiy service response: : "+ response.body());
 
             JsonNode jsonObject = objectMapper.readTree(response.body());
-            ProfanityResponseData profanityResponse = new ProfanityResponseData(jsonObject);
-            logger.info("weather: " + jsonObject);
+            ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
 
-            logger.info("Profaintiy service response: : "+ response.body());
-            return response.body();
+            return profanityResponse;
+
         } catch (IOException | InterruptedException errorException) {
             Thread.currentThread().interrupt();
             logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
-            return "Automatic Moderation Failure, Moderate Manually";
+            return null; ///RETURN ERROR, FIX LATER
         }
     }
     /**
@@ -93,8 +92,8 @@ public class ProfanityService {
      * @return True if terms has one or more bad words. If not found return false
      */
     public boolean containsProfanity (String inputString) {
-        String returnedString = moderateContent(inputString);
-        String termsIndicator = "\"Terms\":[{";
-        return returnedString.contains(termsIndicator);
+        ProfanityResponseData returnedData = moderateContent(inputString);
+        logger.info(returnedData.toString());
+        return returnedData.isHasProfanity();
     }
 }
