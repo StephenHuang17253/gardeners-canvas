@@ -41,8 +41,16 @@ public class UserInteraction {
         this.interactionTime = interactionTime;
     }
 
+    public Long getUserInteractionId() {
+        return userInteractionId;
+    }
+
     public User getUser() {
         return user;
+    }
+
+    public Long getItemId() {
+        return itemId;
     }
 
     public ItemType getItemType() {
