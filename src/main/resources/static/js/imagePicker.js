@@ -1,4 +1,5 @@
 const MAX_FILE_SIZE = 10; // in MB
+const ERROR_DISPLAY_DURATION = 5000; // in ms
 const imageInputs = document.querySelectorAll("[data-image-input]");
 const errorMessage = `Image must be less than ${MAX_FILE_SIZE}MB`;
 
@@ -39,7 +40,7 @@ const handleFileSelect = (imageInput) => {
         setTimeout(() => {
             imageDisplayElement.classList.remove("border-danger");
             errorDisplayElement.textContent = '';
-        }, 5000)
+        }, ERROR_DISPLAY_DURATION)
         return;
     }
 
