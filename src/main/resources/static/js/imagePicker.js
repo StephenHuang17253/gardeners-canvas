@@ -31,12 +31,13 @@ const handleFileSelect = (imageInput) => {
     const imageDisplayId = imageInput.getAttribute("data-displayed-by");
     const imageDisplayElement = document.getElementById(imageDisplayId);
 
+    // Check if file size is greater than the max file size
     if (fileSizeInMB > MAX_FILE_SIZE) {
         errorDisplayElement.textContent = errorMessage;
         imageDisplayElement.classList.add("border-danger");
         imageInput.value = '';
 
-        // Clear errors after 5 seconds
+        // Clear error message and border after 5 seconds
         setTimeout(() => {
             imageDisplayElement.classList.remove("border-danger");
             errorDisplayElement.textContent = '';
@@ -46,6 +47,7 @@ const handleFileSelect = (imageInput) => {
 
     const submitIfvalid = imageInput.getAttribute("data-submit-if-valid");
 
+    // If the input has the attribute data-submit-if-valid, submit the form
     if (submitIfvalid !== null) {
         imageInput.closest("form").submit();
         return;
@@ -54,8 +56,8 @@ const handleFileSelect = (imageInput) => {
     imageDisplayElement.classList.remove("border-danger");
     errorDisplayElement.textContent = '';
 
+    // Set the image as the preview image
     const reader = new FileReader();
-
     reader.onload = (e) => {
         imageDisplayElement.src = e.target.result;
     };
