@@ -42,7 +42,7 @@ public class UserTest {
     public void banUser_WaitHalfDuration_IsBanned() throws InterruptedException {
         Duration banDuration = Duration.ofSeconds(banDurationSec);
         user.ban(banDuration);
-        Thread.sleep((int) 0.5 * banDurationSec * 1000 );
+        Thread.sleep((int) 0.5 * banDurationSec * 1000);
         assertTrue(user.isBanned());
     }
 
