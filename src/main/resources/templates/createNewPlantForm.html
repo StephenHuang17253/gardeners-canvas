@@ -34,7 +34,7 @@
                                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                                     data-image-input data-displayed-by="imageToChange"
                                     data-errored-by="plantPictureError" class="visually-hidden">
-                            </label>
+                            </div>
                         </div>
                         <p id="plantPictureError" class="text-danger fs-6" th:text="${plantPictureError}"></p>
                     </div>
@@ -79,7 +79,6 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
     <script th:src="@{/js/descriptionCounter.js}"></script>

@@ -15,7 +15,6 @@
         <div class="col-6">
             <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data"
                   class="border rounded-3 p-3">
-
                 <div class="w-100 d-flex flex-row justify-content-center mb-3">
                     <div class="position-relative w-75">
                         <div class="ratio ratio-1x1"
@@ -26,72 +25,74 @@
                         </div>
                         <div
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
+                            <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
                                 <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
-                                <input th:name="profilePictureInput" type="file" class="visually-hidden"
-                                    accept="image/*" data-image-input data-displayed-by="imageToChange"
-                                    data-errored-by="profilePictureError">
-                            </label>
+                            </div>
+                            <input th:name="profilePictureInput" type="file" class="visually-hidden"
+                                   accept="image/*" data-image-input data-displayed-by="imageToChange"
+                                   data-errored-by="profilePictureError">
                         </div>
-
-                        <p id="profilePictureError" class="text-danger fs-6" th:text="${profilePictureError}"></p>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="firstName" class="form-label">First Name *</label>
-                        <input id="firstName" type="text" class="form-control" th:name="firstName"
-                            th:value="*{firstName}" autofocus
-                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
-                        <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
-                    </div>
+                    <p id="profilePictureError" class="text-danger fs-6" th:text="${profilePictureError}"></p>
+                </div>
 
-                    <div class="mb-3" id="lastNameDiv">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
-                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
-                        <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
-                    </div>
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name *</label>
+                    <input id="firstName" type="text" class="form-control" th:name="firstName"
+                           th:value="*{firstName}" autofocus
+                           th:classappend="${firstNameError == null ? '' : 'border-danger'}">
+                    <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                </div>
 
-                    <div class="form-check mb-3">
-                        <input id="lastNameCheck" class="form-check-input" type="checkbox" th:name="noLastName"
-                            th:checked="${noLastName}" onchange="hideLastName(event.target.checked)">
-                        <label for="lastNameCheck" class="form-check-label">
-                            I have no Surname
-                        </label>
-                    </div>
+                <div class="mb-3" id="lastNameDiv">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
+                           th:classappend="${lastNameError == null ? '' : 'border-danger'}">
+                    <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                </div>
 
-                    <div class="mb-3">
-                        <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                        <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
-                            th:value="*{dateOfBirth}" max="9999-12-30" th:oninvalid="handleInvalidDate()"
-                            th:oninput="clearDateError()"
-                            th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
-                        <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
-                            th:text="${dateOfBirthError}"></p>
-                        <p id="dateOfBirthJSError" class="text-danger fs-6" style="display: none;"
-                            th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
-                    </div>
+                <div class="form-check mb-3">
+                    <input id="lastNameCheck" class="form-check-input" type="checkbox" th:name="noLastName"
+                           th:checked="${noLastName}" onchange="hideLastName(event.target.checked)">
+                    <label for="lastNameCheck" class="form-check-label">
+                        I have no Surname
+                    </label>
+                </div>
 
-                    <div class="mb-3">
-                        <label for="emailAddress" class="form-label">Email Address *</label>
-                        <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
-                            th:value="*{emailAddress}"
-                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
-                        <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
-                    </div>
+                <div class="mb-3">
+                    <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                    <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
+                           th:value="*{dateOfBirth}" max="9999-12-30" th:oninvalid="handleInvalidDate()"
+                           th:oninput="clearDateError()"
+                           th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
+                    <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
+                       th:text="${dateOfBirthError}"></p>
+                    <p id="dateOfBirthJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
+                </div>
 
-                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success">Submit</button>
-                        <a th:href="@{/profile}">
-                            <button type="button" class="btn btn-secondary">Cancel</button>
-                        </a>
-                        <a th:href="@{/profile/change-password}">
-                            <button type="button" class="btn btn-secondary">Change Password</button>
-                        </a>
-                    </div>
-                </form>
-            </div>
+                <div class="mb-3">
+                    <label for="emailAddress" class="form-label">Email Address *</label>
+                    <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
+                           th:value="*{emailAddress}"
+                           th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
+                    <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                </div>
+
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <a th:href="@{/profile}">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                    </a>
+                    <a th:href="@{/profile/change-password}">
+                        <button type="button" class="btn btn-secondary">Change Password</button>
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
