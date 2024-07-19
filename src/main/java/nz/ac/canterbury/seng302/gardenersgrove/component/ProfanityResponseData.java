@@ -96,16 +96,16 @@ public class ProfanityResponseData {
     /**
      * Returns a string representation of the processed profanity
      */
+    @Override
     public String toString() {
-        return "ProfanityResponseData{" +
-                "originalText='" + getOriginalText() + '\'' +
-                ", normalizedText='" + getNormalizedText() + '\'' +
-                ", misrepresentation='" + getMisrepresentation() + '\'' +
-                ", language='" + getLanguage() + '\'' +
-                ", terms=" + getFoundTerms() + '\'' +
-                ", status=" + getStatus() +  '\'' +
-                ", trackingId='" + getTrackingId() + '\'' +
-                ", hasProfanity=" + isHasProfanity() +
-                '}';
+        return "{" +
+                "\"OriginalText\":\"" + getOriginalText() + "\"," +
+                "\"NormalizedText\":\"" + getNormalizedText() + "\"," +
+                "\"Misrepresentation\":" + getMisrepresentation() + "," +
+                "\"Language\":\"" + getLanguage() + "\"," +
+                "\"Terms\":" + terms.toString() + "," +
+                "\"Status\":" + status.toString() + "," +
+                "\"TrackingId\":\"" + getTrackingId() + "\"" +
+                "}";
     }
 }
