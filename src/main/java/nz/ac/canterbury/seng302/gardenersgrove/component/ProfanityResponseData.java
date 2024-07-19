@@ -17,6 +17,8 @@ public class ProfanityResponseData {
     JsonNode trackingId;
     boolean hasProfanity;
     List<String> foundTerms;
+    String statusCode;
+    String statusDescription;
 
     @JsonCreator
     public ProfanityResponseData(JsonNode jsonProfanityData){
@@ -30,6 +32,7 @@ public class ProfanityResponseData {
 
         setFoundTerms();
         setHasProfanity();
+        setStatus();
     }
     public String getOriginalText() {
         return originalText.asText();
@@ -52,7 +55,7 @@ public class ProfanityResponseData {
     }
 
     public String getStatus() {
-        return status.asText();
+        return "Code: " + statusCode + ", Description: " + statusDescription;
     }
 
     public String getTrackingId() {
@@ -73,6 +76,16 @@ public class ProfanityResponseData {
             }
         }
     }
+    void setStatus() {
+        if (status != null && status.isObject()) {
+            statusCode = status.get("Code").asText();
+            statusDescription = status.get("Description").asText();
+        } else {
+            statusCode = "Unknown";
+            statusDescription = "Unknown";
+        }
+    }
+
     /**
      * Sets the hasProfanity flag based on the presence of terms.
      */
@@ -89,8 +102,8 @@ public class ProfanityResponseData {
                 ", normalizedText='" + getNormalizedText() + '\'' +
                 ", misrepresentation='" + getMisrepresentation() + '\'' +
                 ", language='" + getLanguage() + '\'' +
-                ", terms=" + getFoundTerms() +
-                ", status=" + getStatus() +
+                ", terms=" + getFoundTerms() + '\'' +
+                ", status=" + getStatus() +  '\'' +
                 ", trackingId='" + getTrackingId() + '\'' +
                 ", hasProfanity=" + isHasProfanity() +
                 '}';
