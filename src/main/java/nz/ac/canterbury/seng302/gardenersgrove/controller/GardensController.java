@@ -431,13 +431,13 @@ public class GardensController {
             return "403";
         }
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> gardens = friend.getGardens();
+        List<Garden> friendGardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", gardens);
+        model.addAttribute("friendGardens", friendGardens);
 
-        long publicGardensCount = gardens.stream().filter(Garden::getIsPublic).count();
+        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).collect(Collectors.toList());
 
-        gardens = gardens.stream().filter(garden -> garden.getIsPublic()).collect(Collectors.toList());
+        int publicGardensCount = gardens.size();
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
