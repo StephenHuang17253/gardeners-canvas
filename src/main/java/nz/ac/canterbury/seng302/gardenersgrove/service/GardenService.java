@@ -133,6 +133,26 @@ public class GardenService {
     }
 
     /**
+     * #TODO: Write updateGardenCoordinates javadoc
+     */
+    public Garden updateGardenCoordinates(Long id, String latitude, String longitude) {
+        Optional<Garden> optionalGarden = getGardenById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setGardenLatitude(latitude);
+            targetGarden.setGardenLatitude(longitude);
+
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+
+
+    /**
      * Adds plant entity to garden entity plant list
      *
      * @param gardenId the id of the garden we wish to add plant to

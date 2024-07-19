@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -98,6 +99,49 @@ public class GardenFormController {
     }
 
     /**
+     * Retrieves location suggestions from the LocationIQ API based on query string
+     * provided by frontend JS.
+     * Also handles rate limiting to prevent exceeding 2 requests per second, to
+     * match our free tier.
+     *
+     * @param query The search query for location autocomplete suggestions.
+     * @return A JSON response string containing location suggestions, or a "429"
+     *         string if rate limit is exceeded.
+     * @throws IOException          If an I/O error occurs while making the
+     *                              requesting
+     * @throws InterruptedException If an interruption occurs while waiting for
+     *                              response
+     */
+    @GetMapping("/api/location/coordinates")
+    @ResponseBody
+    public JsonNode getLatitudeLongitudeValues(@RequestParam("query") String query) throws IOException, InterruptedException {
+        long currentTime = Instant.now().getEpochSecond();
+        long timeElapsed = currentTime - lastRequestTime;
+
+        logger.info("Time elapsed: " + timeElapsed);
+        // Every second, the number of available permits is reset to 2
+        if (timeElapsed >= 1) {
+            semaphore.drainPermits();
+            semaphore.release(MAX_REQUESTS_PER_SECOND);
+            logger.info("A second or more has elapsed, permits reset to: " + semaphore.availablePermits());
+            lastRequestTime = currentTime;
+        }
+
+        logger.info("Permits left before request: " + semaphore.availablePermits());
+
+//        // Check if rate limit exceeded
+//        if (!semaphore.tryAcquire()) {
+//            logger.info("Exceeded location API rate limit of 2 requests per second.");
+//            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
+//        }
+//        logger.info("Permits left after request: " + semaphore.availablePermits());
+
+        return locationService.getLatitudeLongitude(query);
+
+    }
+
+
+    /**
      * Maps the createNewGardenPage html page to /create-new-garden url
      *
      * @return thymeleaf createNewGardenPage
@@ -168,7 +212,7 @@ public class GardenFormController {
             @RequestParam(name = "latitude") String latitude,
             HttpSession session,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) throws IOException, InterruptedException {
 
         logger.info("POST /create-new-garden");
 
@@ -225,6 +269,15 @@ public class GardenFormController {
 
         Garden garden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
                 doubleGardenSize, isPublic, latitude, longitude, owner);
+
+
+
+        JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
+
+        gardenService.updateGardenCoordinates(garden.getGardenId(), coordData.get("lat").toString(), coordData.get("lon").toString());
+
+        logger.info(garden.getGardenLatitude());
+        logger.info(garden.getGardenLongitude());
 
         User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
