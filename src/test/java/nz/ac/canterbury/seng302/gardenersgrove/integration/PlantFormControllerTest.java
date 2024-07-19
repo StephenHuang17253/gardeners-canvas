@@ -6,7 +6,10 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -345,7 +347,7 @@ public class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0", "0.9", "1000001", "1000000.00000000000000000001", "-1"
+            "0", "0.9", "1000001", "1000000.00000000000000000001", "-1", "0.0"
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
@@ -494,11 +496,12 @@ public class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "1", "9999", "1000000"
+            "1", "9999", "1000000", "1.0", "100.0000000000000"
     })
     @WithMockUser(username = "test@gmail.com")
-    public void plantFormController_editCountVariantsPass(int plantCount) throws Exception {
-
+    public void plantFormController_editCountVariantsPass(String plantCountStr) throws Exception {
+        double dblPlantCount = Double.parseDouble(plantCountStr);
+        int plantCount = (int) dblPlantCount; //parse string input from double to int, allows float inputs
         Plant expectedPlant = plantList.get(1);
 
         String gardenId = "1";
