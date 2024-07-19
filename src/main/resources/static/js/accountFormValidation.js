@@ -108,9 +108,9 @@ const handleDateUpdate = (event) => {
     let validAge = false;
 
     if (age > 120 || (age === 120 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
-        dateOfBirthJSError.textContent = "Age cannot be more than 120 years";
+        dateOfBirthJSError.textContent = "The maximum age allowed is 120 years";
     } else if (age < 13 || (age === 13 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
-        dateOfBirthJSError.textContent = "You must be at least 13 years old";
+        dateOfBirthJSError.textContent = "You must be 13 years or older to create an account";
     } else {
         validAge = true;
     }
