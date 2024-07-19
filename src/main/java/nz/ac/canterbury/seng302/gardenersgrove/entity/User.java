@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,9 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<Garden> gardens =  new ArrayList<>();
 
+    @Column
+    private LocalDateTime lastBanDate;
+
     /**
      * JPA required no-args constructor
      */
@@ -67,6 +71,7 @@ public class User {
         this.emailAddress = emailAddress;
         this.dateOfBirth = dateOfBirth;
         this.verified = false;
+        this.lastBanDate = null;
     }
 
     public void setFirstName(String firstName) {
@@ -100,6 +105,8 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void setLa
 
 
     public Long getId() {
