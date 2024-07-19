@@ -71,6 +71,8 @@
                     <input id="password" type="password" class="form-control" th:name="password"
                            th:value="*{password}" th:classappend="${passwordError == null ? '' : 'border-danger'}">
                     <p th:if="${passwordError}" class="text-danger fs-6" th:text="${passwordError}"></p>
+                    <p id="passwordJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'"></p>
                 </div>
 
                 <div class="mb-3">
@@ -80,6 +82,8 @@
                            th:classappend="${passwordMatchingError == null ? '' : 'border-danger'}">
                     <p th:if="${passwordMatchingError}" class="text-danger fs-6" th:text="${passwordMatchingError}">
                     </p>
+                    <p id="repeatPasswordJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Passwords do not match'"></p>
                 </div>
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-3">

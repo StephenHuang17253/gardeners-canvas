@@ -11,6 +11,11 @@ let emailJSError = document.getElementById("emailJSError");
 const dateOfBirth = document.getElementById("dateOfBirth");
 let dateOfBirthJSError = document.getElementById("dateOfBirthJSError");
 
+const password = document.getElementById("password");
+const repeatPassword = document.getElementById("repeatPassword");
+let passwordJSError = document.getElementById("passwordJSError");
+let repeatPasswordJSError = document.getElementById("repeatPasswordJSError");
+
 const signUpButton = document.querySelector('button[type="submit"]');
 
 /**
@@ -40,7 +45,7 @@ const clearNameError = (inputField, errorField) => {
 
 /**
  * Handles updates (char input) to the input field for names (first name or last name).
- * @param {Event} event - The input event.
+ * @param {{target: HTMLElement}} event - The input event.
  * @param {HTMLElement} errorField - The error message element.
  * @returns {void}
  */
@@ -56,6 +61,58 @@ const handleNameUpdate = (event, errorField) => {
         handleInvalidName(event.target, errorField);
     } else {
         clearNameError(event.target, errorField);
+    }
+}
+
+/**
+ * Handles the case where the user's input for the date field is invalid.
+ * Sets the border of the input to red, and makes the error message visible.
+ * @returns {void}
+ */
+const handleInvalidDate = () => {
+    dateOfBirth.setCustomValidity(" ");
+    dateOfBirth.classList.add("border-danger");
+    dateOfBirthJSError.style.display = "block";
+}
+
+/**
+ * Clears the error message and removes the red border from the input field.
+ * @param {HTMLElement} inputField - The input field element.
+ * @param {HTMLElement} errorField - The error message element.
+ * @returns {void}
+ */
+const clearDateError = () => {
+    dateOfBirth.setCustomValidity("");
+    dateOfBirthJSError.style.display = "none";
+    dateOfBirth.classList.remove("border-danger");
+}
+
+/**
+ * Handles updates to the input field for date of birth.
+ * @param {{target: HTMLElement}} event - The input event.
+ * @returns {void}
+ */
+const handleDateUpdate = (event) => {
+    const dateValue = new Date(event.target.value);
+    const today = new Date();
+    const age = today.getFullYear() - dateValue.getFullYear();
+    const monthDiff = today.getMonth() - dateValue.getMonth();
+    const dayDiff = today.getDate() - dateValue.getDate();
+
+    let validAge = false;
+
+    if (age > 120 || (age === 120 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
+        dateOfBirthJSError.textContent = "Age cannot be more than 120 years";
+    } else if (age < 13 || (age === 13 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
+        dateOfBirthJSError.textContent = "You must be at least 13 years old";
+    } else {
+        validAge = true;
+    }
+
+    if (!dateOfBirth.checkValidity() || !validAge) {
+        handleInvalidDate();
+    } else {
+        clearDateError();
     }
 }
 
@@ -84,7 +141,7 @@ const clearEmailError = () => {
 
 /**
  * Handles updates (char input) to the input field for the user's email.
- * @param {Event} event - The input event.
+ * @param {{target: HTMLElement}} event - The input event.
  * @returns {void}
  */
 const handleEmailUpdate = (event) => {
@@ -107,55 +164,65 @@ const handleEmailUpdate = (event) => {
 }
 
 /**
- * Handles the case where the user's input for the date field is invalid.
+ * Handles the case where the user's input for the password field is invalid.
  * Sets the border of the input to red, and makes the error message visible.
  * @returns {void}
  */
-const handleInvalidDate = () => {
-    dateOfBirth.setCustomValidity(" ");
-    dateOfBirth.classList.add("border-danger");
-    dateOfBirthJSError.style.display = "block";
+const handleInvalidPassword = () => {
+    password.setCustomValidity(" ");
+    password.classList.add("border-danger");
+    passwordJSError.style.display = "block";
+    passwordJSError.textContent = "Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.";
 }
 
 /**
  * Clears the error message and removes the red border from the input field.
- * @param {HTMLElement} inputField - The input field element.
- * @param {HTMLElement} errorField - The error message element.
  * @returns {void}
  */
-const clearDateError = () => {
-    dateOfBirth.setCustomValidity("");
-    dateOfBirthJSError.style.display = "none";
-    dateOfBirth.classList.remove("border-danger");
-    document.getElementById("dateOfBirthError").textContent = "";
+const clearPasswordError = () => {
+    password.setCustomValidity("");
+    password.classList.remove("border-danger");
+    passwordJSError.style.display = "none";
 }
 
 /**
- * Handles updates to the input field for date of birth.
- * @param {Event} event - The input event.
+ * Handles updates (char input) to the input field for the user's password.
+ * @param {{target: HTMLElement}} event - The input event.
  * @returns {void}
  */
-const handleDateUpdate = (event) => {
-    const dateValue = new Date(event.target.value);
-    const today = new Date();
-    const age = today.getFullYear() - dateValue.getFullYear();
-    const monthDiff = today.getMonth() - dateValue.getMonth();
-    const dayDiff = today.getDate() - dateValue.getDate();
+const handlePasswordInput = (event) => {
+    console.log("handlePasswordInput was called")
+    let passwordValue = event.target.value;
+    console.log(passwordValue)
+    const validPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
-    let validAge = false;
-
-    if (age > 120 || (age === 120 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
-        dateOfBirthJSError.textContent = "Age cannot be more than 120 years";
-    } else if (age < 13 || (age === 13 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
-        dateOfBirthJSError.textContent = "You must be at least 13 years old";
+    if (passwordValue === "") {
+        handleInvalidPassword();
+    } else if (!validPasswordRegex.test(passwordValue)) {
+        handleInvalidPassword();
     } else {
-        validAge = true;
+        clearPasswordError();
     }
+}
 
-    if (!dateOfBirth.checkValidity() || !validAge) {
-        handleInvalidDate();
+/**
+ * Handles updates (char input) to the input field for the user's repeated password.
+ * @param {{target: HTMLElement}} event - The input event.
+ * @returns {void}
+ */
+const handleRepeatPasswordInput = (event) => {
+    const repeatPasswordValue = event.target.value;
+    const passwordValue = password.value;
+
+    if (repeatPasswordValue !== passwordValue) {
+        repeatPassword.setCustomValidity(" ");
+        repeatPassword.classList.add("border-danger");
+        repeatPasswordJSError.style.display = "block";
+        repeatPasswordJSError.textContent = "Passwords do not match";
     } else {
-        clearDateError();
+        repeatPassword.setCustomValidity("");
+        repeatPassword.classList.remove("border-danger");
+        repeatPasswordJSError.style.display = "none";
     }
 }
 
@@ -168,19 +235,30 @@ const handleDateUpdate = (event) => {
 const handleFormSubmit = (event) => {
     handleNameUpdate({ target: firstName }, firstNameJSError);
     handleNameUpdate({ target: lastName }, lastNameJSError);
-    handleEmailUpdate({ target: email });
     handleDateUpdate({ target: dateOfBirth });
+    handleEmailUpdate({ target: email });
+    handlePasswordInput({ target: password });
+    handleRepeatPasswordInput({ target: repeatPassword })
 
     // Prevent form submission if there are any validation errors
-    if (!firstName.checkValidity() || !lastName.checkValidity() || !email.checkValidity() || !dateOfBirth.checkValidity()) {
+    if (!firstName.checkValidity() || !lastName.checkValidity() || !email.checkValidity()
+        || !dateOfBirth.checkValidity() || !password.checkValidity() || !repeatPassword.checkValidity()) {
         event.preventDefault();
     }
 }
 
-// Event Listeners
-firstName.addEventListener("input", (event) => handleNameUpdate(event, firstNameJSError));
-lastName.addEventListener("input", (event) => handleNameUpdate(event, lastNameJSError));
-email.addEventListener("input", handleEmailUpdate);
-dateOfBirth.addEventListener("input", handleDateUpdate);
-
 signUpButton.addEventListener('click', handleFormSubmit);
+
+/**
+ * The event listeners below are currently commented out.
+ * However, I am considering getting PO approval to change the ACs to allow error messages to appear
+ * before the user submits the form.
+ * I think the form will feel more responsive if the user gets feedback as they type.
+ * Will discuss at next Scrum, or on Mattermost.
+ */
+// Event Listeners .
+// firstName.addEventListener("input", (event) => handleNameUpdate(event, firstNameJSError));
+// lastName.addEventListener("input", (event) => handleNameUpdate(event, lastNameJSError));
+// email.addEventListener("input", handleEmailUpdate);
+// dateOfBirth.addEventListener("input", handleDateUpdate);
+
