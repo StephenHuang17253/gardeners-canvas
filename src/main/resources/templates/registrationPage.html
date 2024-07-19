@@ -5,14 +5,14 @@
 
 <body>
 <div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
-<div class="container-md my-5">
-
-    <div class="text-center">
-        <h1>Registration</h1>
-    </div>
-
-    <div class="row justify-content-center my-5">
-        <div class="col-5 col-md-10 col-lg-4">
+<div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+     th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+<div class="container-md my-5 bg-white rounded py-5 w-50">
+    <div class="row justify-content-center">
+        <div class="text-center py-5">
+            <h1>Registration</h1>
+        </div>
+        <div class="col-6">
             <form th:action="@{/register}" method="post" class="border rounded-3 p-3">
 
                 <div class="mb-3">
@@ -21,6 +21,8 @@
                            th:value="*{firstName}" autofocus
                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
                     <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                    <p id="firstNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'First name must be less than or equal to 64 characters'"></p>
                 </div>
 
                 <div class="mb-3" id="lastNameDiv">
@@ -28,6 +30,8 @@
                     <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
                     <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                    <p id="lastNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Last name must be less than or equal to 64 characters'"></p>
                 </div>
 
                 <div class="form-check mb-3">
