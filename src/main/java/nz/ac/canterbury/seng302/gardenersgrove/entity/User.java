@@ -18,6 +18,8 @@ import java.util.List;
 @Table(name = "user_table")
 public class User {
 
+    private static final int STRIKES_TO_BAN = 6;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -118,8 +120,8 @@ public class User {
         this.banDuration = banDuration;
     }
 
-    public void addStrikes(int strikes) {
-        this.strikes += strikes;
+    public void incrementStrikes() {
+        strikes++;
     }
 
     public void resetStrikes() {

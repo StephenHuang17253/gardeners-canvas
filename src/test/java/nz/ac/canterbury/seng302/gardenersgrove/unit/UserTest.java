@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,4 +54,16 @@ public class UserTest {
         Thread.sleep(banDurationSec * 1000);
         assertFalse(user.isBanned());
     }
+
+    @Test
+    public void incrementStrikes_ThenReset_IsCorrectStrikes() {
+        user.incrementStrikes();
+        assertEquals(user.getStrikes(), 1);
+        user.resetStrikes();
+        assertEquals(user.getStrikes(), 0);
+        user.incrementStrikes();
+        assertEquals(user.getStrikes(), 1);
+    }
+
+
 }
