@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -83,6 +84,15 @@ public class GardensController {
     }
 
     /**
+     * Adds the loggedIn attribute to the model for all requests
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+    /**
      * Maps the myGardensPage html file to /my-gardens url
      *
      * @param page   page number
@@ -95,7 +105,6 @@ public class GardensController {
             Model model) {
         logger.info("GET /my-gardens");
 
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
 
@@ -172,8 +181,6 @@ public class GardensController {
             HttpServletResponse response,
             Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -263,8 +270,6 @@ public class GardensController {
             HttpServletResponse response,
             Model model) {
         logger.info("POST /my-gardens/{}/public", gardenId);
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -364,8 +369,6 @@ public class GardensController {
             int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
             User user = securityService.getCurrentUser();
 
-            model.addAttribute("loggedIn", securityService.isLoggedIn());
-
             model.addAttribute("myGardens", gardenService.getGardens());
             model.addAttribute("plantToEditId", Long.valueOf(plantId));
 
@@ -416,8 +419,6 @@ public class GardensController {
             @RequestParam(defaultValue = "All") String filter,
             HttpServletResponse response) {
         logger.info("GET {}/gardens", userId);
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         User friend;
         try {
