@@ -33,7 +33,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -45,7 +44,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 
 @SpringBootTest
 public class U9_ViewGarden {
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -70,8 +69,6 @@ public class U9_ViewGarden {
 
     private static PlantService plantService;
 
-    private static FileService fileService;
-
     private static FriendshipService friendshipService;
 
     @Mock
@@ -89,13 +86,13 @@ public class U9_ViewGarden {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService,fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        mockMVC = MockMvcBuilders.standaloneSetup(gardensController).build();
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +
                 "  \"latitude\": -43.5,\n" +
@@ -159,7 +156,7 @@ public class U9_ViewGarden {
         User user = userService.getUserByEmail(userEmail);
 
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 get("/my-gardens/{gardenId}", gardenId)).andExpect(MockMvcResultMatchers.status().isOk());
 
     }
@@ -168,7 +165,7 @@ public class U9_ViewGarden {
     @When("I try to visit user {string}'s garden, {string}")
     public void iTryToVisitGarden(String userEmail, String gardenName) throws Exception {
         User user = userService.getUserByEmail(userEmail);
-        resultActions = MOCK_MVC.perform(
+        resultActions = mockMVC.perform(
                 get("/my-gardens/{gardenId}", user.getGardens().get(0).getGardenId()));
     }
 
@@ -183,8 +180,7 @@ public class U9_ViewGarden {
     }
 
     @And("The garden's name {string} and location {string}, {string} are visible")
-    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry)
-            throws Exception {
+    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), gardenName);
         Assertions.assertEquals(modelMap.getAttribute("gardenLocation"), gardenCity + ", " + gardenCountry);

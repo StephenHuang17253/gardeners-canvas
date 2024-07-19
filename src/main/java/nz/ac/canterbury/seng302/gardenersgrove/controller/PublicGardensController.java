@@ -196,7 +196,7 @@ public class PublicGardensController {
 
         if (!garden.getIsPublic()) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message", "This isn’t your patch of soil. No peeking at the neighbor's garden without an invite!");
+            model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
 
         }

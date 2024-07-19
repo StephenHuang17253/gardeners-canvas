@@ -37,7 +37,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -48,7 +47,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 
 @SpringBootTest
 public class WeatherMonitoring {
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -73,22 +72,15 @@ public class WeatherMonitoring {
 
     private static PlantService plantService;
 
-    private static FileService fileService;
-
     private static FriendshipService friendshipService;
 
     private Map<String, Object> model;
 
     private List<DailyWeather> weather;
 
-    private MvcResult mvcResult;
-
-    private String weatherDescription;
-
     @MockBean
     private WeatherService weatherService;
 
-    private List<DailyWeather> pastWeather;
     private String mockResponse ="{\n" +
             "  \"latitude\": -43.5,\n" +
             "  \"longitude\": 172.625,\n" +
@@ -146,8 +138,8 @@ public class WeatherMonitoring {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
         weatherService = mock(WeatherService.class);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
 
 
@@ -158,14 +150,13 @@ public class WeatherMonitoring {
         User user = userService.getUserByEmail(userEmail);
 
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
-        MvcResult result = MOCK_MVC.perform(
+        MvcResult result = mockMVC.perform(
                 MockMvcRequestBuilders
                         .get("/my-gardens/{gardenId}", gardenId)
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         ModelAndView modelAndView = result.getModelAndView();
 
-        mvcResult = result;
         model = modelAndView.getModel();
         weather = (List<DailyWeather>) model.get("weather");
 
@@ -221,7 +212,7 @@ public class WeatherMonitoring {
 
 
     @Given("The past two days have been sunny in my location")
-    public void thePastTwoDaysHaveBeenSunnyInMyLocation() throws Exception {
+    public void thePastTwoDaysHaveBeenSunnyInMyLocation() {
         WeatherResponseData mockedWeatherData = mock(WeatherResponseData.class);
 
         DailyWeather sunnyWeatherToday = new DailyWeather("sunny.png", LocalDate.now(), "Sunny");
