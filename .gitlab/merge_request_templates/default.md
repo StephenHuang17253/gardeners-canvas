@@ -1,4 +1,4 @@
-Things to review before merge:
+Things to review before merge:\
 The code:
 - [ ] has unit, acceptance and or manual tests (with link to exel document) that cover all new code (inc edge cases)
 - [ ] is readable with sensible variable names (variables and functions in camel case, classes and interfaces in Pascal case, css classes in kebab case)
