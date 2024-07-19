@@ -6,17 +6,17 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.io.IOException;
@@ -40,6 +40,8 @@ public class HomePageController {
 
     private FriendshipService friendshipService;
 
+    private SecurityService securityService;
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -48,12 +50,24 @@ public class HomePageController {
      * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService,
-                              FriendshipService friendshipService) {
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager,
+            GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
+        this.securityService = securityService;
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -63,27 +77,99 @@ public class HomePageController {
      * @throws IOException
      */
     @GetMapping("/")
-    public String home() throws IOException {
+    public String home() {
         logger.info("GET /");
         return "redirect:./home";
     }
 
     /**
-     * Gets the resource url for the profile picture, or the default profile picture
-     * if the user does not have one
-     * 
-     * @param filename string filename
-     * @return string of the profile picture url
+     * Adds a default user and gardens to the database for testing purposes
      */
-    public String getProfilePictureString(String filename) {
+    public void addDefautContent() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
-        String profilePictureString = "/images/default_profile_picture.png";
+        // Add a default user to speed up manual testing.
+        User johnDoe = new User("John",
+                "Doe",
+                "gardenersgrovetest@gmail.com",
+                date);
+        userService.addUser(johnDoe, "Password1!");
+        userService.verifyUser(johnDoe);
 
-        if (filename != null && filename.length() != 0) {
-            profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
-                    "serveFile", filename).build().toUri().toString();
+        for (int i = 1; i < 12; i++) {
+            Garden sampleGarden = new Garden(
+                    "John's Garden " + i,
+                    "Some Description here",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    true,
+                    "-43.5214643",
+                    "172.5796159",
+                    johnDoe);
+            sampleGarden = gardenService.addGarden(sampleGarden);
+
+            for (int k = 0; k < 12; k++) {
+                plantService.addPlant("Test Plant #" + k, 2,
+                        "test", LocalDate.now(), sampleGarden.getGardenId());
+            }
         }
-        return profilePictureString;
+
+        Garden sampleGarden2 = new Garden(
+                "John's Private garden ",
+                "Some Description here",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                15.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                johnDoe);
+
+        gardenService.addGarden(sampleGarden2);
+
+        if (!userService.emailInUse("janedoe@email.com")) {
+
+            // Add a default user to speed up manual testing.
+            User janeDoe = new User("Jane",
+                    "Doe",
+                    "janedoe@email.com",
+                    date);
+            userService.addUser(janeDoe, "Password1!");
+            userService.verifyUser(janeDoe);
+
+            for (int i = 0; i < 1; i++) {
+                Garden sampleGarden = new Garden(
+                        "Jane's Garden " + i,
+                        "Some Description here",
+                        "114 Ilam Road",
+                        "Ilam",
+                        "Christchurch",
+                        "8041",
+                        "New Zealand",
+                        15.0,
+                        true,
+                        "-43.5214643",
+                        "172.5796159",
+                        janeDoe);
+                sampleGarden = gardenService.addGarden(sampleGarden);
+
+                for (int k = 0; k < 1; k++) {
+                    plantService.addPlant("Test Plant " + k, 2,
+                            "test", LocalDate.now(), sampleGarden.getGardenId());
+                }
+
+            }
+            Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
+            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
+        }
     }
 
     /**
@@ -99,126 +185,20 @@ public class HomePageController {
 
         model.addAttribute("myGardens", gardenService.getGardens());
 
-
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            LocalDate date = LocalDate.parse("01/01/2001", formatter);
-
-            // Add a default user to speed up manual testing.
-            User johnDoe = new User("John",
-                    "Doe",
-                    "gardenersgrovetest@gmail.com",
-                    date);
-            userService.addUser(johnDoe, "Password1!");
-            userService.verifyUser(johnDoe);
-
-
-            for (int i = 1; i < 12; i ++) {
-                Garden sampleGarden = new Garden(
-                        "John's Garden " + i,
-                        "Some Description here",
-                        "114 Ilam Road",
-                        "Ilam",
-                        "Christchurch",
-                        "8041",
-                        "New Zealand",
-                        15.0,
-                        true,
-                        "-43.5214643",
-                        "172.5796159",
-                        johnDoe);
-                sampleGarden = gardenService.addGarden(sampleGarden);
-
-                for(int k = 0; k < 12; k++)
-                {
-                    plantService.addPlant("Test Plant #" + k,2,
-                            "test", LocalDate.now(),sampleGarden.getGardenId());
-                }
-            }
-
-            Garden sampleGarden2 = new Garden(
-                    "John's Private garden ",
-                    "Some Description here",
-                    "114 Ilam Road",
-                    "Ilam",
-                    "Christchurch",
-                    "8041",
-                    "New Zealand",
-                    15.0,
-                    false,
-                    "-43.5214643",
-                    "172.5796159",
-                    johnDoe);
-            sampleGarden2 = gardenService.addGarden(sampleGarden2);
-
-            if (!userService.emailInUse("janedoe@email.com")) {
-
-                // Add a default user to speed up manual testing.
-                User janeDoe = new User("Jane",
-                        "Doe",
-                        "janedoe@email.com",
-                        date);
-                userService.addUser(janeDoe, "Password1!");
-                userService.verifyUser(janeDoe);
-
-
-                for (int i = 0; i < 1; i++) {
-                    Garden sampleGarden = new Garden(
-                            "Jane's Garden " + i,
-                            "Some Description here",
-                            "114 Ilam Road",
-                            "Ilam",
-                            "Christchurch",
-                            "8041",
-                            "New Zealand",
-                            15.0,
-                            true,
-                            "-43.5214643",
-                            "172.5796159",
-                            janeDoe);
-                    sampleGarden = gardenService.addGarden(sampleGarden);
-
-                    for(int k = 0; k < 1; k++)
-                    {
-                        plantService.addPlant("Test Plant #" + k,2,
-                                "test", LocalDate.now(),sampleGarden.getGardenId());
-                    }
-
-                }
-                Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
-                friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
-            }
-
+            addDefautContent();
         }
 
-
-        // If no users exist then clear the security context,
-        // useful for testing without persistent storage,
-        // otherwise a user can be logged in without being in the database
-        if (userService.getAllUsers().isEmpty()) {
-            SecurityContextHolder.clearContext();
-        }
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
-
-        String username = "";
-        String profilePicture = "";
+        boolean loggedIn = securityService.isLoggedIn();
 
         if (loggedIn) {
-            User user = userService.getUserByEmail(authentication.getName());
-            if (user != null) {
-                username = user.getFirstName() + " " + user.getLastName();
-                String filename = user.getProfilePictureFilename();
-                profilePicture = filename;
-            }
+            User user = securityService.getCurrentUser();
+            String username = user.getFirstName() + " " + user.getLastName();
+            String profilePicture = user.getProfilePictureFilename();
+            model.addAttribute("profilePicture", profilePicture);
+            model.addAttribute("username", username);
         }
-
-        model.addAttribute("profilePicture", profilePicture);
-
-        model.addAttribute("username", username);
 
         return "homePage";
     }
