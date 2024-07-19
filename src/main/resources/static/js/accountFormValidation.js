@@ -63,7 +63,7 @@ const handleNameUpdate = (event, errorField) => {
         errorField.textContent = firstOrLast + " name must be 64 characters long or less";
         handleInvalidName(event.target, errorField);
     } else if (!validNameRegex.test(nameValue) || nameValue === "") {
-        errorField.textContent = firstOrLast + " name must be 64 characters long or less";
+        errorField.textContent = firstOrLast + " name cannot be empty and must only include letters, spaces, hyphens or apostrophes";
         handleInvalidName(event.target, errorField);
     } else {
         clearNameError(event.target, errorField);
