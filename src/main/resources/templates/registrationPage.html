@@ -21,6 +21,8 @@
                            th:value="*{firstName}" autofocus
                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
                     <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                    <p id="firstNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'First name must be less than or equal to 64 characters'"></p>
                 </div>
 
                 <div class="mb-3" id="lastNameDiv">
@@ -28,6 +30,8 @@
                     <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
                     <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                    <p id="lastNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Last name must be less than or equal to 64 characters'"></p>
                 </div>
 
                 <div class="form-check mb-3">
