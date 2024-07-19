@@ -17,6 +17,8 @@ public class UserInteraction {
     @ManyToOne
     private User user;
 
+    private Long itemId;
+
     private ItemType itemType;
 
     private LocalDateTime interactionTime;
@@ -28,11 +30,13 @@ public class UserInteraction {
      * Creates a new UserInteraction object
      *
      * @param user the user of whom the interaction pertains to
+     * @param itemId the id of the item
      * @param itemType the item type of the interaction
      * @param interactionTime time of interaction
      */
-    public UserInteraction(User user, ItemType itemType, LocalDateTime interactionTime){
+    public UserInteraction(User user, Long itemId, ItemType itemType, LocalDateTime interactionTime){
         this.user = user;
+        this.itemId = itemId;
         this.itemType = itemType;
         this.interactionTime = interactionTime;
     }
@@ -54,6 +58,7 @@ public class UserInteraction {
         return "UserInteraction{" +
                 "id=" + userInteractionId +
                 ", user='" + user.getId() + '\'' +
+                ", itemId='" + itemId + '\'' +
                 ", itemType='" + itemType + '\'' +
                 ", interactionTime='" + interactionTime + '\'' +
                 '}';
