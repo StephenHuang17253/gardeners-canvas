@@ -54,6 +54,9 @@ public class User {
     @Column
     private Duration banDuration;
 
+    @Column
+    private int strikes;
+
     /**
      * JPA required no-args constructor
      */
@@ -115,6 +118,14 @@ public class User {
         this.banDuration = banDuration;
     }
 
+    public void addStrikes(int strikes) {
+        this.strikes += strikes;
+    }
+
+    public void resetStrikes() {
+        strikes = 0;
+    }
+
     public Long getId() {
         return id;
     }
@@ -161,6 +172,10 @@ public class User {
     public void ban(Duration banDuration) {
         lastBanDate = LocalDateTime.now();
         this.banDuration = banDuration;
+    }
+
+    public int getStrikes() {
+        return strikes;
     }
 
     /**
