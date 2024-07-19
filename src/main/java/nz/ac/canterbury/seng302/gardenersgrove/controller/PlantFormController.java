@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -121,11 +122,10 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
-        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
+        ValidationResult plantCountResult;
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
@@ -153,6 +153,15 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
+        int integerPlantCount = 0;
+        if (Objects.equals(plantCount, "")) {
+            plantCountResult = ValidationResult.OK;
+        } else {
+            int value = (int) Double.parseDouble(plantCount);
+            integerPlantCount = Integer.parseInt(String.valueOf(value));
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
+
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
 
         model.addAttribute("plantName", plantName);
@@ -169,11 +178,10 @@ public class PlantFormController {
         model.addAttribute("plantPicture", plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
         Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
@@ -270,12 +278,11 @@ public class PlantFormController {
         }
 
 
-        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
+        ValidationResult plantCountResult;
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
         if (plantDate == null) {
@@ -285,6 +292,14 @@ public class PlantFormController {
             plantDateResult = InputValidator.validatePlantDate(dateString);
         }
 
+        int integerPlantCount = 0;
+        if (Objects.equals(plantCount, "")) {
+            plantCountResult = ValidationResult.OK;
+        } else {
+            int value = (int) Double.parseDouble(plantCount);
+            integerPlantCount = Integer.parseInt(String.valueOf(value));
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -307,7 +322,7 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
+
         plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
