@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('profile')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('profile')}" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md my-5">
 
         <div class="text-center">
@@ -12,13 +12,14 @@
         </div>
 
         <div class="row justify-content-center my-5">
-            <div class="col-md-5 p-3">
+            <div class="col-5 col-md-10 col-lg-4">
                 <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data"
                     class="border rounded-3 p-3">
 
                     <div class="w-100 d-flex flex-row justify-content-center mb-3">
                         <div class="position-relative w-75">
-                            <div class="ratio ratio-1x1">
+                            <div class="ratio ratio-1x1"
+                                th:classappend="${profilePictureError == null ? '' : 'border-danger'}">
                                 <img id="imageToChange"
                                     th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                                     alt="User's Profile Picture" class="image-fluid rounded-circle border">
@@ -27,23 +28,26 @@
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
                                 <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
                                 <input th:name="profilePictureInput" type="file" class="visually-hidden"
-                                    accept="image/*" onChange="handleFileSelect(event)">
+                                    accept="image/*" data-image-input data-displayed-by="imageToChange"
+                                    data-errored-by="profilePictureError">
                             </label>
                         </div>
 
-                        <p th:if="${profilePictureError}" class="text-danger fs-6" th:text="${profilePictureError}"></p>
+                        <p id="profilePictureError" class="text-danger fs-6" th:text="${profilePictureError}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="firstName" class="form-label">First Name *</label>
                         <input id="firstName" type="text" class="form-control" th:name="firstName"
-                            th:value="*{firstName}" autofocus>
+                            th:value="*{firstName}" autofocus
+                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
                         <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
                     </div>
 
                     <div class="mb-3" id="lastNameDiv">
                         <label for="lastName" class="form-label">Last Name</label>
-                        <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}">
+                        <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
+                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
                         <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
                     </div>
 
@@ -58,24 +62,30 @@
                     <div class="mb-3">
                         <label for="dateOfBirth" class="form-label">Date of Birth</label>
                         <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
-                            th:value="*{dateOfBirth}" max="9999-12-30" min="0000-01-01">
-                        <p th:if="${dateOfBirthError}" class="text-danger fs-6" th:text="${dateOfBirthError}"></p>
+                            th:value="*{dateOfBirth}" max="9999-12-30" th:oninvalid="handleInvalidDate()"
+                            th:oninput="clearDateError()"
+                            th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
+                        <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
+                            th:text="${dateOfBirthError}"></p>
+                        <p id="dateOfBirthJSError" class="text-danger fs-6" style="display: none;"
+                            th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="emailAddress" class="form-label">Email Address *</label>
                         <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
-                            th:value="*{emailAddress}">
+                            th:value="*{emailAddress}"
+                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
                         <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-primary text-nowrap" formnovalidate>Submit</button>
+                        <button type="submit" class="btn btn-success">Submit</button>
                         <a th:href="@{/profile}">
-                            <button type="button" class="btn btn-secondary text-nowrap">Cancel</button>
+                            <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>
                         <a th:href="@{/profile/change-password}">
-                            <button type="button" class="btn btn-secondary text-nowrap">Change Password</button>
+                            <button type="button" class="btn btn-secondary">Change Password</button>
                         </a>
                     </div>
                 </form>
@@ -87,6 +97,7 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/noLastName.js}"></script>
+    <script th:src="@{/js/dateInputValid.js}"></script>
 </body>
 
 </html>

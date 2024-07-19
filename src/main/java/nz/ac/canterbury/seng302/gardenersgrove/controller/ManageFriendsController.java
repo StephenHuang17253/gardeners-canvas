@@ -1,16 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +16,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import jakarta.servlet.http.HttpServletRequest;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 /**
  * Controller for the Manage Friends page
@@ -48,9 +53,9 @@ public class ManageFriendsController {
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
-     * @param securityService   service to access security methods
+     * @param securityService service to access security methods
      * @param friendshipService service to access plant repository
-     * @param fileService       service to manage files
+     * @param fileService service to manage files
      */
     @Autowired
     public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
@@ -62,8 +67,8 @@ public class ManageFriendsController {
     }
 
     /**
-     * Helper function to create a list of friend models.
-     * Used for adding to the model of the Manage Friends page.
+     * Helper function to create a list of friend models. Used for adding to the
+     * model of the Manage Friends page.
      *
      * @return friendModels
      */
@@ -74,7 +79,7 @@ public class ManageFriendsController {
         List<User> userTypeFriends = new ArrayList<>();
 
         for (Friendship friendship : friendships) {
-            if(friendship.getStatus().equals(FriendshipStatus.ACCEPTED)){
+            if (friendship.getStatus().equals(FriendshipStatus.ACCEPTED)) {
                 if (friendship.getUser1().getId().equals(currentUser.getId())) {
                     userTypeFriends.add(friendship.getUser2());
                 } else {
@@ -97,8 +102,10 @@ public class ManageFriendsController {
     }
 
     /**
-     * Helper function for creating a list of request (pending or declined) models.
-     * Used for adding friend requests to the model of the Manage Friends page.
+     * Helper function for creating a list of request (pending or declined)
+     * models. Used for adding friend requests to the model of the Manage
+     * Friends page.
+     *
      * @param friendshipStatus pending or declined
      * @return requestFriendModels
      */
@@ -138,19 +145,26 @@ public class ManageFriendsController {
         return requestFriendModels;
     }
 
-
     /**
      * Maps the manageFriendsPage html file to /manage-friends url
      *
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends")
-    public String myFriends(Model model) {
+    public String myFriends(Model model, HttpServletRequest request) {
         logger.info("GET /manage-friends");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
+
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        String activeTab;
+        if (inputFlashMap != null && inputFlashMap.containsKey("activeTab")) {
+            activeTab = (String) inputFlashMap.get("activeTab");
+        } else {
+            activeTab = "friends";
+        }
 
         List<FriendModel> acceptedFriendModels = createFriendModel();
         List<RequestFriendModel> pendingFriendModels = createRequestFriendModel(FriendshipStatus.PENDING);
@@ -158,8 +172,7 @@ public class ManageFriendsController {
         model.addAttribute("userFriends", acceptedFriendModels);
         model.addAttribute("pendingFriends", pendingFriendModels);
         model.addAttribute("declinedFriends", declinedFriendModels);
-        model.addAttribute("SearchErrorText", "");
-
+        model.addAttribute("activeTab", activeTab);
 
         return "manageFriendsPage";
     }
@@ -178,11 +191,11 @@ public class ManageFriendsController {
         //preparing input for validation
         searchInput = searchInput.strip();
         ValidationResult validEmail = InputValidator.validateEmail(searchInput);
-        String[] seperated = searchInput.split(" ");
+        String[] separated = searchInput.split(" ");
 
         //validating input
-        ValidationResult validFName = InputValidator.validateName(seperated[0]);
-        ValidationResult validLName = InputValidator.validateName((seperated.length > 1) ? seperated[1] : "");
+        ValidationResult validFName = InputValidator.validateName(separated[0]);
+        ValidationResult validLName = InputValidator.validateName((separated.length > 1) ? separated[1] : "");
         List<FriendModel> friendModels = new ArrayList<>();
         //getting results
         if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
@@ -210,7 +223,7 @@ public class ManageFriendsController {
             model.addAttribute("searchResults", friendModels);
         }
         if (friendModels.isEmpty()) {
-            model.addAttribute("SearchErrorText", "There is nobody with that name or email in Gardener's Grove");
+            model.addAttribute("searchErrorText", "There is nobody with that name or email in Gardener's Grove");
             model.addAttribute("userSearch", searchInput);
 
         }
@@ -222,9 +235,9 @@ public class ManageFriendsController {
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("isPotentialFriend", true);
         model.addAttribute("userSearch", searchInput);
+        model.addAttribute("activeTab", "search");
         return "manageFriendsPage";
     }
-
 
     /**
      * Creates a new friendship with pending status
@@ -233,51 +246,50 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId,
-                                   @RequestParam("activeTab") String activeTab,
-                                   @RequestParam(value = "searchInput", required = false) String searchInput,
-                                   Model model) {
+            @RequestParam("activeTab") String activeTab,
+            @RequestParam(value = "searchInput", required = false) String searchInput,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends/send-invite");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
-
-        User currentUser = userService.getUserByEmail(Objects.requireNonNull(authentication).getName());
+        User currentUser = securityService.getCurrentUser();
         User potentialFriend = userService.getUserById(friendId);
         try {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
-            model.addAttribute("SearchErrorText", exception.getMessage());
-
+            model.addAttribute("searchErrorText", exception.getMessage());
+            model.addAttribute("loggedIn", securityService.isLoggedIn());
             return "manageFriendsPage";
         }
 
-        model.addAttribute("activeTab", activeTab);
+
+        redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
         if (searchInput != null) {
-            return "redirect:/manage-friends/search?searchInput=" + searchInput + "#" + activeTab;
+            return "redirect:/manage-friends/search?searchInput=" + searchInput;
         }
 
-        return "redirect:/manage-friends#" + activeTab;
+        return "redirect:/manage-friends";
     }
 
     /**
-     * Changes the status of a pending request, based on whether it was accepted or declined
-     * @param friendAccepted    boolean, whether the friend request was accepted or declined
-     * @param pendingFriendId   the id of the user who sent the request
-     * @param activeTab         the tab which the user is on ( #pending for this endpoint )
-     * @return                  thymeleaf manageFriendsPage
+     * Changes the status of a pending request, based on whether it was accepted
+     * or declined
+     *
+     * @param friendAccepted boolean, whether the friend request was accepted or
+     * declined
+     * @param pendingFriendId the id of the user who sent the request
+     * @param activeTab the tab which the user is on ( #pending for this
+     * endpoint )
+     * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends")
     public String managePendingRequest(@RequestParam(name = "friendAccepted", required = true) boolean friendAccepted,
-                                        @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
-                                        @RequestParam("activeTab") String activeTab,
-                                        Model model) {
+            @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
+            @RequestParam("activeTab") String activeTab,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         if (friendAccepted) {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.ACCEPTED);
@@ -285,27 +297,28 @@ public class ManageFriendsController {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.DECLINED);
         }
 
-        model.addAttribute("activeTab", activeTab);
+        redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
-        return "redirect:/manage-friends#" + activeTab;
+        return "redirect:/manage-friends";
     }
 
     /**
-     * This function removes a friendship entity. It is called when the user cancels a pending friend request,
-     * or when they remove a friend from their friends list.
-     * @param friendId          the user they sent the request to, or removed from friends
-     * @param activeTab         the tab which the user is on ( #pending for this endpoint )
-     * @return                  thymeleaf manageFriendsPage
+     * This function removes a friendship entity. It is called when the user
+     * cancels a pending friend request, or when they remove a friend from their
+     * friends list.
+     *
+     * @param friendId the user they sent the request to, or removed from
+     * friends
+     * @param activeTab the tab which the user is on ( #pending for this
+     * endpoint )
+     * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends/remove")
     public String cancelSentRequest(@RequestParam(name = "friendId", required = true) Long friendId,
-                                       @RequestParam("activeTab") String activeTab,
-                                       Model model) {
+            @RequestParam("activeTab") String activeTab,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends/remove");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         User currentUser = securityService.getCurrentUser();
         User friend = userService.getUserById(friendId);
@@ -315,11 +328,9 @@ public class ManageFriendsController {
             friendshipService.deleteFriendship(friendship.getId());
         }
 
-        model.addAttribute("activeTab", activeTab);
+        redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
-        return "redirect:/manage-friends#" + activeTab;
+        return "redirect:/manage-friends";
     }
-
-
 
 }

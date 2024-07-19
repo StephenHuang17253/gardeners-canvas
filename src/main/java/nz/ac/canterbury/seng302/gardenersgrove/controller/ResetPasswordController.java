@@ -58,7 +58,7 @@ public class ResetPasswordController {
     /**
      * Post form for entering email if user has forgotten their password
      * Checks if input values are valid and then sends reset password link to email entered
-     * @param email input email to send reset password link to
+     * @param emailAddress input email to send reset password link to
      * @param model to collect field values and error messages
      * @return lostPasswordPage
      */
@@ -103,7 +103,6 @@ public class ResetPasswordController {
                                 RedirectAttributes redirectAttributes) {
         logger.info("GET /reset-password");
 
-
         Token token = tokenService.getTokenByTokenString(resetToken);
         if (token == null || token.isExpired()) {
             if (token != null) {
@@ -132,7 +131,8 @@ public class ResetPasswordController {
     public String passwordChecker(@PathVariable("token") String resetToken,
                                   @RequestParam("password") String password,
                                   @RequestParam("retypePassword") String retypePassword,
-                                  Model model) {
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
         logger.info("POST /reset-password");
 
         Token token = tokenService.getTokenByTokenString(resetToken);
@@ -172,7 +172,14 @@ public class ResetPasswordController {
             } catch (MessagingException e) {
                 logger.error("Password reset confirmation email not sent");
             }
-
+            if (token == null || token.isExpired()) {
+                if (token != null) {
+                    tokenService.deleteToken(token);
+                }
+                redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+                redirectAttributes.addFlashAttribute("goodMessage", false);
+                return "redirect:/login";
+            }
         }
         return "redirect:/login";
     }

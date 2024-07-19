@@ -4,6 +4,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.cucumber.java.eo.Se;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -60,6 +61,7 @@ public class BrowsePublicGardens {
 
     public static FileService fileService;
 
+
     private String searchValue;
 
     private MvcResult mvcResult;
@@ -76,7 +78,7 @@ public class BrowsePublicGardens {
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
 
-        PublicGardensController publicGardensController = new PublicGardensController(gardenService);
+        PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService);
 
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders

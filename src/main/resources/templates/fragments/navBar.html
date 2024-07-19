@@ -2,8 +2,9 @@
 Fragment that runs the nav bar, to add the navbar to you page:
 insert into the HTML body at the top:
 "
-<div th:replace="fragments/navBar.html :: navBar">
+<div th:replace="~{fragments/navBar.html :: navBar('linkToHighlight')}" th:with="loggedIn=${loggedIn}"></div>
 "
+Where linkToHighlight is the name of the tab that you want to be highlighted in the navbar while on this page
 The page on which this is used must have the header imported from ./header.html which contains the necessary CSS and JS imports.
 Editing content below will change the nav bar on all pages where it is implemented
 -->

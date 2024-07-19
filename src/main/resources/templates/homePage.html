@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body class="overflow-hidden">
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
@@ -15,10 +15,10 @@
             <p>Start your journey today! Or continue it...</p>
             <p class="d-flex flex-row flex-wrap gap-3 mb-3">
                 <a th:href="@{register}">
-                    <button class="btn btn-primary btn-lg">Register</button>
+                    <button class="btn btn-success btn-lg">Register</button>
                 </a>
                 <a th:href="@{login}">
-                    <button class="btn btn-primary btn-lg">Login</button>
+                    <button class="btn btn-success btn-lg">Login</button>
                 </a>
             </p>
         </div>
@@ -35,10 +35,10 @@
                 <p>Want to check yourself out? Or need to leave us...</p>
                 <div class="d-flex flex-row flex-wrap gap-3 mb-3">
                     <a th:href="@{profile}">
-                        <button class="btn btn-primary btn-lg">Profile</button>
+                        <button class="btn btn-success btn-lg">Profile</button>
                     </a>
                     <form id="logoutForm" th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-primary btn-lg"
+                        <button type="submit" class="btn btn-success btn-lg"
                             onclick="document.getElementById('logoutForm').submit()">
                             Logout
                         </button>

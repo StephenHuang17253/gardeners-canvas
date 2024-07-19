@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-5 pb-5" style="width: 60%;">
         <div class="d-flex justify-content-center align-items-center ratio ratio-1x1 mx-auto mt-5 mb-5" style="width: 15%">
@@ -57,8 +57,8 @@
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
                 <div class="col" th:each="garden : ${myGardens}">
-                    <div th:replace="~{fragments/gardenBox.html ::
-                                gardenBox(gardenId=${garden.gardenId},
+                    <div th:replace="~{fragments/myGardensCard.html ::
+                                myGardensCard(gardenId=${garden.gardenId},
                                 gardenName=${garden.gardenName},
                                 gardenLocation=${garden.gardenLocation},
                                 gardenSize=${garden.gardenSize},

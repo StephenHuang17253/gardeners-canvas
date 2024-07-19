@@ -1,21 +1,16 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
-import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,15 +23,27 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 
 
 @SpringBootTest
@@ -166,24 +173,24 @@ public class WeatherMonitoring {
 
     @Then("Current weather for my location is shown")
     public void currentWeatherForMyLocationIsShown(){
-        Assertions.assertNotNull(weather.get(0));
-        Assertions.assertEquals("9.6", weather.get(0).getTemp());
-        Assertions.assertEquals("92", weather.get(0).getHumidity());
-        Assertions.assertEquals("0.0", weather.get(0).getPrecipitation());
-        Assertions.assertNull( weather.get(0).getWeatherError());
+        Assertions.assertNotNull(weather.get(2));
+        Assertions.assertEquals("10", weather.get(2).getTemp());
+        Assertions.assertEquals("92", weather.get(2).getHumidity());
+        Assertions.assertEquals("0.0", weather.get(2).getPrecipitation());
+        Assertions.assertNull( weather.get(2).getWeatherError());
         System.out.println(model);
     }
 
     @Then("Future weather for my location is shown")
     public void futureWeatherForMyLocationIsShown() {
         Assertions.assertNotNull(weather);
-        Assertions.assertEquals(6, weather.size());
-        Assertions.assertNull(weather.get(1).getTemp());
-        Assertions.assertNull(weather.get(1).getHumidity());
-        Assertions.assertEquals("1.4", weather.get(1).getPrecipitation());
-        Assertions.assertEquals("11.1", weather.get(1).getMaxTemp());
-        Assertions.assertEquals("7.8", weather.get(1).getMinTemp());
-        Assertions.assertNull(weather.get(0).getWeatherError());
+        Assertions.assertEquals(8, weather.size());
+        Assertions.assertNull(weather.get(3).getTemp());
+        Assertions.assertNull(weather.get(3).getHumidity());
+        Assertions.assertEquals("1.4", weather.get(3).getPrecipitation());
+        Assertions.assertEquals("11", weather.get(3).getMaxTemp());
+        Assertions.assertEquals("8", weather.get(3).getMinTemp());
+        Assertions.assertNull( weather.get(0).getWeatherError());
         System.out.println(model);
 
     }
@@ -200,6 +207,7 @@ public class WeatherMonitoring {
     public void myGardenIsNotSetToALocationThatTheLocationServiceCanNotFind() {
         WeatherResponseData mockResponseData = mock(WeatherResponseData.class);
         Mockito.when(mockResponseData.getCurrentWeather()).thenThrow(new NullPointerException("No such location"));
+        Mockito.when(mockResponseData.getPastWeather()).thenThrow(new NullPointerException("No such location"));
         Mockito.when(mockResponseData.getForecastWeather()).thenThrow(new NullPointerException("No such location"));
         Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
     }

@@ -1,103 +1,92 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-    <title>Edit Plant</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
-    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
-    <link th:href="@{/css/plantPicturePicker.css}" rel="stylesheet">
-    <script th:src="@{/js/imagePicker.js}"></script>
+<head th:replace="~{fragments/header.html}"></head>
 
-</head>
+<body>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 
-<body class="bg-success">
-    <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
-    <div class="form-outline row justify-content-center my-5">
-        <div class="col-md-3 p-3 ">
+    <div class="container-md my-5">
 
-        <form th:action="@{edit}" method="post" enctype="multipart/form-data" class="bg-white border rounded-3 p-3">
+        <div class="text-center">
+            <h1>Edit Plant</h1>
+        </div>
 
-            <div class="text-center">
-                <h1>Edit Plant</h1>
+        <div class="row justify-content-center my-5">
+            <div class="col-5 col-md-10 col-lg-4 p-3">
+
+                <form th:action="@{edit}" method="post" enctype="multipart/form-data"
+                    class="border rounded-3 p-3 bg-white">
+
+                    <div class="w-100 d-flex flex-column align-items-center mb-3">
+
+                        <div class="position-relative w-75">
+
+                            <div class="ratio ratio-1x1">
+                                <img id="imageToChange"
+                                    th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                                    alt="Plant image" class="image-fluid rounded-circle border">
+                            </div>
+
+                            <label
+                                class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
+                                <div class="position-absolute top-0 end-0 w-50 h-50">
+                                    <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                </div>
+                                <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
+                                    data-image-input data-displayed-by="imageToChange"
+                                    data-errored-by="plantPictureError" class="visually-hidden">
+                            </label>
+                        </div>
+                        <p id="plantPictureError" class="text-danger fs-6" th:text="${plantPictureError}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="plantName" class="form-label">Plant Name *</label>
+                        <input id="plantName" type="text" class="form-control" th:name="plantName"
+                            th:value="*{plantName}" autofocus>
+                        <p th:if="${PNErrorText}" class="text-danger fs-6" th:text="${PNErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="plantCount" class="form-label">Plant Count</label>
+                        <input id="plantCount" type="number" min="0" step="1" class="form-control" th:name="plantCount"
+                            th:value="*{plantCount}">
+                        <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="plantDescription" class="form-label">Plant Description</label>
+                        <textarea id="plantDescription" class="form-control" th:name="plantDescription"
+                            th:text="*{plantDescription}" data-description="true"
+                            data-counter-id="plantDescriptionCounter"></textarea>
+                        <p id="plantDescriptionCounter" class="fs-6">
+                        </p>
+                        <p id="plantDescriptionError" th:if="${PDErrorText}" class="text-danger fs-6"
+                            th:text="${PDErrorText}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="plantDate" class="form-label">Plant Date</label>
+                        <input id="plantDate" type="date" class="form-control" max="9999-12-30" min="0000-01-01"
+                            th:name="plantDate" th:value="*{plantDate}">
+                        <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
+                    </div>
+
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                        <button type="submit" class="btn btn-success" formnovalidate>Submit</button>
+                        <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                        </a>
+                    </div>
+                </form>
             </div>
 
-            <div class="w-100 d-flex flex-row justify-content-center mb-3">
-                <!-- Some things are still named 'profile_picture', this is so I can reuse the existing css and js. -->
-                <div class="plant_picture_container small_pic">
-                    <img id="imageToChange"
-                        th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                        alt="Plant image">
-                    <label for="plantPictureInput">+</label>
-                    <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                        onChange="handleFileSelect(event)">
-                </div>
-                <span th:if="${plantPictureError}" class="text-danger fs-6" th:text="${plantPictureError}"></span>
-                <br>
-            </div>
-
-            <div class="mb-3 ">
-                <label for="plantName" class="form-label"> Plant Name: </label>
-                <input type="text" class="form-control"  th:classappend="${PNErrorClass == 'true' ? 'border-danger' : PNErrorClass}" id="plantName"
-                    placeholder="Name of plant" th:name="plantName" th:value="*{plantName}" autofocus>
-
-                <div th:if="${PNErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${PNErrorText}"></h3>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="plantCount" class="form-label"> Plant Count: </label>
-                <br>
-                <input type="number" class="form-control"  th:classappend="${PCErrorClass == 'true' ? 'border-danger' : PCErrorClass}" id="plantCount"
-                    placeholder="Number of plants" th:name="plantCount" th:value="*{plantCount}" data-cy="plantCount"
-                    >
-
-                <div th:if="${PCErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${PCErrorText}"></h3>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="plantDescription" class="form-label"> Plant Description (Optional)</label>
-                <br>
-                <div class="form-description">
-                    <textarea class="form-control"  th:classappend="${PDErrorClass == 'true' ? 'border-danger' : PDErrorClass}" id="plantDescription"
-                        placeholder="Description" th:name="plantDescription" th:text="*{plantDescription}"
-                        data-cy="plantDescription" ></textarea>
-                    <p id="plantDescriptionCounter" class="fs-6"></p>
-                </div>
-
-                <div th:if="${PDErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${PDErrorText}" id="plantDescriptionError"></h3>
-                </div>
-            </div>
-
-
-            <div class="mb-3">
-                <label for="plantDate" class="form-label"> Plant Date (Optional)</label>
-                <input type="date" class="form-control"  th:classappend="${PAErrorClass == 'true' ? 'border-danger' : PAErrorClass}" id="plantDate" placeholder=""
-                    max="9999-12-30" min="0000-01-01" th:name="plantDate" th:value="*{plantDate}" data-cy="plantDate"
-                    >
-
-                <div th:if="${PAErrorText!=''}">
-                    <h3 class="text-danger fs-6" th:text="${PAErrorText}" id="plantDateError"></h3>
-                </div>
-            </div>
-
-            <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
-                <button type="submit" class="btn btn-success text-nowrap rounded-5">Submit</button>
-                <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
-                    <button type="button" class="btn btn-danger text-nowrap rounded-5">Cancel</button>
-                </a>
-            </div>
-            </form>
         </div>
     </div>
+    <script th:src="@{/js/descriptionCounter.js}"></script>
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
-    <script th:src="@{/js/editPlantForm.js}"></script>
+    <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('login')}" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md my-5">
 
         <div class="text-center">
@@ -12,31 +12,33 @@
         </div>
 
         <div class="row justify-content-center my-5">
-            <div class="col-md-3 p-3">
+            <div class="col-5 col-md-10 col-lg-4">
                 <form th:action="@{/login}" method="post" class="border rounded-3 p-3">
 
                     <div class="mb-3">
                         <label for="emailAddress" class="form-label">Email Address *</label>
                         <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
-                            th:value="*{emailAddress}" autofocus>
+                            th:value="*{emailAddress}" autofocus
+                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
                         <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password *</label>
                         <input id="password" type="password" class="form-control" th:name="password"
-                            th:value="*{password}">
+                            th:value="*{password}" th:classappend="${loginError == null ? '' : 'border-danger'}">
                         <p th:if="${loginError}" class="text-danger fs-6" th:text="${loginError}"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3 mb-3">
-                        <button type="submit" class="btn btn-primary" formnovalidate>Sign In</button>
+                        <button type="submit" class="btn btn-success" formnovalidate>Sign In</button>
                         <a th:href="@{/home}">
                             <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>
                     </div>
 
-                    <div th:replace="fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})"></div>
+                    <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}">
+                    </div>
 
                     <div class="d-flex flex-column justify-content-center gap-3 text-center">
                         <a th:href="@{/register}">Not registered? Create an account</a>

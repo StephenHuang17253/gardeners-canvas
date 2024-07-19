@@ -10,7 +10,7 @@ const BACKSPACE = "Backspace";
  * @return {void} - No return value.
  */
 const updateTokenString = () => {
-    tokenString.value = codeInputs.map(input => input.value).join('');
+    tokenString.value = codeInputs.map(input => input.value).join("");
 };
 
 /**
@@ -33,10 +33,10 @@ const handleKeydown = (e) => {
  */
 const handleBackspace = (e) => {
     const currentIndex = codeInputs.indexOf(e.target);
-    if (currentIndex > 0 && e.target.value === '') {
-        codeInputs[currentIndex - 1].value = '';
+    if (currentIndex > 0 && e.target.value === "") {
+        codeInputs[currentIndex - 1].value = "";
     }
-    codeInputs[currentIndex].value = '';
+    codeInputs[currentIndex].value = "";
     handleFocus(e);
     updateTokenString();
 };
@@ -60,7 +60,7 @@ const handleInput = (e) => {
  */
 const handleFocus = (e) => {
     for (var i = 0; i < codeInputs.length; i++) {
-        if (codeInputs[i].value === '' || i === codeInputs.length - 1) {
+        if (codeInputs[i].value === "" || i === codeInputs.length - 1) {
             codeInputs[i].focus();
             break;
         }
@@ -75,9 +75,9 @@ const handleFocus = (e) => {
  */
 const handlePaste = (e) => {
     e.preventDefault();
-    const paste = e.clipboardData.getData('text');
+    const paste = e.clipboardData.getData("text");
     codeInputs.forEach((input, i) => {
-        input.value = paste[i] || '';
+        input.value = paste[i] || "";
     });
     handleFocus(e);
     updateTokenString();
@@ -86,8 +86,8 @@ const handlePaste = (e) => {
 // Add event listeners to each code input.
 codeInputs.forEach(input => {
     input.maxLength = 1;
-    input.addEventListener('keydown', handleKeydown);
-    input.addEventListener('input', handleInput);
-    input.addEventListener('focus', handleFocus);
-    input.addEventListener('paste', handlePaste);
+    input.addEventListener("keydown", handleKeydown);
+    input.addEventListener("input", handleInput);
+    input.addEventListener("focus", handleFocus);
+    input.addEventListener("paste", handlePaste);
 });
