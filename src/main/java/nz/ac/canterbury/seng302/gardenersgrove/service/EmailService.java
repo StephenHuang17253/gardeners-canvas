@@ -72,8 +72,6 @@ public class EmailService {
         this.senderEmail = overwrittenSenderEmail;
     }
 
-
-
     public String getBaseURL() {
         return baseURL;
     }
@@ -143,8 +141,6 @@ public class EmailService {
             }
         });
         asynchronousEmailthread.start();
-
-
     }
 
     /**
@@ -202,16 +198,14 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
+
     /**
      * Sends a confirmation of reset password
      *
      * @param currentUser user to send confirmation of password reset to
      */
     public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
-
         logger.info("Sending confirmation email to {}",currentUser.getEmailAddress());
-
-
         String subject = "Your Password Has Been Updated";
         String template = "generalEmail";
 
