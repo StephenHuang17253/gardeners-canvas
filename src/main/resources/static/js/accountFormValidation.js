@@ -52,12 +52,18 @@ const clearNameError = (inputField, errorField) => {
 const handleNameUpdate = (event, errorField) => {
     let nameValue = event.target.value;
     const validNameRegex = /^[A-Za-z\s\-']+$/;
+    let firstOrLast;
+    if (errorField === firstNameJSError) {
+        firstOrLast = "First"
+    } else {
+        firstOrLast = "Last"
+    }
     console.log(nameValue);
     if (nameValue.length > 64) {
-        errorField.textContent = 'Name must be less than or equal to 64 characters';
+        errorField.textContent = firstOrLast + " name must be 64 characters long or less";
         handleInvalidName(event.target, errorField);
     } else if (!validNameRegex.test(nameValue) || nameValue === "") {
-        errorField.textContent = 'Name cannot be empty and must only include letters, spaces, hyphens or apostrophes';
+        errorField.textContent = firstOrLast + " name must be 64 characters long or less";
         handleInvalidName(event.target, errorField);
     } else {
         clearNameError(event.target, errorField);
