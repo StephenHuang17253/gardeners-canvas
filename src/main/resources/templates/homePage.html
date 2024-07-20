@@ -8,7 +8,7 @@
     <div id="homeImage" class="d-flex align-items-center justify-content-center"
          th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|">
 
-        <div th:if="${!loggedIn}" class="content" style="z-index: 2">
+        <div th:if="${!loggedIn}" class="content z-2">
             <h1 class="display-4">Welcome, to Gardener's Grove</h1>
             <p class="lead">Your one-stop shop for everything garden related.</p>
             <hr class="my-4">
@@ -23,26 +23,30 @@
             </p>
         </div>
 
-        <div th:if="${loggedIn}" class="content d-flex flex-row gap-3" style="z-index: 2">
-            <img id="profilePicture" th:if="${loggedIn}" class="image-fluid rounded-circle border"
-                th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                alt="User's profile picture" width="200" height="200">
-            <div>
-                <h1 class="display-4">Welcome back <b th:text="${username}"></b>, </h1>
+        <div th:if="${loggedIn}" class="container-md row gap-0 z-2">
+            <div class="col-3">
+                <div class="ratio ratio-1x1 mt-3 mb-3 ms-auto">
+                    <img id="profilePicture" th:if="${loggedIn}" class="rounded-circle object-fit-cover w-100 h-100"
+                         th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                         alt="User's profile picture">
+                </div>
+            </div>
+            <div class="col-6">
+                <h1 class="display-4">Welcome back,</h1>
+                <h1 class="display-4 overflow-text">
+                    <b th:text="${username}"></b>,
+                </h1>
                 <h1 class="display-4">to Gardener's Grove</h1>
                 <p class="lead">Your gardens await!</p>
-                <hr class="my-4">
-                <p>Want to check yourself out? Or need to leave us...</p>
+                <hr class="my-5">
+                <p>Need some inspiration for your Garden? Or have some new plants?</p>
                 <div class="d-flex flex-row flex-wrap gap-3 mb-3">
-                    <a th:href="@{profile}">
-                        <button class="btn btn-success btn-lg">Profile</button>
+                    <a th:href="@{public-gardens}">
+                        <button class="btn btn-success btn-lg">Find Gardens</button>
                     </a>
-                    <form id="logoutForm" th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-success btn-lg"
-                            onclick="document.getElementById('logoutForm').submit()">
-                            Logout
-                        </button>
-                    </form>
+                    <a th:href="@{my-gardens}">
+                        <button class="btn btn-success btn-lg">Your Gardens</button>
+                    </a>
                 </div>
             </div>
         </div>
