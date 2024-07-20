@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -121,11 +122,19 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
-        int value = (int) Double.parseDouble(plantCount);
+
+        Integer plantCountValue = null;
+
+        ValidationResult plantCountResult = ValidationResult.OK;
+        if (plantCount != null && !plantCount.isEmpty()) {
+            plantCountValue = (int) Double.parseDouble(plantCount);
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
+
+
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
@@ -173,7 +182,7 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
+        int integerPlantCount = Integer.parseInt(String.valueOf(plantCountValue));
         Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
