@@ -18,6 +18,7 @@ import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
+
 /**
  * This class is a service class for sending emails defined by the
  * {@link Service} annotation.
@@ -30,11 +31,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    @Autowired
-    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
-        this.mailSender = mailSender;
-        this.templateEngine = templateEngine;
-    }
+    private static final String USERNAME_FIELD = "username";
 
     /**
      * The email address of the sender retrieved from the email.properties file.
@@ -48,6 +45,33 @@ public class EmailService {
     @Value("${spring.base.url}")
     private String baseURL;
 
+    /**
+     * Autowired default constructor for Email Service
+     * @param mailSender mail sender bean
+     * @param templateEngine mail sender bean
+     */
+    @Autowired
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
+
+    /**
+     * <h4 style="color:red;"> CONSTRUCTOR FOR TEST USE ONLY </h4>
+     * Overloaded constructor for email service,
+     * Overwrites application properties usually defined at runtime in order to make testing this service easier
+     * @param mailSender mail sender bean
+     * @param templateEngine mail sender bean
+     * @param overwrittenBaseUrl overwritten url basis (where emails are sent to)
+     * @param overwrittenSenderEmail overwritten sending email address (where emails are sent froim)
+     */
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine, String overwrittenSenderEmail, String overwrittenBaseUrl) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+        this.baseURL = overwrittenBaseUrl;
+        this.senderEmail = overwrittenSenderEmail;
+    }
+
     public String getBaseURL() {
         return baseURL;
     }
@@ -55,6 +79,8 @@ public class EmailService {
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
+     * Actual email is sent asynchronously to make the app more responsive.
+     * (the send email function takes 5 seconds to run)
      *
      * @param toEmail the email recipient
      * @param subject the email subject
@@ -67,12 +93,25 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject(subject);
         message.setText(body);
-        mailSender.send(message);
+
+        Thread asynchronousEmailthread = new Thread(() -> {
+            try
+            {
+                mailSender.send(message);
+                logger.info("Email Sent");
+            }
+            catch (MailException error)
+            {
+                logger.error("Email could not be sent");
+            }
+        });
+        asynchronousEmailthread.start();
     }
 
     /**
      * Sends an HTML email to the specified email address with the specified
-     * subject
+     * subject. Actual email is sent asynchronously to make the app more responsive.
+     * (the send email function takes 5 seconds to run)
      *
      * @param recipientEmail email of person to receive message
      * @param subject subject of email
@@ -89,7 +128,19 @@ public class EmailService {
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
-        mailSender.send(message);
+
+        Thread asynchronousEmailthread = new Thread(() -> {
+            try
+            {
+                mailSender.send(message);
+                logger.info("Email Sent");
+            }
+            catch (MailException error)
+            {
+                logger.error("Email could not be sent");
+            }
+        });
+        asynchronousEmailthread.start();
     }
 
     /**
@@ -107,7 +158,7 @@ public class EmailService {
         int lifetime = (int) token.getLifetime().toMinutes();
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("tokenString", tokenString);
         context.setVariable("lifetime", lifetime);
 
@@ -122,7 +173,7 @@ public class EmailService {
      * @param token the token to use to reset password
      */
     public void sendResetPasswordEmail(Token token) throws MessagingException {
-        logger.info("Sending reset password email to " + token.getUser().getEmailAddress());
+        logger.info("Sending reset password email to {}", token.getUser().getEmailAddress());
         String subject = "Link to Reset Password to Gardener's Grove!";
         String template = "generalEmail";
 
@@ -135,10 +186,10 @@ public class EmailService {
                 .buildAndExpand(tokenString)
                 .toUriString();
         String urlText = "RESET PASSWORD";
-        String mainBody = String.format("Click the link below to reset your password. \n This link expires in %s minutes.", lifetime);
+        String mainBody = String.format("Click the link below to reset your password. %n This link expires in %s minutes.", lifetime);
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
         context.setVariable("url", url);
         context.setVariable("urlText", urlText);
@@ -147,13 +198,14 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
+
     /**
      * Sends a confirmation of reset password
      *
      * @param currentUser user to send confirmation of password reset to
      */
     public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
-        logger.info("Sending confirmation email to " + currentUser.getEmailAddress());
+        logger.info("Sending confirmation email to {}",currentUser.getEmailAddress());
         String subject = "Your Password Has Been Updated";
         String template = "generalEmail";
 
@@ -161,7 +213,7 @@ public class EmailService {
         String mainBody = "This email is to confirm that your Gardener's Grove account's password has been updated";
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
 
         String toEmail = currentUser.getEmailAddress();

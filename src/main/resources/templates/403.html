@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
   <div class="text-center">
     <h1 class="my-3">403 Forbidden</h1>
-    <p>Forbidden! This section of the garden is off-limits. No peeking!</p>
+    <p th:text="${message == null ? 'Forbidden! This section of the garden is off-limits. No peeking!' : message}"></p>
   </div>
 </body>

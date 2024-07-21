@@ -2,6 +2,7 @@
 
 .dropdown-menu {
     max-height: 200px;
+    max-width: 200px;
     overflow-y: scroll;
 }
 
@@ -48,4 +49,57 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1;
+}
+
+.green-pill
+{
+    color: darkgreen;
+}
+
+.green-pill.active
+{
+    color: white;
+    background-color: darkgreen !important;
+}
+
+.green-pill:hover,
+.green-pill:focus
+{
+    background-color: #d1e7dd !important;
+}
+
+.btn.light_green
+{
+    background-color: #d1e7dd !important;
+    color: black;
+}
+
+.btn.light_green:hover,
+.btn.light_green:focus
+{
+    background-color: #309865 !important;
+    color: white;
+}
+
+
+.btn.light_red
+{
+    background-color: #f8d7da !important;
+    color: black;
+}
+
+.btn.light_red:hover ,
+.btn.light_red:focus
+{
+    background-color: darkred !important;
+    color: white;
+}
+.overflow-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.break-word {
+    word-break: break-word;
+    overflow-wrap: break-word;
 }

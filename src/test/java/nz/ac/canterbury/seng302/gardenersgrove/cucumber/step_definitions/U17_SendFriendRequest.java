@@ -209,7 +209,7 @@ public class U17_SendFriendRequest {
 
     @Then("I can see the error {string}")
     public void i_can_see_the_error(String error) {
-        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("SearchErrorText");
+        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("searchErrorText");
         Assertions.assertEquals(error, searchError);
     }
 

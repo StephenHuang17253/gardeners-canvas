@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-    <div class="container-md my-5">
-
-        <div class="text-center">
-            <h1>Edit Garden</h1>
-        </div>
-
-        <div class="row justify-content-center my-5">
-            <div class="col-md-5 p-3">
+    <div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded py-5 w-50">
+        <div class="row justify-content-center">
+            <div class="text-center py-5">
+                <h1>Edit Garden</h1>
+            </div>
+            <div class="col-6">
                 <form th:action="@{edit}" method="post" class="border rounded-3 p-3">
 
                     <div class="mb-3">
@@ -26,7 +26,8 @@
                     <div class="mb-3">
                         <label for="gardenDescription" class="form-label">Description</label>
                         <textarea id="gardenDescription" class="form-control" rows="3" th:name="gardenDescription"
-                            th:text="*{gardenDescription}"
+                            th:text="*{gardenDescription}" data-description="true"
+                            data-counter-id="gardenDescriptionCounter"
                             th:classappend="${GDErrorText == null ? '' : 'border-danger'}"></textarea>
                         <p id="gardenDescriptionCounter" class="fs-6"></p>
                         <p th:if="${GDErrorText}" class="text-danger fs-6" th:text="${GDErrorText}"></p>
@@ -91,13 +92,12 @@
                 </form>
             </div>
         </div>
+        <div th:replace="~{fragments/locationIQFooter.html}"></div>
     </div>
-
-    <div th:replace="fragments/locationIQFooter.html"></div>
 
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
-    <script th:src="@{/js/gardenDescriptionCounter.js}"></script>
+    <script th:src="@{/js/descriptionCounter.js}"></script>
     <script th:src="@{/js/locationIQAutocomplete.js}"></script>
     <script th:src="@{/js/gardenSizeFormat.js}"></script>
 </body>

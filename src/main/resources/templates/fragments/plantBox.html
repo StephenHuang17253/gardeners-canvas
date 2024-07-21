@@ -1,32 +1,57 @@
-<div th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner)">
-    <div class="plantbox" id="plantbox">
-        <div class="plant-info">
-            <span th:text="${plantName} + ' (x' + ${plantCount} +')'" class="plant-name"></span>
-            <form th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data">
-            <div class="plant_picture_container small_pic">
-                <img id="imageToChange" th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                     alt="Plant Image" class="plant-image">
-                <label for="plantPictureInput">+</label>
-                <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden"/>
-                <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                       onChange="handleFileSelect(event); this.form.submit()">
+<div
+    th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weather)">
+    <div class="card h-100 bg-success text-white garden-card">
+        <div class="card-body pt-1">
+            <div class="text-end">
+                <a th:if="${isOwner}" th:href="@{__${gardenId}__/__${plantId}__/edit}">
+                    <svg width="20" height="20" focusable="false" aria-hidden="true" viewBox="0 0 24 24" fill="#ffffff"
+                        tabindex="-1" title="Edit">
+                        <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z">
+                        </path>
+                    </svg>
+                </a>
             </div>
-            </form>
-            <span th:if="${plantToEditId == plantId}" class="error-message" th:text="${plantPictureError}"></span>
-            <br>
-        </div>
+            <div th:if="${isOwner}">
+                <form id="plantImageForm" th:action="@{/my-gardens/__${gardenId}__}" method="post" enctype="multipart/form-data"
+                    class="w-100 d-flex flex-column align-items-center mb-2">
 
-        <div class="plant-details">
-            <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>
-            <span th:if="${plantDate != null}" th:text="'Planted on: ' + ${plantDate}" class="plant-date"> Name </span>
-            <span th:text="${plantDescription}" class="plant-description"></span>
+                    <div class="position-relative w-50 mb-1">
+                        <div class="ratio ratio-1x1">
+                            <img id="imageToChange"
+                                th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                                alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
+                        </div>
+                        <label
+                            class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
+                            <span class="position-absolute top-0 end-0 mt-2 pe-4 fs-1">+</span>
+                            <input id="page" th:name="page" th:value="${page}" type="hidden" />
+                            <input id="weather" th:name="weather" th:value="${weather}" type="hidden" />
+                            <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden" />
+                            <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
+                                class="visually-hidden" data-image-input data-displayed-by="imageToChange"
+                                data-errored-by="plantPictureError" data-submit-if-valid>
+                        </label>
+                    </div>
+                    <p id="plantPictureError" class="text-danger fs-6 text-bold" th:text="${plantToEditId == plantId ? plantPictureError : ''}"></p>
+                </form>
+            </div>
+            <div th:if="${!isOwner}">
+                <div class="position-relative w-50 mt-2">
+                    <div class="ratio ratio-1x1">
+                        <img th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                            alt="Plant Picture" class="image-fluid rounded-circle"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+            <h4 class="card-title mt-1" th:text="${plantName} + ' (x' + ${plantCount} +')'"></h4>
+            <div class="row">
+                <span th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </span>
+                <span th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </span>
+                <span th:text="${plantDescription}" class="plant-description"></span>
+            </div>
         </div>
     </div>
 
-    <div class="edit-button-container">
-        <a th:if="${isOwner}"  th:href="@{__${gardenId}__/__${plantId}__/edit}">
-            <button class="rounded-button">Edit Plant</button>
-        </a>
-    </div>
-    <br>
 </div>

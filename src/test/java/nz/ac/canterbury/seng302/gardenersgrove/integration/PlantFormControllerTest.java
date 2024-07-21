@@ -1,39 +1,41 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PlantFormControllerTest {
 
     @Autowired
@@ -48,12 +50,14 @@ public class PlantFormControllerTest {
     private GardenService gardenService;
 
     User mockUser = new User("Test", "Test", "test@gmail.com", LocalDate.now());
+    Garden testGarden;
+    List<Plant> plantList = new ArrayList<>();
 
-    @BeforeEach
-    public void initial() {
+    @BeforeAll
+    void before_or_after_all() {
         userService.addUser(mockUser, "1es1P@ssword");
         LocalDate date1 = LocalDate.of(2024, 3, 27);
-        Garden test_garden = new Garden(
+        testGarden = gardenService.addGarden(new Garden(
                 "test",
                 "test",
                 "test",
@@ -66,21 +70,21 @@ public class PlantFormControllerTest {
                 "",
                 "",
                 mockUser
-        );
-        gardenService.addGarden(test_garden);
+        ));
 
-        plantService.addPlant("test",
+        plantList.add(plantService.addPlant("testName1",
                 1,
-                "test",
+                "testDescription1",
                 date1,
-                test_garden.getGardenId());
+                testGarden.getGardenId()));
+
+        plantList.add(plantService.addPlant("testName2",
+                1,
+                "testDescription2",
+                date1,
+                testGarden.getGardenId()));
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
-    @AfterAll
-    public static void bin() {
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -94,44 +98,42 @@ public class PlantFormControllerTest {
     @Test
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_OnePlantAdded() throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
-        String plantDescription = "test";
-        int plantCount = 1;
-        String plantName = "test";
-        LocalDate date = LocalDate.parse("2024-03-28");
+
+        Plant expectedPlant = plantList.get(0);
+
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // Form field name
                 "default_plant.png", // Filename
                 "image/png", // Content type
                 "image data".getBytes() // File content as byte array
         );
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/create-new-plant", gardenId)
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/create-new-plant", testGarden.getGardenId())
                 .file(mockFile) // Attach the file to the request
-                .param("plantName", plantName)
-                .param("plantCount", String.valueOf(plantCount))
-                .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()));
+                .param("plantName", expectedPlant.getPlantName())
+                .param("plantCount", String.valueOf(expectedPlant.getPlantCount()))
+                .param("plantDescription", expectedPlant.getPlantDescription())
+                .param("plantDate", expectedPlant.getPlantDate().toString()));
 
-        Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
-        Assertions.assertEquals(plantDescription,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
-        Assertions.assertEquals(plantCount,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
-        Assertions.assertEquals(Long.parseLong(plantId),
-                plantService.findById(Long.parseLong(plantId)).get().getPlantId());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(expectedPlant.getPlantName(), actualPlant.getPlantName());
+        Assertions.assertEquals(expectedPlant.getPlantDescription(), actualPlant.getPlantDescription());
+        Assertions.assertEquals(expectedPlant.getPlantCount(), actualPlant.getPlantCount());
 
     }
 
     @Test
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_plantEdited() throws Exception {
-        String plantName = "test";
-        String gardenId = "1";
-        String plantId = "1";
-        String plantDescription = "standardPlant";
-        int plantCount = 1;
-        LocalDate date = LocalDate.of(2024, 3, 28);
+
+        Plant expectedPlant = plantList.get(1);
+
+        String newPlantName = "test";
+        String newPlantDescription = "standardPlant";
+        int newPlantCount = 1;
+        LocalDate newPlantDate = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // This should match the name of the form field for the file in the
                                      // request
@@ -141,21 +143,21 @@ public class PlantFormControllerTest {
         );
 
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
-                .param("plantName", plantName)
-                .param("plantCount", String.valueOf(plantCount))
-                .param("plantDescription", plantDescription)
-                .param("plantDate", date.toString()));
+                .param("plantName", newPlantName)
+                .param("plantCount", String.valueOf(newPlantCount))
+                .param("plantDescription", newPlantDescription)
+                .param("plantDate", newPlantDate.toString()));
 
-        Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
-        Assertions.assertEquals(plantDescription,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
-        Assertions.assertEquals(plantCount,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
-        Assertions.assertEquals(Long.parseLong(plantId),
-                plantService.findById(Long.parseLong(plantId)).get().getPlantId());
-        Assertions.assertEquals(date, plantService.findById(Long.parseLong(plantId)).get().getPlantDate());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(newPlantName, actualPlant.getPlantName());
+        Assertions.assertEquals(newPlantDescription, actualPlant.getPlantDescription());
+        Assertions.assertEquals(newPlantCount, actualPlant.getPlantCount());
+        Assertions.assertEquals(newPlantDate, actualPlant.getPlantDate());
     }
 
     @ParameterizedTest
@@ -170,23 +172,25 @@ public class PlantFormControllerTest {
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_addNameVariantsFail(String plantName, int plantCount, String plantDescription,
             LocalDate date) throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // Form field name
                 "default_plant.png", // Filename
                 "image/png", // Content type
                 "image data".getBytes() // File content as byte array
         );
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/create-new-plant", gardenId)
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/my-gardens/{gardenId}/create-new-plant", testGarden.getGardenId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()));
 
-        Assertions.assertNotEquals(plantName,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantName());
+        Plant expectedPlant = plantList.get(plantList.size() - 1);
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertNotEquals(plantName, actualPlant.getPlantName());
 
     }
 
@@ -202,8 +206,9 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editNameVariantsFail(String plantName) throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
+
+        Plant expectedPlant = plantList.get(1);
+
         String plantDescription = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -214,15 +219,19 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()));
 
-        Assertions.assertNotEquals(plantName,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantName());
+
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertNotEquals(plantName, actualPlant.getPlantName());
 
     }
 
@@ -253,8 +262,9 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsFail(String plantDescription) throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
+
+        Plant expectedPlant = plantList.get(1);
+
         String plantName = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -265,15 +275,18 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()));
 
-        Assertions.assertNotEquals(plantDescription,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertNotEquals(plantDescription, actualPlant.getPlantDescription());
 
     }
 
@@ -292,18 +305,19 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDateVariantsFail(String date) throws Exception {
+
+        Plant expectedPlant = plantList.get(1);
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         LocalDate formattedDate;
-        String plantId = "1";
         // try catch for different date input types
         try {
             formattedDate = LocalDate.parse(date, formatter);
         } catch (DateTimeParseException e) {
             Assertions.assertNotEquals(date,
-                    plantService.findById(Long.parseLong(plantId)).get().getPlantDate());
+                    expectedPlant.getPlantDate().toString());
             return;
         }
-        String gardenId = "1";
         String plantDescription = "standardPlant";
         int plantCount = 1;
         String plantName = "test";
@@ -314,15 +328,19 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", String.valueOf(formattedDate)));
 
-        Assertions.assertNotEquals(formattedDate,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDate());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertNotEquals(formattedDate, actualPlant.getFormattedPlantDate());
+
     }
 
     @ParameterizedTest
@@ -331,9 +349,11 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
-        String gardenId = "1";
+
+        Plant expectedPlant = plantList.get(1);
+
         String plantName = "test name";
-        String plantId = "1";
+
         String plantDescription = "standardPlant";
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -343,15 +363,19 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", plantCount)
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()));
 
-        Assertions.assertNotEquals(plantCount,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertNotEquals(plantCount, String.valueOf(actualPlant.getPlantCount()));
+
 
     }
 
@@ -361,11 +385,13 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDateVariantsPass(String date) throws Exception {
+
+        Plant expectedPlant = plantList.get(1);
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         LocalDate formattedDate = LocalDate.parse(date, formatter);
 
-        String gardenId = "1";
-        String plantId = "1";
+
         String plantDescription = "standardPlant";
         int plantCount = 1;
         String plantName = "test";
@@ -376,15 +402,18 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", String.valueOf(formattedDate)));
 
-        Assertions.assertEquals(formattedDate,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDate());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(formattedDate, actualPlant.getPlantDate());
     }
 
     @ParameterizedTest
@@ -393,8 +422,9 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editNameVariantsPass(String plantName) throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
+
+        Plant expectedPlant = plantList.get(1);
+
         String plantDescription = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -405,15 +435,19 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId));
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + testGarden.getGardenId()));
 
-        Assertions.assertEquals(plantName, plantService.findById(Long.parseLong(plantId)).get().getPlantName());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(plantName, actualPlant.getPlantName());
 
     }
 
@@ -430,8 +464,7 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
-        String gardenId = "1";
-        String plantId = "1";
+        Plant expectedPlant = plantList.get(1);
         String plantName = "standardPlant";
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
@@ -442,16 +475,20 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId));
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + testGarden.getGardenId()));
 
-        Assertions.assertEquals(plantDescription,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantDescription());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(plantDescription, actualPlant.getPlantDescription());
+
 
     }
 
@@ -461,9 +498,12 @@ public class PlantFormControllerTest {
     })
     @WithMockUser(username = "test@gmail.com")
     public void plantFormController_editCountVariantsPass(int plantCount) throws Exception {
+
+        Plant expectedPlant = plantList.get(1);
+
         String gardenId = "1";
         String plantName = "test name";
-        String plantId = "1";
+        String plantId = "2";
         String plantDescription = "standardPlant";
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -473,16 +513,20 @@ public class PlantFormControllerTest {
                 "image data".getBytes() // File content as byte array
         );
         mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/my-gardens/{gardenId}/{plantId}/edit", gardenId, plantId)
+                .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(), expectedPlant.getPlantId())
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
                 .param("plantDate", date.toString()))
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + gardenId));
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/my-gardens/" + testGarden.getGardenId()));
 
-        Assertions.assertEquals(plantCount,
-                plantService.findById(Long.parseLong(plantId)).get().getPlantCount());
+        Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
+        Assertions.assertTrue(optionalPlant.isPresent());
+        Plant actualPlant = optionalPlant.get();
+
+        Assertions.assertEquals(plantCount, actualPlant.getPlantCount());
+
 
     }
 }

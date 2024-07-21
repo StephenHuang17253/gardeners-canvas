@@ -6,11 +6,11 @@
  * @return {String} - The base url of the page.
  */
 const getBaseUrl = (currentUrl) => {
-    let instance = '';
-    if (currentUrl.includes('/test/')) {
-        instance = '/test';
-    } else if (currentUrl.includes('/prod/')) {
-        instance = '/prod';
+    let instance = "";
+    if (currentUrl.includes("/test/")) {
+        instance = "/test";
+    } else if (currentUrl.includes("/prod/")) {
+        instance = "/prod";
     }
     return instance;
 }
@@ -27,12 +27,12 @@ const navigateTo = (toUrl) => {
     // if currentURL is not toUrl send them to this page
     // Does not check for test and prod, see git lab issue
     if (currentUrl !== toUrl) {
-        localStorage.setItem('previousUrl', window.location.href);
+        localStorage.setItem("previousUrl", window.location.href);
         const baseUrl = getBaseUrl(currentUrl);
         window.location.href = baseUrl + toUrl;
     }
 
-    if (!localStorage.getItem('previousUrl')) {
-        localStorage.setItem('previousUrl', '/home');
+    if (!localStorage.getItem("previousUrl")) {
+        localStorage.setItem("previousUrl", "/home");
     }
 }

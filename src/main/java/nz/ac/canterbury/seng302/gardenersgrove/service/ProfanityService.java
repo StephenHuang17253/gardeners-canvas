@@ -73,9 +73,9 @@ public class ProfanityService {
             logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
             return "Automatic Moderation Failure, Moderate Manually";
         }
-
-
     }
+
+
     /**
      * Checks a string to see if it contains any bad words, if so return True.
      * @param inputString The string to send to the content moderator API Which will check for any profanity.

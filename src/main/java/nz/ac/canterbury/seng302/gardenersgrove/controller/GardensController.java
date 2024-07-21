@@ -1,30 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
-import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
 import java.time.Instant;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +11,34 @@ import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 
 /**
  * Controller for viewing all the created Gardens
@@ -56,12 +63,13 @@ public class GardensController {
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
 
-    private int COUNT_PER_PAGE = 10;
+    private final int COUNT_PER_PAGE = 10;
 
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
+
     /**
-     * Constructor for the GardensController with {@link Autowired} to
-     * connect this controller with other services
+     * Constructor for the GardensController with {@link Autowired} to connect
+     * this controller with other services
      *
      * @param gardenService service to access garden repository
      * @param securityService service to access security methods
@@ -69,7 +77,8 @@ public class GardensController {
      * @param fileService service to manage files
      */
     @Autowired
-    public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService, FileService fileService, WeatherService weatherService) {
+    public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
+            FileService fileService, WeatherService weatherService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.fileService = fileService;
@@ -86,11 +95,11 @@ public class GardensController {
      */
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "All") String filter,
-                            Model model) {
+            @RequestParam(defaultValue = "All") String filter,
+            Model model) {
         logger.info("GET /my-gardens");
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
 
@@ -110,7 +119,7 @@ public class GardensController {
         model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
         model.addAttribute("currentPage", page);
         model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("totalGardens", gardens.size());
         model.addAttribute("filter", filter);
@@ -123,19 +132,51 @@ public class GardensController {
     }
 
     /**
-     * Gets all the users created gardens
-     * and maps them all and there attributes to the gardenDetailsPage
-     * but with the custom url of /my-gardens/{gardenId}
+     * Helper method for getting weather data for a garden
      *
+     * @param garden Garden entity of
+     * @return list of DailyWeather components
+     */
+    private List<DailyWeather> getGardenWeatherData(Garden garden) {
+        List<DailyWeather> weatherList = new ArrayList<>();
+        DailyWeather noWeather = null;
+        try {
+            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
+            List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
+            weatherList.add(pastWeather.get(0));
+            weatherList.add(pastWeather.get(1));
+            weatherList.add(gardenWeather.getCurrentWeather());
+            weatherList.addAll(gardenWeather.getForecastWeather());
+
+        } catch (Error error) {
+            noWeather = new DailyWeather("not_found.png", null, null);
+        } catch (NullPointerException error) {
+            noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
+            noWeather.setError("Location not found, please update your location to see the weather");
+        }
+
+        if (noWeather != null) {
+            weatherList.add(noWeather);
+        }
+
+        return weatherList;
+    }
+
+    /**
+     * Get Mapping of the /my-gardens/{gardenId} endpoint Garden Details page of
+     * all the plants belonging to the garden
+     *
+     * @param gardenId id of the garden used in the end-point path
      * @return thymeleaf createNewGardenForm
      */
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
-                                    HttpServletResponse response,
-                                    Model model) {
+            @RequestParam(defaultValue = "1") int page,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -147,72 +188,40 @@ public class GardensController {
         Garden garden = optionalGarden.get();
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
-            if (!garden.getIsPublic()) {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                return "403";
-            }
-            List<DailyWeather> weather = new ArrayList<>();
-            try {
-                WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
-                weather.add(gardenWeather.getCurrentWeather());
-                weather.addAll(gardenWeather.getForecastWeather());
-
-                DailyWeather currentWeather = gardenWeather.getCurrentWeather();
-                List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
-                DailyWeather yesterdayWeather = pastWeather.get(0);
-                DailyWeather beforeYesterdayWeather = pastWeather.get(1);
-
-                if (currentWeather.getDescription().equals("Rainy")) {
-                    model.addAttribute("message","Outdoor plants don’t need any water today");
-                } else if ("Sunny".equals(yesterdayWeather.getDescription()) && "Sunny".equals(beforeYesterdayWeather.getDescription())) {
-                    model.addAttribute("message","There hasn’t been any rain recently, make sure to water your plants if they need it");
-                }
-
-            } catch (Error error) {
-                DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
-            } catch (NullPointerException error) {
-                DailyWeather noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
-                noWeather.setError("Location not found, please update your location to see the weather");
-                weather.add(noWeather);
-            }
-
-            model.addAttribute("isOwner", false);
-            model.addAttribute("gardenName", garden.getGardenName());
-            model.addAttribute("gardenLocation", garden.getGardenLocation());
-            model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenDescription", garden.getGardenDescription());
-            model.addAttribute("gardenId", gardenId);
-            model.addAttribute("plants", garden.getPlants());
-            model.addAttribute("totalPlants", garden.getPlants().size());
-            model.addAttribute("makeGardenPublic", garden.getIsPublic());
-            model.addAttribute("weather", weather);
-            return "gardenDetailsPage";
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            model.addAttribute("message", "This isn’t your patch of soil. No peeking at the neighbor's garden without an invite!");
+            return "403";
         }
 
-        List<DailyWeather> weather = new ArrayList<>();
-        try {
-            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(), garden.getGardenLongitude());
-            weather.add(gardenWeather.getCurrentWeather());
-            weather.addAll(gardenWeather.getForecastWeather());
-
-            DailyWeather currentWeather = gardenWeather.getCurrentWeather();
-            List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
-            DailyWeather yesterdayWeather = pastWeather.get(0);
-            DailyWeather beforeYesterdayWeather = pastWeather.get(1);
-
+        List<DailyWeather> weatherList = getGardenWeatherData(garden);
+        if (weatherList.size() > 1) {
+            DailyWeather beforeYesterdayWeather = weatherList.get(0);
+            DailyWeather yesterdayWeather = weatherList.get(1);
+            DailyWeather currentWeather = weatherList.get(2);
             if (currentWeather.getDescription().equals("Rainy")) {
-                model.addAttribute("message","Outdoor plants don’t need any water today");
-            } else if ("Sunny".equals(yesterdayWeather.getDescription()) && "Sunny".equals(beforeYesterdayWeather.getDescription())) {
-                model.addAttribute("message","There hasn’t been any rain recently, make sure to water your plants if they need it");
+                model.addAttribute("message", "Outdoor plants don’t need any water today");
+                model.addAttribute("goodMessage", true);
             }
 
-        } catch (Error error) {
-            DailyWeather noWeather = new DailyWeather("not_found.png", null, null);
-        } catch (NullPointerException error) {
-            DailyWeather noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
-            noWeather.setError("Location not found, please update your location to see the weather");
-            weather.add(noWeather);
+            if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                    && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
+                    && Objects.equals(currentWeather.getDescription(), "Sunny")) {
+                model.addAttribute("message", "There hasn’t been any rain recently, make sure to water your plants if they need it");
+                model.addAttribute("goodMessage", false);
+            }
         }
+
+        int hour = LocalTime.now().getHour();
+        String gradientClass = "g" + hour;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        String formattedTime = LocalDateTime.now().format(formatter);
+
+        User user = garden.getOwner();
+        List<Plant> plants = garden.getPlants();
+
+        int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
 
         model.addAttribute("isOwner", true);
         model.addAttribute("gardenName", garden.getGardenName());
@@ -220,16 +229,27 @@ public class GardensController {
         model.addAttribute("gardenSize", garden.getGardenSize());
         model.addAttribute("gardenDescription", garden.getGardenDescription());
         model.addAttribute("gardenId", gardenId);
-        model.addAttribute("plants", garden.getPlants());
-        model.addAttribute("totalPlants", garden.getPlants().size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("totalGardens", plants.size());
+        model.addAttribute("totalPlants", plants.size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
-        model.addAttribute("weather", weather);
+        model.addAttribute("weather", weatherList);
+        model.addAttribute("gradientClass", gradientClass);
+        model.addAttribute("currentTime", formattedTime);
+        model.addAttribute("profilePicture", user.getProfilePictureFilename());
+        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("endIndex", endIndex);
         return "gardenDetailsPage";
 
     }
 
     /**
-     * This function creates a post mapping for updating the garden's isPublic boolean.
+     * This function creates a post mapping for updating the garden's isPublic
+     * boolean.
      *
      * @param gardenId - the id of the garden being edited
      * @param makeGardenPublic - the new status of the garden isPublic
@@ -238,17 +258,18 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}/public")
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
-                                           @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
-                                    HttpServletResponse response,
-                                    Model model) {
+            @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
+            @RequestParam(defaultValue = "1") int page,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /my-gardens/{gardenId}/public", gardenId);
-        logger.info("Value of makeGardenPublic: {}", makeGardenPublic);
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-        if (!optionalGarden.isPresent()) {
+        if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
@@ -261,7 +282,6 @@ public class GardensController {
         }
 
         gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
-        logger.error("Status of Garden publicity: {}", garden.getIsPublic());
 
         model.addAttribute("gardenName", garden.getGardenName());
         model.addAttribute("gardenLocation", garden.getGardenLocation());
@@ -270,25 +290,29 @@ public class GardensController {
         model.addAttribute("plants", garden.getPlants());
         model.addAttribute("totalPlants", garden.getPlants().size());
         model.addAttribute("makeGardenPublic", garden.getIsPublic());
+        redirectAttributes.addAttribute("page", page);
         return "redirect:/my-gardens/{gardenId}";
 
     }
 
     /**
-     * This function is called when a user tries to update a plants image directly from the My Garden's page
-     * instead of one of the plant forms.
+     * This function is called when a user tries to update a plants image
+     * directly from the My Garden's page instead of one of the plant forms.
      *
      * @param gardenIdString id of the garden being edited
-     * @param plantId        id of the plant being edited
-     * @param plantPicture   the new picture
-     * @param model          the model
+     * @param plantId id of the plant being edited
+     * @param plantPicture the new picture
+     * @param model the model
      * @return thymeleaf gardenDetails
      */
     @PostMapping("/my-gardens/{gardenId}")
     public String updatePlantImage(@PathVariable("gardenId") String gardenIdString,
-                                   @RequestParam("plantId") String plantId,
-                                   @RequestParam("plantPictureInput") MultipartFile plantPicture,
-                                   Model model) {
+            @RequestParam("plantId") String plantId,
+            @RequestParam("plantPictureInput") MultipartFile plantPicture,
+            @RequestParam(defaultValue = "1") int page,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /my-gardens/{}", gardenIdString);
 
         long gardenId = Long.parseLong(gardenIdString);
@@ -296,13 +320,13 @@ public class GardensController {
         model.addAttribute("myGardens", gardenService.getGardens());
 
         Optional<Plant> plantToUpdate = plantService.findById(Long.parseLong((plantId)));
-        model.addAttribute("plantToEditId", (Long.parseLong(plantId)));
+        model.addAttribute("plantToEditId", Long.valueOf(plantId));
         if (plantToUpdate.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
-
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         if (plantPicture.isEmpty()) {
@@ -312,53 +336,90 @@ public class GardensController {
         if (optionalGarden.isPresent()) {
 
             Garden garden = optionalGarden.get();
-            String plantPictureString = getPlantPictureString(plantToUpdate.get().getPlantPictureFilename());
-            model.addAttribute("plantPicture", plantPictureString);
+
+            List<DailyWeather> weatherList;
+            weatherList = getGardenWeatherData(garden);
+            if (weatherList.size() > 1) {
+                DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                DailyWeather yesterdayWeather = weatherList.get(1);
+                DailyWeather currentWeather = weatherList.get(2);
+                if (currentWeather.getDescription().equals("Rainy")) {
+                    model.addAttribute("message", "Outdoor plants don’t need any water today");
+                }
+
+                if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                        && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
+                        && Objects.equals(currentWeather.getDescription(), "Sunny")) {
+                    model.addAttribute("message", "There hasn’t been any rain recently, make sure to water your plants if they need it");
+                }
+            }
+            int hour = LocalTime.now().getHour();
+            String gradientClass = "g" + hour;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+            String formattedTime = LocalDateTime.now().format(formatter);
+            List<Plant> plants = garden.getPlants();
+
+            int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
+            int startIndex = (page - 1) * COUNT_PER_PAGE;
+            int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
+            User user = securityService.getCurrentUser();
+
+            model.addAttribute("isOwner", true);
             model.addAttribute("gardenName", garden.getGardenName());
             model.addAttribute("gardenLocation", garden.getGardenLocation());
             model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenId", gardenIdString);
-            model.addAttribute("plants", garden.getPlants());
-            model.addAttribute("totalPlants", garden.getPlants().size());
+            model.addAttribute("gardenDescription", garden.getGardenDescription());
+            model.addAttribute("gardenId", gardenId);
+            model.addAttribute("plants", plants.subList(startIndex, endIndex));
+            model.addAttribute("totalGardens", plants.size());
             model.addAttribute("makeGardenPublic", garden.getIsPublic());
-
+            model.addAttribute("weather", weatherList);
+            model.addAttribute("gradientClass", gradientClass);
+            model.addAttribute("currentTime", formattedTime);
+            model.addAttribute("profilePicture", user.getProfilePictureFilename());
+            model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("lastPage", totalPages);
+            model.addAttribute("startIndex", startIndex + 1);
+            model.addAttribute("endIndex", endIndex);
 
         } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
 
-
+        redirectAttributes.addAttribute("page", page);
         if (!plantPictureResult.valid()) {
-            logger.info("Plant picture validation failed");
             model.addAttribute("plantPictureError", plantPictureResult);
             return "gardenDetailsPage";
 
         } else {
 
             if (!plantPicture.isEmpty()) {
-                logger.info("Updating plant picture");
                 plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
             }
-            logger.info("Plant updated successfully");
 
-            return "redirect:/my-gardens/{gardenId}";
         }
+        return "redirect:/my-gardens/{gardenId}";
 
     }
 
     /**
      * This function is called when trying to access another user's gardens.
+     *
      * @param model - the model
      * @param userId - id of the user being viewed
      * @return thymeleaf gardensPage
      */
-    @GetMapping("{userId}/gardens")
+    @GetMapping("/{userId}/gardens")
     public String friendsGardens(Model model,
-                                 @PathVariable("userId") Long userId,
-                                 HttpServletResponse response) {
-        logger.info("GET /my-gardens");
+            @PathVariable("userId") Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "All") String filter,
+            HttpServletResponse response) {
+        logger.info("GET {}/gardens", userId);
 
-        model.addAttribute("loggedIn",  securityService.isLoggedIn());
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         User friend;
         try {
@@ -367,44 +428,37 @@ public class GardensController {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return "403";
             }
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
-
-
-
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> gardenList = friend.getGardens();
+        List<Garden> gardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", gardenList);
+        model.addAttribute("friendGardens", gardens);
+
+        long publicGardensCount = gardens.stream().filter(Garden::getIsPublic).count();
+
+        gardens = gardens.stream().filter(garden -> garden.getIsPublic()).collect(Collectors.toList());
+
+        int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
+
+        model.addAttribute("friendId", userId);
+        model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("totalGardens", gardens.size());
+        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("userName", friend.getFirstName() + " " + friend.getLastName());
+        model.addAttribute("firstName", friend.getFirstName());
+        model.addAttribute("profilePicture", friend.getProfilePictureFilename());
 
         return "gardensPage";
     }
-
-
-
-    /**
-     * Gets the resource url for the plant picture, or the default plant picture
-     * if the plant does not have one
-     *
-     * @param filename string filename
-     * @return string of the plant picture url
-     */
-    public String getPlantPictureString(String filename) {
-
-        String plantPictureString = "/images/default_plant.png";
-
-        if (filename != null && !filename.isEmpty()) {
-            plantPictureString = MvcUriComponentsBuilder
-                    .fromMethodName(PlantFormController.class, "serveFile", filename)
-                    .build()
-                    .toUri()
-                    .toString();
-        }
-        return plantPictureString;
-    }
-
 
     WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) {
 
@@ -428,9 +482,8 @@ public class GardensController {
             throw new Error("429");
         }
         logger.info("Permits left after request: " + semaphore.availablePermits());
-        return weatherService.getWeather(gardenLatitude,gardenLongitude);
+        return weatherService.getWeather(gardenLatitude, gardenLongitude);
 
     }
 
 }
-
