@@ -219,4 +219,42 @@ public class EmailService {
         String toEmail = currentUser.getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
     }
+
+    public void sendTagBanWarningEmail(Token token) throws MessagingException {
+        String subject = "Tag moderation warning";
+        String template = "banEmail";
+        String mainBody = "Warning: If you add another inappropriate tag your account will be banned for 7 days";
+
+        String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
+        String tokenString = token.getTokenString();
+        int lifetime = (int) token.getLifetime().toMinutes();
+
+        Context context = new Context();
+        context.setVariable(USERNAME_FIELD, username);
+        context.setVariable("mainBody", mainBody);
+        context.setVariable("tokenString", tokenString);
+        context.setVariable("lifetime", lifetime);
+
+        String toEmail = token.getUser().getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
+
+    public void sendTagBanEmail(Token token) throws MessagingException {
+        String subject = "Tag moderation ban";
+        String template = "banEmail";
+        String mainBody = "The email is to inform you that due to inappropriate behaviour involving the use of our tag system, you are hereby banned for 7 days";
+
+        String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
+        String tokenString = token.getTokenString();
+        int lifetime = (int) token.getLifetime().toMinutes();
+
+        Context context = new Context();
+        context.setVariable(USERNAME_FIELD, username);
+        context.setVariable("mainBody", mainBody);
+        context.setVariable("tokenString", tokenString);
+        context.setVariable("lifetime", lifetime);
+
+        String toEmail = token.getUser().getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
 }
