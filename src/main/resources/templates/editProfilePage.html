@@ -43,6 +43,8 @@
                            th:value="*{firstName}" autofocus
                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
                     <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                    <p id="firstNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'First name must be 64 characters long or less'"></p>
                 </div>
 
                 <div class="mb-3" id="lastNameDiv">
@@ -50,6 +52,8 @@
                     <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
                     <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                    <p id="lastNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Last name must be 64 characters long or less'"></p>
                 </div>
 
                 <div class="form-check mb-3">
@@ -78,6 +82,8 @@
                            th:value="*{emailAddress}"
                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
                     <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    <p id="emailJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Email must be in the form \'jane@doe.nz\''"></p>
                 </div>
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
