@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,8 +23,16 @@ public interface UserInteractionRepository extends CrudRepository<UserInteractio
     Optional<UserInteraction> findById(long id);
 
     /**
-     * Find all UserInteraction objects in repo
+     * Find all UserInteraction objects for a given user
+     * @param userId the id to match the user objects id
      * @return list of UserInteraction objects
      */
-    List<UserInteraction> findAll();
+    List<UserInteraction> findByUserId(long userId);
+
+    /**
+     * Find all UserInteraction objects for a given user of a given item type
+     * @param userId the id to match the user objects id
+     * @return list of UserInteraction objects
+     */
+    List<UserInteraction> findByUserIdAndItemTypeOrderByInteractionTime(long userId, ItemType itemType);
 }
