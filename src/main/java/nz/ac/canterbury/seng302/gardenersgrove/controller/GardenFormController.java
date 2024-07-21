@@ -271,14 +271,6 @@ public class GardenFormController {
                 doubleGardenSize, isPublic, latitude, longitude, owner);
 
 
-
-        JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
-
-        gardenService.updateGardenCoordinates(garden.getGardenId(), coordData.get("lat").toString(), coordData.get("lon").toString());
-
-        logger.info(garden.getGardenLatitude());
-        logger.info(garden.getGardenLongitude());
-
         User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
@@ -288,6 +280,16 @@ public class GardenFormController {
         }
         session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
+
+        if (Objects.equals(garden.getGardenLatitude(), "")) {
+            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
+            String lat = coordData.get(0).get("lat").asText();
+            String lon = coordData.get(0).get("lon").asText();
+            gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
+            logger.info("Forward geocoding request made to get lat and lon");
+        }
+        logger.info(garden.getGardenLatitude());
+        logger.info(garden.getGardenLongitude());
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
 

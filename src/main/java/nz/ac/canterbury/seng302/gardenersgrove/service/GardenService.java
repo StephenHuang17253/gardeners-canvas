@@ -133,7 +133,10 @@ public class GardenService {
     }
 
     /**
-     * #TODO: Write updateGardenCoordinates javadoc
+     * Updates the longitude and latitude of a Garden entity.
+     * @param id the id of the garden we wish to update the coordinates of
+     * @param latitude the new latitude
+     * @param longitude the new longitude
      */
     public Garden updateGardenCoordinates(Long id, String latitude, String longitude) {
         Optional<Garden> optionalGarden = getGardenById(id);
@@ -141,7 +144,7 @@ public class GardenService {
             Garden targetGarden = optionalGarden.get();
 
             targetGarden.setGardenLatitude(latitude);
-            targetGarden.setGardenLatitude(longitude);
+            targetGarden.setGardenLongitude(longitude);
 
             return gardenRepository.save(targetGarden);
 
