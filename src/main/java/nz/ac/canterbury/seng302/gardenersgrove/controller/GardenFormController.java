@@ -270,7 +270,6 @@ public class GardenFormController {
         Garden garden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
                 doubleGardenSize, isPublic, latitude, longitude, owner);
 
-
         User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
@@ -288,8 +287,6 @@ public class GardenFormController {
             gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
             logger.info("Forward geocoding request made to get lat and lon");
         }
-        logger.info(garden.getGardenLatitude());
-        logger.info(garden.getGardenLongitude());
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
 
@@ -377,7 +374,7 @@ public class GardenFormController {
             @RequestParam(name = "latitude") String latitude,
             @PathVariable Long gardenId, HttpSession session,
             HttpServletResponse response,
-            Model model) {
+            Model model) throws IOException, InterruptedException {
         logger.info("POST / edited garden");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -441,6 +438,14 @@ public class GardenFormController {
         gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
                 postcode, country, doubleGardenSize, isPublic, latitude, longitude, owner));
         logger.info("Edited Garden Page");
+
+        if (Objects.equals(garden.getGardenLatitude(), "")) {
+            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
+            String lat = coordData.get(0).get("lat").asText();
+            String lon = coordData.get(0).get("lon").asText();
+            gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
+            logger.info("Forward geocoding request made to get lat and lon");
+        }
 
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
