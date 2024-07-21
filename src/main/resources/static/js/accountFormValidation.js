@@ -128,7 +128,7 @@ const handleDateUpdate = (event) => {
  * @returns {void}
  */
 const handleInvalidEmail = () => {
-    email.setCustomValidity("");
+    email.setCustomValidity(" ");
     email.classList.add("border-danger");
     emailJSError.style.display = "block";
 }
