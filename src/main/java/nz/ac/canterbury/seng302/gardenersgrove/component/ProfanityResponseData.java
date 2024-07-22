@@ -96,7 +96,8 @@ public class ProfanityResponseData {
         if (jsonProfanityData.has("error")) {
             JsonNode errorNode = jsonProfanityData.get("error");
             if (errorNode.has("code")) {
-                errorCode = jsonProfanityData.get("code").asInt();
+                String codeString = errorNode.get("code").asText();
+                errorCode = Integer.parseInt(codeString);
                 if (errorCode == 429) {
                     callLimitExceeded = true;
                 }
