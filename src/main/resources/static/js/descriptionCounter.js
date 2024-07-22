@@ -24,7 +24,13 @@ const updateCounter = (descriptionInput) => {
     } else {
         descriptionCounter.classList.remove("text-danger");
     }
-    descriptionCounter.textContent = descriptionInput.value.length + "/" + MAX_CHARS;
+
+    let characterCount = 0;
+    for (const char of descriptionInput.value) {
+        characterCount++;
+    }
+
+    descriptionCounter.textContent = characterCount + "/" + MAX_CHARS;
 }
 
 window.addEventListener("load", () => {
