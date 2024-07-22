@@ -1,5 +1,8 @@
 const MAX_CHARS = 512;
 const descriptionInputs = document.querySelectorAll("[data-description='true']");
+// This is a special character that is used to describe which variation of the previous emoji to display,
+// We don't want to count it as a character.
+const variationSelector = 65039;
 
 
 /**
@@ -25,10 +28,7 @@ const updateCounter = (descriptionInput) => {
         descriptionCounter.classList.remove("text-danger");
     }
 
-    let characterCount = 0;
-    for (const char of descriptionInput.value) {
-        characterCount++;
-    }
+    const characterCount = Array.from(descriptionInput.value).filter(char => !(char.match(/\s/) || char.charCodeAt(0) == variationSelector)).length;
 
     descriptionCounter.textContent = characterCount + "/" + MAX_CHARS;
 }
