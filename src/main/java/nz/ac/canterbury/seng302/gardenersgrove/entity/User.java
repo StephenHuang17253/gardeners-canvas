@@ -82,6 +82,7 @@ public class User {
         this.verified = false;
         this.lastBanDate = null;
         this.banDuration = null;
+        this.strikes = 0;
     }
 
     public void setFirstName(String firstName) {
