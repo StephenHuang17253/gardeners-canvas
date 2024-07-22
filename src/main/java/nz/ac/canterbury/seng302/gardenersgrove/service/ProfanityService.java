@@ -50,8 +50,6 @@ public class ProfanityService {
         httpClient = httpClientMock;
     }
 
-
-
     /**
      * Sends post a post request to the bad words API and then returns a JSON
      * response.
@@ -78,9 +76,13 @@ public class ProfanityService {
             JsonNode jsonObject = objectMapper.readTree(response.body());
             ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
 
+            logger.info("Call limit passed: "+ profanityResponse.isCallLimitExceeded());
             return profanityResponse;
 
         } catch (IOException | InterruptedException errorException) {
+            if (errorException.getMessage().contains("Moderate have exceeded call rate limit")) {
+                logger.info("Call limit reached!");
+            }
             Thread.currentThread().interrupt();
             logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
             return null; ///RETURN ERROR, FIX LATER

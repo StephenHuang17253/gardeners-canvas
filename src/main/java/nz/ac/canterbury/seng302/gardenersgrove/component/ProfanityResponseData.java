@@ -19,20 +19,24 @@ public class ProfanityResponseData {
     List<String> foundTerms;
     String statusCode;
     String statusDescription;
+    boolean callLimitExceeded;
+    public int errorCode;
 
     @JsonCreator
     public ProfanityResponseData(JsonNode jsonProfanityData){
-        originalText = jsonProfanityData.get("OriginalText");
-        normalizedText = jsonProfanityData.get("NormalizedText");
-        misrepresentation = jsonProfanityData.get("Misrepresentation");
-        language = jsonProfanityData.get("Language");
-        terms = jsonProfanityData.get("Terms");
-        status = jsonProfanityData.get("Status");
-        trackingId = jsonProfanityData.get("TrackingId");
-
-        setFoundTerms();
-        setHasProfanity();
-        setStatus();
+        detectError(jsonProfanityData);
+        if (!callLimitExceeded) {
+            originalText = jsonProfanityData.get("OriginalText");
+            normalizedText = jsonProfanityData.get("NormalizedText");
+            misrepresentation = jsonProfanityData.get("Misrepresentation");
+            language = jsonProfanityData.get("Language");
+            terms = jsonProfanityData.get("Terms");
+            trackingId = jsonProfanityData.get("TrackingId");
+            status = jsonProfanityData.get("Status");
+            setStatus();
+            setFoundTerms();
+            setHasProfanity();
+        }
     }
     public String getOriginalText() {
         return originalText.asText();
@@ -65,6 +69,9 @@ public class ProfanityResponseData {
     public boolean isHasProfanity() {
         return hasProfanity;
     }
+
+    public boolean isCallLimitExceeded() {return callLimitExceeded;}
+
     /**
      * Sets the list of found terms from the JSON data.
      */
@@ -85,7 +92,14 @@ public class ProfanityResponseData {
             statusDescription = "Unknown";
         }
     }
-
+    void detectError(JsonNode jsonProfanityData) {
+        if (jsonProfanityData.get("error") != null) {
+            errorCode = jsonProfanityData.get("error").asInt();
+            if (errorCode == 429) {
+                callLimitExceeded = true;
+            }
+        }
+    }
     /**
      * Sets the hasProfanity flag based on the presence of terms.
      */
