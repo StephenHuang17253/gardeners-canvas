@@ -398,7 +398,7 @@ public class InputValidator {
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
      */
-    public static ValidationResult validatePlantCount(int plantCount) {
+    public static ValidationResult validatePlantCount(String plantCount) {
         ValidationResult result = new InputValidator(String.valueOf(plantCount))
                 .validWholeNumberHelper()
                 .maxNumberHelper(1000000)
