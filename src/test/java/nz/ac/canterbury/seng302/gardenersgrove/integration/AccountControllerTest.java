@@ -5,6 +5,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
@@ -71,6 +72,9 @@ public class AccountControllerTest {
     @MockBean
     private static EmailService emailServiceMock;
 
+    @MockBean
+    private static SecurityService securityServiceMock;
+
     private static AccountController accountController;
 
     private static String verifiedEmail = "verifiedEmail@gmail.com";
@@ -83,8 +87,9 @@ public class AccountControllerTest {
     public static void setup() {
         securityContextMock = spy(SecurityContext.class);
         SecurityContextHolder.setContext(securityContextMock);
-        accountController = spy(new AccountController(userServiceMock, authenticationManagerMock, emailServiceMock,
-                tokenServiceMock, gardenServiceMock));
+        accountController = spy(
+                new AccountController(userServiceMock, authenticationManagerMock, emailServiceMock,
+                        tokenServiceMock, gardenServiceMock, securityServiceMock));
         doNothing().when(accountController).setSecurityContext(any(String.class), any(String.class),
                 any(HttpSession.class));
     }
@@ -216,7 +221,8 @@ public class AccountControllerTest {
     @ParameterizedTest
     @CsvSource(value = {
             ":Jobs:false:steve@jobs.com:Password1!:Password1!", // no fname
-            "Steve::false:steve@jobs.com:Password1!:Password1!", // no lname (last name bool set to required)
+            "Steve::false:steve@jobs.com:Password1!:Password1!", // no lname (last name bool set to
+                                                                 // required)
             "Steve:Jobs:false::Password1!:Password1!", // no email
             "Steve:Jobs:false:steve@jobs.com::Password1!", // no password
             "Steve:Jobs:false:steve@jobs.com:Password1!:", // no repeat password
@@ -278,12 +284,14 @@ public class AccountControllerTest {
             "Steve:Jobs}:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
             "Steve:Jobs]:false:steve@jobs.com:Password1!:Password1!", // illegal chars in lname
             " :Jobs:false:steve@jobs.com:Password1!:Password1!", // no fname (Blank)
-            "Steve: :false:steve@jobs.com:Password1!:Password1!", // no lname (last name bool set to required) (Blank)
+            "Steve: :false:steve@jobs.com:Password1!:Password1!", // no lname (last name bool set to
+                                                                  // required) (Blank)
             "Steve:Jobs:false: :Password1!:Password1!", // no email (Blank)
             "Steve:Jobs:false:steve@jobs.com: :Password1!", // no password (Blank)
             "Steve:Jobs:false:steve@jobs.com:Password1!: ", // no repeat password (Blank)
             "'':Jobs:false:steve@jobs.com:Password1!:Password1!", // just special chars fname
-            "Steve:'':false:steve@jobs.com:Password1!:Password1!", // just special chars lname (last name bool set to
+            "Steve:'':false:steve@jobs.com:Password1!:Password1!", // just special chars lname (last name
+                                                                   // bool set to
                                                                    // Required)
             "Steve:Jobs:false:'':Password1!:Password1!", // just special chars email
             "Steve:Jobs:false:steve@jobs.com:'':Password1!", // just special chars password
@@ -355,7 +363,8 @@ public class AccountControllerTest {
     @Test
     public void postLogin_InvalidPassword_AddLoginErrorText() throws Exception {
         MvcResult result = this.mockMvc.perform(
-                post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param("password",
+                post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param(
+                        "password",
                         ""))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("emailAddress", "unUsedTestEmail@gmail.com"))
@@ -380,7 +389,8 @@ public class AccountControllerTest {
     public void postLogin_UserDoesNotExist_AddLoginErrorText() throws Exception {
 
         MvcResult result = this.mockMvc.perform(
-                post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param("password",
+                post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param(
+                        "password",
                         "ValidPa33w0rd!"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("emailAddress", "unUsedTestEmail@gmail.com"))
@@ -409,7 +419,8 @@ public class AccountControllerTest {
         verifiedMockUser.setPassword(userPassword);
         when(verifiedMockUser.getId()).thenReturn(1L);
 
-        when(userServiceMock.getUserByEmailAndPassword(verifiedEmail, userPassword)).thenReturn(verifiedMockUser);
+        when(userServiceMock.getUserByEmailAndPassword(verifiedEmail, userPassword))
+                .thenReturn(verifiedMockUser);
         when(userServiceMock.getUserByEmail(any(String.class))).thenReturn(verifiedMockUser);
 
         when(tokenServiceMock.getTokenByUser(verifiedMockUser)).thenReturn(null);
@@ -421,7 +432,8 @@ public class AccountControllerTest {
         when(authenticationManagerMock.authenticate(any())).thenReturn(authenticationMock);
 
         this.mockMvc.perform(
-                post("/login").with(csrf()).param("emailAddress", verifiedEmail).param("password", userPassword))
+                post("/login").with(csrf()).param("emailAddress", verifiedEmail).param("password",
+                        userPassword))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/home"))
                 .andReturn();
@@ -430,7 +442,8 @@ public class AccountControllerTest {
     @Test
     public void postLogin_UserExistsAndIsNotVerified_RedirectToVerify() throws Exception {
 
-        User unverifiedMockUser = spy(new User("unverifiedFirstName", "unverifiedLastName", unverifiedEmail, null));
+        User unverifiedMockUser = spy(
+                new User("unverifiedFirstName", "unverifiedLastName", unverifiedEmail, null));
         unverifiedMockUser.setPassword(userPassword);
         when(unverifiedMockUser.getId()).thenReturn(1L);
 
@@ -449,7 +462,8 @@ public class AccountControllerTest {
         when(authenticationManagerMock.authenticate(any())).thenReturn(authenticationMock);
 
         this.mockMvc.perform(
-                post("/login").with(csrf()).param("emailAddress", unverifiedEmail).param("password", userPassword))
+                post("/login").with(csrf()).param("emailAddress", unverifiedEmail).param("password",
+                        userPassword))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verify/" + unverifiedEmail));
     }

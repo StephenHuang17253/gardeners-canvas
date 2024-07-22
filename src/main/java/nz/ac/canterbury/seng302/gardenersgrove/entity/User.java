@@ -18,6 +18,8 @@ import java.util.List;
 @Table(name = "user_table")
 public class User {
 
+    private static final int STRIKES_TO_BAN = 6;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -54,6 +56,9 @@ public class User {
     @Column
     private Duration banDuration;
 
+    @Column
+    private Integer strikes;
+
     /**
      * JPA required no-args constructor
      */
@@ -77,6 +82,7 @@ public class User {
         this.verified = false;
         this.lastBanDate = null;
         this.banDuration = null;
+        this.strikes = 0;
     }
 
     public void setFirstName(String firstName) {
@@ -113,6 +119,14 @@ public class User {
 
     public void setBanDuration(Duration banDuration) {
         this.banDuration = banDuration;
+    }
+
+    public void incrementStrikes() {
+        strikes++;
+    }
+
+    public void resetStrikes() {
+        strikes = 0;
     }
 
     public Long getId() {
@@ -161,6 +175,10 @@ public class User {
     public void ban(Duration banDuration) {
         lastBanDate = LocalDateTime.now();
         this.banDuration = banDuration;
+    }
+
+    public int getStrikes() {
+        return strikes;
     }
 
     /**

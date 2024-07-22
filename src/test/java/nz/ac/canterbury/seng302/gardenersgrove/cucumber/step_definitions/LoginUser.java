@@ -50,7 +50,7 @@ public class LoginUser {
 
         AccountController loginPageController = new AccountController(userService, authenticationManager,
                 emailService,
-                tokenService, gardenService);
+                tokenService, gardenService, securityService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(loginPageController).build();
 
