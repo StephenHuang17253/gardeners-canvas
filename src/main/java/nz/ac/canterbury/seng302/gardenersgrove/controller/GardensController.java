@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
@@ -153,12 +153,11 @@ public class GardensController {
             weatherList.add(pastWeather.get(1));
             weatherList.add(gardenWeather.getCurrentWeather());
             weatherList.addAll(gardenWeather.getForecastWeather());
-
-        } catch (Error error) {
-            noWeather = new DailyWeather("not_found.png", null, null);
         } catch (NullPointerException error) {
             noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
             noWeather.setError("Location not found, please update your location to see the weather");
+        } catch (UnavailableException e) {
+            noWeather = new DailyWeather("not_found.png", null, null);
         }
 
         if (noWeather != null) {
@@ -459,7 +458,7 @@ public class GardensController {
         return "gardensPage";
     }
 
-    WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) {
+    WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) throws UnavailableException {
 
         long currentTime = Instant.now().getEpochSecond();
         long timeElapsed = currentTime - lastRequestTime;
@@ -478,7 +477,7 @@ public class GardensController {
         // Check if rate limit exceeded
         if (!semaphore.tryAcquire()) {
             logger.info("Exceeded location API rate limit of 2 requests per second.");
-            throw new Error("429");
+            throw new UnavailableException("429");
         }
         logger.info("Permits left after request: {}", semaphore.availablePermits());
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
