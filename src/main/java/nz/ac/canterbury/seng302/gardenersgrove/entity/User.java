@@ -57,7 +57,7 @@ public class User {
     private Duration banDuration;
 
     @Column
-    private int strikes;
+    private Integer strikes;
 
     /**
      * JPA required no-args constructor
