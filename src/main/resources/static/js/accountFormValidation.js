@@ -25,7 +25,7 @@ const signUpButton = document.querySelector('button[type="submit"]');
  * @param {HTMLElement} errorField - The error message element (firstNameJSError or lastNameJSError).
  * @returns {void}
  */
-const handleInvalidName = (inputField, errorField) => {
+const displayNameError = (inputField, errorField) => {
     inputField.setCustomValidity(" "); // ignore underline, is fine (appears because I'm using a param)
     inputField.classList.add("border-danger");
     errorField.style.display = "block";
@@ -61,10 +61,10 @@ const handleNameUpdate = (event, errorField) => {
     console.log(nameValue);
     if (nameValue.length > 64) {
         errorField.textContent = firstOrLast + " name must be 64 characters long or less";
-        handleInvalidName(event.target, errorField);
+        displayNameError(event.target, errorField);
     } else if (!validNameRegex.test(nameValue) || nameValue === "") {
         errorField.textContent = firstOrLast + " name cannot be empty and must only include letters, spaces, hyphens or apostrophes";
-        handleInvalidName(event.target, errorField);
+        displayNameError(event.target, errorField);
     } else {
         clearNameError(event.target, errorField);
     }
@@ -75,7 +75,7 @@ const handleNameUpdate = (event, errorField) => {
  * Sets the border of the input to red, and makes the error message visible.
  * @returns {void}
  */
-const handleInvalidDate = () => {
+const displayDateError = () => {
     dateOfBirth.setCustomValidity(" ");
     dateOfBirth.classList.add("border-danger");
     dateOfBirthJSError.style.display = "block";
@@ -116,7 +116,7 @@ const handleDateUpdate = (event) => {
     }
 
     if (!dateOfBirth.checkValidity() || !validAge) {
-        handleInvalidDate();
+        displayDateError();
     } else {
         clearDateError();
     }
@@ -127,8 +127,8 @@ const handleDateUpdate = (event) => {
  * Sets the border of the input to red, and makes the error message visible.
  * @returns {void}
  */
-const handleInvalidEmail = () => {
-    email.setCustomValidity("");
+const displayEmailError = () => {
+    email.setCustomValidity(" ");
     email.classList.add("border-danger");
     emailJSError.style.display = "block";
 }
@@ -157,13 +157,13 @@ const handleEmailUpdate = (event) => {
 
     if (emailValue.length > MAX_EMAIL_LENGTH) {
         emailJSError.textContent = "Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters";
-        handleInvalidEmail();
+        displayEmailError();
     } else if (!emailRegex.test(emailValue)) {
         emailJSError.textContent = "Email must be in the form 'jane@doe.nz'";
-        handleInvalidEmail();
+        displayEmailError();
     } else if (localPart.length > 64 || domainPart.length > 255) {
         emailJSError.textContent = "Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters";
-        handleInvalidEmail();
+        displayEmailError();
     } else {
         clearEmailError();
     }
@@ -174,7 +174,7 @@ const handleEmailUpdate = (event) => {
  * Sets the border of the input to red, and makes the error message visible.
  * @returns {void}
  */
-const handleInvalidPassword = () => {
+const displayPasswordError = () => {
     password.setCustomValidity(" ");
     password.classList.add("border-danger");
     passwordJSError.style.display = "block";
@@ -203,9 +203,9 @@ const handlePasswordInput = (event) => {
     const validPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
     if (passwordValue === "") {
-        handleInvalidPassword();
+        displayPasswordError();
     } else if (!validPasswordRegex.test(passwordValue)) {
-        handleInvalidPassword();
+        displayPasswordError();
     } else {
         clearPasswordError();
     }
@@ -256,6 +256,7 @@ const handleFormSubmit = (event) => {
 signUpButton.addEventListener('click', handleFormSubmit);
 
 /**
+ * TODO: Bring up real-time validation on client-side on Tuesday 23rd SCRUM meeting
  * The event listeners below are currently commented out.
  * However, I am considering getting PO approval to change the ACs to allow error messages to appear
  * before the user submits the form.
