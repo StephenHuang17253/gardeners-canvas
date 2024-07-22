@@ -112,9 +112,9 @@ public class GardensController {
         long privateGardensCount = gardens.stream().filter(garden -> !garden.getIsPublic()).count();
 
         if (Objects.equals(filter, "Public")) {
-            gardens = gardens.stream().filter(Garden::getIsPublic).collect(Collectors.toList());
+            gardens = gardens.stream().filter(Garden::getIsPublic).toList();
         } else if (Objects.equals(filter, "Private")) {
-            gardens = gardens.stream().filter(garden -> !garden.getIsPublic()).collect(Collectors.toList());
+            gardens = gardens.stream().filter(garden -> !garden.getIsPublic()).toList();
         }
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
@@ -436,7 +436,7 @@ public class GardensController {
         model.addAttribute("friendName", friendName);
         model.addAttribute("friendGardens", friendGardens);
 
-        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).collect(Collectors.toList());
+        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).toList();
 
         int publicGardensCount = gardens.size();
 
