@@ -17,16 +17,16 @@
                 </form>
             </div>
             <div>
-                <h1 th:text="${gardenName}"></h1>
-                <p th:text="${gardenDescription}"></p>
+                <h1 class="break-word" th:text="${gardenName}"></h1>
+                <p class="break-word" th:text="${gardenDescription}"></p>
                 <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
                     <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                          alt="User's Profile Picture" class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
                 </div>
                 <h5 th:if="${isOwner}">Owner: You</h5>
-                <h5 th:if="${!isOwner}" th:text="'Owner: ' + ${userName}"></h5>
+                <h5 class="break-word" th:if="${!isOwner}" th:text="'Owner: ' + ${userName}"></h5>
                 <div>
-                    <p>
+                    <p class="break-word">
                         <strong>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" transform="translate(0, -2)">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier">
@@ -38,7 +38,7 @@
                             <span th:text="${totalGardens}"></span>
                         </strong>
                     </p>
-                    <p>
+                    <p class="break-word">
                         <strong>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
                                 <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
@@ -47,7 +47,7 @@
                             <span th:text="${gardenLocation}"></span>
                         </strong>
                     </p>
-                    <p>
+                    <p class="break-word">
                         <strong>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows" viewBox="0 0 16 16">
                                 <path d="M1.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L2.707 7.5h10.586l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L13.293 8.5H2.707l1.147 1.146a.5.5 0 0 1-.708.708z"/>

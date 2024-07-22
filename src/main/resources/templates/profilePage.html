@@ -4,15 +4,15 @@
 <head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="~{fragments/navBar.html :: navBar('profile')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="container-md my-5">
-
-        <div class="text-center">
-            <h1>My Profile</h1>
-        </div>
-
-        <div class="row justify-content-center my-5">
-            <div class="col-5 col-md-10 col-lg-4">
+    <div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded py-5 w-50">
+        <div class="row justify-content-center">
+            <div class="text-center py-5">
+                <h1>My Profile</h1>
+            </div>
+            <div class="col-6">
                 <div class="border rounded-3 p-3">
 
                     <form id="profilePictureForm" th:action="@{/profile}" method="post" enctype="multipart/form-data"
@@ -21,16 +21,18 @@
                         <div class="position-relative w-75">
                             <div class="ratio ratio-1x1">
                                 <img id="imageToChange" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                                    alt="User's Profile Picture" class="image-fluid rounded-circle border">
+                                    alt="User's Profile Picture" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
-                            <label
+                            <div
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
-                                <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
+                                    <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
+                                </div>
                                 <input th:name="profilePictureInput" type="file" class="visually-hidden"
                                     accept="image/*" data-image-input data-displayed-by="imageToChange"
                                     data-errored-by="profilePictureError" data-submit-if-valid="true"
                                     th:classappend="${profilePictureError == null ? '' : 'border-danger'}">
-                            </label>
+                            </div>
                         </div>
 
                         <p id="profilePictureError" class="text-danger fs-6" th:text="${profilePictureError}"></p>
@@ -38,7 +40,7 @@
 
                     <div class="mb-3 text-center">
                         <h3>Name</h3>
-                        <p th:text="${userName}"></p>
+                        <p class="break-word" th:text="${userName}"></p>
                     </div>
 
                     <div th:if="${dateOfBirth}" class="mb-3 text-center">
@@ -48,7 +50,7 @@
 
                     <div class="mb-3 text-center">
                         <h3>Email Address</h3>
-                        <p th:text="${emailAddress}"></p>
+                        <p class="break-word" th:text="${emailAddress}"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
