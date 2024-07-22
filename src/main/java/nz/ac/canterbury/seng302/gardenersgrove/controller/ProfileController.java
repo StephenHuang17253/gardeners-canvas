@@ -24,6 +24,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +38,7 @@ import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
@@ -55,6 +57,7 @@ public class ProfileController {
     private final UserService userService;
     private final FileService fileService;
     private final EmailService emailService;
+    private final SecurityService securityService;
 
     /**
      * Constructor for the ProfileController with {@link Autowired} to connect
@@ -68,11 +71,23 @@ public class ProfileController {
     public ProfileController(AuthenticationManager authenticationManager,
             UserService userService,
             FileService fileService,
-            EmailService emailService) {
+            EmailService emailService,
+            SecurityService securityService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.fileService = fileService;
         this.emailService = emailService;
+        this.securityService = securityService; 
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -105,7 +120,7 @@ public class ProfileController {
     @GetMapping("/files/users/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/users/" + filename);
+        logger.info("GET /files/users/{}", filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
@@ -179,13 +194,7 @@ public class ProfileController {
     public String profile(Model model) {
         logger.info("GET /profile");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
-
-        String currentEmail = authentication.getName();
-
-        User user = userService.getUserByEmail(currentEmail);
+        User user = securityService.getCurrentUser();
         String userName = user.getFirstName() + " " + user.getLastName();
 
         String filename = user.getProfilePictureFilename();
@@ -200,8 +209,6 @@ public class ProfileController {
         }
         model.addAttribute("dateOfBirth", formattedDateOfBirth);
         model.addAttribute("emailAddress", user.getEmailAddress());
-
-        logger.info(filename);
 
         return "profilePage";
     }
@@ -220,12 +227,7 @@ public class ProfileController {
             Model model) {
         logger.info("POST /profile");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        User user = userService.getUserByEmail(email);
-
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        User user = securityService.getCurrentUser();
 
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
 
@@ -253,12 +255,8 @@ public class ProfileController {
     @GetMapping("/profile/edit")
     public String editProfile(Model model) {
         logger.info("GET /profile/edit");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        User user = userService.getUserByEmail(email);
-
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        
+        User user = securityService.getCurrentUser();
 
         model.addAttribute("firstName", user.getFirstName());
         model.addAttribute("lastName", user.getLastName());
@@ -298,12 +296,8 @@ public class ProfileController {
             @RequestParam(name = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentEmail = authentication.getName();
-        User currentUser = userService.getUserByEmail(currentEmail);
-
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+        
+        User user = securityService.getCurrentUser();
 
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
@@ -316,7 +310,7 @@ public class ProfileController {
         }
         validationMap.put("lastName", lastNameValidation);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
-        if (emailAddress.equals(currentEmail)) {
+        if (emailAddress.equals(user.getEmailAddress())) {
             emailAddressValidation = ValidationResult.OK;
         }
         validationMap.put("emailAddress", emailAddressValidation);
@@ -365,19 +359,19 @@ public class ProfileController {
             model.addAttribute("emailAddress", emailAddress);
             model.addAttribute("dateOfBirth", dateOfBirth);
             model.addAttribute("noLastName", noLastName);
-            String filename = currentUser.getProfilePictureFilename();
+            String filename = user.getProfilePictureFilename();
             model.addAttribute("profilePicture", filename);
             return "editProfilePage";
         }
 
         // Update the user's profile
         if (!profilePicture.isEmpty()) {
-            updateProfilePicture(currentUser, profilePicture);
+            updateProfilePicture(user, profilePicture);
         }
 
-        userService.updateUser(currentUser.getId(), firstName, lastName, emailAddress, dateOfBirth);
+        userService.updateUser(user.getId(), firstName, lastName, emailAddress, dateOfBirth);
 
-        setSecurityContext(currentUser.getEmailAddress(), currentUser.getEncodedPassword(), request.getSession());
+        setSecurityContext(user.getEmailAddress(), user.getEncodedPassword(), request.getSession());
         return "redirect:/profile";
     }
 
@@ -394,17 +388,12 @@ public class ProfileController {
             @RequestParam(name = "newPassword", required = false) String newPassword,
             @RequestParam(name = "retypePassword", required = false) String retypePassword
     ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
-        String email = authentication.getName();
-        User currentUser = userService.getUserByEmail(email);
+        logger.info("GET /profile/change-password");
 
         model.addAttribute("currentPassword", currentPassword);
         model.addAttribute("newPassword", newPassword);
         model.addAttribute("retypePassword", retypePassword);
 
-        logger.info("GET profile/change-password");
         return "changePasswordPage";
     }
 
@@ -425,12 +414,9 @@ public class ProfileController {
             @RequestParam(name = "newPassword") String newPassword,
             @RequestParam(name = "retypePassword") String retypePassword,
             Model model) {
+        logger.info("POST /profile/change-password");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
-        String currentEmail = authentication.getName();
-        User currentUser = userService.getUserByEmail(currentEmail);
+        User currentUser = securityService.getCurrentUser();
         String firstName = currentUser.getFirstName();
         String lastName = currentUser.getLastName();
         boolean noLastName = false;
@@ -453,13 +439,13 @@ public class ProfileController {
 
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
-        if (noLastName == false) {
+        if (!noLastName) {
             otherFields.add(lastName);
         }
-        if (!(dateOfBirth == null)) {
+        if (dateOfBirth != null) {
             otherFields.add(dateOfBirth.toString());
         }
-        otherFields.add(currentEmail);
+        otherFields.add(currentUser.getEmailAddress());
         ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, otherFields);;
 
         if (!passwordValidation.valid()) {
@@ -478,11 +464,10 @@ public class ProfileController {
         userService.updatePassword(currentUser.getId(), newPassword);
 
         try {
-            logger.info("Attempting to send confirmation email");
+            logger.info("Attempting to send confirmation email to {}", currentUser.getEmailAddress());
             emailService.sendPasswordResetConfirmationEmail(currentUser);
-            logger.info("Password update confirmation email was sent");
         } catch (MessagingException e) {
-            logger.error("Password update confirmation email not sent");
+            logger.error("Unsuccessful");
         }
 
         return "redirect:/profile";
