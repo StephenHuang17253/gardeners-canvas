@@ -3,6 +3,7 @@ let firstNameJSError = document.getElementById("firstNameJSError");
 
 const lastName = document.getElementById("lastName");
 let lastNameJSError = document.getElementById("lastNameJSError");
+const noLastNameCheckbox = document.getElementById("lastNameCheck");
 
 const email = document.getElementById("emailAddress")
 const MAX_EMAIL_LENGTH = 320
@@ -58,7 +59,12 @@ const handleNameUpdate = (event, errorField) => {
     } else {
         firstOrLast = "Last"
     }
-    console.log(nameValue);
+
+    if (firstOrLast === "Last" && !event.target.offsetParent) {
+        clearNameError(event.target, errorField);
+        return;
+    }
+
     if (nameValue.length > 64) {
         errorField.textContent = firstOrLast + " name must be 64 characters long or less";
         displayNameError(event.target, errorField);
