@@ -22,13 +22,13 @@ const updateCounter = (descriptionInput) => {
 
     const descriptionCounter = document.getElementById(counterId);
 
-    if (descriptionInput.value.length > MAX_CHARS) {
+    const characterCount = Array.from(descriptionInput.value).filter(char => !(char.match(/\s/) || char.charCodeAt(0) == variationSelector)).length;
+
+    if (characterCount > MAX_CHARS) {
         descriptionCounter.classList.add("text-danger");
     } else {
         descriptionCounter.classList.remove("text-danger");
     }
-
-    const characterCount = Array.from(descriptionInput.value).filter(char => !(char.match(/\s/) || char.charCodeAt(0) == variationSelector)).length;
 
     descriptionCounter.textContent = characterCount + "/" + MAX_CHARS;
 }
