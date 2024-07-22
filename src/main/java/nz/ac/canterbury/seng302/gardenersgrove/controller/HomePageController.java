@@ -3,11 +3,10 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -40,6 +40,10 @@ public class HomePageController {
 
     private FriendshipService friendshipService;
 
+    private SecurityService securityService;
+
+    private UserInteractionService userInteractionService;
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -49,11 +53,13 @@ public class HomePageController {
      */
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService,
-                              FriendshipService friendshipService) {
+                              FriendshipService friendshipService, SecurityService securityService, UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
+        this.securityService = securityService;
+        this.userInteractionService = userInteractionService;
     }
 
     /**
@@ -79,27 +85,14 @@ public class HomePageController {
 
         String profilePictureString = "/images/default_profile_picture.png";
 
-        if (filename != null && filename.length() != 0) {
+        if (filename != null && !filename.isEmpty()) {
             profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
                     "serveFile", filename).build().toUri().toString();
         }
         return profilePictureString;
     }
 
-    /**
-     * This function is called when a GET request is made to /home
-     * 
-     * @param model
-     * @return The homePage html page
-     */
-    @GetMapping("/home")
-    public String home(Model model) {
-
-        logger.info("GET /home");
-
-        model.addAttribute("myGardens", gardenService.getGardens());
-
-
+    private void createDefaultUsers(){
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
@@ -199,27 +192,48 @@ public class HomePageController {
         if (userService.getAllUsers().isEmpty()) {
             SecurityContextHolder.clearContext();
         }
+    }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
+    /**
+     * This function is called when a GET request is made to /home
+     * 
+     * @param model
+     * @return The homePage html page
+     */
+    @GetMapping("/home")
+    public String home(Model model) {
 
-        String username = "";
-        String profilePicture = "";
+        logger.info("GET /home");
 
-        if (loggedIn) {
-            User user = userService.getUserByEmail(authentication.getName());
-            if (user != null) {
-                username = user.getFirstName() + " " + user.getLastName();
-                String filename = user.getProfilePictureFilename();
-                profilePicture = filename;
-            }
+        createDefaultUsers();
+
+        User user = securityService.getCurrentUser();
+
+        if (user != null) {
+            return loadUserMainPage(user, model);
         }
 
-        model.addAttribute("profilePicture", profilePicture);
-
-        model.addAttribute("username", username);
-
         return "homePage";
+    }
+
+
+    private List<Garden> getRecentGardens(Long userId){
+        List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsofItemType(userId,ItemType.GARDEN);
+        return gardenService.getGardensByInteraction(gardenInteractions);
+    }
+
+
+    private String loadUserMainPage(User user, Model model){
+
+        String username = user.getFirstName() + " " + user.getLastName();
+        String profilePicture = user.getProfilePictureFilename();
+
+        List<Garden> recentGardens = getRecentGardens(user.getId());
+
+        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("username", username);
+        model.addAttribute("recentGardens", recentGardens);
+
+        return "mainPage";
     }
 }

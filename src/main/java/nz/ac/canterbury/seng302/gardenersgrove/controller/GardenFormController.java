@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.model.GardenModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenNavModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -229,11 +229,11 @@ public class GardenFormController {
         User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenModel> gardenModels = new ArrayList<>();
+        List<GardenNavModel> gardenNavModels = new ArrayList<>();
         for(Garden g : gardens){
-            gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
+            gardenNavModels.add(new GardenNavModel(g.getGardenId(), g.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenModels);
+        session.setAttribute("userGardens", gardenNavModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
@@ -389,11 +389,11 @@ public class GardenFormController {
 
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenModel> gardenModels = new ArrayList<>();
+        List<GardenNavModel> gardenNavModels = new ArrayList<>();
         for(Garden g : gardens){
-            gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
+            gardenNavModels.add(new GardenNavModel(g.getGardenId(), g.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenModels);
+        session.setAttribute("userGardens", gardenNavModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
         return "redirect:/my-gardens/{gardenId}";
