@@ -5,7 +5,9 @@
 
 <body>
 <div th:replace="~{fragments/navBar.html :: navBar('browsePublic')}" th:with="loggedIn=${loggedIn}"></div>
-<div class="container mt-5 bg-light border rounded pt-4">
+<div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+     th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+<div class="container mt-5 bg-white border rounded pt-4">
     <div class="row mb-4" >
         <div class="col">
             <h1 class="mb-3">Public Gardens</h1>
