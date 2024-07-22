@@ -11,8 +11,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,24 +19,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @SpringBootTest
 public class addUserProfilePicture {

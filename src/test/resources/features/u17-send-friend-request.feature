@@ -1,4 +1,4 @@
-Feature: U17 (Send friend request): As Liam, I want to connect with my friends on Gardener’s Grove
+Feature: U17 (Send friend request): As Liam, I want to connect with my friends on Gardener's Grove
   so that we can build a community on the app.
 
   Background:
@@ -77,7 +77,7 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     Then user "sarah@email.com" sees the invite from "liam@email.com"
 
   Scenario: AC8 - Given I am on the manage friends page, and I have pending invites, when I accept an invite, then
-  that person is added to my list of friends, and I can see their profile, and I am added to that person’s friends list, and that person can see my profile.
+  that person is added to my list of friends, and I can see their profile, and I am added to that person's friends list, and that person can see my profile.
     Given I as user "sarah@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
     And I "sarah@email.com" have a pending invite from "liam@email.com"
