@@ -93,13 +93,17 @@ public class ProfanityResponseData {
         }
     }
     void detectError(JsonNode jsonProfanityData) {
-        if (jsonProfanityData.get("error") != null) {
-            errorCode = jsonProfanityData.get("error").asInt();
-            if (errorCode == 429) {
-                callLimitExceeded = true;
+        if (jsonProfanityData.has("error")) {
+            JsonNode errorNode = jsonProfanityData.get("error");
+            if (errorNode.has("code")) {
+                errorCode = jsonProfanityData.get("code").asInt();
+                if (errorCode == 429) {
+                    callLimitExceeded = true;
+                }
             }
         }
     }
+
     /**
      * Sets the hasProfanity flag based on the presence of terms.
      */
