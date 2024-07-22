@@ -6,10 +6,7 @@ import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +44,8 @@ public class RegisterANewUser {
 
     public TokenService tokenService;
 
+    public SecurityService securityService;
+
     String firstName;
     String lastName;
     Boolean noLastName = false;
@@ -63,7 +62,7 @@ public class RegisterANewUser {
         gardenService = Mockito.mock(GardenService.class);
 
         AccountController accountController = new AccountController(userService, authenticationManager, emailService,
-                tokenService, gardenService, null);
+                tokenService, gardenService, securityService);
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }

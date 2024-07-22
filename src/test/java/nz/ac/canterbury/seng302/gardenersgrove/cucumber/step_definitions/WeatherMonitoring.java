@@ -64,7 +64,7 @@ public class WeatherMonitoring {
     @Autowired
     public FriendshipRepository friendshipRepository;
 
-    public SecurityService securityService;
+    public static SecurityService securityService;
 
     private static GardenService gardenService;
 
