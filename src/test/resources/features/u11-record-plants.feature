@@ -2,7 +2,7 @@ Feature: U11 (Record plants in garden): As Kaia, I want to record the different 
 
   Background:
     Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
-    And User "kaia@email.com" has a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
+    And User "kaia@email.com" with a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
     And I as user "kaia@email.com" am logged in with "TestPassword10!"
 
     Scenario: AC1 -  “Add new plant” button takes you to a new "add plant form"

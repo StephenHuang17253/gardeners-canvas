@@ -130,6 +130,7 @@ public class U10_Acceptance_Testing {
                         .get(gardenUrl)
 
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
     }
 
     @Then("I see the edit garden form where all the details are prepopulated")
