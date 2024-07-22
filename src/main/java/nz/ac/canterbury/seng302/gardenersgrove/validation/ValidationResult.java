@@ -34,33 +34,31 @@ public enum ValidationResult {
 
     private String message;
 
-    ValidationResult(String inMessage)
-    {
+    ValidationResult(String inMessage) {
         this.message = inMessage;
     }
 
     /**
      * Returns if the string passed validation
+     *
      * @return pass status (true for yes)
      */
-    public boolean valid()
-    {
+    public boolean valid() {
         return this == OK;
     }
 
     /**
      * returns a basic description of why the input failed
      * IMPORTANT: this is not sufficient as user feedback, more info is needed if this output is shown on UI
+     *
      * @return fail or ok Message
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.message;
     }
 
-    public void updateMessage(String newMessage)
-    {
+    public void updateMessage(String newMessage) {
         this.message = newMessage;
     }
 }

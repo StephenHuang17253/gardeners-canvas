@@ -46,7 +46,7 @@ public class GardenFormController {
 
     @Autowired
     public GardenFormController(GardenService gardenService, LocationService locationService,
-            SecurityService securityService) {
+                                SecurityService securityService) {
         this.gardenService = gardenService;
         this.locationService = locationService;
         this.securityService = securityService;
@@ -54,7 +54,7 @@ public class GardenFormController {
 
     /**
      * Adds the loggedIn attribute to the model for all requests
-     * 
+     *
      * @param model
      */
     @ModelAttribute
@@ -70,7 +70,7 @@ public class GardenFormController {
      *
      * @param query The search query for location autocomplete suggestions.
      * @return A JSON response string containing location suggestions, or a "429"
-     *         string if rate limit is exceeded.
+     * string if rate limit is exceeded.
      * @throws IOException          If an I/O error occurs while making the
      *                              requesting
      * @throws InterruptedException If an interruption occurs while waiting for
@@ -111,16 +111,16 @@ public class GardenFormController {
      */
     @GetMapping("/create-new-garden")
     public String newGardenForm(@RequestParam(name = "gardenName", required = false) String gardenName,
-            @RequestParam(name = "streetAddress", required = false) String streetAddress,
-            @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
-            @RequestParam(name = "suburb", required = false) String suburb,
-            @RequestParam(name = "city", required = false) String city,
-            @RequestParam(name = "country", required = false) String country,
-            @RequestParam(name = "postcode", required = false) String postcode,
-            @RequestParam(name = "gardenSize", required = false) String gardenSize,
-            @RequestParam(name = "longitude", required = false) String longitude,
-            @RequestParam(name = "latitude", required = false) String latitude,
-            Model model) {
+                                @RequestParam(name = "streetAddress", required = false) String streetAddress,
+                                @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
+                                @RequestParam(name = "suburb", required = false) String suburb,
+                                @RequestParam(name = "city", required = false) String city,
+                                @RequestParam(name = "country", required = false) String country,
+                                @RequestParam(name = "postcode", required = false) String postcode,
+                                @RequestParam(name = "gardenSize", required = false) String gardenSize,
+                                @RequestParam(name = "longitude", required = false) String longitude,
+                                @RequestParam(name = "latitude", required = false) String latitude,
+                                Model model) {
 
         model.addAttribute("gardenName", gardenName);
         model.addAttribute("gardenDescription", gardenDescription);
@@ -160,18 +160,18 @@ public class GardenFormController {
      */
     @PostMapping("/create-new-garden")
     public String submitNewGardenForm(@RequestParam(name = "gardenName") String gardenName,
-            @RequestParam(name = "gardenDescription") String gardenDescription,
-            @RequestParam(name = "streetAddress") String streetAddress,
-            @RequestParam(name = "suburb") String suburb,
-            @RequestParam(name = "city") String city,
-            @RequestParam(name = "country") String country,
-            @RequestParam(name = "postcode") String postcode,
-            @RequestParam(name = "gardenSize") String gardenSize,
-            @RequestParam(name = "longitude") String longitude,
-            @RequestParam(name = "latitude") String latitude,
-            HttpSession session,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+                                      @RequestParam(name = "gardenDescription") String gardenDescription,
+                                      @RequestParam(name = "streetAddress") String streetAddress,
+                                      @RequestParam(name = "suburb") String suburb,
+                                      @RequestParam(name = "city") String city,
+                                      @RequestParam(name = "country") String country,
+                                      @RequestParam(name = "postcode") String postcode,
+                                      @RequestParam(name = "gardenSize") String gardenSize,
+                                      @RequestParam(name = "longitude") String longitude,
+                                      @RequestParam(name = "latitude") String latitude,
+                                      HttpSession session,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
 
         logger.info("POST /create-new-garden");
 
@@ -228,7 +228,7 @@ public class GardenFormController {
         gardenService.addGarden(garden);
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
         List<GardenModel> gardenModels = new ArrayList<>();
-        for(Garden g : gardens){
+        for (Garden g : gardens) {
             gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
         }
         session.setAttribute("userGardens", gardenModels);
@@ -246,8 +246,8 @@ public class GardenFormController {
      */
     @GetMapping("/my-gardens/{gardenId}/edit")
     public String editGardenDetails(@PathVariable Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+                                    HttpServletResponse response,
+                                    Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -305,18 +305,18 @@ public class GardenFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/edit")
     public String submitEditedGardenForm(@RequestParam(name = "gardenName") String gardenName,
-            @RequestParam(name = "gardenDescription") String gardenDescription,
-            @RequestParam(name = "streetAddress") String streetAddress,
-            @RequestParam(name = "suburb") String suburb,
-            @RequestParam(name = "city") String city,
-            @RequestParam(name = "country") String country,
-            @RequestParam(name = "postcode") String postcode,
-            @RequestParam(name = "gardenSize") String gardenSize,
-            @RequestParam(name = "longitude") String longitude,
-            @RequestParam(name = "latitude") String latitude,
-            @PathVariable Long gardenId, HttpSession session,
-            HttpServletResponse response,
-            Model model) {
+                                         @RequestParam(name = "gardenDescription") String gardenDescription,
+                                         @RequestParam(name = "streetAddress") String streetAddress,
+                                         @RequestParam(name = "suburb") String suburb,
+                                         @RequestParam(name = "city") String city,
+                                         @RequestParam(name = "country") String country,
+                                         @RequestParam(name = "postcode") String postcode,
+                                         @RequestParam(name = "gardenSize") String gardenSize,
+                                         @RequestParam(name = "longitude") String longitude,
+                                         @RequestParam(name = "latitude") String latitude,
+                                         @PathVariable Long gardenId, HttpSession session,
+                                         HttpServletResponse response,
+                                         Model model) {
         logger.info("POST / edited garden");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -379,7 +379,7 @@ public class GardenFormController {
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
         List<GardenModel> gardenModels = new ArrayList<>();
-        for(Garden g : gardens){
+        for (Garden g : gardens) {
             gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
         }
         session.setAttribute("userGardens", gardenModels);
@@ -393,10 +393,10 @@ public class GardenFormController {
      * parameters and prints the appropriate
      */
     private void gardenFormErrorText(Model model, ValidationResult gardenNameResult,
-            ValidationResult streetAddressResult,
-            ValidationResult suburbResult, ValidationResult cityResult,
-            ValidationResult countryResult, ValidationResult postcodeResult,
-            ValidationResult gardenSizeResult, ValidationResult gardenDescriptionResult) {
+                                     ValidationResult streetAddressResult,
+                                     ValidationResult suburbResult, ValidationResult cityResult,
+                                     ValidationResult countryResult, ValidationResult postcodeResult,
+                                     ValidationResult gardenSizeResult, ValidationResult gardenDescriptionResult) {
 
         // notifies the user that the garden Name is invalid (if applicable)
         if (!gardenNameResult.valid()) {
