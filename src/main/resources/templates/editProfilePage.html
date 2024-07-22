@@ -81,7 +81,7 @@
                     <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
                            th:value="*{emailAddress}"
                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
-                    <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    <p id="emailError" th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
                     <p id="emailJSError" class="text-danger fs-6" style="display: none;"
                        th:text="'Email must be in the form \'jane@doe.nz\''"></p>
                 </div>

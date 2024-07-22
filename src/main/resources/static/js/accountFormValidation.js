@@ -7,6 +7,7 @@ const lastNameJSError = document.getElementById("lastNameJSError");
 
 const email = document.getElementById("emailAddress")
 const MAX_EMAIL_LENGTH = 320
+const emailServerError = document.getElementById("emailError")
 const emailJSError = document.getElementById("emailJSError");
 
 const dateOfBirth = document.getElementById("dateOfBirth");
@@ -143,6 +144,7 @@ const displayEmailError = () => {
     email.setCustomValidity(" ");
     email.classList.add("border-danger");
     emailJSError.style.display = "block";
+    emailServerError.style.display = "none";
 }
 
 /**

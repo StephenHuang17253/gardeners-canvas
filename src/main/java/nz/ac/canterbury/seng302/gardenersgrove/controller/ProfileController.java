@@ -348,7 +348,7 @@ public class ProfileController {
                     case "lastName" ->
                         "Last name " + error;
                     case "emailAddress" ->
-                        "Email address " + error;
+                        error;
                     default ->
                         entry.getValue().toString();
                 };
