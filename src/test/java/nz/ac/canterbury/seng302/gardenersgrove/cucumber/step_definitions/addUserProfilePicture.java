@@ -52,6 +52,7 @@ public class addUserProfilePicture {
     public EmailService emailService;
     public FileService fileService;
     public UserService userService;
+    @Autowired
     public SecurityService securityService;
 
     String firstName = "John";
