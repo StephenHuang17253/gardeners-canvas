@@ -144,7 +144,9 @@ const displayEmailError = () => {
     email.setCustomValidity(" ");
     email.classList.add("border-danger");
     emailJSError.style.display = "block";
-    emailServerError.style.display = "none";
+    if (emailServerError) {
+        emailServerError.style.display = "none";
+    }
 }
 
 /**
@@ -226,6 +228,28 @@ const handlePasswordInput = (event) => {
 }
 
 /**
+ * Handles the case where the user's input for the password field is invalid (not the same).
+ * Sets the border of the input to red, and makes the error message visible.
+ * @returns {void}
+ */
+const displayRepeatPasswordError = () => {
+    repeatPassword.setCustomValidity(" ");
+    repeatPassword.classList.add("border-danger");
+    repeatPasswordJSError.style.display = "block";
+    repeatPasswordJSError.textContent = "Passwords do not match";
+}
+
+/**
+ * Clears the error message and removes the red border from the input field.
+ * @returns {void}
+ */
+const clearRepeatPasswordError = () => {
+    repeatPassword.setCustomValidity("");
+    repeatPassword.classList.remove("border-danger");
+    repeatPasswordJSError.style.display = "none";
+}
+
+/**
  * Handles updates (char input) to the input field for the user's repeated password.
  * @param {{target: HTMLElement}} event - The input event.
  * @returns {void}
@@ -235,14 +259,9 @@ const handleRepeatPasswordInput = (event) => {
     const passwordValue = password.value;
 
     if (repeatPasswordValue !== passwordValue) {
-        repeatPassword.setCustomValidity(" ");
-        repeatPassword.classList.add("border-danger");
-        repeatPasswordJSError.style.display = "block";
-        repeatPasswordJSError.textContent = "Passwords do not match";
+        displayRepeatPasswordError()
     } else {
-        repeatPassword.setCustomValidity("");
-        repeatPassword.classList.remove("border-danger");
-        repeatPasswordJSError.style.display = "none";
+        clearRepeatPasswordError()
     }
 }
 
@@ -264,6 +283,8 @@ const handleFormSubmit = (event) => {
     if (!firstName.checkValidity() || !lastName.checkValidity() || !email.checkValidity()
         || !dateOfBirth.checkValidity() || !password.checkValidity() || !repeatPassword.checkValidity()) {
         event.preventDefault();
+        password.value = "";
+        repeatPassword.value = "";
     }
 }
 
