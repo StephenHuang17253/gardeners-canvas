@@ -10,7 +10,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Selected plant::
                             <select class="form-select" aria-label="Select garden">
                                 <option selected>Select a garden</option>
                                 <option th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}" th:value="${garden.getGardenId}"></option>
