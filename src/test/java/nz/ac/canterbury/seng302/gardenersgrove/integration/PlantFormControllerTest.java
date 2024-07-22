@@ -232,7 +232,6 @@ public class PlantFormControllerTest {
         Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
         Assertions.assertTrue(optionalPlant.isPresent());
         Plant actualPlant = optionalPlant.get();
-
         Assertions.assertNotEquals(plantName, actualPlant.getPlantName());
 
     }
