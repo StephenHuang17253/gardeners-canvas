@@ -15,9 +15,9 @@
                                 <option th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}" th:value="${garden.getGardenId}"></option>
                             </select>
                         </div>
-                        <div class="modal-footer">
+                        <div class="modal-footer justify-content-center">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary">Add to garden</button>
+                            <button type="button" class="btn btn-success">Add to garden</button>
                         </div>
                     </div>
                 </div>
