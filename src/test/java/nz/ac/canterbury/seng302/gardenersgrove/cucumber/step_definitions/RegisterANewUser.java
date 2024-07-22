@@ -44,6 +44,7 @@ public class RegisterANewUser {
 
     public TokenService tokenService;
 
+    @Autowired
     public SecurityService securityService;
 
     String firstName;
