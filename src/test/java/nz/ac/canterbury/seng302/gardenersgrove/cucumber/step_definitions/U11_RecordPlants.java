@@ -112,7 +112,7 @@ public class U11_RecordPlants {
     }
     @When("I click the add new plant button")
     public void iClickTheAddNewPlantButton() throws Exception {
-        String gardenUrl = String.format("/my-gardens/%d/create-new-plant", expectedGarden.getGardenId());
+        String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
         newPlantResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
                         .get(gardenUrl)
