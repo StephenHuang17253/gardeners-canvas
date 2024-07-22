@@ -6,11 +6,11 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5">Modal title</h1>
+                            <h1 class="modal-title fs-5">Select one of your gardens to add plant to:</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Select a Garden to import plant to:
+                            Selected plant::
                             <select class="form-select" aria-label="Select garden">
                                 <option selected>Select a garden</option>
                                 <option th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}" th:value="${garden.getGardenId}"></option>
