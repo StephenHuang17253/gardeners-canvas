@@ -20,7 +20,7 @@ public enum ValidationResult {
     PLANT_AGE_ABOVE_400("Plant date cannot be more than 400 years ago."),
     PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE("Plant date cannot be more than a year in the future."),
     INVALID_DATE_FORMAT("Date in not in valid format, DD/MM/YYYY"),
-    NON_UNIQUE_EMAIL("Email is already in use"),
+    NON_UNIQUE_EMAIL("This email address is already in use"),
     NON_NUMERIC_COMMA("must be a positive number"),
     LENGTH_OVER_LIMIT("must be less than limit characters"),
     LENGTH_UNDER_MINIMUM("must be more than minimum number of characters"),
