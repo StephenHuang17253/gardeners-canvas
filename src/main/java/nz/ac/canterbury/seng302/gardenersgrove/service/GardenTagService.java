@@ -45,7 +45,7 @@ public class GardenTagService {
         boolean nameInUse = this.getByName(gardenTag.getTagName()).isPresent();
         if (nameInUse)
         {
-            throw new IllegalArgumentException("A Tag with this nme already exists");
+            throw new IllegalArgumentException("A Tag with this name already exists");
         }
         return gardenTagRepository.save(gardenTag);
 

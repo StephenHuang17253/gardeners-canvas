@@ -45,13 +45,13 @@ public class GardenTag {
      * get a tag objects name
      * @return the name
      */
-    public String getTagName() {return tagName;}
+    public String getTagName() { return tagName; }
 
     /**
      * change a tag objects name
      * @param newTagName new name
      */
-    public void setTagName(String newTagName) {this.tagName = newTagName;}
+    public void setTagName(String newTagName) { this.tagName = newTagName; }
 
 
     @Override
