@@ -1,21 +1,22 @@
 const firstName = document.getElementById("firstName");
-let firstNameJSError = document.getElementById("firstNameJSError");
+const firstNameJSError = document.getElementById("firstNameJSError");
 
 const lastName = document.getElementById("lastName");
-let lastNameJSError = document.getElementById("lastNameJSError");
-const noLastNameCheckbox = document.getElementById("lastNameCheck");
+const lastNameJSError = document.getElementById("lastNameJSError");
+
 
 const email = document.getElementById("emailAddress")
 const MAX_EMAIL_LENGTH = 320
-let emailJSError = document.getElementById("emailJSError");
+const emailServerError = document.getElementById("emailError")
+const emailJSError = document.getElementById("emailJSError");
 
 const dateOfBirth = document.getElementById("dateOfBirth");
-let dateOfBirthJSError = document.getElementById("dateOfBirthJSError");
+const dateOfBirthJSError = document.getElementById("dateOfBirthJSError");
 
 const password = document.getElementById("password");
 const repeatPassword = document.getElementById("repeatPassword");
-let passwordJSError = document.getElementById("passwordJSError");
-let repeatPasswordJSError = document.getElementById("repeatPasswordJSError");
+const passwordJSError = document.getElementById("passwordJSError");
+const repeatPasswordJSError = document.getElementById("repeatPasswordJSError");
 
 const signUpButton = document.querySelector('button[type="submit"]');
 
@@ -143,6 +144,7 @@ const displayEmailError = () => {
     email.setCustomValidity(" ");
     email.classList.add("border-danger");
     emailJSError.style.display = "block";
+    emailServerError.style.display = "none";
 }
 
 /**

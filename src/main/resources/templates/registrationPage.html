@@ -22,7 +22,7 @@
                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
                     <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
                     <p id="firstNameJSError" class="text-danger fs-6" style="display: none;"
-                       th:text="'First name must be less than or equal to 64 characters'"></p>
+                       th:text="'First name must be 64 characters long or less'"></p>
                 </div>
 
                 <div class="mb-3" id="lastNameDiv">
@@ -31,7 +31,7 @@
                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
                     <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
                     <p id="lastNameJSError" class="text-danger fs-6" style="display: none;"
-                       th:text="'Last name must be less than or equal to 64 characters'"></p>
+                       th:text="'Last name must be 64 characters long or less'"></p>
                 </div>
 
                 <div class="form-check mb-3">
@@ -46,7 +46,7 @@
                     <label for="dateOfBirth" class="form-label">Date of Birth</label>
                     <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
                            th:value="*{dateOfBirth}" max="9999-12-30"
-                           th:oninvalid="handleInvalidDate()" th:oninput="clearDateError()"
+                           th:oninvalid="displayDateError()" th:oninput="clearDateError()"
                            th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
                     <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
                        th:text="${dateOfBirthError}"></p>
@@ -59,7 +59,7 @@
                     <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
                            th:value="*{emailAddress}"
                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
-                    <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    <p id="emailError" th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
                     <p id="emailJSError" class="text-danger fs-6" style="display: none;"
                        th:text="'Email must be in the form \'jane@doe.nz\''"></p>
                 </div>
