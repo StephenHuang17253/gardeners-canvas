@@ -191,6 +191,50 @@ class GardenTagServiceIntegrationTest {
     }
 
     @Test
+    void simpleFetchGardenTag_getAll_withMultipleNames()
+    {
+        GardenTag tag1 = new GardenTag("Test");
+        GardenTag tag2 = new GardenTag("Test2");
+        GardenTag tag3 = new GardenTag("Test3");
+        GardenTag tag4 = new GardenTag("Test4");
+        GardenTag tag5 = new GardenTag("Test5");
+        GardenTag tag6 = new GardenTag("Test6");
+        GardenTag tag7 = new GardenTag("redHerring");
+        HashSet<String> gardenTagHashSet = new HashSet<>();
+        gardenTagHashSet.add(tag1.getTagName());
+        gardenTagHashSet.add(tag2.getTagName());
+        gardenTagHashSet.add(tag3.getTagName());
+        gardenTagHashSet.add(tag4.getTagName());
+        gardenTagHashSet.add(tag5.getTagName());
+        gardenTagHashSet.add(tag6.getTagName());
+        gardenTagHashSet.add(tag7.getTagName());
+
+        gardenTagService.addGardenTag(tag1);
+        gardenTagService.addGardenTag(tag2);
+        gardenTagService.addGardenTag(tag3);
+        gardenTagService.addGardenTag(tag4);
+        gardenTagService.addGardenTag(tag5);
+        gardenTagService.addGardenTag(tag6);
+        gardenTagService.addGardenTag(tag7);
+
+        try
+        {
+            List<GardenTag> SearchResults = gardenTagService.getAllGardenTags();
+            Assertions.assertEquals(7, SearchResults.size());
+            for (GardenTag tag: SearchResults)
+            {
+                Assertions.assertTrue(gardenTagHashSet.contains(tag.getTagName()));
+                gardenTagHashSet.remove(tag.getTagName());
+            }
+
+        }
+        catch (NoSuchElementException exception)
+        {
+            fail(exception);
+        }
+    }
+
+    @Test
     void simpleFetchGardenTag_OnSimilarName_NoneMatch()
     {
         GardenTag tag1 = new GardenTag("redHerring1");
