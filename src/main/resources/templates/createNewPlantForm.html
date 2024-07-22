@@ -26,7 +26,7 @@
                                     class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
 
-                            <div
+                            <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
                                 <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
                                     <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
@@ -34,7 +34,7 @@
                                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                                     data-image-input data-displayed-by="imageToChange"
                                     data-errored-by="plantPictureError" class="visually-hidden">
-                            </div>
+                            </label>
                         </div>
                         <p id="plantPictureError" class="text-danger fs-6" th:text="${plantPictureError}"></p>
                     </div>

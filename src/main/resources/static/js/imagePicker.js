@@ -1,5 +1,5 @@
 const MAX_FILE_SIZE = 10; // in MB
-const ERROR_DISPLAY_DURATION = 5000; // in ms
+const ERROR_DISPLAY_DURATION = 5; // in secs
 const imageInputs = document.querySelectorAll("[data-image-input]");
 const errorMessage = `Image must be less than ${MAX_FILE_SIZE}MB`;
 
@@ -23,8 +23,6 @@ const handleFileSelect = (imageInput) => {
 
     const file = files[0];
 
-    const fileSizeInMB = file.size / (1024 ** 2);
-
     const errorDisplayId = imageInput.getAttribute("data-errored-by");
     const errorDisplayElement = document.getElementById(errorDisplayId);
 
@@ -32,7 +30,7 @@ const handleFileSelect = (imageInput) => {
     const imageDisplayElement = document.getElementById(imageDisplayId);
 
     // Check if file size is greater than the max file size
-    if (fileSizeInMB > MAX_FILE_SIZE) {
+    if (file.size > MAX_FILE_SIZE * (1024 ** 2)) {
         errorDisplayElement.textContent = errorMessage;
         imageDisplayElement.classList.add("border-danger");
         imageInput.value = '';
@@ -41,7 +39,7 @@ const handleFileSelect = (imageInput) => {
         setTimeout(() => {
             imageDisplayElement.classList.remove("border-danger");
             errorDisplayElement.textContent = '';
-        }, ERROR_DISPLAY_DURATION)
+        }, ERROR_DISPLAY_DURATION * 1000)
         return;
     }
 
