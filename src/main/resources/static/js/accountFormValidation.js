@@ -105,8 +105,13 @@ const handleDateUpdate = (event) => {
     const monthDiff = today.getMonth() - dateValue.getMonth();
     const dayDiff = today.getDate() - dateValue.getDate();
 
-    let validAge = false;
+    if (!dateOfBirth.checkValidity()) {
+        dateOfBirthJSError.textContent = "Date is not in valid format, DD/MM/YYYY";
+        displayDateError();
+        return
+    }
 
+    let validAge = false;
     if (age > 120 || (age === 120 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
         dateOfBirthJSError.textContent = "The maximum age allowed is 120 years";
     } else if (age < 13 || (age === 13 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
@@ -115,7 +120,8 @@ const handleDateUpdate = (event) => {
         validAge = true;
     }
 
-    if (!dateOfBirth.checkValidity() || !validAge) {
+
+    if (!validAge) {
         displayDateError();
     } else {
         clearDateError();
