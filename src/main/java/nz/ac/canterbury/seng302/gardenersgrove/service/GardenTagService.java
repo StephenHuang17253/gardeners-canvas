@@ -41,8 +41,14 @@ public class GardenTagService {
      * @param gardenTag the tag to save
      * @return the tag to save (with filled in id field)
      */
-    public GardenTag addGardenTag(GardenTag gardenTag) {
+    public GardenTag addGardenTag(GardenTag gardenTag) throws IllegalArgumentException {
+        boolean nameInUse = this.getByName(gardenTag.getTagName()).isPresent();
+        if (nameInUse)
+        {
+            throw new IllegalArgumentException("A Tag with this nme already exists");
+        }
         return gardenTagRepository.save(gardenTag);
+
     }
 
     /**

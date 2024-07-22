@@ -11,11 +11,13 @@ public class GardenTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tag_id")
     private Long tagId;
 
     /**
      * The name on the tag
      */
+    @Column(columnDefinition = "TEXT", unique = true)
     private String tagName;
 
     /**
