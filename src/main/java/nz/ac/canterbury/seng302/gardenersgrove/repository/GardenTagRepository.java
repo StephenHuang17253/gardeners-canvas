@@ -28,11 +28,11 @@ public interface GardenTagRepository extends CrudRepository<GardenTag, Long> {
     Optional<GardenTag> findByTagNameIs(String name);
 
     /**
-     * Finds garden objects who's name contains a specific string
+     * Finds garden objects who's name contains a specific string (ignores case)
      * @param name string to match in each gardenTag object
      * @return none or a GardenTag object
      */
-    List<GardenTag> findByTagNameContains(String name);
+    List<GardenTag> findByTagNameContainsIgnoreCase(String name);
 
     /**
      * Find all GardenTag objects in repo

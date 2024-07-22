@@ -13,7 +13,9 @@ public class GardenTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tagId;
 
-
+    /**
+     * The name on the tag
+     */
     private String tagName;
 
     /**
@@ -29,10 +31,24 @@ public class GardenTag {
         tagName = tagNameInput;
     }
 
+    /**
+     * get a tag object's id
+     * @return the id
+     */
     public Long getId() {
         return tagId;
     }
+
+    /**
+     * get a tag objects name
+     * @return the name
+     */
     public String getTagName() {return tagName;}
+
+    /**
+     * change a tag objects name
+     * @param newTagName new name
+     */
     public void setTagName(String newTagName) {this.tagName = newTagName;}
 
 

@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,13 +8,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class that manages Garden tags
+ */
 @Service
 public class GardenTagService {
 
     /**
      * Interface for generic CRUD operations on a repository for GardenTag types.
      */
-    private GardenTagRepository gardenTagRepository;
+    private final GardenTagRepository gardenTagRepository;
 
     /**
      * GardenTagService constructor with repository.
@@ -28,19 +30,48 @@ public class GardenTagService {
         this.gardenTagRepository = gardenTagRepositoryInput;
     }
 
-    public List<GardenTag> getGardenTags() {return gardenTagRepository.findAll();}
+    /**
+     * Gets all Garden tags currently stored in the underlying repository
+     * @return all tags in underlying repository as a List of tags
+     */
+    public List<GardenTag> getAllGardenTags() {return gardenTagRepository.findAll();}
 
-    public void addGardenTag(GardenTag gardenTag) {
-        gardenTagRepository.save(gardenTag);
+    /**
+     * Saves a garden tag to the repository
+     * @param gardenTag the tag to save
+     * @return the tag to save (with filled in id field)
+     */
+    public GardenTag addGardenTag(GardenTag gardenTag) {
+        return gardenTagRepository.save(gardenTag);
     }
 
+    /**
+     * Gets a tag from the database with a matching name, returns an empty Optional if not found
+     * @param queryString the name of the target tag
+     * @return An empty optional or one containing a matching tag
+     */
     public Optional<GardenTag> getByName(String queryString)
     {
         return gardenTagRepository.findByTagNameIs(queryString);
     }
 
+    /**
+     * Gets a tag from the database with a matching id, returns an empty Optional if not found
+     * @param id the id of the target tag
+     * @return An empty optional or one containing a matching tag
+     */
+    public Optional<GardenTag> getById(Long id)
+    {
+        return gardenTagRepository.findById(id);
+    }
+
+    /**
+     * Returns a list of all tags that contain the query string regardless of case
+     * @param queryString the query string to match
+     * @return a list of all matching tags
+     */
     public List<GardenTag> getAllSimilar(String queryString)
     {
-        return gardenTagRepository.findByTagNameContains(queryString);
+        return gardenTagRepository.findByTagNameContainsIgnoreCase(queryString);
     }
 }
