@@ -85,15 +85,6 @@ public void before_or_after_all() {
                 .andExpect(status().isForbidden()); //Should be 403 as the user is not logged in
     }
 
-    @Test
-    public void getMappingNotLoggedIn_home_containsNoNames() throws Exception
-    {
-        this.mockMvc.perform(get("/home"))
-                .andDo(print())
-                .andExpect(status().isOk()) //Should be 403 as the user is not logged in
-                .andExpect(model().attribute("profilePicture",is("")))
-                .andExpect(model().attribute("username", is("")));
-    }
 
     @Test
     @WithMockUser(username="johndoe.test@email.com")
