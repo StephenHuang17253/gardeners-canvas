@@ -46,7 +46,7 @@
                     <label for="dateOfBirth" class="form-label">Date of Birth</label>
                     <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
                            th:value="*{dateOfBirth}" max="9999-12-30"
-                           th:oninvalid="handleInvalidDate()" th:oninput="clearDateError()"
+                           th:oninvalid="displayDateError()" th:oninput="clearDateError()"
                            th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
                     <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
                        th:text="${dateOfBirthError}"></p>
