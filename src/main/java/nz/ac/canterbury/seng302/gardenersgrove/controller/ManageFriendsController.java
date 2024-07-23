@@ -53,9 +53,9 @@ public class ManageFriendsController {
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
-     * @param securityService service to access security methods
+     * @param securityService   service to access security methods
      * @param friendshipService service to access plant repository
-     * @param fileService service to manage files
+     * @param fileService       service to manage files
      */
     @Autowired
     public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
@@ -178,9 +178,11 @@ public class ManageFriendsController {
     }
 
     /**
+     * Get all people in database matching input string
+     *
      * @param searchInput input name or email from user
      * @param validEmail  Validation result of if searchInput is an email
-     * @return
+     * @return list of results in FriendModels
      */
     List<FriendModel> getSearchResults(String searchInput, ValidationResult validEmail) {
         List<FriendModel> friendModels = new ArrayList<>();
@@ -264,10 +266,10 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId,
-            @RequestParam("activeTab") String activeTab,
-            @RequestParam(value = "searchInput", required = false) String searchInput,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+                                   @RequestParam("activeTab") String activeTab,
+                                   @RequestParam(value = "searchInput", required = false) String searchInput,
+                                   RedirectAttributes redirectAttributes,
+                                   Model model) {
         logger.info("POST /manage-friends/send-invite");
 
         User currentUser = securityService.getCurrentUser();
@@ -294,19 +296,19 @@ public class ManageFriendsController {
      * Changes the status of a pending request, based on whether it was accepted
      * or declined
      *
-     * @param friendAccepted boolean, whether the friend request was accepted or
-     * declined
+     * @param friendAccepted  boolean, whether the friend request was accepted or
+     *                        declined
      * @param pendingFriendId the id of the user who sent the request
-     * @param activeTab the tab which the user is on ( #pending for this
-     * endpoint )
+     * @param activeTab       the tab which the user is on ( #pending for this
+     *                        endpoint )
      * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends")
-    public String managePendingRequest(@RequestParam(name = "friendAccepted", required = true) boolean friendAccepted,
-            @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
-            @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+    public String managePendingRequest(@RequestParam(name = "friendAccepted") boolean friendAccepted,
+                                       @RequestParam(name = "pendingFriendId") Long pendingFriendId,
+                                       @RequestParam("activeTab") String activeTab,
+                                       RedirectAttributes redirectAttributes,
+                                       Model model) {
         logger.info("POST /manage-friends");
 
         if (friendAccepted) {
@@ -325,17 +327,17 @@ public class ManageFriendsController {
      * cancels a pending friend request, or when they remove a friend from their
      * friends list.
      *
-     * @param friendId the user they sent the request to, or removed from
-     * friends
+     * @param friendId  the user they sent the request to, or removed from
+     *                  friends
      * @param activeTab the tab which the user is on ( #pending for this
-     * endpoint )
+     *                  endpoint )
      * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends/remove")
-    public String cancelSentRequest(@RequestParam(name = "friendId", required = true) Long friendId,
-            @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+    public String cancelSentRequest(@RequestParam(name = "friendId") Long friendId,
+                                    @RequestParam("activeTab") String activeTab,
+                                    RedirectAttributes redirectAttributes,
+                                    Model model) {
         logger.info("POST /manage-friends/remove");
 
         User currentUser = securityService.getCurrentUser();
