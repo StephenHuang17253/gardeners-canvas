@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -136,12 +137,12 @@ public class GardenFormController {
 
         logger.info("Permits left before request: " + semaphore.availablePermits());
 
-//        // Check if rate limit exceeded
-//        if (!semaphore.tryAcquire()) {
-//            logger.info("Exceeded location API rate limit of 2 requests per second.");
-//            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
-//        }
-//        logger.info("Permits left after request: " + semaphore.availablePermits());
+        // Check if rate limit exceeded
+        if (!semaphore.tryAcquire()) {
+            logger.info("Exceeded location API rate limit of 2 requests per second.");
+
+        }
+        logger.info("Permits left after request: " + semaphore.availablePermits());
 
         return locationService.getLatitudeLongitude(query);
 
@@ -278,17 +279,23 @@ public class GardenFormController {
         session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
-        if (Objects.equals(garden.getGardenLatitude(), "")) {
-            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
-            String lat = coordData.get(0).get("lat").asText();
-            String lon = coordData.get(0).get("lon").asText();
-            gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
-            logger.info("Forward geocoding request made to get lat and lon");
-        }
+        findingGardenCoordinates(garden);
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
 
         return "redirect:/my-gardens/{gardenId}";
+    }
+
+    private void findingGardenCoordinates(Garden garden) throws IOException, InterruptedException {
+        if (Objects.equals(garden.getGardenLatitude(), "")) {
+            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
+            if (coordData.get(0) != null) {
+                String lat = coordData.get(0).get("lat").asText();
+                String lon = coordData.get(0).get("lon").asText();
+                gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
+                logger.info("Forward geocoding request made to get lat and lon");
+            }
+        }
     }
 
     /**
@@ -424,17 +431,11 @@ public class GardenFormController {
 
         User owner = securityService.getCurrentUser();
         boolean isPublic = false;
-        gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
+        Garden updatedGarden = gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
                 postcode, country, doubleGardenSize, isPublic, latitude, longitude, owner));
         logger.info("Edited Garden Page");
 
-        if (Objects.equals(garden.getGardenLatitude(), "")) {
-            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
-            String lat = coordData.get(0).get("lat").asText();
-            String lon = coordData.get(0).get("lon").asText();
-            gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
-            logger.info("Forward geocoding request made to get lat and lon");
-        }
+        findingGardenCoordinates(updatedGarden);
 
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
