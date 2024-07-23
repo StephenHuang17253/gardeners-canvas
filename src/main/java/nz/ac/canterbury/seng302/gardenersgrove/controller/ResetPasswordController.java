@@ -140,6 +140,14 @@ public class ResetPasswordController {
         logger.info("POST /reset-password");
 
         Token token = tokenService.getTokenByTokenString(resetToken);
+        if (token == null || token.isExpired()) {
+            if (token != null) {
+                tokenService.deleteToken(token);
+            }
+            redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            return "redirect:/login";
+        }
         User user = token.getUser();
         String emailAddress = user.getEmailAddress();
         String firstName = user.getFirstName();
@@ -168,14 +176,6 @@ public class ResetPasswordController {
             model.addAttribute("passwordError", "The passwords do not match");
             return "resetPasswordPage";
         } else {
-            if (token == null || token.isExpired()) {
-                if (token != null) {
-                    tokenService.deleteToken(token);
-                }
-                redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
-                redirectAttributes.addFlashAttribute("goodMessage", false);
-                return "redirect:/login";
-            }
             User currentUser = token.getUser();
             userService.updatePassword(currentUser.getId(), password);
             tokenService.deleteToken(token);
