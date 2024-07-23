@@ -1,6 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRelationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,15 +22,18 @@ public class GardenTagService {
      */
     private final GardenTagRepository gardenTagRepository;
 
+    private final GardenTagRelationRepository gardenTagRelationRepository;
+
     /**
      * GardenTagService constructor with repository.
      *
      * @param gardenTagRepositoryInput the repository for GardenTags
      */
     @Autowired
-    public GardenTagService(GardenTagRepository gardenTagRepositoryInput)
+    public GardenTagService(GardenTagRepository gardenTagRepositoryInput, GardenTagRelationRepository gardenTagRelationRepository)
     {
         this.gardenTagRepository = gardenTagRepositoryInput;
+        this.gardenTagRelationRepository = gardenTagRelationRepository;
     }
 
     /**
@@ -80,4 +86,42 @@ public class GardenTagService {
     {
         return gardenTagRepository.findByTagNameContainsIgnoreCase(queryString);
     }
+
+    /**
+     * Saves a gardenTagRelation to the repository
+     * @param gardenTagRelation the gardenTagRelation to save
+     * @return the GardenTagRelation
+     */
+    public GardenTagRelation addGardenTagRelation(GardenTagRelation gardenTagRelation) {
+        return gardenTagRelationRepository.save(gardenTagRelation);
+    }
+
+    /**
+     * Remove a gardenTagRelation to the repository
+     * @param gardenTagRelation the gardenTagRelation to remove
+     */
+    public void removeGardenTagRelation(GardenTagRelation gardenTagRelation)
+    {
+        gardenTagRelationRepository.delete(gardenTagRelation);
+    }
+
+    /**
+     * Get gardenTagRelation by garden
+     * @param garden in the relation
+     * @return list of gardenTagRelations with that garden
+     */
+    public List<GardenTagRelation> getGardenTagRelationByGarden(Garden garden) {
+        return gardenTagRelationRepository.findGardenTagRelationsByGardenIs(garden);
+    }
+
+    /**
+     * Get gardenTagRelation by tag
+     * @param tag in the relation
+     * @return list of gardenTagRelations with that tag
+     */
+    public List<GardenTagRelation> getGardenTagRelationByTag(GardenTag tag) {
+        return gardenTagRelationRepository.findGardenTagRelationsByTagIs(tag);
+    }
+
+
 }

@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRelationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import org.junit.jupiter.api.Assertions;
@@ -10,13 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.util.Assert;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
@@ -25,13 +23,15 @@ class GardenTagServiceIntegrationTest {
 
     @Autowired
     private GardenTagRepository gardenTagRepository;
+    @Autowired
+    private GardenTagRelationRepository gardenTagRelationRepository;
     private GardenTagService gardenTagService;
 
     @BeforeEach
     public void prepare_test()
     {
         gardenTagRepository.deleteAll();
-        gardenTagService = new GardenTagService(gardenTagRepository);
+        gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
     }
 
     @Test
