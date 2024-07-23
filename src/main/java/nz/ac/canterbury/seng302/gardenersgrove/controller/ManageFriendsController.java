@@ -204,12 +204,17 @@ public class ManageFriendsController {
                 // add status of friendship from current user to  foundUser
                 friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, foundUser));
                 friendModel.setFriendId(foundUser.getId());
-                // ensure there is not friendship from foundUser to currentUser
-                Friendship friendship = friendshipService.findFriendship(foundUser, currentUser);
+                // ensure there is no friendship from foundUser to currentUser
                 boolean existsFriendship = friendshipService.checkFriendshipExists(foundUser, currentUser);
-                boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED && friendship.getUser1() == foundUser);
-                if (!existsFriendship || declinedRequest) {
+
+                if (!existsFriendship) {
                     friendModels.add(friendModel);
+                } else {
+                    Friendship friendship = friendshipService.findFriendship(foundUser, currentUser);
+                    boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED && friendship.getUser1() == foundUser);
+                    if (declinedRequest) {
+                        friendModels.add(friendModel);
+                    }
                 }
             }
         }
