@@ -4,15 +4,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+
 
 public class GardenServiceUnitTest {
 
@@ -66,7 +62,15 @@ public class GardenServiceUnitTest {
                 "",
                 testUser1);
 
-        gardenService.addGarden(garden);
+
+        Optional<Garden> gardenOptional = Mockito.mock(Optional.class);
+        Mockito.when(gardenOptional.get()).thenReturn(garden);
+        Mockito.when(gardenOptional.isPresent()).thenReturn(true);
+        Mockito.when(gardenRepository.findById(1L)).thenReturn(gardenOptional);
+
+        // mocks the save function to output whatever was inputted into it.
+        // https://stackoverflow.com/questions/2684630/making-a-mocked-method-return-an-argument-that-was-passed-to-it
+        Mockito.when(gardenRepository.save(Mockito.any())).thenAnswer(input -> input.getArgument(0));
 
 
     }
@@ -76,14 +80,14 @@ public class GardenServiceUnitTest {
     @Test
     void testUpdateGardenLocationCoordinates_Success() {
 
-        Garden updatedGarden = gardenService.updateGardenCoordinates(garden.getGardenId(), "1.1", "1.1");
+        Garden updatedGarden = gardenService.updateGardenCoordinates(1L, "1.1", "1.1");
         assertEquals("1.1", updatedGarden.getGardenLatitude());
         assertEquals("1.1", updatedGarden.getGardenLongitude());
     }
 
     @Test
     void testUpdateGardenLocationCoordinates_InvalidId() {
-        Mockito.when(gardenService.getGardenById(2L)).thenReturn(Optional.empty());
+        Mockito.when(gardenRepository.findById(2L)).thenReturn(Optional.empty());
         Exception error = assertThrows(IllegalArgumentException.class,() -> {gardenService.updateGardenCoordinates(2L, "1.1", "1.1");});
         assertEquals("Invalid garden ID", error.getMessage());
         assertEquals("", garden.getGardenLongitude());
