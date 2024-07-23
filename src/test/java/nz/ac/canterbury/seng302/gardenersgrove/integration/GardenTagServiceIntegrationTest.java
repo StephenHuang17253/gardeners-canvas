@@ -10,7 +10,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +39,8 @@ class GardenTagServiceIntegrationTest {
     private GardenTagService gardenTagService;
 
     private Garden testGarden;
+    private Garden testGarden2;
+    private Garden testGarden3;
     private User owner;
 
 
@@ -73,6 +74,40 @@ class GardenTagServiceIntegrationTest {
                     "172.5796159",
                     userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com"));
             gardenService.addGarden(testGarden);
+        }
+        if (testGarden2 == null)
+        {
+            testGarden2 = new Garden(
+                    "John's Garden",
+                    "",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    false,
+                    "-43.5214643",
+                    "172.5796159",
+                    userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com"));
+            gardenService.addGarden(testGarden2);
+        }
+        if (testGarden3 == null)
+        {
+            testGarden3 = new Garden(
+                    "John's Garden",
+                    "",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    false,
+                    "-43.5214643",
+                    "172.5796159",
+                    userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com"));
+            gardenService.addGarden(testGarden3);
         }
 
     }
@@ -354,6 +389,45 @@ class GardenTagServiceIntegrationTest {
 
     }
 
+    @Test
+    void addGardenTagRelation_addOneTagToManyGardens_findByTag() {
+
+        GardenTag test_tag = gardenTagService.addGardenTag(new GardenTag("Test"));
+        GardenTag red_herring = gardenTagService.addGardenTag(new GardenTag("red_herring"));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden2,test_tag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden3,test_tag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden3,red_herring));
+
+        try {
+            List<GardenTagRelation> similarSearchResult = gardenTagService.getGardenTagRelationByTag(test_tag);
+            Assertions.assertEquals(3, similarSearchResult.size());
+        }
+        catch (NoSuchElementException exception) {
+            fail(exception);
+        }
+    }
+
+    @Test
+    void addGardenTagRelation_addManyTagToOneGarden_findByGarden() {
+
+        GardenTag test_tag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag test_tag2 = gardenTagService.addGardenTag(new GardenTag("test2"));
+        GardenTag test_tag3 = gardenTagService.addGardenTag(new GardenTag("test3"));
+        GardenTag test_tag4 = gardenTagService.addGardenTag(new GardenTag("test4"));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag1));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag2));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag3));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden2,test_tag4));
+
+        try {
+            List<GardenTagRelation> similarSearchResult = gardenTagService.getGardenTagRelationByGarden(testGarden);
+            Assertions.assertEquals(3, similarSearchResult.size());
+        }
+        catch (NoSuchElementException exception) {
+            fail(exception);
+        }
+    }
 
 
 
