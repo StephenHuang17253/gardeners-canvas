@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
@@ -23,8 +24,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.net.MalformedURLException;
 import java.time.LocalDate;
@@ -123,11 +122,13 @@ public class PlantFormController {
             Model model) {
         logger.info("POST /create-new-plant");
 
-        Integer plantCountValue = null;
+        int plantCountValue;
 
         ValidationResult plantCountResult = ValidationResult.OK;
-        if (plantCount != null && !plantCount.isEmpty()) {
-            plantCountValue = (int) Double.parseDouble(plantCount);
+        if (Objects.equals(plantCount, "")) {
+            plantCountValue = 0;
+        } else {
+            plantCountValue = Integer.parseInt(plantCount);
             plantCountResult = InputValidator.validatePlantCount(plantCount);
         }
 
@@ -182,8 +183,7 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(String.valueOf(plantCountValue));
-        Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
@@ -278,11 +278,13 @@ public class PlantFormController {
             return "403";
         }
 
-        Integer plantCountValue = null;
+        int plantCountValue;
 
         ValidationResult plantCountResult = ValidationResult.OK;
-        if (plantCount != null && !plantCount.isEmpty()) {
-            plantCountValue = (int) Double.parseDouble(plantCount);
+        if (Objects.equals(plantCount, "")) {
+            plantCountValue = 0;
+        } else {
+            plantCountValue = Integer.parseInt(plantCount);
             plantCountResult = InputValidator.validatePlantCount(plantCount);
         }
 
@@ -321,8 +323,8 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(String.valueOf(plantCountValue));
-        plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
+
+        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
