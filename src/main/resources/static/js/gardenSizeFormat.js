@@ -62,5 +62,4 @@ const handleBlur = (event) => {
 
 document.getElementById('gardenSize').addEventListener('keypress', handleKeyPress);
 document.getElementById('gardenSize').addEventListener('blur', handleBlur);
-document.getElementById('plantCount').addEventListener('keydown', handleKeyPress);
 
