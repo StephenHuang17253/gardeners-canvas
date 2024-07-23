@@ -128,7 +128,7 @@ public class PlantFormController {
         if (Objects.equals(plantCount, "")) {
             plantCountValue = 0;
         } else {
-            plantCountValue = Integer.parseInt(plantCount);
+            plantCountValue = (int) (Double.parseDouble(plantCount));
             plantCountResult = InputValidator.validatePlantCount(plantCount);
         }
 
@@ -284,7 +284,7 @@ public class PlantFormController {
         if (Objects.equals(plantCount, "")) {
             plantCountValue = 0;
         } else {
-            plantCountValue = Integer.parseInt(plantCount);
+            plantCountValue = (int) (Double.parseDouble(plantCount));
             plantCountResult = InputValidator.validatePlantCount(plantCount);
         }
 
