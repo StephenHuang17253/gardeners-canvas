@@ -23,7 +23,7 @@ Feature: U18 (Cancel friend request): As Liam, I want to cancel friends on Garde
 
     Scenario: AC2 - Given I am on my “manage friends” page, when I hit a UI element to remove a friend from my
     list, and I have confirmed that I want to remove that friend, then that friend is removed from my list
-    of friends, and I cannot see this friend’s gardens, and this friend cannot see my gardens, and I am
+    of friends, and I cannot see this friend's gardens, and this friend cannot see my gardens, and I am
     removed from the list of friends of that user.
       Given I as user "liam@email.com" am logged in with "TestPassword10!"
       When I hit the 'Remove Friend' button for user "kaia@email.com"

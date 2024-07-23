@@ -56,6 +56,10 @@ public class ResetUserPassword {
     public static MockMvc MOCK_MVC;
     @Autowired
     public UserService userService;
+
+    @Autowired
+    public SecurityService securityService;
+
     private MvcResult resetPasswordResult;
 
     private Token token;
@@ -70,11 +74,10 @@ public class ResetUserPassword {
 
     private EmailService emailService;
 
-
     private TemplateEngine templateEngine;
 
-
     private JavaMailSender mailSender;
+
     @Before
     public void before_or_after_all() throws MessagingException {
         token = new Token(loggedInUser, null);
@@ -82,10 +85,14 @@ public class ResetUserPassword {
 
         emailService = mock(EmailService.class);
 
-        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
-        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService, gardenService);
-        ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService, emailService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController).build();
+        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService,
+                emailService);
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService,
+                tokenService, gardenService, securityService);
+        ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService,
+                emailService);
+        MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController)
+                .build();
         tokenService.addToken(token);
 
         mailSender = mock(JavaMailSender.class);
@@ -100,15 +107,14 @@ public class ResetUserPassword {
         when(emailService.getBaseURL()).thenReturn("");
     }
 
-
     @Given("I am on the login page")
     public void i_am_on_the_login_page() throws Exception {
         SecurityContextHolder.clearContext();
         String url = "/login";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(status().isOk()).andReturn();
+                        .get(url))
+                .andExpect(status().isOk()).andReturn();
 
     }
 
@@ -117,8 +123,8 @@ public class ResetUserPassword {
         String url = "/lost-password";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(status().isOk()).andReturn();
+                        .get(url))
+                .andExpect(status().isOk()).andReturn();
 
     }
 
@@ -127,8 +133,8 @@ public class ResetUserPassword {
         String url = "/lost-password";
         resetPasswordResult = MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(status().isOk()).andReturn();
+                        .get(url))
+                .andExpect(status().isOk()).andReturn();
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
 
@@ -139,8 +145,8 @@ public class ResetUserPassword {
         String url = "/lost-password";
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(status().isOk()).andReturn();
+                        .get(url))
+                .andExpect(status().isOk()).andReturn();
 
     }
 
@@ -155,11 +161,10 @@ public class ResetUserPassword {
         String url = "/lost-password";
         System.out.println(userEmail);
         resetPasswordResult = MOCK_MVC.perform(
-                        MockMvcRequestBuilders.post(url)
-                                .param("emailAddress", userEmail))
+                MockMvcRequestBuilders.post(url)
+                        .param("emailAddress", userEmail))
                 .andExpect(status().isOk())
                 .andReturn();
-
 
         Mockito.verify(emailService, times(0)).sendHTMLEmail(anyString(), anyString(), anyString(), any(Context.class));
     }
@@ -219,12 +224,12 @@ public class ResetUserPassword {
 
     @When("I click the clickable link in the email")
     public void i_click_the_clickable_link_in_the_email() throws Exception {
-        // Simulates clicking because it parses the link from the sent email directly into the request
+        // Simulates clicking because it parses the link from the sent email directly
+        // into the request
         resetPasswordResult = MOCK_MVC.perform(MockMvcRequestBuilders.get(resetLink))
                 .andExpect(status().isOk())
                 .andReturn();
     }
-
 
     @Then("I am taken to the reset password form")
     public void i_am_taken_to_the_reset_password_form() throws Exception {
@@ -248,9 +253,8 @@ public class ResetUserPassword {
         String url = "/reset-password/" + token.getTokenString();
         MOCK_MVC.perform(
                 MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-
+                        .get(url))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     }
 
@@ -261,8 +265,8 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .post(url)
                         .param("password", newPassword)
-                        .param("retypePassword", retypePassword)
-        ).andReturn();
+                        .param("retypePassword", retypePassword))
+                .andReturn();
 
     }
 
@@ -273,9 +277,8 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .post(url)
                         .param("password", weakPassword)
-                        .param("retypePassword", weakPassword)
-        ).andReturn();
-
+                        .param("retypePassword", weakPassword))
+                .andReturn();
 
     }
 
@@ -292,8 +295,8 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .post(url)
                         .param("password", password)
-                        .param("retypePassword", password)
-        ).andReturn();
+                        .param("retypePassword", password))
+                .andReturn();
 
     }
 

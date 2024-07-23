@@ -4,16 +4,15 @@
 <head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
-
-    <div class="container-md my-5">
-
-        <div class="text-center">
-            <h1>Edit Plant</h1>
-        </div>
-
-        <div class="row justify-content-center my-5">
-            <div class="col-5 col-md-10 col-lg-4 p-3">
+    <div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded py-5 w-50">
+        <div class="row justify-content-center">
+            <div class="text-center py-5">
+                <h1>Edit Plant</h1>
+            </div>
+            <div class="col-6">
 
                 <form th:action="@{edit}" method="post" enctype="multipart/form-data"
                     class="border rounded-3 p-3 bg-white">
@@ -25,12 +24,12 @@
                             <div class="ratio ratio-1x1">
                                 <img id="imageToChange"
                                     th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                                    alt="Plant image" class="image-fluid rounded-circle border">
+                                    alt="Plant image" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
 
                             <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
-                                <div class="position-absolute top-0 end-0 w-50 h-50">
+                                <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
                                     <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
                                 </div>
                                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
@@ -44,14 +43,14 @@
                     <div class="mb-3">
                         <label for="plantName" class="form-label">Plant Name *</label>
                         <input id="plantName" type="text" class="form-control" th:name="plantName"
-                            th:value="*{plantName}" autofocus>
+                            th:value="*{plantName}" th:classappend="${PNErrorText == null ? '' : 'border-danger'}" autofocus>
                         <p th:if="${PNErrorText}" class="text-danger fs-6" th:text="${PNErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="plantCount" class="form-label">Plant Count</label>
                         <input id="plantCount" type="number" min="0" step="1" class="form-control" th:name="plantCount"
-                            th:value="*{plantCount}">
+                            th:value="*{plantCount}" th:classappend="${PCErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
                     </div>
 
@@ -59,7 +58,7 @@
                         <label for="plantDescription" class="form-label">Plant Description</label>
                         <textarea id="plantDescription" class="form-control" th:name="plantDescription"
                             th:text="*{plantDescription}" data-description="true"
-                            data-counter-id="plantDescriptionCounter"></textarea>
+                            data-counter-id="plantDescriptionCounter" th:classappend="${PDErrorText == null ? '' : 'border-danger'}"></textarea>
                         <p id="plantDescriptionCounter" class="fs-6">
                         </p>
                         <p id="plantDescriptionError" th:if="${PDErrorText}" class="text-danger fs-6"
@@ -69,7 +68,7 @@
                     <div class="mb-3">
                         <label for="plantDate" class="form-label">Plant Date</label>
                         <input id="plantDate" type="date" class="form-control" max="9999-12-30" min="0000-01-01"
-                            th:name="plantDate" th:value="*{plantDate}">
+                            th:name="plantDate" th:value="*{plantDate}" th:classappend="${PAErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
                     </div>
 
