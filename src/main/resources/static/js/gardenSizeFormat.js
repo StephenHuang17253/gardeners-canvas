@@ -18,6 +18,7 @@ const handleKeyPress = (event) => {
     const validDecimalPoint = hasDecimalPoint(pressed) && !hasDecimalPoint(value) && !hasExponent(value)
     const validExponent = hasExponent(pressed) && !hasExponent(value)
     const validSign = hasSign(pressed) && !hasSign(value);
+
     if (isNumber(pressed) || validSign || validDecimalPoint || validExponent) {
         return true;
     } else {
@@ -62,4 +63,5 @@ const handleBlur = (event) => {
 
 document.getElementById('gardenSize').addEventListener('keypress', handleKeyPress);
 document.getElementById('gardenSize').addEventListener('blur', handleBlur);
+document.getElementById('plantCount').addEventListener('keydown', handleKeyPress);
 
