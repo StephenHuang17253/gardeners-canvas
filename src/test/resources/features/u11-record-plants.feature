@@ -2,7 +2,7 @@ Feature: U11 (Record plants in garden): As Kaia, I want to record the different 
 
   Background:
     Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"
-    And User "kaia@email.com" with a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
+    And User "kaia@email.com" has a garden "Kaia's Garden" located in "Christchurch", "New Zealand"
     And I as user "kaia@email.com" am logged in with "TestPassword10!"
 
     Scenario: AC1 -  “Add new plant” button takes you to a new "add plant form"
@@ -41,13 +41,14 @@ Feature: U11 (Record plants in garden): As Kaia, I want to record the different 
         | ""                |
 
 
-    Scenario: AC4 - Can't submit long description
+    Scenario Outline: AC4 - Can't submit long description
       Given I am on the add plant form
-      And  I enter invalid plant value for the "<description>"
+      And  I enter invalid plant value for the <description>
       When I click the Submit button on the add plant form
       Then a new plant record is not added to the garden
-      Example:
-      | a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant description that exceeds the maximum length a very long plant description that a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant description that exceeds the maximum length a very long plant description that|
+      Examples:
+        | description |
+        | a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant description that exceeds the maximum length a very long plant description that a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant name that exceeds the maximum length a very long plant description that exceeds the maximum length a very long plant description that |
 
 
     Scenario Outline: AC5 - Can't submit invalid count

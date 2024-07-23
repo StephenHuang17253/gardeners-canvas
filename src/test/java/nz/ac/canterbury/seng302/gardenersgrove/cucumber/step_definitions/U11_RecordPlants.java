@@ -66,15 +66,6 @@ public class U11_RecordPlants {
     String plantDescription;
     String plantCount;
     String plantDate;
-
-    String gardenName;
-    String gardenDescription;
-    String gardenCity;
-    String gardenCountry;
-    String gardenSize;
-
-    String gardenLongitude = "";
-    String gardenLatitude = "";
     private Garden expectedGarden;
     private Plant expectedPlant;
     private MvcResult newPlantResult;
@@ -96,28 +87,8 @@ public class U11_RecordPlants {
 
     }
 
-    @And("User {string} with a garden {string} located in {string}, {string}")
-    public void userWithAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
-        User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, "","", user);
-        gardenService.addGarden(garden);
-        Assertions.assertEquals(garden.getGardenId(),
-                userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
-        expectedGarden = garden;
-        this.gardenName = gardenName;
-        gardenCity = garden.getGardenCity();
-        gardenCountry = garden.getGardenCountry();
-        gardenLongitude = garden.getGardenLongitude();
-        gardenLatitude = garden.getGardenLatitude();
-    }
     @When("I click the add new plant button")
     public void iClickTheAddNewPlantButton() throws Exception {
-        String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
-        newPlantResult = MOCK_MVC.perform(
-                MockMvcRequestBuilders
-                        .get(gardenUrl)
-
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
     }
 
     @Then("I see an add plant form.")
@@ -129,8 +100,8 @@ public class U11_RecordPlants {
     public void iAmOnTheAddPlantForm() {
     }
 
-    @And("I enter valid plant values for the <name>, <count>, <description>, and <date>")
-    public void iEnterValidPlantValuesForTheNameCountDescriptionAndDate() {
+    @And("I enter valid plant values for the {string}, {string}, {string}, and {string}")
+    public void iEnterValidPlantValuesForTheNameCountDescriptionAndDate(String name, String count, String description, String date) {
     }
 
     @When("I click the Submit button on the add plant form")
@@ -141,16 +112,12 @@ public class U11_RecordPlants {
     public void aNewPlantRecordIsAddedToTheGarden() {
     }
 
-    @And("I enter invalid plant value for the <name>")
-    public void iEnterInvalidPlantValueForTheName() {
-    }
 
     @Then("a new plant record is not added to the garden")
     public void aNewPlantRecordIsNotAddedToTheGarden() {
     }
 
     @And("I enter invalid plant value for the {string}")
-    public void iEnterInvalidPlantValueForThe(String arg0) {
+    public void iEnterInvalidPlantValueForTheName(String arg0) {
     }
-
 }

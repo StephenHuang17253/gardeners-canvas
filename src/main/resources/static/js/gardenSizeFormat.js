@@ -18,7 +18,6 @@ const handleKeyPress = (event) => {
     const validDecimalPoint = hasDecimalPoint(pressed) && !hasDecimalPoint(value) && !hasExponent(value)
     const validExponent = hasExponent(pressed) && !hasExponent(value)
     const validSign = hasSign(pressed) && !hasSign(value);
-
     if (isNumber(pressed) || validSign || validDecimalPoint || validExponent) {
         return true;
     } else {
