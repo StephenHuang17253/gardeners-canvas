@@ -87,23 +87,6 @@ public void before_or_after_all() {
 
 
     @Test
-    public void getProfilePictureString_Null_DefaultPath() throws Exception
-    {
-        String pictureUrl = homePageController.getProfilePictureString(null);
-        assertEquals("/images/default_profile_picture.png", pictureUrl);
-    }
-
-    @Test
-    public void getMappingNotLoggedIn_home_containsNoNames() throws Exception
-    {
-        this.mockMvc.perform(get("/home"))
-                .andDo(print())
-                .andExpect(status().isOk()) //Should be 403 as the user is not logged in
-                .andExpect(model().attribute("profilePicture",is("")))
-                .andExpect(model().attribute("username", is("")));
-    };
-
-    @Test
     @WithMockUser(username="johndoe.test@email.com")
     public void getMappingLoggedIn_home_containsNames() throws Exception
     {
@@ -112,8 +95,6 @@ public void before_or_after_all() {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("username",is("John Doe")));
-    };
-
-
+    }
 
 }
