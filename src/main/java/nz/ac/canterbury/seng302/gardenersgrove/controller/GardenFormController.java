@@ -390,6 +390,7 @@ public class GardenFormController {
 
     /**
      * takes as an input the result of validating the garden name, location and size
+     * takes as an input the result of validating the garden name, location and size
      * parameters and prints the appropriate
      */
     private void gardenFormErrorText(Model model, ValidationResult gardenNameResult,

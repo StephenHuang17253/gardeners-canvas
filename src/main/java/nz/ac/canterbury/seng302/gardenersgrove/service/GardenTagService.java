@@ -72,7 +72,7 @@ public class GardenTagService {
      * @param id the id of the target tag
      * @return An empty optional or one containing a matching tag
      */
-    public Optional<GardenTag> getById(Long id)
+    public Optional<GardenTag> getGardenTabById(Long id)
     {
         return gardenTagRepository.findById(id);
     }
@@ -106,6 +106,15 @@ public class GardenTagService {
     }
 
     /**
+     * Get gardenTagRelation by Id
+     * @param id in the relation
+     * @return list of gardenTagRelations with that tag
+     */
+    public Optional<GardenTagRelation> getGardenTagRelationById(Long id) {
+        return gardenTagRelationRepository.findById(id);
+    }
+
+    /**
      * Get gardenTagRelation by garden
      * @param garden in the relation
      * @return list of gardenTagRelations with that garden
@@ -122,6 +131,8 @@ public class GardenTagService {
     public List<GardenTagRelation> getGardenTagRelationByTag(GardenTag tag) {
         return gardenTagRelationRepository.findGardenTagRelationsByTagIs(tag);
     }
+
+
 
 
 }

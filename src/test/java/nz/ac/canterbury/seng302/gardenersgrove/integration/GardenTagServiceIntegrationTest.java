@@ -1,16 +1,23 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRelationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,13 +32,49 @@ class GardenTagServiceIntegrationTest {
     private GardenTagRepository gardenTagRepository;
     @Autowired
     private GardenTagRelationRepository gardenTagRelationRepository;
+    @Autowired
+    private GardenService gardenService;
+    @Autowired
+    private UserService userService;
+
     private GardenTagService gardenTagService;
+
+    private Garden testGarden;
+    private User owner;
+
+
 
     @BeforeEach
     public void prepare_test()
     {
+        gardenTagRelationRepository.deleteAll();
         gardenTagRepository.deleteAll();
+
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
+
+        if (!userService.emailInUse("GardenServiceIntegrationTest@ProfileController.com"))
+        {
+            owner =  new User("John", "Test", "GardenServiceIntegrationTest@ProfileController.com", LocalDate.of(2003,5,2));
+            userService.addUser(owner,"cheeseCake");
+        }
+        if (testGarden == null)
+        {
+            testGarden = new Garden(
+                    "John's Garden",
+                    "",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    false,
+                    "-43.5214643",
+                    "172.5796159",
+                    userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com"));
+            gardenService.addGarden(testGarden);
+        }
+
     }
 
     @Test
@@ -42,7 +85,7 @@ class GardenTagServiceIntegrationTest {
 
         try
         {
-            Assertions.assertEquals("Test", gardenTagService.getById(saveGardenId).get().getTagName());
+            Assertions.assertEquals("Test", gardenTagService.getGardenTabById(saveGardenId).get().getTagName());
         }
         catch (NoSuchElementException exception)
         {
@@ -79,7 +122,7 @@ class GardenTagServiceIntegrationTest {
 
         try
         {
-            Assertions.assertEquals("Test", gardenTagService.getById(saveGardenId).get().getTagName());
+            Assertions.assertEquals("Test", gardenTagService.getGardenTabById(saveGardenId).get().getTagName());
         }
         catch (NoSuchElementException exception)
         {
@@ -262,6 +305,53 @@ class GardenTagServiceIntegrationTest {
         {
             fail(exception);
         }
+    }
+
+    @Test
+    void addGardenTagRelation_basicAddition_findById()
+    {
+        GardenTag test_tag = new GardenTag("Test");
+        gardenTagService.addGardenTag(test_tag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
+        Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
+        Assertions.assertEquals(testGardenTagRelation.toString(),
+                gardenTagService.getGardenTagRelationById(testGardenTagRelationId).get().toString());
+
+    }
+
+    @Test
+    void addGardenTagRelation_basicAdditionThenDelete_findById()
+    {
+        GardenTag test_tag = new GardenTag("Test");
+        gardenTagService.addGardenTag(test_tag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
+        Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
+        gardenTagService.removeGardenTagRelation(testGardenTagRelation);
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationById(testGardenTagRelationId).isEmpty());
+    }
+
+    @Test
+    void addGardenTagRelation_basicAddition_findByGarden()
+    {
+        GardenTag test_tag = new GardenTag("Test");
+        gardenTagService.addGardenTag(test_tag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
+        Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
+        Assertions.assertEquals(testGardenTagRelation.toString(),
+                gardenTagService.getGardenTagRelationByGarden(testGarden).get(0).toString());
+
+    }
+
+    @Test
+    void addGardenTagRelation_basicAddition_findByTag()
+    {
+        GardenTag test_tag = new GardenTag("Test");
+        gardenTagService.addGardenTag(test_tag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
+        Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
+        Assertions.assertEquals(testGardenTagRelation.toString(),
+                gardenTagService.getGardenTagRelationByTag(test_tag).get(0).toString());
+
     }
 
 
