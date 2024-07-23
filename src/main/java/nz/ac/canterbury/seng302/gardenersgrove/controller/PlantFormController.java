@@ -135,7 +135,7 @@ public class PlantFormController {
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantDateResult;
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -290,7 +290,7 @@ public class PlantFormController {
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantDateResult;
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
