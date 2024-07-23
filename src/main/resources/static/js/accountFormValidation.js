@@ -1,21 +1,22 @@
 const firstName = document.getElementById("firstName");
-let firstNameJSError = document.getElementById("firstNameJSError");
+const firstNameJSError = document.getElementById("firstNameJSError");
 
 const lastName = document.getElementById("lastName");
-let lastNameJSError = document.getElementById("lastNameJSError");
-const noLastNameCheckbox = document.getElementById("lastNameCheck");
+const lastNameJSError = document.getElementById("lastNameJSError");
+
 
 const email = document.getElementById("emailAddress")
 const MAX_EMAIL_LENGTH = 320
-let emailJSError = document.getElementById("emailJSError");
+const emailServerError = document.getElementById("emailError")
+const emailJSError = document.getElementById("emailJSError");
 
 const dateOfBirth = document.getElementById("dateOfBirth");
-let dateOfBirthJSError = document.getElementById("dateOfBirthJSError");
+const dateOfBirthJSError = document.getElementById("dateOfBirthJSError");
 
 const password = document.getElementById("password");
 const repeatPassword = document.getElementById("repeatPassword");
-let passwordJSError = document.getElementById("passwordJSError");
-let repeatPasswordJSError = document.getElementById("repeatPasswordJSError");
+const passwordJSError = document.getElementById("passwordJSError");
+const repeatPasswordJSError = document.getElementById("repeatPasswordJSError");
 
 const signUpButton = document.querySelector('button[type="submit"]');
 
@@ -143,6 +144,9 @@ const displayEmailError = () => {
     email.setCustomValidity(" ");
     email.classList.add("border-danger");
     emailJSError.style.display = "block";
+    if (emailServerError) {
+        emailServerError.style.display = "none";
+    }
 }
 
 /**
@@ -224,6 +228,28 @@ const handlePasswordInput = (event) => {
 }
 
 /**
+ * Handles the case where the user's input for the password field is invalid (not the same).
+ * Sets the border of the input to red, and makes the error message visible.
+ * @returns {void}
+ */
+const displayRepeatPasswordError = () => {
+    repeatPassword.setCustomValidity(" ");
+    repeatPassword.classList.add("border-danger");
+    repeatPasswordJSError.style.display = "block";
+    repeatPasswordJSError.textContent = "Passwords do not match";
+}
+
+/**
+ * Clears the error message and removes the red border from the input field.
+ * @returns {void}
+ */
+const clearRepeatPasswordError = () => {
+    repeatPassword.setCustomValidity("");
+    repeatPassword.classList.remove("border-danger");
+    repeatPasswordJSError.style.display = "none";
+}
+
+/**
  * Handles updates (char input) to the input field for the user's repeated password.
  * @param {{target: HTMLElement}} event - The input event.
  * @returns {void}
@@ -233,14 +259,9 @@ const handleRepeatPasswordInput = (event) => {
     const passwordValue = password.value;
 
     if (repeatPasswordValue !== passwordValue) {
-        repeatPassword.setCustomValidity(" ");
-        repeatPassword.classList.add("border-danger");
-        repeatPasswordJSError.style.display = "block";
-        repeatPasswordJSError.textContent = "Passwords do not match";
+        displayRepeatPasswordError()
     } else {
-        repeatPassword.setCustomValidity("");
-        repeatPassword.classList.remove("border-danger");
-        repeatPasswordJSError.style.display = "none";
+        clearRepeatPasswordError()
     }
 }
 
@@ -262,6 +283,8 @@ const handleFormSubmit = (event) => {
     if (!firstName.checkValidity() || !lastName.checkValidity() || !email.checkValidity()
         || !dateOfBirth.checkValidity() || !password.checkValidity() || !repeatPassword.checkValidity()) {
         event.preventDefault();
+        password.value = "";
+        repeatPassword.value = "";
     }
 }
 

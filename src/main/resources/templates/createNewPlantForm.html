@@ -17,7 +17,7 @@
                 <form th:action="@{create-new-plant}" method="post" enctype="multipart/form-data"
                     class="border rounded-3 p-3">
 
-                    <div class="w-100 d-flex flex-row justify-content-center mb-3">
+                    <div class="w-100 d-flex flex-column align-items-center mb-3">
 
                         <div class="position-relative w-75">
 
@@ -26,7 +26,7 @@
                                     class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
 
-                            <div
+                            <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
                                 <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
                                     <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
@@ -34,7 +34,7 @@
                                 <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
                                     data-image-input data-displayed-by="imageToChange"
                                     data-errored-by="plantPictureError" class="visually-hidden">
-                            </div>
+                            </label>
                         </div>
                         <p id="plantPictureError" class="text-danger fs-6" th:text="${plantPictureError}"></p>
                     </div>
@@ -42,14 +42,14 @@
                     <div class="mb-3">
                         <label for="plantName" class="form-label">Plant Name *</label>
                         <input id="plantName" type="text" class="form-control" th:name="plantName"
-                            th:value="*{plantName}" autofocus>
+                            th:value="*{plantName}" th:classappend="${PNErrorText == null ? '' : 'border-danger'}" autofocus>
                         <p th:if="${PNErrorText}" class="text-danger fs-6" th:text="${PNErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="plantCount" class="form-label">Plant Count</label>
                         <input id="plantCount" type="number" min="0" step="1" class="form-control" th:name="plantCount"
-                            th:value="*{plantCount}">
+                            th:value="*{plantCount}" th:classappend="${PCErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
                     </div>
 
@@ -57,7 +57,9 @@
                         <label for="plantDescription" class="form-label">Plant Description</label>
                         <textarea id="plantDescription" class="form-control" th:name="plantDescription"
                             th:text="*{plantDescription}" data-description="true"
-                            data-counter-id="plantDescriptionCounter"></textarea>
+                            data-counter-id="plantDescriptionCounter" th:classappend="${PDErrorText == null ? '' : 'border-danger'}">
+
+                        </textarea>
                         <p id="plantDescriptionCounter" class="fs-6"></p>
                         <p id="plantDescriptionError" th:if="${PDErrorText}" class="text-danger fs-6"
                             th:text="${PDErrorText}"></p>
@@ -67,7 +69,7 @@
                     <div class="mb-3">
                         <label for="plantDate" class="form-label">Plant Date</label>
                         <input id="plantDate" type="date" class="form-control" max="9999-12-30" min="0000-01-01"
-                            th:name="plantDate" th:value="*{plantDate}">
+                            th:name="plantDate" th:value="*{plantDate}" th:classappend="${PAErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
                     </div>
 

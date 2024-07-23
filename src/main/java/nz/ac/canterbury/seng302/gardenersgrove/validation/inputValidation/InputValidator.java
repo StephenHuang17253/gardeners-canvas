@@ -248,7 +248,7 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(8000000.0, 0.01)
+                .gardenAreaHelper(8000000.0, 0.01)
                 .getResult();
     }
 
@@ -884,7 +884,7 @@ public class InputValidator {
      * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(Double maxArea, Double minArea) {
+    private InputValidator gardenAreaHelper(Double maxArea, Double minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
