@@ -178,6 +178,44 @@ public class ManageFriendsController {
     }
 
     /**
+     * @param searchInput input name or email from user
+     * @param validEmail  Validation result of if searchInput is an email
+     * @return
+     */
+    List<FriendModel> getSearchResults(String searchInput, ValidationResult validEmail) {
+        List<FriendModel> friendModels = new ArrayList<>();
+        //get all matching search results
+        User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
+        User currentUser = securityService.getCurrentUser();
+        if (searchResults.length < 1) {
+            return null;
+        }
+        for (User foundUser : searchResults) {
+            // ensure that a search result is not the current user
+            if (!Objects.equals(foundUser.getId(), currentUser.getId())) {
+                //creating a friend (person) object for display on frontend
+                String friendProfilePicture = foundUser.getProfilePictureFilename();
+                String friendsName = foundUser.getFirstName() + " " + foundUser.getLastName();
+                String friendGardenLink = "/" + foundUser.getId() + "/gardens";
+                FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+                friendModel.setFriendId(foundUser.getId());
+                // add status of friendship from current user to  foundUser
+                friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, foundUser));
+                friendModel.setFriendId(foundUser.getId());
+                // ensure there is not friendship from foundUser to currentUser
+                Friendship friendship = friendshipService.findFriendship(foundUser, currentUser);
+                boolean existsFriendship = friendshipService.checkFriendshipExists(foundUser, currentUser);
+                boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED && friendship.getUser1() == foundUser);
+                if (!existsFriendship || declinedRequest) {
+                    friendModels.add(friendModel);
+                }
+            }
+        }
+        return friendModels;
+    }
+
+
+    /**
      * Gets results of search for other users
      *
      * @return thymeleaf manageFriendsPage
@@ -199,30 +237,10 @@ public class ManageFriendsController {
         List<FriendModel> friendModels = new ArrayList<>();
         //getting results
         if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
-            User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
-            User currentUser = userService.getUserByEmail(Objects.requireNonNull(authentication).getName());
-            if (searchResults.length >= 1) {
-                for (User user : searchResults) {
-                    if (!Objects.equals(user.getId(), currentUser.getId())) {
-                        String friendProfilePicture = user.getProfilePictureFilename();
-                        String friendsName = user.getFirstName() + " " + user.getLastName();
-                        String friendGardenLink = "/" + user.getId() + "/gardens";
-                        FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
-                        friendModel.setFriendId(user.getId());
-                        // add status of friendship from current user to other user
-                        friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, user));
-                        friendModel.setFriendId(user.getId());
-                        // ensure there is not friendship from other user to this user
-                        if (!friendshipService.checkFriendshipExists(user, currentUser)) {
-                            friendModels.add(friendModel);
-                        }
-
-                    }
-                }
-            }
+            friendModels = getSearchResults(searchInput, validEmail);
             model.addAttribute("searchResults", friendModels);
         }
-        if (friendModels.isEmpty()) {
+        if (friendModels == null || friendModels.isEmpty()) {
             model.addAttribute("searchErrorText", "There is nobody with that name or email in Gardener's Grove");
             model.addAttribute("userSearch", searchInput);
 
