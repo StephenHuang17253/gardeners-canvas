@@ -48,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            <h4 class="card-title mt-1" th:text="${plantName} + ' (x' + ${plantCount} +')'"></h4>
+            <h4 class="card-title mt-1" th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}"></h4>
             <div class="row">
                 <p th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </p>
                 <p th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </p>

@@ -26,41 +26,39 @@ public enum ValidationResult {
     LENGTH_UNDER_MINIMUM("must be more than minimum number of characters"),
     INVALID_FILE_TYPE("Image must be of type png, jpg or svg"),
     INVALID_FILE_SIZE("Image must be less than 10MB"),
-    AREA_TOO_SMALL("Area (meters squared) is too small"),
-    AREA_TOO_LARGE("Area (meters squared) is too large"),
+    AREA_TOO_LARGE("must be a positive number. \n\r Must be less than or equal to 8000000"),
+    AREA_TOO_SMALL("must be a positive number. \n\r Must be greater than or equal to 0.01"),
     DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
     INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text"),
     INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
 
     private String message;
 
-    ValidationResult(String inMessage)
-    {
+    ValidationResult(String inMessage) {
         this.message = inMessage;
     }
 
     /**
      * Returns if the string passed validation
+     *
      * @return pass status (true for yes)
      */
-    public boolean valid()
-    {
+    public boolean valid() {
         return this == OK;
     }
 
     /**
      * returns a basic description of why the input failed
      * IMPORTANT: this is not sufficient as user feedback, more info is needed if this output is shown on UI
+     *
      * @return fail or ok Message
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.message;
     }
 
-    public void updateMessage(String newMessage)
-    {
+    public void updateMessage(String newMessage) {
         this.message = newMessage;
     }
 }
