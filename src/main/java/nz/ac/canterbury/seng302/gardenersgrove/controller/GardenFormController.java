@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -105,6 +107,49 @@ public class GardenFormController {
     }
 
     /**
+     * Retrieves location suggestions from the LocationIQ API based on query string
+     * provided by frontend JS.
+     * Also handles rate limiting to prevent exceeding 2 requests per second, to
+     * match our free tier.
+     *
+     * @param query The search query for location autocomplete suggestions.
+     * @return A JSON response string containing location suggestions, or a "429"
+     *         string if rate limit is exceeded.
+     * @throws IOException          If an I/O error occurs while making the
+     *                              requesting
+     * @throws InterruptedException If an interruption occurs while waiting for
+     *                              response
+     */
+    @GetMapping("/api/location/coordinates")
+    @ResponseBody
+    public JsonNode getLatitudeLongitudeValues(@RequestParam("query") String query) throws IOException, InterruptedException {
+        long currentTime = Instant.now().getEpochSecond();
+        long timeElapsed = currentTime - lastRequestTime;
+
+        logger.info("Time elapsed: " + timeElapsed);
+        // Every second, the number of available permits is reset to 2
+        if (timeElapsed >= 1) {
+            semaphore.drainPermits();
+            semaphore.release(MAX_REQUESTS_PER_SECOND);
+            logger.info("A second or more has elapsed, permits reset to: " + semaphore.availablePermits());
+            lastRequestTime = currentTime;
+        }
+
+        logger.info("Permits left before request: " + semaphore.availablePermits());
+
+        // Check if rate limit exceeded
+        if (!semaphore.tryAcquire()) {
+            logger.info("Exceeded location API rate limit of 2 requests per second.");
+
+        }
+        logger.info("Permits left after request: " + semaphore.availablePermits());
+
+        return locationService.getLatitudeLongitude(query);
+
+    }
+
+
+    /**
      * Maps the createNewGardenPage html page to /create-new-garden url
      *
      * @return thymeleaf createNewGardenPage
@@ -160,18 +205,18 @@ public class GardenFormController {
      */
     @PostMapping("/create-new-garden")
     public String submitNewGardenForm(@RequestParam(name = "gardenName") String gardenName,
-                                      @RequestParam(name = "gardenDescription") String gardenDescription,
-                                      @RequestParam(name = "streetAddress") String streetAddress,
-                                      @RequestParam(name = "suburb") String suburb,
-                                      @RequestParam(name = "city") String city,
-                                      @RequestParam(name = "country") String country,
-                                      @RequestParam(name = "postcode") String postcode,
-                                      @RequestParam(name = "gardenSize") String gardenSize,
-                                      @RequestParam(name = "longitude") String longitude,
-                                      @RequestParam(name = "latitude") String latitude,
-                                      HttpSession session,
-                                      Model model,
-                                      RedirectAttributes redirectAttributes) {
+            @RequestParam(name = "gardenDescription") String gardenDescription,
+            @RequestParam(name = "streetAddress") String streetAddress,
+            @RequestParam(name = "suburb") String suburb,
+            @RequestParam(name = "city") String city,
+            @RequestParam(name = "country") String country,
+            @RequestParam(name = "postcode") String postcode,
+            @RequestParam(name = "gardenSize") String gardenSize,
+            @RequestParam(name = "longitude") String longitude,
+            @RequestParam(name = "latitude") String latitude,
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes) throws IOException, InterruptedException {
 
         logger.info("POST /create-new-garden");
 
@@ -234,9 +279,23 @@ public class GardenFormController {
         session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
+        findingGardenCoordinates(garden);
+
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
 
         return "redirect:/my-gardens/{gardenId}";
+    }
+
+    private void findingGardenCoordinates(Garden garden) throws IOException, InterruptedException {
+        if (Objects.equals(garden.getGardenLatitude(), "")) {
+            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
+            if (coordData.get(0) != null) {
+                String lat = coordData.get(0).get("lat").asText();
+                String lon = coordData.get(0).get("lon").asText();
+                gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
+                logger.info("Forward geocoding request made to get lat and lon");
+            }
+        }
     }
 
     /**
@@ -305,18 +364,18 @@ public class GardenFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/edit")
     public String submitEditedGardenForm(@RequestParam(name = "gardenName") String gardenName,
-                                         @RequestParam(name = "gardenDescription") String gardenDescription,
-                                         @RequestParam(name = "streetAddress") String streetAddress,
-                                         @RequestParam(name = "suburb") String suburb,
-                                         @RequestParam(name = "city") String city,
-                                         @RequestParam(name = "country") String country,
-                                         @RequestParam(name = "postcode") String postcode,
-                                         @RequestParam(name = "gardenSize") String gardenSize,
-                                         @RequestParam(name = "longitude") String longitude,
-                                         @RequestParam(name = "latitude") String latitude,
-                                         @PathVariable Long gardenId, HttpSession session,
-                                         HttpServletResponse response,
-                                         Model model) {
+            @RequestParam(name = "gardenDescription") String gardenDescription,
+            @RequestParam(name = "streetAddress") String streetAddress,
+            @RequestParam(name = "suburb") String suburb,
+            @RequestParam(name = "city") String city,
+            @RequestParam(name = "country") String country,
+            @RequestParam(name = "postcode") String postcode,
+            @RequestParam(name = "gardenSize") String gardenSize,
+            @RequestParam(name = "longitude") String longitude,
+            @RequestParam(name = "latitude") String latitude,
+            @PathVariable Long gardenId, HttpSession session,
+            HttpServletResponse response,
+            Model model) throws IOException, InterruptedException {
         logger.info("POST / edited garden");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -372,9 +431,11 @@ public class GardenFormController {
 
         User owner = securityService.getCurrentUser();
         boolean isPublic = false;
-        gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
+        Garden updatedGarden = gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
                 postcode, country, doubleGardenSize, isPublic, latitude, longitude, owner));
         logger.info("Edited Garden Page");
+
+        findingGardenCoordinates(updatedGarden);
 
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());

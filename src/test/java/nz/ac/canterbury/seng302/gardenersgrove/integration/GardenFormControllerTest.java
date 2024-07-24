@@ -95,6 +95,7 @@ public class GardenFormControllerTest {
         Mockito.when(gardenOptional.get()).thenReturn(test_garden);
         Mockito.when(gardenOptional.isEmpty()).thenReturn(false);
         when(gardenService.getGardenById(Mockito.anyLong())).thenReturn(gardenOptional);
+        when(gardenService.updateGarden(Mockito.anyLong(), Mockito.any())).thenAnswer(input -> input.getArgument(1));
 
     }
 

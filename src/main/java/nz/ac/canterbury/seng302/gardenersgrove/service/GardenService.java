@@ -133,6 +133,29 @@ public class GardenService {
     }
 
     /**
+     * Updates the longitude and latitude of a Garden entity.
+     * @param id the id of the garden we wish to update the coordinates of
+     * @param latitude the new latitude
+     * @param longitude the new longitude
+     */
+    public Garden updateGardenCoordinates(Long id, String latitude, String longitude) {
+        Optional<Garden> optionalGarden = getGardenById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setGardenLatitude(latitude);
+            targetGarden.setGardenLongitude(longitude);
+
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+
+
+    /**
      * Adds plant entity to garden entity plant list
      *
      * @param gardenId the id of the garden we wish to add plant to
