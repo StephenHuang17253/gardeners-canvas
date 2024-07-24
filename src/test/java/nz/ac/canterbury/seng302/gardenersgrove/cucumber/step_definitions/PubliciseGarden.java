@@ -59,7 +59,7 @@ public class PubliciseGarden {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
     @Mock
