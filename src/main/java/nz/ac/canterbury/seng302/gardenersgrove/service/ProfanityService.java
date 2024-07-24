@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -32,8 +33,9 @@ public class ProfanityService {
     private HttpClient httpClient;
     ObjectMapper objectMapper = new ObjectMapper();
 
-    private final AtomicLong lastCallTimestamp = new AtomicLong(0);
-    private static final long RATE_LIMIT_DELAY_MS = 1000;
+    private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
+    private static final long RATE_LIMIT_DELAY_MS = 1500;
+    private static final long RATE_LIMIT_DELAY_BUFFER = 5;
     /**
      * General constructor for profanity service, creates new http client.
      * always use this constructor when running real api calls
@@ -64,7 +66,7 @@ public class ProfanityService {
             waitForRateLimit();
             logger.info("Profaintiy service input: "+ content);
             String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
-
+            logger.debug("Sent profainty API request : " + new Date().getTime());
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(endPoint + "/contentmoderator/moderate/v1.0/ProcessText/Screen?text=" + encodedContent))
                     .header("Content-Type", "text/plain")
@@ -100,15 +102,28 @@ public class ProfanityService {
         logger.info(returnedData.toString());
         return returnedData.isHasProfanity();
     }
-
+    /**
+     * Handles profanity API rate limiting, when called instructs thread to wait for next available time slot.
+     */
     private void waitForRateLimit() throws InterruptedException {
-        long currentTime = Instant.now().getEpochSecond();
-        long lastCallTime = lastCallTimestamp.get();
-        long timeSinceLastCall = currentTime - lastCallTime;
-
-        if (timeSinceLastCall < RATE_LIMIT_DELAY_MS) {
-            Thread.sleep(RATE_LIMIT_DELAY_MS - timeSinceLastCall);
+        logger.debug("Scheduled new moderation call at " + new Date().getTime());
+        long timeToWait = 0;
+        boolean couldUpdate = false;
+        while (!couldUpdate)
+        {
+            long nextCallSlot = nextFreeCallTimestamp.get();
+            if (nextCallSlot < new Date().getTime())
+            {
+                timeToWait = 0;
+                couldUpdate = nextFreeCallTimestamp.compareAndSet(nextCallSlot, (new Date().getTime() + RATE_LIMIT_DELAY_BUFFER + RATE_LIMIT_DELAY_MS));
+            }
+            else
+            {
+                timeToWait = nextCallSlot - new Date().getTime();
+                couldUpdate = nextFreeCallTimestamp.compareAndSet(nextCallSlot, (nextCallSlot+ RATE_LIMIT_DELAY_BUFFER + RATE_LIMIT_DELAY_MS));
+            }
         }
-        lastCallTimestamp.set(Instant.now().getEpochSecond());
+        Thread.sleep(timeToWait);
+
     }
 }
