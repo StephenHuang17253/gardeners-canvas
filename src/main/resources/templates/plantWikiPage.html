@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{fragments/header.html}"></head>
+
+<body>
+    <div th:replace="~{fragments/navBar.html :: navBar('browsePublic')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container mt-5 bg-white border rounded pt-4">
+        <div class="row mb-4" >
+            <div class="col">
+                <h1 class="mb-3">Plant Wiki</h1>
+<!--                <div th:replace="~{fragments/paginationPageOverview.html}"-->
+<!--                     th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">-->
+<!--                </div>-->
+            </div>
+        </div>
+        <div class="row mb-4">
+            <form th:action="@{/plant-wiki}" method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" id="friendSearchBar" placeholder="Search"
+                       maxlength="5000" th:value="${searchTerm}" />
+                <button type="submit" class="btn btn-outline-success">Search</button>
+            </form>
+        </div>
+
+
+
+    </div>
+</body>
+
+</html>
