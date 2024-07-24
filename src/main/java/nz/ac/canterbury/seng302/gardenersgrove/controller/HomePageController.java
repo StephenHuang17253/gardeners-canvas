@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -94,6 +95,7 @@ public class HomePageController {
                 date);
         userService.addUser(johnDoe, "Password1!");
         userService.verifyUser(johnDoe);
+        johnDoe.ban(Duration.ofDays(2));
 
         for (int i = 1; i < 12; i++) {
             Garden sampleGarden = new Garden(

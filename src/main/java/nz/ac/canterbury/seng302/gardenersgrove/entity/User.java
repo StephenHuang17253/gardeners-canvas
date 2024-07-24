@@ -165,7 +165,15 @@ public class User {
         return gardens;
     }
 
-    public Boolean isBanned() {
+    public int daysUntilUnban() {
+        if (lastBanDate == null) {
+            return 0;
+        }
+        LocalDateTime banEnds = lastBanDate.plus(banDuration);
+        return (int) Duration.between(LocalDateTime.now(), banEnds).toDays();
+    }
+
+    public boolean isBanned() {
         if (lastBanDate == null) {
             return false;
         }
