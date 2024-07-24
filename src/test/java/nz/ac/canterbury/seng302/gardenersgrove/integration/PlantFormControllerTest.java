@@ -5,13 +5,16 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -48,12 +51,18 @@ class PlantFormControllerTest {
     @Autowired
     private GardenService gardenService;
 
+    @MockBean
+    private ProfanityService profanityService;
+
     User mockUser = new User("Test", "Test", "test@gmail.com", LocalDate.now());
     Garden testGarden;
     List<Plant> plantList = new ArrayList<>();
 
     @BeforeAll
     void before_or_after_all() {
+
+        Mockito.when(profanityService.containsProfanity(Mockito.any())).thenReturn(false);
+
         userService.addUser(mockUser, "1es1P@ssword");
         LocalDate date1 = LocalDate.of(2024, 3, 27);
         testGarden = gardenService.addGarden(new Garden(
@@ -259,7 +268,9 @@ class PlantFormControllerTest {
                     "long plant name that exceeds the maximum lengtha very long plant name " +
                     "that exceeds the maximum lengtha very long plant name that exceeds the" +
                     " maximum lengtha very long plant name that exceeds the maximum lengtha " +
-                    "very long plant name that exceeds the maximum length"
+                    "very long plant name that exceeds the maximum length",
+            "[", "{", "|", "$$", ":", ";",
+            "-1", "0", "-1.0", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7"
     })
     @WithMockUser(username = "test@gmail.com")
     void plantFormController_editDescriptionVariantsFail(String plantDescription) throws Exception {
@@ -458,14 +469,12 @@ class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "plant description", "PLANT", "plantDescription", "c00l pl4nt", "this, is. a-real_plant", "!",
+            "plant description", "PLANT", "plantDescription", "c00l pl4nt", "this, is. a-real_plant",
             "a very long plant name that exceeds the maximum length" +
                     "a very long plant description that does not exceed the maximum length" +
                     "a very long plant description that does not exceed the maximum length" +
                     "a very long plant description that does not exceed the maximum length" +
                     "a very long plant description that does not exceed the maximum length",
-            "''", "[", "{", "|", "$$", "o_o", "test@gmail.com", ":", ";",
-            "-1", "0", "-1.0", "a", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7",
             "😚☺️🙂🤗"
     })
     @WithMockUser(username = "test@gmail.com")
