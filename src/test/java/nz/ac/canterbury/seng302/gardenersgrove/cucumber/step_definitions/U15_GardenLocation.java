@@ -55,7 +55,7 @@ public class U15_GardenLocation {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
     public static GardenService gardenService;

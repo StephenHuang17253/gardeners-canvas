@@ -56,7 +56,7 @@ public class U10_Acceptance_Testing {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
 
