@@ -83,6 +83,9 @@ public class ProfanityResponseData {
             }
         }
     }
+    /**
+     * Sets status variables from the JSON data.
+     */
     void setStatus() {
         if (status != null && status.isObject()) {
             statusCode = status.get("Code").asText();
@@ -92,6 +95,10 @@ public class ProfanityResponseData {
             statusDescription = "Unknown";
         }
     }
+
+    /**
+     * Checks for errors and sets errorCode if error is found
+     */
     void detectError(JsonNode jsonProfanityData) {
         if (jsonProfanityData.has("error")) {
             JsonNode errorNode = jsonProfanityData.get("error");
