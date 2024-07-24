@@ -112,20 +112,30 @@ public class PlantFormController {
      *                         with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
-    @PostMapping("/my-gardens/{gardenId}/create-new-plant")
     public String submitNewPlantForm(@RequestParam(name = "plantName") String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
-            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-            @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
-            @PathVariable("gardenId") Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+                                     @RequestParam(name = "plantCount", required = false) String plantCount,
+                                     @RequestParam(name = "plantDescription", required = false) String plantDescription,
+                                     @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+                                     @PathVariable("gardenId") Long gardenId,
+                                     HttpServletResponse response,
+                                     Model model) {
         logger.info("POST /create-new-plant");
+
+        int plantCountValue;
+
+        ValidationResult plantCountResult = ValidationResult.OK;
+        if (Objects.equals(plantCount, "")) {
+            plantCountValue = 0;
+        } else {
+            plantCountValue = (int) (Double.parseDouble(plantCount));
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
+
+
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
-        ValidationResult plantCountResult;
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
@@ -153,15 +163,6 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        int integerPlantCount = 0;
-        if (Objects.equals(plantCount, "")) {
-            plantCountResult = ValidationResult.OK;
-        } else {
-            int value = (int) Double.parseDouble(plantCount);
-            integerPlantCount = Integer.parseInt(String.valueOf(value));
-            plantCountResult = InputValidator.validatePlantCount(plantCount);
-        }
-
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
 
         model.addAttribute("plantName", plantName);
@@ -178,17 +179,18 @@ public class PlantFormController {
         model.addAttribute("plantPicture", plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "createNewPlantForm";
         }
 
-        Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
 
         return "redirect:/my-gardens/{gardenId}";
     }
+
 
     /**
      * Maps the editPlantForm html page to /create-new-plant url
@@ -251,14 +253,14 @@ public class PlantFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String submiteditPlantForm(@RequestParam(name = "plantName") String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
-            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-            @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
-            @PathVariable("gardenId") Long gardenId,
-            @PathVariable("plantId") Long plantId,
-            HttpServletResponse response,
-            Model model) {
+                                      @RequestParam(name = "plantCount", required = false) String plantCount,
+                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
+                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                                      @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
+                                      @PathVariable("gardenId") Long gardenId,
+                                      @PathVariable("plantId") Long plantId,
+                                      HttpServletResponse response,
+                                      Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
@@ -277,12 +279,20 @@ public class PlantFormController {
             return "403";
         }
 
+        int plantCountValue;
+
+        ValidationResult plantCountResult = ValidationResult.OK;
+        if (Objects.equals(plantCount, "")) {
+            plantCountValue = 0;
+        } else {
+            plantCountValue = (int) (Double.parseDouble(plantCount));
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
 
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantCountResult;
         ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
         if (plantDate == null) {
@@ -292,14 +302,6 @@ public class PlantFormController {
             plantDateResult = InputValidator.validatePlantDate(dateString);
         }
 
-        int integerPlantCount = 0;
-        if (Objects.equals(plantCount, "")) {
-            plantCountResult = ValidationResult.OK;
-        } else {
-            int value = (int) Double.parseDouble(plantCount);
-            integerPlantCount = Integer.parseInt(String.valueOf(value));
-            plantCountResult = InputValidator.validatePlantCount(plantCount);
-        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
@@ -323,12 +325,13 @@ public class PlantFormController {
             return "editPlantForm";
         }
 
-        plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
+        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
         return "redirect:/my-gardens/{gardenId}";
     }
+
 
     /**
      * Takes as an input the result of validating the plant name, count, description
