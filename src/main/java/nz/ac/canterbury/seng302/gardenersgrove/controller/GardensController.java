@@ -432,11 +432,10 @@ public class GardensController {
             return "403";
         }
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> friendGardens = friend.getGardens();
+        List<Garden> gardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", friendGardens);
+        model.addAttribute("friendGardens", gardens);
 
-        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).collect(Collectors.toList());
 
         int publicGardensCount = gardens.size();
 
