@@ -32,9 +32,10 @@ public class GardenServiceUnitTest {
     private Garden garden;
 
     private int gardenId;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-    LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+
+    LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
     @BeforeEach
     void setup() {
@@ -46,7 +47,6 @@ public class GardenServiceUnitTest {
 
         Mockito.when(testUser1.getId()).thenReturn(1L);
         Mockito.when(userService.getUserById(1L)).thenReturn(testUser1);
-
 
         garden = new Garden(
                 "test",
@@ -62,7 +62,6 @@ public class GardenServiceUnitTest {
                 "",
                 testUser1);
 
-
         Optional<Garden> gardenOptional = Mockito.mock(Optional.class);
         Mockito.when(gardenOptional.get()).thenReturn(garden);
         Mockito.when(gardenOptional.isPresent()).thenReturn(true);
@@ -71,15 +70,10 @@ public class GardenServiceUnitTest {
         // mocks the save function to output whatever was inputted into it.
         // https://stackoverflow.com/questions/2684630/making-a-mocked-method-return-an-argument-that-was-passed-to-it
         Mockito.when(gardenRepository.save(Mockito.any())).thenAnswer(input -> input.getArgument(0));
-
-
     }
-
-
 
     @Test
     void testUpdateGardenLocationCoordinates_Success() {
-
         Garden updatedGarden = gardenService.updateGardenCoordinates(1L, "1.1", "1.1");
         assertEquals("1.1", updatedGarden.getGardenLatitude());
         assertEquals("1.1", updatedGarden.getGardenLongitude());
@@ -92,6 +86,5 @@ public class GardenServiceUnitTest {
         assertEquals("Invalid garden ID", error.getMessage());
         assertEquals("", garden.getGardenLongitude());
         assertEquals("", garden.getGardenLatitude());
-
     }
 }
