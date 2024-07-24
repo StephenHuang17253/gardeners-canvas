@@ -170,7 +170,7 @@ public class User {
             return 0;
         }
         LocalDateTime banEnds = lastBanDate.plus(banDuration);
-        return (int) Duration.between(LocalDateTime.now(), banEnds).toDays();
+        return (int) Math.ceil(Duration.between(LocalDateTime.now(), banEnds).toHours() / 24.0);
     }
 
     public boolean isBanned() {

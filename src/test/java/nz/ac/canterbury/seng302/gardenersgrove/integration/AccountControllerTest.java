@@ -501,6 +501,6 @@ class AccountControllerTest {
                         .param("password", userPassword))
                 .andExpect(status().isOk())
                 .andExpect(
-                        model().attribute("message", "Your account is blocked for 1 day due to inappropriate conduct"));
+                        model().attribute("message", "Your account is blocked for 2 days due to inappropriate conduct"));
     }
 }
