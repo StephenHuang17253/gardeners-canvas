@@ -17,11 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.MalformedURLException;
 import java.time.LocalDate;
@@ -53,7 +56,7 @@ public class PlantFormController {
 
      /**
      * Adds the loggedIn attribute to the model for all requests
-     * 
+     *
      * @param model
      */
     @ModelAttribute
@@ -156,7 +159,8 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
+                plantDateResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
@@ -168,7 +172,7 @@ public class PlantFormController {
         model.addAttribute("plantPicture", plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
             return "createNewPlantForm";
         }
 
@@ -287,7 +291,8 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
+                plantDateResult);
 
         String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPictureString);
@@ -297,7 +302,7 @@ public class PlantFormController {
         model.addAttribute("plantDate", plantDate);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
             return "editPlantForm";
         }
 
@@ -402,6 +407,37 @@ public class PlantFormController {
         }
         return null;
 
+    }
+
+    /**
+     *
+     * @param gardenId
+     * @param plantId
+     * @param redirectAttributes
+     * @param response
+     * @return
+     */
+    @PostMapping("/import-plant")
+    public String importPlant(@RequestParam("gardenId") Long gardenId,
+            @RequestParam("plantId") Long plantId, RedirectAttributes redirectAttributes,
+            HttpServletResponse response) {
+        logger.info("POST /import-plant");
+        Optional<Plant> optionalPlant = plantService.findById(plantId);
+
+        if (optionalPlant.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Plant plant = optionalPlant.get();
+
+        redirectAttributes.addAttribute("plantName", plant.getPlantName());
+        redirectAttributes.addAttribute("plantCount", plant.getPlantCount());
+        redirectAttributes.addAttribute("plantDescription", plant.getPlantDescription());
+        redirectAttributes.addAttribute("plantDate", plant.getPlantDate());
+        redirectAttributes.addAttribute("plantPicture", plant.getPlantDate());
+
+        return "redirect:/my-gardens/{gardenId}/create-new-plant";
     }
 
 }
