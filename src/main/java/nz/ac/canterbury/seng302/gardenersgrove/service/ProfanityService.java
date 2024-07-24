@@ -13,6 +13,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -26,11 +29,11 @@ public class ProfanityService {
     @Value("${azure.service.endpoint}")
     private String endPoint;
     Logger logger = LoggerFactory.getLogger(ProfanityService.class);
-
     private HttpClient httpClient;
-
     ObjectMapper objectMapper = new ObjectMapper();
 
+    private final AtomicLong lastCallTimestamp = new AtomicLong(0);
+    private static final long RATE_LIMIT_DELAY_MS = 1000;
     /**
      * General constructor for profanity service, creates new http client.
      * always use this constructor when running real api calls
@@ -38,7 +41,6 @@ public class ProfanityService {
     public ProfanityService () {
         httpClient = HttpClient.newHttpClient();
     }
-
     /**
      * Overloaded constructor with input for a mock http clients, used to
      * mock the function of api calls
@@ -49,7 +51,6 @@ public class ProfanityService {
     {
         httpClient = httpClientMock;
     }
-
     /**
      * Sends post a post request to the bad words API and then returns a JSON
      * response.
@@ -60,6 +61,7 @@ public class ProfanityService {
      */
     public ProfanityResponseData moderateContent(String content) {
         try {
+            waitForRateLimit();
             logger.info("Profaintiy service input: "+ content);
             String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
 
@@ -97,5 +99,16 @@ public class ProfanityService {
         ProfanityResponseData returnedData = moderateContent(inputString);
         logger.info(returnedData.toString());
         return returnedData.isHasProfanity();
+    }
+
+    private void waitForRateLimit() throws InterruptedException {
+        long currentTime = Instant.now().getEpochSecond();
+        long lastCallTime = lastCallTimestamp.get();
+        long timeSinceLastCall = currentTime - lastCallTime;
+
+        if (timeSinceLastCall < RATE_LIMIT_DELAY_MS) {
+            Thread.sleep(RATE_LIMIT_DELAY_MS - timeSinceLastCall);
+        }
+        lastCallTimestamp.set(Instant.now().getEpochSecond());
     }
 }
