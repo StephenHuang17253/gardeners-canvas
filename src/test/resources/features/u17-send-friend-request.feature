@@ -8,7 +8,6 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     And I "Sarah" "Thompson", 36 am a user with email "sarah@email.com" and password "TestPassword10!"
 
 
-
   Scenario: AC1 - nav bar takes me to manage friends page
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     When I click on the 'Manage Friends' button
@@ -40,6 +39,21 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
 
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     And A user with first name <fname>, last name <lname>, and email <email> exists
+    When I am on the 'Manage Friends' page
+    And I enter in <input>
+    And I hit the search button
+    Then I can see a list of users of the app exactly matching <fname> <lname> <email>
+    Examples:
+      | fname  | lname | email            | input            |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "doe@gmail.com"  |
+      | "Andy" | ""    | "andy@gmail.com" | "andy@gmail.com" |
+
+  Scenario Outline: AC5.1 - Given I am on the manage friends page and I have opened the search bar, when I enter an email
+  address and I hit the search button, then I can see a list of users of the app exactly matching the email provided.
+
+    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    And A user with first name <fname>, last name <lname>, and email <email> exists
+    And I, user "liam@email.com", have declined a friend request from <email>
     When I am on the 'Manage Friends' page
     And I enter in <input>
     And I hit the search button
