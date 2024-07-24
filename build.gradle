@@ -112,23 +112,7 @@ tasks.register("cucumber", Test) {
 	finalizedBy "cucumberTestReport"
 }
 
-jacocoTestReport { // Generate a report for all generated test data
-	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
-		return !project.hasProperty('skipTestReport')
-	}
 
-	mustRunAfter test, integration, cucumber
-
-	executionData fileTree(project.rootDir) {
-		include '**/*.exec'
-	}
-	reports {
-		xml.required = true
-		xml.destination file("${buildDir}/jacoco/test-report.xml")
-		csv.required = false
-		html.destination file("${buildDir}/jacoco/html")
-	}
-}
 
 tasks.register("unitTestReport", JacocoReport) { // Generate a report for unit tests
 	group = 'verification'
@@ -188,5 +172,32 @@ tasks.register("cucumberTestReport", JacocoReport) { // Generate a report for cu
 		// The jacoco coverage report will ge generated in the destination below
 		html.destination file("${buildDir}/reports/coverage/cucumber")
 	}
+
+
 }
 
+jacocoTestReport { // Generate a report for all generated test data
+	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
+		return !project.hasProperty('skipTestReport')
+	}
+
+	mustRunAfter test, integration, cucumber
+
+	executionData fileTree(project.rootDir) {
+		include '**/*.exec'
+	}
+	reports {
+		xml.required = true
+		xml.destination file("${buildDir}/jacoco/test-report.xml")
+		csv.required = false
+		html.destination file("${buildDir}/jacoco/html")
+	}
+}
+tasks.named("check") {
+	dependsOn test, integration, cucumber
+}
+// Ensure jacocoTestReport is ran after each specific test report.
+// The 'overall' coverage will then include each of the test tasks ran.
+tasks.named("unitTestReport").configure { finalizedBy "jacocoTestReport" }
+tasks.named("integrationTestReport").configure { finalizedBy "jacocoTestReport" }
+tasks.named("cucumberTestReport").configure { finalizedBy "jacocoTestReport" }
