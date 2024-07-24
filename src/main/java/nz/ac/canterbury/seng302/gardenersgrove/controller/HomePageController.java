@@ -95,7 +95,6 @@ public class HomePageController {
                 date);
         userService.addUser(johnDoe, "Password1!");
         userService.verifyUser(johnDoe);
-        johnDoe.ban(Duration.ofDays(2));
 
         for (int i = 1; i < 12; i++) {
             Garden sampleGarden = new Garden(
