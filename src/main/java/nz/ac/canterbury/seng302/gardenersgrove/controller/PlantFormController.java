@@ -359,37 +359,20 @@ public class PlantFormController {
                         "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
-            model.addAttribute("PNErrorClass", "true");
-        } else {
-            model.addAttribute("PNErrorClass", "null");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
             model.addAttribute("PCErrorText", plantCountResult);
-            model.addAttribute("PCErrorClass", "true");
-
-        } else {
-            model.addAttribute("PCErrorClass", "null");
         }
 
         // notifies the user that the plant Description is invalid (if applicable)
         if (!plantDescriptionResult.valid()) {
-            if (plantDescriptionResult.toString().equals(ValidationResult.INVALID_DESCRIPTION.toString())) {
-                plantDescriptionResult.updateMessage("Plant description must be less than 512 characters");
-            }
             model.addAttribute("PDErrorText", plantDescriptionResult);
-            model.addAttribute("PDErrorClass", "true");
-
-        } else {
-            model.addAttribute("PDErrorClass", "null");
         }
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
-            model.addAttribute("PAErrorClass", "true");
-        } else {
-            model.addAttribute("PAErrorClass", "null");
         }
 
     }
