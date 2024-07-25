@@ -270,7 +270,7 @@ class PlantFormControllerTest {
                     " maximum lengtha very long plant name that exceeds the maximum lengtha " +
                     "very long plant name that exceeds the maximum length",
             "[", "{", "|", "$$", ":", ";",
-            "-1", "0", "-1.0", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7"
+            "-1", "0", "-1.0", "!", "{}", "99999999999999999999999999999999999999999", "5..5", "5.5.7", "😘😗😙😚☺️🙂🤗"
     })
     @WithMockUser(username = "test@gmail.com")
     void plantFormController_editDescriptionVariantsFail(String plantDescription) throws Exception {
@@ -475,7 +475,7 @@ class PlantFormControllerTest {
                     "a very long plant description that does not exceed the maximum length" +
                     "a very long plant description that does not exceed the maximum length" +
                     "a very long plant description that does not exceed the maximum length",
-            "😚☺️🙂🤗"
+            "😚☺️🙂🤗hello"
     })
     @WithMockUser(username = "test@gmail.com")
     void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
