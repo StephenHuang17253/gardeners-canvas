@@ -60,6 +60,7 @@ sonar {
 		property "sonar.sourceEncoding", "UTF-8"
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"
+		property "sonar.coverage.jacoco.xmlReportPath", "${buildDir}/jacoco/test-report.xml"
 	}
 }
 
