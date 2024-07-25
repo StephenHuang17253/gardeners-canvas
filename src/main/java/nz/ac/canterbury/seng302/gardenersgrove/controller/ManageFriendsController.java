@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -24,7 +25,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
@@ -39,13 +39,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 @SessionAttributes("userGardens")
 public class ManageFriendsController {
 
-    Logger logger = LoggerFactory.getLogger(GardensController.class);
+    Logger logger = LoggerFactory.getLogger(ManageFriendsController.class);
 
     private final FriendshipService friendshipService;
 
     private final SecurityService securityService;
-
-    private final FileService fileService;
 
     private final UserService userService;
 
@@ -58,9 +56,9 @@ public class ManageFriendsController {
      * @param fileService       service to manage files
      */
     @Autowired
-    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
+    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService,
+            UserService userService) {
         this.friendshipService = friendshipService;
-        this.fileService = fileService;
         this.securityService = securityService;
         this.userService = userService;
 
@@ -138,11 +136,22 @@ public class ManageFriendsController {
             String fName = userTypeFriend.getFirstName();
             String lName = userTypeFriend.getLastName();
             String friendsName = fName + ' ' + lName;
-            RequestFriendModel requestFriendModel = new RequestFriendModel(friendProfilePicture, friendsName, isSender, userTypeFriend.getId());
+            RequestFriendModel requestFriendModel = new RequestFriendModel(friendProfilePicture, friendsName, isSender,
+                    userTypeFriend.getId());
             requestFriendModels.add(requestFriendModel);
         }
 
         return requestFriendModels;
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -153,10 +162,6 @@ public class ManageFriendsController {
     @GetMapping("/manage-friends")
     public String myFriends(Model model, HttpServletRequest request) {
         logger.info("GET /manage-friends");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         String activeTab;
@@ -186,22 +191,22 @@ public class ManageFriendsController {
      */
     List<FriendModel> getSearchResults(String searchInput, ValidationResult validEmail) {
         List<FriendModel> friendModels = new ArrayList<>();
-        //get all matching search results
+        // get all matching search results
         User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
         User currentUser = securityService.getCurrentUser();
         if (searchResults.length < 1) {
-            return null;
+            return friendModels;
         }
         for (User foundUser : searchResults) {
             // ensure that a search result is not the current user
             if (!Objects.equals(foundUser.getId(), currentUser.getId())) {
-                //creating a friend (person) object for display on frontend
+                // creating a friend (person) object for display on frontend
                 String friendProfilePicture = foundUser.getProfilePictureFilename();
                 String friendsName = foundUser.getFirstName() + " " + foundUser.getLastName();
                 String friendGardenLink = "/" + foundUser.getId() + "/gardens";
                 FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
                 friendModel.setFriendId(foundUser.getId());
-                // add status of friendship from current user to  foundUser
+                // add status of friendship from current user to foundUser
                 friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, foundUser));
                 friendModel.setFriendId(foundUser.getId());
                 // ensure there is no friendship from foundUser to currentUser
@@ -211,7 +216,8 @@ public class ManageFriendsController {
                     friendModels.add(friendModel);
                 } else {
                     Friendship friendship = friendshipService.findFriendship(foundUser, currentUser);
-                    boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED && friendship.getUser1() == foundUser);
+                    boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED
+                            && friendship.getUser1() == foundUser);
                     if (declinedRequest) {
                         friendModels.add(friendModel);
                     }
@@ -221,36 +227,36 @@ public class ManageFriendsController {
         return friendModels;
     }
 
-
     /**
      * Gets results of search for other users
      *
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends/search")
-    public String searchForUsers(@RequestParam(name = "searchInput", defaultValue = "") String searchInput, Model model) {
+    public String searchForUsers(@RequestParam(name = "searchInput", defaultValue = "") String searchInput,
+            Model model) {
         logger.info("GET /manage-friends/search");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
-        //preparing input for validation
+
+        // preparing input for validation
         searchInput = searchInput.strip();
         ValidationResult validEmail = InputValidator.validateEmail(searchInput);
         String[] separated = searchInput.split(" ");
 
-        //validating input
+        // validating input
         ValidationResult validFName = InputValidator.validateName(separated[0]);
         ValidationResult validLName = InputValidator.validateName((separated.length > 1) ? separated[1] : "");
         List<FriendModel> friendModels = new ArrayList<>();
-        //getting results
+        // getting results
         if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
             friendModels = getSearchResults(searchInput, validEmail);
-            model.addAttribute("searchResults", friendModels);
         }
-        if (friendModels == null || friendModels.isEmpty()) {
+        
+        if (friendModels.isEmpty()) {
             model.addAttribute("searchErrorText", "There is nobody with that name or email in Gardener's Grove");
             model.addAttribute("userSearch", searchInput);
-
+            model.addAttribute("searchResults", null);
+        } else {
+            model.addAttribute("searchResults", friendModels);
         }
         List<FriendModel> acceptedFriendModels = createFriendModel();
         List<RequestFriendModel> pendingFriendModels = createRequestFriendModel(FriendshipStatus.PENDING);
@@ -271,10 +277,10 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId,
-                                   @RequestParam("activeTab") String activeTab,
-                                   @RequestParam(value = "searchInput", required = false) String searchInput,
-                                   RedirectAttributes redirectAttributes,
-                                   Model model) {
+            @RequestParam("activeTab") String activeTab,
+            @RequestParam(value = "searchInput", required = false) String searchInput,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends/send-invite");
 
         User currentUser = securityService.getCurrentUser();
@@ -283,10 +289,8 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("searchErrorText", exception.getMessage());
-            model.addAttribute("loggedIn", securityService.isLoggedIn());
             return "manageFriendsPage";
         }
-
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
@@ -310,10 +314,10 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends")
     public String managePendingRequest(@RequestParam(name = "friendAccepted") boolean friendAccepted,
-                                       @RequestParam(name = "pendingFriendId") Long pendingFriendId,
-                                       @RequestParam("activeTab") String activeTab,
-                                       RedirectAttributes redirectAttributes,
-                                       Model model) {
+            @RequestParam(name = "pendingFriendId") Long pendingFriendId,
+            @RequestParam("activeTab") String activeTab,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends");
 
         if (friendAccepted) {
@@ -340,9 +344,9 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/remove")
     public String cancelSentRequest(@RequestParam(name = "friendId") Long friendId,
-                                    @RequestParam("activeTab") String activeTab,
-                                    RedirectAttributes redirectAttributes,
-                                    Model model) {
+            @RequestParam("activeTab") String activeTab,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends/remove");
 
         User currentUser = securityService.getCurrentUser();
