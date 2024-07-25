@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
@@ -24,11 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -121,13 +121,21 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
-        int value = (int) Double.parseDouble(plantCount);
+
+        int plantCountValue;
+
+        ValidationResult plantCountResult = ValidationResult.OK;
+        if (Objects.equals(plantCount, "")) {
+            plantCountValue = 0;
+        } else {
+            plantCountValue = (int) (Double.parseDouble(plantCount));
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantDateResult;
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -173,8 +181,7 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
-        Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
@@ -270,13 +277,21 @@ public class PlantFormController {
         }
 
 
-        int value = (int) Double.parseDouble(plantCount);
+        int plantCountValue;
+
+        ValidationResult plantCountResult = ValidationResult.OK;
+        if (Objects.equals(plantCount, "")) {
+            plantCountValue = 0;
+        } else {
+            plantCountValue = (int) (Double.parseDouble(plantCount));
+            plantCountResult = InputValidator.validatePlantCount(plantCount);
+        }
+
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantDateResult;
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
@@ -307,8 +322,8 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
-        plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
+
+        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
@@ -328,7 +343,8 @@ public class PlantFormController {
      *                               appropriate error)
      */
     private void plantFormErrorText(Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
-            ValidationResult plantCountResult, ValidationResult plantDescriptionResult, ValidationResult plantDateResult) {
+            ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
+            ValidationResult plantDateResult) {
 
         if (!plantPictureResult.valid()) {
             model.addAttribute("plantPictureError", plantPictureResult);
@@ -343,37 +359,20 @@ public class PlantFormController {
                         "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
-            model.addAttribute("PNErrorClass", "true");
-        } else {
-            model.addAttribute("PNErrorClass", "null");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
             model.addAttribute("PCErrorText", plantCountResult);
-            model.addAttribute("PCErrorClass", "true");
-
-        } else {
-            model.addAttribute("PCErrorClass", "null");
         }
 
         // notifies the user that the plant Description is invalid (if applicable)
         if (!plantDescriptionResult.valid()) {
-            if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                plantNameResult.updateMessage("cannot be greater than 512 characters in length");
-            }
-            model.addAttribute("PDErrorText", "Plant description " + plantDescriptionResult);
-            model.addAttribute("PDErrorClass", "true");
-
-        } else {
-            model.addAttribute("PDErrorClass", "null");
+            model.addAttribute("PDErrorText", plantDescriptionResult);
         }
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
-            model.addAttribute("PAErrorClass", "true");
-        } else {
-            model.addAttribute("PAErrorClass", "null");
         }
 
     }

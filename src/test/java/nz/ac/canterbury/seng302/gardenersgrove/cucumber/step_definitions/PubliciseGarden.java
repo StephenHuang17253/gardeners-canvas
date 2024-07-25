@@ -59,7 +59,7 @@ public class PubliciseGarden {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
     @Mock
@@ -217,7 +217,7 @@ public class PubliciseGarden {
         Assertions.assertNotNull(modelAndView);
         String model = modelAndView.getModel().toString();
 
-        Assertions.assertTrue(model.contains("Description must be 512 characters or less and contain some text"));
+        Assertions.assertTrue(model.contains("Description must be 512 characters or less and contain some letters"));
     }
 
 

@@ -4,7 +4,9 @@
 <head th:replace="~{fragments/header.html :: head (includeWeatherStyles=true)}"></head>
 
 <body>
-    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+
+
+<div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-3 pb-5" style="width: 60%;">
         <div class="container text-center">
@@ -83,17 +85,8 @@
                     </div>
                 </div>
 
-                <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                    <a>
-                        <button th:if="${!isOwner}" type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tag</button>
-                    </a>
-                </div>
-
 
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                   <a>
-                       <button type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tag</button>
-                   </a>
                     <a th:href="@{__${gardenId}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
                     </a>
@@ -174,6 +167,7 @@
             </div>
         </div>
     </div>
+
     <script th:src="@{/js/wateringBox.js}"></script>
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
