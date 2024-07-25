@@ -931,7 +931,7 @@ public class InputValidator {
             return this;
         }
 
-        String filteredValue = testedValue.replace(" ", "");
+        String filteredValue = testedValue.replaceAll("\\s+", "");
 
         if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
