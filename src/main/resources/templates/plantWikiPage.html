@@ -27,6 +27,9 @@
                 <p th:if="${plantName}" th:text="${plantName}"></p>
                 <img class="w-50" th:if="${plantName}" th:src="${plantImage}" alt="Image not found">
             </div>
+            <div th:each="suggestion : ${searchSuggestions}">
+                <p th:text="${suggestion}"></p>
+            </div>
 
         </div>
 

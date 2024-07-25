@@ -21,6 +21,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -104,7 +106,18 @@ public class PlantWikiController {
 
     private void addSearchSuggestions(Model model, JsonNode plantList) {
 
-        // TODO complete
+        JsonNode dataArray = plantList.path("data");
+
+        // Ensure dataArray is an array node
+        if (dataArray.isArray()) {
+            // Convert JsonNode to a stream and extract common names
+            List<String> commonNames = StreamSupport.stream(dataArray.spliterator(), false)
+                    .map(node -> node.path("common_name").asText())
+                    .collect(Collectors.toList());
+
+            // Add the common names to the model
+            model.addAttribute("searchSuggestions", commonNames);
+        }
     }
 
     @GetMapping("/plant-wiki")
