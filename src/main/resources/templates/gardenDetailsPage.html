@@ -87,6 +87,8 @@
 
 
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                    <button type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tag</button>
+
                     <a th:href="@{__${gardenId}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
                     </a>
