@@ -92,7 +92,7 @@ public class ResetUserPassword {
         AccountController accountController = new AccountController(userService, authenticationManager, emailService,
                 tokenService, gardenService, securityService);
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService,
-                emailService);
+                emailService, securityService);
         mockMVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController)
                 .build();
         tokenService.addToken(token);
