@@ -29,7 +29,7 @@ public enum ValidationResult {
     AREA_TOO_LARGE("must be a positive number. \n\r Must be less than or equal to 8000000"),
     AREA_TOO_SMALL("must be a positive number. \n\r Must be greater than or equal to 0.01"),
     DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
-    INVALID_DESCRIPTION("Description must be 512 characters or less and contain some text"),
+    INVALID_DESCRIPTION("Description must be 512 characters or less and contain some letters"),
     INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
 
     private String message;
