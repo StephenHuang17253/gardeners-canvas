@@ -933,7 +933,7 @@ public class InputValidator {
 
         String filteredValue = testedValue.replace(" ", "");
 
-        if (!filteredValue.equals("") && filteredValue.matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
+        if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
