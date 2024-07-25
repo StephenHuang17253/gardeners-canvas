@@ -3,7 +3,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,8 @@ import java.util.List;
 @Entity
 @Table(name = "user_table")
 public class User {
+
+    private static final int STRIKES_TO_BAN = 6;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +48,16 @@ public class User {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
-    private List<Garden> gardens =  new ArrayList<>();
+    private List<Garden> gardens = new ArrayList<>();
+
+    @Column
+    private LocalDateTime lastBanDate;
+
+    @Column
+    private Duration banDuration;
+
+    @Column
+    private Integer strikes;
 
     /**
      * JPA required no-args constructor
@@ -67,6 +80,9 @@ public class User {
         this.emailAddress = emailAddress;
         this.dateOfBirth = dateOfBirth;
         this.verified = false;
+        this.lastBanDate = null;
+        this.banDuration = null;
+        this.strikes = 0;
     }
 
     public void setFirstName(String firstName) {
@@ -101,6 +117,17 @@ public class User {
         this.id = id;
     }
 
+    public void setBanDuration(Duration banDuration) {
+        this.banDuration = banDuration;
+    }
+
+    public void incrementStrikes() {
+        strikes++;
+    }
+
+    public void resetStrikes() {
+        strikes = 0;
+    }
 
     public Long getId() {
         return id;
@@ -134,7 +161,25 @@ public class User {
         return verified;
     }
 
-    public List<Garden> getGardens() { return gardens; }
+    public List<Garden> getGardens() {
+        return gardens;
+    }
+
+    public Boolean isBanned() {
+        if (lastBanDate == null) {
+            return false;
+        }
+        return LocalDateTime.now().isBefore(lastBanDate.plus(banDuration));
+    }
+
+    public void ban(Duration banDuration) {
+        lastBanDate = LocalDateTime.now();
+        this.banDuration = banDuration;
+    }
+
+    public int getStrikes() {
+        return strikes;
+    }
 
     /**
      * Returns a string representation of the user
@@ -147,8 +192,8 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
-                ", profilePictureFilename='" + profilePictureFilename + '\''+
-                ", gardens='" + gardens + '\''+
+                ", profilePictureFilename='" + profilePictureFilename + '\'' +
+                ", gardens='" + gardens + '\'' +
                 ", verified='" + verified + '\'' +
                 '}';
     }

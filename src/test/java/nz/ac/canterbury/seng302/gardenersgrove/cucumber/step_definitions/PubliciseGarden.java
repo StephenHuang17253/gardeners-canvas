@@ -29,7 +29,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -37,14 +36,13 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 @SpringBootTest
 public class PubliciseGarden {
 
-    public static MockMvc MOCK_MVC_MY_GARDEN;
+    public static MockMvc mockMVCMyGarden;
 
-    public static MockMvc MOCK_MVC_GARDEN_FORM;
+    public static MockMvc mockMVCGardenForm;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -61,7 +59,7 @@ public class PubliciseGarden {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
     @Mock
@@ -73,10 +71,7 @@ public class PubliciseGarden {
 
     private static PlantService plantService;
 
-    private static FileService fileService;
     private ProfanityService profanityService;
-
-    private InputValidator inputValidator;
 
     private User user;
 
@@ -94,17 +89,16 @@ public class PubliciseGarden {
 
         profanityService = Mockito.mock(ProfanityService.class);
         weatherService = Mockito.mock(WeatherService.class);
-        inputValidator = new InputValidator(userService, profanityService);
 
         Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
-        MOCK_MVC_MY_GARDEN = MockMvcBuilders.standaloneSetup(myGardensController).build();
-        MOCK_MVC_GARDEN_FORM = MockMvcBuilders.standaloneSetup(gardenFormController).build();
+        mockMVCMyGarden = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        mockMVCGardenForm = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
     }
 //    AC1
@@ -118,7 +112,7 @@ public class PubliciseGarden {
     @When("I mark a checkbox labelled \"Make my garden public\"")
     public void iMarkACheckboxLabelledMakeMyGardenPublic() throws Exception {
        String myGardenUrl = String.format("/my-gardens/%d/public", userGarden.getGardenId());
-        MOCK_MVC_MY_GARDEN.perform(
+        mockMVCMyGarden.perform(
                         MockMvcRequestBuilders
                                 .post(myGardenUrl)
                                 .param("makeGardenPublic", String.valueOf(true))
@@ -147,7 +141,7 @@ public class PubliciseGarden {
 
     @And("I am creating a new garden {string}")
     public void iAmCreatingANewGarden(String gardenName) throws Exception {
-        createGardenResult = MOCK_MVC_GARDEN_FORM.perform(
+        createGardenResult = mockMVCGardenForm.perform(
                 MockMvcRequestBuilders
                         .post("/create-new-garden")
                         .param("gardenName", gardenName)
@@ -168,7 +162,7 @@ public class PubliciseGarden {
     public void iAmEditingAnExistingGarden() throws Exception {
         System.out.println(userGarden.getGardenId());
         String gardenUrl = String.format("/my-gardens/%d/edit", userGarden.getGardenId());
-        MOCK_MVC_GARDEN_FORM.perform(
+        mockMVCGardenForm.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", userGarden.getGardenName())

@@ -1,4 +1,4 @@
-Feature: U19 As Inaya, I want to be able to make my garden public so that others can see what I’m growing.
+Feature: U19 As Inaya, I want to be able to make my garden public so that others can see what I'm growing.
 
   Background:
     Given "Kaia" "Pene", 67 is a user with email "kaia@email.com" and password "TestPassword10!"

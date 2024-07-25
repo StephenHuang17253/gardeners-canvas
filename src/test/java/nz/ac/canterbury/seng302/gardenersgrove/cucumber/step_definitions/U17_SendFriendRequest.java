@@ -178,6 +178,18 @@ public class U17_SendFriendRequest {
         Assertions.assertNotNull(userService.getUserByEmail(email));
     }
 
+
+    @Given("I, user {string}, have declined a friend request from {string}")
+    public void i_user_have_declined_a_friend_request_from(String myEmail, String declinedFriendEmail) {
+        User liam = userService.getUserByEmail(myEmail);
+        User declinedFriend = userService.getUserByEmail(declinedFriendEmail);
+
+        Friendship friendship = friendshipService.addFriendship(liam, declinedFriend);
+        friendship.setStatus(FriendshipStatus.DECLINED);
+        Assertions.assertEquals(FriendshipStatus.DECLINED, friendship.getStatus());
+    }
+
+
     @When("I enter in {string}")
     public void i_enter_in(String input) {
         this.input = input;
@@ -229,9 +241,10 @@ public class U17_SendFriendRequest {
                 .andReturn();
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("searchResults");
         FriendModel friendModel = result.get(0);
-        Assertions.assertEquals(friendProfilePicture,friendModel.getFriendProfilePicture());
-        Assertions.assertEquals(userName,friendModel.getFriendName());
+        Assertions.assertEquals(friendProfilePicture, friendModel.getFriendProfilePicture());
+        Assertions.assertEquals(userName, friendModel.getFriendName());
     }
+
     @When("I hit the 'invite as friend' button for user with {string}")
     public void i_hit_the_invite_as_friend_button_for_user_with(String email) throws Exception {
         User user = userService.getUserByEmail(email);
@@ -242,6 +255,7 @@ public class U17_SendFriendRequest {
                                 .param("activeTab", "search"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
+
     @Then("user {string} sees the invite from {string}")
     public void user_sees_the_invite_from(String receiverEmail, String senderEmail) throws Exception {
         User user = userService.getUserByEmail(senderEmail);
@@ -312,6 +326,7 @@ public class U17_SendFriendRequest {
                                 .param("activeTab", "pending"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
+
     @Then("{string} are not added to friends list")
     public void are_not_added_to_friends_list(String email) throws Exception {
         User user = userService.getUserByEmail(email);
@@ -324,6 +339,7 @@ public class U17_SendFriendRequest {
         System.out.println(result);
         Assertions.assertEquals(0, result.size());
     }
+
     @Then("{string} can not add me {string}")
     public void can_not_add_me(String senderEmail, String receiverEmail) {
         User sender = userService.getUserByEmail(senderEmail);
@@ -340,6 +356,7 @@ public class U17_SendFriendRequest {
         Friendship friendship = friendshipService.addFriendship(sender, receiver);
         Assertions.assertEquals(FriendshipStatus.PENDING, friendship.getStatus());
     }
+
     @When("{string} declines my {string} request")
     public void declines_my_request(String receiverEmail, String senderEmail) {
         User sender = userService.getUserByEmail(senderEmail);
@@ -350,6 +367,7 @@ public class U17_SendFriendRequest {
         Friendship updatedFriendship = friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.DECLINED);
         Assertions.assertEquals(FriendshipStatus.DECLINED, updatedFriendship.getStatus());
     }
+
     @Then("I see the request as declined by {string}")
     public void i_see_the_request_as_declined_by(String receiver) throws Exception {
         User user = userService.getUserByEmail(receiver);
@@ -393,7 +411,6 @@ public class U17_SendFriendRequest {
         Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, requestFriendModel.getFriendName());
     }
-
 
 
 }

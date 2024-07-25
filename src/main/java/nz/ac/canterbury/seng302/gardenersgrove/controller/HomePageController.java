@@ -5,19 +5,21 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
+import org.springframework.web.bind.annotation.ModelAttribute;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -52,6 +54,9 @@ public class HomePageController {
      * @param authenticationManager
      */
     @Autowired
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager,
+            GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService) {
     public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService,
                               FriendshipService friendshipService, SecurityService securityService, UserInteractionService userInteractionService) {
         this.userService = userService;
@@ -60,6 +65,17 @@ public class HomePageController {
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
+        this.securityService = securityService;
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     *
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -69,47 +85,77 @@ public class HomePageController {
      * @throws IOException
      */
     @GetMapping("/")
-    public String home() throws IOException {
+    public String home() {
         logger.info("GET /");
         return "redirect:./home";
     }
 
     /**
-     * Gets the resource url for the profile picture, or the default profile picture
-     * if the user does not have one
-     * 
-     * @param filename string filename
-     * @return string of the profile picture url
+     * Adds a default user and gardens to the database for testing purposes
      */
-    public String getProfilePictureString(String filename) {
+    public void addDefautContent() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
-        String profilePictureString = "/images/default_profile_picture.png";
+        // Add a default user to speed up manual testing.
+        User johnDoe = new User("John",
+                "Doe",
+                "gardenersgrovetest@gmail.com",
+                date);
+        userService.addUser(johnDoe, "Password1!");
+        userService.verifyUser(johnDoe);
 
-        if (filename != null && !filename.isEmpty()) {
-            profilePictureString = MvcUriComponentsBuilder.fromMethodName(ProfileController.class,
-                    "serveFile", filename).build().toUri().toString();
+        for (int i = 1; i < 12; i++) {
+            Garden sampleGarden = new Garden(
+                    "John's Garden " + i,
+                    "Some Description here",
+                    "114 Ilam Road",
+                    "Ilam",
+                    "Christchurch",
+                    "8041",
+                    "New Zealand",
+                    15.0,
+                    true,
+                    "-43.5214643",
+                    "172.5796159",
+                    johnDoe);
+            sampleGarden = gardenService.addGarden(sampleGarden);
+
+            for (int k = 0; k < 12; k++) {
+                plantService.addPlant("Test Plant #" + k, 2,
+                        "test", LocalDate.now(), sampleGarden.getGardenId());
+            }
         }
-        return profilePictureString;
-    }
 
-    private void createDefaultUsers(){
-        // Add a test user with test gardens and test plants
-        if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-            LocalDate date = LocalDate.parse("01/01/2001", formatter);
+        Garden sampleGarden2 = new Garden(
+                "John's Private garden ",
+                "Some Description here",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                15.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                johnDoe);
+
+        gardenService.addGarden(sampleGarden2);
+
+        if (!userService.emailInUse("janedoe@email.com")) {
 
             // Add a default user to speed up manual testing.
-            User johnDoe = new User("John",
+            User janeDoe = new User("Jane",
                     "Doe",
-                    "gardenersgrovetest@gmail.com",
+                    "janedoe@email.com",
                     date);
-            userService.addUser(johnDoe, "Password1!");
-            userService.verifyUser(johnDoe);
+            userService.addUser(janeDoe, "Password1!");
+            userService.verifyUser(janeDoe);
 
-
-            for (int i = 1; i < 12; i ++) {
+            for (int i = 0; i < 1; i++) {
                 Garden sampleGarden = new Garden(
-                        "John's Garden " + i,
+                        "Jane's Garden " + i,
                         "Some Description here",
                         "114 Ilam Road",
                         "Ilam",
@@ -120,71 +166,28 @@ public class HomePageController {
                         true,
                         "-43.5214643",
                         "172.5796159",
-                        johnDoe);
+                        janeDoe);
                 sampleGarden = gardenService.addGarden(sampleGarden);
 
-                for(int k = 0; k < 12; k++)
-                {
-                    plantService.addPlant("Test Plant #" + k,2,
-                            "test", LocalDate.now(),sampleGarden.getGardenId());
+                for (int k = 0; k < 1; k++) {
+                    plantService.addPlant("Test Plant " + k, 2,
+                            "test", LocalDate.now(), sampleGarden.getGardenId());
                 }
+
             }
-
-            Garden sampleGarden2 = new Garden(
-                    "John's Private garden ",
-                    "Some Description here",
-                    "114 Ilam Road",
-                    "Ilam",
-                    "Christchurch",
-                    "8041",
-                    "New Zealand",
-                    15.0,
-                    false,
-                    "-43.5214643",
-                    "172.5796159",
-                    johnDoe);
-            sampleGarden2 = gardenService.addGarden(sampleGarden2);
-
-            if (!userService.emailInUse("janedoe@email.com")) {
-
-                // Add a default user to speed up manual testing.
-                User janeDoe = new User("Jane",
-                        "Doe",
-                        "janedoe@email.com",
-                        date);
-                userService.addUser(janeDoe, "Password1!");
-                userService.verifyUser(janeDoe);
-
-
-                for (int i = 0; i < 1; i++) {
-                    Garden sampleGarden = new Garden(
-                            "Jane's Garden " + i,
-                            "Some Description here",
-                            "114 Ilam Road",
-                            "Ilam",
-                            "Christchurch",
-                            "8041",
-                            "New Zealand",
-                            15.0,
-                            true,
-                            "-43.5214643",
-                            "172.5796159",
-                            janeDoe);
-                    sampleGarden = gardenService.addGarden(sampleGarden);
-
-                    for(int k = 0; k < 1; k++)
-                    {
-                        plantService.addPlant("Test Plant #" + k,2,
-                                "test", LocalDate.now(),sampleGarden.getGardenId());
-                    }
-
-                }
-                Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
-                friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
-            }
-
+            Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
+            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
         }
+    }
 
+    /**
+     * This function is called when a GET request is made to /home
+     *
+     * @param model
+     * @return The homePage html page
+     */
+    @GetMapping("/home")
+    public String home(Model model) {
 
         // If no users exist then clear the security context,
         // useful for testing without persistent storage,
@@ -192,16 +195,6 @@ public class HomePageController {
         if (userService.getAllUsers().isEmpty()) {
             SecurityContextHolder.clearContext();
         }
-    }
-
-    /**
-     * This function is called when a GET request is made to /home
-     * 
-     * @param model
-     * @return The homePage html page
-     */
-    @GetMapping("/home")
-    public String home(Model model) {
 
         logger.info("GET /home");
 
