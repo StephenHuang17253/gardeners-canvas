@@ -161,10 +161,10 @@ public class WeatherMonitoring {
     @Then("Current weather for my location is shown")
     public void currentWeatherForMyLocationIsShown() {
         Assertions.assertNotNull(weather.get(2));
-        Assertions.assertEquals("10", weather.get(2).getTemp());
-        Assertions.assertEquals("92", weather.get(2).getHumidity());
-        Assertions.assertEquals("0.0", weather.get(2).getPrecipitation());
-        Assertions.assertNull(weather.get(2).getWeatherError());
+        Assertions.assertEquals("10", weather.get(2).getMaxTemp());
+        Assertions.assertEquals("8", weather.get(2).getMinTemp());
+        Assertions.assertEquals("1.0", weather.get(2).getPrecipitation());
+        Assertions.assertNull( weather.get(2).getWeatherError());
     }
 
     @Then("Future weather for my location is shown")
@@ -190,10 +190,8 @@ public class WeatherMonitoring {
     @Given("My garden is not set to a location that the location service can not find")
     public void myGardenIsNotSetToALocationThatTheLocationServiceCanNotFind() {
         WeatherResponseData mockResponseData = mock(WeatherResponseData.class);
-        Mockito.when(mockResponseData.getCurrentWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(mockResponseData.getPastWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(mockResponseData.getForecastWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(weatherService.getWeather(Mockito.anyString(), Mockito.anyString())).thenReturn(mockResponseData);
+        Mockito.when(mockResponseData.getRetrievedWeatherData()).thenThrow(new NullPointerException("No such location"));
+        Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
     }
 
     @Then("A Weather error message tells me “Location not found, please update your location to see the weather”")
@@ -211,12 +209,12 @@ public class WeatherMonitoring {
         DailyWeather sunnyWeatherYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(1), "Sunny");
         DailyWeather sunnyWeatherBeforeYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(2), "Sunny");
 
-        List<DailyWeather> pastWeather = new ArrayList<>();
-        pastWeather.add(sunnyWeatherBeforeYesterday);
-        pastWeather.add(sunnyWeatherYesterday);
+        List<DailyWeather> mockWeatherData = new ArrayList<>();
+        mockWeatherData.add(sunnyWeatherBeforeYesterday);
+        mockWeatherData.add(sunnyWeatherYesterday);
+        mockWeatherData.add(sunnyWeatherToday);
 
-        Mockito.when(mockedWeatherData.getPastWeather()).thenReturn(pastWeather);
-        Mockito.when(mockedWeatherData.getCurrentWeather()).thenReturn(sunnyWeatherToday);
+        Mockito.when(mockedWeatherData.getRetrievedWeatherData()).thenReturn(mockWeatherData);
         Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);
     }
 
@@ -228,12 +226,13 @@ public class WeatherMonitoring {
         DailyWeather sunnyWeatherYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(1), "Sunny");
         DailyWeather sunnyWeatherBeforeYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(2), "Sunny");
 
-        List<DailyWeather> pastWeather = new ArrayList<>();
-        pastWeather.add(sunnyWeatherBeforeYesterday);
-        pastWeather.add(sunnyWeatherYesterday);
+        List<DailyWeather> mockWeatherData = new ArrayList<>();
+        mockWeatherData.add(sunnyWeatherBeforeYesterday);
+        mockWeatherData.add(sunnyWeatherYesterday);
+        mockWeatherData.add(rainyWeatherToday);
 
-        Mockito.when(mockedWeatherData.getPastWeather()).thenReturn(pastWeather);
-        Mockito.when(mockedWeatherData.getCurrentWeather()).thenReturn(rainyWeatherToday);
+
+        Mockito.when(mockedWeatherData.getRetrievedWeatherData()).thenReturn(mockWeatherData);
         Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);
     }
 

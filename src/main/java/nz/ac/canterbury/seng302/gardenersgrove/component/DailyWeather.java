@@ -106,4 +106,12 @@ public class DailyWeather {
     public void setError(String error) {
         this.error = error;
     }
+
+    public void setWeatherIcon(String urlToWeatherIcon) {
+        this.urlToWeatherIcon = urlToWeatherIcon;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

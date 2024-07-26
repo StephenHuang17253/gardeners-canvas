@@ -156,13 +156,9 @@ class GardensControllerIntegrationTests {
     void GetAnIndividualGarden_GardenHasBadLocationValue_Return200ButHasWeatherError() throws Exception {
 
         WeatherResponseData mockResponseData = Mockito.mock(WeatherResponseData.class);
-        Mockito.when(mockResponseData.getPastWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(mockResponseData.getCurrentWeather())
-                .thenThrow(new NullPointerException("No such location"));
-        Mockito.when(mockResponseData.getForecastWeather())
-                .thenThrow(new NullPointerException("No such location"));
-        Mockito.when(weatherService.getWeather(Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(mockResponseData);
+        Mockito.when(mockResponseData.getRetrievedWeatherData()).thenThrow(new NullPointerException("No such location"));
+        Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
+
 
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders
