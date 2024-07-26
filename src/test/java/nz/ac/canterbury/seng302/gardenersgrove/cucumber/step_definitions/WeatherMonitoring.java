@@ -165,7 +165,6 @@ public class WeatherMonitoring {
         Assertions.assertEquals("8", weather.get(2).getMinTemp());
         Assertions.assertEquals("1.0", weather.get(2).getPrecipitation());
         Assertions.assertNull( weather.get(2).getWeatherError());
-        System.out.println(model);
     }
 
     @Then("Future weather for my location is shown")
