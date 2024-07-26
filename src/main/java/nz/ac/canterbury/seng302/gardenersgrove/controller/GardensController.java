@@ -248,6 +248,15 @@ public class GardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
+
+        List<String> tagsList = new ArrayList<>();
+        tagsList.add("Tag1");
+        tagsList.add("Tag2");
+        tagsList.add("Tag3");
+        tagsList.add("Tag4");
+        tagsList.add("Tag5");
+        tagsList.add("Tag6");
+        model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
 
     }
