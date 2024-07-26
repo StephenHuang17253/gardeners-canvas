@@ -244,7 +244,6 @@ public class GardensController {
                 .map(GardenTag::getTagName)
                 .toList();
 
-        List<String> tagsList = new ArrayList<>();
         model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
 
@@ -518,7 +517,6 @@ public class GardensController {
     @GetMapping("/tag/suggestions")
     @ResponseBody
     public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
-        logger.info("Querying "+ query + " for tags");
         return gardenTagService.getAllSimilar(query);
     }
 
