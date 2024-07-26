@@ -6,7 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
@@ -17,12 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -42,275 +39,296 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class GardensControllerIntegrationTests {
-    @Autowired
-    private GardenService gardenService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PlantService plantService;
-    @MockBean
-    WeatherService weatherService;
-    private final MockMvc mockMvc;
-    private List<Garden> gardenList = new ArrayList<>();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-    LocalDate date = LocalDate.parse("01/01/2001", formatter);
-    Long MAX_LONG = 10000L;
+class GardensControllerIntegrationTests {
+        @Autowired
+        private GardenService gardenService;
+        @Autowired
+        private UserService userService;
+        @Autowired
+        private PlantService plantService;
+        @MockBean
+        WeatherService weatherService;
+        private final MockMvc mockMvc;
+        private List<Garden> gardenList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        LocalDate date = LocalDate.parse("01/01/2001", formatter);
+        private static final Long MAX_LONG = 10000L;
 
-    @Autowired
-    public GardensControllerIntegrationTests(MockMvc mockMvc){
-        this.mockMvc = mockMvc;
-    }
+        @Autowired
+        GardensControllerIntegrationTests(MockMvc mockMvc) {
+                this.mockMvc = mockMvc;
+        }
 
-    @BeforeAll
-    void before_or_after_all() {
-        gardenList = new ArrayList<>();
-        User user1 = new User("John","Doe","johnDoe@email.com", date);
-        User user2 = new User("Jane","Doe","janeDoe@email.com", date);
-        User user3 = new User("Bruce","Wayne","bruceWayne@email.com", date);
-        userService.addUser(user1,"1es1P@ssword");
-        userService.addUser(user2,"1es1P@ssword");
-        userService.addUser(user3,"1es1P@ssword");
-        Garden garden1 = gardenService.addGarden(new Garden(
-                "John's Garden",
-                "",
-                "114 Ilam Road",
-                "Ilam",
-                "Christchurch",
-                "8041",
-                "New Zealand",
-                10.0,
-                false,
-                "-43.5214643",
-                "172.5796159",
-                userService.getUserByEmail(user1.getEmailAddress())));
+        @BeforeAll
+        void before_or_after_all() {
+                gardenList = new ArrayList<>();
+                User user1 = new User("John", "Doe", "johnDoe@email.com", date);
+                User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);
+                User user3 = new User("Bruce", "Wayne", "bruceWayne@email.com", date);
+                userService.addUser(user1, "1es1P@ssword");
+                userService.addUser(user2, "1es1P@ssword");
+                userService.addUser(user3, "1es1P@ssword");
+                Garden garden1 = gardenService.addGarden(new Garden(
+                                "John's Garden",
+                                "",
+                                "114 Ilam Road",
+                                "Ilam",
+                                "Christchurch",
+                                "8041",
+                                "New Zealand",
+                                10.0,
+                                false,
+                                "-43.5214643",
+                                "172.5796159",
+                                userService.getUserByEmail(user1.getEmailAddress())));
 
-        Garden garden2 = gardenService.addGarden(new Garden(
-                "Jane's Garden",
-                "",
-                "20 Kirkwood Avenue",
-                "Upper Riccarton",
-                "Christchurch",
-                "8041",
-                "New Zealand",
-                20.0,
-                false,
-                "-43.5214643",
-                "172.5796159",
-                userService.getUserByEmail(user2.getEmailAddress())));
-        Garden garden3 = gardenService.addGarden(new Garden(
-                "John's Garden",
-                "Some description",
-                "Some Real Address",
-                "Ilam",
-                "Christchurch",
-                "8041",
-                "New Zealand",
-                10.0,
-                false,
-                "-43.5214643",
-                "172.5796159",
-                userService.getUserByEmail(user3.getEmailAddress())));
-        Garden garden4 = gardenService.addGarden(new Garden(
-                "John's Garden",
-                "Some description",
-                "Some Real Address",
-                "Ilam",
-                "Christchurch",
-                "8041",
-                "New Zealand",
-                10.0,
-                false,
-                "-43.5214643",
-                "172.5796159",
-                userService.getUserByEmail(user3.getEmailAddress())));
+                Garden garden2 = gardenService.addGarden(new Garden(
+                                "Jane's Garden",
+                                "",
+                                "20 Kirkwood Avenue",
+                                "Upper Riccarton",
+                                "Christchurch",
+                                "8041",
+                                "New Zealand",
+                                20.0,
+                                false,
+                                "-43.5214643",
+                                "172.5796159",
+                                userService.getUserByEmail(user2.getEmailAddress())));
+                Garden garden3 = gardenService.addGarden(new Garden(
+                                "John's Garden",
+                                "Some description",
+                                "Some Real Address",
+                                "Ilam",
+                                "Christchurch",
+                                "8041",
+                                "New Zealand",
+                                10.0,
+                                false,
+                                "-43.5214643",
+                                "172.5796159",
+                                userService.getUserByEmail(user3.getEmailAddress())));
+                Garden garden4 = gardenService.addGarden(new Garden(
+                                "John's Garden",
+                                "Some description",
+                                "Some Real Address",
+                                "Ilam",
+                                "Christchurch",
+                                "8041",
+                                "New Zealand",
+                                10.0,
+                                false,
+                                "-43.5214643",
+                                "172.5796159",
+                                userService.getUserByEmail(user3.getEmailAddress())));
 
-        plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());
-        plantService.addPlant("Java Tree",1,"Grows Java Plums",date,garden2.getGardenId());
-        gardenList.add(gardenService.getGardenById(garden1.getGardenId()).get());
-        gardenList.add(gardenService.getGardenById(garden2.getGardenId()).get());
-        gardenList.add(gardenService.getGardenById(garden3.getGardenId()).get());
-        gardenList.add(gardenService.getGardenById(garden4.getGardenId()).get());
+                plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
+                plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
+                gardenList.add(gardenService.getGardenById(garden1.getGardenId()).get());
+                gardenList.add(gardenService.getGardenById(garden2.getGardenId()).get());
+                gardenList.add(gardenService.getGardenById(garden3.getGardenId()).get());
+                gardenList.add(gardenService.getGardenById(garden4.getGardenId()).get());
 
-    }
+        }
 
-    @Test
-    public void GetMyGardens_UserNotAuthorized_Return403() throws Exception {
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-    @Test
-    @WithMockUser(username = "johnDoe@email.com")
-    public void GetMyGardens_UserAuthorized_Return200() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+        @Test
+        void GetMyGardens_UserNotAuthorized_Return403() throws Exception {
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens"))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden());
+        }
 
-    @Test
-    @WithMockUser(username = "bruceWayne@email.com")
-    public void GetAnIndividualGarden_GardenHasBadLocationValue_Return200ButHasWeatherError() throws Exception {
+        @Test
+        @WithMockUser(username = "johnDoe@email.com")
+        void GetMyGardens_UserAuthorized_Return200() throws Exception {
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens"))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
 
-        WeatherResponseData mockResponseData = Mockito.mock(WeatherResponseData.class);
-        Mockito.when(mockResponseData.getPastWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(mockResponseData.getCurrentWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(mockResponseData.getForecastWeather()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
+        @Test
+        @WithMockUser(username = "bruceWayne@email.com")
+        void GetAnIndividualGarden_GardenHasBadLocationValue_Return200ButHasWeatherError() throws Exception {
 
+                WeatherResponseData mockResponseData = Mockito.mock(WeatherResponseData.class);
+                Mockito.when(mockResponseData.getPastWeather()).thenThrow(new NullPointerException("No such location"));
+                Mockito.when(mockResponseData.getCurrentWeather())
+                                .thenThrow(new NullPointerException("No such location"));
+                Mockito.when(mockResponseData.getForecastWeather())
+                                .thenThrow(new NullPointerException("No such location"));
+                Mockito.when(weatherService.getWeather(Mockito.anyString(), Mockito.anyString()))
+                                .thenReturn(mockResponseData);
 
-        MvcResult result = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .get("/my-gardens/{gardenId}", gardenList.get(2).getGardenId())
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        String expectedErrorMessage = "Location not found, please update your location to see the weather";
-        Assertions.assertEquals(expectedErrorMessage ,((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0).getWeatherError());
-    }
+                MvcResult result = mockMvc.perform(
+                                MockMvcRequestBuilders
+                                                .get("/my-gardens/{gardenId}", gardenList.get(2).getGardenId()))
+                                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                String expectedErrorMessage = "Location not found, please update your location to see the weather";
+                Assertions.assertEquals(expectedErrorMessage,
+                                ((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0)
+                                                .getWeatherError());
+        }
 
-    @Test
-    @WithMockUser(username = "bruceWayne@email.com")
-    public void GetAnIndividualGarden_GardenHasGoodLocationValue_Return200WithGoodWeatherInfo() throws Exception {
+        @Test
+        @WithMockUser(username = "bruceWayne@email.com")
+        void GetAnIndividualGarden_GardenHasGoodLocationValue_Return200WithGoodWeatherInfo() throws Exception {
 
-        String mockResponse ="{\n" +
-                "  \"latitude\": -43.5,\n" +
-                "  \"longitude\": 172.625,\n" +
-                "  \"generationtime_ms\": 0.07200241088867188,\n" +
-                "  \"utc_offset_seconds\": 0,\n" +
-                "  \"timezone\": \"GMT\",\n" +
-                "  \"timezone_abbreviation\": \"GMT\",\n" +
-                "  \"elevation\": 7.0,\n" +
-                "  \"current_units\": {\n" +
-                "    \"time\": \"iso8601\",\n" +
-                "    \"interval\": \"seconds\",\n" +
-                "    \"temperature_2m\": \"°C\",\n" +
-                "    \"relative_humidity_2m\": \"%\",\n" +
-                "    \"precipitation\": \"mm\",\n" +
-                "    \"weather_code\": \"wmo code\"\n" +
-                "  },\n" +
-                "  \"current\": {\n" +
-                "    \"time\": \"2024-05-21T06:15\",\n" +
-                "    \"interval\": 900,\n" +
-                "    \"temperature_2m\": 9.6,\n" +
-                "    \"relative_humidity_2m\": 92,\n" +
-                "    \"precipitation\": 0.00,\n" +
-                "    \"weather_code\": 3\n" +
-                "  },\n" +
-                "  \"daily_units\": {\n" +
-                "    \"time\": \"iso8601\",\n" +
-                "    \"weather_code\": \"wmo code\",\n" +
-                "    \"temperature_2m_max\": \"°C\",\n" +
-                "    \"temperature_2m_min\": \"°C\",\n" +
-                "    \"precipitation_sum\": \"mm\"\n" +
-                "  },\n" +
-                "  \"daily\": {\n" +
-                "    \"time\": [\n" +
-                "      \"2024-05-19\",\n" +
-                "      \"2024-05-20\",\n" +
-                "      \"2024-05-21\",\n" +
-                "      \"2024-05-22\",\n" +
-                "      \"2024-05-23\",\n" +
-                "      \"2024-05-24\",\n" +
-                "      \"2024-05-25\",\n" +
-                "      \"2024-05-26\",\n" +
-                "      \"2024-05-27\"\n" +
-                "    ],\n" +
-                "    \"weather_code\": [45, 63, 80, 80, 45, 45, 3, 3, 61],\n" +
-                "    \"temperature_2m_max\": [11.1, 12.3, 10.3, 11.1, 11.2, 11.0, 13.1, 9.7, 10.9],\n" +
-                "    \"temperature_2m_min\": [7.0, 8.2, 7.9, 7.8, 2.8, 3.5, 7.7, 2.5, 6.6],\n" +
-                "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
-                "  }\n" +
-                "}\n";
+                String mockResponse = "{\n" +
+                                "  \"latitude\": -43.5,\n" +
+                                "  \"longitude\": 172.625,\n" +
+                                "  \"generationtime_ms\": 0.07200241088867188,\n" +
+                                "  \"utc_offset_seconds\": 0,\n" +
+                                "  \"timezone\": \"GMT\",\n" +
+                                "  \"timezone_abbreviation\": \"GMT\",\n" +
+                                "  \"elevation\": 7.0,\n" +
+                                "  \"current_units\": {\n" +
+                                "    \"time\": \"iso8601\",\n" +
+                                "    \"interval\": \"seconds\",\n" +
+                                "    \"temperature_2m\": \"°C\",\n" +
+                                "    \"relative_humidity_2m\": \"%\",\n" +
+                                "    \"precipitation\": \"mm\",\n" +
+                                "    \"weather_code\": \"wmo code\"\n" +
+                                "  },\n" +
+                                "  \"current\": {\n" +
+                                "    \"time\": \"2024-05-21T06:15\",\n" +
+                                "    \"interval\": 900,\n" +
+                                "    \"temperature_2m\": 9.6,\n" +
+                                "    \"relative_humidity_2m\": 92,\n" +
+                                "    \"precipitation\": 0.00,\n" +
+                                "    \"weather_code\": 3\n" +
+                                "  },\n" +
+                                "  \"daily_units\": {\n" +
+                                "    \"time\": \"iso8601\",\n" +
+                                "    \"weather_code\": \"wmo code\",\n" +
+                                "    \"temperature_2m_max\": \"°C\",\n" +
+                                "    \"temperature_2m_min\": \"°C\",\n" +
+                                "    \"precipitation_sum\": \"mm\"\n" +
+                                "  },\n" +
+                                "  \"daily\": {\n" +
+                                "    \"time\": [\n" +
+                                "      \"2024-05-19\",\n" +
+                                "      \"2024-05-20\",\n" +
+                                "      \"2024-05-21\",\n" +
+                                "      \"2024-05-22\",\n" +
+                                "      \"2024-05-23\",\n" +
+                                "      \"2024-05-24\",\n" +
+                                "      \"2024-05-25\",\n" +
+                                "      \"2024-05-26\",\n" +
+                                "      \"2024-05-27\"\n" +
+                                "    ],\n" +
+                                "    \"weather_code\": [45, 63, 80, 80, 45, 45, 3, 3, 61],\n" +
+                                "    \"temperature_2m_max\": [11.1, 12.3, 10.3, 11.1, 11.2, 11.0, 13.1, 9.7, 10.9],\n" +
+                                "    \"temperature_2m_min\": [7.0, 8.2, 7.9, 7.8, 2.8, 3.5, 7.7, 2.5, 6.6],\n" +
+                                "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
+                                "  }\n" +
+                                "}\n";
 
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonObject = objectMapper.readTree(mockResponse);
+                WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
+                when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonObject = objectMapper.readTree(mockResponse);
-        WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
-        when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
+                MvcResult result = mockMvc.perform(
+                                MockMvcRequestBuilders
+                                                .get("/my-gardens/{gardenId}", gardenList.get(3).getGardenId()))
+                                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
+                Assertions.assertNull(((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0)
+                                .getWeatherError());
+        }
 
-        MvcResult result = mockMvc.perform(
-                MockMvcRequestBuilders
-                        .get("/my-gardens/{gardenId}", gardenList.get(3).getGardenId())
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        @Test
+        @WithAnonymousUser
+        void GetGardenDetailsPage_UserNotAuthenticated_Return403() throws Exception {
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden());
+        }
 
-        Assertions.assertNull(((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0).getWeatherError());
-    }
-    @Test
-    @WithAnonymousUser
-    public void GetGardenDetailsPage_UserNotAuthenticated_Return403() throws Exception {
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-    @Test
-    @WithMockUser(username = "janeDoe@email.com")
-    public void GetGardenDetailsPage_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/" + MAX_LONG))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
-    @Test
-    @WithMockUser(username = "bruceWayne@email.com")
-    public void GetGardenDetailsPage_UserNotAuthorizedAndGardenExists_Return403() throws Exception {
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
-    }
-    @Test
-    @WithMockUser(username = "johnDoe@email.com")
-    public void GetGardenDetailsPage_UserAuthorizedAndGardenExists_Return200() throws Exception {
-        Garden garden = gardenList.get(0);
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", is(garden.getIsPublic())));
-        ;
-    }
-    @Test
-    @WithMockUser(username = "janeDoe@email.com")
-    public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsWithPlants_Return200() throws Exception {
-        Garden garden = gardenList.get(1);
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/2"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", is(garden.getIsPublic())));
-        ;
-    }
+        @Test
+        @WithMockUser(username = "janeDoe@email.com")
+        void GetGardenDetailsPage_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/" + MAX_LONG))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound());
+        }
 
-    @Test
-    @WithMockUser(username = "johnDoe@email.com")
-    public void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
-        Garden garden = gardenList.get(0);
-        // make an initial request to ensure garden is private as set in @before
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", false));
+        @Test
+        @WithMockUser(username = "bruceWayne@email.com")
+        void GetGardenDetailsPage_UserNotAuthorizedAndGardenExists_Return403() throws Exception {
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                                .andExpect(MockMvcResultMatchers.status().isForbidden());
+        }
 
-        // set the garden to public
-        mockMvc.perform(MockMvcRequestBuilders.post("/my-gardens/1/public").with(csrf()).param("makeGardenPublic", "true"))
-                        .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+        @Test
+        @WithMockUser(username = "johnDoe@email.com")
+        void GetGardenDetailsPage_UserAuthorizedAndGardenExists_Return200() throws Exception {
+                Garden garden = gardenList.get(0);
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenName",
+                                                is(garden.getGardenName())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation",
+                                                is(garden.getGardenLocation())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize",
+                                                is(garden.getGardenSize())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
+                                                is(garden.getPlants().size())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic",
+                                                is(garden.getIsPublic())));
+                ;
+        }
 
-        // check the garden is now public
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenName", is(garden.getGardenName())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation", is(garden.getGardenLocation())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize", is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants", is(garden.getPlants().size())))
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", true));
-    }
+        @Test
+        @WithMockUser(username = "janeDoe@email.com")
+        void GetGardenDetailsPage_UserAuthorizedAndGardenExistsWithPlants_Return200() throws Exception {
+                Garden garden = gardenList.get(1);
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/2"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenName",
+                                                is(garden.getGardenName())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation",
+                                                is(garden.getGardenLocation())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize",
+                                                is(garden.getGardenSize())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
+                                                is(garden.getPlants().size())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic",
+                                                is(garden.getIsPublic())));
+                ;
+        }
+
+        @Test
+        @WithMockUser(username = "johnDoe@email.com")
+        void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
+                Garden garden = gardenList.get(0);
+                // make an initial request to ensure garden is private as set in @before
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", false));
+
+                // set the garden to public
+                mockMvc.perform(MockMvcRequestBuilders.post("/my-gardens/1/public").with(csrf())
+                                .param("makeGardenPublic", "true"))
+                                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+
+                // check the garden is now public
+                mockMvc
+                                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenName",
+                                                is(garden.getGardenName())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation",
+                                                is(garden.getGardenLocation())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize",
+                                                is(garden.getGardenSize())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
+                                                is(garden.getPlants().size())))
+                                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", true));
+        }
 
 }

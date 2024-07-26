@@ -43,23 +43,19 @@ class GardenTagServiceIntegrationTest {
     private Garden testGarden3;
     private User owner;
 
-
-
     @BeforeEach
-    public void prepare_test()
-    {
+    void prepare_test() {
         gardenTagRelationRepository.deleteAll();
         gardenTagRepository.deleteAll();
 
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
 
-        if (!userService.emailInUse("GardenServiceIntegrationTest@ProfileController.com"))
-        {
-            owner =  new User("John", "Test", "GardenServiceIntegrationTest@ProfileController.com", LocalDate.of(2003,5,2));
-            userService.addUser(owner,"cheeseCake");
+        if (!userService.emailInUse("GardenServiceIntegrationTest@ProfileController.com")) {
+            owner = new User("John", "Test", "GardenServiceIntegrationTest@ProfileController.com",
+                    LocalDate.of(2003, 5, 2));
+            userService.addUser(owner, "cheeseCake");
         }
-        if (testGarden == null)
-        {
+        if (testGarden == null) {
             testGarden = new Garden(
                     "John's Garden",
                     "",
@@ -75,8 +71,7 @@ class GardenTagServiceIntegrationTest {
                     userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com"));
             gardenService.addGarden(testGarden);
         }
-        if (testGarden2 == null)
-        {
+        if (testGarden2 == null) {
             testGarden2 = new Garden(
                     "John's Garden",
                     "",
@@ -92,8 +87,7 @@ class GardenTagServiceIntegrationTest {
                     userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com"));
             gardenService.addGarden(testGarden2);
         }
-        if (testGarden3 == null)
-        {
+        if (testGarden3 == null) {
             testGarden3 = new Garden(
                     "John's Garden",
                     "",
@@ -113,34 +107,30 @@ class GardenTagServiceIntegrationTest {
     }
 
     @Test
-    void simpleFetchGardenTag_OnId()
-    {
+    void simpleFetchGardenTag_OnId() {
         GardenTag tag1 = new GardenTag("Test");
         Long saveGardenId = gardenTagService.addGardenTag(tag1).getId();
 
-        try
-        {
+        try {
             Assertions.assertEquals("Test", gardenTagService.getGardenTabById(saveGardenId).get().getTagName());
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void doubleAddNewTag_throwsArgumentException()
-    {
+    void doubleAddNewTag_throwsArgumentException() {
         GardenTag tag1 = new GardenTag("Test");
         GardenTag tag2 = new GardenTag("Test");
         gardenTagService.addGardenTag(tag1);
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {gardenTagService.addGardenTag(tag2);});
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            gardenTagService.addGardenTag(tag2);
+        });
 
     }
 
     @Test
-    void simpleFetchGardenTag_OnId_withOtherData()
-    {
+    void simpleFetchGardenTag_OnId_withOtherData() {
         GardenTag tag1 = new GardenTag("Test");
         GardenTag tag2 = new GardenTag("Test2");
         GardenTag tag3 = new GardenTag("Test3");
@@ -155,36 +145,28 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag5);
         gardenTagService.addGardenTag(tag6);
 
-        try
-        {
+        try {
             Assertions.assertEquals("Test", gardenTagService.getGardenTabById(saveGardenId).get().getTagName());
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void simpleFetchGardenTag_OnName()
-    {
+    void simpleFetchGardenTag_OnName() {
         GardenTag tag1 = new GardenTag("Test2");
         gardenTagService.addGardenTag(tag1).getId();
 
-        try
-        {
+        try {
             Assertions.assertEquals("Test2", gardenTagService.getByName("Test2").get().getTagName());
             System.out.println(gardenTagService.getAllSimilar("te"));
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void simpleFetchGardenTag_OnName_withOtherData()
-    {
+    void simpleFetchGardenTag_OnName_withOtherData() {
         GardenTag tag1 = new GardenTag("Test");
         GardenTag tag2 = new GardenTag("Test2");
         GardenTag tag3 = new GardenTag("Test3");
@@ -198,36 +180,27 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag5);
         gardenTagService.addGardenTag(tag6);
 
-        try
-        {
+        try {
             Assertions.assertEquals("Test", gardenTagService.getByName("Test").get().getTagName());
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
-
     @Test
-    void simpleFetchGardenTag_OnSimilarName()
-    {
+    void simpleFetchGardenTag_OnSimilarName() {
         GardenTag tag1 = new GardenTag("Test2");
         gardenTagService.addGardenTag(tag1).getId();
 
-        try
-        {
+        try {
             Assertions.assertEquals("Test2", gardenTagService.getAllSimilar("te").get(0).getTagName());
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void simpleFetchGardenTag_OnSimilarName_withMultipleNames()
-    {
+    void simpleFetchGardenTag_OnSimilarName_withMultipleNames() {
         GardenTag tag1 = new GardenTag("Test");
         GardenTag tag2 = new GardenTag("Test2");
         GardenTag tag3 = new GardenTag("Test3");
@@ -251,26 +224,21 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
 
-        try
-        {
+        try {
             List<GardenTag> similarSearchResult = gardenTagService.getAllSimilar("test");
             Assertions.assertEquals(6, similarSearchResult.size());
-            for (GardenTag tag: similarSearchResult)
-            {
+            for (GardenTag tag : similarSearchResult) {
                 Assertions.assertTrue(gardenTagHashSet.contains(tag.getTagName()));
                 gardenTagHashSet.remove(tag.getTagName());
             }
 
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void simpleFetchGardenTag_getAll_withMultipleNames()
-    {
+    void simpleFetchGardenTag_getAll_withMultipleNames() {
         GardenTag tag1 = new GardenTag("Test");
         GardenTag tag2 = new GardenTag("Test2");
         GardenTag tag3 = new GardenTag("Test3");
@@ -295,26 +263,21 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
 
-        try
-        {
-            List<GardenTag> SearchResults = gardenTagService.getAllGardenTags();
-            Assertions.assertEquals(7, SearchResults.size());
-            for (GardenTag tag: SearchResults)
-            {
+        try {
+            List<GardenTag> searchResults = gardenTagService.getAllGardenTags();
+            Assertions.assertEquals(7, searchResults.size());
+            for (GardenTag tag : searchResults) {
                 Assertions.assertTrue(gardenTagHashSet.contains(tag.getTagName()));
                 gardenTagHashSet.remove(tag.getTagName());
             }
 
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void simpleFetchGardenTag_OnSimilarName_NoneMatch()
-    {
+    void simpleFetchGardenTag_OnSimilarName_NoneMatch() {
         GardenTag tag1 = new GardenTag("redHerring1");
         GardenTag tag2 = new GardenTag("redHerring2");
         GardenTag tag3 = new GardenTag("redHerring3");
@@ -331,23 +294,19 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
 
-        try
-        {
+        try {
             List<GardenTag> similarSearchResult = gardenTagService.getAllSimilar("test");
             Assertions.assertEquals(0, similarSearchResult.size());
-        }
-        catch (NoSuchElementException exception)
-        {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
 
     @Test
-    void addGardenTagRelation_basicAddition_findById()
-    {
-        GardenTag test_tag = new GardenTag("Test");
-        gardenTagService.addGardenTag(test_tag);
-        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
+    void addGardenTagRelation_basicAddition_findById() {
+        GardenTag testTag = new GardenTag("Test");
+        gardenTagService.addGardenTag(testTag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden, testTag);
         Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
         Assertions.assertEquals(testGardenTagRelation.toString(),
                 gardenTagService.getGardenTagRelationById(testGardenTagRelationId).get().toString());
@@ -355,55 +314,49 @@ class GardenTagServiceIntegrationTest {
     }
 
     @Test
-    void addGardenTagRelation_basicAdditionThenDelete_findById()
-    {
-        GardenTag test_tag = new GardenTag("Test");
-        gardenTagService.addGardenTag(test_tag);
-        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
+    void addGardenTagRelation_basicAdditionThenDelete_findById() {
+        GardenTag testTag = new GardenTag("Test");
+        gardenTagService.addGardenTag(testTag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden, testTag);
         Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
         gardenTagService.removeGardenTagRelation(testGardenTagRelation);
         Assertions.assertTrue(gardenTagService.getGardenTagRelationById(testGardenTagRelationId).isEmpty());
     }
 
     @Test
-    void addGardenTagRelation_basicAddition_findByGarden()
-    {
-        GardenTag test_tag = new GardenTag("Test");
-        gardenTagService.addGardenTag(test_tag);
-        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
-        Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
+    void addGardenTagRelation_basicAddition_findByGarden() {
+        GardenTag testTag = new GardenTag("Test");
+        gardenTagService.addGardenTag(testTag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden, testTag);
         Assertions.assertEquals(testGardenTagRelation.toString(),
                 gardenTagService.getGardenTagRelationByGarden(testGarden).get(0).toString());
 
     }
 
     @Test
-    void addGardenTagRelation_basicAddition_findByTag()
-    {
-        GardenTag test_tag = new GardenTag("Test");
-        gardenTagService.addGardenTag(test_tag);
-        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden,test_tag);
-        Long testGardenTagRelationId = gardenTagService.addGardenTagRelation(testGardenTagRelation).getId();
+    void addGardenTagRelation_basicAddition_findByTag() {
+        GardenTag testTag = new GardenTag("Test");
+        gardenTagService.addGardenTag(testTag);
+        GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden, testTag);
         Assertions.assertEquals(testGardenTagRelation.toString(),
-                gardenTagService.getGardenTagRelationByTag(test_tag).get(0).toString());
+                gardenTagService.getGardenTagRelationByTag(testTag).get(0).toString());
 
     }
 
     @Test
     void addGardenTagRelation_addOneTagToManyGardens_findByTag() {
 
-        GardenTag test_tag = gardenTagService.addGardenTag(new GardenTag("Test"));
-        GardenTag red_herring = gardenTagService.addGardenTag(new GardenTag("red_herring"));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden2,test_tag));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden3,test_tag));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden3,red_herring));
+        GardenTag testTag = gardenTagService.addGardenTag(new GardenTag("Test"));
+        GardenTag redHerring = gardenTagService.addGardenTag(new GardenTag("redHerring"));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden, testTag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden2, testTag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden3, testTag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden3, redHerring));
 
         try {
-            List<GardenTagRelation> similarSearchResult = gardenTagService.getGardenTagRelationByTag(test_tag);
+            List<GardenTagRelation> similarSearchResult = gardenTagService.getGardenTagRelationByTag(testTag);
             Assertions.assertEquals(3, similarSearchResult.size());
-        }
-        catch (NoSuchElementException exception) {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
@@ -411,24 +364,21 @@ class GardenTagServiceIntegrationTest {
     @Test
     void addGardenTagRelation_addManyTagToOneGarden_findByGarden() {
 
-        GardenTag test_tag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
-        GardenTag test_tag2 = gardenTagService.addGardenTag(new GardenTag("test2"));
-        GardenTag test_tag3 = gardenTagService.addGardenTag(new GardenTag("test3"));
-        GardenTag test_tag4 = gardenTagService.addGardenTag(new GardenTag("test4"));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag1));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag2));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,test_tag3));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden2,test_tag4));
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag testTag2 = gardenTagService.addGardenTag(new GardenTag("test2"));
+        GardenTag testTag3 = gardenTagService.addGardenTag(new GardenTag("test3"));
+        GardenTag testTag4 = gardenTagService.addGardenTag(new GardenTag("test4"));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden, testTag1));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden, testTag2));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden, testTag3));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden2, testTag4));
 
         try {
             List<GardenTagRelation> similarSearchResult = gardenTagService.getGardenTagRelationByGarden(testGarden);
             Assertions.assertEquals(3, similarSearchResult.size());
-        }
-        catch (NoSuchElementException exception) {
+        } catch (NoSuchElementException exception) {
             fail(exception);
         }
     }
-
-
 
 }

@@ -6,8 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -31,9 +29,7 @@ import java.util.Locale;
 @SpringBootTest
 @Import(UserService.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class UserServiceTest {
-
-    Logger logger = LoggerFactory.getLogger(UserServiceTest.class);
+class UserServiceTest {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
@@ -72,7 +68,7 @@ public class UserServiceTest {
      * Test that the user is added to the repository
      */
     @Test
-    public void AddedNewUser_UserInPersistence() {
+    void AddedNewUser_UserInPersistence() {
         List<User> allUsers = userRepository.findAll();
         Assertions.assertEquals(allUsers.get(0).getFirstName(), "John");
         Assertions.assertEquals(allUsers.get(0).getLastName(), "Doe");
@@ -86,7 +82,7 @@ public class UserServiceTest {
      * the repository is the same
      */
     @Test
-    public void UpdateUserEmailAddress_SameNumberOfUsersInPersistence() {
+    void UpdateUserEmailAddress_SameNumberOfUsersInPersistence() {
         String fName = "John";
         String lName = "Doe";
         String email = "john@email.com";
@@ -100,7 +96,7 @@ public class UserServiceTest {
      * and other values are updated
      */
     @Test
-    public void UpdateAllUserDetails_AllDetailsUpdatedForUser() {
+    void UpdateAllUserDetails_AllDetailsUpdatedForUser() {
         String fName = "Jane";
         String lName = "Ode";
         String email = "janeOde@email.com";
