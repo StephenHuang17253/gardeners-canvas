@@ -6,9 +6,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.http.HttpServletRequest;
+import nz.ac.canterbury.seng302.gardenersgrove.component.Weather;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,8 @@ public class GardensController {
 
     private final WeatherService weatherService;
 
+    private final ObjectMapper objectMapper;
+
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
@@ -78,11 +83,12 @@ public class GardensController {
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService) {
+            WeatherService weatherService, ObjectMapper objectMapper) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
         this.weatherService = weatherService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -136,17 +142,19 @@ public class GardensController {
      * @param garden Garden entity of
      * @return list of DailyWeather components
      */
-    private List<DailyWeather> getGardenWeatherData(Garden garden) {
-        List<DailyWeather> weatherList = new ArrayList<>();
+    private List<Weather> getGardenWeatherData(Garden garden) {
+        List<Weather> weatherList = new ArrayList<>();
         DailyWeather noWeather = null;
         try {
             WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(),
                     garden.getGardenLongitude());
             List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
-            weatherList.add(pastWeather.get(0));
-            weatherList.add(pastWeather.get(1));
-            weatherList.add(gardenWeather.getCurrentWeather());
-            weatherList.addAll(gardenWeather.getForecastWeather());
+            weatherList.add(new Weather(pastWeather.get(0)));
+            weatherList.add(new Weather(pastWeather.get(1)));
+            weatherList.add(new Weather(gardenWeather.getCurrentWeather()));
+            weatherList.addAll(gardenWeather.getForecastWeather().stream()
+                    .map(Weather::new)
+                    .collect(Collectors.toList()));
         } catch (NullPointerException error) {
             noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
             noWeather.setError("Location not found, please update your location to see the weather");
@@ -155,16 +163,16 @@ public class GardensController {
         }
 
         if (noWeather != null) {
-            weatherList.add(noWeather);
+            weatherList.add(new Weather(noWeather));
         }
 
         return weatherList;
     }
 
-    private void handleWeatherMessages(List<DailyWeather> weatherList, Model model){
-        DailyWeather beforeYesterdayWeather = weatherList.get(0);
-        DailyWeather yesterdayWeather = weatherList.get(1);
-        DailyWeather currentWeather = weatherList.get(2);
+    private void handleWeatherMessages(List<Weather> weatherList, Model model){
+        Weather beforeYesterdayWeather = weatherList.get(0);
+        Weather yesterdayWeather = weatherList.get(1);
+        Weather currentWeather = weatherList.get(2);
         if (currentWeather.getDescription().equals("Rainy")) {
             model.addAttribute("message", "Outdoor plants don’t need any water today");
             model.addAttribute("goodMessage", true);
@@ -200,9 +208,9 @@ public class GardensController {
     public String showGardenDetails(@PathVariable Long gardenId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) ValidationResult plantPictureResult,
-            HttpServletResponse response,
             HttpServletRequest request,
-            Model model) {
+            HttpServletResponse response,
+            Model model) throws JsonProcessingException {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -220,16 +228,18 @@ public class GardensController {
             return "403";
         }
 
+        List<Weather> weatherList = null;
+
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        WeatherListWrapper weatherList;
         if (inputFlashMap != null) {
-            weatherList = (WeatherListWrapper) inputFlashMap.get("weatherList");
-        }else{
-            weatherList = new WeatherListWrapper(getGardenWeatherData(garden));
+            weatherList = (List<Weather>) inputFlashMap.get("weatherList");
         }
 
-        if (weatherList.getWeather().size() > 1) {
-            handleWeatherMessages(weatherList.getWeather(), model);
+        if(weatherList == null || weatherList.isEmpty()){
+            weatherList = getGardenWeatherData(garden);
+        }
+        if (weatherList.size() > 1) {
+            handleWeatherMessages(weatherList, model);
         }
 
         User user = garden.getOwner();
@@ -245,6 +255,10 @@ public class GardensController {
         model.addAttribute("profilePicture", user.getProfilePictureFilename());
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureResult);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String weatherListJson = objectMapper.writeValueAsString(weatherList);
+        model.addAttribute("weatherListJson", weatherListJson);
+
 
         return "gardenDetailsPage";
     }
@@ -262,9 +276,9 @@ public class GardensController {
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
             @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
             @RequestParam(defaultValue = "1") int page,
-            @ModelAttribute WeatherListWrapper weatherList,
+            @RequestParam("weatherListJson")  String weatherListJson,
             RedirectAttributes redirectAttributes,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}/public", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -273,6 +287,7 @@ public class GardensController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
+        logger.info(weatherListJson);
 
         Garden garden = optionalGarden.get();
 
@@ -282,6 +297,7 @@ public class GardensController {
         }
 
         gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
+        List<Weather> weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<Weather>>() {});
         redirectAttributes.addFlashAttribute("page", page);
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
 

@@ -5,7 +5,6 @@
 
 <body>
 
-
 <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-3 pb-5" style="width: 60%;">
@@ -15,7 +14,7 @@
                     <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic"
                            th:checked="${garden.isGardenIsPublic()}" onChange="this.form.submit()">Make my garden public
                     <input id="page" th:name="page" th:value="${currentPage}" type="hidden"/>
-                    <input id="weather" th:name="weather" th:value="${weatherList.getWeather()}" type="hidden"/>
+                    <input type="hidden" id="weatherListJson" name="weatherListJson" th:value="${weatherListJson}"/>
                 </form>
             </div>
             <div>
@@ -74,7 +73,7 @@
                     <h4 th:text="${currentTime}"></h4>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
-                    <div class="w-25" th:each="prediction, iterStat : ${weatherList.getWeather()}">
+                    <div class="w-25" th:each="prediction, iterStat : ${weatherList}">
                         <div th:replace="~{fragments/weatherBox.html :: weatherBox(
                             weatherIcon=${prediction.getWeatherIcon()},
                             date=${prediction.getDate()},
