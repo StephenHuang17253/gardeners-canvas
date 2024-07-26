@@ -24,6 +24,11 @@ public class WeatherResponseData {
     List<DailyWeather> retrievedWeatherData;
 
 
+    /**
+     * Constructor for the weather reponse data class
+     * Takes a response from the weather api as an input
+     * @param jsonWeatherData the response data from a class to the weather api as a json file
+     */
     public WeatherResponseData(JsonNode jsonWeatherData) {
         current = jsonWeatherData.get("current");
         daily = jsonWeatherData.get("daily");
