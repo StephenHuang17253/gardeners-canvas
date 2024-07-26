@@ -435,8 +435,6 @@ public class GardensController {
         model.addAttribute("friendName", friendName);
         model.addAttribute("friendGardens", gardens);
 
-        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).toList();
-
         int publicGardensCount = gardens.size();
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
