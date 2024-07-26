@@ -1,29 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Semaphore;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
@@ -39,6 +15,24 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 /**
  * Controller for viewing all the created Gardens
@@ -250,7 +244,37 @@ public class GardensController {
         model.addAttribute("endIndex", endIndex);
 
         List<String> tagsList = new ArrayList<>();
+        tagsList.add("Vegetable Garden");
+        tagsList.add("Tag2");
+        tagsList.add("Tag3");
+        tagsList.add("Tag4");
+        tagsList.add("Tag5");
+        tagsList.add("Tag6");
         tagsList.add("Tag1");
+        tagsList.add("Tag2");
+        tagsList.add("Tag3");
+        tagsList.add("Vegetable Garden");
+        tagsList.add("Tag5");
+        tagsList.add("Tag6");
+        tagsList.add("Tag1");
+        tagsList.add("Tag2");
+        tagsList.add("Tag3");
+        tagsList.add("Tag4");
+        tagsList.add("Tag5");
+        tagsList.add("Vegetable Garden");
+        tagsList.add("Tag1");
+        tagsList.add("Tag2");
+        tagsList.add("Tag3");
+        tagsList.add("Vegetable Garden");
+        tagsList.add("Tag5");
+        tagsList.add("Tag6");
+        tagsList.add("Tag1");
+        tagsList.add("Tag2");
+        tagsList.add("Tag3");
+        tagsList.add("Tag4");
+        tagsList.add("Tag5");
+        tagsList.add("Tag6");
+        tagsList.add("Vegetable Garden");
         tagsList.add("Tag2");
         tagsList.add("Tag3");
         tagsList.add("Tag4");
