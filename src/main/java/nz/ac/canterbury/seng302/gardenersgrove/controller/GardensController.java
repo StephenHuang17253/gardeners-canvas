@@ -435,7 +435,7 @@ public class GardensController {
         model.addAttribute("friendName", friendName);
         model.addAttribute("friendGardens", gardens);
 
-        int publicGardensCount = gardens.size();
+        int gardensCount = gardens.size();
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
@@ -449,7 +449,7 @@ public class GardensController {
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("totalGardens", gardens.size());
-        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("gardensCount", gardensCount);
         model.addAttribute("userName", friend.getFirstName() + " " + friend.getLastName());
         model.addAttribute("firstName", friend.getFirstName());
         model.addAttribute("profilePicture", friend.getProfilePictureFilename());
