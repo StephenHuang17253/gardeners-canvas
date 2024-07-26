@@ -9,7 +9,7 @@ const getDisplayString = (data) => {
 }
 
 const fillTagField = (data) => {
-    tagField.value = data
+    tagField.value = getDisplayString(data)
 }
 
 const hideTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.add("d-none");
