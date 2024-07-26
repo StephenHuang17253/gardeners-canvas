@@ -8,6 +8,7 @@ import io.cucumber.java.eo.Se;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -48,6 +49,9 @@ public class BrowsePublicGardens {
     @Autowired
     public PasswordEncoder passwordEncoder;
 
+    @Autowired
+    public FriendshipRepository friendshipRepository;
+
 
     @Autowired
     public SecurityService securityService;
@@ -60,6 +64,8 @@ public class BrowsePublicGardens {
     public static PlantService plantService;
 
     public static FileService fileService;
+
+    private static FriendshipService friendshipService;
 
 
     private String searchValue;
@@ -77,8 +83,9 @@ public class BrowsePublicGardens {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
+        friendshipService = new FriendshipService(friendshipRepository, userService);
 
-        PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService);
+        PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService, friendshipService);
 
         // Allows us to bypass spring security
         MOCK_MVC = MockMvcBuilders
