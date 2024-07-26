@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,7 +33,7 @@ public class PublicGardensController {
     private final SecurityService securityService;
 
     private final FriendshipService friendshipService;
-    private final int COUNT_PER_PAGE = 10;
+    private static final int COUNT_PER_PAGE = 10;
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService, FriendshipService friendshipService) {
@@ -41,6 +42,18 @@ public class PublicGardensController {
         this.friendshipService = friendshipService;
     }
 
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+  
     /**
      * returns a page with the 10 most recent public gardens based on current page in pagination
      * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
@@ -50,8 +63,6 @@ public class PublicGardensController {
     @GetMapping("/public-gardens/page/{pageNumber}")
     public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
         logger.info("GET /public-gardens");
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         List<Garden> allGardens = gardenService.getAllPublicGardens();
         int totalGardens = allGardens.size();
@@ -112,8 +123,6 @@ public class PublicGardensController {
                                 @PathVariable Long pageNumber,
                                 Model model) {
         logger.info("GET /public-gardens/search");
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         if (Objects.equals(searchInput, "")) {
             return "redirect:/public-gardens/page/1";
@@ -187,8 +196,6 @@ public class PublicGardensController {
                                    HttpServletResponse response,
                                    Model model) {
         logger.info("GET public-gardens/{}", gardenId);
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 

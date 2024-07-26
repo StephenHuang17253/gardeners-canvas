@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,7 +34,7 @@ public class U18_RemoveFriend {
 
     Logger logger = LoggerFactory.getLogger(U18_RemoveFriend.class);
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -63,14 +62,7 @@ public class U18_RemoveFriend {
     @Autowired
     public FriendshipService friendshipService;
 
-    @Autowired
-    public FileService fileService;
-
     private MvcResult mvcResult;
-
-    private String input;
-
-    private List<FriendModel> friendsList = new ArrayList<>();
 
     // Setup
     @Before
@@ -81,9 +73,9 @@ public class U18_RemoveFriend {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
-                securityService, fileService, userService);
+                securityService, userService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 
     }
 
@@ -92,7 +84,7 @@ public class U18_RemoveFriend {
     public void i_cancel_my_friend_request_to(String receiverEmail) throws Exception {
         User user = userService.getUserByEmail(receiverEmail);
 
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .post("/manage-friends/remove")
                                 .param("friendId", String.valueOf(user.getId()))
@@ -102,7 +94,7 @@ public class U18_RemoveFriend {
     // AC1
     @When("There is user {string} who is logged in with {string}")
     public void there_is_user_who_is_logged_in(String userEmail, String userPassword) throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                         post("/login")
                                 .param("emailAddress", userEmail)
                                 .param("password", userPassword))
@@ -115,7 +107,7 @@ public class U18_RemoveFriend {
 
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
         List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
@@ -129,7 +121,7 @@ public class U18_RemoveFriend {
 
         User user = userService.getUserByEmail(email);
 
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .post("/manage-friends/remove")
                                 .param("friendId", String.valueOf(user.getId()))
@@ -142,10 +134,9 @@ public class U18_RemoveFriend {
 
         User user = userService.getUserByEmail(email);
 
-        String friendProfilePicture = user.getProfilePictureFilename();
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");

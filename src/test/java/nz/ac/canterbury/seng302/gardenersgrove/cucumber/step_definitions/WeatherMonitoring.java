@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 
-
 @SpringBootTest
 public class WeatherMonitoring {
     public static MockMvc mockMVC;
@@ -81,7 +79,7 @@ public class WeatherMonitoring {
     @MockBean
     private WeatherService weatherService;
 
-    private String mockResponse ="{\n" +
+    private String mockResponse = "{\n" +
             "  \"latitude\": -43.5,\n" +
             "  \"longitude\": 172.625,\n" +
             "  \"generationtime_ms\": 0.07200241088867188,\n" +
@@ -132,16 +130,15 @@ public class WeatherMonitoring {
             "}\n";
 
     @Before
-    public void before_or_after_all() throws IOException, InterruptedException {
+    public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService);
         weatherService = mock(WeatherService.class);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
+                weatherService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
-
-
 
     }
 
@@ -152,18 +149,17 @@ public class WeatherMonitoring {
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
         MvcResult result = mockMVC.perform(
                 MockMvcRequestBuilders
-                        .get("/my-gardens/{gardenId}", gardenId)
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                        .get("/my-gardens/{gardenId}", gardenId))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         ModelAndView modelAndView = result.getModelAndView();
 
         model = modelAndView.getModel();
         weather = (List<DailyWeather>) model.get("weather");
-
     }
 
     @Then("Current weather for my location is shown")
-    public void currentWeatherForMyLocationIsShown(){
+    public void currentWeatherForMyLocationIsShown() {
         Assertions.assertNotNull(weather.get(2));
         Assertions.assertEquals("10", weather.get(2).getMaxTemp());
         Assertions.assertEquals("8", weather.get(2).getMinTemp());
@@ -181,9 +177,7 @@ public class WeatherMonitoring {
         Assertions.assertEquals("1.4", weather.get(3).getPrecipitation());
         Assertions.assertEquals("11", weather.get(3).getMaxTemp());
         Assertions.assertEquals("8", weather.get(3).getMinTemp());
-        Assertions.assertNull( weather.get(0).getWeatherError());
-        System.out.println(model);
-
+        Assertions.assertNull(weather.get(0).getWeatherError());
     }
 
     @Given("My garden is not set to a location that the location service can find")
@@ -203,11 +197,10 @@ public class WeatherMonitoring {
 
     @Then("A Weather error message tells me “Location not found, please update your location to see the weather”")
     public void aWeatherErrorMessageTellsMeLocationNotFoundPleaseUpdateYourLocationToSeeTheWeather() {
-        System.out.println(model);
         Assertions.assertNotNull(weather.get(0));
-        Assertions.assertEquals("Location not found, please update your location to see the weather", weather.get(0).getWeatherError());
+        Assertions.assertEquals("Location not found, please update your location to see the weather",
+                weather.get(0).getWeatherError());
     }
-
 
     @Given("The past two days have been sunny in my location")
     public void thePastTwoDaysHaveBeenSunnyInMyLocation() {
@@ -221,7 +214,7 @@ public class WeatherMonitoring {
         mockWeatherData.add(sunnyWeatherBeforeYesterday);
         mockWeatherData.add(sunnyWeatherYesterday);
         mockWeatherData.add(sunnyWeatherToday);
-        
+
         Mockito.when(mockedWeatherData.getRetrievedWeatherData()).thenReturn(mockWeatherData);
         Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);
     }

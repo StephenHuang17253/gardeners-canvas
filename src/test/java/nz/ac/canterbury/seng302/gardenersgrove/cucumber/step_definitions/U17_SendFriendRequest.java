@@ -37,7 +37,7 @@ public class U17_SendFriendRequest {
 
     Logger logger = LoggerFactory.getLogger(U17_SendFriendRequest.class);
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -65,9 +65,6 @@ public class U17_SendFriendRequest {
     @Autowired
     public FriendshipService friendshipService;
 
-    @Autowired
-    public FileService fileService;
-
     private MvcResult mvcResult;
 
     private String input;
@@ -83,9 +80,9 @@ public class U17_SendFriendRequest {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
-                securityService, fileService, userService);
+                securityService, userService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 
     }
 
@@ -138,7 +135,7 @@ public class U17_SendFriendRequest {
     // AC1
     @When("I click on the 'Manage Friends' button")
     public void i_click_on_button() throws Exception {
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
     }
 
@@ -153,7 +150,7 @@ public class U17_SendFriendRequest {
     // AC2
     @When("I am on the 'Manage Friends' page")
     public void i_am_on_the_manage_friends_page() throws Exception {
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
     }
 
@@ -197,7 +194,7 @@ public class U17_SendFriendRequest {
 
     @When("I hit the search button")
     public void i_hit_the_search_button() throws Exception {
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .get("/manage-friends/search")
                                 .param("searchInput", input))
@@ -233,7 +230,7 @@ public class U17_SendFriendRequest {
         String friendProfilePicture = user.getProfilePictureFilename();
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .get("/manage-friends/search")
                                 .param("searchInput", email))
@@ -248,7 +245,7 @@ public class U17_SendFriendRequest {
     @When("I hit the 'invite as friend' button for user with {string}")
     public void i_hit_the_invite_as_friend_button_for_user_with(String email) throws Exception {
         User user = userService.getUserByEmail(email);
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .post("/manage-friends/send-invite")
                                 .param("friendId", String.valueOf(user.getId()))
@@ -263,7 +260,7 @@ public class U17_SendFriendRequest {
         String friendProfilePicture = user.getProfilePictureFilename();
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
         List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
         RequestFriendModel requestFriendModel = result.get(0);
@@ -286,7 +283,7 @@ public class U17_SendFriendRequest {
     public void i_accept_the_pending_invite_from(String email) throws Exception {
         User user = userService.getUserByEmail(email);
 
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .post("/manage-friends")
                                 .param("pendingFriendId", String.valueOf(user.getId()))
@@ -303,7 +300,7 @@ public class U17_SendFriendRequest {
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
@@ -318,7 +315,7 @@ public class U17_SendFriendRequest {
     public void i_decline_the_pending_invite_from(String email) throws Exception {
         User user = userService.getUserByEmail(email);
 
-        mvcResult = MOCK_MVC.perform(
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .post("/manage-friends")
                                 .param("pendingFriendId", String.valueOf(user.getId()))
@@ -332,7 +329,7 @@ public class U17_SendFriendRequest {
         User user = userService.getUserByEmail(email);
 
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
@@ -375,7 +372,7 @@ public class U17_SendFriendRequest {
         String friendProfilePicture = user.getProfilePictureFilename();
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
         List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("declinedFriends");
@@ -402,7 +399,7 @@ public class U17_SendFriendRequest {
         String friendProfilePicture = user.getProfilePictureFilename();
         String userName = user.getFirstName() + ' ' + user.getLastName();
 
-        mvcResult = MOCK_MVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
+        mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
         List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");

@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -28,10 +27,9 @@ import java.util.Optional;
  * of @DataJpaTest fixed the tests
  */
 @SpringBootTest
-@Import({GardenService.class, PlantService.class})
+@Import({ GardenService.class, PlantService.class })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class PlantServiceTest {
-
+class PlantServiceTest {
 
     private static PlantRepository plantRepository;
     private static GardenService gardenService;
@@ -43,11 +41,11 @@ public class PlantServiceTest {
     private static User owner;
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         gardenService = Mockito.mock(GardenService.class);
         plantRepository = Mockito.mock(PlantRepository.class);
-        plantService = new PlantService(plantRepository,gardenService,fileService);
-        owner =  new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
+        plantService = new PlantService(plantRepository, gardenService, fileService);
+        owner = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003, 5, 2));
     }
 
     @Test
@@ -110,8 +108,7 @@ public class PlantServiceTest {
                 false,
                 "-43.5214643",
                 "172.5796159",
-                owner
-                );
+                owner);
         Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
         List<Plant> mockPlantsList = new ArrayList<>();
         mockPlantsList.add(plant);
@@ -163,7 +160,7 @@ public class PlantServiceTest {
 
         // When
         plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
-        Optional <Plant> resultOptionalPlant = plantService.findById(1L);
+        Optional<Plant> resultOptionalPlant = plantService.findById(1L);
 
         // Then
         Assertions.assertTrue(resultOptionalPlant.isPresent());
@@ -174,6 +171,7 @@ public class PlantServiceTest {
         Assertions.assertEquals(dateOfPlanting, resultPlant.getPlantDate());
         Assertions.assertEquals(garden, resultPlant.getGarden());
     }
+
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     void testUpdatePlant() {
@@ -246,7 +244,7 @@ public class PlantServiceTest {
         Plant resultPlant = plantService.updatePlant(1L, "Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting);
 
         // Then
-        Assertions.assertEquals("Jane's Plant", resultPlant.getPlantName() );
+        Assertions.assertEquals("Jane's Plant", resultPlant.getPlantName());
         Assertions.assertEquals(4f, resultPlant.getPlantCount());
         Assertions.assertEquals("Plant owned by Jane", resultPlant.getPlantDescription());
         Assertions.assertEquals(newDateOfPlanting, resultPlant.getPlantDate());

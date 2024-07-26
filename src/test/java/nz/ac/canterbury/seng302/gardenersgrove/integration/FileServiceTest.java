@@ -22,17 +22,17 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.multipart.MultipartFile;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 
-public class FileServiceTest {
+class FileServiceTest {
 
     private Path tempDir;
 
     private static FileService fileService;
-    public static String[] mockFilenames = { "test1.img", "test2.txt", "test3.pdf" };
-    public static String[] mockFileContents = { "Hello, World!", "ABCDEF", "Content" };
+    static String[] mockFilenames = { "test1.img", "test2.txt", "test3.pdf" };
+    static String[] mockFileContents = { "Hello, World!", "ABCDEF", "Content" };
 
     @BeforeAll
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-    public static void setup() throws IOException {
+    static void setup() {
         fileService = spy(new FileService());
     }
 
@@ -41,7 +41,7 @@ public class FileServiceTest {
      * 
      * @param numFiles number of files from mock lists to initialise
      */
-    public void initDir(int numFiles) throws IOException {
+    void initDir(int numFiles) throws IOException {
         for (int i = 0; i < numFiles; i++) {
             Path testFile = tempDir.resolve(mockFilenames[i]);
             Files.write(testFile, mockFileContents[i].getBytes());
@@ -49,31 +49,32 @@ public class FileServiceTest {
     }
 
     @BeforeEach
-    public void setupDirectory(@TempDir Path tempDir) throws IOException {
+    void setupDirectory(@TempDir Path tempDir) {
         this.tempDir = tempDir;
 
         // Reset root location to tempDir
         when(fileService.getRootLocation()).thenReturn(tempDir);
     }
 
-    //Todo fix this test
-//    @Test
-//    public void testLoadFile_FileExists_ReturnsResource() throws IOException {
-//        int i = 0;
-//
-//        initDir(1);
-//
-//        Resource resource = fileService.loadFile(mockFilenames[i]);
-//
-//        assertNotNull(resource);
-//        assertTrue(resource.exists());
-//        assertTrue(resource.isReadable());
-//        assertEquals(mockFilenames[i], resource.getFilename());
-//        assertEquals(mockFileContents[i], new String(resource.getInputStream().readAllBytes()));
-//    }
+    // Todo fix this test
+    // @Test
+    // void testLoadFile_FileExists_ReturnsResource() throws IOException {
+    // int i = 0;
+    //
+    // initDir(1);
+    //
+    // Resource resource = fileService.loadFile(mockFilenames[i]);
+    //
+    // assertNotNull(resource);
+    // assertTrue(resource.exists());
+    // assertTrue(resource.isReadable());
+    // assertEquals(mockFilenames[i], resource.getFilename());
+    // assertEquals(mockFileContents[i], new
+    // String(resource.getInputStream().readAllBytes()));
+    // }
 
     @Test
-    public void testLoadFile_FileDoesNotExist_ThrowsMalformedURLException() {
+    void testLoadFile_FileDoesNotExist_ThrowsMalformedURLException() {
 
         Exception exception = assertThrows(MalformedURLException.class, () -> {
             fileService.loadFile("nonExistentFile.txt");
@@ -81,24 +82,25 @@ public class FileServiceTest {
         assertEquals("Could not read the file", exception.getMessage());
     }
 
-    //Todo fix this test
-//    @Test
-//    public void testLoadFile_FileNotReadable_ThrowsMalformedURLException() throws IOException {
-//
-//        String nonReadableFilename = "nonReadableFile.txt";
-//
-//        Path nonReadableFile = tempDir.resolve(nonReadableFilename);
-//        Files.createFile(nonReadableFile);
-//        nonReadableFile.toFile().setReadable(false);
-//
-//        Exception exception = assertThrows(MalformedURLException.class, () -> {
-//            fileService.loadFile(nonReadableFilename);
-//        });
-//        assertEquals("Could not read the file", exception.getMessage());
-//    }
+    // Todo fix this test
+    // @Test
+    // void testLoadFile_FileNotReadable_ThrowsMalformedURLException() throws
+    // IOException {
+    //
+    // String nonReadableFilename = "nonReadableFile.txt";
+    //
+    // Path nonReadableFile = tempDir.resolve(nonReadableFilename);
+    // Files.createFile(nonReadableFile);
+    // nonReadableFile.toFile().setReadable(false);
+    //
+    // Exception exception = assertThrows(MalformedURLException.class, () -> {
+    // fileService.loadFile(nonReadableFilename);
+    // });
+    // assertEquals("Could not read the file", exception.getMessage());
+    // }
 
     @Test
-    public void testSaveFile_ValidFile_FileSavedSuccessfully() throws IOException {
+    void testSaveFile_ValidFile_FileSavedSuccessfully() throws IOException {
         int i = 0;
         MultipartFile file = new MockMultipartFile(mockFilenames[i], mockFileContents[i].getBytes());
 
@@ -109,7 +111,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testSaveFile_InvalidFile_ThrowsIOException() throws IOException {
+    void testSaveFile_InvalidFile_ThrowsIOException() throws IOException {
         String invalidFileName = "invalidFile.txt";
 
         MultipartFile invalidFile = mock(MultipartFile.class);
@@ -123,7 +125,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testInit_DirectoryDoesNotExist_DirectoryCreatedSuccessfully() throws IOException {
+    void testInit_DirectoryDoesNotExist_DirectoryCreatedSuccessfully() throws IOException {
         Path nonExistentDir = tempDir.resolve("nonExistentDir");
         when(fileService.getRootLocation()).thenReturn(nonExistentDir);
 
@@ -135,7 +137,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testInit_DirectoryExists_NoExceptionThrown() throws IOException {
+    void testInit_DirectoryExists_NoExceptionThrown() throws IOException {
         Path existingDir = tempDir.resolve("existingDir");
         when(fileService.getRootLocation()).thenReturn(existingDir);
 
@@ -147,7 +149,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testGetAllFiles_DirectoryHasFiles_ReturnsListOfFiles() throws IOException {
+    void testGetAllFiles_DirectoryHasFiles_ReturnsListOfFiles() throws IOException {
 
         initDir(3);
 
@@ -158,7 +160,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testGetAllFiles_DirectoryIsEmpty_ReturnsEmptyList() throws Exception {
+    void testGetAllFiles_DirectoryIsEmpty_ReturnsEmptyList() throws Exception {
 
         initDir(0);
 
@@ -169,7 +171,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testDeleteFile_FileExists_FileDeletedSuccessfully() throws Exception {
+    void testDeleteFile_FileExists_FileDeletedSuccessfully() throws Exception {
         int i = 0;
 
         initDir(1);
@@ -181,7 +183,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testDeleteFile_FileDoesNotExist_ThrowsIOException() throws Exception {
+    void testDeleteFile_FileDoesNotExist_ThrowsIOException() {
         String nonExistentFileName = "nonExistentFile.txt";
 
         Exception exception = assertThrows(IOException.class, () -> {

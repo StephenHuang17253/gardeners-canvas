@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +51,16 @@ public class PlantFormController {
         this.securityService = securityService;
     }
 
+     /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
     /**
      * Maps the createNewPlantForm html page to /create-new-plant url
      * 
@@ -67,10 +75,6 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("GET /create-new-plant");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -159,10 +163,6 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
-
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
         model.addAttribute("plantPicture", plantPictureString);
@@ -199,10 +199,6 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -286,11 +282,6 @@ public class PlantFormController {
             String dateString = plantDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             plantDateResult = InputValidator.validatePlantDate(dateString);
         }
-
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
@@ -400,7 +391,7 @@ public class PlantFormController {
     @GetMapping("/files/plants/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/plants/" + filename);
+        logger.info("GET /files/plants/{}", filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()
