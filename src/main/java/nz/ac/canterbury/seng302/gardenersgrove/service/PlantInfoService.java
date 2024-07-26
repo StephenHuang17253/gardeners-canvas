@@ -14,6 +14,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * Service class for obtaining plant information from the Perenual Plant API
+ */
 @Service
 public class PlantInfoService {
 
