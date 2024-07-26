@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -112,14 +111,15 @@ public class PlantFormController {
      *                         with values being set to relevant parameters provided
      * @return thymeleaf landingPage
      */
+    @PostMapping("/my-gardens/{gardenId}/create-new-plant")
     public String submitNewPlantForm(@RequestParam(name = "plantName") String plantName,
-                                     @RequestParam(name = "plantCount", required = false) String plantCount,
-                                     @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                                     @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
-                                     @PathVariable("gardenId") Long gardenId,
-                                     HttpServletResponse response,
-                                     Model model) {
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+            @PathVariable("gardenId") Long gardenId,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /create-new-plant");
 
         int plantCountValue;
@@ -128,7 +128,7 @@ public class PlantFormController {
         if (Objects.equals(plantCount, "")) {
             plantCountValue = 0;
         } else {
-            plantCountValue = (int) (Double.parseDouble(plantCount));
+            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
             plantCountResult = InputValidator.validatePlantCount(plantCount);
         }
 
@@ -188,7 +188,6 @@ public class PlantFormController {
 
         return "redirect:/my-gardens/{gardenId}";
     }
-
 
     /**
      * Maps the editPlantForm html page to /create-new-plant url
@@ -251,14 +250,14 @@ public class PlantFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String submiteditPlantForm(@RequestParam(name = "plantName") String plantName,
-                                      @RequestParam(name = "plantCount", required = false) String plantCount,
-                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                      @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
-                                      @PathVariable("gardenId") Long gardenId,
-                                      @PathVariable("plantId") Long plantId,
-                                      HttpServletResponse response,
-                                      Model model) {
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
+            @PathVariable("gardenId") Long gardenId,
+            @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
@@ -284,7 +283,7 @@ public class PlantFormController {
         if (Objects.equals(plantCount, "")) {
             plantCountValue = 0;
         } else {
-            plantCountValue = (int) (Double.parseDouble(plantCount));
+            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
             plantCountResult = InputValidator.validatePlantCount(plantCount);
         }
 
@@ -330,7 +329,6 @@ public class PlantFormController {
         }
         return "redirect:/my-gardens/{gardenId}";
     }
-
 
     /**
      * Takes as an input the result of validating the plant name, count, description

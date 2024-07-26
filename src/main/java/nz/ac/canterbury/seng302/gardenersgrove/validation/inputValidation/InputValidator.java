@@ -423,7 +423,7 @@ public class InputValidator {
         }
 
         try {
-            float floatValue = Float.parseFloat(testedValue);
+            float floatValue = Float.parseFloat(testedValue.replace(",", "."));
             if (floatValue % 1 != 0) { // Checks if float isn't a whole number (i.e. its not an integer)
                 this.validationResult = ValidationResult.INVALID_PLANT_COUNT;
                 this.passState = false;
@@ -975,7 +975,7 @@ public class InputValidator {
      * @return the calling object
      */
     private InputValidator minNumberHelper(int minValue) {
-        int snippedTestValue = (int) Double.parseDouble(testedValue); // snips decimal value of floats off
+        int snippedTestValue = (int) Double.parseDouble(testedValue.replace(",", ".")); // snips decimal value of floats off
         if (!this.passState) {
             return this;
         }
@@ -999,7 +999,7 @@ public class InputValidator {
      * @return the calling object
      */
     private InputValidator maxNumberHelper(int maxValue) {
-        int snippedTestValue = (int) Double.parseDouble(testedValue); // snips decimal value of floats off
+        int snippedTestValue = (int) Double.parseDouble(testedValue.replace(",", ".")); // snips decimal value of floats off
         if (!this.passState) {
             return this;
         }
