@@ -4,13 +4,8 @@ import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
@@ -51,6 +46,8 @@ public class GardensController {
 
     private final WeatherService weatherService;
 
+    private final GardenTagService gardenTagService;
+
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
@@ -70,11 +67,12 @@ public class GardensController {
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService) {
+            WeatherService weatherService, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
         this.weatherService = weatherService;
+        this.gardenTagService = gardenTagService;
     }
 
     /**
@@ -243,13 +241,13 @@ public class GardensController {
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
 
-        List<String> tagsList = new ArrayList<>();
-        tagsList.add("Vegetable Garden");
-        tagsList.add("Tag2");
-        tagsList.add("Tag3");
-        tagsList.add("Tag4");
-        tagsList.add("Tag5");
-        tagsList.add("Tag6");
+        List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+        List<String> tagsList = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
         model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
 
@@ -300,6 +298,39 @@ public class GardensController {
         return "redirect:/my-gardens/{gardenId}";
 
     }
+
+    @PostMapping("/my-gardens/{gardenId}/tag")
+    public String addGardenTag(@PathVariable("gardenId") String gardenIdString,
+                                   @RequestParam("tag") String tag,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   RedirectAttributes redirectAttributes,
+                                   HttpServletResponse response,
+                                   Model model) {
+        logger.info("POST /my-gardens/{}/tag", gardenIdString);
+
+        long gardenId = Long.parseLong(gardenIdString);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (!optionalGarden.isPresent()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        // TODO: Tag Validation (AC6, AC7)
+
+        Garden garden = optionalGarden.get();
+
+        GardenTag gardenTag = gardenTagService.addGardenTag(new GardenTag(tag));
+        gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+
+
+
+        redirectAttributes.addAttribute("page", page);
+
+        return "redirect:/my-gardens/{gardenId}";
+
+    }
+
+
 
     /**
      * This function is called when a user tries to update a plants image
