@@ -346,7 +346,7 @@ class PlantFormControllerTest {
         mockMvc.perform(MockMvcRequestBuilders
                 .multipart("/my-gardens/{gardenId}/{plantId}/edit", testGarden.getGardenId(),
                         expectedPlant.getPlantId())
-                .file(mockFile) // Attach the file to the request
+                .file(mockFile) // Attach the file to the request// TODO: handle exception
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
@@ -362,7 +362,7 @@ class PlantFormControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0", "0.9", "1000001", "1000000.00000000000000000001", "-1", "0.0"
+            "0", "0.9", "1000001", "1000000.00000000000000000001", "-1", "0.0", "e", "3e3"
     })
     @WithMockUser(username = "test@gmail.com")
     void plantFormController_editCountVariantsFail(String plantCount) throws Exception {
@@ -516,7 +516,7 @@ class PlantFormControllerTest {
             "1", "9999", "1000000", "1.0", "100.0000000000000"
     })
     @WithMockUser(username = "test@gmail.com")
-    void plantFormController_editCountVariantsPass(int plantCount) throws Exception {
+    void plantFormController_editCountVariantsPass(String plantCount) throws Exception {
 
         Plant expectedPlant = plantList.get(1);
 
@@ -544,7 +544,7 @@ class PlantFormControllerTest {
         Assertions.assertTrue(optionalPlant.isPresent());
         Plant actualPlant = optionalPlant.get();
 
-        Assertions.assertEquals(plantCount, actualPlant.getPlantCount());
+        Assertions.assertEquals((int) Double.parseDouble(plantCount.replace(',', '.')), actualPlant.getPlantCount());
 
     }
 }
