@@ -2,6 +2,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * Entity class of a Friendship, reflecting a many-to-many relationship between users
  */
@@ -14,9 +17,11 @@ public class Friendship {
     private Long friendShipId;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user1;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user2;
 
     private FriendshipStatus status;

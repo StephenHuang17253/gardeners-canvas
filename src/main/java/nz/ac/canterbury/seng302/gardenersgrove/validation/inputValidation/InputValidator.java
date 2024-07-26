@@ -1,9 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -154,6 +154,30 @@ public class InputValidator {
     }
 
     /**
+     * This function is called by methods which require checking a input length
+     * containing emojis
+     *
+     * @param length - int, the character limit
+     * @return the calling object
+     */
+    private InputValidator lengthHelperWithEmojis(int length) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        String cleanedValue = testedValue.replaceAll("\\s+", "");
+        if (cleanedValue.codePointCount(0, cleanedValue.length()) > length) {
+            this.validationResult = ValidationResult.LENGTH_OVER_LIMIT;
+            validationResult.updateMessage("must be less than or equal to  " + length + " characters");
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
      * Checks input against a criteria:
      * This function only allows non blank strings containing only alphanumeric
      * characters and select punctuation
@@ -224,7 +248,7 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(8000000.0, 0.01)
+                .gardenAreaHelper(8000000.0, 0.01)
                 .getResult();
     }
 
@@ -246,7 +270,7 @@ public class InputValidator {
      *
      * @param name string input in text field
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateName(String name) {
         return new InputValidator(name)
@@ -265,7 +289,7 @@ public class InputValidator {
      */
     public static ValidationResult validateDescription(String text) {
         ValidationResult result = new InputValidator(text)
-                .lengthHelper(512)
+                .lengthHelperWithEmojis(512)
                 .NotOnlyNumOrSpecChar()
                 .getResult();
 
@@ -290,7 +314,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateUniqueEmail(String email) {
 
@@ -305,7 +329,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
@@ -319,7 +343,7 @@ public class InputValidator {
      * @param password
      * @param otherFields other input fields to test likeness with password
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePassword(String password, List<String> otherFields) {
         ValidationResult result = new InputValidator(password)
@@ -338,7 +362,7 @@ public class InputValidator {
      *
      * @param dob
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDOB(String dob) {
         return new InputValidator(dob)
@@ -359,7 +383,7 @@ public class InputValidator {
      *
      * @param date
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDate(String date) {
         return new InputValidator(date)
@@ -372,7 +396,7 @@ public class InputValidator {
      *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     * otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
         ValidationResult result = new InputValidator(String.valueOf(plantCount))
@@ -400,7 +424,7 @@ public class InputValidator {
 
         try {
             float floatValue = Float.parseFloat(testedValue);
-            if (floatValue % 1 != 0) {  // Checks if float isn't a whole number (i.e. its not an integer)
+            if (floatValue % 1 != 0) { // Checks if float isn't a whole number (i.e. its not an integer)
                 this.validationResult = ValidationResult.INVALID_PLANT_COUNT;
                 this.passState = false;
                 return this;
@@ -745,7 +769,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[]{" ", ",", ".", "'", "-"};
+        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-" };
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
@@ -790,7 +814,7 @@ public class InputValidator {
             return this;
         }
 
-        //checks if number is a negative number
+        // checks if number is a negative number
         if (!testedValue.isBlank() && testedValue.strip().charAt(0) == '-') {
             validationResult = ValidationResult.NON_NUMERIC_COMMA;
             passState = false;
@@ -824,7 +848,6 @@ public class InputValidator {
                     allowedCommaNumber -= 1;
                 }
             }
-
 
         }
 
@@ -861,7 +884,7 @@ public class InputValidator {
      * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(Double maxArea, Double minArea) {
+    private InputValidator gardenAreaHelper(Double maxArea, Double minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
@@ -908,9 +931,9 @@ public class InputValidator {
             return this;
         }
 
-        String filteredValue = testedValue.replace(" ", "");
+        String filteredValue = testedValue.replaceAll("\\s+", "");
 
-        if (!filteredValue.equals("") && filteredValue.matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
+        if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;

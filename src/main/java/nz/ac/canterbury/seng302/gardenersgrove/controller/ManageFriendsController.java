@@ -53,9 +53,9 @@ public class ManageFriendsController {
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
-     * @param securityService service to access security methods
+     * @param securityService   service to access security methods
      * @param friendshipService service to access plant repository
-     * @param fileService service to manage files
+     * @param fileService       service to manage files
      */
     @Autowired
     public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
@@ -178,6 +178,51 @@ public class ManageFriendsController {
     }
 
     /**
+     * Get all people in database matching input string
+     *
+     * @param searchInput input name or email from user
+     * @param validEmail  Validation result of if searchInput is an email
+     * @return list of results in FriendModels
+     */
+    List<FriendModel> getSearchResults(String searchInput, ValidationResult validEmail) {
+        List<FriendModel> friendModels = new ArrayList<>();
+        //get all matching search results
+        User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
+        User currentUser = securityService.getCurrentUser();
+        if (searchResults.length < 1) {
+            return null;
+        }
+        for (User foundUser : searchResults) {
+            // ensure that a search result is not the current user
+            if (!Objects.equals(foundUser.getId(), currentUser.getId())) {
+                //creating a friend (person) object for display on frontend
+                String friendProfilePicture = foundUser.getProfilePictureFilename();
+                String friendsName = foundUser.getFirstName() + " " + foundUser.getLastName();
+                String friendGardenLink = "/" + foundUser.getId() + "/gardens";
+                FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+                friendModel.setFriendId(foundUser.getId());
+                // add status of friendship from current user to  foundUser
+                friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, foundUser));
+                friendModel.setFriendId(foundUser.getId());
+                // ensure there is no friendship from foundUser to currentUser
+                boolean existsFriendship = friendshipService.checkFriendshipExists(foundUser, currentUser);
+
+                if (!existsFriendship) {
+                    friendModels.add(friendModel);
+                } else {
+                    Friendship friendship = friendshipService.findFriendship(foundUser, currentUser);
+                    boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED && friendship.getUser1() == foundUser);
+                    if (declinedRequest) {
+                        friendModels.add(friendModel);
+                    }
+                }
+            }
+        }
+        return friendModels;
+    }
+
+
+    /**
      * Gets results of search for other users
      *
      * @return thymeleaf manageFriendsPage
@@ -199,30 +244,10 @@ public class ManageFriendsController {
         List<FriendModel> friendModels = new ArrayList<>();
         //getting results
         if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
-            User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
-            User currentUser = userService.getUserByEmail(Objects.requireNonNull(authentication).getName());
-            if (searchResults.length >= 1) {
-                for (User user : searchResults) {
-                    if (!Objects.equals(user.getId(), currentUser.getId())) {
-                        String friendProfilePicture = user.getProfilePictureFilename();
-                        String friendsName = user.getFirstName() + " " + user.getLastName();
-                        String friendGardenLink = "/" + user.getId() + "/gardens";
-                        FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
-                        friendModel.setFriendId(user.getId());
-                        // add status of friendship from current user to other user
-                        friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, user));
-                        friendModel.setFriendId(user.getId());
-                        // ensure there is not friendship from other user to this user
-                        if (!friendshipService.checkFriendshipExists(user, currentUser)) {
-                            friendModels.add(friendModel);
-                        }
-
-                    }
-                }
-            }
+            friendModels = getSearchResults(searchInput, validEmail);
             model.addAttribute("searchResults", friendModels);
         }
-        if (friendModels.isEmpty()) {
+        if (friendModels == null || friendModels.isEmpty()) {
             model.addAttribute("searchErrorText", "There is nobody with that name or email in Gardener's Grove");
             model.addAttribute("userSearch", searchInput);
 
@@ -246,10 +271,10 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId,
-            @RequestParam("activeTab") String activeTab,
-            @RequestParam(value = "searchInput", required = false) String searchInput,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+                                   @RequestParam("activeTab") String activeTab,
+                                   @RequestParam(value = "searchInput", required = false) String searchInput,
+                                   RedirectAttributes redirectAttributes,
+                                   Model model) {
         logger.info("POST /manage-friends/send-invite");
 
         User currentUser = securityService.getCurrentUser();
@@ -276,19 +301,19 @@ public class ManageFriendsController {
      * Changes the status of a pending request, based on whether it was accepted
      * or declined
      *
-     * @param friendAccepted boolean, whether the friend request was accepted or
-     * declined
+     * @param friendAccepted  boolean, whether the friend request was accepted or
+     *                        declined
      * @param pendingFriendId the id of the user who sent the request
-     * @param activeTab the tab which the user is on ( #pending for this
-     * endpoint )
+     * @param activeTab       the tab which the user is on ( #pending for this
+     *                        endpoint )
      * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends")
-    public String managePendingRequest(@RequestParam(name = "friendAccepted", required = true) boolean friendAccepted,
-            @RequestParam(name = "pendingFriendId", required = true) Long pendingFriendId,
-            @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+    public String managePendingRequest(@RequestParam(name = "friendAccepted") boolean friendAccepted,
+                                       @RequestParam(name = "pendingFriendId") Long pendingFriendId,
+                                       @RequestParam("activeTab") String activeTab,
+                                       RedirectAttributes redirectAttributes,
+                                       Model model) {
         logger.info("POST /manage-friends");
 
         if (friendAccepted) {
@@ -307,17 +332,17 @@ public class ManageFriendsController {
      * cancels a pending friend request, or when they remove a friend from their
      * friends list.
      *
-     * @param friendId the user they sent the request to, or removed from
-     * friends
+     * @param friendId  the user they sent the request to, or removed from
+     *                  friends
      * @param activeTab the tab which the user is on ( #pending for this
-     * endpoint )
+     *                  endpoint )
      * @return thymeleaf manageFriendsPage
      */
     @PostMapping("/manage-friends/remove")
-    public String cancelSentRequest(@RequestParam(name = "friendId", required = true) Long friendId,
-            @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+    public String cancelSentRequest(@RequestParam(name = "friendId") Long friendId,
+                                    @RequestParam("activeTab") String activeTab,
+                                    RedirectAttributes redirectAttributes,
+                                    Model model) {
         logger.info("POST /manage-friends/remove");
 
         User currentUser = securityService.getCurrentUser();
