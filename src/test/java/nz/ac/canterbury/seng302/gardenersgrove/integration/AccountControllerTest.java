@@ -476,12 +476,16 @@ class AccountControllerTest {
         String firstName = "bannedFirstName";
         String lastName = "bannedLastName";
         String bannedEmail = "banned@email.com";
+        int banDuration = 2;
 
         User bannedMockUser = spy(new User(firstName, lastName, bannedEmail, null));
         bannedMockUser.setVerified(true);
         bannedMockUser.setPassword(userPassword);
-        bannedMockUser.setBanDuration(Duration.ofDays(2));
         when(bannedMockUser.getId()).thenReturn(1L);
+
+        when(bannedMockUser.isBanned()).thenReturn(true);
+
+        when(bannedMockUser.daysUntilUnban()).thenReturn(banDuration);
 
         when(userServiceMock.getUserByEmailAndPassword(bannedEmail, userPassword))
                 .thenReturn(bannedMockUser);
@@ -502,6 +506,6 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(
                         model().attribute("message",
-                                "Your account is blocked for 2 days due to inappropriate conduct"));
+                                "Your account is blocked for " + banDuration + " days due to inappropriate conduct"));
     }
 }
