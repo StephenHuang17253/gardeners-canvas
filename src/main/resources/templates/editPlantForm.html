@@ -51,7 +51,7 @@
                     <div class="mb-3">
                         <label for="plantCount" class="form-label">Plant Count</label>
                         <input id="plantCount" type="number" min="0" step="1" class="form-control" th:name="plantCount"
-                            th:value="*{plantCount}">
+                            th:value="*{plantCount}" data-formatted-number>
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
                     </div>
 
@@ -88,7 +88,7 @@
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
-    <script th:src="@{/js/plantGardenNumberFormat.js}"></script>
+    <script th:src="@{/js/formatNumber.js}"></script>
 </body>
 
 </html>

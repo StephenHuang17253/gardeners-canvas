@@ -1,8 +1,10 @@
 
-export const isNumber = (input) => /^\d+$/.test(input);
-export const hasSign = (input) => /(\+|\-)/.test(input);
-export const hasDecimalPoint = (input) => /(\.|,)/.test(input);
-export const hasExponent = (input) => /[eE]/.test(input);
+const isNumber = (input) => /^\d+$/.test(input);
+const hasSign = (input) => /(\+|\-)/.test(input);
+const hasDecimalPoint = (input) => /(\.|,)/.test(input);
+const hasExponent = (input) => /[eE]/.test(input);
+
+const numberInputs = document.querySelectorAll("[data-formatted-number]");
 
 /**
  * Checks if the key pressed is a number or a decimal point or e and whether it is valid.
@@ -56,6 +58,7 @@ const handleBlur = (event) => {
     }
 };
 
-document.getElementById('gardenSize').addEventListener('keypress', handleKeyPress);
-document.getElementById('gardenSize').addEventListener('blur', handleBlur);
-document.getElementById('plantCount').addEventListener('keypress', handleKeyPress);
+numberInputs.forEach((numberInput) => {
+    numberInput.addEventListener('keypress', handleKeyPress);
+    numberInput.addEventListener('blur', handleBlur);
+});
