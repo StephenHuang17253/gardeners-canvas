@@ -31,7 +31,7 @@
 //@SpringBootTest
 //public class U11_RecordPlants {
 //
-//    public static MockMvc MOCK_MVC;
+//    public static MockMvc mockMVC;
 //
 //    private ProfanityService profanityService;
 //
@@ -83,7 +83,7 @@
 //        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
 //                securityService);
 //        // Allows us to bypass spring security
-//        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
+//        mockMVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 //
 //    }
 //

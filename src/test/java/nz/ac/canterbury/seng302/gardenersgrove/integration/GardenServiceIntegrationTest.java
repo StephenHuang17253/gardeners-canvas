@@ -18,7 +18,7 @@ import java.util.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class GardenServiceIntegrationTest {
+class GardenServiceIntegrationTest {
     @Autowired
     private GardenRepository gardenRepository;
     @Autowired
@@ -88,7 +88,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void GetAllUsersGardens_UserInPersistenceAndOwnsSingleGardens() {
+    void GetAllUsersGardens_UserInPersistenceAndOwnsSingleGardens() {
         List<Garden> expectedGardens = new ArrayList<>();
         expectedGardens.add(gardenList.get(2));
         List<Garden> actualGardens = gardenService.getAllUsersGardens(2L);
@@ -106,7 +106,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void GetAllUsersGardens_UserInPersistenceAndOwnsMultipleGardens() {
+    void GetAllUsersGardens_UserInPersistenceAndOwnsMultipleGardens() {
         List<Garden> expectedGardens = new ArrayList<>();
         expectedGardens.add(gardenList.get(0));
         List<Garden> actualGardens = gardenService.getAllUsersGardens(1L);
@@ -124,7 +124,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void GetAllUsersGardens_UserInPersistenceAndOwnsNoGardens() {
+    void GetAllUsersGardens_UserInPersistenceAndOwnsNoGardens() {
         List<Garden> actualGardens = gardenService.getAllUsersGardens(3L);
         Assertions.assertEquals(0, actualGardens.size());
     }
@@ -137,7 +137,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void FindById_GardenIdExists() {
+    void FindById_GardenIdExists() {
         List<Garden> expectedGardens = new ArrayList<>();
         expectedGardens.add(gardenList.get(0));
         Optional<Garden> optionalGarden = gardenService.getGardenById(1L);
@@ -153,13 +153,13 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void FindById_GardenIdDoseNotExist() {
+    void FindById_GardenIdDoseNotExist() {
         Optional<Garden> optionalGarden = gardenService.getGardenById(4L);
         Assertions.assertFalse(optionalGarden.isPresent());
     }
 
     @Test
-    public void AddGarden_UserInPersistence() {
+    void AddGarden_UserInPersistence() {
         Garden garden = new Garden(
                 "Bat Cave",
                 "",
@@ -187,7 +187,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void AddGarden_UserNotInPersistence_ThrowsIllegalArgumentException() {
+    void AddGarden_UserNotInPersistence_ThrowsIllegalArgumentException() {
         User user = new User("Boogie", "Man", "boogieMan@email.com", date);
         Garden garden = new Garden(
                 "Bat Cave",
@@ -208,7 +208,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void UpdateGarden_GardenInPersistence() {
+    void UpdateGarden_GardenInPersistence() {
         Garden gardenWithUpdatedValues = new Garden(
                 "Jane's Garden",
                 "",
@@ -232,7 +232,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void UpdateGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
+    void UpdateGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
         User user = userService.getUserById(4L);
         Garden gardenWithUpdatedValues = new Garden(
                 "Jane's Garden",
@@ -254,7 +254,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void AddPlantToGarden_GardenInPersistence() {
+    void AddPlantToGarden_GardenInPersistence() {
         // Given
         Garden garden = userService.getUserById(1L).getGardens().get(0);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
@@ -275,7 +275,7 @@ public class GardenServiceIntegrationTest {
     }
 
     @Test
-    public void AddPlantToGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
+    void AddPlantToGarden_GardenNotInPersistence_ThrowsIllegalArgumentException() {
         User user = userService.getUserById(4L);
         Garden garden = new Garden(
                 "Jane's Garden",

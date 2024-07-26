@@ -394,6 +394,14 @@ public class AccountController {
         if (!user.isVerified()) {
             return "redirect:/verify/" + user.getEmailAddress();
         }
+        
+        if (user.isBanned()) {
+            int banTimeLeft = user.daysUntilUnban();
+            String message = "Your account is blocked for " + banTimeLeft + " day" + (banTimeLeft == 1 ? "": "s") + " due to inappropriate conduct";
+            model.addAttribute("goodMessage", false);
+            model.addAttribute("message", message);
+            return "loginPage";
+        }
 
         setSecurityContext(emailAddress, password, request.getSession());
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());

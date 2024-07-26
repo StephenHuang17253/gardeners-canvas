@@ -38,16 +38,16 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class ProfileControllerTest {
+class ProfileControllerTest {
 
     @Autowired
     WebApplicationContext webApplicationContext;
 
     @Autowired
-    public UserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
-    public PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
     private MockMvc mockMvc;
 
     @MockBean
@@ -56,14 +56,12 @@ public class ProfileControllerTest {
     @MockBean
     private UserService userServiceMock;
 
-    private UserService userServiceTestMock;
-
     User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
     @InjectMocks
     private static ProfileController profileController;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
@@ -72,7 +70,7 @@ public class ProfileControllerTest {
     }
 
     @AfterAll
-    public static void cleanup() {
+    static void cleanup() {
         // Clear the context tests
         SecurityContextHolder.clearContext();
     }
@@ -149,9 +147,5 @@ public class ProfileControllerTest {
                 .andDo(MockMvcResultHandlers.print());
         Mockito.verify(userServiceMock, Mockito.times(1)).updatePassword(1L, input);
     }
-
-    // Add tests for posting picture method
-    // useful reference: https://stackoverflow.com/questions/38571716/how-to-put-multipart-form-data-using-spring-mockmvc
-
 
 }

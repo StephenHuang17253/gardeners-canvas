@@ -8,11 +8,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -24,7 +23,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
@@ -39,13 +37,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 @SessionAttributes("userGardens")
 public class ManageFriendsController {
 
-    Logger logger = LoggerFactory.getLogger(GardensController.class);
+    Logger logger = LoggerFactory.getLogger(ManageFriendsController.class);
 
     private final FriendshipService friendshipService;
 
     private final SecurityService securityService;
-
-    private final FileService fileService;
 
     private final UserService userService;
 
@@ -58,9 +54,8 @@ public class ManageFriendsController {
      * @param fileService       service to manage files
      */
     @Autowired
-    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, FileService fileService, UserService userService) {
+    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, UserService userService) {
         this.friendshipService = friendshipService;
-        this.fileService = fileService;
         this.securityService = securityService;
         this.userService = userService;
 
@@ -146,6 +141,16 @@ public class ManageFriendsController {
     }
 
     /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+    /**
      * Maps the manageFriendsPage html file to /manage-friends url
      *
      * @return thymeleaf manageFriendsPage
@@ -153,10 +158,6 @@ public class ManageFriendsController {
     @GetMapping("/manage-friends")
     public String myFriends(Model model, HttpServletRequest request) {
         logger.info("GET /manage-friends");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         String activeTab;
@@ -230,9 +231,7 @@ public class ManageFriendsController {
     @GetMapping("/manage-friends/search")
     public String searchForUsers(@RequestParam(name = "searchInput", defaultValue = "") String searchInput, Model model) {
         logger.info("GET /manage-friends/search");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        
         //preparing input for validation
         searchInput = searchInput.strip();
         ValidationResult validEmail = InputValidator.validateEmail(searchInput);
@@ -283,7 +282,6 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("searchErrorText", exception.getMessage());
-            model.addAttribute("loggedIn", securityService.isLoggedIn());
             return "manageFriendsPage";
         }
 

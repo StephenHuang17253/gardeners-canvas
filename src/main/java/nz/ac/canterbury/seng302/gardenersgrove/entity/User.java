@@ -18,8 +18,6 @@ import java.util.List;
 @Table(name = "user_table")
 public class User {
 
-    private static final int STRIKES_TO_BAN = 6;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -121,14 +119,13 @@ public class User {
         this.banDuration = banDuration;
     }
 
-    public void incrementStrikes() {
-        strikes++;
+    public void setLastBanDate(LocalDateTime date) {
+        this.lastBanDate = date;
     }
 
-    public void resetStrikes() {
-        strikes = 0;
+    public void setStrikes(int strikes) {
+        this.strikes = strikes;
     }
-
     public Long getId() {
         return id;
     }
@@ -165,16 +162,19 @@ public class User {
         return gardens;
     }
 
-    public Boolean isBanned() {
+    public int daysUntilUnban() {
+        if (lastBanDate == null) {
+            return 0;
+        }
+        LocalDateTime banEnds = lastBanDate.plus(banDuration);
+        return (int) Math.ceil(Duration.between(LocalDateTime.now(), banEnds).toHours() / 24.0);
+    }
+
+    public boolean isBanned() {
         if (lastBanDate == null) {
             return false;
         }
         return LocalDateTime.now().isBefore(lastBanDate.plus(banDuration));
-    }
-
-    public void ban(Duration banDuration) {
-        lastBanDate = LocalDateTime.now();
-        this.banDuration = banDuration;
     }
 
     public int getStrikes() {

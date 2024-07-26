@@ -168,6 +168,16 @@ public class HomePageController {
             Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
             friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
         }
+
+        if (!userService.emailInUse("badguy@email.com")) {
+            User badGuy = new User("Bad",
+                    "Guy",
+                    "badguy@email.com",
+                    date);
+            userService.addUser(badGuy, "Badguy1!");
+            userService.verifyUser(badGuy);
+            userService.banUser(badGuy, 1);
+        }
     }
 
     /**
