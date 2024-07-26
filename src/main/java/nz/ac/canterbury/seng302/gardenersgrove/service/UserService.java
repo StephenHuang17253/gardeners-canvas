@@ -4,7 +4,9 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -151,11 +153,11 @@ public class UserService {
      * then sets it as the users password
      *
      * @param id          id of user to update
-     * @param NewPassword New password to set for user's account
+     * @param newPassword New password to set for user's account
      */
-    public void updatePassword(long id, String NewPassword) {
+    public void updatePassword(long id, String newPassword) {
         User user = getUserById(id);
-        String encodedNewPassword = passwordEncoder.encode(NewPassword);
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedNewPassword);
         userRepository.save(user);
     }
@@ -201,7 +203,28 @@ public class UserService {
         User user = getUserById(id);
         user.getGardens().add(garden);
         userRepository.save(user);
+    }
 
+    /**
+     * ban a given user for a given amount of days
+     * 
+     * @param user the user to ban
+     * @param days length of ban
+     */
+    public void banUser(User user, int days) {
+        user.setLastBanDate(LocalDateTime.now());
+        user.setBanDuration(Duration.ofDays(days));
+        userRepository.save(user);
+    }
+
+    /**
+     * give a strike to the user
+     * @param user user to strike
+     */
+    public void strikeUser(User user) {
+        int strikes = user.getStrikes();
+        user.setStrikes(strikes + 1);
+        userRepository.save(user);
     }
 
     /**

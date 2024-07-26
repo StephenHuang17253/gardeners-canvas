@@ -18,7 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -168,6 +167,16 @@ public class HomePageController {
             }
             Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
             friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
+        }
+
+        if (!userService.emailInUse("badguy@email.com")) {
+            User badGuy = new User("Bad",
+                    "Guy",
+                    "badguy@email.com",
+                    date);
+            userService.addUser(badGuy, "Badguy1!");
+            userService.verifyUser(badGuy);
+            userService.banUser(badGuy, 1);
         }
     }
 

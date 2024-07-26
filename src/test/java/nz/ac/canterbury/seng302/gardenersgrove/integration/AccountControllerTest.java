@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpSession;
 import static org.hamcrest.core.AnyOf.anyOf;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -358,7 +359,7 @@ class AccountControllerTest {
 
         String error = model.get("emailAddressError").toString();
 
-        assertTrue("Email must be in the form 'jane@doe.nz'".equals(error));
+        assertEquals("Email must be in the form 'jane@doe.nz'", error);
     }
 
     @Test
@@ -383,7 +384,7 @@ class AccountControllerTest {
 
         String error = model.get("loginError").toString();
 
-        assertTrue("The email address is unknown, or the password is invalid".equals(error));
+        assertEquals("The email address is unknown, or the password is invalid", error);
     }
 
     @Test
@@ -409,7 +410,7 @@ class AccountControllerTest {
 
         String error = model.get("loginError").toString();
 
-        assertTrue("The email address is unknown, or the password is invalid".equals(error));
+        assertEquals("The email address is unknown, or the password is invalid", error);
     }
 
     @Test
@@ -479,7 +480,7 @@ class AccountControllerTest {
         User bannedMockUser = spy(new User(firstName, lastName, bannedEmail, null));
         bannedMockUser.setVerified(true);
         bannedMockUser.setPassword(userPassword);
-        bannedMockUser.ban(Duration.ofDays(2));
+        bannedMockUser.setBanDuration(Duration.ofDays(2));
         when(bannedMockUser.getId()).thenReturn(1L);
 
         when(userServiceMock.getUserByEmailAndPassword(bannedEmail, userPassword))
@@ -500,6 +501,7 @@ class AccountControllerTest {
                         .param("password", userPassword))
                 .andExpect(status().isOk())
                 .andExpect(
-                        model().attribute("message", "Your account is blocked for 2 days due to inappropriate conduct"));
+                        model().attribute("message",
+                                "Your account is blocked for 2 days due to inappropriate conduct"));
     }
 }
