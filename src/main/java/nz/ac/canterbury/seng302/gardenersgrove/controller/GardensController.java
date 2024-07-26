@@ -441,6 +441,7 @@ public class GardensController {
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
 
+
         model.addAttribute("friendId", userId);
         model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
         model.addAttribute("currentPage", page);
