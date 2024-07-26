@@ -517,4 +517,10 @@ public class GardensController {
 
     }
 
+
+    @GetMapping("/tag/suggestions")
+    public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
+        return gardenTagService.getAllSimilar(query);
+    }
+
 }
