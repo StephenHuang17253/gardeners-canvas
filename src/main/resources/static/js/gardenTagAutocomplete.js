@@ -4,6 +4,10 @@ const MIN_TAG_INPUT_LENGTH = 3;
 const tagField = document.getElementById("tag")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
 
+const getDisplayString = (data) => {
+    return data.tagName;
+}
+
 const fillTagField = (data) => {
     tagField.value = data
 }
@@ -12,7 +16,7 @@ const hideTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.add(
 
 const showTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.remove("d-none");
 
-const clearTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.innerHTML = "";
+const clearTagAutocompleteDropdown = () => tagAutocompleteDropdown.innerHTML = "";
 
 
 const handleTagSuggestionClicked = (tagSuggestion) => {
@@ -46,10 +50,10 @@ const handleTagUpdate = (async (event) => {
         return;
     }
 
-    // if (event.target.value.length < MIN_TAG_INPUT_LENGTH) {
-    //     hideTagAutocompleteDropdown();
-    //     return;
-    // }
+    if (event.target.value.length < MIN_TAG_INPUT_LENGTH) {
+        hideTagAutocompleteDropdown();
+        return;
+    }
 
     const tagSuggestions = await fetchTagData(event.target.value);
 
@@ -72,16 +76,33 @@ const handleTagClick = (event) => {
     }
 }
 
+/**
+ * Determines the instance based on the current URL path.
+ * @returns {string} The instance ("", "test/" or "prod/") based on the URL path.
+ */
+const getInstance = () => {
+    const path = window.location.pathname
+    let instance = "";
+    if (path.includes("/test/")) {
+        instance = "test/";
+    } else if (path.includes("/prod/")) {
+        instance = "prod/";
+    }
+    return instance;
+};
+
 const fetchTagData = async (query) => {
     const instance = getInstance();
-    return await fetch(`/${instance}tag/suggestions?query=${query}`)
+
+    const response =  await fetch(`/${instance}tag/suggestions?query=${query}`)
+    return await response.json()
 
 }
 
 
 
 // Event listeners
-
+console.log("Testing")
 tagField.addEventListener("input", handleTagUpdate);
 tagField.addEventListener("focus", handleTagUpdate);
 tagField.addEventListener("blur", handleTagDeselect);

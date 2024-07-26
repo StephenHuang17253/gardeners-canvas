@@ -519,7 +519,9 @@ public class GardensController {
 
 
     @GetMapping("/tag/suggestions")
+    @ResponseBody
     public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
+        logger.info("Querying "+ query + " for tags");
         return gardenTagService.getAllSimilar(query);
     }
 
