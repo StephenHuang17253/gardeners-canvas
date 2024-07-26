@@ -21,44 +21,32 @@ public class WeatherResponseData {
     JsonNode jsonDailyWeatherCodes;
     JsonNode jsonDailyPrecipitationSum;
     JsonNode jsonDates;
-    DailyWeather currentWeather;
-    List<DailyWeather> forecastWeather;
-    List<DailyWeather> pastWeather;
-
+    List<DailyWeather> retrievedWeatherData;
 
 
     public WeatherResponseData(JsonNode jsonWeatherData) {
         current = jsonWeatherData.get("current");
         daily = jsonWeatherData.get("daily");
         setDailyWeather();
-        setCurrentWeather();
-        setForecastWeather();
-        setPastWeather();
+        convertToWeatherObjects();
+        improveCurrentWeatherForecast();
     }
 
-    public DailyWeather getCurrentWeather() {
-        return currentWeather;
-    }
-
-    public List<DailyWeather> getForecastWeather() {
-        return forecastWeather;
-    }
-
-    public List<DailyWeather> getPastWeather() {
-        return pastWeather;
+    public List<DailyWeather> getRetrievedWeatherData() {
+        return retrievedWeatherData;
     }
 
     /**
      * Creates a DailyWeather object containing all details of current weather.
      */
-    void setCurrentWeather() {
+    void improveCurrentWeatherForecast() {
         int weatherCode = current.get("weather_code").asInt();
         List<String> weatherDescriptionAndIcon = getWeatherDescriptionAndIcon(weatherCode);
         LocalDate currentTime = LocalDate.now();
-        this.currentWeather = new DailyWeather(weatherDescriptionAndIcon.get(1), currentTime, weatherDescriptionAndIcon.get(0));
-        currentWeather.setCurrentTemp(current.get("temperature_2m").asDouble());
-        currentWeather.setHumidity(current.get("relative_humidity_2m").asInt());
-        currentWeather.setPrecipitation(current.get("precipitation").asDouble());
+
+        DailyWeather currentWeather = retrievedWeatherData.get(2);
+        currentWeather.setDescription(weatherDescriptionAndIcon.get(0));
+        currentWeather.setWeatherIcon(weatherDescriptionAndIcon.get(1));
     }
 
     /**
@@ -71,28 +59,17 @@ public class WeatherResponseData {
         jsonDailyPrecipitationSum = daily.get("precipitation_sum");
         jsonDates = daily.get("time");
     }
-
     /**
-     * This method collects the API response for the past 2 days and adds them to the pastWeather
+     * This method collects all API responses and adds them to a list of weather object
      */
-    void setPastWeather() {
-        List<DailyWeather> pastWeather = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            pastWeather.add(getWeatherDay(i));
+    void convertToWeatherObjects() {
+        List<DailyWeather> weatherObjects = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            weatherObjects.add(getWeatherDay(i));
         }
-        this.pastWeather = pastWeather;
+        this.retrievedWeatherData = weatherObjects;
     }
 
-    /**
-     * This method collects the API response for the next 3 days and adds them to forecastWeather
-     */
-    void setForecastWeather() {
-        List<DailyWeather> forecastWeather = new ArrayList<>();
-        for (int i = 3; i < jsonDates.size()-1; i++) {
-            forecastWeather.add(getWeatherDay(i));
-        }
-        this.forecastWeather = forecastWeather;
-    }
 
     /**
      * This helper method creates a day with all weather details entered
