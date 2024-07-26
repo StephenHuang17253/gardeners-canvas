@@ -392,13 +392,16 @@ public class InputValidator {
     }
 
     /**
-     * Checks if the given plantCount is a valid integer between 1 and 1,000,000
+     * Checks if the given plantCount is a valid integer between 1 and 1,000,000 or if empty string
      *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
+        if (plantCount.equals("")) {
+            return ValidationResult.OK;
+        }
         ValidationResult result = new InputValidator(String.valueOf(plantCount))
                 .validWholeNumberHelper()
                 .maxNumberHelper(1000000)

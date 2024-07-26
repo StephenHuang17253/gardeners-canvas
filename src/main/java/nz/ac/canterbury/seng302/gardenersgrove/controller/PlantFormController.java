@@ -122,20 +122,11 @@ public class PlantFormController {
             Model model) {
         logger.info("POST /create-new-plant");
 
-        int plantCountValue;
-
-        ValidationResult plantCountResult = ValidationResult.OK;
-        if (Objects.equals(plantCount, "")) {
-            plantCountValue = 0;
-        } else {
-            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
-            plantCountResult = InputValidator.validatePlantCount(plantCount);
-        }
-
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
+        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -179,6 +170,12 @@ public class PlantFormController {
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "createNewPlantForm";
+        }
+
+        int plantCountValue = 0;
+
+        if (!Objects.equals(plantCount, "")) {
+            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
         Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
@@ -277,21 +274,11 @@ public class PlantFormController {
         }
 
 
-        int plantCountValue;
-
-        ValidationResult plantCountResult = ValidationResult.OK;
-        if (Objects.equals(plantCount, "")) {
-            plantCountValue = 0;
-        } else {
-            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
-            plantCountResult = InputValidator.validatePlantCount(plantCount);
-        }
-
-
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
+        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
@@ -321,6 +308,12 @@ public class PlantFormController {
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
+        }
+
+        int plantCountValue = 0;
+
+        if (!Objects.equals(plantCount, "")) {
+            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
         plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
