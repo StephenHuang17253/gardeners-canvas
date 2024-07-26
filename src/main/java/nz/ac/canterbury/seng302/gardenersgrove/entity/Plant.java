@@ -22,7 +22,7 @@ public class Plant {
     @Column
     private int plantCount;
 
-    @Column(length = 512)
+    @Column(columnDefinition = "TEXT")
     private String plantDescription;
 
     @Column

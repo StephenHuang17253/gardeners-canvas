@@ -45,6 +45,7 @@ public class ResetPasswordController {
 
     /**
      * Get form for entering email if user has forgotten their password
+     *
      * @return lostPasswordPage
      */
     @GetMapping("/lost-password")
@@ -58,8 +59,9 @@ public class ResetPasswordController {
     /**
      * Post form for entering email if user has forgotten their password
      * Checks if input values are valid and then sends reset password link to email entered
+     *
      * @param emailAddress input email to send reset password link to
-     * @param model to collect field values and error messages
+     * @param model        to collect field values and error messages
      * @return lostPasswordPage
      */
     @PostMapping("/lost-password")
@@ -70,9 +72,9 @@ public class ResetPasswordController {
         boolean isRegistered = userService.emailInUse(emailAddress);
         ValidationResult emailValidation = InputValidator.validateEmail(emailAddress);
         model.addAttribute("emailAddress", emailAddress);
-        if (!emailValidation.valid()){
+        if (!emailValidation.valid()) {
             model.addAttribute("emailError", emailValidation);
-        } else  {
+        } else {
             model.addAttribute("message", "An email was sent to the address if it was recognised");
             model.addAttribute("goodMessage", true);
             if (isRegistered) {
@@ -94,7 +96,8 @@ public class ResetPasswordController {
     /**
      * Get form for entering in new passwords (for resetting passwords)
      * Checks token in url is valid
-     * @param resetToken unique temp token for resetting password
+     *
+     * @param resetToken         unique temp token for resetting password
      * @param redirectAttributes to add message before redirecting to different page
      * @return form for resetting password
      */
@@ -121,10 +124,11 @@ public class ResetPasswordController {
      * Checks if input values are valid and then resets the password
      * Sends confirmation email to user
      * Also deletes the token to ensure it cannot be reused
-     * @param resetToken token to identify user whose password has to be reset
-     * @param password new password
+     *
+     * @param resetToken     token to identify user whose password has to be reset
+     * @param password       new password
      * @param retypePassword new password
-     * @param model to collect field values and error messages
+     * @param model          to collect field values and error messages
      * @return resetPasswordPage or loginPage if reset password is successful
      */
     @PostMapping("/reset-password/{token}")
@@ -136,6 +140,14 @@ public class ResetPasswordController {
         logger.info("POST /reset-password");
 
         Token token = tokenService.getTokenByTokenString(resetToken);
+        if (token == null || token.isExpired()) {
+            if (token != null) {
+                tokenService.deleteToken(token);
+            }
+            redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            return "redirect:/login";
+        }
         User user = token.getUser();
         String emailAddress = user.getEmailAddress();
         String firstName = user.getFirstName();
@@ -171,14 +183,6 @@ public class ResetPasswordController {
                 emailService.sendPasswordResetConfirmationEmail(currentUser);
             } catch (MessagingException e) {
                 logger.error("Password reset confirmation email not sent");
-            }
-            if (token == null || token.isExpired()) {
-                if (token != null) {
-                    tokenService.deleteToken(token);
-                }
-                redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
-                redirectAttributes.addFlashAttribute("goodMessage", false);
-                return "redirect:/login";
             }
         }
         return "redirect:/login";
