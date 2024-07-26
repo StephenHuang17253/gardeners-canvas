@@ -11,12 +11,11 @@
     <div class="container-md my-5 bg-white rounded pt-3 pb-5" style="width: 60%;">
         <div class="container text-center">
             <div th:if="${isOwner}" class="text-end">
-                <form th:action="@{/my-gardens/__${garden.getGardenId()}__/public}" method="post"
-                      enctype="multipart/form-data">
+                <form th:action="@{/my-gardens/__${garden.getGardenId()}__/public}" method="post" th:object="${weatherList}">
                     <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic"
                            th:checked="${garden.isGardenIsPublic()}" onChange="this.form.submit()">Make my garden public
                     <input id="page" th:name="page" th:value="${currentPage}" type="hidden"/>
-                    <input id="weatherList" name="weatherList" type="hidden" th:value="${weather}" />
+                    <input id="weather" th:name="weather" th:value="${weatherList.getWeather()}" type="hidden"/>
                 </form>
             </div>
             <div>
@@ -75,7 +74,7 @@
                     <h4 th:text="${currentTime}"></h4>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
-                    <div class="w-25" th:each="prediction, iterStat : ${weather}">
+                    <div class="w-25" th:each="prediction, iterStat : ${weatherList.getWeather()}">
                         <div th:replace="~{fragments/weatherBox.html :: weatherBox(
                             weatherIcon=${prediction.getWeatherIcon()},
                             date=${prediction.getDate()},

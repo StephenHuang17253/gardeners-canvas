@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,38 +52,22 @@ public class HomePageController {
      * controller with other services
      *
      * @param userService
-     * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager,
-            GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService) {
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager, GardenService gardenService, PlantService plantService,
-                              FriendshipService friendshipService, SecurityService securityService, UserInteractionService userInteractionService) {
+    public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService, UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
-        this.securityService = securityService;
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     *
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
      * Redirects GET default url '/' to '/home'
      * 
      * @return redirect to /home
-     * @throws IOException
      */
     @GetMapping("/")
     public String home() {
@@ -189,16 +174,12 @@ public class HomePageController {
     @GetMapping("/home")
     public String home(Model model) {
 
-        // If no users exist then clear the security context,
-        // useful for testing without persistent storage,
-        // otherwise a user can be logged in without being in the database
-        if (userService.getAllUsers().isEmpty()) {
-            SecurityContextHolder.clearContext();
-        }
-
         logger.info("GET /home");
 
-        createDefaultUsers();
+        // Add a test user with test gardens and test plants
+        if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
+            addDefautContent();
+        }
 
         User user = securityService.getCurrentUser();
 

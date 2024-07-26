@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.servlet.http.HttpServletRequest;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
  * Controller for viewing all the created Gardens
@@ -73,7 +75,6 @@ public class GardensController {
      * @param gardenService   service to access garden repository
      * @param securityService service to access security methods
      * @param plantService    service to access plant repository
-     * @param fileService     service to manage files
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
@@ -198,9 +199,9 @@ public class GardensController {
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
             @RequestParam(defaultValue = "1") int page,
-            @ModelAttribute("weatherList") List<DailyWeather> weatherList,
             @RequestParam(required = false) ValidationResult plantPictureResult,
             HttpServletResponse response,
+            HttpServletRequest request,
             Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -219,12 +220,16 @@ public class GardensController {
             return "403";
         }
 
-        if (weatherList == null || weatherList.isEmpty()) {
-            weatherList = getGardenWeatherData(garden);
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        WeatherListWrapper weatherList;
+        if (inputFlashMap != null) {
+            weatherList = (WeatherListWrapper) inputFlashMap.get("weatherList");
+        }else{
+            weatherList = new WeatherListWrapper(getGardenWeatherData(garden));
         }
 
-        if (weatherList.size() > 1) {
-            handleWeatherMessages(weatherList, model);
+        if (weatherList.getWeather().size() > 1) {
+            handleWeatherMessages(weatherList.getWeather(), model);
         }
 
         User user = garden.getOwner();
@@ -234,16 +239,14 @@ public class GardensController {
 
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(garden));
-        model.addAttribute("weather", weatherList);
+        model.addAttribute("weatherList", weatherList);
         model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
         model.addAttribute("currentTime", formattedTime);
         model.addAttribute("profilePicture", user.getProfilePictureFilename());
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureResult);
 
-
         return "gardenDetailsPage";
-
     }
 
     /**
@@ -259,7 +262,7 @@ public class GardensController {
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
             @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
             @RequestParam(defaultValue = "1") int page,
-            @ModelAttribute("weatherList") List<DailyWeather> weatherList,
+            @ModelAttribute WeatherListWrapper weatherList,
             RedirectAttributes redirectAttributes,
             HttpServletResponse response) {
         logger.info("POST /my-gardens/{}/public", gardenId);
@@ -280,9 +283,7 @@ public class GardensController {
 
         gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
         redirectAttributes.addFlashAttribute("page", page);
-        if (weatherList != null && !weatherList.isEmpty()) {
-            redirectAttributes.addFlashAttribute("weatherList", weatherList);
-        }
+        redirectAttributes.addFlashAttribute("weatherList", weatherList);
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -370,14 +371,12 @@ public class GardensController {
             return "403";
         }
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> gardens = friend.getGardens();
+        List<Garden> friendGardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", gardens);
+        model.addAttribute("friendGardens", friendGardens);
 
-        long publicGardensCount = gardens.stream().filter(Garden::getIsPublic).count();
+        long publicGardensCount = friendGardens.stream().filter(Garden::getIsPublic).count();
         List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).toList();
-
-        gardens = gardens.stream().filter(garden -> garden.getIsPublic()).collect(Collectors.toList());
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
