@@ -36,6 +36,7 @@ public class ProfanityService {
     private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
     private static final long RATE_LIMIT_DELAY_MS = 1500;
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
+    String emptyRegex = "^\\s*$";
     /**
      * General constructor for profanity service, creates new http client.
      * always use this constructor when running real api calls
@@ -100,8 +101,12 @@ public class ProfanityService {
      * @return True if terms has one or more bad words. If not found return false
      */
     public boolean containsProfanity (String inputString) {
+        if (inputString.matches(emptyRegex)) {
+            return false;
+        }
         ProfanityResponseData returnedData = moderateContent(inputString);
         logger.info(returnedData.toString());
+
         return returnedData.isHasProfanity();
     }
     /**
