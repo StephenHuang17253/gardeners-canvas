@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class ManageFriendsControllerIntegrationTest {
+class ManageFriendsControllerIntegrationTest {
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -40,9 +40,6 @@ public class ManageFriendsControllerIntegrationTest {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    private FriendshipRepository friendshipRepository;
 
     private final MockMvc mockMvc;
     User user1;
@@ -54,28 +51,29 @@ public class ManageFriendsControllerIntegrationTest {
     List<FriendModel> friendsList;
 
     @Autowired
-    public ManageFriendsControllerIntegrationTest(MockMvc mockMvc) {
+    ManageFriendsControllerIntegrationTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
     @BeforeAll
     void before_or_after_all() {
 
+        user1 = new User("John", "Doe", "jhonDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003, 5, 2));
+        user2 = new User("Jane", "Doe", "janeDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003, 5, 2));
+        user3 = new User("Bruce", "Wayne", "bruceWayne@ManageFriendsControllerIntegrationTest.com",
+                LocalDate.of(2003, 5, 2));
+        user4 = new User("Test", "Doe", "testDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003, 5, 2));
+        user5 = new User("Walter", "Doe", "pending@ManageFriendsControllerIntegrationTest.com",
+                LocalDate.of(2003, 5, 2));
 
-        user1 =  new User("John", "Doe", "jhonDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
-        user2 =  new User("Jane", "Doe", "janeDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
-        user3 =  new User("Bruce", "Wayne", "bruceWayne@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
-        user4 =  new User("Test", "Doe", "testDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
-        user5 =  new User("Walter", "Doe", "pending@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2));
+        userService.addUser(user1, "1es1P@ssword");
+        userService.addUser(user2, "1es1P@ssword");
+        userService.addUser(user3, "1es1P@ssword");
+        userService.addUser(user4, "1es1P@ssword");
+        userService.addUser(user5, "1es1P@ssword");
 
-        userService.addUser(user1,"1es1P@ssword");
-        userService.addUser(user2,"1es1P@ssword");
-        userService.addUser(user3,"1es1P@ssword");
-        userService.addUser(user4,"1es1P@ssword");
-        userService.addUser(user5,"1es1P@ssword");
-
-        Friendship friendship1 = friendshipService.addFriendship(user1,user2);
-        Friendship friendship2 = friendshipService.addFriendship(user3,user1);
+        Friendship friendship1 = friendshipService.addFriendship(user1, user2);
+        Friendship friendship2 = friendshipService.addFriendship(user3, user1);
         Friendship friendship3 = friendshipService.addFriendship(user5, user1);
         friendshipService.updateFriendShipStatus(friendship1.getId(), FriendshipStatus.ACCEPTED);
         friendshipService.updateFriendShipStatus(friendship2.getId(), FriendshipStatus.ACCEPTED);
@@ -89,7 +87,7 @@ public class ManageFriendsControllerIntegrationTest {
     }
 
     @Test
-    public void GetMyFriends_UserNotAuthorized_Return403() throws Exception {
+    void GetMyFriends_UserNotAuthorized_Return403() throws Exception {
         mockMvc
                 .perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
@@ -97,42 +95,47 @@ public class ManageFriendsControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "jhonDoe@ManageFriendsControllerIntegrationTest.com")
-    public void GetMyFriends_UserAuthorizedAndHasMultipleFriends_Return200() throws Exception {
+    void GetMyFriends_UserAuthorizedAndHasMultipleFriends_Return200() throws Exception {
         List<User> userList = List.of(user2, user3);
-        for(int i = 0; i < userList.size(); i++){
+        for (int i = 0; i < userList.size(); i++) {
             User friend = userList.get(i);
             String friendProfilePicture = friend.getProfilePictureFilename();
             String friendsName = friend.getFirstName() + ' ' + friend.getLastName();
             String friendGardenLink = "/" + friend.getId() + "/gardens";
-            friendsList.add(new FriendModel(friendProfilePicture,friendsName,friendGardenLink));
+            friendsList.add(new FriendModel(friendProfilePicture, friendsName, friendGardenLink));
         }
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+                .getAttribute("userFriends");
         for (int i = 0; i < friendsList.size(); i++) {
             Assertions.assertEquals(friendsList.get(i).getFriendName(), result.get(i).getFriendName());
-            Assertions.assertEquals(friendsList.get(i).getFriendProfilePicture(), result.get(i).getFriendProfilePicture());
+            Assertions.assertEquals(friendsList.get(i).getFriendProfilePicture(),
+                    result.get(i).getFriendProfilePicture());
             Assertions.assertEquals(friendsList.get(i).getFriendGardenLink(), result.get(i).getFriendGardenLink());
         }
 
     }
+
     @Test
     @WithMockUser(username = "bruceWayne@ManageFriendsControllerIntegrationTest.com")
-    public void GetMyFriends_UserAuthorizedAndHasASingleFriend_Return200() throws Exception {
+    void GetMyFriends_UserAuthorizedAndHasASingleFriend_Return200() throws Exception {
         List<User> userList = List.of(user1);
-        for(int i = 0; i < userList.size(); i++){
+        for (int i = 0; i < userList.size(); i++) {
             User friend = userList.get(i);
             String friendProfilePicture = friend.getProfilePictureFilename();
             String friendsName = friend.getFirstName() + ' ' + friend.getLastName();
             String friendGardenLink = "/" + friend.getId() + "/gardens";
-            friendsList.add(new FriendModel(friendProfilePicture,friendsName,friendGardenLink));
+            friendsList.add(new FriendModel(friendProfilePicture, friendsName, friendGardenLink));
         }
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+                .getAttribute("userFriends");
         for (int i = 0; i < friendsList.size(); i++) {
             Assertions.assertEquals(friendsList.get(i).getFriendName(), result.get(i).getFriendName());
-            Assertions.assertEquals(friendsList.get(i).getFriendProfilePicture(), result.get(i).getFriendProfilePicture());
+            Assertions.assertEquals(friendsList.get(i).getFriendProfilePicture(),
+                    result.get(i).getFriendProfilePicture());
             Assertions.assertEquals(friendsList.get(i).getFriendGardenLink(), result.get(i).getFriendGardenLink());
         }
 
@@ -140,42 +143,39 @@ public class ManageFriendsControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "testDoe@ManageFriendsControllerIntegrationTest.com")
-    public void GetMyFriends_UserAuthorizedAndHasNoFriends_Return200() throws Exception {
+    void GetMyFriends_UserAuthorizedAndHasNoFriends_Return200() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
-        Assertions.assertEquals(0,result.size());
+        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+                .getAttribute("userFriends");
+        Assertions.assertEquals(0, result.size());
 
     }
 
-
     @Test
     @WithMockUser(username = "pending@ManageFriendsControllerIntegrationTest.com")
-    public void cancelFriendRequest_cancelFriendRequestValidUser_DeletesFriendship() throws Exception {
+    void cancelFriendRequest_cancelFriendRequestValidUser_DeletesFriendship() throws Exception {
 
         Assertions.assertTrue(friendshipService.checkFriendshipExists(user5, user1));
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/manage-friends/remove")
-                        .param("friendId", user1.getId().toString()).with(csrf())
-                        .param("activeTab","friends"))
-                .andExpect(status().is3xxRedirection()).andReturn();
+        mockMvc.perform(MockMvcRequestBuilders.post("/manage-friends/remove")
+                .param("friendId", user1.getId().toString()).with(csrf())
+                .param("activeTab", "friends"))
+                .andExpect(status().is3xxRedirection());
 
         Assertions.assertFalse(friendshipService.checkFriendshipExists(user5, user1));
     }
 
-
     @Test
     @WithMockUser(username = "pending@ManageFriendsControllerIntegrationTest.com")
-    public void cancelFriendRequest_cancelFriendRequestNoFriendship_NoAction() throws Exception {
+    void cancelFriendRequest_cancelFriendRequestNoFriendship_NoAction() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/manage-friends/remove")
-                        .param("friendId", user3.getId().toString()).with(csrf())
-                        .param("activeTab","friends"))
-                .andExpect(status().is3xxRedirection()).andReturn();
+        mockMvc.perform(MockMvcRequestBuilders.post("/manage-friends/remove")
+                .param("friendId", user3.getId().toString()).with(csrf())
+                .param("activeTab", "friends"))
+                .andExpect(status().is3xxRedirection());
 
     }
-
-
 
 }

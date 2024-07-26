@@ -36,7 +36,8 @@
                     <div class="mb-3">
                         <label for="gardenSize" class="form-label">Size (m<sup>2</sup>)</label>
                         <input id="gardenSize" type="text" class="form-control" th:name="gardenSize"
-                            th:value="*{gardenSize}" th:classappend="${GSErrorText == null ? '' : 'border-danger'}">
+                            th:value="*{gardenSize}" th:classappend="${GSErrorText == null ? '' : 'border-danger'}"
+                            data-formatted-number>
                         <p th:if="${GSErrorText}" class="text-danger fs-6" th:text="${GSErrorText}"></p>
                     </div>
 
@@ -99,7 +100,7 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/descriptionCounter.js}"></script>
     <script th:src="@{/js/locationIQAutocomplete.js}"></script>
-    <script th:src="@{/js/gardenSizeFormat.js}"></script>
+    <script th:src="@{/js/formatNumber.js}"></script>
 </body>
 
 </html>

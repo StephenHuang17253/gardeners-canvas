@@ -434,17 +434,16 @@ public class GardensController {
             return "403";
         }
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> friendGardens = friend.getGardens();
+        List<Garden> gardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", friendGardens);
+        model.addAttribute("friendGardens", gardens);
 
-        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).toList();
-
-        int publicGardensCount = gardens.size();
+        int gardensCount = gardens.size();
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
+
 
         model.addAttribute("friendId", userId);
         model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
@@ -453,7 +452,7 @@ public class GardensController {
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("totalGardens", gardens.size());
-        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("gardensCount", gardensCount);
         model.addAttribute("userName", friend.getFirstName() + " " + friend.getLastName());
         model.addAttribute("firstName", friend.getFirstName());
         model.addAttribute("profilePicture", friend.getProfilePictureFilename());

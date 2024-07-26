@@ -2,7 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
-import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -24,7 +23,7 @@ import java.util.Locale;
 @SpringBootTest
 public class RegisterANewUser {
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public UserRepository userRepository;
@@ -56,7 +55,7 @@ public class RegisterANewUser {
     LocalDate dateOfBirth;
 
     @Before
-    public void before_or_after_all() throws MessagingException {
+    public void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository);
         emailService = Mockito.mock(EmailService.class);
         tokenService = Mockito.mock(TokenService.class);
@@ -65,7 +64,7 @@ public class RegisterANewUser {
         AccountController accountController = new AccountController(userService, authenticationManager, emailService,
                 tokenService, gardenService, securityService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
     @Given("There exists a user with email {string}")
@@ -142,7 +141,7 @@ public class RegisterANewUser {
 
     @And("I click the \"Sign Up\" button")
     public void i_click_sign_up_button() throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/register")
                         .param("firstName", firstName)

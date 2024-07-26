@@ -87,12 +87,14 @@ public class ResetUserPassword {
 
         emailService = mock(EmailService.class);
 
-        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService,
+        ProfileController profileController = new ProfileController(authenticationManager, userService,
+                fileService,
                 emailService, securityService);
-        AccountController accountController = new AccountController(userService, authenticationManager, emailService,
+        AccountController accountController = new AccountController(userService, authenticationManager,
+                emailService,
                 tokenService, gardenService, securityService);
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService,
-                emailService);
+                emailService, securityService);
         mockMVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController)
                 .build();
         tokenService.addToken(token);
@@ -153,9 +155,8 @@ public class ResetUserPassword {
     }
 
     @When("I enter an empty or malformed email address {string}")
-    public void i_enter_an_empty_or_malformed_email_address(String email) throws MessagingException {
+    public void i_enter_an_empty_or_malformed_email_address(String email) {
         userEmail = email;
-
     }
 
     @And("I click the submit button")
@@ -168,22 +169,21 @@ public class ResetUserPassword {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Mockito.verify(emailService, times(0)).sendHTMLEmail(anyString(), anyString(), anyString(), any(Context.class));
+        Mockito.verify(emailService, times(0)).sendHTMLEmail(anyString(), anyString(), anyString(),
+                any(Context.class));
     }
 
     @Then("an error message tells me {string}")
-    public void an_error_message_tells_me(String errorMessage) throws MessagingException {
+    public void an_error_message_tells_me(String errorMessage) {
         ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
         Object errorObject = modelMap.get("emailError");
         String givenErrorMessage = errorObject.toString();
         Assertions.assertEquals(errorMessage, givenErrorMessage, "Error message match");
-
     }
 
     @When("I enter a valid email {string} that is not known to the system")
-    public void i_enter_a_valid_email_that_is_not_known_to_the_system(String email) throws MessagingException {
+    public void i_enter_a_valid_email_that_is_not_known_to_the_system(String email) {
         userEmail = email;
-
     }
 
     @Then("a confirmation message tells me {string}")
@@ -215,7 +215,8 @@ public class ResetUserPassword {
         tokenService.addToken(token);
 
         ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
-        doNothing().when(emailService).sendHTMLEmail(anyString(), anyString(), anyString(), contextCaptor.capture());
+        doNothing().when(emailService).sendHTMLEmail(anyString(), anyString(), anyString(),
+                contextCaptor.capture());
 
         emailService.sendResetPasswordEmail(token);
 
@@ -244,7 +245,8 @@ public class ResetUserPassword {
     }
 
     @And("I as user {string} with password {string} am on the reset password form")
-    public void i_as_user_with_password_am_on_the_reset_password_form(String email, String password) throws Exception {
+    public void i_as_user_with_password_am_on_the_reset_password_form(String email, String password)
+            throws Exception {
         loggedInUser = userService.getUserByEmail(email);
         currentPassword = password;
         origHash = loggedInUser.getEncodedPassword();
@@ -285,7 +287,7 @@ public class ResetUserPassword {
     }
 
     @Then("My password does not get updated")
-    public void my_password_does_not_get_updated() throws MessagingException {
+    public void my_password_does_not_get_updated() {
         Assertions.assertEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
 
     }
@@ -303,13 +305,13 @@ public class ResetUserPassword {
     }
 
     @Then("my password is updated")
-    public void my_password_is_updated() throws MessagingException {
+    public void my_password_is_updated() {
         Assertions.assertNotEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
 
     }
 
     @And("I am redirected to the login page")
-    public void i_am_redirected_to_the_login_page() throws MessagingException {
+    public void i_am_redirected_to_the_login_page() {
         String url = "/login";
         String redirectedUrl = resetPasswordResult.getResponse().getRedirectedUrl();
         Assertions.assertEquals(String.format(url), redirectedUrl);

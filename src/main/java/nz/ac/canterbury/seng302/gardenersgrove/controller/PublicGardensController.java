@@ -4,14 +4,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -28,14 +31,29 @@ public class PublicGardensController {
 
     private final GardenService gardenService;
     private final SecurityService securityService;
-    private final int COUNT_PER_PAGE = 10;
+
+    private final FriendshipService friendshipService;
+    private static final int COUNT_PER_PAGE = 10;
 
     @Autowired
-    public PublicGardensController(GardenService gardenService, SecurityService securityService) {
+    public PublicGardensController(GardenService gardenService, SecurityService securityService, FriendshipService friendshipService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
+        this.friendshipService = friendshipService;
     }
 
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+  
     /**
      * returns a page with the 10 most recent public gardens based on current page in pagination
      * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
@@ -45,8 +63,6 @@ public class PublicGardensController {
     @GetMapping("/public-gardens/page/{pageNumber}")
     public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
         logger.info("GET /public-gardens");
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         List<Garden> allGardens = gardenService.getAllPublicGardens();
         int totalGardens = allGardens.size();
@@ -107,8 +123,6 @@ public class PublicGardensController {
                                 @PathVariable Long pageNumber,
                                 Model model) {
         logger.info("GET /public-gardens/search");
-
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
 
         if (Objects.equals(searchInput, "")) {
             return "redirect:/public-gardens/page/1";
@@ -183,8 +197,6 @@ public class PublicGardensController {
                                    Model model) {
         logger.info("GET public-gardens/{}", gardenId);
 
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
-
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
         if (optionalGarden.isEmpty()) {
@@ -194,7 +206,13 @@ public class PublicGardensController {
 
         Garden garden = optionalGarden.get();
 
-        if (!garden.getIsPublic()) {
+        User currentUser = securityService.getCurrentUser();
+        User gardenOwner = garden.getOwner();
+
+        FriendshipStatus userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+
+
+        if (!garden.getIsPublic() && userOwnerRelationship != FriendshipStatus.ACCEPTED) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
