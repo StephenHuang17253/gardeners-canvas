@@ -29,10 +29,13 @@ class GardenTagServiceIntegrationTest {
 
     @Autowired
     private GardenTagRepository gardenTagRepository;
+
     @Autowired
     private GardenTagRelationRepository gardenTagRelationRepository;
+
     @Autowired
     private GardenService gardenService;
+
     @Autowired
     private UserService userService;
 
@@ -328,6 +331,7 @@ class GardenTagServiceIntegrationTest {
         GardenTag testTag = new GardenTag("Test");
         gardenTagService.addGardenTag(testTag);
         GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden, testTag);
+        gardenTagService.addGardenTagRelation(testGardenTagRelation);
         Assertions.assertEquals(testGardenTagRelation.toString(),
                 gardenTagService.getGardenTagRelationByGarden(testGarden).get(0).toString());
 
@@ -338,6 +342,7 @@ class GardenTagServiceIntegrationTest {
         GardenTag testTag = new GardenTag("Test");
         gardenTagService.addGardenTag(testTag);
         GardenTagRelation testGardenTagRelation = new GardenTagRelation(testGarden, testTag);
+        gardenTagService.addGardenTagRelation(testGardenTagRelation);
         Assertions.assertEquals(testGardenTagRelation.toString(),
                 gardenTagService.getGardenTagRelationByTag(testTag).get(0).toString());
 
