@@ -356,6 +356,7 @@ public class GardensController {
             int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
             User user = securityService.getCurrentUser();
 
+            model.addAttribute("tagText", tag);
             model.addAttribute("myGardens", gardenService.getGardens());
             model.addAttribute("isOwner", true);
             model.addAttribute("gardenName", garden.getGardenName());
