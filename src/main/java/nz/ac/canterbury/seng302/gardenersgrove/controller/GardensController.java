@@ -244,12 +244,6 @@ public class GardensController {
         model.addAttribute("endIndex", endIndex);
 
         List<String> tagsList = new ArrayList<>();
-        tagsList.add("Vegetable Garden");
-        tagsList.add("Tag2");
-        tagsList.add("Tag3");
-        tagsList.add("Tag4");
-        tagsList.add("Tag5");
-        tagsList.add("Tag6");
         model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
 
