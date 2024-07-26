@@ -4,8 +4,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +30,15 @@ public class PublicGardensController {
 
     private final GardenService gardenService;
     private final SecurityService securityService;
+
+    private final FriendshipService friendshipService;
     private final int COUNT_PER_PAGE = 10;
 
     @Autowired
-    public PublicGardensController(GardenService gardenService, SecurityService securityService) {
+    public PublicGardensController(GardenService gardenService, SecurityService securityService, FriendshipService friendshipService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
+        this.friendshipService = friendshipService;
     }
 
     /**
@@ -194,7 +199,13 @@ public class PublicGardensController {
 
         Garden garden = optionalGarden.get();
 
-        if (!garden.getIsPublic()) {
+        User currentUser = securityService.getCurrentUser();
+        User gardenOwner = garden.getOwner();
+
+        FriendshipStatus userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+
+
+        if (!garden.getIsPublic() && userOwnerRelationship != FriendshipStatus.ACCEPTED) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
