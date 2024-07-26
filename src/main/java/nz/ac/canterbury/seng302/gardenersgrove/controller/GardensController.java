@@ -10,6 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -299,6 +300,13 @@ public class GardensController {
 
     }
 
+    /**
+     * This function creates a post mapping for adding a tag to a garden
+     * @param gardenIdString id of garden to add tag to
+     * @param tag tag string
+     * @param page pagination page
+     * @return template for garden page or redirect to garden page
+     */
     @PostMapping("/my-gardens/{gardenId}/tag")
     public String addGardenTag(@PathVariable("gardenId") String gardenIdString,
                                    @RequestParam("tag") String tag,
@@ -315,7 +323,62 @@ public class GardensController {
             return "404";
         }
 
-        // TODO: Tag Validation (AC6, AC7)
+        ValidationResult tagResult = InputValidator.validateTag(tag);
+        if (!tagResult.valid()) {
+            model.addAttribute("tagErrorText", tagResult);
+            Garden garden = optionalGarden.get();
+
+            List<DailyWeather> weatherList;
+            weatherList = getGardenWeatherData(garden);
+            if (weatherList.size() > 1) {
+                DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                DailyWeather yesterdayWeather = weatherList.get(1);
+                DailyWeather currentWeather = weatherList.get(2);
+                if (currentWeather.getDescription().equals("Rainy")) {
+                    model.addAttribute("message", "Outdoor plants don't need any water today");
+                }
+
+                if (beforeYesterdayWeather.getDescription().equals("Sunny")
+                        && yesterdayWeather.getDescription().equals("Sunny")
+                        && currentWeather.getDescription().equals("Sunny")) {
+                    model.addAttribute("message",
+                            "There hasn't been any rain recently, make sure to water your plants if they need it");
+                }
+            }
+            int hour = LocalTime.now().getHour();
+            String gradientClass = "g" + hour;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+            String formattedTime = LocalDateTime.now().format(formatter);
+            List<Plant> plants = garden.getPlants();
+
+            int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
+            int startIndex = (page - 1) * COUNT_PER_PAGE;
+            int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
+            User user = securityService.getCurrentUser();
+
+            model.addAttribute("myGardens", gardenService.getGardens());
+            model.addAttribute("isOwner", true);
+            model.addAttribute("gardenName", garden.getGardenName());
+            model.addAttribute("gardenLocation", garden.getGardenLocation());
+            model.addAttribute("gardenSize", garden.getGardenSize());
+            model.addAttribute("gardenDescription", garden.getGardenDescription());
+            model.addAttribute("gardenId", gardenId);
+            model.addAttribute("plants", plants.subList(startIndex, endIndex));
+            model.addAttribute("totalGardens", plants.size());
+            model.addAttribute("makeGardenPublic", garden.getIsPublic());
+            model.addAttribute("weather", weatherList);
+            model.addAttribute("gradientClass", gradientClass);
+            model.addAttribute("currentTime", formattedTime);
+            model.addAttribute("profilePicture", user.getProfilePictureFilename());
+            model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("lastPage", totalPages);
+            model.addAttribute("startIndex", startIndex + 1);
+            model.addAttribute("endIndex", endIndex);
+
+            return "gardenDetailsPage";
+        }
+
 
         Garden garden = optionalGarden.get();
 
