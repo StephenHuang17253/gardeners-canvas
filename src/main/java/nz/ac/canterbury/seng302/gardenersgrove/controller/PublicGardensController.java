@@ -1,11 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
@@ -31,15 +30,17 @@ public class PublicGardensController {
 
     private final GardenService gardenService;
     private final SecurityService securityService;
-
+    private final GardenTagService gardenTagService;
     private final FriendshipService friendshipService;
     private static final int COUNT_PER_PAGE = 10;
 
     @Autowired
-    public PublicGardensController(GardenService gardenService, SecurityService securityService, FriendshipService friendshipService) {
+    public PublicGardensController(GardenService gardenService, SecurityService securityService,
+                                   FriendshipService friendshipService, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
+        this.gardenTagService = gardenTagService;
     }
 
 
@@ -242,6 +243,16 @@ public class PublicGardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex+1);
         model.addAttribute("endIndex", endIndex);
+
+        List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+        List<String> tagsList = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("tagsList", tagsList);
+
         return "gardenDetailsPage";
 
     }
