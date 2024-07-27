@@ -1,9 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserInteractionRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ public class UserInteractionService {
 
     private final PlantService plantService;
 
-    private int MAX_INTERACTION_COUNT_PER_TYPE = 10;
+    private static int MAX_INTERACTION_COUNT_PER_TYPE = 10;
 
     /**
      * UserInteractionService constructor
@@ -69,7 +67,7 @@ public class UserInteractionService {
      * @param id the user's ID
      * @return a list of UserInteraction objects
      */
-    public List<UserInteraction> getAllUsersUserInteractionsofItemType(long id, ItemType itemType) throws IllegalArgumentException {
+    public List<UserInteraction> getAllUsersUserInteractionsByItemType(long id, ItemType itemType) throws IllegalArgumentException {
         if (userService.getUserById(id) == null) {
             throw new IllegalArgumentException("Invalid user ID: " + id);
         }
@@ -112,9 +110,16 @@ public class UserInteractionService {
             throw new IllegalArgumentException("Interaction Time: " + interactionTime + " cannot be in the future");
         }
 
+        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository.findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
+        if (existingInteractionOpt.isPresent()) {
+            UserInteraction existingInteraction = existingInteractionOpt.get();
+            existingInteraction.setInteractionTime(interactionTime);
+            return userInteractionRepository.save(existingInteraction);
+        }
+
         UserInteraction userInteraction = new UserInteraction(user, itemId, itemType, interactionTime);
 
-        List<UserInteraction> userInteractions = getAllUsersUserInteractionsofItemType(userId, itemType);
+        List<UserInteraction> userInteractions = getAllUsersUserInteractionsByItemType(userId, itemType);
 
         if(userInteractions.size() == MAX_INTERACTION_COUNT_PER_TYPE){
             userInteractionRepository.delete(userInteractions.get(userInteractions.size()-1));

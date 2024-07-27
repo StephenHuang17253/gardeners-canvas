@@ -15,13 +15,10 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import java.io.IOException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -192,7 +189,7 @@ public class HomePageController {
 
 
     private List<Garden> getRecentGardens(Long userId){
-        List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsofItemType(userId,ItemType.GARDEN);
+        List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,ItemType.GARDEN);
         return gardenService.getGardensByInteraction(gardenInteractions);
     }
 

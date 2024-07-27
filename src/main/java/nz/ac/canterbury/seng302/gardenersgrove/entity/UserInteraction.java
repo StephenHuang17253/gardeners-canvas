@@ -61,6 +61,10 @@ public class UserInteraction {
         return interactionTime;
     }
 
+    public void setInteractionTime(LocalDateTime interactionTime){
+        this.interactionTime = interactionTime;
+    }
+
     @Override
     public String toString() {
         return "UserInteraction{" +

@@ -35,4 +35,6 @@ public interface UserInteractionRepository extends CrudRepository<UserInteractio
      * @return list of UserInteraction objects
      */
     List<UserInteraction> findByUserIdAndItemTypeOrderByInteractionTime(long userId, ItemType itemType);
+
+    Optional<UserInteraction> findByUserIdAndItemIdAndItemType(Long userId, Long itemId, ItemType itemType);
 }
