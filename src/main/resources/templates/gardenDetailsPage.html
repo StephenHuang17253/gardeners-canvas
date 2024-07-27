@@ -18,8 +18,15 @@
                 </form>
             </div>
             <div>
-                <h1 class="break-word" th:text="${garden.getGardenName()}"></h1>
-                <p class="break-word" th:text="${garden.getGardenDescription()}"></p>
+                <h1 class="break-word" th:text="${gardenName.getGardenName()}"></h1>
+
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
+                    <div class="p-1" th:each="tag : ${tagsList}">
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag})}"></div>
+                    </div>
+                </div>
+
+                <p class="break-word" th:text="${gardenDescription.getGardenDescription()}"></p>
                 <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
                     <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                          alt="User's Profile Picture" class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
@@ -59,7 +66,33 @@
                     </p>
                 </div>
 
+                <div class="modal fade text-black" id="tagModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5">Enter a tag to apply to your garden</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="input-group rounded">
+                                    <input type="search" class="form-control rounded" placeholder="e.g. vegetable garden" aria-label="Search" aria-describedby="search-addon" />
+                                    <button type="button" class="btn btn-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                    <button type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
                     <a th:href="@{__${garden.getGardenId()}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
                     </a>
@@ -67,6 +100,7 @@
                         <button type="button" class="btn bg-success text-white">Edit Garden</button>
                     </a>
                 </div>
+
             </div>
             <div th:if="${isOwner}" class="mt-3 rounded" th:classappend="${gradientClass}">
                 <div class="p-2 text-white">
@@ -81,9 +115,7 @@
                             weatherDescription=${prediction.getDescription()},
                             minTemp=${prediction.getMinTemp()},
                             maxTemp=${prediction.getMaxTemp()},
-                            temp=${prediction.getTemp()},
                             precipitation=${prediction.getPrecipitation()},
-                            humidity=${prediction.getHumidity()},
                             weatherError=${prediction.getWeatherError()},
                             today=${iterStat.index == 2}
                         )}">

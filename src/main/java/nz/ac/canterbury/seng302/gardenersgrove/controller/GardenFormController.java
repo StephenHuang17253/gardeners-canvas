@@ -126,23 +126,23 @@ public class GardenFormController {
         long currentTime = Instant.now().getEpochSecond();
         long timeElapsed = currentTime - lastRequestTime;
 
-        logger.info("Time elapsed: " + timeElapsed);
+        logger.info("Time elapsed: {}", timeElapsed);
         // Every second, the number of available permits is reset to 2
         if (timeElapsed >= 1) {
             semaphore.drainPermits();
             semaphore.release(MAX_REQUESTS_PER_SECOND);
-            logger.info("A second or more has elapsed, permits reset to: " + semaphore.availablePermits());
+            logger.info("A second or more has elapsed, permits reset to: {}", semaphore.availablePermits());
             lastRequestTime = currentTime;
         }
 
-        logger.info("Permits left before request: " + semaphore.availablePermits());
+        logger.info("Permits left before request: {}", semaphore.availablePermits());
 
         // Check if rate limit exceeded
         if (!semaphore.tryAcquire()) {
             logger.info("Exceeded location API rate limit of 2 requests per second.");
 
         }
-        logger.info("Permits left after request: " + semaphore.availablePermits());
+        logger.info("Permits left after request: {}", semaphore.availablePermits());
 
         return locationService.getLatitudeLongitude(query);
 

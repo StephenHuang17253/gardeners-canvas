@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpSession;
 import static org.hamcrest.core.AnyOf.anyOf;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,12 +46,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Duration;
 import java.util.Map;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class AccountControllerTest {
+class AccountControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -84,7 +86,7 @@ public class AccountControllerTest {
     private static String userPassword = "ValidPa33w0rd!";
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         securityContextMock = spy(SecurityContext.class);
         SecurityContextHolder.setContext(securityContextMock);
         accountController = spy(
@@ -95,17 +97,17 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void controllerLoads() {
+    void controllerLoads() {
         assertNotNull(accountController);
     }
 
     @Test
-    public void mvcMockIsAlive() throws Exception {
+    void mvcMockIsAlive() throws Exception {
         this.mockMvc.perform(get("/register")).andExpect(status().isOk());
     }
 
     @Test
-    public void getRegistrationPage_NoParams_NonFilledPage() throws Exception {
+    void getRegistrationPage_NoParams_NonFilledPage() throws Exception {
         this.mockMvc.perform(get("/register"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", ""))
@@ -117,7 +119,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getRegistrationPage_FirstName_PageWFirstName() throws Exception {
+    void getRegistrationPage_FirstName_PageWFirstName() throws Exception {
         this.mockMvc.perform(get("/register").param("firstName", "123"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", "123"))
@@ -130,7 +132,7 @@ public class AccountControllerTest {
 
     @Test
 
-    public void getRegistrationPage_LastName_PageWLastName() throws Exception {
+    void getRegistrationPage_LastName_PageWLastName() throws Exception {
         this.mockMvc.perform(get("/register").param("lastName", "123"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", ""))
@@ -142,7 +144,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getRegistrationPage_NoLastName_PageWNoLastName() throws Exception {
+    void getRegistrationPage_NoLastName_PageWNoLastName() throws Exception {
         this.mockMvc.perform(get("/register").param("noLastName", "true"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", ""))
@@ -154,7 +156,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getRegistrationPage_Email_PageWEmail() throws Exception {
+    void getRegistrationPage_Email_PageWEmail() throws Exception {
         this.mockMvc.perform(get("/register").param("emailAddress", "123"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", ""))
@@ -166,7 +168,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getRegistrationPage_Password_PageWPassword() throws Exception {
+    void getRegistrationPage_Password_PageWPassword() throws Exception {
         this.mockMvc.perform(get("/register").param("password", "123"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", ""))
@@ -178,7 +180,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getRegistrationPage_RepeatPassword_PageWRepeatPassword() throws Exception {
+    void getRegistrationPage_RepeatPassword_PageWRepeatPassword() throws Exception {
         this.mockMvc.perform(get("/register").param("repeatPassword", "123"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("firstName", ""))
@@ -202,7 +204,7 @@ public class AccountControllerTest {
             "qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:Jobs:true:steve@jobs.com:Password1!",
             "Steve-e:qweasdksadksakdksakdksakdsakdksakdsakdkaskdsakdksakdaskdksadksak:true:steve@jobs.com:Password1!",
     }, delimiter = ':')
-    public void RegistrationPage_ValidInputs_CreatesUser(String firstName, String lastName, String noLastName,
+    void RegistrationPage_ValidInputs_CreatesUser(String firstName, String lastName, String noLastName,
             String emailAddress, String password) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
                 .param("firstName", firstName)
@@ -298,7 +300,7 @@ public class AccountControllerTest {
             "Steve:Jobs:false:steve@jobs.com:Password1!:''", // just special chars repeat password
 
     }, delimiter = ':')
-    public void RegistrationPage_InvalidInputs_CreatesNoUser(String firstName, String lastName, String noLastName,
+    void RegistrationPage_InvalidInputs_CreatesNoUser(String firstName, String lastName, String noLastName,
             String emailAddress, String password, String repeatedPassword) throws Exception {
         this.mockMvc.perform(post("/register").with(csrf())
                 .param("firstName", firstName)
@@ -313,7 +315,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getLoginPage_NoParams_NonFilledPage() throws Exception {
+    void getLoginPage_NoParams_NonFilledPage() throws Exception {
         this.mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("emailAddress", ""))
@@ -321,7 +323,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getLoginPage_EmailAddress_PageWEmailAddress() throws Exception {
+    void getLoginPage_EmailAddress_PageWEmailAddress() throws Exception {
         this.mockMvc.perform(get("/login").param("emailAddress", "testEmail"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("emailAddress", "testEmail"))
@@ -329,7 +331,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void getLoginPage_Password_PageWPassword() throws Exception {
+    void getLoginPage_Password_PageWPassword() throws Exception {
         this.mockMvc.perform(get("/login").param("password", "testPassword"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("emailAddress", ""))
@@ -337,7 +339,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void postLogin_InvalidEmailAddress_AddEmailAddressErrorText() throws Exception {
+    void postLogin_InvalidEmailAddress_AddEmailAddressErrorText() throws Exception {
         MvcResult result = this.mockMvc.perform(
                 post("/login")
                         .with(csrf()).param("emailAddress", "testEmail").param("password", ""))
@@ -357,11 +359,11 @@ public class AccountControllerTest {
 
         String error = model.get("emailAddressError").toString();
 
-        assertTrue("Email must be in the form 'jane@doe.nz'".equals(error));
+        assertEquals("Email must be in the form 'jane@doe.nz'", error);
     }
 
     @Test
-    public void postLogin_InvalidPassword_AddLoginErrorText() throws Exception {
+    void postLogin_InvalidPassword_AddLoginErrorText() throws Exception {
         MvcResult result = this.mockMvc.perform(
                 post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param(
                         "password",
@@ -382,11 +384,11 @@ public class AccountControllerTest {
 
         String error = model.get("loginError").toString();
 
-        assertTrue("The email address is unknown, or the password is invalid".equals(error));
+        assertEquals("The email address is unknown, or the password is invalid", error);
     }
 
     @Test
-    public void postLogin_UserDoesNotExist_AddLoginErrorText() throws Exception {
+    void postLogin_UserDoesNotExist_AddLoginErrorText() throws Exception {
 
         MvcResult result = this.mockMvc.perform(
                 post("/login").with(csrf()).param("emailAddress", "unUsedTestEmail@gmail.com").param(
@@ -408,11 +410,11 @@ public class AccountControllerTest {
 
         String error = model.get("loginError").toString();
 
-        assertTrue("The email address is unknown, or the password is invalid".equals(error));
+        assertEquals("The email address is unknown, or the password is invalid", error);
     }
 
     @Test
-    public void postLogin_UserExistsAndIsVerified_RedirectToHome() throws Exception {
+    void postLogin_UserExistsAndIsVerified_RedirectToHome() throws Exception {
 
         User verifiedMockUser = spy(new User("verifiedFirstName", "verifiedLastName", verifiedEmail, null));
         verifiedMockUser.setVerified(true);
@@ -440,7 +442,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void postLogin_UserExistsAndIsNotVerified_RedirectToVerify() throws Exception {
+    void postLogin_UserExistsAndIsNotVerified_RedirectToVerify() throws Exception {
 
         User unverifiedMockUser = spy(
                 new User("unverifiedFirstName", "unverifiedLastName", unverifiedEmail, null));
@@ -466,5 +468,44 @@ public class AccountControllerTest {
                         userPassword))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verify/" + unverifiedEmail));
+    }
+
+    @Test
+    void postLogin_UserIsBanned_ShowMessage() throws Exception {
+
+        String firstName = "bannedFirstName";
+        String lastName = "bannedLastName";
+        String bannedEmail = "banned@email.com";
+        int banDuration = 2;
+
+        User bannedMockUser = spy(new User(firstName, lastName, bannedEmail, null));
+        bannedMockUser.setVerified(true);
+        bannedMockUser.setPassword(userPassword);
+        when(bannedMockUser.getId()).thenReturn(1L);
+
+        when(bannedMockUser.isBanned()).thenReturn(true);
+
+        when(bannedMockUser.daysUntilUnban()).thenReturn(banDuration);
+
+        when(userServiceMock.getUserByEmailAndPassword(bannedEmail, userPassword))
+                .thenReturn(bannedMockUser);
+        when(userServiceMock.getUserByEmail(any(String.class))).thenReturn(bannedMockUser);
+
+        when(tokenServiceMock.getTokenByUser(bannedMockUser)).thenReturn(null);
+
+        Authentication authenticationMock = Mockito.mock(Authentication.class);
+
+        when(authenticationMock.isAuthenticated()).thenReturn(false);
+
+        when(authenticationManagerMock.authenticate(any())).thenReturn(authenticationMock);
+
+        this.mockMvc
+                .perform(post("/login").with(csrf())
+                        .param("emailAddress", bannedEmail)
+                        .param("password", userPassword))
+                .andExpect(status().isOk())
+                .andExpect(
+                        model().attribute("message",
+                                "Your account is blocked for " + banDuration + " days due to inappropriate conduct"));
     }
 }

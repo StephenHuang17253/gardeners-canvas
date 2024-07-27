@@ -1,10 +1,10 @@
+
 const isNumber = (input) => /^\d+$/.test(input);
-
 const hasSign = (input) => /(\+|\-)/.test(input);
-
 const hasDecimalPoint = (input) => /(\.|,)/.test(input);
-
 const hasExponent = (input) => /[eE]/.test(input);
+
+const numberInputs = document.querySelectorAll("[data-formatted-number]");
 
 /**
  * Checks if the key pressed is a number or a decimal point or e and whether it is valid.
@@ -15,8 +15,8 @@ const hasExponent = (input) => /[eE]/.test(input);
 const handleKeyPress = (event) => {
     const pressed = event.key;
     const value = event.target.value;
-    const validDecimalPoint = hasDecimalPoint(pressed) && !hasDecimalPoint(value) && !hasExponent(value)
-    const validExponent = hasExponent(pressed) && !hasExponent(value)
+    const validDecimalPoint = hasDecimalPoint(pressed) && !hasDecimalPoint(value) && !hasExponent(value);
+    const validExponent = hasExponent(pressed) && !hasExponent(value);
     const validSign = hasSign(pressed) && !hasSign(value);
     if (isNumber(pressed) || validSign || validDecimalPoint || validExponent) {
         return true;
@@ -24,8 +24,7 @@ const handleKeyPress = (event) => {
         event.preventDefault();
         return false;
     }
-}
-
+};
 
 /**
  * Handles the blur event of the garden size input field, to limit the final number of decimal places to 2.
@@ -41,7 +40,7 @@ const handleBlur = (event) => {
         splitChar = ',';
     }
 
-    let expChar = ''
+    let expChar = '';
     if (gardenSize.includes('E')) {
         expChar = 'E';
     } else if (gardenSize.includes('e')) {
@@ -57,9 +56,9 @@ const handleBlur = (event) => {
     } else {
         event.target.value = splitInputByDecimal[0] + splitChar + splitInputByDecimal[1].substring(0, 2);
     }
+};
 
-}
-
-document.getElementById('gardenSize').addEventListener('keypress', handleKeyPress);
-document.getElementById('gardenSize').addEventListener('blur', handleBlur);
-
+numberInputs.forEach((numberInput) => {
+    numberInput.addEventListener('keypress', handleKeyPress);
+    numberInput.addEventListener('blur', handleBlur);
+});

@@ -2,9 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,20 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.hamcrest.Matchers.is;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class BrowsePublicGardensControllerTest {
+class BrowsePublicGardensControllerTest {
     @Autowired
     private GardenService gardenService;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private UserService userService;
-    @Autowired
-    private PlantService plantService;
     private final MockMvc mockMvc;
 
     private MvcResult mockMvcResult;
@@ -48,7 +40,7 @@ public class BrowsePublicGardensControllerTest {
     List<Garden> mostRecent10TestGardens = new ArrayList<>();
 
     @Autowired
-    public BrowsePublicGardensControllerTest(MockMvc mockMvc){
+    BrowsePublicGardensControllerTest(MockMvc mockMvc){
         this.mockMvc = mockMvc;
     }
 
@@ -83,7 +75,7 @@ public class BrowsePublicGardensControllerTest {
 
     @Test
     @WithMockUser(username = "johnDoe@email.com")
-    public void GetPublicGardens_GardensAreReturnedInReversCreationDateOrder_Return200() throws Exception {
+    void GetPublicGardens_GardensAreReturnedInReversCreationDateOrder_Return200() throws Exception {
         mockMvcResult = mockMvc
                 .perform(MockMvcRequestBuilders.get("/public-gardens/page/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())

@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,16 +35,30 @@ import java.util.Objects;
 public class ResetPasswordController {
     private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
     private final UserService userService;
-    private EmailService emailService;
-    private TokenService tokenService;
+    private final EmailService emailService;
+    private final TokenService tokenService;
+    private final SecurityService securityService;
 
     @Autowired
-    public ResetPasswordController(UserService userService, TokenService tokenService, EmailService emailService) {
+    public ResetPasswordController(UserService userService, TokenService tokenService, EmailService emailService, SecurityService securityService) {
         this.userService = userService;
         this.emailService = emailService;
         this.tokenService = tokenService;
+        this.securityService = securityService;
     }
 
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+  
     /**
      * Get form for entering email if user has forgotten their password
      *
@@ -85,7 +101,7 @@ public class ResetPasswordController {
                 try {
                     emailService.sendResetPasswordEmail(token);
                 } catch (MessagingException e) {
-                    logger.info("could not send email to " + emailAddress);
+                    logger.info("could not send email to {}", emailAddress);
                 }
             }
         }
@@ -160,10 +176,10 @@ public class ResetPasswordController {
 
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
-        if (noLastName == false) {
+        if (!noLastName) {
             otherFields.add(lastName);
         }
-        if (!(dateOfBirth == null)) {
+        if (dateOfBirth != null) {
             otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(emailAddress);

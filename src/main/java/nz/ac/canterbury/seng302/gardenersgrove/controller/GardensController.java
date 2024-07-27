@@ -41,6 +41,24 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Semaphore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
@@ -146,11 +164,8 @@ public class GardensController {
         try {
             WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(),
                     garden.getGardenLongitude());
-            List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
-            weatherList.add(new WeatherModel(pastWeather.get(0)));
-            weatherList.add(new WeatherModel(pastWeather.get(1)));
-            weatherList.add(new WeatherModel(gardenWeather.getCurrentWeather()));
-            weatherList.addAll(gardenWeather.getForecastWeather().stream()
+
+            weatherList.addAll(gardenWeather.getRetrievedWeatherData().stream()
                     .map(WeatherModel::new)
                     .collect(Collectors.toList()));
         } catch (NullPointerException error) {
@@ -262,6 +277,8 @@ public class GardensController {
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureError);
 
+        List<String> tagsList = new ArrayList<>();
+        model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
     }
 
@@ -388,12 +405,11 @@ public class GardensController {
             return "403";
         }
         String friendName = String.format("%s %s", friend.getFirstName(), friend.getLastName());
-        List<Garden> friendGardens = friend.getGardens();
+        List<Garden> gardens = friend.getGardens();
         model.addAttribute("friendName", friendName);
-        model.addAttribute("friendGardens", friendGardens);
+        model.addAttribute("friendGardens", gardens);
 
-        long publicGardensCount = friendGardens.stream().filter(Garden::getIsPublic).count();
-        List<Garden> gardens = friendGardens.stream().filter(Garden::getIsPublic).toList();
+        int gardensCount = gardens.size();
 
         int totalPages = (int) Math.ceil((double) gardens.size() / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
@@ -406,7 +422,7 @@ public class GardensController {
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("totalGardens", gardens.size());
-        model.addAttribute("publicGardensCount", publicGardensCount);
+        model.addAttribute("gardensCount", gardensCount);
         model.addAttribute("userName", friend.getFirstName() + " " + friend.getLastName());
         model.addAttribute("firstName", friend.getFirstName());
         model.addAttribute("profilePicture", friend.getProfilePictureFilename());

@@ -1,4 +1,4 @@
-<div th:fragment="weatherBox(weatherIcon, date, day, weatherDescription, minTemp, maxTemp, temp, precipitation, humidity, weatherError, today)"
+<div th:fragment="weatherBox(weatherIcon, date, day, weatherDescription, minTemp, maxTemp, precipitation, weatherError, today)"
      class="h-100">
     <div class="card h-100 bg-white border-0 text-white" th:classappend="${today} ? 'bg-opacity-50' : 'bg-opacity-25'">
         <div class="card-body d-flex flex-column pt-1">
@@ -15,11 +15,6 @@
                 </div>
                 <div class="col-6 flex-grow-1">
                     <p class="card-text mb-auto">
-                        <strong>
-                            <span th:if="${temp != null}" th:text="${temp} + '°'"></span>
-                        </strong>
-                    </p>
-                    <p class="card-text">
                         <strong>
                             <span th:if="${maxTemp != null}" th:text="${maxTemp} + '°'"></span>
                         </strong>
