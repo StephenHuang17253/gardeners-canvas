@@ -120,14 +120,15 @@
                     plantPicture=${plant.getPlantPictureFilename()},
                     isOwner=${isOwner},
                     page=${currentPage},
-                    weather=${weather})}">
+                    weatherListJson=${weatherListJson})}">
                     </div>
                 </div>
             </div>
             <div th:if="${isOwner}" class="row mt-4">
                 <div class="col">
                     <div th:replace="~{fragments/plantPaginationNav.html}"
-                         th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                         th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
+                          startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, weatherListJson=${weatherListJson}">
                     </div>
                 </div>
             </div>

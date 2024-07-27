@@ -1,15 +1,12 @@
-package nz.ac.canterbury.seng302.gardenersgrove.component;
+package nz.ac.canterbury.seng302.gardenersgrove.model;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
-import java.util.Locale;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 
 /**
- * Object storing key details about a day's weather
- * Contains date, weather description, weather icon name, temperatures, precipitation, and any errors that may appear.
+ * Model class for storing DailyWeather component
+ * NOTE: attributes converted to string or int for Json conversion
  */
-public class Weather {
+public class WeatherModel {
     String weatherIcon;
     String date;
     String description;
@@ -21,9 +18,12 @@ public class Weather {
     String error;
     String day;
 
-    public Weather(String urlToWeatherIcon, String date, String description,
-                   String minTemp, String maxTemp, String currentTemp,
-                   String precipitation, Integer humidity, String error, String day) {
+    /**
+     * WeatherModel Constructor for JSON construction
+     */
+    public WeatherModel(String weatherIcon, String date, String description,
+                        String minTemp, String maxTemp, String currentTemp,
+                        String precipitation, Integer humidity, String error, String day) {
         this.weatherIcon = weatherIcon;
         this.date = date;
         this.description = description;
@@ -37,9 +37,9 @@ public class Weather {
     }
 
     /**
-     * Constructor for class containing weather details of a day
+     * WeatherModel Constructor for controller construction
      */
-    public Weather(DailyWeather dailyWeather) {
+    public WeatherModel(DailyWeather dailyWeather) {
         this.weatherIcon = dailyWeather.getWeatherIcon();
         this.date = dailyWeather.getDate();
         this.description = dailyWeather.getDescription();

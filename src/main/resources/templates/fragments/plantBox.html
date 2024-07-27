@@ -1,5 +1,5 @@
 <div
-    th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weather)">
+    th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weatherListJson)">
     <div class="card h-100 bg-success text-white garden-card">
         <div class="card-body pt-1">
             <div class="modal fade text-black" id="importPlantModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -59,7 +59,7 @@
                     <p th:id="'plantPictureError' + ${plantId}" class="text-danger fs-6 text-bold"
                         th:text="${plantToEditId == plantId ? plantPictureError : ''}"></p>
                     <input id="page" th:name="page" th:value="${page}" type="hidden" />
-                    <input id="weather" th:name="weather" th:value="${weather}" type="hidden" />
+                    <input id="weather" th:name="weatherListJson" th:value="${weatherListJson}" type="hidden" />
                     <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden" />
                 </form>
             </div>
