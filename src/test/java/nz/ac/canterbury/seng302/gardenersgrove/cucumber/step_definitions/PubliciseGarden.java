@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -61,6 +62,10 @@ public class PubliciseGarden {
     @Autowired
     private LocationService locationService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+
     @Mock
     private WeatherService weatherService;
 
@@ -93,7 +98,7 @@ public class PubliciseGarden {
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService, objectMapper);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
         mockMVCMyGarden = MockMvcBuilders.standaloneSetup(myGardensController).build();

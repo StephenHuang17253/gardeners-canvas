@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service("securityService")
@@ -25,6 +27,8 @@ public class SecurityService {
     private final FriendshipService friendshipService;
 
     private final AuthenticationManager authenticationManager;
+
+    private final UserInteractionService userInteractionService;
 
     Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
@@ -39,11 +43,13 @@ public class SecurityService {
     @Autowired
     public SecurityService(UserService userService,
                            AuthenticationManager authenticationManager,
-                           FriendshipService friendshipService){
+                           FriendshipService friendshipService,
+                           UserInteractionService userInteractionService){
 
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.friendshipService = friendshipService;
+        this.userInteractionService = userInteractionService;
 
     }
     /**
@@ -76,6 +82,10 @@ public class SecurityService {
     public User getCurrentUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.getUserByEmail(authentication.getName());
+    }
+
+    public void addUserInteraction(Long itemId, ItemType itemType, LocalDateTime interactionTime){
+        userInteractionService.addUserInteraction(getCurrentUser().getId(), itemId, itemType, interactionTime);
     }
 
     /**

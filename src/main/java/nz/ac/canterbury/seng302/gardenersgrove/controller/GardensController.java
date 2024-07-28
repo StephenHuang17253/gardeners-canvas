@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.http.HttpServletRequest;
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,14 +175,14 @@ public class GardensController {
         WeatherModel yesterdayWeather = weatherList.get(1);
         WeatherModel currentWeather = weatherList.get(2);
         if (currentWeather.getDescription().equals("Rainy")) {
-            model.addAttribute("message", "Outdoor plants don’t need any water today");
+            model.addAttribute("message", "Outdoor plants don't need any water today");
             model.addAttribute("goodMessage", true);
         }
 
         if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(currentWeather.getDescription(), "Sunny")) {
-            model.addAttribute("message", "There hasn’t been any rain recently, make sure to water your plants if they need it");
+            model.addAttribute("message", "There hasn't been any rain recently, make sure to water your plants if they need it");
             model.addAttribute("goodMessage", false);
         }
     }
@@ -211,7 +212,7 @@ public class GardensController {
             @RequestParam(required = false) String weatherListJson,
             HttpServletRequest request,
             HttpServletResponse response,
-            Model model) throws JsonProcessingException {
+            Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -229,15 +230,25 @@ public class GardensController {
             return "403";
         }
 
+        securityService.addUserInteraction(gardenId, ItemType.GARDEN,LocalDateTime.now());
+
         List<WeatherModel> weatherList = null;
 
-        if(weatherListJson != null){
-            weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+        try {
+            if(weatherListJson != null){
+                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred while mapping the weatherListJson: " + e.getMessage());
         }
 
-        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        if (inputFlashMap != null) {
-            weatherList = (List<WeatherModel>) inputFlashMap.get("weatherList");
+        try {
+            Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+            if (inputFlashMap != null) {
+                weatherList = (List<WeatherModel>) inputFlashMap.get("weatherList");
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred while getting the weather list from the flash map: " + e.getMessage());
         }
 
         if(weatherList == null || weatherList.isEmpty()){
@@ -252,7 +263,22 @@ public class GardensController {
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
         handlePagniation(page, plants.size(), model);
 
-        weatherListJson = objectMapper.writeValueAsString(weatherList);
+        try {
+            if(weatherListJson != null){
+                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
+        }
+
+        weatherListJson = null;
+
+        try {
+            weatherListJson = objectMapper.writeValueAsString(weatherList);
+        } catch (Exception e) {
+            logger.error("An error occurred while writing the weatherListJson: " + e.getMessage());
+        }
+
         model.addAttribute("weatherListJson", weatherListJson);
 
         model.addAttribute("isOwner", true);

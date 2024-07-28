@@ -4,6 +4,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
@@ -21,8 +22,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -43,6 +47,8 @@ public class HomePageController {
     private SecurityService securityService;
 
     private UserInteractionService userInteractionService;
+
+    private static int PAGE_SIZE = 5;
 
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
@@ -203,17 +209,39 @@ public class HomePageController {
         return gardenService.getGardensByInteraction(gardenInteractions);
     }
 
+    private List<RecentGardenModel> setRecentGardenModels(List<Garden> gardenList) {
+        if(gardenList.isEmpty()){
+            return null;
+        }
+        return gardenList.stream()
+                .map(garden -> new RecentGardenModel(garden, garden.getOwner()))
+                .collect(Collectors.toList());
+    }
+
 
     private String loadUserMainPage(User user, Model model){
 
         String username = user.getFirstName() + " " + user.getLastName();
         String profilePicture = user.getProfilePictureFilename();
 
-        List<Garden> recentGardens = getRecentGardens(user.getId());
+        List<RecentGardenModel> recentGardens = setRecentGardenModels(getRecentGardens(user.getId()));
 
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
-        model.addAttribute("recentGardens", recentGardens);
+        if(recentGardens == null){
+            return "mainPage";
+        }
+        if(recentGardens.size() < PAGE_SIZE){
+            model.addAttribute("recentGardensPage1", recentGardens.subList(0,recentGardens.size()));
+        }else{
+            model.addAttribute("recentGardensPage1", recentGardens.subList(0,5));
+        }
+        if (recentGardens.size() > PAGE_SIZE) {
+            List<RecentGardenModel> recentGardensPage2 = recentGardens.subList(PAGE_SIZE, Math.min(PAGE_SIZE*2, recentGardens.size()));
+            model.addAttribute("recentGardensPage2", recentGardensPage2);
+        } else {
+            model.addAttribute("recentGardensPage2", null);
+        }
 
         return "mainPage";
     }

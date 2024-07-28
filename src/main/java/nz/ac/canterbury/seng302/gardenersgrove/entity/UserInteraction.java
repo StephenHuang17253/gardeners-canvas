@@ -2,6 +2,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.LocalDateTime;
 
 /**
@@ -15,6 +18,7 @@ public class UserInteraction {
     private Long userInteractionId;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     private Long itemId;

@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mock;
@@ -33,13 +34,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
-
 
 
 @SpringBootTest
@@ -60,6 +54,12 @@ public class U9_ViewGarden {
 
     @Autowired
     public AuthenticationManager authenticationManager;
+
+    @Autowired
+    public UserInteractionService userInteractionService;
+
+    @Autowired
+    public ObjectMapper objectMapper;
 
     public SecurityService securityService;
 
@@ -84,14 +84,14 @@ public class U9_ViewGarden {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper);
         mockMVC = MockMvcBuilders.standaloneSetup(gardensController).build();
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +
