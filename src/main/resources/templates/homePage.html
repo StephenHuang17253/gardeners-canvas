@@ -48,6 +48,23 @@
                         <button class="btn btn-success btn-lg">Your Gardens</button>
                     </a>
                 </div>
+
+                <div class="d-flex flex-row flex-wrap gap-3 mb-3">
+                    <div class="container">
+                        <h3>Gardens that need watering</h3>
+                        <div class="row">
+                            <div th:each="garden : ${gardens}" class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title" th:text="${garden.gardenName}"></h5>
+                                        <p class="card-text" th:text="${garden.gardenDescription}"></p>
+                                        <a th:href="@{/my-gardens/{gardenId}(gardenId=${garden.gardenId})}" class="btn btn-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

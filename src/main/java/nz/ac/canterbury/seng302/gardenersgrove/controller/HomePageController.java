@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -204,6 +205,8 @@ public class HomePageController {
             User user = securityService.getCurrentUser();
             String username = user.getFirstName() + " " + user.getLastName();
             String profilePicture = user.getProfilePictureFilename();
+            List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+            model.addAttribute("gardens", gardens);
             model.addAttribute("profilePicture", profilePicture);
             model.addAttribute("username", username);
         }
