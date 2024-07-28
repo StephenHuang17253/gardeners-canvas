@@ -104,6 +104,15 @@ public class ProfanityService {
         if (inputString.matches(emptyRegex)) {
             return false;
         }
+
+        //Checking if the input is a tag stored in database with allocated status.
+        List<TagStatus> previousOccurrenceOfTag = gardenTagService.getAllSimilar(inputString).stream().map(GardenTag::getTagStatus).toList();
+        if (previousOccurrenceOfTag.stream().anyMatch(tagStatus -> tagStatus == TagStatus.INAPPROPRIATE)) {
+            return true;
+        } else if (previousOccurrenceOfTag.stream().anyMatch(tagStatus -> tagStatus == TagStatus.APPROPRIATE)) {
+            return false;
+        }
+
         ProfanityResponseData returnedData = moderateContent(inputString);
         logger.info(returnedData.toString());
 
