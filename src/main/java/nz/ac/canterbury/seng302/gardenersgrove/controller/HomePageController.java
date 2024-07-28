@@ -1,13 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +17,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -41,6 +40,8 @@ public class HomePageController {
 
     private SecurityService securityService;
 
+    private final WeatherService weatherService;
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -51,12 +52,13 @@ public class HomePageController {
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager,
             GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService) {
+            FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
         this.securityService = securityService;
+        this.weatherService = weatherService;
     }
 
     /**
@@ -205,12 +207,30 @@ public class HomePageController {
             User user = securityService.getCurrentUser();
             String username = user.getFirstName() + " " + user.getLastName();
             String profilePicture = user.getProfilePictureFilename();
-            List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-            model.addAttribute("gardens", gardens);
-            model.addAttribute("profilePicture", profilePicture);
-            model.addAttribute("username", username);
-        }
 
+            List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+            List<Garden> gardensNeedWatering = new ArrayList<>();
+            for (Garden garden : gardens) {
+                List<DailyWeather> weatherList = weatherService.getGardenWeatherData(garden);
+                if (weatherList.size() > 1) {
+                    DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                    DailyWeather yesterdayWeather = weatherList.get(1);
+                    DailyWeather currentWeather = weatherList.get(2);
+                    if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                            && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
+                        gardensNeedWatering.add(garden);
+                    }
+                    model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+                    model.addAttribute("profilePicture", profilePicture);
+                    model.addAttribute("username", username);
+                }
+
+                model.addAttribute("gardens", gardens);
+                model.addAttribute("profilePicture", profilePicture);
+                model.addAttribute("username", username);
+            }
+
+        }
         return "homePage";
     }
 }
