@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.component.ProfanityResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -36,7 +34,7 @@ public class ProfanityService {
     @Value("${azure.service.endpoint}")
     private String endPoint;
     Logger logger = LoggerFactory.getLogger(ProfanityService.class);
-    private HttpClient httpClient;
+    private final HttpClient httpClient;
     ObjectMapper objectMapper = new ObjectMapper();
 
     private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
