@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -182,8 +183,11 @@ public class U9_ViewGarden {
     @And("The garden's name {string} and location {string}, {string} are visible")
     public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"), gardenName);
-        Assertions.assertEquals(modelMap.getAttribute("gardenLocation"), gardenCity + ", " + gardenCountry);
+        GardenDetailModel garden = (GardenDetailModel) modelMap.getAttribute("garden");
+
+        Assertions.assertNotNull(garden);
+        Assertions.assertEquals(gardenName, garden.getGardenName());
+        Assertions.assertEquals(gardenCity + ", " + gardenCountry, garden.getGardenLocation());
 
     }
 }

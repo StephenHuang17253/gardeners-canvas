@@ -308,7 +308,7 @@ public class GardensController {
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
             @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam("weatherListJson")  String weatherListJson,
+            @RequestParam(value = "weatherListJson", required = false)  String weatherListJson,
             RedirectAttributes redirectAttributes,
             HttpServletResponse response) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}/public", gardenId);
@@ -329,7 +329,14 @@ public class GardensController {
         }
 
         gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
-        List<WeatherModel> weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+        List<WeatherModel> weatherList = null;
+        if(weatherListJson != null){
+            try {
+                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+            } catch (Exception e) {
+                logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
+            }
+        }
         redirectAttributes.addFlashAttribute("page", page);
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
 

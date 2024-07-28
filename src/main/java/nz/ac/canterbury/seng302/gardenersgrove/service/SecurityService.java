@@ -83,7 +83,13 @@ public class SecurityService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.getUserByEmail(authentication.getName());
     }
-
+    /**
+     * Helper to add a user interaction to repo
+     *
+     * @param itemId id of item
+     * @param itemType the enum value of the item
+     * @param interactionTime LocalDateTime of interaction
+     */
     public void addUserInteraction(Long itemId, ItemType itemType, LocalDateTime interactionTime){
         userInteractionService.addUserInteraction(getCurrentUser().getId(), itemId, itemType, interactionTime);
     }
