@@ -141,11 +141,7 @@ public class GardensController {
         try {
             WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(),
                     garden.getGardenLongitude());
-            List<DailyWeather> pastWeather = gardenWeather.getPastWeather();
-            weatherList.add(pastWeather.get(0));
-            weatherList.add(pastWeather.get(1));
-            weatherList.add(gardenWeather.getCurrentWeather());
-            weatherList.addAll(gardenWeather.getForecastWeather());
+            weatherList.addAll(gardenWeather.getRetrievedWeatherData());
         } catch (NullPointerException error) {
             noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
             noWeather.setError("Location not found, please update your location to see the weather");

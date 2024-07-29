@@ -46,9 +46,8 @@ public class WeatherService {
         try {
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             JsonNode jsonObject = objectMapper.readTree(response.body());
-            WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
             logger.info("weather: " + jsonObject);
-            return weatherData;
+            return new WeatherResponseData(jsonObject);
 
         } catch (Exception weatherApiError) {
             logger.error(weatherApiError.toString());
