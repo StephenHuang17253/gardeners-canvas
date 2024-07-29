@@ -26,16 +26,16 @@ const handleTagSuggestionClicked = (tagSuggestion) => {
 
 const updateTagAutocompleteDropdown = (tagSuggestions) => {
     clearTagAutocompleteDropdown();
+
+    tagAutocompleteDropdown.style.width = `${tagField.offsetWidth}px`
      tagSuggestions.forEach(tag => {
          const listElement = document.createElement("li");
-         listElement.classList.add("list-group-item");
-         listElement.classList.add("py-2");
+         listElement.classList.add("list-group-item", "py-2");
          const div = document.createElement("div");
          div.textContent = getDisplayString(tag);
-         div.classList.add("cursor-pointer");
-         div.classList.add("darken-on-hover");
-         div.classList.add("rounded");
-         div.classList.add("p-2");
+         div.classList.add("cursor-pointer", "darken-on-hover", "rounded", "p-2");
+         div.style.overflowWrap = "break-word";
+         div.style.textAlign = "left"
          div.addEventListener("click", () => handleTagSuggestionClicked(tag));
          listElement.appendChild(div);
          tagAutocompleteDropdown.appendChild(listElement);
