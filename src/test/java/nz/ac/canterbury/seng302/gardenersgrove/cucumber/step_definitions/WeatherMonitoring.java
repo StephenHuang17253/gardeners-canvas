@@ -12,6 +12,13 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +41,16 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 @SpringBootTest
 public class WeatherMonitoring {
@@ -62,6 +79,12 @@ public class WeatherMonitoring {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    public UserInteractionService userInteractionService;
+
+    @Autowired
+    public ObjectMapper objectMapper;
+
+    @Autowired
     private GardenTagService gardenTagService;
 
     public static SecurityService securityService;
@@ -76,7 +99,7 @@ public class WeatherMonitoring {
 
     private Map<String, Object> model;
 
-    private List<DailyWeather> weather;
+    private List<WeatherModel> weather;
 
     @MockBean
     private WeatherService weatherService;
@@ -136,11 +159,11 @@ public class WeatherMonitoring {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
-        gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
         weatherService = mock(WeatherService.class);
+        gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService, gardenTagService);
+                weatherService,objectMapper,gardenTagService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
     }
@@ -158,7 +181,7 @@ public class WeatherMonitoring {
         ModelAndView modelAndView = result.getModelAndView();
 
         model = modelAndView.getModel();
-        weather = (List<DailyWeather>) model.get("weather");
+        weather = (List<WeatherModel>) model.get("weatherList");
     }
 
     @Then("Current weather for my location is shown")
@@ -242,6 +265,6 @@ public class WeatherMonitoring {
     @Then("An element tells me {string}")
     public void anElementTellsMe(String message) {
         String modelMessage = (String) model.get("message");
-        Assertions.assertEquals(modelMessage, message);
+        Assertions.assertEquals(message, modelMessage);
     }
 }

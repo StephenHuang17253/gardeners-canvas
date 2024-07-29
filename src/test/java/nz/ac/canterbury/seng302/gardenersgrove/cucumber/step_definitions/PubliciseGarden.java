@@ -1,5 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -66,6 +69,10 @@ public class PubliciseGarden {
     @Autowired
     private GardenTagService gardenTagService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+
     @Mock
     private WeatherService weatherService;
 
@@ -98,8 +105,7 @@ public class PubliciseGarden {
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService, gardenTagService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService, objectMapper, gardenTagService);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
         mockMVCMyGarden = MockMvcBuilders.standaloneSetup(myGardensController).build();

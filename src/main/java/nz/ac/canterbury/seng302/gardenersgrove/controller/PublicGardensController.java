@@ -1,12 +1,17 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -220,6 +226,8 @@ public class PublicGardensController {
 
         }
 
+        securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
+
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
@@ -227,14 +235,7 @@ public class PublicGardensController {
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
 
         model.addAttribute("isOwner", false);
-        model.addAttribute("gardenName", garden.getGardenName());
-        model.addAttribute("gardenLocation", garden.getGardenLocation());
-        model.addAttribute("gardenSize", garden.getGardenSize());
-        model.addAttribute("gardenDescription", garden.getGardenDescription());
-        model.addAttribute("gardenId", gardenId);
-        model.addAttribute("plants", plants.subList(startIndex, endIndex));
-        model.addAttribute("totalGardens", garden.getPlants().size());
-        model.addAttribute("makeGardenPublic", garden.getIsPublic());
+        model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("weather", null);
         model.addAttribute("profilePicture",user.getProfilePictureFilename());
         model.addAttribute("userName",user.getFirstName() + " " + user.getLastName());
