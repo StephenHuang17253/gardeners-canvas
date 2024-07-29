@@ -216,13 +216,26 @@ public class PublicGardensController {
         User currentUser = securityService.getCurrentUser();
         User gardenOwner = garden.getOwner();
 
-        FriendshipStatus userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
 
 
-        if (!garden.getIsPublic() && userOwnerRelationship != FriendshipStatus.ACCEPTED) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
-            return "403";
+        if (!garden.getIsPublic() ) {
+            FriendshipStatus userOwnerRelationship;
+            if(Objects.equals(gardenOwner.getId(), currentUser.getId()))
+            {
+                userOwnerRelationship = FriendshipStatus.ACCEPTED;
+            }
+            else
+            {
+                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+            }
+
+
+            if (userOwnerRelationship != FriendshipStatus.ACCEPTED)
+            {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+                return "403";
+            }
 
         }
 

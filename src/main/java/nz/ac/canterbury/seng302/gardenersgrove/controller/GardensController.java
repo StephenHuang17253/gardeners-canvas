@@ -190,8 +190,7 @@ public class GardensController {
         }
 
         if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
-                && Objects.equals(currentWeather.getDescription(), "Sunny")) {
+                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
             model.addAttribute("message", "There hasn't been any rain recently, make sure to water your plants if they need it");
             model.addAttribute("goodMessage", false);
         }
