@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
-import org.junit.jupiter.api.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,10 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +54,9 @@ class GardensControllerIntegrationTests {
 
     @Autowired
     private PlantService plantService;
+
+    @Autowired
+    private GardenTagService gardenTagService;
 
     @MockBean
     WeatherService weatherService;
@@ -334,6 +342,64 @@ class GardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
                         is(garden.getPlants().size())))
                 .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", true));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Vegetable Garden", "Flower Bed", "Herb Garden", "Succulent Area", "Fruit Orchard",
+            "Rose Collection", "Perennial Patch", "Shade Garden", "Rock Garden", "Tropical Zone", "Cottage Garden",
+            "aaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @WithMockUser(username = "johnDoe@email.com")
+    void PostGardenDetailsPage_AddValidTag_Return302(String tagInput) throws Exception {
+        Garden garden = gardenList.get(0);
+
+
+        // Add tag
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/1/tag").with(csrf())
+                .param("tag", tagInput))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        // Garden Tag relation should exist now
+        GardenTag tag = gardenTagService.getByName(tagInput).get();
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationByGardenAndTag(garden, tag).isPresent());
+
+        // And the tag is visible on the Garden's Details page.
+        List<String> expectedTagsList = gardenTagService.getGardenTagRelationByGarden(garden).stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
+                        is((expectedTagsList))));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Flower@Bed", "Herb$Garden", "Succulent#Area", "Fruit%Orchard", "Rose^Collection",
+            "Perennial&Patch", "Shade*Garden", "Rock(Garden", "Tropical)Zone", "Cottage+Garden", "Garden=Area",
+            "Vegetable|Garden", "Herb~Garden", "Fruit`Orchard", "Succulent;Area", "Tropical)Zone", "Rock<Area",
+            "Shade>Garden", "Cottage/Garden", "Flower?Bed", "Perennial[Patch", "Rose]Collection", "Herb{Garden",
+            "Tropical}Zone", "Succulent;Area", "Fruit`Orchard", "Rock.Garden", "Shade!Garden", "Cottage@Zone",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @WithMockUser(username = "johnDoe@email.com")
+    void PostGardenDetailsPage_AddInvalidTag_DontAddTag(String tagInput) throws Exception {
+        Garden garden = gardenList.get(0);
+
+        // Attempt to add tag
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/1/tag").with(csrf())
+                .param("tag", tagInput))
+                .andExpect(status().isOk());
+
+        // Tag shouldn't be added to the garden
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
+                        is(empty())));
+
+        // Tag shouldn't be added to the system
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationByGarden(garden).isEmpty());
     }
 
 }

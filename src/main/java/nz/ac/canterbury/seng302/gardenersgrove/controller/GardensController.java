@@ -336,6 +336,7 @@ public class GardensController {
 
         boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
+
         if (!gardenAlreadyHasThisTag && tagResult.valid()) {
             gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
         }
