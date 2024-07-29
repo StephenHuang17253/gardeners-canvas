@@ -77,7 +77,10 @@
                             <form th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
                                 <div class="modal-body">
                                     <div class="input-group rounded">
-                                        <input id="tag" th:name="tag" class="form-control rounded" placeholder="e.g. vegetable garden" aria-label="Search" aria-describedby="search-addon" />
+                                        <input id="tag" th:name="tag" type="search" class="form-control rounded"
+                                               th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
+                                               th:value="${tagText}" placeholder="e.g. vegetable garden"
+                                               aria-label="Search" aria-describedby="search-addon" />
                                         <button type="submit" class="btn btn-success">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                                                 <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
@@ -87,6 +90,7 @@
                                     <div class="position-relative">
                                         <ul id="tagAutocompleteSuggestions" class="list-group position-absolute"></ul>
                                     </div>
+                                    <p id="tagErrorText" th:if="${tagErrorText}" class="text-danger fs-6" th:text="${tagErrorText}"></p>
                                 </div>
                             </form>
                             <div class="modal-footer justify-content-center">
@@ -99,7 +103,7 @@
 
 
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                    <button type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
+                    <button id="openTagModalButton" type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
 
                     <a th:href="@{__${gardenId}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
@@ -181,8 +185,8 @@
         </div>
     </div>
 
+    <script th:src="@{/js/tagModalOpener.js}"></script>
     <script th:src="@{/js/wateringBox.js}"></script>
-    <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/gardenTagAutocomplete.js}"></script>

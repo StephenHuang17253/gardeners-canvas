@@ -7,10 +7,7 @@ import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,12 @@ public class BrowsePublicGardens {
     public GardenRepository gardenRepository;
 
     @Autowired
+    public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public GardenTagRelationRepository gardenTagRelationRepository;
+
+    @Autowired
     public PlantRepository plantRepository;
 
     @Autowired
@@ -63,6 +66,8 @@ public class BrowsePublicGardens {
 
     private static FriendshipService friendshipService;
 
+    private static GardenTagService gardenTagService;
+
     private String searchValue;
 
     private MvcResult mvcResult;
@@ -78,9 +83,10 @@ public class BrowsePublicGardens {
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
+        gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
 
         PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService,
-                friendshipService);
+                friendshipService, gardenTagService);
 
         // Allows us to bypass spring security
         mockMVC = MockMvcBuilders
