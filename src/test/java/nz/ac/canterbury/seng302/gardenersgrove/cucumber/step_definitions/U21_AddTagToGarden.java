@@ -1,7 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -25,6 +28,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,6 +86,7 @@ public class U21_AddTagToGarden {
     private MvcResult mvcResultPublicGardens;
 
     private MvcResult mvcResultGardens;
+    private MvcResult tagResult;
 
     private Garden garden;
 
@@ -150,6 +155,32 @@ public class U21_AddTagToGarden {
                                 .param("tag", tag)
                         ).andExpect(status().isOk()).andReturn();
     }
+//    AC5
+    @When ("I enter a valid tag {string}")
+    public void i_enter_a_valid_tag(String tag) throws Exception {
+        mvcResultGardens = mockMVCGardens.perform(
+                MockMvcRequestBuilders
+                        .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
+                        .param("tag", tag)
+        ).andExpect(status().is3xxRedirection()).andReturn();
+    }
+
+//    AC3
+    @And("I begin typing the tag {string}")
+    public void i_begin_typing_a_tag(String query) throws Exception {
+        gardenTagService.addGardenTag(new GardenTag("Garden"));
+        gardenTagService.addGardenTag(new GardenTag("Vegetable Garden"));
+        gardenTagService.addGardenTag(new GardenTag("Rose Garden"));
+
+
+        String fetchUrl = "/tag/suggestions";
+        tagResult = mockMVCGardens.perform(
+                MockMvcRequestBuilders
+                        .get(fetchUrl)
+                        .param("query", query)
+
+        ).andReturn();
+    }
 
     @Then("The following error message is displayed {string}")
     public void the_following_error_message_is_displayed(String errorMessage) {
@@ -167,6 +198,50 @@ public class U21_AddTagToGarden {
 
         Assertions.assertTrue(gardenTags.isEmpty());
 
+    }
+// AC3
+    @Then("I see autocomplete options for existing tags")
+    public void i_see_autocomplete_options_for_existing_tags() throws JsonProcessingException, UnsupportedEncodingException {
+        assert tagResult != null;
+        String tagListResponse = tagResult.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(tagListResponse);
+
+        Assertions.assertEquals("Garden", jsonNode.get(0).get("tagName").asText());
+        Assertions.assertEquals("Rose Garden", jsonNode.get(1).get("tagName").asText());
+        Assertions.assertEquals("Vegetable Garden", jsonNode.get(2).get("tagName").asText());
+
+        gardenTagRepository.deleteAll();
+    }
+//    AC5
+    @Then("the tag is added to my garden")
+    public void the_tag_is_added_to_my_garden() {
+        List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
+        Assertions.assertNotNull(gardenTags);
+
+        String tag = String.valueOf(gardenTags.get(0).getTag().getTagName());
+        Assertions.assertEquals("Cabbage Patch", tag);
+        Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
+    }
+
+//    AC5
+    @And("the tag shows up in future autocomplete suggestions")
+    public void the_tag_shows_up_in_future_autocomplete_suggestions() throws Exception {
+        String query = "Cabbage";
+        String fetchUrl = "/tag/suggestions";
+        tagResult = mockMVCGardens.perform(
+                MockMvcRequestBuilders
+                        .get(fetchUrl)
+                        .param("query", query)
+
+        ).andReturn();
+
+        String tagListResponse = tagResult.getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(tagListResponse);
+
+        Assertions.assertEquals("Cabbage Patch", jsonNode.get(0).get("tagName").asText());
+
+        gardenTagRelationRepository.deleteAll();
+        gardenTagRepository.deleteAll();
     }
 
 }
