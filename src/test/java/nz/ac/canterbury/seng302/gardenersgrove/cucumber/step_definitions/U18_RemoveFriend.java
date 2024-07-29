@@ -62,6 +62,9 @@ public class U18_RemoveFriend {
     @Autowired
     public FriendshipService friendshipService;
 
+    @Autowired
+    public UserInteractionService userInteractionService;
+
     private MvcResult mvcResult;
 
     // Setup
@@ -73,7 +76,7 @@ public class U18_RemoveFriend {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
-                securityService, userService);
+                securityService, userService, userInteractionService);
         // Allows us to bypass spring security
         mockMVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 

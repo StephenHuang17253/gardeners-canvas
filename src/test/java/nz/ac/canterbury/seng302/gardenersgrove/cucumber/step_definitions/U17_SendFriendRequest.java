@@ -65,6 +65,9 @@ public class U17_SendFriendRequest {
     @Autowired
     public FriendshipService friendshipService;
 
+    @Autowired
+    public UserInteractionService userInteractionService;
+
     private MvcResult mvcResult;
 
     private String input;
@@ -80,7 +83,7 @@ public class U17_SendFriendRequest {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
-                securityService, userService);
+                securityService, userService, userInteractionService);
         // Allows us to bypass spring security
         mockMVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 

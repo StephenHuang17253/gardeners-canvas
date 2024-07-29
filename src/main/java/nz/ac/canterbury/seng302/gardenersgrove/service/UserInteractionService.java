@@ -22,7 +22,7 @@ public class UserInteractionService {
 
     private final PlantService plantService;
 
-    private static int MAX_INTERACTION_COUNT_PER_TYPE = 10;
+    private static final int MAX_INTERACTION_COUNT_PER_TYPE = 10;
 
     /**
      * UserInteractionService constructor
@@ -85,6 +85,7 @@ public class UserInteractionService {
         return switch (itemType) {
             case GARDEN -> gardenService.getGardenById(itemId).isPresent();
             case PLANT -> plantService.findById(itemId).isPresent();
+            case USER -> userService.getUserById(itemId) != null;
         };
     }
 
