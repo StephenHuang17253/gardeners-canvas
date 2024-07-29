@@ -5,21 +5,20 @@
 
 <body>
 
-
 <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-3 pb-5" style="width: 60%;">
         <div class="container text-center">
             <div th:if="${isOwner}" class="text-end">
-                <form th:action="@{/my-gardens/__${gardenId}__/public}" method="post"
-                      enctype="multipart/form-data">
+                <form th:action="@{/my-gardens/__${garden.getGardenId()}__/public}" method="post" th:object="${weatherList}">
                     <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic"
-                           th:checked="${makeGardenPublic}" onChange="this.form.submit()">Make my garden public
+                           th:checked="${garden.isGardenIsPublic()}" onChange="this.form.submit()">Make my garden public
                     <input id="page" th:name="page" th:value="${currentPage}" type="hidden"/>
+                    <input type="hidden" id="weatherListJson" name="weatherListJson" th:value="${weatherListJson}"/>
                 </form>
             </div>
             <div>
-                <h1 class="break-word" th:text="${gardenName}"></h1>
+                <h1 class="break-word" th:text="${garden.getGardenName()}"></h1>
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
                     <div class="p-1" th:each="tag : ${tagsList}">
@@ -27,7 +26,7 @@
                     </div>
                 </div>
 
-                <p class="break-word" th:text="${gardenDescription}"></p>
+                <p class="break-word" th:text="${garden.getGardenDescription()}"></p>
                 <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
                     <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                          alt="User's Profile Picture" class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
@@ -44,7 +43,7 @@
                                 <path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                 <path d="M5 14H19L17 22H7L5 14Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g>
                             </svg>
-                            <span th:text="${totalGardens}"></span>
+                            <span th:text="${garden.getTotalPlants()}"></span>
                         </strong>
                     </p>
                     <p class="break-word">
@@ -53,7 +52,7 @@
                                 <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
                                 <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
                             </svg>
-                            <span th:text="${gardenLocation}"></span>
+                            <span th:text="${garden.getGardenLocation()}"></span>
                         </strong>
                     </p>
                     <p class="break-word">
@@ -61,8 +60,8 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows" viewBox="0 0 16 16">
                                 <path d="M1.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L2.707 7.5h10.586l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L13.293 8.5H2.707l1.147 1.146a.5.5 0 0 1-.708.708z"/>
                             </svg>
-                            <span th:if="${#strings.equals(gardenSize, 0.0)}"> not specified</span>
-                            <span th:if="${not #strings.equals(gardenSize, 0.0)}" th:utext="${gardenSize} + ' m&sup2;'"></span>
+                            <span th:if="${#strings.equals(garden.getGardenSize(), 0.0)}"> not specified</span>
+                            <span th:if="${not #strings.equals(garden.getGardenSize(), 0.0)}" th:utext="${garden.getGardenSize()} + ' m&sup2;'"></span>
                         </strong>
                     </p>
                 </div>
@@ -74,16 +73,22 @@
                                 <h1 class="modal-title fs-5">Enter a tag to apply to your garden</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="input-group rounded">
-                                    <input type="search" class="form-control rounded" placeholder="e.g. vegetable garden" aria-label="Search" aria-describedby="search-addon" />
-                                    <button type="button" class="btn btn-success">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-                                        </svg>
-                                    </button>
+                            <form th:action="@{/my-gardens/__${gardenId}__/tag}" method="post">
+                                <div class="modal-body">
+                                    <div class="input-group rounded">
+                                        <input th:name="tag" type="search" class="form-control rounded"
+                                               th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
+                                               th:value="${tagText}" placeholder="e.g. vegetable garden"
+                                               aria-label="Search" aria-describedby="search-addon" />
+                                        <button type="submit" class="btn btn-success">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <p id="tagErrorText" th:if="${tagErrorText}" class="text-danger fs-6" th:text="${tagErrorText}"></p>
                                 </div>
-                            </div>
+                            </form>
                             <div class="modal-footer justify-content-center">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
@@ -93,12 +98,12 @@
 
 
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                    <button type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
+                    <button id="openTagModalButton" type="button" class="btn bg-success text-white" data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
 
-                    <a th:href="@{__${gardenId}__/create-new-plant}">
+                    <a th:href="@{__${garden.getGardenId()}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
                     </a>
-                    <a th:href="@{__${gardenId}__/edit}">
+                    <a th:href="@{__${garden.getGardenId()}__/edit}">
                         <button type="button" class="btn bg-success text-white">Edit Garden</button>
                     </a>
                 </div>
@@ -109,7 +114,7 @@
                     <h4 th:text="${currentTime}"></h4>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
-                    <div class="w-25" th:each="prediction, iterStat : ${weather}">
+                    <div class="w-25" th:each="prediction, iterStat : ${weatherList}">
                         <div th:replace="~{fragments/weatherBox.html :: weatherBox(
                             weatherIcon=${prediction.getWeatherIcon()},
                             date=${prediction.getDate()},
@@ -137,14 +142,14 @@
             <div class="row mb-4">
                 <div class="col">
                     <h1 class="mb-3">Plants</h1>
-                    <div th:replace="~{fragments/paginationPageOverview.html}"
-                         th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
-                    </div>
+                    <p class="text-muted">
+                        Showing results <span th:text="${startIndex}"></span> to <span th:text="${endIndex}"></span> of <span th:text="${garden.getTotalPlants()}"></span>
+                    </p>
                 </div>
             </div>
-            <input type="hidden" id="gardenId" th:value="${gardenId}" />
+            <input type="hidden" id="gardenId" th:value="${garden.getGardenId()}" />
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                <div class="col" th:each="plant : ${plants}">
+                <div class="col" th:each="plant : ${garden.getPlants()}">
                     <div th:replace="~{fragments/plantBox.html :: plantBox(
                     plantId=${plant.getPlantId()},
                     plantName=${plant.getPlantName()},
@@ -154,29 +159,30 @@
                     plantPicture=${plant.getPlantPictureFilename()},
                     isOwner=${isOwner},
                     page=${currentPage},
-                    weather=${weather})}">
+                    weatherListJson=${weatherListJson})}">
                     </div>
                 </div>
             </div>
             <div th:if="${isOwner}" class="row mt-4">
                 <div class="col">
                     <div th:replace="~{fragments/plantPaginationNav.html}"
-                         th:with="gardenId=${gardenId}, currentPage=${currentPage}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                         th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
+                          startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, weatherListJson=${weatherListJson}">
                     </div>
                 </div>
             </div>
             <div th:if="${!isOwner}" class="row mt-4">
                 <div class="col">
                     <div th:replace="~{fragments/publicPlantPaginationNav.html}"
-                         th:with="gardenId=${gardenId}, currentPage=${currentPage}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                         th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script th:src="@{/js/tagModalOpener.js}"></script>
     <script th:src="@{/js/wateringBox.js}"></script>
-    <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
 </body>

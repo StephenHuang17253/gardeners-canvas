@@ -1,15 +1,26 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
-import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,10 +33,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -36,12 +51,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 
 @SpringBootTest
 public class WeatherMonitoring {
@@ -49,6 +58,13 @@ public class WeatherMonitoring {
 
     @Autowired
     public GardenRepository gardenRepository;
+
+    @Autowired
+    public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public GardenTagRelationRepository gardenTagRelationRepository;
+
 
     @Autowired
     public UserRepository userRepository;
@@ -62,6 +78,15 @@ public class WeatherMonitoring {
     @Autowired
     public FriendshipRepository friendshipRepository;
 
+    @Autowired
+    public UserInteractionService userInteractionService;
+
+    @Autowired
+    public ObjectMapper objectMapper;
+
+    @Autowired
+    private GardenTagService gardenTagService;
+
     public static SecurityService securityService;
 
     private static GardenService gardenService;
@@ -74,7 +99,7 @@ public class WeatherMonitoring {
 
     private Map<String, Object> model;
 
-    private List<DailyWeather> weather;
+    private List<WeatherModel> weather;
 
     @MockBean
     private WeatherService weatherService;
@@ -134,10 +159,11 @@ public class WeatherMonitoring {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
         weatherService = mock(WeatherService.class);
+        gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService);
+                weatherService,objectMapper,gardenTagService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
     }
@@ -155,7 +181,7 @@ public class WeatherMonitoring {
         ModelAndView modelAndView = result.getModelAndView();
 
         model = modelAndView.getModel();
-        weather = (List<DailyWeather>) model.get("weather");
+        weather = (List<WeatherModel>) model.get("weatherList");
     }
 
     @Then("Current weather for my location is shown")
@@ -239,6 +265,6 @@ public class WeatherMonitoring {
     @Then("An element tells me {string}")
     public void anElementTellsMe(String message) {
         String modelMessage = (String) model.get("message");
-        Assertions.assertEquals(modelMessage, message);
+        Assertions.assertEquals(message, modelMessage);
     }
 }

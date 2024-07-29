@@ -13,7 +13,7 @@
                 <h1>Create New Garden</h1>
             </div>
             <div class="col-6">
-                <form th:action="@{/create-new-garden}" method="post" class="border rounded-3 p-3">
+                <form th:action="@{/create-new-garden}" method="post" class="border rounded-3 p-3 submit-form-once">
 
                     <div class="mb-3">
                         <label for="gardenName" class="form-label">Name *</label>
@@ -85,7 +85,7 @@
                     <input type="hidden" id="longitude" th:name="longitude">
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success" formnovalidate>Create</button>
+                        <button type="submit" class="btn btn-success submit-button" formnovalidate>Create</button>
                         <button type="button" class="btn btn-secondary"
                             onclick="window.location.href = localStorage.getItem('previousUrl')">
                             Cancel
@@ -102,6 +102,7 @@
     <script th:src="@{/js/descriptionCounter.js}"></script>
     <script th:src="@{/js/locationIQAutocomplete.js}"></script>
     <script th:src="@{/js/formatNumber.js}"></script>
+    <script th:src="@{/js/submitFormOnce.js}"></script>
 </body>
 
 </html>

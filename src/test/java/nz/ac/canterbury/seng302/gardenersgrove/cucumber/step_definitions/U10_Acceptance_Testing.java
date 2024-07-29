@@ -64,8 +64,8 @@ public class U10_Acceptance_Testing {
     String gardenCountry;
     String gardenSize;
 
-    String gardenLongitude = "";
-    String gardenLatitude = "";
+    String gardenLongitude = "-43.5214643";
+    String gardenLatitude = "172.5796159";
 
     private Garden expectedGarden;
 

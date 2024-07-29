@@ -5,12 +5,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,17 +35,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.ui.ModelMap;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +64,9 @@ class GardensControllerIntegrationTests {
 
     @Autowired
     private PlantService plantService;
+
+    @Autowired
+    private GardenTagService gardenTagService;
 
     @MockBean
     WeatherService weatherService;
@@ -126,6 +144,19 @@ class GardensControllerIntegrationTests {
                 "-43.5214643",
                 "172.5796159",
                 userService.getUserByEmail(user3.getEmailAddress())));
+        Garden garden5 = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "Some description",
+                "Some Real Address",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                10.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                userService.getUserByEmail(user1.getEmailAddress())));
 
         plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
         plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
@@ -133,6 +164,7 @@ class GardensControllerIntegrationTests {
         gardenList.add(gardenService.getGardenById(garden2.getGardenId()).get());
         gardenList.add(gardenService.getGardenById(garden3.getGardenId()).get());
         gardenList.add(gardenService.getGardenById(garden4.getGardenId()).get());
+        gardenList.add(gardenService.getGardenById(garden5.getGardenId()).get());
 
     }
 
@@ -166,7 +198,7 @@ class GardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         String expectedErrorMessage = "Location not found, please update your location to see the weather";
         Assertions.assertEquals(expectedErrorMessage,
-                ((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0)
+                ((List<WeatherModel>) result.getModelAndView().getModel().get("weatherList")).get(0)
                         .getWeatherError());
     }
 
@@ -234,7 +266,7 @@ class GardensControllerIntegrationTests {
                         .get("/my-gardens/{gardenId}", gardenList.get(3).getGardenId()))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-        Assertions.assertNull(((List<DailyWeather>) result.getModelAndView().getModel().get("weather")).get(0)
+        Assertions.assertNull(((List<WeatherModel>) result.getModelAndView().getModel().get("weatherList")).get(0)
                 .getWeatherError());
     }
 
@@ -266,40 +298,34 @@ class GardensControllerIntegrationTests {
     @WithMockUser(username = "johnDoe@email.com")
     void GetGardenDetailsPage_UserAuthorizedAndGardenExists_Return200() throws Exception {
         Garden garden = gardenList.get(0);
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenName",
-                        is(garden.getGardenName())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation",
-                        is(garden.getGardenLocation())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize",
-                        is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
-                        is(garden.getPlants().size())))
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic",
-                        is(garden.getIsPublic())));
-        ;
+                .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
+        Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
+        Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
+        Assertions.assertEquals(garden.getPlants().size(), gardenDetailModel.getTotalPlants());
+        Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
     }
 
     @Test
     @WithMockUser(username = "janeDoe@email.com")
     void GetGardenDetailsPage_UserAuthorizedAndGardenExistsWithPlants_Return200() throws Exception {
         Garden garden = gardenList.get(1);
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/2"))
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/my-gardens/2"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenName",
-                        is(garden.getGardenName())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation",
-                        is(garden.getGardenLocation())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize",
-                        is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
-                        is(garden.getPlants().size())))
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic",
-                        is(garden.getIsPublic())));
-        ;
+                .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
+        Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
+        Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
+        Assertions.assertEquals(garden.getPlants().size(), gardenDetailModel.getTotalPlants());
+        Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
     }
 
     @Test
@@ -307,10 +333,12 @@ class GardensControllerIntegrationTests {
     void GetGardenDetailsPage_UserAuthorizedAndGardenExistsAndIsPublic_Return200() throws Exception {
         Garden garden = gardenList.get(0);
         // make an initial request to ensure garden is private as set in @before
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", false));
+                .andReturn();
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        Assertions.assertEquals(false, gardenDetailModel.isGardenIsPublic());
 
         // set the garden to public
         mockMvc.perform(MockMvcRequestBuilders.post("/my-gardens/1/public").with(csrf())
@@ -318,18 +346,111 @@ class GardensControllerIntegrationTests {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 
         // check the garden is now public
+        mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        modelMap = mvcResult.getModelAndView().getModelMap();
+        gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
+        Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
+        Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
+        Assertions.assertEquals(garden.getPlants().size(), gardenDetailModel.getTotalPlants());
+        Assertions.assertEquals(true, gardenDetailModel.isGardenIsPublic());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Vegetable Garden", "Flower Bed", "Herb Garden", "Succulent Area", "Fruit Orchard",
+            "Rose Collection", "Perennial Patch", "Shade Garden", "Rock Garden", "Tropical Zone", "Cottage Garden",
+            "aaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @WithMockUser(username = "johnDoe@email.com")
+    void PostGardenDetailsPage_AddValidTag_Return302(String tagInput) throws Exception {
+        Garden garden = gardenList.get(0);
+
+
+        // Add tag
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/1/tag").with(csrf())
+                .param("tag", tagInput))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        // Garden Tag relation should exist now
+        GardenTag tag = gardenTagService.getByName(tagInput).get();
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationByGardenAndTag(garden, tag).isPresent());
+
+        // And the tag is visible on the Garden's Details page.
+        List<String> expectedTagsList = gardenTagService.getGardenTagRelationByGarden(garden).stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
         mockMvc
                 .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenName",
-                        is(garden.getGardenName())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenLocation",
-                        is(garden.getGardenLocation())))
-                .andExpect(MockMvcResultMatchers.model().attribute("gardenSize",
-                        is(garden.getGardenSize())))
-                .andExpect(MockMvcResultMatchers.model().attribute("totalPlants",
-                        is(garden.getPlants().size())))
-                .andExpect(MockMvcResultMatchers.model().attribute("makeGardenPublic", true));
+                .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
+                        is((expectedTagsList))));
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    void PostGardenDetailsPage_AddExistingTag_DontAddItAgain() throws Exception {
+        Garden garden = gardenList.get(4);
+
+        // Add tag
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId()).with(csrf())
+                        .param("tag", "Roses"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        // Garden Tag relation should exist now
+        GardenTag tag = gardenTagService.getByName("Roses").get();
+
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationByGardenAndTag(garden, tag).isPresent());
+
+        // Try add it again
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId()).with(csrf())
+                        .param("tag", "Roses"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        // And the tag is visible on the Garden's Details page, but only once
+        List<String> expectedTagsList = gardenTagService.getGardenTagRelationByGarden(garden).stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/{gardenId}", garden.getGardenId()))
+                .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
+                        is((expectedTagsList))));
+
+        // Verify that it is stored in the database only once as well
+        Assertions.assertEquals(1, gardenTagService.getGardenTagRelationByGarden(garden).size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Flower@Bed", "Herb$Garden", "Succulent#Area", "Fruit%Orchard", "Rose^Collection",
+            "Perennial&Patch", "Shade*Garden", "Rock(Garden", "Tropical)Zone", "Cottage+Garden", "Garden=Area",
+            "Vegetable|Garden", "Herb~Garden", "Fruit`Orchard", "Succulent;Area", "Tropical)Zone", "Rock<Area",
+            "Shade>Garden", "Cottage/Garden", "Flower?Bed", "Perennial[Patch", "Rose]Collection", "Herb{Garden",
+            "Tropical}Zone", "Succulent;Area", "Fruit`Orchard", "Rock.Garden", "Shade!Garden", "Cottage@Zone",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @WithMockUser(username = "johnDoe@email.com")
+    void PostGardenDetailsPage_AddInvalidTag_DontAddTag(String tagInput) throws Exception {
+        Garden garden = gardenList.get(0);
+
+        // Attempt to add tag
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/1/tag").with(csrf())
+                .param("tag", tagInput))
+                .andExpect(status().isOk());
+
+        // Tag shouldn't be added to the garden
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
+                .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
+                        is(empty())));
+
+        // Tag shouldn't be added to the system
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationByGarden(garden).isEmpty());
     }
 
 }
