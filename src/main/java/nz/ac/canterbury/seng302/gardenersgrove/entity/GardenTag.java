@@ -26,7 +26,7 @@ public class GardenTag {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "tag_status")
-    private TagStatus tagStatus;
+    private TagStatus tagStatus = TagStatus.PENDING;
 
 
     /**
