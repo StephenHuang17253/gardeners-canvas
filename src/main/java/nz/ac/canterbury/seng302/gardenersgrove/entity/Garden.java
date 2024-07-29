@@ -67,6 +67,13 @@ public class Garden {
     @Column(nullable = false)
     private boolean isPublic;
 
+    @Column(name = "needs_watering")
+    private boolean needsWatering;
+
+    @Column(name = "last_water_check")
+    @CreatedDate
+    private LocalDateTime lastWaterCheck;
+
     /**
      * JPA required no-args constructor
      */
@@ -127,6 +134,8 @@ public class Garden {
         this.gardenLongitude = gardenLongitude;
         this.isPublic = isPublic;
         this.owner = owner;
+        this.lastWaterCheck = LocalDateTime.of(2023, 12, 12, 11, 11);
+        this.needsWatering = false;
     }
 
 
@@ -221,6 +230,23 @@ public class Garden {
     public void setIsPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
+
+    /**
+     * Sets boolean value for if a garden needs watering and sets the date at which that garden was last checked for watering
+     *
+     * @param needsWatering boolean value for if a garden needs watering
+     */
+    public void setNeedsWatering(boolean needsWatering) {
+        this.needsWatering = needsWatering;
+        this.lastWaterCheck = LocalDateTime.now();
+
+    }
+
+    public void setNeedsWatering(boolean needsWatering, LocalDateTime lastWaterCheck) {
+        this.needsWatering = needsWatering;
+        this.lastWaterCheck = lastWaterCheck;
+    }
+
 
     /**
      * Retrieves a garden's location which is a concatenation of its address
