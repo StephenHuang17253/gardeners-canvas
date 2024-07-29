@@ -1,4 +1,3 @@
-// Use getAllSimilar in GardenTagService
 const MIN_TAG_INPUT_LENGTH = 3;
 
 const tagField = document.getElementById("tag")
@@ -8,22 +7,43 @@ const getDisplayString = (data) => {
     return data.tagName;
 }
 
+/**
+ * Fills tag field with provided data
+ * @param data - data containing the tag name
+ */
 const fillTagField = (data) => {
     tagField.value = getDisplayString(data)
 }
 
+/**
+ * Hides the tag autocomplete dropdown
+ */
 const hideTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.add("d-none");
 
+/**
+ * Shows the tag autocomplete dropdown
+ */
 const showTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.remove("d-none");
 
+/**
+ * Clears the autocomplete dropdown.
+ * @returns {string}
+ */
 const clearTagAutocompleteDropdown = () => tagAutocompleteDropdown.innerHTML = "";
 
-
+/**
+ * Handles a clicked tag suggestion, filling tag field and hiding dropdowns
+ * @param tagSuggestion - the selected suggestion
+ */
 const handleTagSuggestionClicked = (tagSuggestion) => {
     fillTagField(tagSuggestion);
     hideAutocompleteDropdown();
 }
 
+/**
+ * Updates the tag autocomplete dropdown with new suggestions
+ * @param tagSuggestions - an array of suggestion tags
+ */
 const updateTagAutocompleteDropdown = (tagSuggestions) => {
     clearTagAutocompleteDropdown();
 
@@ -43,7 +63,11 @@ const updateTagAutocompleteDropdown = (tagSuggestions) => {
      });
 }
 
-
+/**
+ * Handles updates to the input field such as char input and the field being selected,
+ *      fetching suggestions and updating the UI accordingly
+ * @type {(function(*): Promise<void>)|*}
+ */
 const handleTagUpdate = (async (event) => {
     if (event.target.value === "") {
         hideTagAutocompleteDropdown();
@@ -66,10 +90,17 @@ const handleTagUpdate = (async (event) => {
     showTagAutocompleteDropdown();
 })
 
+/**
+ * Handles deselecting an input focus, hiding dropdowns
+ */
 const handleTagDeselect = () => {
     hideTagAutocompleteDropdown();
 }
 
+/**
+ * Handles click events, hding dropdowns if the click is outside the input field
+ * @param event - The input event
+ */
 const handleTagClick = (event) => {
     if (event.target !== tagField && event.target !== tagAutocompleteDropdown) {
         handleTagDeselect();
@@ -91,6 +122,11 @@ const getInstance = () => {
     return instance;
 };
 
+/**
+ * Fetches tag data
+ * @param query - the query string to search for
+ * @returns {Promise<any>} - A promise that resolves with the fetched data
+ */
 const fetchTagData = async (query) => {
     const instance = getInstance();
 
@@ -102,7 +138,6 @@ const fetchTagData = async (query) => {
 
 
 // Event listeners
-console.log("Testing")
 tagField.addEventListener("input", handleTagUpdate);
 tagField.addEventListener("focus", handleTagUpdate);
 tagField.addEventListener("blur", handleTagDeselect);

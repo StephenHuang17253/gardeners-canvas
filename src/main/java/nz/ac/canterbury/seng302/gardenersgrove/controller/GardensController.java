@@ -38,14 +38,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -576,6 +569,11 @@ public class GardensController {
     }
 
 
+    /**
+     * Retrieves tag suggestions from the Garden Tag Repository through the Garden Tag Service
+     * @param query - The search query for tag autocomplete suggestions
+     * @return a list of garden tags whose names are similar to the query
+     */
     @GetMapping("/tag/suggestions")
     @ResponseBody
     public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
