@@ -134,6 +134,19 @@ class GardensControllerIntegrationTests {
                 "-43.5214643",
                 "172.5796159",
                 userService.getUserByEmail(user3.getEmailAddress())));
+        Garden garden5 = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "Some description",
+                "Some Real Address",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                10.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                userService.getUserByEmail(user1.getEmailAddress())));
 
         plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
         plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
@@ -141,6 +154,7 @@ class GardensControllerIntegrationTests {
         gardenList.add(gardenService.getGardenById(garden2.getGardenId()).get());
         gardenList.add(gardenService.getGardenById(garden3.getGardenId()).get());
         gardenList.add(gardenService.getGardenById(garden4.getGardenId()).get());
+        gardenList.add(gardenService.getGardenById(garden5.getGardenId()).get());
 
     }
 
@@ -373,6 +387,43 @@ class GardensControllerIntegrationTests {
                 .perform(MockMvcRequestBuilders.get("/my-gardens/1"))
                 .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
                         is((expectedTagsList))));
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    void PostGardenDetailsPage_AddExistingTag_DontAddItAgain() throws Exception {
+        Garden garden = gardenList.get(4);
+
+        // Add tag
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId()).with(csrf())
+                        .param("tag", "Roses"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        // Garden Tag relation should exist now
+        GardenTag tag = gardenTagService.getByName("Roses").get();
+
+        Assertions.assertTrue(gardenTagService.getGardenTagRelationByGardenAndTag(garden, tag).isPresent());
+
+        // Try add it again
+        mockMvc
+                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId()).with(csrf())
+                        .param("tag", "Roses"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        // And the tag is visible on the Garden's Details page, but only once
+        List<String> expectedTagsList = gardenTagService.getGardenTagRelationByGarden(garden).stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/my-gardens/{gardenId}", garden.getGardenId()))
+                .andExpect(MockMvcResultMatchers.model().attribute("tagsList",
+                        is((expectedTagsList))));
+
+        // Verify that it is stored in the database only once as well
+        Assertions.assertEquals(1, gardenTagService.getGardenTagRelationByGarden(garden).size());
     }
 
     @ParameterizedTest
