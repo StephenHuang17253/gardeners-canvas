@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -13,8 +14,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -49,10 +48,62 @@ public class GardenFormController {
 
     @Autowired
     public GardenFormController(GardenService gardenService, LocationService locationService,
-            SecurityService securityService) {
+                                SecurityService securityService) {
         this.gardenService = gardenService;
         this.locationService = locationService;
         this.securityService = securityService;
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     *
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+    /**
+     * Retrieves location suggestions from the LocationIQ API based on query string
+     * provided by frontend JS.
+     * Also handles rate limiting to prevent exceeding 2 requests per second, to
+     * match our free tier.
+     *
+     * @param query The search query for location autocomplete suggestions.
+     * @return A JSON response string containing location suggestions, or a "429"
+     * string if rate limit is exceeded.
+     * @throws IOException          If an I/O error occurs while making the
+     *                              requesting
+     * @throws InterruptedException If an interruption occurs while waiting for
+     *                              response
+     */
+    @GetMapping("/api/location/suggestions")
+    @ResponseBody
+    public String getLocationSuggestions(@RequestParam("query") String query) throws IOException, InterruptedException {
+        long currentTime = Instant.now().getEpochSecond();
+        long timeElapsed = currentTime - lastRequestTime;
+
+        logger.info("Time elapsed: {}", timeElapsed);
+        // Every second, the number of available permits is reset to 2
+        if (timeElapsed >= 1) {
+            semaphore.drainPermits();
+            semaphore.release(MAX_REQUESTS_PER_SECOND);
+            logger.info("A second or more has elapsed, permits reset to: {}", semaphore.availablePermits());
+            lastRequestTime = currentTime;
+        }
+
+        logger.info("Permits left before request: {}", semaphore.availablePermits());
+
+        // Check if rate limit exceeded
+        if (!semaphore.tryAcquire()) {
+            logger.info("Exceeded location API rate limit of 2 requests per second.");
+            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
+        }
+        logger.info("Permits left after request: {}", semaphore.availablePermits());
+
+        return locationService.getLocationSuggestions(query);
+
     }
 
     /**
@@ -69,33 +120,34 @@ public class GardenFormController {
      * @throws InterruptedException If an interruption occurs while waiting for
      *                              response
      */
-    @GetMapping("/api/location/suggestions")
+    @GetMapping("/api/location/coordinates")
     @ResponseBody
-    public String getLocationSuggestions(@RequestParam("query") String query) throws IOException, InterruptedException {
+    public JsonNode getLatitudeLongitudeValues(@RequestParam("query") String query) throws IOException, InterruptedException {
         long currentTime = Instant.now().getEpochSecond();
         long timeElapsed = currentTime - lastRequestTime;
 
-        logger.info("Time elapsed: " + timeElapsed);
+        logger.info("Time elapsed: {}", timeElapsed);
         // Every second, the number of available permits is reset to 2
         if (timeElapsed >= 1) {
             semaphore.drainPermits();
             semaphore.release(MAX_REQUESTS_PER_SECOND);
-            logger.info("A second or more has elapsed, permits reset to: " + semaphore.availablePermits());
+            logger.info("A second or more has elapsed, permits reset to: {}", semaphore.availablePermits());
             lastRequestTime = currentTime;
         }
 
-        logger.info("Permits left before request: " + semaphore.availablePermits());
+        logger.info("Permits left before request: {}", semaphore.availablePermits());
 
         // Check if rate limit exceeded
         if (!semaphore.tryAcquire()) {
             logger.info("Exceeded location API rate limit of 2 requests per second.");
-            return "429"; // Frontend script will check if this returns 429 to toggle error messages.
-        }
-        logger.info("Permits left after request: " + semaphore.availablePermits());
 
-        return locationService.getLocationSuggestions(query);
+        }
+        logger.info("Permits left after request: {}", semaphore.availablePermits());
+
+        return locationService.getLatitudeLongitude(query);
 
     }
+
 
     /**
      * Maps the createNewGardenPage html page to /create-new-garden url
@@ -104,20 +156,16 @@ public class GardenFormController {
      */
     @GetMapping("/create-new-garden")
     public String newGardenForm(@RequestParam(name = "gardenName", required = false) String gardenName,
-            @RequestParam(name = "streetAddress", required = false) String streetAddress,
-            @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
-            @RequestParam(name = "suburb", required = false) String suburb,
-            @RequestParam(name = "city", required = false) String city,
-            @RequestParam(name = "country", required = false) String country,
-            @RequestParam(name = "postcode", required = false) String postcode,
-            @RequestParam(name = "gardenSize", required = false) String gardenSize,
-            @RequestParam(name = "longitude", required = false) String longitude,
-            @RequestParam(name = "latitude", required = false) String latitude,
-            Model model) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+                                @RequestParam(name = "streetAddress", required = false) String streetAddress,
+                                @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
+                                @RequestParam(name = "suburb", required = false) String suburb,
+                                @RequestParam(name = "city", required = false) String city,
+                                @RequestParam(name = "country", required = false) String country,
+                                @RequestParam(name = "postcode", required = false) String postcode,
+                                @RequestParam(name = "gardenSize", required = false) String gardenSize,
+                                @RequestParam(name = "longitude", required = false) String longitude,
+                                @RequestParam(name = "latitude", required = false) String latitude,
+                                Model model) {
 
         model.addAttribute("gardenName", gardenName);
         model.addAttribute("gardenDescription", gardenDescription);
@@ -168,7 +216,7 @@ public class GardenFormController {
             @RequestParam(name = "latitude") String latitude,
             HttpSession session,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) throws IOException, InterruptedException {
 
         logger.info("POST /create-new-garden");
 
@@ -202,10 +250,6 @@ public class GardenFormController {
         model.addAttribute("latitude", latitude);
         model.addAttribute("longitude", longitude);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
-
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
                 || !gardenDescriptionResult.valid()) {
@@ -220,7 +264,6 @@ public class GardenFormController {
         }
         boolean isPublic = false;
 
-        logger.info("Latitude" + latitude);
         User owner = securityService.getCurrentUser();
 
         Garden garden = new Garden(gardenName, gardenDescription, streetAddress, suburb, city, postcode, country,
@@ -229,16 +272,30 @@ public class GardenFormController {
         User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenNavModel> gardenNavModels = new ArrayList<>();
-        for(Garden g : gardens){
-            gardenNavModels.add(new GardenNavModel(g.getGardenId(), g.getGardenName()));
+        List<GardenNavModel> gardenModels = new ArrayList<>();
+        for (Garden g : gardens) {
+            gardenModels.add(new GardenNavModel(g.getGardenId(),g.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenNavModels);
+        session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
+
+        findingGardenCoordinates(garden);
 
         redirectAttributes.addAttribute("gardenId", garden.getGardenId());
 
         return "redirect:/my-gardens/{gardenId}";
+    }
+
+    private void findingGardenCoordinates(Garden garden) throws IOException, InterruptedException {
+        if (Objects.equals(garden.getGardenLatitude(), "")) {
+            JsonNode coordData = getLatitudeLongitudeValues(garden.getGardenLocation());
+            if (coordData.get(0) != null) {
+                String lat = coordData.get(0).get("lat").asText();
+                String lon = coordData.get(0).get("lon").asText();
+                gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
+                logger.info("Forward geocoding request made to get lat and lon");
+            }
+        }
     }
 
     /**
@@ -248,13 +305,9 @@ public class GardenFormController {
      */
     @GetMapping("/my-gardens/{gardenId}/edit")
     public String editGardenDetails(@PathVariable Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+                                    HttpServletResponse response,
+                                    Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -322,7 +375,7 @@ public class GardenFormController {
             @RequestParam(name = "latitude") String latitude,
             @PathVariable Long gardenId, HttpSession session,
             HttpServletResponse response,
-            Model model) {
+            Model model) throws IOException, InterruptedException {
         logger.info("POST / edited garden");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -337,10 +390,6 @@ public class GardenFormController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
@@ -361,7 +410,6 @@ public class GardenFormController {
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid()
                 || !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
                 || !gardenDescriptionResult.valid()) {
-            model.addAttribute("loggedIn", loggedIn);
             model.addAttribute("gardenName", gardenName);
             model.addAttribute("gardenDescription", gardenDescription);
             model.addAttribute("streetAddress", streetAddress);
@@ -383,17 +431,19 @@ public class GardenFormController {
 
         User owner = securityService.getCurrentUser();
         boolean isPublic = false;
-        gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
+        Garden updatedGarden = gardenService.updateGarden(gardenId, new Garden(gardenName, gardenDescription, streetAddress, suburb, city,
                 postcode, country, doubleGardenSize, isPublic, latitude, longitude, owner));
         logger.info("Edited Garden Page");
 
+        findingGardenCoordinates(updatedGarden);
+
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenNavModel> gardenNavModels = new ArrayList<>();
-        for(Garden g : gardens){
-            gardenNavModels.add(new GardenNavModel(g.getGardenId(), g.getGardenName()));
+        List<GardenNavModel> gardenModels = new ArrayList<>();
+        for (Garden g : gardens) {
+            gardenModels.add(new GardenNavModel(g.getGardenId(),g.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenNavModels);
+        session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
 
         return "redirect:/my-gardens/{gardenId}";
@@ -401,13 +451,14 @@ public class GardenFormController {
 
     /**
      * takes as an input the result of validating the garden name, location and size
+     * takes as an input the result of validating the garden name, location and size
      * parameters and prints the appropriate
      */
     private void gardenFormErrorText(Model model, ValidationResult gardenNameResult,
-            ValidationResult streetAddressResult,
-            ValidationResult suburbResult, ValidationResult cityResult,
-            ValidationResult countryResult, ValidationResult postcodeResult,
-            ValidationResult gardenSizeResult, ValidationResult gardenDescriptionResult) {
+                                     ValidationResult streetAddressResult,
+                                     ValidationResult suburbResult, ValidationResult cityResult,
+                                     ValidationResult countryResult, ValidationResult postcodeResult,
+                                     ValidationResult gardenSizeResult, ValidationResult gardenDescriptionResult) {
 
         // notifies the user that the garden Name is invalid (if applicable)
         if (!gardenNameResult.valid()) {
@@ -415,10 +466,6 @@ public class GardenFormController {
                 gardenNameResult.updateMessage("cannot be greater than 64 characters in length");
             }
             model.addAttribute("GNErrorText", "Garden name " + gardenNameResult);
-            model.addAttribute("GNErrorClass", "errorBorder");
-            logger.info("Garden Name failed validation");
-        } else {
-            model.addAttribute("GNErrorClass", "noErrorBorder");
         }
 
         // notifies the user that the street address is invalid (if applicable)
@@ -427,7 +474,6 @@ public class GardenFormController {
                 streetAddressResult.updateMessage("cannot be longer than 96 characters");
             }
             model.addAttribute("AddressErrorText", "Address " + streetAddressResult);
-            logger.info("Garden Street failed validation");
         }
 
         // notifies the user that the suburb is invalid (if applicable)
@@ -436,40 +482,28 @@ public class GardenFormController {
                 suburbResult.updateMessage("cannot be longer than 96 characters");
             }
             model.addAttribute("SuburbErrorText", "Suburb " + suburbResult);
-            model.addAttribute("SuburbErrorClass", "errorBorder");
-            logger.info("Garden Suburb failed validation");
-        } else {
-            model.addAttribute("SuburbErrorClass", "noErrorBorder");
         }
 
         // notifies the user that the city input is invalid (if applicable)
         if (!cityResult.valid()) {
-
+            String message;
             if (cityResult == ValidationResult.BLANK) {
-                model.addAttribute("CityErrorText", "City and Country are required");
+                message = "City and Country are required";
             } else {
-                model.addAttribute("CityErrorText", "City " + cityResult);
+                message = "City " + cityResult.toString();
             }
-
-            model.addAttribute("CityErrorClass", "errorBorder");
-            logger.info("Garden City failed validation");
-        } else {
-            model.addAttribute("CityErrorClass", "noErrorBorder");
+            model.addAttribute("CityErrorText", message);
         }
 
         // notifies the user that the country input is invalid (if applicable)
         if (!countryResult.valid()) {
-
+            String message;
             if (countryResult == ValidationResult.BLANK) {
-                model.addAttribute("CountryErrorText", "City and Country are required");
+                message = "City and Country are required";
             } else {
-                model.addAttribute("CountryErrorText", "Country " + countryResult);
+                message = "Country " + countryResult.toString();
             }
-
-            model.addAttribute("CountryErrorClass", "errorBorder");
-            logger.info("Garden Country failed validation");
-        } else {
-            model.addAttribute("CountryErrorClass", "noErrorBorder");
+            model.addAttribute("CountryErrorText", message);
         }
 
         // notifies the user that the postcode input is invalid (if applicable)
@@ -477,30 +511,14 @@ public class GardenFormController {
             if (postcodeResult == ValidationResult.LENGTH_OVER_LIMIT) {
                 postcodeResult.updateMessage("cannot be longer than 10 digits");
             }
-
             model.addAttribute("PostCodeErrorText", "Postcode " + postcodeResult);
-            model.addAttribute("PostCodeErrorClass", "errorBorder");
-            logger.info("Garden Postcode failed validation");
-        } else {
-            model.addAttribute("PostCodeErrorClass", "noErrorBorder");
         }
+
         // notifies the user that the garden Size is invalid (if applicable)
         if (!gardenSizeResult.valid()) {
-            String message;
-            if (gardenSizeResult == ValidationResult.AREA_TOO_LARGE) {
-                message = "is too large. \n\r Must be smaller than or equal to 8000000";
-            } else if (gardenSizeResult == ValidationResult.AREA_TOO_SMALL) {
-                message = "is too small. \n\r Must be larger than or equal to 0.01";
-            } else {
-                message = gardenSizeResult.toString();
-            }
+            String message = gardenSizeResult.toString();
             gardenSizeResult.updateMessage(message);
             model.addAttribute("GSErrorText", "Garden size " + gardenSizeResult);
-            model.addAttribute("GSErrorClass", "errorBorder");
-            logger.info("Garden Size failed validation");
-
-        } else {
-            model.addAttribute("GSErrorClass", "noErrorBorder");
         }
 
         // notifies the user that the garden Description is invalid (if applicable)

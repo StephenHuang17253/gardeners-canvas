@@ -123,6 +123,11 @@ public class UserInteractionServiceIntergrationTest {
         plantList.add(plant1);
     }
 
+    @BeforeEach
+    void clear_repo() {
+        userInteractionRepository.deleteAll();
+    }
+
 
     @Test
     void getUserInteractionById_UserInteractionNotInPersistence_returnsOptionalUserInteraction(){
@@ -274,7 +279,7 @@ public class UserInteractionServiceIntergrationTest {
     void addUserInteraction_UserInPersistenceAndItemInPersistenceAndOwner_returnsUserInteraction(){
         LocalDateTime interactionTime = LocalDateTime.of(2023, 7, 15, 10, 0);
         Long gardenId = gardenList.get(1).getGardenId();
-        UserInteraction expectedUserInteraction = new UserInteraction(user1,gardenId,ItemType.GARDEN,LocalDateTime.MIN);
+        UserInteraction expectedUserInteraction = new UserInteraction(user1,gardenId,ItemType.GARDEN,interactionTime);
 
         UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user1.getId(),gardenId,ItemType.GARDEN,interactionTime);
 
@@ -290,7 +295,7 @@ public class UserInteractionServiceIntergrationTest {
         LocalDateTime interactionTime = LocalDateTime.of(2023, 7, 15, 10, 0);
         UserInteraction expectedUserInteraction = new UserInteraction(user3,gardenId,ItemType.GARDEN,interactionTime);
 
-        UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user1.getId(),gardenId,ItemType.GARDEN, interactionTime);
+        UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user3.getId(),gardenId,ItemType.GARDEN, interactionTime);
 
         Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
         Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());

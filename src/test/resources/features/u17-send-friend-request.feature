@@ -1,4 +1,4 @@
-Feature: U17 (Send friend request): As Liam, I want to connect with my friends on Gardener’s Grove
+Feature: U17 (Send friend request): As Liam, I want to connect with my friends on Gardener's Grove
   so that we can build a community on the app.
 
   Background:
@@ -6,7 +6,6 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     And I "liam@email.com" am friends with "Kaia" "Pene", 67, a user with email "kaia@email.com" and password "TestPassword10!"
     And I "liam@email.com" am friends with "Inaya" "Singh", 24, a user with email "inaya@email.com" and password "TestPassword10!"
     And I "Sarah" "Thompson", 36 am a user with email "sarah@email.com" and password "TestPassword10!"
-
 
 
   Scenario: AC1 - nav bar takes me to manage friends page
@@ -49,6 +48,21 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
       | "Amy"  | "Doe" | "doe@gmail.com"  | "doe@gmail.com"  |
       | "Andy" | ""    | "andy@gmail.com" | "andy@gmail.com" |
 
+  Scenario Outline: AC5.1 - Given I am on the manage friends page and I have opened the search bar, when I enter an email
+  address and I hit the search button, then I can see a list of users of the app exactly matching the email provided.
+
+    Given I as user "liam@email.com" am logged in with "TestPassword10!"
+    And A user with first name <fname>, last name <lname>, and email <email> exists
+    And I, user "liam@email.com", have declined a friend request from <email>
+    When I am on the 'Manage Friends' page
+    And I enter in <input>
+    And I hit the search button
+    Then I can see a list of users of the app exactly matching <fname> <lname> <email>
+    Examples:
+      | fname  | lname | email            | input            |
+      | "Amy"  | "Doe" | "doe@gmail.com"  | "doe@gmail.com"  |
+      | "Andy" | ""    | "andy@gmail.com" | "andy@gmail.com" |
+
   Scenario Outline: AC6 - Given I am on the manage friends page and I have opened the search bar, when I enter a search
   string and I press the search button and there are no perfect matches, then I see a message saying "There is nobody with that name or email in Gardener's Grove".
 
@@ -77,7 +91,7 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
     Then user "sarah@email.com" sees the invite from "liam@email.com"
 
   Scenario: AC8 - Given I am on the manage friends page, and I have pending invites, when I accept an invite, then
-  that person is added to my list of friends, and I can see their profile, and I am added to that person’s friends list, and that person can see my profile.
+  that person is added to my list of friends, and I can see their profile, and I am added to that person's friends list, and that person can see my profile.
     Given I as user "sarah@email.com" am logged in with "TestPassword10!"
     And I am on the 'Manage Friends' page
     And I "sarah@email.com" have a pending invite from "liam@email.com"

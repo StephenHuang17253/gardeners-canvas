@@ -34,5 +34,7 @@ public interface UserInteractionRepository extends CrudRepository<UserInteractio
      * @param userId the id to match the user objects id
      * @return list of UserInteraction objects
      */
-    List<UserInteraction> findByUserIdAndItemTypeOrderByInteractionTime(long userId, ItemType itemType);
+    List<UserInteraction> findByUserIdAndItemTypeOrderByInteractionTimeDesc(long userId, ItemType itemType);
+
+    Optional<UserInteraction> findByUserIdAndItemIdAndItemType(Long userId, Long itemId, ItemType itemType);
 }

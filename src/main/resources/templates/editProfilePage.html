@@ -15,7 +15,7 @@
         <div class="col-6">
             <form th:action="@{/profile/edit}" method="post" enctype="multipart/form-data"
                   class="border rounded-3 p-3">
-                <div class="w-100 d-flex flex-row justify-content-center mb-3">
+                <div class="w-100 d-flex flex-column align-items-center mb-3">
                     <div class="position-relative w-75">
                         <div class="ratio ratio-1x1"
                              th:classappend="${profilePictureError == null ? '' : 'border-danger'}">
@@ -23,7 +23,7 @@
                                  th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
                                  alt="User's Profile Picture" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                         </div>
-                        <div
+                        <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
                             <div class="position-absolute top-0 end-0 w-50 h-50 text-white">
                                 <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
@@ -31,7 +31,7 @@
                             <input th:name="profilePictureInput" type="file" class="visually-hidden"
                                    accept="image/*" data-image-input data-displayed-by="imageToChange"
                                    data-errored-by="profilePictureError">
-                        </div>
+                        </label>
                     </div>
 
                     <p id="profilePictureError" class="text-danger fs-6" th:text="${profilePictureError}"></p>
@@ -43,6 +43,8 @@
                            th:value="*{firstName}" autofocus
                            th:classappend="${firstNameError == null ? '' : 'border-danger'}">
                     <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                    <p id="firstNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'First name must be 64 characters long or less'"></p>
                 </div>
 
                 <div class="mb-3" id="lastNameDiv">
@@ -50,6 +52,8 @@
                     <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
                            th:classappend="${lastNameError == null ? '' : 'border-danger'}">
                     <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                    <p id="lastNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Last name must be 64 characters long or less'"></p>
                 </div>
 
                 <div class="form-check mb-3">
@@ -63,7 +67,7 @@
                 <div class="mb-3">
                     <label for="dateOfBirth" class="form-label">Date of Birth</label>
                     <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
-                           th:value="*{dateOfBirth}" max="9999-12-30" th:oninvalid="handleInvalidDate()"
+                           th:value="*{dateOfBirth}" max="9999-12-30" th:oninvalid="displayDateError()"
                            th:oninput="clearDateError()"
                            th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
                     <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
@@ -77,7 +81,9 @@
                     <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
                            th:value="*{emailAddress}"
                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
-                    <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    <p id="emailError" th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    <p id="emailJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Email must be in the form \'jane@doe.nz\''"></p>
                 </div>
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
@@ -98,7 +104,7 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/noLastName.js}"></script>
-    <script th:src="@{/js/dateInputValid.js}"></script>
+    <script th:src="@{/js/accountFormValidation.js}"></script>
 </body>
 
 </html>

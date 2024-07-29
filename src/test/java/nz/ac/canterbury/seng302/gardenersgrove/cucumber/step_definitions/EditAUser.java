@@ -12,8 +12,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,8 +37,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @AutoConfigureMockMvc
 public class EditAUser {
 
-    Logger logger = LoggerFactory.getLogger(EditAUser.class);
-    public MockMvc MOCK_MVC;
+    public MockMvc mockMVC;
 
     @Autowired
     private WebApplicationContext context;
@@ -87,7 +84,7 @@ public class EditAUser {
                 dateOfBirth), "1es1P@ssword");
 
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders
+        mockMVC = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
@@ -110,13 +107,11 @@ public class EditAUser {
     public void i_click_the_submit_button() throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = dateOfBirth.format(formatter);
-        logger.debug(String.valueOf(lastName));
-        logger.debug(String.valueOf(noLastName));
         if (noLastName) {
             lastName = "";
         }
 
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .multipart("/profile/edit")
                         .file("profilePictureInput", null)
@@ -131,7 +126,7 @@ public class EditAUser {
     }
 
     @When("I enter valid values for first name {string}, last name {string}, email address {string}, and date of birth {string}")
-    public void i_enter_valid_values(String fname, String lname, String email, String date) throws Exception {
+    public void i_enter_valid_values(String fname, String lname, String email, String date) {
         firstName = fname;
         lastName = lname;
         emailAddress = email;
@@ -143,30 +138,30 @@ public class EditAUser {
     @Then("No details are changed")
     public void no_details_are_changed() {
         Assertions.assertNotNull(userService.getUserByEmail(emailAddress));
-        User test_user = userService.getUserByEmail(emailAddress);
-        Assertions.assertEquals(firstName, test_user.getFirstName());
-        Assertions.assertEquals(lastName, test_user.getLastName());
-        Assertions.assertEquals(emailAddress, test_user.getEmailAddress());
-        Assertions.assertEquals(dateOfBirth, test_user.getDateOfBirth());
+        User testUser = userService.getUserByEmail(emailAddress);
+        Assertions.assertEquals(firstName, testUser.getFirstName());
+        Assertions.assertEquals(lastName, testUser.getLastName());
+        Assertions.assertEquals(emailAddress, testUser.getEmailAddress());
+        Assertions.assertEquals(dateOfBirth, testUser.getDateOfBirth());
     }
 
     @Then("My surname will become {string}")
     public void my_surname_will_become(String surname) {
         Assertions.assertNotNull(userService.getUserByEmail(emailAddress));
-        User test_user = userService.getUserByEmail(emailAddress);
-        Assertions.assertEquals(surname, test_user.getLastName());
+        User testUser = userService.getUserByEmail(emailAddress);
+        Assertions.assertEquals(surname, testUser.getLastName());
     }
 
     @Then("I will be a user with first name {string}, last name {string}, email address {string}, and date of birth {string}")
     public void i_will_be_a_user_with_new_details(String fname, String lname, String email, String date) {
         Assertions.assertNotNull(userService.getUserByEmail(email));
-        User test_user = userService.getUserByEmail(email);
-        Assertions.assertEquals(fname, test_user.getFirstName());
-        Assertions.assertEquals(lname, test_user.getLastName());
-        Assertions.assertEquals(email, test_user.getEmailAddress());
+        User testUser = userService.getUserByEmail(email);
+        Assertions.assertEquals(fname, testUser.getFirstName());
+        Assertions.assertEquals(lname, testUser.getLastName());
+        Assertions.assertEquals(email, testUser.getEmailAddress());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate newDateOfBirth = LocalDate.parse(date, formatter);
-        Assertions.assertEquals(newDateOfBirth, test_user.getDateOfBirth());
+        Assertions.assertEquals(newDateOfBirth, testUser.getDateOfBirth());
     }
 
     @When("I check the check box marked \"I have no surname\"")

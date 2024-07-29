@@ -1,6 +1,9 @@
 const MAX_FILE_SIZE = 10; // in MB
+const ERROR_DISPLAY_DURATION = 5; // in secs
 const imageInputs = document.querySelectorAll("[data-image-input]");
 const errorMessage = `Image must be less than ${MAX_FILE_SIZE}MB`;
+const wrongFileErrorMessage = 'Image must be of type png, jpg or svg'
+const validFileTypes = ['image/png', 'image/jpeg', 'image/svg+xml'];
 
 /**
  * Handles setting the inputted image as the preview image. 
@@ -22,35 +25,52 @@ const handleFileSelect = (imageInput) => {
 
     const file = files[0];
 
-    const fileSizeInMB = file.size / (1024 ** 2);
-
     const errorDisplayId = imageInput.getAttribute("data-errored-by");
     const errorDisplayElement = document.getElementById(errorDisplayId);
 
-    if (fileSizeInMB > MAX_FILE_SIZE) {
+    const imageDisplayId = imageInput.getAttribute("data-displayed-by");
+    const imageDisplayElement = document.getElementById(imageDisplayId);
+
+    // Check if file size is greater than the max file size
+    if (file.size > MAX_FILE_SIZE * (1024 ** 2)) {
         errorDisplayElement.textContent = errorMessage;
-        imageInput.classList.add("border-danger");
+        imageDisplayElement.classList.add("border-danger");
         imageInput.value = '';
+
+        // Clear error message and border after 5 seconds
+        setTimeout(() => {
+            imageDisplayElement.classList.remove("border-danger");
+            errorDisplayElement.textContent = '';
+        }, ERROR_DISPLAY_DURATION * 1000)
+        return;
+    }
+    if (!validFileTypes.includes(file.type)) {
+        errorDisplayElement.textContent = wrongFileErrorMessage;
+        imageDisplayElement.classList.add("border-danger");
+        imageInput.value = '';
+
+        // Clear error message and border after 5 seconds
+        setTimeout(() => {
+            imageDisplayElement.classList.remove("border-danger");
+            errorDisplayElement.textContent = '';
+        }, ERROR_DISPLAY_DURATION * 1000)
         return;
     }
 
     const submitIfvalid = imageInput.getAttribute("data-submit-if-valid");
 
+    // If the input has the attribute data-submit-if-valid, submit the form
     if (submitIfvalid !== null) {
-        const formId = imageInput.closest("form").id;
-        const formElement = document.getElementById(formId);
-        formElement.submit();
+        imageInput.closest("form").submit();
         return;
     }
 
-    imageInput.classList.remove("border-danger");
+    imageDisplayElement.classList.remove("border-danger");
     errorDisplayElement.textContent = '';
 
+    // Set the image as the preview image
     const reader = new FileReader();
-
     reader.onload = (e) => {
-        const imageDisplayId = imageInput.getAttribute("data-displayed-by");
-        const imageDisplayElement = document.getElementById(imageDisplayId);
         imageDisplayElement.src = e.target.result;
     };
 
