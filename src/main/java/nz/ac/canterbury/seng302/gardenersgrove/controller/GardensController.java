@@ -90,6 +90,9 @@ public class GardensController {
      * @param gardenService   service to access garden repository
      * @param securityService service to access security methods
      * @param plantService    service to access plant repository
+     * @param weatherService    service to perform weather api calls
+     * @param objectMapper    used for JSON conversion
+     * @param gardenTagService    service to access tag repository
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
@@ -404,23 +407,12 @@ public class GardensController {
                 model.addAttribute("tagErrorText", tagResult);
             }
 
-            List<DailyWeather> weatherList;
+            List<WeatherModel> weatherList;
             weatherList = getGardenWeatherData(garden);
             if (weatherList.size() > 1) {
-                DailyWeather beforeYesterdayWeather = weatherList.get(0);
-                DailyWeather yesterdayWeather = weatherList.get(1);
-                DailyWeather currentWeather = weatherList.get(2);
-                if (currentWeather.getDescription().equals("Rainy")) {
-                    model.addAttribute("message", "Outdoor plants don't need any water today");
-                }
-
-                if (beforeYesterdayWeather.getDescription().equals("Sunny")
-                        && yesterdayWeather.getDescription().equals("Sunny")
-                        && currentWeather.getDescription().equals("Sunny")) {
-                    model.addAttribute("message",
-                            "There hasn't been any rain recently, make sure to water your plants if they need it");
-                }
+                handleWeatherMessages(weatherList, model);
             }
+
             int hour = LocalTime.now().getHour();
             String gradientClass = "g" + hour;
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");

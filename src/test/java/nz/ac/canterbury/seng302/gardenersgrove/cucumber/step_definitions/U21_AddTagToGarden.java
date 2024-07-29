@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -62,6 +63,9 @@ public class U21_AddTagToGarden {
     @Autowired
     public SecurityService securityService;
 
+    @Autowired
+    public ObjectMapper objectMapper;
+
     public static GardenService gardenService;
 
     public static UserService userService;
@@ -95,7 +99,7 @@ public class U21_AddTagToGarden {
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
         GardensController GardensController = new GardensController(gardenService, securityService,
-                plantService, weatherService, gardenTagService);
+                plantService, weatherService, objectMapper, gardenTagService);
 
         mockMVCGardens = MockMvcBuilders.standaloneSetup(GardensController).build();
 
