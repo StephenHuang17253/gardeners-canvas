@@ -362,23 +362,22 @@ public class GardensController {
 
     /**
      * This function creates a post mapping for adding a tag to a garden
-     * @param gardenIdString id of garden to add tag to
+     * @param gardenId id of garden to add tag to
      * @param tag tag string
      * @param page pagination page
      * @return template for garden page or redirect to garden page
      */
     @PostMapping("/my-gardens/{gardenId}/tag")
-    public String addGardenTag(@PathVariable("gardenId") String gardenIdString,
+    public String addGardenTag(@PathVariable Long gardenId,
                                    @RequestParam("tag") String tag,
                                    @RequestParam(defaultValue = "1") int page,
                                    RedirectAttributes redirectAttributes,
                                    HttpServletResponse response,
                                    Model model) {
-        logger.info("POST /my-gardens/{}/tag", gardenIdString);
+        logger.info("POST /my-gardens/{}/tag", gardenId);
 
-        long gardenId = Long.parseLong(gardenIdString);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-        if (!optionalGarden.isPresent()) {
+        if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
@@ -413,37 +412,19 @@ public class GardensController {
                 handleWeatherMessages(weatherList, model);
             }
 
-            int hour = LocalTime.now().getHour();
-            String gradientClass = "g" + hour;
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
-            String formattedTime = LocalDateTime.now().format(formatter);
+            User user = garden.getOwner();
             List<Plant> plants = garden.getPlants();
-
-            int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
-            int startIndex = (page - 1) * COUNT_PER_PAGE;
-            int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
-            User user = securityService.getCurrentUser();
+            String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
+            handlePagniation(page, plants.size(), model);
 
             model.addAttribute("tagText", tag);
-            model.addAttribute("myGardens", gardenService.getGardens());
             model.addAttribute("isOwner", true);
-            model.addAttribute("gardenName", garden.getGardenName());
-            model.addAttribute("gardenLocation", garden.getGardenLocation());
-            model.addAttribute("gardenSize", garden.getGardenSize());
-            model.addAttribute("gardenDescription", garden.getGardenDescription());
-            model.addAttribute("gardenId", gardenId);
-            model.addAttribute("plants", plants.subList(startIndex, endIndex));
-            model.addAttribute("totalGardens", plants.size());
-            model.addAttribute("makeGardenPublic", garden.getIsPublic());
-            model.addAttribute("weather", weatherList);
-            model.addAttribute("gradientClass", gradientClass);
+            model.addAttribute("garden", new GardenDetailModel(garden));
+            model.addAttribute("weatherList", weatherList);
+            model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
             model.addAttribute("currentTime", formattedTime);
             model.addAttribute("profilePicture", user.getProfilePictureFilename());
             model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("lastPage", totalPages);
-            model.addAttribute("startIndex", startIndex + 1);
-            model.addAttribute("endIndex", endIndex);
 
             List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
