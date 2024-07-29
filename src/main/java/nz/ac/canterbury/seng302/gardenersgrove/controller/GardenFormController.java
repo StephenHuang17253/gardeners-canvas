@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.model.GardenModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenNavModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.LocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
@@ -272,9 +272,9 @@ public class GardenFormController {
         User user = securityService.getCurrentUser();
         gardenService.addGarden(garden);
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenModel> gardenModels = new ArrayList<>();
+        List<GardenNavModel> gardenModels = new ArrayList<>();
         for (Garden g : gardens) {
-            gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
+            gardenModels.add(new GardenNavModel(g.getGardenId(),g.getGardenName()));
         }
         session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));
@@ -439,9 +439,9 @@ public class GardenFormController {
 
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenModel> gardenModels = new ArrayList<>();
+        List<GardenNavModel> gardenModels = new ArrayList<>();
         for (Garden g : gardens) {
-            gardenModels.add(new GardenModel(g.getGardenId(), g.getGardenName()));
+            gardenModels.add(new GardenNavModel(g.getGardenId(),g.getGardenName()));
         }
         session.setAttribute("userGardens", gardenModels);
         model.addAttribute("userGardens", session.getAttribute("userGardens"));

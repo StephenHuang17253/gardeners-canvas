@@ -2,6 +2,8 @@ const MAX_FILE_SIZE = 10; // in MB
 const ERROR_DISPLAY_DURATION = 5; // in secs
 const imageInputs = document.querySelectorAll("[data-image-input]");
 const errorMessage = `Image must be less than ${MAX_FILE_SIZE}MB`;
+const wrongFileErrorMessage = 'Image must be of type png, jpg or svg'
+const validFileTypes = ['image/png', 'image/jpeg', 'image/svg+xml'];
 
 /**
  * Handles setting the inputted image as the preview image. 
@@ -32,6 +34,18 @@ const handleFileSelect = (imageInput) => {
     // Check if file size is greater than the max file size
     if (file.size > MAX_FILE_SIZE * (1024 ** 2)) {
         errorDisplayElement.textContent = errorMessage;
+        imageDisplayElement.classList.add("border-danger");
+        imageInput.value = '';
+
+        // Clear error message and border after 5 seconds
+        setTimeout(() => {
+            imageDisplayElement.classList.remove("border-danger");
+            errorDisplayElement.textContent = '';
+        }, ERROR_DISPLAY_DURATION * 1000)
+        return;
+    }
+    if (!validFileTypes.includes(file.type)) {
+        errorDisplayElement.textContent = wrongFileErrorMessage;
         imageDisplayElement.classList.add("border-danger");
         imageInput.value = '';
 

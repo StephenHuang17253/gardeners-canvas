@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +30,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -58,6 +75,12 @@ public class U9_ViewGarden {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
+    public UserInteractionService userInteractionService;
+
+    @Autowired
+    public ObjectMapper objectMapper;
+
     public SecurityService securityService;
 
     @Autowired
@@ -84,10 +107,14 @@ public class U9_ViewGarden {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService);
+
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
+        mockMVC = MockMvcBuilders.standaloneSetup(gardensController).build();
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService, gardenTagService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +
@@ -178,8 +205,11 @@ public class U9_ViewGarden {
     @And("The garden's name {string} and location {string}, {string} are visible")
     public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"), gardenName);
-        Assertions.assertEquals(modelMap.getAttribute("gardenLocation"), gardenCity + ", " + gardenCountry);
+        GardenDetailModel garden = (GardenDetailModel) modelMap.getAttribute("garden");
+
+        Assertions.assertNotNull(garden);
+        Assertions.assertEquals(gardenName, garden.getGardenName());
+        Assertions.assertEquals(gardenCity + ", " + gardenCountry, garden.getGardenLocation());
 
     }
 }
