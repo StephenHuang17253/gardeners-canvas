@@ -414,6 +414,31 @@ public class InputValidator {
         return result;
     }
 
+
+    /**
+     * Validate a new garden tag
+     * 25 characters or less and alpha numeric or _ - ' " and space
+     * @param tag tag string to validate
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *   otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateTag(String tag) {
+        ValidationResult result = new InputValidator(tag)
+                .lengthHelperWithEmojis(25).getResult();
+        if (!result.valid()) {
+            result.updateMessage("A tag cannot exceed 25 characters");
+            return result;
+        }
+        if (!tag.matches("^[a-zA-Z0-9\\s\\-'\"_]*$")) {
+            result = ValidationResult.NON_ALPHA_PLUS;
+            result.updateMessage("The tag name must only contain alphanumeric characters, spaces, -, _, ', or \"");
+            return result;
+        }
+        return result;
+    }
+
+
+
     /**
      * Checks if a string represents a valid float that is also a whole number
      * updates local variables with results
