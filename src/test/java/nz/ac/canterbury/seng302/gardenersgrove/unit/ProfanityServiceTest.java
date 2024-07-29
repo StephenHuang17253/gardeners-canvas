@@ -1,30 +1,31 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
 
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Date;
 
-import static org.mockito.Mockito.when;
 
 class ProfanityServiceTest {
 
     private ProfanityService profanityService;
     HttpClient httpClientMock;
+
+    GardenTagService gardenTagServiceMock;
+
     @BeforeEach
-    void init()
-    {
+    void init() {
         httpClientMock = Mockito.mock(HttpClient.class);
-        profanityService = new ProfanityService(httpClientMock);
+        gardenTagServiceMock = Mockito.mock(GardenTagService.class);
+        profanityService = new ProfanityService(httpClientMock, gardenTagServiceMock);
         ReflectionTestUtils.setField(profanityService, "endPoint", "https://gg-content-moderator.cognitiveservices.anImaginaryWebsite.com/");
         ReflectionTestUtils.setField(profanityService, "moderatorKey", "NotARealKey123");
     }

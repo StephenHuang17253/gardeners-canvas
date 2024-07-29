@@ -45,7 +45,7 @@ public class ProfanityService {
     /**
      * Service to handle tag database checks.
      */
-    private GardenTagService gardenTagService;
+    private final GardenTagService gardenTagService;
 
     /**
      * General constructor for profanity service, creates new http client.
@@ -63,10 +63,12 @@ public class ProfanityService {
      * mock the function of api calls
      * Test Use Only
      *
-     * @param httpClientMock mockHttpClient used to mock the api calls when testing the Profanity service
+     * @param httpClientMock       mockHttpClient used to mock the api calls when testing the Profanity service
+     * @param gardenTagServiceMock mocked garden service for unit testing.
      */
-    public ProfanityService(HttpClient httpClientMock) {
+    public ProfanityService(HttpClient httpClientMock, GardenTagService gardenTagServiceMock) {
         httpClient = httpClientMock;
+        this.gardenTagService = gardenTagServiceMock;
     }
 
     /**
