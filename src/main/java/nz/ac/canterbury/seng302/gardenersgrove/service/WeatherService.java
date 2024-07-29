@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.UnavailableException;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
-import java.util.stream.Collectors;
 
 @Service
 public class WeatherService {
@@ -107,7 +106,7 @@ public class WeatherService {
     /**
      * Processes multiple weather requests in chunks of gardens
      *
-     * @param gardens
+     * @param gardens list of gardens
      * @return a list of weather data for gardens
      * @throws UnavailableException
      */
@@ -127,8 +126,8 @@ public class WeatherService {
     /**
      * Process chunks of gardens, adds weatherdata to the list
      *
-     * @param chunk
-     * @param weatherDataList
+     * @param chunk sublist of gardens that will have their weather retrieved together
+     * @param weatherDataList list of weather data
      * @throws UnavailableException
      */
     private void processChunk(List<Garden> chunk, List<WeatherResponseData> weatherDataList) throws UnavailableException {
@@ -152,8 +151,8 @@ public class WeatherService {
     /**
      * Fetches weather data through series of HTTP requests
      *
-     * @param garden
-     * @return
+     * @param garden the garden that's weather data is being fetched
+     * @return async request
      */
     private CompletableFuture<WeatherResponseData> fetchWeatherData(Garden garden) {
         semaphore.acquireUninterruptibly();
@@ -169,8 +168,8 @@ public class WeatherService {
     /**
      * Splits users gardens into chunks, default size = 9
      *
-     * @param gardens
-     * @param chunkSize
+     * @param gardens list of gardens
+     * @param chunkSize size of chunk to split the gardens into sublists of that length
      * @return 2-dimensional list of chunks of gardens
      */
     private List<List<Garden>> chunkGardens(List<Garden> gardens, int chunkSize) {
@@ -198,7 +197,7 @@ public class WeatherService {
     /**
      * Pre-existing logic, used to build HTTP request
      *
-     * @param garden
+     * @param garden the garden the request is built for
      * @return HTTP request
      */
     private HttpRequest buildHttpRequest(Garden garden) {
@@ -216,9 +215,9 @@ public class WeatherService {
     /**
      * pre-existing logic, handles HTTP response
      *
-     * @param response
-     * @param garden
-     * @return
+     * @param response response from the weather
+     * @param garden the garden needing the response data
+     * @return JSON that holds weather data
      */
     private WeatherResponseData handleHttpResponse(HttpResponse<String> response, Garden garden) {
         try {
