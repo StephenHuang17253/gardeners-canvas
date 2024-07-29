@@ -332,7 +332,6 @@ public class GardensController {
 
         boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
-
         if (!gardenAlreadyHasThisTag && tagResult.valid()) {
             gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
         }
@@ -410,8 +409,6 @@ public class GardensController {
         return "redirect:/my-gardens/{gardenId}";
 
     }
-
-
 
     /**
      * This function is called when a user tries to update a plants image
@@ -595,7 +592,6 @@ public class GardensController {
         }
         logger.info("Permits left after request: {}", semaphore.availablePermits());
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
-
     }
 
 }
