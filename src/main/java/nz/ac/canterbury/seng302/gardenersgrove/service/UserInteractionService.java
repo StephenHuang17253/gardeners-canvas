@@ -72,7 +72,7 @@ public class UserInteractionService {
             throw new IllegalArgumentException("Invalid user ID: " + id);
         }
 
-        return userInteractionRepository.findByUserIdAndItemTypeOrderByInteractionTime(id, itemType);
+        return userInteractionRepository.findByUserIdAndItemTypeOrderByInteractionTimeDesc(id, itemType);
     }
 
     /**
