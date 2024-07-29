@@ -59,6 +59,7 @@ public class HomePageController {
 
     private final WeatherService weatherService;
 
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -242,7 +243,7 @@ public class HomePageController {
     }
 
 
-    private String loadUserMainPage(User user, Model model){
+    private String loadUserMainPage(User user, Model model) throws UnavailableException {
 
         String username = user.getFirstName() + " " + user.getLastName();
         String profilePicture = user.getProfilePictureFilename();
@@ -251,59 +252,57 @@ public class HomePageController {
 
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
-        if(recentGardens == null){
+        if (recentGardens == null) {
             return "mainPage";
         }
-        if(recentGardens.size() < PAGE_SIZE){
-            model.addAttribute("recentGardensPage1", recentGardens.subList(0,recentGardens.size()));
-        }else{
-            model.addAttribute("recentGardensPage1", recentGardens.subList(0,5));
+        if (recentGardens.size() < PAGE_SIZE) {
+            model.addAttribute("recentGardensPage1", recentGardens.subList(0, recentGardens.size()));
+        } else {
+            model.addAttribute("recentGardensPage1", recentGardens.subList(0, 5));
         }
         if (recentGardens.size() > PAGE_SIZE) {
-            List<RecentGardenModel> recentGardensPage2 = recentGardens.subList(PAGE_SIZE, Math.min(PAGE_SIZE*2, recentGardens.size()));
+            List<RecentGardenModel> recentGardensPage2 = recentGardens.subList(PAGE_SIZE, Math.min(PAGE_SIZE * 2, recentGardens.size()));
             model.addAttribute("recentGardensPage2", recentGardensPage2);
         } else {
             model.addAttribute("recentGardensPage2", null);
-        boolean loggedIn = securityService.isLoggedIn();
+            boolean loggedIn = securityService.isLoggedIn();
 
-        if (loggedIn) {
-            User user = securityService.getCurrentUser();
-            String username = user.getFirstName() + " " + user.getLastName();
-            String profilePicture = user.getProfilePictureFilename();
+            if (loggedIn) {
+                user = securityService.getCurrentUser();
+                username = user.getFirstName() + " " + user.getLastName();
+                profilePicture = user.getProfilePictureFilename();
 
-            List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-            List<Garden> gardensNeedWatering = new ArrayList<>();
-            List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
+                List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+                List<Garden> gardensNeedWatering = new ArrayList<>();
+                List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
 
-            // Map weather data to corresponding gardens
-            Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
-            for (int i = 0; i < gardens.size(); i++) {
-                gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
-            }
+                Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
+                for (int i = 0; i < gardens.size(); i++) {
+                    gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
+                }
 
-            for (Garden garden : gardens) {
-                WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
-                if (weatherData != null) {
-                    List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
-                    if (weatherList.size() > 1) {
-                        DailyWeather beforeYesterdayWeather = weatherList.get(0);
-                        DailyWeather yesterdayWeather = weatherList.get(1);
-                        if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
-                            gardensNeedWatering.add(garden);
+                for (Garden garden : gardens) {
+                    WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
+                    if (weatherData != null) {
+                        List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
+                        if (weatherList.size() > 1) {
+                            DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                            DailyWeather yesterdayWeather = weatherList.get(1);
+                            if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                                    && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
+                                gardensNeedWatering.add(garden);
+                            }
                         }
                     }
                 }
+                model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+                model.addAttribute("profilePicture", profilePicture);
+                model.addAttribute("username", username);
+                model.addAttribute("gardens", gardens);
+                model.addAttribute("gardenWeatherMap", gardenWeatherMap);
             }
-            model.addAttribute("gardensNeedWatering", gardensNeedWatering);
-            model.addAttribute("profilePicture", profilePicture);
-            model.addAttribute("username", username);
-            model.addAttribute("gardens", gardens);
-            model.addAttribute("gardenWeatherMap", gardenWeatherMap);
         }
 
         return "mainPage";
     }
-
-
 }

@@ -104,6 +104,13 @@ public class WeatherService {
         return getWeather(gardenLatitude, gardenLongitude);
     }
 
+    /**
+     * Processes multiple weather requests in chunks of gardens
+     *
+     * @param gardens
+     * @return a list of weather data for gardens
+     * @throws UnavailableException
+     */
     public List<WeatherResponseData> getWeatherForGardens(List<Garden> gardens) throws UnavailableException {
         List<WeatherResponseData> weatherDataList = new ArrayList<>();
         List<List<Garden>> gardenChunks = chunkGardens(gardens, MAX_REQUESTS_PER_SECOND - 1);
@@ -116,6 +123,14 @@ public class WeatherService {
         return weatherDataList;
     }
 
+
+    /**
+     * Process chunks of gardens, adds weatherdata to the list
+     *
+     * @param chunk
+     * @param weatherDataList
+     * @throws UnavailableException
+     */
     private void processChunk(List<Garden> chunk, List<WeatherResponseData> weatherDataList) throws UnavailableException {
         resetPermitsIfNeeded();
 
@@ -125,18 +140,24 @@ public class WeatherService {
         }
 
         List<CompletableFuture<WeatherResponseData>> futures = chunk.stream()
-                .map(this::fetchWeatherDataAsync)
-                .collect(Collectors.toList());
+                .map(this::fetchWeatherData)
+                .toList();
 
         weatherDataList.addAll(futures.stream()
                 .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+                .toList());
     }
 
-    private CompletableFuture<WeatherResponseData> fetchWeatherDataAsync(Garden garden) {
+    /**
+     * Fetches weather data through series of HTTP requests
+     *
+     * @param garden
+     * @return
+     */
+    private CompletableFuture<WeatherResponseData> fetchWeatherData(Garden garden) {
         semaphore.acquireUninterruptibly();
-        logger.info("Permits left after acquiring for garden {}: {}", garden.getGardenId(), semaphore.availablePermits());
+        logger.info("Permits left after request for garden {}: {}", garden.getGardenId(), semaphore.availablePermits());
 
         HttpRequest request = buildHttpRequest(garden);
 
@@ -145,6 +166,41 @@ public class WeatherService {
                 .whenComplete((response, ex) -> semaphore.release());
     }
 
+    /**
+     * Splits users gardens into chunks, default size = 9
+     *
+     * @param gardens
+     * @param chunkSize
+     * @return 2-dimensional list of chunks of gardens
+     */
+    private List<List<Garden>> chunkGardens(List<Garden> gardens, int chunkSize) {
+        List<List<Garden>> chunks = new ArrayList<>();
+        for (int i = 0; i < gardens.size(); i += chunkSize) {
+            chunks.add(gardens.subList(i, Math.min(gardens.size(), i + chunkSize)));
+        }
+        return chunks;
+    }
+
+    /**
+     * Delays the chunk weather requests to avoid running out of permits
+     *
+     * @throws UnavailableException
+     */
+    private void delayBetweenChunks() throws UnavailableException {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new UnavailableException("Thread interrupted");
+        }
+    }
+
+    /**
+     * Pre-existing logic, used to build HTTP request
+     *
+     * @param garden
+     * @return HTTP request
+     */
     private HttpRequest buildHttpRequest(Garden garden) {
         String url = "https://api.open-meteo.com/v1/forecast?latitude="
                 + garden.getGardenLatitude()
@@ -157,6 +213,13 @@ public class WeatherService {
                 .build();
     }
 
+    /**
+     * pre-existing logic, handles HTTP response
+     *
+     * @param response
+     * @param garden
+     * @return
+     */
     private WeatherResponseData handleHttpResponse(HttpResponse<String> response, Garden garden) {
         try {
             JsonNode jsonObject = objectMapper.readTree(response.body());
@@ -168,6 +231,9 @@ public class WeatherService {
         }
     }
 
+    /**
+     * pre-existing logic, resets permits
+     */
     private void resetPermitsIfNeeded() {
         long currentTime = Instant.now().getEpochSecond();
         long timeElapsed = currentTime - lastRequestTime;
@@ -183,20 +249,4 @@ public class WeatherService {
         logger.info("Permits left before request: {}", semaphore.availablePermits());
     }
 
-    private void delayBetweenChunks() throws UnavailableException {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new UnavailableException("Thread interrupted");
-        }
-    }
-
-    private List<List<Garden>> chunkGardens(List<Garden> gardens, int chunkSize) {
-        List<List<Garden>> chunks = new ArrayList<>();
-        for (int i = 0; i < gardens.size(); i += chunkSize) {
-            chunks.add(gardens.subList(i, Math.min(gardens.size(), i + chunkSize)));
-        }
-        return chunks;
-    }
 }
