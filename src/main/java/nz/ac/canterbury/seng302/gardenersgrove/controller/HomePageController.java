@@ -214,7 +214,7 @@ public class HomePageController {
             return null;
         }
         return gardenList.stream()
-                .map(garden -> new RecentGardenModel(garden, garden.getOwner()))
+                .map(garden -> new RecentGardenModel(garden, garden.getOwner(), securityService.isOwner(garden.getOwner().getId())))
                 .collect(Collectors.toList());
     }
 
