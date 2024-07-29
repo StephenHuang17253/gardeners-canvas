@@ -84,7 +84,6 @@ class HomePageControllerIntegrationTest {
     void getMappingLoggedIn_home_containsNames() throws Exception {
 
         this.mockMvc.perform(get("/home"))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("username", is("John Doe")));
     }
