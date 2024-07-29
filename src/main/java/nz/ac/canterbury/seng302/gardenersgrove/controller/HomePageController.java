@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.UnavailableException;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -17,10 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -63,7 +62,7 @@ public class HomePageController {
 
     /**
      * Adds the loggedIn attribute to the model for all requests
-     * 
+     *
      * @param model
      */
     @ModelAttribute
@@ -73,7 +72,7 @@ public class HomePageController {
 
     /**
      * Redirects GET default url '/' to '/home'
-     * 
+     *
      * @return redirect to /home
      * @throws IOException
      */
@@ -86,7 +85,7 @@ public class HomePageController {
     /**
      * Adds a default user and gardens to the database for testing purposes
      */
-    public void addDefautContent() {
+    public void addDefaultContent() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
@@ -185,12 +184,12 @@ public class HomePageController {
 
     /**
      * This function is called when a GET request is made to /home
-     * 
+     *
      * @param model
      * @return The homePage html page
      */
     @GetMapping("/home")
-    public String home(Model model) {
+    public String home(Model model) throws UnavailableException {
 
         logger.info("GET /home");
 
@@ -198,7 +197,7 @@ public class HomePageController {
 
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
-            addDefautContent();
+            addDefaultContent();
         }
 
         boolean loggedIn = securityService.isLoggedIn();
@@ -210,27 +209,37 @@ public class HomePageController {
 
             List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
             List<Garden> gardensNeedWatering = new ArrayList<>();
-            for (Garden garden : gardens) {
-                List<DailyWeather> weatherList = weatherService.getGardenWeatherData(garden);
-                if (weatherList.size() > 1) {
-                    DailyWeather beforeYesterdayWeather = weatherList.get(0);
-                    DailyWeather yesterdayWeather = weatherList.get(1);
-                    DailyWeather currentWeather = weatherList.get(2);
-                    if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                            && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
-                        gardensNeedWatering.add(garden);
-                    }
-                    model.addAttribute("gardensNeedWatering", gardensNeedWatering);
-                    model.addAttribute("profilePicture", profilePicture);
-                    model.addAttribute("username", username);
-                }
+            List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
 
-                model.addAttribute("gardens", gardens);
-                model.addAttribute("profilePicture", profilePicture);
-                model.addAttribute("username", username);
+            // Map weather data to corresponding gardens
+            Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
+            for (int i = 0; i < gardens.size(); i++) {
+                gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
             }
 
+            for (Garden garden : gardens) {
+                WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
+                if (weatherData != null) {
+                    List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
+                    if (weatherList.size() > 1) {
+                        DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                        DailyWeather yesterdayWeather = weatherList.get(1);
+                        if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
+                            gardensNeedWatering.add(garden);
+                        }
+                    }
+                }
+            }
+            model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+            model.addAttribute("profilePicture", profilePicture);
+            model.addAttribute("username", username);
+            model.addAttribute("gardens", gardens);
+            model.addAttribute("gardenWeatherMap", gardenWeatherMap);
         }
+
         return "homePage";
     }
+
+
 }
