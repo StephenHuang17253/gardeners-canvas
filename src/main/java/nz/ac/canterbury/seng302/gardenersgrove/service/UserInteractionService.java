@@ -128,4 +128,30 @@ public class UserInteractionService {
 
         return userInteractionRepository.save(userInteraction);
     }
+
+    /**
+     * Remove a user interaction by its user, item id and item type,
+     * If the interaction does not exist, nothing will happen.
+     * @param userId the user who triggered the interaction
+     * @param itemId the item interacted with
+     * @param itemType the item's type
+     */
+    public void removeUserInteraction(Long userId, Long itemId, ItemType itemType) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid user ID: " + userId);
+        }
+
+        if (!isValidItem(itemId, itemType)) {
+            throw new IllegalArgumentException("Invalid item ID: " + itemId + " for item type: " + itemType);
+        }
+
+        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository.findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
+        if (existingInteractionOpt.isPresent()) {
+            UserInteraction userInteraction = existingInteractionOpt.get();
+            userInteractionRepository.delete(userInteraction);
+        }
+
+    }
+
 }

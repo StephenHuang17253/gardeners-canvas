@@ -56,7 +56,8 @@ public class ManageFriendsController {
      *
      * @param securityService   service to access security methods
      * @param friendshipService service to access plant repository
-     * @param fileService       service to manage files
+     * @param userService       service to manage users
+     * @param userInteractionService service to manage user interactions
      */
     @Autowired
     public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService,
@@ -363,6 +364,8 @@ public class ManageFriendsController {
 
         if (friendship != null) {
             friendshipService.deleteFriendship(friendship.getId());
+            userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);
+            userInteractionService.removeUserInteraction(friendId, currentUser.getId(), ItemType.USER);
         }
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
