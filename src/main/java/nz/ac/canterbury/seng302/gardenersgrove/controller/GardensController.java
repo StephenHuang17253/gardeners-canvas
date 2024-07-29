@@ -323,10 +323,29 @@ public class GardensController {
             return "404";
         }
 
+        Garden garden = optionalGarden.get();
+        GardenTag gardenTag = new GardenTag(tag);
+
+        if (gardenTagService.getByName(tag).isPresent()) {
+            gardenTag = gardenTagService.getByName(tag).get();
+        } else {
+            gardenTagService.addGardenTag(gardenTag);
+        }
+
         ValidationResult tagResult = InputValidator.validateTag(tag);
-        if (!tagResult.valid()) {
-            model.addAttribute("tagErrorText", tagResult);
-            Garden garden = optionalGarden.get();
+
+        boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+
+        if (!gardenAlreadyHasThisTag && tagResult.valid()) {
+            gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+        }
+
+        if (!tagResult.valid() || gardenAlreadyHasThisTag) {
+            if (gardenAlreadyHasThisTag) {
+                model.addAttribute("tagErrorText", "This tag has already been added to the garden.");
+            } else {
+                model.addAttribute("tagErrorText", tagResult);
+            }
 
             List<DailyWeather> weatherList;
             weatherList = getGardenWeatherData(garden);
@@ -377,16 +396,17 @@ public class GardensController {
             model.addAttribute("startIndex", startIndex + 1);
             model.addAttribute("endIndex", endIndex);
 
+            List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+            List<String> tagsList = tagRelationsList.stream()
+                    .map(GardenTagRelation::getTag)
+                    .map(GardenTag::getTagName)
+                    .toList();
+
+            model.addAttribute("tagsList", tagsList);
+
             return "gardenDetailsPage";
         }
-
-
-        Garden garden = optionalGarden.get();
-
-        GardenTag gardenTag = gardenTagService.addGardenTag(new GardenTag(tag));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
-
-
 
         redirectAttributes.addAttribute("page", page);
 
