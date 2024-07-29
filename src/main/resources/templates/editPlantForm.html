@@ -15,7 +15,7 @@
             <div class="col-6">
 
                 <form th:action="@{edit}" method="post" enctype="multipart/form-data"
-                    class="border rounded-3 p-3 bg-white">
+                    class="border rounded-3 p-3 bg-white submit-form-once">
 
                     <div class="w-100 d-flex flex-column align-items-center mb-3">
 
@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success" formnovalidate>Submit</button>
+                        <button type="submit" class="btn btn-success submit-button" formnovalidate>Submit</button>
                         <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
                             <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>
@@ -93,6 +93,7 @@
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/formatNumber.js}"></script>
+    <script th:src="@{/js/submitFormOnce.js}"></script>
 </body>
 
 </html>
