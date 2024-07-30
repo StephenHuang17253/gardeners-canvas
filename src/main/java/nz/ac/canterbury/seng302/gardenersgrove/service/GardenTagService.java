@@ -153,7 +153,7 @@ public class GardenTagService {
     public void updateGardenTagStatus(String tagName, TagStatus tagStatus) {
         List<GardenTag>  tagList = gardenTagRepository.findByTagNameContainsIgnoreCase(tagName);
         tagList.forEach(item -> item.setTagStatus(tagStatus));
-        tagList.forEach(gardenTagRepository::updateGardenTagByTagId);
+        gardenTagRepository.saveAll(tagList);
     }
 
 
