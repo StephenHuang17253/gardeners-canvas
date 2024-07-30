@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import io.cucumber.java.Before;
@@ -67,6 +69,10 @@ public class U25_MainPage {
 
     private static FriendshipService friendshipService;
 
+    public static WeatherService weatherService;
+
+    public static AuthenticationManager authenticationManager;
+
     @Autowired
     public UserInteractionService userInteractionService;
 
@@ -82,8 +88,10 @@ public class U25_MainPage {
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
+        weatherService = new WeatherService();
 
-        HomePageController homePageController = new HomePageController(userService, gardenService, plantService, friendshipService, securityService, userInteractionService);
+
+        HomePageController homePageController = new HomePageController(userService, authenticationManager, gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService);
 
         // Allows us to bypass spring security
         mockMVC = MockMvcBuilders
@@ -134,4 +142,17 @@ public class U25_MainPage {
     }
 
 
+    @And("I am on the home page")
+    public void iAmOnTheHomePage() throws Exception {
+        String url = "/home";
+        mockMVC.perform(
+                        MockMvcRequestBuilders
+                                .get(url))
+                .andExpect(status().isOk()).andReturn();
+    }
+
+    @Then("I can see the names and gardens of plants that need watering")
+    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering() {
+
+    }
 }
