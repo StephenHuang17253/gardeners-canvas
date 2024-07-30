@@ -102,7 +102,7 @@
             <h2>Recent Users</h2>
         </div>
         <div class="col-3" th:each="friend : ${recentFriends}">
-            <a th:href="@{${friend.getFriendGardenLink}}" class="btn btn-light mb-3">
+            <a th:href="@{${friend.getFriendGardenLink}}" class="text-reset text-decoration-none">
                 <div class="card h-100 bg-success text-white garden-card">
                     <div class="card-body pt-1 text-center">
                         <h4 th:text="${friend.getFriendName}" class="card-title justify-content-center"></h4>
