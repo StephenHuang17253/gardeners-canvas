@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,10 +25,10 @@ public class ErrorHandleController implements ErrorController {
      * @param request the request object
      * @return the error page to display
      */
-    @RequestMapping("/error")
+    @GetMapping("/error")
     public String handleError(HttpServletRequest request) {
 
-        logger.error("An Error Ocurred");
+        logger.error("An Error Occurred");
 
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 

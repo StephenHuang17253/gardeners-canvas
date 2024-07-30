@@ -168,7 +168,7 @@ public class GardensController {
         return weatherList;
     }
 
-    private void handleWeatherMessages(List<WeatherModel> weatherList, Model model){
+    private void handleWeatherMessages(List<WeatherModel> weatherList, Model model) {
         WeatherModel beforeYesterdayWeather = weatherList.get(0);
         WeatherModel yesterdayWeather = weatherList.get(1);
         WeatherModel currentWeather = weatherList.get(2);
@@ -180,12 +180,13 @@ public class GardensController {
         if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(currentWeather.getDescription(), "Sunny")) {
-            model.addAttribute("message", "There hasn't been any rain recently, make sure to water your plants if they need it");
+            model.addAttribute("message",
+                    "There hasn't been any rain recently, make sure to water your plants if they need it");
             model.addAttribute("goodMessage", false);
         }
     }
 
-    private void handlePagniation(int page, int listLength, Model model){
+    private void handlePagniation(int page, int listLength, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -228,13 +229,14 @@ public class GardensController {
             return "403";
         }
 
-        securityService.addUserInteraction(gardenId, ItemType.GARDEN,LocalDateTime.now());
+        securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
         List<WeatherModel> weatherList = null;
 
         try {
-            if(weatherListJson != null){
-                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+            if (weatherListJson != null) {
+                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {
+                });
             }
         } catch (Exception e) {
             logger.error("An error occurred while mapping the weatherListJson: " + e.getMessage());
@@ -249,7 +251,7 @@ public class GardensController {
             logger.error("An error occurred while getting the weather list from the flash map: " + e.getMessage());
         }
 
-        if(weatherList == null || weatherList.isEmpty()){
+        if (weatherList == null || weatherList.isEmpty()) {
             weatherList = getGardenWeatherData(garden);
         }
         if (weatherList.size() > 1) {
@@ -262,8 +264,9 @@ public class GardensController {
         handlePagniation(page, plants.size(), model);
 
         try {
-            if(weatherListJson != null){
-                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+            if (weatherListJson != null) {
+                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {
+                });
             }
         } catch (Exception e) {
             logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
@@ -312,7 +315,7 @@ public class GardensController {
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
             @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(value = "weatherListJson", required = false)  String weatherListJson,
+            @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
             RedirectAttributes redirectAttributes,
             HttpServletResponse response) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}/public", gardenId);
@@ -334,9 +337,10 @@ public class GardensController {
 
         gardenService.updateGardenPublicity(garden.getGardenId(), makeGardenPublic);
         List<WeatherModel> weatherList = null;
-        if(weatherListJson != null){
+        if (weatherListJson != null) {
             try {
-                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+                weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {
+                });
             } catch (Exception e) {
                 logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
             }
@@ -436,16 +440,16 @@ public class GardensController {
      * This function is called when a user tries to update a plants image
      * directly from the My Garden's page instead of one of the plant forms.
      *
-     * @param gardenId id of the garden being edited
-     * @param plantId        id of the plant being edited
-     * @param plantPicture   the new picture
-     * @param model          the model
+     * @param gardenId     id of the garden being edited
+     * @param plantId      id of the plant being edited
+     * @param plantPicture the new picture
+     * @param model        the model
      * @return thymeleaf gardenDetails
      */
     @PostMapping("/my-gardens/{gardenId}")
     public String updatePlantImage(@PathVariable Long gardenId,
             @RequestParam("plantId") Long plantId,
-            @RequestParam("weatherListJson")  String weatherListJson,
+            @RequestParam("weatherListJson") String weatherListJson,
             @RequestParam("plantPictureInput") MultipartFile plantPicture,
             @RequestParam(defaultValue = "1") int page,
             RedirectAttributes redirectAttributes,
@@ -472,7 +476,9 @@ public class GardensController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        List<WeatherModel> weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {});
+        List<WeatherModel> weatherList = objectMapper.readValue(weatherListJson,
+                new TypeReference<List<WeatherModel>>() {
+                });
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
         redirectAttributes.addAttribute("plantToEditId", plantId);
         redirectAttributes.addAttribute("page", page);
@@ -489,7 +495,7 @@ public class GardensController {
     /**
      * This function is called when trying to access another user's gardens.
      *
-     * @param model - the model
+     * @param model  - the model
      * @param userId - id of the user being viewed
      * @return thymeleaf gardensPage
      */
