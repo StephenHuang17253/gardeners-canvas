@@ -85,6 +85,7 @@ public class ProfanityService {
     public ProfanityResponseData moderateContent(String content) {
         try
         {
+            logger.info("sending normal priority call to normal moderation queue");
             waitForRateLimit();
         }
         catch (InterruptedException errorException)
@@ -177,6 +178,42 @@ public class ProfanityService {
      * @return True if terms has one or more bad words. If not found return false
      */
     public boolean containsProfanity(String inputString) {
+
+        Boolean precheckResponse = containPriorityPrecheck(inputString);
+        if(precheckResponse != null)
+        {
+            return precheckResponse;
+        }
+
+        ProfanityResponseData returnedData = moderateContent(inputString);
+        logger.info("Completed Low Profanity Check");
+        return returnedData.isHasProfanity();
+    }
+
+
+    /**
+     * Checks a string to see if it contains any bad words, if so return True.
+     * This function will take longer on average than the normal priority one
+     *
+     * @param inputString The string to send to the content moderator API Which will check for any profanity.
+     * @return True if terms has one or more bad words. If not found return false
+     */
+    public boolean containsProfanityLowPriority(String inputString) {
+
+        Boolean precheckResponse = containPriorityPrecheck(inputString);
+        if(precheckResponse != null)
+        {
+            return precheckResponse;
+        }
+
+
+        ProfanityResponseData returnedData = moderateContentLowPriority(inputString);
+        logger.info("Completed Low Priority Profanity Check");
+        return returnedData.isHasProfanity();
+    }
+
+    private Boolean containPriorityPrecheck(String inputString)
+    {
         if (inputString.matches(emptyRegex)) {
             return false;
         }
@@ -188,12 +225,9 @@ public class ProfanityService {
         } else if (previousOccurrenceOfTag.stream().anyMatch(tagStatus -> tagStatus == TagStatus.APPROPRIATE)) {
             return false;
         }
-
-        ProfanityResponseData returnedData = moderateContent(inputString);
-        logger.info(returnedData.toString());
-
-        return returnedData.isHasProfanity();
+        return null;
     }
+
 
     /**
      * Handles profanity API rate limiting, when called instructs thread to wait for next available time slot.
