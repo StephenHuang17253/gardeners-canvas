@@ -18,6 +18,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -41,6 +42,8 @@ public class ProfanityService {
     private static final long RATE_LIMIT_DELAY_MS = 1500;
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
     String emptyRegex = "^\\s*$";
+
+    Random random = new Random();
 
     /**
      * Service to handle tag database checks.
@@ -80,8 +83,63 @@ public class ProfanityService {
      * NormalizedText string, Misrepresentation boolean, Language string, Terms list, Status object and TrackingID string
      */
     public ProfanityResponseData moderateContent(String content) {
-        try {
+        try
+        {
             waitForRateLimit();
+        }
+        catch (InterruptedException errorException)
+        {
+            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
+            Thread.currentThread().interrupt();
+            return null;
+        }
+        return  moderateContentApiCall(content);
+
+    }
+
+    /**
+     * Sends post a post request to the bad words API and then returns a JSON
+     * response. Experiences longer than average que times compared to normal function
+     *
+     * @param content The string for which profanity is checked.
+     * @return A return string from the api that has been processed. The return format contains: Original text string,
+     * NormalizedText string, Misrepresentation boolean, Language string, Terms list, Status object and TrackingID string
+     */
+    public ProfanityResponseData moderateContentLowPriority(String content) {
+        try
+        {
+            logger.info("Queuing low priority moderation call in low priority queue");
+            long nextCallSlot = nextFreeCallTimestamp.get();
+            long timeToWait = 0;
+            while (nextCallSlot > new Date().getTime())
+            {
+                timeToWait = nextCallSlot - new Date().getTime();
+                timeToWait = timeToWait + random.nextInt(100,300);
+                Thread.sleep(timeToWait);
+                nextCallSlot = nextFreeCallTimestamp.get();
+            }
+
+
+            logger.info("sending low priority call to normal moderation queue");
+            waitForRateLimit();
+        }
+        catch (InterruptedException errorException)
+        {
+            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
+            Thread.currentThread().interrupt();
+            return null;
+        }
+        return  moderateContentApiCall(content);
+
+    }
+
+
+
+
+    private ProfanityResponseData moderateContentApiCall(String content)
+    {
+        try {
+
             logger.info("Profanity service input: " + content);
             String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
             logger.debug("Sent profanity API request : " + new Date().getTime());
