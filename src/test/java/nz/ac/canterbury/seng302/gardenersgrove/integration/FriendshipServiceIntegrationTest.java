@@ -21,7 +21,7 @@ import java.util.Optional;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class FriendshipServiceIntegrationTest {
+class FriendshipServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -42,7 +42,7 @@ public class FriendshipServiceIntegrationTest {
 
     private static User user3;
 
-    private final Long MAX_LONG = 1000L;
+    private static final Long MAX_LONG = 1000L;
 
     @BeforeAll
     void before_or_after_all() {
@@ -134,11 +134,8 @@ public class FriendshipServiceIntegrationTest {
         friendshipRepository.save(new Friendship(user1,user2, FriendshipStatus.PENDING));
         friendshipRepository.save(new Friendship(user1,user3, FriendshipStatus.PENDING));
 
-        boolean friendshipExists_withSameOrdering = friendshipService.checkFriendshipExists(user1, user2);
-        boolean friendshipExists_withReverseOrdering = friendshipService.checkFriendshipExists(user3, user1);
-
-        Assertions.assertTrue(friendshipExists_withSameOrdering);
-        Assertions.assertTrue(friendshipExists_withReverseOrdering);
+        Assertions.assertTrue(friendshipService.checkFriendshipExists(user1, user2));
+        Assertions.assertTrue(friendshipService.checkFriendshipExists(user3, user1));
     }
 
     @Test

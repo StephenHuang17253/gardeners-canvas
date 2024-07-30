@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @SpringJUnitConfig
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class InputValidatorIntegrationTest {
+class InputValidatorIntegrationTest {
 
     @Autowired
     InputValidator inputValidator;
@@ -27,19 +27,16 @@ public class InputValidatorIntegrationTest {
     UserService userService;
 
     @Test
-    public void InputValidator_validateUniqueEmail_uniqueEmail_return_OK()
-    {
-        assertEquals(ValidationResult.OK,InputValidator.validateUniqueEmail("jondoe@gmail.com"));
+    void InputValidator_validateUniqueEmail_uniqueEmail_return_OK() {
+        assertEquals(ValidationResult.OK, InputValidator.validateUniqueEmail("jondoe@gmail.com"));
     }
 
     @Test
-    public void InputValidator_validateUniqueEmail_duplicatedEmail_return_NON_UNIQUE_EMAIL()
-    {
+    void InputValidator_validateUniqueEmail_duplicatedEmail_return_NON_UNIQUE_EMAIL() {
         LocalDate testDOB = LocalDate.now();
         User testUser = new User("John", "lastName", "jondoe2@gmail.com", testDOB);
-        userService.addUser(testUser,"123Password1!");
-        assertEquals(ValidationResult.NON_UNIQUE_EMAIL,InputValidator.validateUniqueEmail("jondoe2@gmail.com"));
+        userService.addUser(testUser, "123Password1!");
+        assertEquals(ValidationResult.NON_UNIQUE_EMAIL, InputValidator.validateUniqueEmail("jondoe2@gmail.com"));
     }
-
 
 }

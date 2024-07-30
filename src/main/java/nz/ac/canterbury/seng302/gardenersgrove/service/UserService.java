@@ -2,11 +2,16 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
@@ -68,7 +73,7 @@ public class UserService {
     /**
      * Returns a user found by email and password
      * 
-     * @param email user email
+     * @param email    user email
      * @param password user raw password
      * @return user if found, null otherwise
      */
@@ -81,10 +86,6 @@ public class UserService {
         if (passwordEncoder.matches(password, user.getEncodedPassword())
                 || Objects.equals(password, user.getEncodedPassword())) {
             return user;
-        }
-        if (passwordEncoder.matches(password, users[0].getEncodedPassword())) {
-            logger.info(users[0].toString());
-            return users[0];
         }
         return null;
     }
@@ -150,15 +151,16 @@ public class UserService {
     }
 
     /**
-     * Finds user by the id input then encodes the NewPassword input using passwordEncoder
+     * Finds user by the id input then encodes the NewPassword input using
+     * passwordEncoder
      * then sets it as the users password
      *
-     * @param id id of user to update
-     * @param NewPassword New password to set for user's account
+     * @param id          id of user to update
+     * @param newPassword New password to set for user's account
      */
-    public void updatePassword(long id, String NewPassword) {
+    public void updatePassword(long id, String newPassword) {
         User user = getUserById(id);
-        String encodedNewPassword = passwordEncoder.encode(NewPassword);
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedNewPassword);
         userRepository.save(user);
     }
@@ -166,7 +168,7 @@ public class UserService {
     /**
      * Returns true if input password matches user's password in database
      *
-     * @param id id of user to match
+     * @param id              id of user to match
      * @param passwordToCheck Password to check if same in database
      */
     public boolean checkPassword(long id, String passwordToCheck) {
@@ -174,6 +176,7 @@ public class UserService {
         String currentPassword = user.getEncodedPassword();
         return passwordEncoder.matches(passwordToCheck, currentPassword);
     }
+
     /**
      * Verify a user, for when they enter the correct token
      *
@@ -197,18 +200,41 @@ public class UserService {
      * Add garden to the user's garden list
      *
      * @param garden Garden entity to add to the list
-     * @param id id of the user to add garden to
+     * @param id     id of the user to add garden to
      */
     public void addGardenToGardenList(Garden garden, Long id) {
         User user = getUserById(id);
         user.getGardens().add(garden);
         userRepository.save(user);
+    }
 
+    /**
+     * ban a given user for a given amount of days
+     * 
+     * @param user the user to ban
+     * @param days length of ban
+     */
+    public void banUser(User user, int days) {
+        user.setLastBanDate(LocalDateTime.now());
+        user.setBanDuration(Duration.ofDays(days));
+        userRepository.save(user);
+    }
+
+    /**
+     * give a strike to the user
+     * 
+     * @param user user to strike
+     */
+    public void strikeUser(User user) {
+        int strikes = user.getStrikes();
+        user.setStrikes(strikes + 1);
+        userRepository.save(user);
     }
 
     /**
      * Seperates input into firstname, lastname or identifies it as email
-     * @param input search box input to match users with
+     * 
+     * @param input           search box input to match users with
      * @param emailValidation ValidationResult regarding email check on input
      * @return users with emails or first and last names that match the input.
      */
@@ -228,6 +254,17 @@ public class UserService {
         return userRepository.findUsersByEmailAddressOrFirstNameAndLastName(fName, lName, email);
     }
 
-
+    /**
+     * Turns a list of user interactions into a list of users
+     * @param userInteractions a list of recent interaction
+     * @return a list of users associated with each recent interaction
+     */
+    public List<User> getUsersByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(UserInteraction::getItemId)
+                .map(this::getUserById)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
 }

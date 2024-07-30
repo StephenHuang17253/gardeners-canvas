@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @SpringBootTest
 public class LoginUser {
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -50,15 +50,15 @@ public class LoginUser {
 
         AccountController loginPageController = new AccountController(userService, authenticationManager,
                 emailService,
-                tokenService, gardenService);
+                tokenService, gardenService, securityService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(loginPageController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(loginPageController).build();
 
     }
 
     @When("I as user {string} am logged in with {string}")
     public void iAsUserAmLoggedInWith(String userEmail, String userPassword) throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 post("/login")
                         .param("emailAddress", userEmail)
                         .param("password", userPassword))
@@ -67,7 +67,7 @@ public class LoginUser {
 
     @Given("I am not logged in")
     public void iAmNotLoggedIn() throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 post("/logout"));
     }
 

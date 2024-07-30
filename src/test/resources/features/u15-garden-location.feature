@@ -33,9 +33,9 @@ Background:
     When I submit the create garden form
     Then The garden is created successfully with that location
     Examples:
-      | streetAddress | suburb  | city              | postcode  | country        | latitude | longitude |
-      | ""            | ""      | "Christchurch"    | ""        | "New Zealand"  |""        |""         |
-      | ""            | ""      | "Dunedin"         | ""        | "New Zealand"  |""        |""         |
+      | streetAddress | suburb  | city              | postcode  | country        | latitude  | longitude      |
+      | ""            | ""      | "Christchurch"    | ""        | "New Zealand"  |"-43.52"   |"172.58"        |
+      | ""            | ""      | "Dunedin"         | ""        | "New Zealand"  |"-43.52"   |"172.58"        |
 
   Scenario Outline: AC3.2 - Given I am providing an address for a garden, then I must include values for both the country and
   the city.

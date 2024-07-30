@@ -38,16 +38,16 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class ProfileControllerTest {
+class ProfileControllerTest {
 
     @Autowired
     WebApplicationContext webApplicationContext;
 
     @Autowired
-    public UserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
-    public PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
     private MockMvc mockMvc;
 
     @MockBean
@@ -56,14 +56,12 @@ public class ProfileControllerTest {
     @MockBean
     private UserService userServiceMock;
 
-    private UserService userServiceTestMock;
-
-    User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003,5,2));
+    User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.of(2003, 5, 2));
     @InjectMocks
     private static ProfileController profileController;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
@@ -72,49 +70,46 @@ public class ProfileControllerTest {
     }
 
     @AfterAll
-    public static void cleanup() {
+    static void cleanup() {
         // Clear the context tests
         SecurityContextHolder.clearContext();
     }
 
     @Test
-    void controllerLoads()
-    {
+    void controllerLoads() {
         assertNotNull(profileController);
     }
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    void mvcMockIsAlive() throws Exception
-    {
+    void mvcMockIsAlive() throws Exception {
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void getProfilePage_notAuthenticated_Forbidden() throws Exception
-    {
+    void getProfilePage_notAuthenticated_Forbidden() throws Exception {
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "profile.user.test@ProfileController.com")
-    void getProfilePage_LoggedIn_FilledPage() throws Exception
-    {
+    void getProfilePage_LoggedIn_FilledPage() throws Exception {
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
 
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("userName","John Test"))
+                .andExpect(model().attribute("userName", "John Test"))
                 .andExpect(model().attribute("dateOfBirth", "02/05/2003"))
-                .andExpect(model().attribute("emailAddress","profile.user.test@ProfileController.com"));
+                .andExpect(model().attribute("emailAddress", "profile.user.test@ProfileController.com"));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {" ", "a", "lowercase", "UPPERCASE", "1Comma,",
-            "UsersNameIsJohnSoThisShouldntWork!1", "UsersLastNameIsTest1!", "UsersEmailIsprofile.user.test@ProfileController.com1",
+    @ValueSource(strings = { " ", "a", "lowercase", "UPPERCASE", "1Comma,",
+            "UsersNameIsJohnSoThisShouldntWork!1", "UsersLastNameIsTest1!",
+            "UsersEmailIsprofile.user.test@ProfileController.com1",
             "UsersDOBis2003-05-02!", "1backslash/" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     void testUpdatePasswordFailCases(String input) throws Exception {
@@ -132,9 +127,10 @@ public class ProfileControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Password1!", "ThisPasswordShouldWork!1", "123456789Aa!", "JonTes123!", "2002-02-03!aA", "1Exclamationmark!",
-            "1Fullstop.", "1Apostrophe'","1Question?", "1Atsymbol@", "1Hashtag#", "1Moneysign$",
-            "1Percent%", "1Uparrow^", "1Andsymbol&", "1Starsymbol*", "1Bracket(", "1Hyphen-", "1Underscore_"})
+    @ValueSource(strings = { "Password1!", "ThisPasswordShouldWork!1", "123456789Aa!", "JonTes123!", "2002-02-03!aA",
+            "1Exclamationmark!",
+            "1Fullstop.", "1Apostrophe'", "1Question?", "1Atsymbol@", "1Hashtag#", "1Moneysign$",
+            "1Percent%", "1Uparrow^", "1Andsymbol&", "1Starsymbol*", "1Bracket(", "1Hyphen-", "1Underscore_" })
     @WithMockUser(username = "profile.user.test@ProfileController.com")
     void testUpdatePasswordPassCases(String input) throws Exception {
         String currentPassword = "currentPassword1!";
@@ -143,15 +139,10 @@ public class ProfileControllerTest {
         Mockito.when(userServiceMock.getUserByEmail("profile.user.test@ProfileController.com")).thenReturn(mockUser);
         Mockito.when(userServiceMock.checkPassword(1L, currentPassword)).thenReturn(true);
         mockMvc.perform(post("/profile/change-password").with(csrf())
-                        .param("currentPassword", currentPassword)
-                        .param("newPassword", input)
-                        .param("retypePassword", input))
-                .andDo(MockMvcResultHandlers.print());
+                .param("currentPassword", currentPassword)
+                .param("newPassword", input)
+                .param("retypePassword", input));
         Mockito.verify(userServiceMock, Mockito.times(1)).updatePassword(1L, input);
     }
-
-    // Add tests for posting picture method
-    // useful reference: https://stackoverflow.com/questions/38571716/how-to-put-multipart-form-data-using-spring-mockmvc
-
 
 }

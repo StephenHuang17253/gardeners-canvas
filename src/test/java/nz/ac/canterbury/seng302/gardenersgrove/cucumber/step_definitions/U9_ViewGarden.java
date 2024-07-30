@@ -1,10 +1,23 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
-import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
@@ -33,22 +45,23 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
-
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 
 @SpringBootTest
 public class U9_ViewGarden {
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
+
+    @Autowired
+    public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public GardenTagRelationRepository gardenTagRelationRepository;
 
     @Autowired
     public FriendshipRepository friendshipRepository;
@@ -62,15 +75,22 @@ public class U9_ViewGarden {
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
+    public UserInteractionService userInteractionService;
+
+    @Autowired
+    public ObjectMapper objectMapper;
+
     public SecurityService securityService;
+
+    @Autowired
+    private GardenTagService gardenTagService;
 
     private static GardenService gardenService;
 
     private static UserService userService;
 
     private static PlantService plantService;
-
-    private static FileService fileService;
 
     private static FriendshipService friendshipService;
 
@@ -87,15 +107,15 @@ public class U9_ViewGarden {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService,fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
+        mockMVC = MockMvcBuilders.standaloneSetup(gardensController).build();
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
+        mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +
                 "  \"latitude\": -43.5,\n" +
@@ -159,7 +179,7 @@ public class U9_ViewGarden {
         User user = userService.getUserByEmail(userEmail);
 
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 get("/my-gardens/{gardenId}", gardenId)).andExpect(MockMvcResultMatchers.status().isOk());
 
     }
@@ -168,7 +188,7 @@ public class U9_ViewGarden {
     @When("I try to visit user {string}'s garden, {string}")
     public void iTryToVisitGarden(String userEmail, String gardenName) throws Exception {
         User user = userService.getUserByEmail(userEmail);
-        resultActions = MOCK_MVC.perform(
+        resultActions = mockMVC.perform(
                 get("/my-gardens/{gardenId}", user.getGardens().get(0).getGardenId()));
     }
 
@@ -183,11 +203,13 @@ public class U9_ViewGarden {
     }
 
     @And("The garden's name {string} and location {string}, {string} are visible")
-    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry)
-            throws Exception {
+    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"), gardenName);
-        Assertions.assertEquals(modelMap.getAttribute("gardenLocation"), gardenCity + ", " + gardenCountry);
+        GardenDetailModel garden = (GardenDetailModel) modelMap.getAttribute("garden");
+
+        Assertions.assertNotNull(garden);
+        Assertions.assertEquals(gardenName, garden.getGardenName());
+        Assertions.assertEquals(gardenCity + ", " + gardenCountry, garden.getGardenLocation());
 
     }
 }

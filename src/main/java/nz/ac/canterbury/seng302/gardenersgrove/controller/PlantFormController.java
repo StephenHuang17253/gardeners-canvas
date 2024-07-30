@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
@@ -16,19 +17,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -53,6 +51,16 @@ public class PlantFormController {
         this.securityService = securityService;
     }
 
+     /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
     /**
      * Maps the createNewPlantForm html page to /create-new-plant url
      * 
@@ -67,10 +75,6 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("GET /create-new-plant");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -121,13 +125,12 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
-        int value = (int) Double.parseDouble(plantCount);
 
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
-        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
+        ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
+        ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -160,10 +163,6 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
-
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
         model.addAttribute("plantPicture", plantPictureString);
@@ -173,8 +172,13 @@ public class PlantFormController {
             return "createNewPlantForm";
         }
 
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
-        Plant newPlant = plantService.addPlant(plantName, integerPlantCount, plantDescription, plantDate, gardenId);
+        int plantCountValue = 0;
+
+        if (!Objects.equals(plantCount, "")) {
+            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
+        }
+
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
@@ -195,10 +199,6 @@ public class PlantFormController {
             HttpServletResponse response,
             Model model) {
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -270,13 +270,11 @@ public class PlantFormController {
         }
 
 
-        int value = (int) Double.parseDouble(plantCount);
-
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
+        ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
-        ValidationResult plantDescriptionResult = InputValidator.optionalTextField(plantDescription, 512);
         ValidationResult plantDateResult;
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
@@ -284,11 +282,6 @@ public class PlantFormController {
             String dateString = plantDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             plantDateResult = InputValidator.validatePlantDate(dateString);
         }
-
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        model.addAttribute("loggedIn", loggedIn);
 
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
@@ -307,8 +300,14 @@ public class PlantFormController {
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()){
             return "editPlantForm";
         }
-        int integerPlantCount = Integer.parseInt(String.valueOf(value));
-        plantService.updatePlant(plantId, plantName, integerPlantCount, plantDescription, plantDate);
+
+        int plantCountValue = 0;
+
+        if (!Objects.equals(plantCount, "")) {
+            plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
+        }
+
+        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
@@ -328,7 +327,8 @@ public class PlantFormController {
      *                               appropriate error)
      */
     private void plantFormErrorText(Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
-            ValidationResult plantCountResult, ValidationResult plantDescriptionResult, ValidationResult plantDateResult) {
+            ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
+            ValidationResult plantDateResult) {
 
         if (!plantPictureResult.valid()) {
             model.addAttribute("plantPictureError", plantPictureResult);
@@ -343,37 +343,20 @@ public class PlantFormController {
                         "cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes");
             }
             model.addAttribute("PNErrorText", "Plant name " + plantNameResult);
-            model.addAttribute("PNErrorClass", "true");
-        } else {
-            model.addAttribute("PNErrorClass", "null");
         }
 
         // notifies the user that the plant Count is invalid (if applicable)
         if (!plantCountResult.valid()) {
             model.addAttribute("PCErrorText", plantCountResult);
-            model.addAttribute("PCErrorClass", "true");
-
-        } else {
-            model.addAttribute("PCErrorClass", "null");
         }
 
         // notifies the user that the plant Description is invalid (if applicable)
         if (!plantDescriptionResult.valid()) {
-            if (plantNameResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                plantNameResult.updateMessage("cannot be greater than 512 characters in length");
-            }
-            model.addAttribute("PDErrorText", "Plant description " + plantDescriptionResult);
-            model.addAttribute("PDErrorClass", "true");
-
-        } else {
-            model.addAttribute("PDErrorClass", "null");
+            model.addAttribute("PDErrorText", plantDescriptionResult);
         }
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
-            model.addAttribute("PAErrorClass", "true");
-        } else {
-            model.addAttribute("PAErrorClass", "null");
         }
 
     }
@@ -408,7 +391,7 @@ public class PlantFormController {
     @GetMapping("/files/plants/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-        logger.info("GET /files/plants/" + filename);
+        logger.info("GET /files/plants/{}", filename);
         try {
             Resource file = fileService.loadFile(filename);
             return ResponseEntity.ok()

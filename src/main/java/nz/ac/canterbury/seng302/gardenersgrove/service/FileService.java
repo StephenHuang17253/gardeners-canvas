@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -116,15 +115,17 @@ public class FileService {
      * @throws IOException if the files cannot read from the file system
      */
     public String[] getAllFiles() throws IOException {
+        String[] allFiles = new String[0];
         try {
-            String[] thingy = Files.walk(getRootLocation(), 1)
+            allFiles = Files.walk(getRootLocation(), 1)
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .toArray(String[]::new);
-            return thingy;
+            
         } catch (IOException error) {
             throw new IOException("Could not list the files");
         }
+        return allFiles;
     }
 
     /**
