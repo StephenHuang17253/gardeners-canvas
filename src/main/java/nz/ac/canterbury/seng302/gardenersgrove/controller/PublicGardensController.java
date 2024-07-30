@@ -1,9 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
@@ -104,6 +101,15 @@ public class PublicGardensController {
         model.addAttribute("lastPage", lastPage);
         model.addAttribute("SearchErrorText", "");
         model.addAttribute("searchValue", "");
+
+
+        List<String> appliedSearchTagsList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            appliedSearchTagsList.add("tag" + i);
+        }
+
+        model.addAttribute("appliedSearchTagsList", appliedSearchTagsList);
+
         return "browsePublicGardens";
     }
 
@@ -164,6 +170,7 @@ public class PublicGardensController {
             model.addAttribute("endIndex", endIndex);
             model.addAttribute("lastPage", lastPage);
             model.addAttribute("searchValue", searchInput);
+
         } else {
             model = resetModel(model);
             model.addAttribute("searchValue", searchInput);
