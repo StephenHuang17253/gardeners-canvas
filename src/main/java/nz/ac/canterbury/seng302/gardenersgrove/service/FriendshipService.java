@@ -56,8 +56,10 @@ public class FriendshipService {
     public boolean checkFriendshipExists(User user1, User user2) {
         validateUsers(user1, user2);
 
-        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
-        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
+        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user1.getId(), user2.getId());
+        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user2.getId(), user1.getId());
 
         return !(optionalFriendshipUser1IsSender.isEmpty() && optionalFriendshipUser2IsSender.isEmpty());
     }
@@ -72,8 +74,10 @@ public class FriendshipService {
     public Friendship findFriendship(User user1, User user2) {
         validateUsers(user1, user2);
 
-        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
-        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
+        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user1.getId(), user2.getId());
+        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user2.getId(), user1.getId());
 
         if (optionalFriendshipUser1IsSender.isPresent()) {
             return optionalFriendshipUser1IsSender.get();
@@ -95,8 +99,10 @@ public class FriendshipService {
     public FriendshipStatus checkFriendshipStatus(User user1, User user2) {
         validateUsers(user1, user2);
 
-        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
-        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
+        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user1.getId(), user2.getId());
+        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user2.getId(), user1.getId());
 
         if (optionalFriendshipUser1IsSender.isPresent()) {
             return optionalFriendshipUser1IsSender.get().getStatus();
@@ -127,7 +133,8 @@ public class FriendshipService {
      *
      * @param user1 the first user
      * @param user2 the second user
-     * @throws IllegalArgumentException if user IDs are null or refer to the same user
+     * @throws IllegalArgumentException if user IDs are null or refer to the same
+     *                                  user
      */
     private void validateUsers(User user1, User user2) throws IllegalArgumentException {
         if (user1.getId() == null || user2.getId() == null) {
@@ -143,19 +150,25 @@ public class FriendshipService {
 
     /**
      * Adds a new pending friendship entity to persistence
-     * IMPORTANT: cannot add a new friendship relation between two users if one already exists
-     * EXCEPTION: When a users friend request gets declined, the recipient may send a request in return
-     * IN THAT CASE: the old relation gets updated to pending instead of declined and the order of users gets switched around
+     * IMPORTANT: cannot add a new friendship relation between two users if one
+     * already exists
+     * EXCEPTION: When a users friend request gets declined, the recipient may send
+     * a request in return
+     * IN THAT CASE: the old relation gets updated to pending instead of declined
+     * and the order of users gets switched around
      *
      * @param user1 the sender of the friendship relation
      * @param user2 the receiver of the friendship relation
-     * @throws IllegalArgumentException if user prams arnt valid or trying to re-add friendship relation (see above)
+     * @throws IllegalArgumentException if user prams arnt valid or trying to re-add
+     *                                  friendship relation (see above)
      */
     public Friendship addFriendship(User user1, User user2) throws IllegalArgumentException {
         validateUsers(user1, user2);
 
-        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository.findByUser1IdAndUser2Id(user1.getId(), user2.getId());
-        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository.findByUser1IdAndUser2Id(user2.getId(), user1.getId());
+        Optional<Friendship> optionalFriendshipUser1IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user1.getId(), user2.getId());
+        Optional<Friendship> optionalFriendshipUser2IsSender = friendshipRepository
+                .findByUser1IdAndUser2Id(user2.getId(), user1.getId());
 
         if (optionalFriendshipUser1IsSender.isPresent()) {
             Friendship existingFriendship = optionalFriendshipUser1IsSender.get();
@@ -176,7 +189,8 @@ public class FriendshipService {
                 existingFriendship.setStatus(FriendshipStatus.PENDING);
 
                 return friendshipRepository.save(existingFriendship);
-            } else if (Objects.equals(existingUser1Id, user2.getId()) && Objects.equals(existingUser2Id, user1.getId())) {
+            } else if (Objects.equals(existingUser1Id, user2.getId())
+                    && Objects.equals(existingUser2Id, user1.getId())) {
                 throw new IllegalArgumentException("Cant re-add a Friendship relation when one already exists");
             }
         }
@@ -189,9 +203,11 @@ public class FriendshipService {
      *
      * @param id               the id of the existing friendship
      * @param friendshipStatus the status to update it to
-     * @throws IllegalArgumentException if id invalid or trying to update a declined relation
+     * @throws IllegalArgumentException if id invalid or trying to update a declined
+     *                                  relation
      */
-    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus) throws IllegalArgumentException {
+    public Friendship updateFriendShipStatus(Long id, FriendshipStatus friendshipStatus)
+            throws IllegalArgumentException {
         Optional<Friendship> optionalFriend = friendshipRepository.findById(id);
         if (optionalFriend.isEmpty()) {
             throw new IllegalArgumentException("Invalid Friendship ID: " + id);

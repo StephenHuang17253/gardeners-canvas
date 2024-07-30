@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 import java.time.Duration;
@@ -9,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
@@ -219,6 +222,7 @@ public class UserService {
 
     /**
      * give a strike to the user
+     * 
      * @param user user to strike
      */
     public void strikeUser(User user) {
@@ -248,6 +252,19 @@ public class UserService {
             }
         }
         return userRepository.findUsersByEmailAddressOrFirstNameAndLastName(fName, lName, email);
+    }
+
+    /**
+     * Turns a list of user interactions into a list of users
+     * @param userInteractions a list of recent interaction
+     * @return a list of users associated with each recent interaction
+     */
+    public List<User> getUsersByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(UserInteraction::getItemId)
+                .map(this::getUserById)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
 }
