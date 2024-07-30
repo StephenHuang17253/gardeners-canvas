@@ -16,21 +16,28 @@ unit-test:
   stage: test
   script:
     - ./gradlew test
-    - ls ./build/jacoco
+    - ls ./build/reports
   artifacts:
     paths:
-      - build/jacoco/test-report.xml
+      - build/reports/coverage/test.xml
 
 integration-test:
   stage: test
   script:
     - ./gradlew integration
+    - ls ./build/reports
+  artifacts:
+    paths:
+      - build/reports/coverage/integration.xml
 
 cucumber-test:
   stage: test
   script:
     - ./gradlew cucumber
-
+    - ls ./build/reports
+  artifacts:
+    paths:
+      - build/reports/coverage/cucumber.xml
 
 sonarqube-report:
   stage: sonarqube

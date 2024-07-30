@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class U15_GardenLocation {
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
@@ -55,7 +54,7 @@ public class U15_GardenLocation {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
 
     public static GardenService gardenService;
@@ -78,16 +77,16 @@ public class U15_GardenLocation {
     private MvcResult locationResult;
     Logger logger = LoggerFactory.getLogger(U15_GardenLocation.class);
 
-
     @Before
     public void before_or_after_all() throws IOException, InterruptedException {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         locationService = Mockito.mock(LocationService.class);
 
-        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService, securityService);
+        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
+                securityService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
         // Mocking LocationService response
         String mockResponse = "   {\n" +
@@ -105,9 +104,11 @@ public class U15_GardenLocation {
                 "      ],\n" +
                 "      \"class\":\"place\",\n" +
                 "      \"type\":\"house\",\n" +
-                "      \"display_name\":\"20, Kirkwood Avenue, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand\",\n" +
+                "      \"display_name\":\"20, Kirkwood Avenue, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand\",\n"
+                +
                 "      \"display_place\":\"Kirkwood Avenue\",\n" +
-                "      \"display_address\":\"20, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand\",\n" +
+                "      \"display_address\":\"20, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand\",\n"
+                +
                 "      \"address\":{\n" +
                 "         \"house_number\":\"20\",\n" +
                 "         \"road\":\"Kirkwood Avenue\",\n" +
@@ -125,11 +126,14 @@ public class U15_GardenLocation {
     }
 
     @Given("I as user {string} have another garden {string} located in {string}, {string}")
-    public void i_as_user_have_another_garden_located_in(String userEmail, String gardenName, String city, String country) {
+    public void i_as_user_have_another_garden_located_in(String userEmail, String gardenName, String city,
+            String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "A garden for UC students", "", "", city, "", country, 0.0, false, "", "", user);
+        Garden garden = new Garden(gardenName, "A garden for UC students", "", "", city, "", country, 0.0, false, "",
+                "", user);
         gardenService.addGarden(garden);
-        Assertions.assertEquals(garden.getGardenId(), userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
+        Assertions.assertEquals(garden.getGardenId(),
+                userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
         expectedGarden = garden;
         this.gardenName = gardenName;
         gardenDescription = garden.getGardenDescription();
@@ -139,7 +143,8 @@ public class U15_GardenLocation {
 
     // AC1
     @Given("I specify a valid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
-    public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country, String latitude, String longitude) {
+    public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country,
+            String latitude, String longitude) {
         gardenName = "UC Garden";
         gardenDescription = "A garden for UC students";
         gardenStreet = street;
@@ -154,7 +159,8 @@ public class U15_GardenLocation {
 
     // AC3
     @Given("I specify an invalid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
-    public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country, String latitude, String longitude) {
+    public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country,
+            String latitude, String longitude) {
         gardenName = "UC Garden";
         gardenDescription = "A garden for UC students";
         gardenStreet = street;
@@ -167,12 +173,11 @@ public class U15_GardenLocation {
         gardenLatitude = longitude;
     }
 
-
     // AC1, AC3, AC5
     @When("I submit the create garden form")
     public void i_submit_the_create_garden_form() throws Exception {
         String gardenUrl = "/create-new-garden";
-        createGardenResult = MOCK_MVC.perform(
+        createGardenResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
@@ -184,8 +189,8 @@ public class U15_GardenLocation {
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize)
                         .param("longitude", gardenLongitude)
-                        .param("latitude", gardenLatitude)
-        ).andReturn();
+                        .param("latitude", gardenLatitude))
+                .andReturn();
     }
 
     // AC1, AC3.1, AC4
@@ -218,7 +223,7 @@ public class U15_GardenLocation {
     @When("I submit the edit garden form")
     public void i_submit_the_edit_plant_form() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)
@@ -230,8 +235,8 @@ public class U15_GardenLocation {
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
                         .param("longitude", gardenLongitude)
-                        .param("latitude", gardenLatitude)
-        ).andReturn();
+                        .param("latitude", gardenLatitude))
+                .andReturn();
     }
 
     // AC2
@@ -278,7 +283,7 @@ public class U15_GardenLocation {
     @When("I start typing {string}")
     public void i_start_typing(String query) throws Exception {
         String fetchUrl = "/api/location/suggestions";
-        locationResult = MOCK_MVC.perform(
+        locationResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .get(fetchUrl)
                         .param("query", query)
@@ -299,7 +304,8 @@ public class U15_GardenLocation {
     // AC7
     @Then("The matching fields are filled out")
     public void the_matching_fields_are_filled_out() {
-        // not that meaningful of a test, but it's meant to emulate how the autocomplete script fills the fields.
+        // not that meaningful of a test, but it's meant to emulate how the autocomplete
+        // script fills the fields.
         gardenStreet = "Mock Street";
         gardenSuburb = "Mock Suburb";
         gardenCity = "Mock City";

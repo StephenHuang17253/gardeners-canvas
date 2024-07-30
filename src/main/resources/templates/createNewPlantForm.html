@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/header.html}"></head>
+<head th:replace="~{fragments/header.html}">
+</head>
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
-         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+        th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded py-5 w-50">
         <div class="row justify-content-center">
             <div class="text-center py-5">
@@ -15,7 +16,7 @@
             <div class="col-6">
 
                 <form th:action="@{create-new-plant}" method="post" enctype="multipart/form-data"
-                    class="border rounded-3 p-3">
+                    class="border rounded-3 p-3 submit-form-once">
 
                     <div class="w-100 d-flex flex-column align-items-center mb-3">
 
@@ -42,14 +43,16 @@
                     <div class="mb-3">
                         <label for="plantName" class="form-label">Plant Name *</label>
                         <input id="plantName" type="text" class="form-control" th:name="plantName"
-                            th:value="*{plantName}" autofocus>
+                            th:value="*{plantName}" th:classappend="${PNErrorText == null ? '' : 'border-danger'}"
+                            autofocus>
                         <p th:if="${PNErrorText}" class="text-danger fs-6" th:text="${PNErrorText}"></p>
                     </div>
 
                     <div class="mb-3">
                         <label for="plantCount" class="form-label">Plant Count</label>
-                        <input id="plantCount" type="number" min="0" step="1" class="form-control" th:name="plantCount"
-                            th:value="*{plantCount}">
+                        <input id="plantCount" type="text" class="form-control" th:name="plantCount"
+                            th:value="*{plantCount}" th:classappend="${PCErrorText == null ? '' : 'border-danger'}"
+                            data-formatted-number>
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
                     </div>
 
@@ -57,7 +60,10 @@
                         <label for="plantDescription" class="form-label">Plant Description</label>
                         <textarea id="plantDescription" class="form-control" th:name="plantDescription"
                             th:text="*{plantDescription}" data-description="true"
-                            data-counter-id="plantDescriptionCounter"></textarea>
+                            data-counter-id="plantDescriptionCounter"
+                            th:classappend="${PDErrorText == null ? '' : 'border-danger'}">
+
+                        </textarea>
                         <p id="plantDescriptionCounter" class="fs-6"></p>
                         <p id="plantDescriptionError" th:if="${PDErrorText}" class="text-danger fs-6"
                             th:text="${PDErrorText}"></p>
@@ -67,12 +73,13 @@
                     <div class="mb-3">
                         <label for="plantDate" class="form-label">Plant Date</label>
                         <input id="plantDate" type="date" class="form-control" max="9999-12-30" min="0000-01-01"
-                            th:name="plantDate" th:value="*{plantDate}">
+                            th:name="plantDate" th:value="*{plantDate}"
+                            th:classappend="${PAErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success" formnovalidate>Submit</button>
+                        <button type="submit" class="btn btn-success submit-button" formnovalidate>Submit</button>
                         <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
                             <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>
@@ -85,6 +92,8 @@
     <script th:src="@{/js/preventEnterSubmit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
+    <script th:src="@{/js/formatNumber.js}"></script>
+    <script th:src="@{/js/submitFormOnce.js}"></script>
 </body>
 
 </html>

@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -10,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class addUserProfilePicture {
 
 
     Logger logger = LoggerFactory.getLogger(EditAUser.class);
-    public MockMvc MOCK_MVC;
+    public MockMvc mockMVC;
 
     @Autowired
     public UserRepository userRepository;
@@ -51,6 +51,8 @@ public class addUserProfilePicture {
     public EmailService emailService;
     public FileService fileService;
     public UserService userService;
+    @Autowired
+    public SecurityService securityService;
 
     String firstName = "John";
     String lastName = "Doe";
@@ -59,12 +61,6 @@ public class addUserProfilePicture {
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
 
     private static MockMultipartFile mockImage;
-
-
-    @Before
-    public void before_or_after_all() throws IOException {
-
-    }
 
     @Given("I am logged in and on the profile page")
     public void i_am_logged_in_and_on_the_profile_page() throws IOException {
@@ -85,10 +81,10 @@ public class addUserProfilePicture {
 
 
         ProfileController profileController = new ProfileController(authenticationManager,userService,
-                fileService, emailService);
+                fileService, emailService, securityService);
 
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders
+        mockMVC = MockMvcBuilders
                 .standaloneSetup(profileController)
                 .build();
     }
@@ -103,7 +99,7 @@ public class addUserProfilePicture {
     @WithMockUser(username="johndoe.test@email.com")
     @When("I submit my profile picture")
     public void i_submit_my_profile_picture() throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .multipart("/profile").file(mockImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)

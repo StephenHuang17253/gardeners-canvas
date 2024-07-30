@@ -13,7 +13,7 @@
                 <h1>Edit Garden</h1>
             </div>
             <div class="col-6">
-                <form th:action="@{edit}" method="post" class="border rounded-3 p-3">
+                <form th:action="@{edit}" method="post" class="border rounded-3 p-3 submit-form-once">
 
                     <div class="mb-3">
                         <label for="gardenName" class="form-label">Name *</label>
@@ -36,7 +36,8 @@
                     <div class="mb-3">
                         <label for="gardenSize" class="form-label">Size (m<sup>2</sup>)</label>
                         <input id="gardenSize" type="text" class="form-control" th:name="gardenSize"
-                            th:value="*{gardenSize}" th:classappend="${GSErrorText == null ? '' : 'border-danger'}">
+                            th:value="*{gardenSize}" th:classappend="${GSErrorText == null ? '' : 'border-danger'}"
+                            data-formatted-number>
                         <p th:if="${GSErrorText}" class="text-danger fs-6" th:text="${GSErrorText}"></p>
                     </div>
 
@@ -84,7 +85,7 @@
                     <input id="longitude" type="hidden" th:name="longitude">
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success" formnovalidate>Submit</button>
+                        <button type="submit" class="btn btn-success submit-button" formnovalidate>Submit</button>
                         <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
                             <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>
@@ -99,7 +100,8 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/descriptionCounter.js}"></script>
     <script th:src="@{/js/locationIQAutocomplete.js}"></script>
-    <script th:src="@{/js/gardenSizeFormat.js}"></script>
+    <script th:src="@{/js/formatNumber.js}"></script>
+    <script th:src="@{/js/submitFormOnce.js}"></script>
 </body>
 
 </html>

@@ -3,24 +3,30 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import java.io.IOException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -40,39 +46,31 @@ public class HomePageController {
 
     private SecurityService securityService;
 
+    private UserInteractionService userInteractionService;
+
+    private static int PAGE_SIZE = 5;
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
      *
      * @param userService
-     * @param authenticationManager
      */
     @Autowired
-    public HomePageController(UserService userService, AuthenticationManager authenticationManager,
-            GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService) {
+    public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService, UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
         this.securityService = securityService;
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     * 
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
+        this.userInteractionService = userInteractionService;
     }
 
     /**
      * Redirects GET default url '/' to '/home'
      * 
      * @return redirect to /home
-     * @throws IOException
      */
     @GetMapping("/")
     public String home() {
@@ -168,11 +166,21 @@ public class HomePageController {
             Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
             friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
         }
+
+        if (!userService.emailInUse("badguy@email.com")) {
+            User badGuy = new User("Bad",
+                    "Guy",
+                    "badguy@email.com",
+                    date);
+            userService.addUser(badGuy, "Badguy1!");
+            userService.verifyUser(badGuy);
+            userService.banUser(badGuy, 1);
+        }
     }
 
     /**
      * This function is called when a GET request is made to /home
-     * 
+     *
      * @param model
      * @return The homePage html page
      */
@@ -181,23 +189,60 @@ public class HomePageController {
 
         logger.info("GET /home");
 
-        model.addAttribute("myGardens", gardenService.getGardens());
-
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
             addDefautContent();
         }
 
-        boolean loggedIn = securityService.isLoggedIn();
+        User user = securityService.getCurrentUser();
 
-        if (loggedIn) {
-            User user = securityService.getCurrentUser();
-            String username = user.getFirstName() + " " + user.getLastName();
-            String profilePicture = user.getProfilePictureFilename();
-            model.addAttribute("profilePicture", profilePicture);
-            model.addAttribute("username", username);
+        if (user != null) {
+            return loadUserMainPage(user, model);
         }
 
         return "homePage";
+    }
+
+
+    private List<Garden> getRecentGardens(Long userId){
+        List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,ItemType.GARDEN);
+        return gardenService.getGardensByInteraction(gardenInteractions);
+    }
+
+    private List<RecentGardenModel> setRecentGardenModels(List<Garden> gardenList) {
+        if(gardenList.isEmpty()){
+            return null;
+        }
+        return gardenList.stream()
+                .map(garden -> new RecentGardenModel(garden, garden.getOwner(), securityService.isOwner(garden.getOwner().getId())))
+                .collect(Collectors.toList());
+    }
+
+
+    private String loadUserMainPage(User user, Model model){
+
+        String username = user.getFirstName() + " " + user.getLastName();
+        String profilePicture = user.getProfilePictureFilename();
+
+        List<RecentGardenModel> recentGardens = setRecentGardenModels(getRecentGardens(user.getId()));
+
+        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("username", username);
+        if(recentGardens == null){
+            return "mainPage";
+        }
+        if(recentGardens.size() < PAGE_SIZE){
+            model.addAttribute("recentGardensPage1", recentGardens.subList(0,recentGardens.size()));
+        }else{
+            model.addAttribute("recentGardensPage1", recentGardens.subList(0,5));
+        }
+        if (recentGardens.size() > PAGE_SIZE) {
+            List<RecentGardenModel> recentGardensPage2 = recentGardens.subList(PAGE_SIZE, Math.min(PAGE_SIZE*2, recentGardens.size()));
+            model.addAttribute("recentGardensPage2", recentGardensPage2);
+        } else {
+            model.addAttribute("recentGardensPage2", null);
+        }
+
+        return "mainPage";
     }
 }

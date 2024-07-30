@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.model.GardenModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenNavModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +126,7 @@ public class AccountController {
 
     /**
      * Adds the loggedIn attribute to the model for all requests
-     * 
+     *
      * @param model
      */
     @ModelAttribute
@@ -394,14 +394,22 @@ public class AccountController {
         if (!user.isVerified()) {
             return "redirect:/verify/" + user.getEmailAddress();
         }
+        
+        if (user.isBanned()) {
+            int banTimeLeft = user.daysUntilUnban();
+            String message = "Your account is blocked for " + banTimeLeft + " day" + (banTimeLeft == 1 ? "": "s") + " due to inappropriate conduct";
+            model.addAttribute("goodMessage", false);
+            model.addAttribute("message", message);
+            return "loginPage";
+        }
 
         setSecurityContext(emailAddress, password, request.getSession());
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<GardenModel> gardenModels = new ArrayList<>();
-        for (Garden garden : gardens) {
-            gardenModels.add(new GardenModel(garden.getGardenId(), garden.getGardenName()));
+        List<GardenNavModel> gardenNavModels = new ArrayList<>();
+        for(Garden garden : gardens){
+            gardenNavModels.add(new GardenNavModel(garden.getGardenId(), garden.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenModels);
+        session.setAttribute("userGardens", gardenNavModels);
 
         return "redirect:/home";
 

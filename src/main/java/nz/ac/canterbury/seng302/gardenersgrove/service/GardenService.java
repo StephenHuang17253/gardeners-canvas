@@ -2,12 +2,14 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service class for Garden objects.
@@ -49,11 +51,10 @@ public class GardenService {
      * @throws IllegalArgumentException if the provided user ID is invalid
      */
     public List<Garden> getAllUsersGardens(long id) throws IllegalArgumentException {
-        if (userService.getUserById(id) != null) {
-            return gardenRepository.findByOwnerId(id);
-        } else {
+        if (userService.getUserById(id) == null) {
             throw new IllegalArgumentException("Invalid user ID: " + id);
         }
+        return gardenRepository.findByOwnerId(id);
     }
 
     /**
@@ -133,6 +134,29 @@ public class GardenService {
     }
 
     /**
+     * Updates the longitude and latitude of a Garden entity.
+     * @param id the id of the garden we wish to update the coordinates of
+     * @param latitude the new latitude
+     * @param longitude the new longitude
+     */
+    public Garden updateGardenCoordinates(Long id, String latitude, String longitude) {
+        Optional<Garden> optionalGarden = getGardenById(id);
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setGardenLatitude(latitude);
+            targetGarden.setGardenLongitude(longitude);
+
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+
+
+    /**
      * Adds plant entity to garden entity plant list
      *
      * @param gardenId the id of the garden we wish to add plant to
@@ -166,6 +190,14 @@ public class GardenService {
 
     public List<Garden> getAllPublicGardens() {
         return gardenRepository.findAllPublicGardens();
+    }
+
+    public List<Garden> getGardensByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(userInteraction -> getGardenById(userInteraction.getItemId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
 

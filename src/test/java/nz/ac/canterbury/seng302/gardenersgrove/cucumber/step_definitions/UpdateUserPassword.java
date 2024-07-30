@@ -21,6 +21,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 
 @SpringBootTest
@@ -36,8 +37,10 @@ public class UpdateUserPassword {
     public FileService fileService;
     @Mock
     public EmailService emailService;
+    @Autowired
+    public SecurityService securityService;
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
     public static UserService userService;
 
     User loggedInUser;
@@ -50,18 +53,20 @@ public class UpdateUserPassword {
     public void before_or_after_all() {
         emailService = Mockito.mock(EmailService.class);
         userService = new UserService(passwordEncoder, userRepository);
-        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService, emailService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(profileController).build();
+        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService,
+                emailService, securityService);
+        mockMVC = MockMvcBuilders.standaloneSetup(profileController).build();
 
     }
 
     @Given("I as user {string} with password {string} am on the change password page")
-    public void iAsUserWithPasswordAmOnTheChangePasswordPage(String userEmail, String currentPassword) throws Exception {
+    public void iAsUserWithPasswordAmOnTheChangePasswordPage(String userEmail, String currentPassword)
+            throws Exception {
         String url = "/profile/change-password";
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
-                        .get(url)
-        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                        .get(url))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         loggedInUser = userService.getUserByEmail(userEmail);
         this.currentPassword = currentPassword;
         origHash = loggedInUser.getEncodedPassword();
@@ -70,13 +75,13 @@ public class UpdateUserPassword {
 
     @When("I enter two different new passwords: {string} and {string}")
     public void i_enter_two_different_passwords_in_new(String newPass, String retypePass) throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", newPass)
-                        .param("retypePassword", retypePass)
-        ).andReturn();
+                        .param("retypePassword", retypePass))
+                .andReturn();
     }
 
     @Then("The password does not get updated")
@@ -91,35 +96,36 @@ public class UpdateUserPassword {
 
     @When("I enter the weak password: {string}")
     public void i_enter_the_weak_password_weak_password(String weakPassword) throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", weakPassword)
-                        .param("retypePassword", weakPassword)
-        ).andReturn();
+                        .param("retypePassword", weakPassword))
+                .andReturn();
     }
 
     @When("I enter fully compliant password: {string}")
     public void i_enter_fully_compliant_details(String compliantPassword) throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", compliantPassword)
-                        .param("retypePassword", compliantPassword)
-        ).andReturn();
+                        .param("retypePassword", compliantPassword))
+                .andReturn();
     }
 
     @When("I enter an old password {string} that does not match the current password")
-    public void i_enter_an_old_password_that_does_not_match_the_current_password(String incorrectOldPassword) throws Exception {
-        MOCK_MVC.perform(
+    public void i_enter_an_old_password_that_does_not_match_the_current_password(String incorrectOldPassword)
+            throws Exception {
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/profile/change-password")
                         .param("currentPassword", incorrectOldPassword)
                         .param("newPassword", "NewPassword10!")
-                        .param("retypePassword", "NewPassword10!")
-        ).andReturn();
+                        .param("retypePassword", "NewPassword10!"))
+                .andReturn();
     }
 
 }
