@@ -283,42 +283,43 @@ public class HomePageController {
             model.addAttribute("recentGardensPage2", recentGardensPage2);
         } else {
             model.addAttribute("recentGardensPage2", null);
-            boolean loggedIn = securityService.isLoggedIn();
+        }
+        boolean loggedIn = securityService.isLoggedIn();
+        logger.info("mark");
+        if (loggedIn) {
+            user = securityService.getCurrentUser();
+            username = user.getFirstName() + " " + user.getLastName();
+            profilePicture = user.getProfilePictureFilename();
 
-            if (loggedIn) {
-                user = securityService.getCurrentUser();
-                username = user.getFirstName() + " " + user.getLastName();
-                profilePicture = user.getProfilePictureFilename();
+            List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+            List<Garden> gardensNeedWatering = new ArrayList<>();
+            List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
 
-                List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-                List<Garden> gardensNeedWatering = new ArrayList<>();
-                List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
+            Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
+            for (int i = 0; i < gardens.size(); i++) {
+                gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
+            }
 
-                Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
-                for (int i = 0; i < gardens.size(); i++) {
-                    gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
-                }
-
-                for (Garden garden : gardens) {
-                    WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
-                    if (weatherData != null) {
-                        List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
-                        if (weatherList.size() > 1) {
-                            DailyWeather beforeYesterdayWeather = weatherList.get(0);
-                            DailyWeather yesterdayWeather = weatherList.get(1);
-                            if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                                    && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
-                                gardensNeedWatering.add(garden);
-                            }
+            for (Garden garden : gardens) {
+                WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
+                if (weatherData != null) {
+                    List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
+                    if (weatherList.size() > 1) {
+                        DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                        DailyWeather yesterdayWeather = weatherList.get(1);
+                        if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
+                            gardensNeedWatering.add(garden);
+                            System.out.println(gardensNeedWatering);
                         }
                     }
                 }
-                model.addAttribute("gardensNeedWatering", gardensNeedWatering);
-                model.addAttribute("profilePicture", profilePicture);
-                model.addAttribute("username", username);
-                model.addAttribute("gardens", gardens);
-                model.addAttribute("gardenWeatherMap", gardenWeatherMap);
             }
+            model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+            model.addAttribute("profilePicture", profilePicture);
+            model.addAttribute("username", username);
+            model.addAttribute("gardens", gardens);
+            model.addAttribute("gardenWeatherMap", gardenWeatherMap);
         }
 
         List<FriendModel> recentFriends = createFriendModel(user.getId());
