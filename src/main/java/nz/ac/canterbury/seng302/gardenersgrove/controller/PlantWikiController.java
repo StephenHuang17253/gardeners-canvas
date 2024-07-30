@@ -32,15 +32,6 @@ public class PlantWikiController {
         this.plantInfoService = plantInfoService;
     }
 
-    private void displayPlantDetails(Model model, JsonNode plantData) {
-            String plantName = plantData.get("common_name").asText();
-            String plantImageUrl = plantData.get("default_image").get("original_url").asText();
-            model.addAttribute("plantName", plantName);
-            model.addAttribute("plantImage", plantImageUrl);
-            logger.info(plantName);
-            logger.info(plantImageUrl);
-    }
-
     /**
      * This method creates the get mapping for the plant wiki page where users can search for plant information.
      * @param search the query string
@@ -59,7 +50,7 @@ public class PlantWikiController {
 
         if (search != null && !search.isEmpty()) {
             model.addAttribute("searchTerm", search);
-            JsonNode plantList = plantInfoService.getPlantListJson(search, true);
+            JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
             model.addAttribute("plantList", plantList.get("data"));
 
@@ -82,7 +73,7 @@ public class PlantWikiController {
         logger.info("GET /plant-wiki/{}/details", plantId);
 
 
-        JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), true);
+        JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
 
         PlantInfoModel plant = new PlantInfoModel(plantDetails);
 
