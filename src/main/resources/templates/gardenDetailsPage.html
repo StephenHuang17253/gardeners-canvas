@@ -73,7 +73,7 @@
                                 <h1 class="modal-title fs-5">Enter a tag to apply to your garden</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
+                            <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
                                 <div class="modal-body">
                                     <div class="input-group rounded">
                                         <input id="tag" th:name="tag" type="search" class="form-control rounded"
