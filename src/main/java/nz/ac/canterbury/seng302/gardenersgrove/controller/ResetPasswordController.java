@@ -33,7 +33,9 @@ import java.util.Objects;
  */
 @Controller
 public class ResetPasswordController {
+
     private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
+    
     private final UserService userService;
     private final EmailService emailService;
     private final TokenService tokenService;

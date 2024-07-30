@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -384,6 +385,39 @@ class GardenTagServiceIntegrationTest {
         } catch (NoSuchElementException exception) {
             fail(exception);
         }
+    }
+
+    @Test
+    void updateGardenTagStatus_changeToAPPROPRIATE_gardenStatusUpdated() {
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        TagStatus originalTagStatus = testTag1.getTagStatus();
+        gardenTagService.updateGardenTagStatus("test1", TagStatus.APPROPRIATE);
+        GardenTag updatedTag1 = gardenTagRepository.findById(testTag1.getId()).get();
+        Assertions.assertNotEquals(originalTagStatus, updatedTag1.getTagStatus());
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
+
+    }
+
+    @Test
+    void updateGardenTagStatus_changeToAPPROPRIATE_allMatchingGardenTagsUpdated() {
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag testTagCapitalized = gardenTagService.addGardenTag(new GardenTag("TEsT1"));
+        gardenTagService.updateGardenTagStatus("test1", TagStatus.APPROPRIATE);
+        GardenTag updatedTag1 = gardenTagRepository.findById(testTag1.getId()).get();
+        GardenTag updatedTagCapitalized = gardenTagRepository.findById(testTagCapitalized.getId()).get();
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTagCapitalized.getTagStatus());
+    }
+
+    @Test
+    void updateGardenTagStatus_changeToAPPROPRIATE_onlyMatchingGardenTagsUpdated() {
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag testTag2 = gardenTagService.addGardenTag(new GardenTag("test2"));
+        gardenTagService.updateGardenTagStatus("test1", TagStatus.APPROPRIATE);
+        GardenTag updatedTag1 = gardenTagRepository.findById(testTag1.getId()).get();
+        GardenTag updatedTag2 = gardenTagRepository.findById(testTag2.getId()).get();
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
+        Assertions.assertEquals(TagStatus.PENDING, updatedTag2.getTagStatus());
     }
 
 }

@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/header.html"></head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center"
-         th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|"></div>
+        th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|"></div>
     <div class="container-md row gap-0 mx-auto mt-4 text-white">
         <div class="col-2">
             <div class="ratio ratio-1x1 mt-3 mb-3 ms-auto">
                 <img id="profilePicture" th:if="${loggedIn}" class="rounded-circle object-fit-cover w-100 h-100"
-                     th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                     alt="User's profile picture">
+                    th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                    alt="User's profile picture">
             </div>
         </div>
         <div class="col-6">
@@ -34,9 +34,9 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid my-2 bg-white rounded py-2">
+    <div th:if="${recentGardensPage1 != null}" class="container my-2 bg-white rounded py-2">
         <div id="carouselRecentGardens" class="carousel slide">
-            <div class="carousel-inner mx-auto" style="width: 90%">
+            <div class="carousel-inner mx-auto w-100">
                 <div class="col">
                     <h2>Recent Gardens</h2>
                 </div>
@@ -79,20 +79,18 @@
                     </div>
                 </div>
             </div>
-            <button th:if="${recentGardensPage2}" class="carousel-control-prev bg-black bg-opacity-75 rounded-circle my-auto p-2"
-                    type="button" data-bs-target="#carouselRecentGardens" data-bs-slide="prev"
-                    style="height: 75px; width: 75px"
-            >
+            <button th:if="${recentGardensPage2}"
+                class="carousel-control-prev bg-black bg-opacity-75 rounded-circle my-auto p-2" type="button"
+                data-bs-target="#carouselRecentGardens" data-bs-slide="prev" style="height: 75px; width: 75px">
                 <span class="carousel-control-prev-icon" aria-hidden="true">
                     <span class="visually-hidden">Previous</span>
                 </span>
             </button>
-            <button th:if="${recentGardensPage2}" class="carousel-control-next bg-black bg-opacity-75 rounded-circle my-auto p-2"
-                    type="button" data-bs-target="#carouselRecentGardens" data-bs-slide="next"
-                    style="height: 75px; width: 75px"
-            >
+            <button th:if="${recentGardensPage2}"
+                class="carousel-control-next bg-black bg-opacity-75 rounded-circle my-auto p-2" type="button"
+                data-bs-target="#carouselRecentGardens" data-bs-slide="next" style="height: 75px; width: 75px">
                 <span class="carousel-control-next-icon" aria-hidden="true">
-                  <span class="visually-hidden">Next</span>
+                    <span class="visually-hidden">Next</span>
                 </span>
             </button>
         </div>
@@ -119,6 +117,28 @@
             </div>
         </div>
     </div>
+
+
+    <div th:if="${recentFriends.size() > 0}" class="container my-2 py-2 bg-white rounded">
+        <div class="col">
+            <h2>Recent Users</h2>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
+            <div class="col-3" th:each="friend : ${recentFriends}">
+                <a th:href="@{${friend.getFriendGardenLink}}" class="text-reset text-decoration-none">
+                    <div class="card h-100 bg-success text-white garden-card">
+                        <div class="card-body pt-1 text-center">
+                            <h4 th:text="${friend.getFriendName}" class="card-title justify-content-center"></h4>
+                            <img id="card-img-top"
+                                th:src="@{${friend.getFriendProfilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + friend.getFriendProfilePicture}}"
+                                alt="Profile Image" class="card-img-top rounded justify-content-center mb-4">
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

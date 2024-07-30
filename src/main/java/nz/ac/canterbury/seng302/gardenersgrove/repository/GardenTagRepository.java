@@ -41,6 +41,4 @@ public interface GardenTagRepository extends CrudRepository<GardenTag, Long> {
     List<GardenTag> findAll();
 
 
-
-
 }
