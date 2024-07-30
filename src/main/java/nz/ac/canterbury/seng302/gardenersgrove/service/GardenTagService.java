@@ -5,6 +5,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRelationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -141,6 +142,18 @@ public class GardenTagService {
      */
     public Optional<GardenTagRelation> getGardenTagRelationByGardenAndTag(Garden garden, GardenTag tag) {
         return gardenTagRelationRepository.findGardenTagRelationsByGardenIsAndTagIs(garden, tag);
+    }
+
+
+    /**
+     * Updates all tags that are similar to have the same tag status
+     * @param tagName name to match tag
+     * @param tagStatus new tag status
+     */
+    public void updateGardenTagStatus(String tagName, TagStatus tagStatus) {
+        List<GardenTag>  tagList = gardenTagRepository.findByTagNameContainsIgnoreCase(tagName);
+        tagList.forEach(item -> item.setTagStatus(tagStatus));
+        tagList.forEach(gardenTagRepository::updateGardenTagByTagId);
     }
 
 

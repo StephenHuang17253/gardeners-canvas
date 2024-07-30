@@ -40,6 +40,12 @@ public interface GardenTagRepository extends CrudRepository<GardenTag, Long> {
      */
     List<GardenTag> findAll();
 
+    /**
+     * Update any changed fields of the garden tag
+     *
+     * @param tag updated version of the tag
+     */
+    void updateGardenTagByTagId(GardenTag tag);
 
 
 
