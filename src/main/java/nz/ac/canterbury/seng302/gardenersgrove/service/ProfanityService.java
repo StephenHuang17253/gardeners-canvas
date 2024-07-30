@@ -140,36 +140,56 @@ public class ProfanityService {
 
     private ProfanityResponseData moderateContentApiCall(String content)
     {
-        try {
+        boolean wasProfanityChecked = false;
+        int retryCounter = 0;
+        while (!wasProfanityChecked && retryCounter < 4)
+        {
+            try {
 
-            logger.info("Profanity service input: " + content);
-            String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
-            logger.debug("Sent profanity API request : " + new Date().getTime());
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(endPoint + "/contentmoderator/moderate/v1.0/ProcessText/Screen?text=" + encodedContent))
-                    .header("Content-Type", "text/plain")
-                    .header("Ocp-Apim-Subscription-Key", moderatorKey)
-                    .POST(HttpRequest.BodyPublishers.ofString(content))
-                    .build();
+                logger.info("Profanity service input: " + content);
+                String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                logger.debug("Sent profanity API request : " + new Date().getTime());
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(endPoint + "/contentmoderator/moderate/v1.0/ProcessText/Screen?text=" + encodedContent))
+                        .header("Content-Type", "text/plain")
+                        .header("Ocp-Apim-Subscription-Key", moderatorKey)
+                        .POST(HttpRequest.BodyPublishers.ofString(content))
+                        .build();
 
-            logger.info("Sent profanity request to " + request.uri().toString());
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("Profanity service response: : " + response.body());
+                logger.info("Sent profanity request to " + request.uri().toString());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                logger.info("Profanity service response: : " + response.body());
 
-            JsonNode jsonObject = objectMapper.readTree(response.body());
-            ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
+                JsonNode jsonObject = objectMapper.readTree(response.body());
+                ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
 
-            logger.info("Call limit passed: " + profanityResponse.isCallLimitExceeded());
-            return profanityResponse;
+                logger.info("Call limit passed: " + profanityResponse.isCallLimitExceeded());
 
-        } catch (IOException | InterruptedException errorException) {
-            if (errorException.getMessage().contains("Moderate have exceeded call rate limit")) {
-                logger.info("Call limit reached!");
+                if (profanityResponse.isCallLimitExceeded())
+                {
+                    wasProfanityChecked = false;
+                    retryCounter += 1;
+                    logger.warn(String.format("Could not get profanity response due to ratelimit, retrying %d",retryCounter));
+                    waitForRateLimit();
+                }
+                else
+                {
+                    wasProfanityChecked = true;
+                    return profanityResponse;
+                }
+
+            } catch (IOException | InterruptedException errorException) {
+                if (errorException.getMessage().contains("Moderate have exceeded call rate limit")) {
+                    logger.info("Call limit reached!");
+                }
+                Thread.currentThread().interrupt();
+                logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
+                return null; ///RETURN ERROR, FIX LATER
             }
-            Thread.currentThread().interrupt();
-            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
-            return null; ///RETURN ERROR, FIX LATER
         }
+
+
+        return null;
     }
 
 

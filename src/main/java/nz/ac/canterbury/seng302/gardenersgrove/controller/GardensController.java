@@ -597,13 +597,13 @@ public class GardensController {
     {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanityLowPriority(tagName);
-            if (tagContainsProfanity)
+            if (!tagContainsProfanity)
             {
-                gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
+                gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
             }
             else
             {
-                gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
+                gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
             }
         }));
         asyncThread.start();
