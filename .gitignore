@@ -44,3 +44,6 @@ uploads/
 
 ### Test Outputs ###
 target/
+
+### testing data ###
+**/data.sql

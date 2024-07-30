@@ -4,13 +4,9 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -48,7 +43,7 @@ public class HomePageController {
 
     private UserInteractionService userInteractionService;
 
-    private static int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 5;
 
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
@@ -58,7 +53,8 @@ public class HomePageController {
      */
     @Autowired
     public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService, UserInteractionService userInteractionService) {
+            FriendshipService friendshipService, SecurityService securityService,
+            UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -203,14 +199,14 @@ public class HomePageController {
         return "homePage";
     }
 
-
-    private List<Garden> getRecentGardens(Long userId){
-        List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,ItemType.GARDEN);
+    private List<Garden> getRecentGardens(Long userId) {
+        List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
+                ItemType.GARDEN);
         return gardenService.getGardensByInteraction(gardenInteractions);
     }
 
     private List<RecentGardenModel> setRecentGardenModels(List<Garden> gardenList) {
-        if(gardenList.isEmpty()){
+        if (gardenList.isEmpty()) {
             return null;
         }
         return gardenList.stream()
@@ -218,8 +214,32 @@ public class HomePageController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Helper function to create a list of friend models. Used for adding to the
+     * model of the Manage Friends page.
+     * 
+     * @param id of user to find recent friends of
+     * @return friendModels
+     */
+    private List<FriendModel> createFriendModel(long id) {
+        List<FriendModel> friendModels = new ArrayList<>();
+        List<UserInteraction> userInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(id,
+                ItemType.USER);
+        List<User> recentFriends = userService.getUsersByInteraction(userInteractions);
 
-    private String loadUserMainPage(User user, Model model){
+        for (User friend : recentFriends) {
+            String friendProfilePicture = friend.getProfilePictureFilename();
+            String friendsName = friend.getFirstName() + " " + friend.getLastName();
+            String friendGardenLink = "/" + friend.getId() + "/gardens";
+            FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
+            friendModel.setFriendId(friend.getId());
+            friendModels.add(friendModel);
+        }
+
+        return friendModels;
+    }
+
+    private String loadUserMainPage(User user, Model model) {
 
         String username = user.getFirstName() + " " + user.getLastName();
         String profilePicture = user.getProfilePictureFilename();
@@ -228,20 +248,23 @@ public class HomePageController {
 
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
-        if(recentGardens == null){
-            return "mainPage";
-        }
-        if(recentGardens.size() < PAGE_SIZE){
-            model.addAttribute("recentGardensPage1", recentGardens.subList(0,recentGardens.size()));
-        }else{
-            model.addAttribute("recentGardensPage1", recentGardens.subList(0,5));
-        }
-        if (recentGardens.size() > PAGE_SIZE) {
-            List<RecentGardenModel> recentGardensPage2 = recentGardens.subList(PAGE_SIZE, Math.min(PAGE_SIZE*2, recentGardens.size()));
+
+        if (recentGardens != null) {
+            List<RecentGardenModel> recentGardensPage1 = recentGardens.subList(0,
+                    Math.min(recentGardens.size(), PAGE_SIZE));
+            model.addAttribute("recentGardensPage1", recentGardensPage1);
+
+            List<RecentGardenModel> recentGardensPage2 = null;
+            if (recentGardens.size() > PAGE_SIZE) {
+                recentGardensPage2 = recentGardens.subList(PAGE_SIZE,
+                        Math.min(recentGardens.size(), PAGE_SIZE * 2));
+            }
             model.addAttribute("recentGardensPage2", recentGardensPage2);
-        } else {
-            model.addAttribute("recentGardensPage2", null);
         }
+
+        List<FriendModel> recentFriends = createFriendModel(user.getId());
+        List<FriendModel> sublistRecentFriends = recentFriends.subList(0, Math.min(PAGE_SIZE, recentFriends.size()));
+        model.addAttribute("recentFriends", sublistRecentFriends);
 
         return "mainPage";
     }

@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,10 @@ import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RequestFriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserInteractionService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
@@ -45,20 +48,24 @@ public class ManageFriendsController {
 
     private final UserService userService;
 
+    private final UserInteractionService userInteractionService;
+
     /**
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
      * @param securityService   service to access security methods
      * @param friendshipService service to access plant repository
-     * @param fileService       service to manage files
+     * @param userService       service to manage users
+     * @param userInteractionService service to manage user interactions
      */
     @Autowired
-    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService, UserService userService) {
+    public ManageFriendsController(FriendshipService friendshipService, SecurityService securityService,
+            UserService userService, UserInteractionService userInteractionService) {
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userService = userService;
-
+        this.userInteractionService = userInteractionService;
     }
 
     /**
@@ -133,7 +140,8 @@ public class ManageFriendsController {
             String fName = userTypeFriend.getFirstName();
             String lName = userTypeFriend.getLastName();
             String friendsName = fName + ' ' + lName;
-            RequestFriendModel requestFriendModel = new RequestFriendModel(friendProfilePicture, friendsName, isSender, userTypeFriend.getId());
+            RequestFriendModel requestFriendModel = new RequestFriendModel(friendProfilePicture, friendsName, isSender,
+                    userTypeFriend.getId());
             requestFriendModels.add(requestFriendModel);
         }
 
@@ -187,7 +195,7 @@ public class ManageFriendsController {
      */
     List<FriendModel> getSearchResults(String searchInput, ValidationResult validEmail) {
         List<FriendModel> friendModels = new ArrayList<>();
-        //get all matching search results
+        // get all matching search results
         User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
         User currentUser = securityService.getCurrentUser();
         if (searchResults.length < 1) {
@@ -196,13 +204,13 @@ public class ManageFriendsController {
         for (User foundUser : searchResults) {
             // ensure that a search result is not the current user
             if (!Objects.equals(foundUser.getId(), currentUser.getId())) {
-                //creating a friend (person) object for display on frontend
+                // creating a friend (person) object for display on frontend
                 String friendProfilePicture = foundUser.getProfilePictureFilename();
                 String friendsName = foundUser.getFirstName() + " " + foundUser.getLastName();
                 String friendGardenLink = "/" + foundUser.getId() + "/gardens";
                 FriendModel friendModel = new FriendModel(friendProfilePicture, friendsName, friendGardenLink);
                 friendModel.setFriendId(foundUser.getId());
-                // add status of friendship from current user to  foundUser
+                // add status of friendship from current user to foundUser
                 friendModel.setFriendRequestStatus(friendshipService.checkFriendshipStatus(currentUser, foundUser));
                 friendModel.setFriendId(foundUser.getId());
                 // ensure there is no friendship from foundUser to currentUser
@@ -212,7 +220,8 @@ public class ManageFriendsController {
                     friendModels.add(friendModel);
                 } else {
                     Friendship friendship = friendshipService.findFriendship(foundUser, currentUser);
-                    boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED && friendship.getUser1() == foundUser);
+                    boolean declinedRequest = (friendship.getStatus() == FriendshipStatus.DECLINED
+                            && friendship.getUser1() == foundUser);
                     if (declinedRequest) {
                         friendModels.add(friendModel);
                     }
@@ -222,26 +231,26 @@ public class ManageFriendsController {
         return friendModels;
     }
 
-
     /**
      * Gets results of search for other users
      *
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends/search")
-    public String searchForUsers(@RequestParam(name = "searchInput", defaultValue = "") String searchInput, Model model) {
+    public String searchForUsers(@RequestParam(name = "searchInput", defaultValue = "") String searchInput,
+            Model model) {
         logger.info("GET /manage-friends/search");
-        
-        //preparing input for validation
+
+        // preparing input for validation
         searchInput = searchInput.strip();
         ValidationResult validEmail = InputValidator.validateEmail(searchInput);
         String[] separated = searchInput.split(" ");
 
-        //validating input
+        // validating input
         ValidationResult validFName = InputValidator.validateName(separated[0]);
         ValidationResult validLName = InputValidator.validateName((separated.length > 1) ? separated[1] : "");
         List<FriendModel> friendModels = new ArrayList<>();
-        //getting results
+        // getting results
         if ((validEmail.valid() || validFName.valid() || validLName.valid()) && !searchInput.isEmpty()) {
             friendModels = getSearchResults(searchInput, validEmail);
             model.addAttribute("searchResults", friendModels);
@@ -270,10 +279,10 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/send-invite")
     public String createFriendship(@RequestParam("friendId") Long friendId,
-                                   @RequestParam("activeTab") String activeTab,
-                                   @RequestParam(value = "searchInput", required = false) String searchInput,
-                                   RedirectAttributes redirectAttributes,
-                                   Model model) {
+            @RequestParam("activeTab") String activeTab,
+            @RequestParam(value = "searchInput", required = false) String searchInput,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends/send-invite");
 
         User currentUser = securityService.getCurrentUser();
@@ -284,7 +293,6 @@ public class ManageFriendsController {
             model.addAttribute("searchErrorText", exception.getMessage());
             return "manageFriendsPage";
         }
-
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
@@ -297,7 +305,8 @@ public class ManageFriendsController {
 
     /**
      * Changes the status of a pending request, based on whether it was accepted
-     * or declined
+     * or declined, if it is accepted a user interaction is logged for both users
+     * showing that they recently interacted
      *
      * @param friendAccepted  boolean, whether the friend request was accepted or
      *                        declined
@@ -308,14 +317,20 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends")
     public String managePendingRequest(@RequestParam(name = "friendAccepted") boolean friendAccepted,
-                                       @RequestParam(name = "pendingFriendId") Long pendingFriendId,
-                                       @RequestParam("activeTab") String activeTab,
-                                       RedirectAttributes redirectAttributes,
-                                       Model model) {
+            @RequestParam(name = "pendingFriendId") Long pendingFriendId,
+            @RequestParam("activeTab") String activeTab,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends");
+
+        User currentUser = securityService.getCurrentUser();
 
         if (friendAccepted) {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.ACCEPTED);
+            userInteractionService.addUserInteraction(currentUser.getId(), pendingFriendId, ItemType.USER,
+                    LocalDateTime.now());
+            userInteractionService.addUserInteraction(pendingFriendId, currentUser.getId(), ItemType.USER,
+                    LocalDateTime.now());
         } else {
             securityService.changeFriendship(pendingFriendId, FriendshipStatus.DECLINED);
         }
@@ -338,9 +353,9 @@ public class ManageFriendsController {
      */
     @PostMapping("/manage-friends/remove")
     public String cancelSentRequest(@RequestParam(name = "friendId") Long friendId,
-                                    @RequestParam("activeTab") String activeTab,
-                                    RedirectAttributes redirectAttributes,
-                                    Model model) {
+            @RequestParam("activeTab") String activeTab,
+            RedirectAttributes redirectAttributes,
+            Model model) {
         logger.info("POST /manage-friends/remove");
 
         User currentUser = securityService.getCurrentUser();
@@ -349,6 +364,8 @@ public class ManageFriendsController {
 
         if (friendship != null) {
             friendshipService.deleteFriendship(friendship.getId());
+            userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);
+            userInteractionService.removeUserInteraction(friendId, currentUser.getId(), ItemType.USER);
         }
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
