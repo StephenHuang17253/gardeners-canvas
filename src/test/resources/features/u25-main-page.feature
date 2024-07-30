@@ -24,4 +24,5 @@ Scenario: I Have three recent Friends, they show up in order
 Scenario: (AC6) I see plants that need watering notifications
   Given I as user "Liam.smith@email.com" am logged in with "Password1!"
   And I am on the home page
-  Then I can see the names and gardens of plants that need watering
+  When I have garden that needs watering for user "Liam.smith@email.com"
+  Then I can see the names and gardens of plants that need watering for "Liam.smith@email.com"

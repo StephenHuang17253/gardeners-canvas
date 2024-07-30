@@ -151,8 +151,22 @@ public class U25_MainPage {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    @Then("I can see the names and gardens of plants that need watering")
-    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering() {
+    @When("I have garden that needs watering for user {string}")
+    public void iHaveGardenThatNeedsWateringForUser(String email) {
+        User user = userService.getUserByEmail(email);
+        Garden gardenThatNeedsWater = new Garden("Thirsty Garden", "This garden is thirsty", "", "", "", "", "", 0.0, false, "",
+                "", user);
+        gardenService.addGarden(gardenThatNeedsWater);
+    }
+
+    @Then("I can see the names and gardens of plants that need watering for {string}")
+    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String email) {
+        User user = userService.getUserByEmail(email);
+        Garden expectedGarden = gardenService.getMatchingGardens("Thirsty Garden")
+        List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
+        Boolean containsNewGarden = gardensNeedWatering.contains(expectedGarden);
+        assertTrue(containsNewGarden);
 
     }
+
 }
