@@ -410,7 +410,7 @@ public class PlantFormController {
     }
 
     /**
-     *
+     * Add plant to db
      * @param gardenId
      * @param plantId
      * @param redirectAttributes
@@ -431,14 +431,67 @@ public class PlantFormController {
 
         Plant plant = optionalPlant.get();
 
-        redirectAttributes.addAttribute("plantName", plant.getPlantName());
-        redirectAttributes.addAttribute("plantCount", plant.getPlantCount());
-        redirectAttributes.addAttribute("plantDescription", plant.getPlantDescription());
-        redirectAttributes.addAttribute("plantDate", plant.getPlantDate());
-        redirectAttributes.addAttribute("plantPicture", plant.getPlantPictureFilename());
+        //Todo: add in new plant and send that to redirect
+
+        redirectAttributes.addAttribute("plantId", plant.getPlantId());
         redirectAttributes.addAttribute("gardenId", gardenId);
 
-        return "redirect:/my-gardens/{gardenId}/create-new-plant";
+        return "redirect:/confirm-plant-import";
     }
+
+
+    @PostMapping("/import-plant/cancel")
+    public String cancelImportPlant(@RequestParam("gardenId") Long gardenId,
+                              @RequestParam("plantId") Long plantId,
+                              HttpServletResponse response) {
+        logger.info("GET /import-plant");
+        Optional<Plant> optionalPlant = plantService.findById(plantId);
+
+        if (optionalPlant.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        // Todo: delete the plant + might need to keep track of old garden id too to return to where we were
+
+        return "redirect/";
+    }
+
+    @GetMapping("/confirm-plant-import")
+    public String importPlantConfirmationForm(@RequestParam("gardenId") Long gardenId,
+                                @RequestParam("plantId") Long plantId,
+                                HttpServletResponse response,
+                                Model model) {
+        logger.info("GET /confirm-plant-import");
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+        Optional<Plant> plantToUpdate = plantService.findById(plantId);
+        if (plantToUpdate.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        //Todo: keep track of old garden Id + clear any unneccessary code
+
+        model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
+        model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
+        String plantPicture = plantToUpdate.get().getPlantPictureFilename();
+        model.addAttribute("plantPicture", plantPicture);
+        model.addAttribute("plantName", plantToUpdate.get().getPlantName());
+        model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
+        model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
+        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+        return "importPlantForm";
+    }
+
 
 }
