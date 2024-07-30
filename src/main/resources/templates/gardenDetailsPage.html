@@ -73,10 +73,10 @@
                                 <h1 class="modal-title fs-5">Enter a tag to apply to your garden</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form th:action="@{/my-gardens/__${gardenId}__/tag}" method="post">
+                            <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
                                 <div class="modal-body">
                                     <div class="input-group rounded">
-                                        <input th:name="tag" type="search" class="form-control rounded"
+                                        <input id="tag" th:name="tag" type="search" class="form-control rounded"
                                                th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
                                                th:value="${tagText}" placeholder="e.g. vegetable garden"
                                                aria-label="Search" aria-describedby="search-addon" />
@@ -85,6 +85,9 @@
                                                 <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
                                             </svg>
                                         </button>
+                                    </div>
+                                    <div class="position-relative">
+                                        <ul id="tagAutocompleteSuggestions" class="list-group position-absolute"></ul>
                                     </div>
                                     <p id="tagErrorText" th:if="${tagErrorText}" class="text-danger fs-6" th:text="${tagErrorText}"></p>
                                 </div>
@@ -185,6 +188,7 @@
     <script th:src="@{/js/wateringBox.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
+    <script th:src="@{/js/gardenTagAutocomplete.js}"></script>
 </body>
 
 </html>
