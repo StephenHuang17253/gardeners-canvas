@@ -23,21 +23,16 @@
                 <button type="submit" class="btn btn-outline-success">Search</button>
             </form>
 
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                <div class="col" th:each="plant : ${plantList}">
-                    <p th:if="${plant.get('common_name')}" th:text="${plant.get('common_name')}"></p>
-                    <img class="w-25" th:src="${plant.get('default_image').get('original_url').asText()}" alt="Image not found">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
+                <div class="w-25" th:each="plant : ${plantList}">
+                    <div th:replace="~{fragments/plantInfoCard.html :: plantInfoCard(
+                        plantId=${plant.get('id').asText()},
+                        plantName=${plant.get('common_name').asText()},
+                        plantPicture=${plant.get('default_image').get('original_url').asText()})}
+                            ">
+                    </div>
                 </div>
             </div>
-
-<!--            <div class="row mb-4">-->
-<!--                <p th:if="${plantName}" th:text="${plantName}"></p>-->
-<!--                <img class="w-50" th:if="${plantName}" th:src="${plantImage}" alt="Image not found">-->
-<!--            </div>-->
-
-<!--            <div th:each="suggestion : ${searchSuggestions}">-->
-<!--                <p th:text="${suggestion}"></p>-->
-<!--            </div>-->
 
         </div>
 
