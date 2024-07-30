@@ -420,7 +420,7 @@ public class PlantFormController {
     @PostMapping("/import-plant")
     public String importPlant(@RequestParam("gardenId") Long gardenId,
                               @RequestParam("plantId") Long plantId, RedirectAttributes redirectAttributes,
-                              HttpServletResponse response) throws IOException {
+                              HttpServletResponse response) {
         logger.info("POST /import-plant");
         Optional<Plant> optionalPlant = plantService.findById(plantId);
 
@@ -433,9 +433,15 @@ public class PlantFormController {
 
         Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId);
         if (toCopyPlant.getPlantPictureFilename() != null) {
-            Resource pictureToCopy = fileService.loadFile(toCopyPlant.getPlantPictureFilename());
-            plantService.updatePlantPicture(newPlant, pictureToCopy);
+            try {
+                Resource pictureToCopy = fileService.loadFile(toCopyPlant.getPlantPictureFilename());
+                plantService.updatePlantPicture(newPlant, pictureToCopy);
+            } catch (IOException exception) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return "404";
+            }
         }
+
         redirectAttributes.addAttribute("plantId", newPlant.getPlantId());
         redirectAttributes.addAttribute("gardenId", gardenId);
 
@@ -443,11 +449,20 @@ public class PlantFormController {
     }
 
 
+    /**
+     * Cancels copying of plant and deletes copy from database
+     *
+     * @param gardenId my garden that was being copied to
+     * @param plantId  id of plant to be deleted
+     * @param response error page
+     * @return redirect to another page
+     */
     @PostMapping("/import-plant/cancel")
     public String cancelImportPlant(@RequestParam("gardenId") Long gardenId,
                                     @RequestParam("plantId") Long plantId,
+                                    RedirectAttributes redirectAttributes,
                                     HttpServletResponse response) {
-        logger.info("GET /import-plant/cancel");
+        logger.info("POST /import-plant/cancel");
         Optional<Plant> optionalPlant = plantService.findById(plantId);
 
         if (optionalPlant.isEmpty()) {
@@ -455,9 +470,16 @@ public class PlantFormController {
             return "404";
         }
 
-        // Todo: delete the plant + might need to keep track of old garden id too to return to where we were
+        try {
+            plantService.deletePlant(plantId);
+        } catch (IOException error) {
+            response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+            return "500";
+        }
 
-        return "redirect/";
+        redirectAttributes.addAttribute("gardenId", gardenId);
+
+        return "redirect:/my-gardens/{gardenId}";
     }
 
     /**
@@ -492,7 +514,7 @@ public class PlantFormController {
             return "404";
         }
 
-        //Todo: keep track of old garden Id + clear any unneccessary code
+        //Todo: keep track of old garden Id + clear any unnecessary code
 
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form

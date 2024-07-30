@@ -127,7 +127,7 @@ public class PlantService {
             oldPlant.setPlantDate(newDate);
             return plantRepository.save(oldPlant);
         } else {
-            throw new IllegalArgumentException("Invalid plant IDD");
+            throw new IllegalArgumentException("Invalid plant ID");
         }
     }
 
@@ -201,5 +201,23 @@ public class PlantService {
         } catch (IOException error) {
             logger.error(error.getMessage());
         }
+    }
+
+    /**
+     * Deletes plant and its associated picture
+     *
+     * @param plantId id of plant to delete
+     * @throws IOException exception cannot delete plant
+     */
+    public void deletePlant(Long plantId) throws IOException {
+        Optional<Plant> targetPlant = findById(plantId);
+        if (targetPlant.isPresent()) {
+            Plant plantToDelete = targetPlant.get();
+            if (plantToDelete.getPlantPictureFilename() != null) {
+                fileService.deleteFile(String.format("/files/plants/%s", plantToDelete.getPlantPictureFilename()));
+            }
+            plantRepository.deleteById(plantId);
+        }
+
     }
 }
