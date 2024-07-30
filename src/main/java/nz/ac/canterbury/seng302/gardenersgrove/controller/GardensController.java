@@ -369,6 +369,9 @@ public class GardensController {
                                    Model model) {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
+        ValidationResult tagResult = InputValidator.validateTag(tag);
+        boolean gardenAlreadyHasThisTag = false;
+
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -376,20 +379,21 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        GardenTag gardenTag = new GardenTag(tag);
 
-        if (gardenTagService.getByName(tag).isPresent()) {
-            gardenTag = gardenTagService.getByName(tag).get();
-        } else {
-            gardenTagService.addGardenTag(gardenTag);
-        }
+        if (tagResult.valid()) {
+            GardenTag gardenTag = new GardenTag(tag);
 
-        ValidationResult tagResult = InputValidator.validateTag(tag);
+            if (gardenTagService.getByName(tag).isPresent()) {
+                gardenTag = gardenTagService.getByName(tag).get();
+            } else {
+                gardenTagService.addGardenTag(gardenTag);
+            }
 
-        boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+            gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
-        if (!gardenAlreadyHasThisTag && tagResult.valid()) {
-            gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+            if (!gardenAlreadyHasThisTag && tagResult.valid()) {
+                gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+            }
         }
 
         if (!tagResult.valid() || gardenAlreadyHasThisTag) {
