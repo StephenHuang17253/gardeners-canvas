@@ -30,6 +30,14 @@
             <h3 class="text-danger" th:text="${SearchErrorText}"></h3>
         </div>
     </div>
+
+    <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
+        <h7>Applied tags:</h7>
+        <div class="p-1" th:each="tag : ${appliedSearchTagsList}">
+            <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag})}"></div>
+        </div>
+    </div>
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2" th:if="${SearchErrorText==''}">
         <div class="col" th:each="garden : ${publicGardens}">
             <div th:replace="~{fragments/publicGardensCard.html ::
