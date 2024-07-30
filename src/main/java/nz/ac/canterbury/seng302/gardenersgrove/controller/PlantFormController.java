@@ -435,7 +435,8 @@ public class PlantFormController {
         redirectAttributes.addAttribute("plantCount", plant.getPlantCount());
         redirectAttributes.addAttribute("plantDescription", plant.getPlantDescription());
         redirectAttributes.addAttribute("plantDate", plant.getPlantDate());
-        redirectAttributes.addAttribute("plantPicture", plant.getPlantDate());
+        redirectAttributes.addAttribute("plantPicture", plant.getPlantPictureFilename());
+        redirectAttributes.addAttribute("gardenId", gardenId);
 
         return "redirect:/my-gardens/{gardenId}/create-new-plant";
     }
