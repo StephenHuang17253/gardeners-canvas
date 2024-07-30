@@ -220,6 +220,7 @@ public class HomePageController {
 
         User user = securityService.getCurrentUser();
 
+
         if (user != null) {
             return loadUserMainPage(user, model);
         }
