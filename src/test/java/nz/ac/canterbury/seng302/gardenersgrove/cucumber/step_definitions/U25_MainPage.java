@@ -1,9 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
@@ -35,6 +39,8 @@ import java.io.File;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,6 +85,56 @@ public class U25_MainPage {
     public MockMvc mockMVC;
 
     private MvcResult mvcResult;
+
+    private String drySampleWeather = "{\n" +
+            "  \"latitude\": -43.5,\n" +
+            "  \"longitude\": 172.625,\n" +
+            "  \"generationtime_ms\": 0.07200241088867188,\n" +
+            "  \"utc_offset_seconds\": 0,\n" +
+            "  \"timezone\": \"GMT\",\n" +
+            "  \"timezone_abbreviation\": \"GMT\",\n" +
+            "  \"elevation\": 7.0,\n" +
+            "  \"current_units\": {\n" +
+            "    \"time\": \"iso8601\",\n" +
+            "    \"interval\": \"seconds\",\n" +
+            "    \"temperature_2m\": \"°C\",\n" +
+            "    \"relative_humidity_2m\": \"%\",\n" +
+            "    \"precipitation\": \"mm\",\n" +
+            "    \"weather_code\": \"wmo code\"\n" +
+            "  },\n" +
+            "  \"current\": {\n" +
+            "    \"time\": \"2024-05-21T06:15\",\n" +
+            "    \"interval\": 900,\n" +
+            "    \"temperature_2m\": 9.6,\n" +
+            "    \"relative_humidity_2m\": 92,\n" +
+            "    \"precipitation\": 0.00,\n" +
+            "    \"weather_code\": 3\n" +
+            "  },\n" +
+            "  \"daily_units\": {\n" +
+            "    \"time\": \"iso8601\",\n" +
+            "    \"weather_code\": \"wmo code\",\n" +
+            "    \"temperature_2m_max\": \"°C\",\n" +
+            "    \"temperature_2m_min\": \"°C\",\n" +
+            "    \"precipitation_sum\": \"mm\"\n" +
+            "  },\n" +
+            "  \"daily\": {\n" +
+            "    \"time\": [\n" +
+            "      \"2024-05-19\",\n" +
+            "      \"2024-05-20\",\n" +
+            "      \"2024-05-21\",\n" +
+            "      \"2024-05-22\",\n" +
+            "      \"2024-05-23\",\n" +
+            "      \"2024-05-24\",\n" +
+            "      \"2024-05-25\",\n" +
+            "      \"2024-05-26\",\n" +
+            "      \"2024-05-27\"\n" +
+            "    ],\n" +
+            "    \"weather_code\": [45, 63, 80, 80, 45, 45, 3, 3, 61],\n" +
+            "    \"temperature_2m_max\": [11.1, 12.3, 10.3, 11.1, 11.2, 11.0, 13.1, 9.7, 10.9],\n" +
+            "    \"temperature_2m_min\": [7.0, 8.2, 7.9, 7.8, 2.8, 3.5, 7.7, 2.5, 6.6],\n" +
+            "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
+            "  }\n" +
+            "}\n";
 
     // Setup
     @Before
@@ -151,22 +207,29 @@ public class U25_MainPage {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    @When("I have garden that needs watering for user {string}")
-    public void iHaveGardenThatNeedsWateringForUser(String email) {
+    @When("I have garden called {string} that needs watering for user {string}")
+    public void iHaveGardenThatNeedsWateringForUser(String gardenName, String email) throws JsonProcessingException {
         User user = userService.getUserByEmail(email);
-        Garden gardenThatNeedsWater = new Garden("Thirsty Garden", "This garden is thirsty", "", "", "", "", "", 0.0, false, "",
+        Garden gardenThatNeedsWater = new Garden(gardenName, "This garden is thirsty", "", "", "", "", "", 0.0, false, "",
                 "", user);
         gardenService.addGarden(gardenThatNeedsWater);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonObject = objectMapper.readTree(drySampleWeather);
+
+        WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
+        
+        when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
     }
 
-    @Then("I can see the names and gardens of plants that need watering for {string}")
-    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String email) {
+    @Then("I can see that {string} need watering in the watering notifications for {string}")
+    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) {
         User user = userService.getUserByEmail(email);
-        Garden expectedGarden = gardenService.getMatchingGardens("Thirsty Garden")
+        List<Garden> expectedGardens = gardenService.getMatchingGardens(gardenName);
+        Garden expectedGarden = expectedGardens.getFirst();
         List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
         Boolean containsNewGarden = gardensNeedWatering.contains(expectedGarden);
         assertTrue(containsNewGarden);
-
     }
 
 }
