@@ -122,8 +122,9 @@ public class U25_MainPage {
         User user1 = userService.getUserByEmail(email1);
         User user2 = userService.getUserByEmail(email2);
         assertEquals(friendList.size(), 2);
-        assertEquals(friendList.get(0).getFriendId(), user1.getId());
-        assertEquals(friendList.get(1).getFriendId(), user2.getId());
+        // Most to least recent
+        assertEquals(friendList.get(0).getFriendId(), user2.getId());
+        assertEquals(friendList.get(1).getFriendId(), user1.getId());
     }
 
     @Then("There are no recently accessed friends")
