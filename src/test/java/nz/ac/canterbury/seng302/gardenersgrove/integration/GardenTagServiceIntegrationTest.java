@@ -392,8 +392,10 @@ class GardenTagServiceIntegrationTest {
         GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
         TagStatus originalTagStatus = testTag1.getTagStatus();
         gardenTagService.updateGardenTagStatus("test1", TagStatus.APPROPRIATE);
-        Assertions.assertNotEquals(originalTagStatus, testTag1.getTagStatus());
-        Assertions.assertEquals(TagStatus.APPROPRIATE, testTag1.getTagStatus());
+        GardenTag updatedTag1 = gardenTagRepository.findById(testTag1.getId()).get();
+        Assertions.assertNotEquals(originalTagStatus, updatedTag1.getTagStatus());
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
+
     }
 
     @Test
@@ -401,8 +403,10 @@ class GardenTagServiceIntegrationTest {
         GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
         GardenTag testTagCapitalized = gardenTagService.addGardenTag(new GardenTag("TEsT1"));
         gardenTagService.updateGardenTagStatus("test1", TagStatus.APPROPRIATE);
-        Assertions.assertEquals(TagStatus.APPROPRIATE, testTag1.getTagStatus());
-        Assertions.assertEquals(TagStatus.APPROPRIATE, testTagCapitalized.getTagStatus());
+        GardenTag updatedTag1 = gardenTagRepository.findById(testTag1.getId()).get();
+        GardenTag updatedTagCapitalized = gardenTagRepository.findById(testTagCapitalized.getId()).get();
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTagCapitalized.getTagStatus());
     }
 
     @Test
@@ -410,8 +414,10 @@ class GardenTagServiceIntegrationTest {
         GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
         GardenTag testTag2 = gardenTagService.addGardenTag(new GardenTag("test2"));
         gardenTagService.updateGardenTagStatus("test1", TagStatus.APPROPRIATE);
-        Assertions.assertEquals(TagStatus.APPROPRIATE, testTag1.getTagStatus());
-        Assertions.assertEquals(TagStatus.PENDING, testTag2.getTagStatus());
+        GardenTag updatedTag1 = gardenTagRepository.findById(testTag1.getId()).get();
+        GardenTag updatedTag2 = gardenTagRepository.findById(testTag2.getId()).get();
+        Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
+        Assertions.assertEquals(TagStatus.PENDING, updatedTag2.getTagStatus());
     }
 
 }
