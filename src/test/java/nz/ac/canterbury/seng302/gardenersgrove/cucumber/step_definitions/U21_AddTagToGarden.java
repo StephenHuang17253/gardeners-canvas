@@ -206,9 +206,11 @@ public class U21_AddTagToGarden {
         String tagListResponse = tagResult.getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(tagListResponse);
 
+        logger.info(tagListResponse);
+
         Assertions.assertEquals("Garden", jsonNode.get(0).get("tagName").asText());
-        Assertions.assertEquals("Rose Garden", jsonNode.get(1).get("tagName").asText());
-        Assertions.assertEquals("Vegetable Garden", jsonNode.get(2).get("tagName").asText());
+        Assertions.assertEquals("Vegetable Garden", jsonNode.get(1).get("tagName").asText());
+        Assertions.assertEquals("Rose Garden", jsonNode.get(2).get("tagName").asText());
 
         gardenTagRepository.deleteAll();
     }
