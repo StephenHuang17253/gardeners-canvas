@@ -35,6 +35,7 @@ Feature: U21 (Adding tags to gardens) : As Inaya, I want to be able to browse ga
     When I try to add an invalid tag <tag> to my garden
     Then The tag is not added to the garden
     And The following error message is displayed "The tag name must only contain alphanumeric characters, spaces, -, _, ', or \""
+    And The tag <tag> is not shown in future autocomplete suggestions
     Examples:
       | tag                       |
       | "!!"                      |
@@ -53,6 +54,7 @@ Feature: U21 (Adding tags to gardens) : As Inaya, I want to be able to browse ga
     When I try to add an invalid tag <tag> to my garden
     Then The following error message is displayed "A tag cannot exceed 25 characters"
     And The tag is not added to the garden
+    And The tag <tag> is not shown in future autocomplete suggestions
 
     Examples:
       | tag                                                           |

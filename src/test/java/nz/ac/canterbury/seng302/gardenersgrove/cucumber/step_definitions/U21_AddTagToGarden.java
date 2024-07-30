@@ -244,4 +244,21 @@ public class U21_AddTagToGarden {
         gardenTagRepository.deleteAll();
     }
 
+
+//    AC6, AC7
+    @And("The tag {string} is not shown in future autocomplete suggestions")
+    public void the_tag_is_not_shown_in_future_autocomplete_suggestions(String query) throws Exception {
+        String fetchUrl = "/tag/suggestions";
+        tagResult = mockMVCGardens.perform(
+                MockMvcRequestBuilders
+                        .get(fetchUrl)
+                        .param("query", query)
+
+        ).andReturn();
+
+        String tagListResponse = tagResult.getResponse().getContentAsString();
+        logger.info(tagListResponse);
+        Assertions.assertEquals("[]", tagListResponse);
+    }
+
 }
