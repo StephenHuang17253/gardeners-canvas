@@ -24,11 +24,11 @@
             </form>
 
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
-                <div class="w-25" th:each="plant : ${plantList}">
-                    <div th:replace="~{fragments/plantInfoCard.html :: plantInfoCard(
-                        plantId=${plant.get('id').asText()},
-                        plantName=${plant.get('common_name').asText()},
-                        plantPicture=${plant.get('default_image').get('original_url').asText()})}
+                <div class="w-25" th:each="plant : ${plants}">
+                    <div th:replace="~{fragments/plantSearchResultCard.html :: plantSearchResultCard(
+                        plantId=${plant.id},
+                        plantName=${plant.commonName},
+                        plantPicture=${plant.image})}
                             ">
                     </div>
                 </div>

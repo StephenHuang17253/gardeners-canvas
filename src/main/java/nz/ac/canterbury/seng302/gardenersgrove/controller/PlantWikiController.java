@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantInfoModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.PlantSearchModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantInfoService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
@@ -14,6 +15,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -47,14 +52,19 @@ public class PlantWikiController {
                                 String search,
                                 Model model) throws IOException, InterruptedException {
         logger.info("GET /plant-wiki with search: {}", search);
-
+        List<PlantSearchModel> plants = new ArrayList<>();
         if (search != null && !search.isEmpty()) {
             model.addAttribute("searchTerm", search);
             JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
-            model.addAttribute("plantList", plantList.get("data"));
+            plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
+                    .map(plant -> new PlantSearchModel(plant))
+                    .collect(Collectors.toList());
+
 
         }
+
+        model.addAttribute("plants", plants);
 
         return "plantWikiPage";
     }

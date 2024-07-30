@@ -64,11 +64,11 @@ public class PlantInfoModel {
 
     private String getImageURL(JsonNode plantDetails) {
 
-        if (plantDetails.get("default_image").get("regular_url").asText() != null) {
+        if (plantDetails.get("default_image").get("regular_url") != null) {
             return plantDetails.get("default_image").get("regular_url").asText();
         }
 
-        if (plantDetails.get("default_image").get("original_url").asText() != null) {
+        if (plantDetails.get("default_image").get("original_url") != null) {
             return plantDetails.get("default_image").get("original_url").asText();
         }
         return "";
