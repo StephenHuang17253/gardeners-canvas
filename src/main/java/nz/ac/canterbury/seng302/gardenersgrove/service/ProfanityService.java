@@ -123,6 +123,7 @@ public class ProfanityService {
 
             logger.info("sending low priority call to normal moderation queue");
             waitForRateLimit();
+            return  moderateContentApiCall(content);
         }
         catch (InterruptedException errorException)
         {
@@ -130,7 +131,7 @@ public class ProfanityService {
             Thread.currentThread().interrupt();
             return null;
         }
-        return  moderateContentApiCall(content);
+
 
     }
 
@@ -151,6 +152,7 @@ public class ProfanityService {
                     .POST(HttpRequest.BodyPublishers.ofString(content))
                     .build();
 
+            logger.info("Sent profanity request to " + request.uri().toString());
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             logger.info("Profanity service response: : " + response.body());
 

@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,8 @@ public class GardensController {
     private final WeatherService weatherService;
     private final GardenTagService gardenTagService;
 
+    private final ProfanityService profanityService;
+
     private final ObjectMapper objectMapper;
 
     private static final int MAX_REQUESTS_PER_SECOND = 10;
@@ -85,13 +88,15 @@ public class GardensController {
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService) {
+            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
+                             ProfanityService profanityService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
         this.weatherService = weatherService;
         this.gardenTagService = gardenTagService;
         this.objectMapper = objectMapper;
+        this.profanityService = profanityService;
     }
 
     /**
@@ -385,8 +390,10 @@ public class GardensController {
 
             if (gardenTagService.getByName(tag).isPresent()) {
                 gardenTag = gardenTagService.getByName(tag).get();
+
             } else {
                 gardenTagService.addGardenTag(gardenTag);
+                asynchronousTagProfanityCheck(tag);
             }
 
             gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
@@ -585,5 +592,26 @@ public class GardensController {
     public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
         return gardenTagService.getAllSimilar(query);
     }
+
+    private void asynchronousTagProfanityCheck(String tagName)
+    {
+        Thread asyncThread = new Thread((() -> {
+            boolean tagContainsProfanity = profanityService.containsProfanityLowPriority(tagName);
+            if (tagContainsProfanity)
+            {
+                gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
+            }
+            else
+            {
+                gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
+            }
+        }));
+        asyncThread.start();
+
+    }
+
+
+
+
 
 }
