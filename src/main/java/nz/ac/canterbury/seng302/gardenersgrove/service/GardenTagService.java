@@ -151,7 +151,7 @@ public class GardenTagService {
      * @param tagStatus new tag status
      */
     public void updateGardenTagStatus(String tagName, TagStatus tagStatus) {
-        List<GardenTag>  tagList = gardenTagRepository.findByTagNameContainsIgnoreCase(tagName);
+        List<GardenTag>  tagList = gardenTagRepository.findByTagNameIgnoreCase(tagName);
         tagList.forEach(item -> item.setTagStatus(tagStatus));
         gardenTagRepository.saveAll(tagList);
     }
