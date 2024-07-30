@@ -31,17 +31,21 @@ import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +73,8 @@ public class GardensController {
 
     private final ObjectMapper objectMapper;
 
+    private final GardenTagService gardenTagService;
+
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 
     private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
@@ -84,14 +90,18 @@ public class GardensController {
      * @param gardenService   service to access garden repository
      * @param securityService service to access security methods
      * @param plantService    service to access plant repository
+     * @param weatherService    service to perform weather api calls
+     * @param objectMapper    used for JSON conversion
+     * @param gardenTagService    service to access tag repository
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService, ObjectMapper objectMapper) {
+            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
         this.weatherService = weatherService;
+        this.gardenTagService = gardenTagService;
         this.objectMapper = objectMapper;
     }
 
@@ -293,7 +303,13 @@ public class GardensController {
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureError);
 
-        List<String> tagsList = new ArrayList<>();
+        List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+        List<String> tagsList = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
         model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
     }
@@ -343,6 +359,90 @@ public class GardensController {
         }
         redirectAttributes.addFlashAttribute("page", page);
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
+
+        return "redirect:/my-gardens/{gardenId}";
+
+    }
+
+    /**
+     * This function creates a post mapping for adding a tag to a garden
+     * @param gardenId id of garden to add tag to
+     * @param tag tag string
+     * @param page pagination page
+     * @return template for garden page or redirect to garden page
+     */
+    @PostMapping("/my-gardens/{gardenId}/tag")
+    public String addGardenTag(@PathVariable Long gardenId,
+                                   @RequestParam("tag") String tag,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   RedirectAttributes redirectAttributes,
+                                   HttpServletResponse response,
+                                   Model model) {
+        logger.info("POST /my-gardens/{}/tag", gardenId);
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Garden garden = optionalGarden.get();
+        GardenTag gardenTag = new GardenTag(tag);
+
+        if (gardenTagService.getByName(tag).isPresent()) {
+            gardenTag = gardenTagService.getByName(tag).get();
+        } else {
+            gardenTagService.addGardenTag(gardenTag);
+        }
+
+        ValidationResult tagResult = InputValidator.validateTag(tag);
+
+        boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+
+        if (!gardenAlreadyHasThisTag && tagResult.valid()) {
+            gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+        }
+
+        if (!tagResult.valid() || gardenAlreadyHasThisTag) {
+            if (gardenAlreadyHasThisTag) {
+                model.addAttribute("tagErrorText", "This tag has already been added to the garden.");
+            } else {
+                model.addAttribute("tagErrorText", tagResult);
+            }
+
+            List<WeatherModel> weatherList;
+            weatherList = getGardenWeatherData(garden);
+            if (weatherList.size() > 1) {
+                handleWeatherMessages(weatherList, model);
+            }
+
+            User user = garden.getOwner();
+            List<Plant> plants = garden.getPlants();
+            String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
+            handlePagniation(page, plants.size(), model);
+
+            model.addAttribute("tagText", tag);
+            model.addAttribute("isOwner", true);
+            model.addAttribute("garden", new GardenDetailModel(garden));
+            model.addAttribute("weatherList", weatherList);
+            model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
+            model.addAttribute("currentTime", formattedTime);
+            model.addAttribute("profilePicture", user.getProfilePictureFilename());
+            model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+
+            List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+            List<String> tagsList = tagRelationsList.stream()
+                    .map(GardenTagRelation::getTag)
+                    .map(GardenTag::getTagName)
+                    .toList();
+
+            model.addAttribute("tagsList", tagsList);
+
+            return "gardenDetailsPage";
+        }
+
+        redirectAttributes.addAttribute("page", page);
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -479,7 +579,6 @@ public class GardensController {
         }
         logger.info("Permits left after request: {}", semaphore.availablePermits());
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
-
     }
 
 }

@@ -132,7 +132,16 @@ public class GardenTagService {
         return gardenTagRelationRepository.findGardenTagRelationsByTagIs(tag);
     }
 
-
+    /**
+     * Get gardenTagRelation by Garden and Tag.
+     * Helpful for checking if a specific relation already exists.
+     * @param garden in the relation
+     * @param tag in the relation
+     * @return list of gardenTagRelations with that tag
+     */
+    public Optional<GardenTagRelation> getGardenTagRelationByGardenAndTag(Garden garden, GardenTag tag) {
+        return gardenTagRelationRepository.findGardenTagRelationsByGardenIsAndTagIs(garden, tag);
+    }
 
 
 }

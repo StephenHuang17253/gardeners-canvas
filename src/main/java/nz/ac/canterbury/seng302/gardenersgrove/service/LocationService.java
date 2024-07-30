@@ -55,7 +55,7 @@ public class LocationService {
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://us1.locationiq.com/v1/search?key="+ locationIqAccessToken +"&q="+encodedQuery+"&format=json"
+                .uri(URI.create("https://us1.locationiq.com/v1/search?key=" + locationIqAccessToken + "&q=" + encodedQuery + "&format=json"
 
                 ))
                 .header("accept", "application/json")

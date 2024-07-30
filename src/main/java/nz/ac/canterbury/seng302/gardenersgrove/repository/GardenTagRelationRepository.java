@@ -25,23 +25,30 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
     /**
      * Finds a GardenTagRelation object by GardenTag
      * @param tag the GardenTag in the relation
-     * @return none or a GardenTagRelation object
+     * @return none or a list of GardenTagRelation objects
      */
     List<GardenTagRelation> findGardenTagRelationsByTagIs(GardenTag tag);
 
     /**
      * Finds a GardenTagRelation object by Garden
      * @param garden the Garden in the relation
-     * @return none or a GardenTagRelation object
+     * @return none or a list of GardenTagRelation objects
      */
     List<GardenTagRelation> findGardenTagRelationsByGardenIs(Garden garden);
+
+    /**
+     * Finds a GardenTagRelation object by Garden and GardenTag
+     * @param garden the Garden the relation
+     * @param tag the gardenTag in the relation
+     * @return none or a GardenTagRelation object
+     */
+    Optional<GardenTagRelation> findGardenTagRelationsByGardenIsAndTagIs(Garden garden, GardenTag tag);
 
     /**
      * Find all GardenTagRelation objects in repo
      * @return list of GardenTagRelation objects
      */
     List<GardenTagRelation> findAll();
-
 
 
 

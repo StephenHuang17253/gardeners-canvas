@@ -5,6 +5,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -20,6 +21,7 @@ public class RecentGardenModel {
     private String ownerImageURL;
     private String ownerName;
     private List<String> plantImageURLs;
+    private boolean isOwner;
 
     /**
      * Constructor for a RecentGardenModel
@@ -27,7 +29,7 @@ public class RecentGardenModel {
      * @param garden the recent garden
      * @param owner of the recent garden
      */
-    public RecentGardenModel(Garden garden, User owner){
+    public RecentGardenModel(Garden garden, User owner, boolean isOwner){
         this.gardenId = garden.getGardenId();
         this.gardenName = garden.getGardenName();
         this.gardenLocation = garden.getGardenCity() + ", " + garden.getGardenCountry();
@@ -39,7 +41,7 @@ public class RecentGardenModel {
                 .limit(3)
                 .map(Plant::getPlantPictureFilename)
                 .collect(Collectors.toList());
-
+        this.isOwner = isOwner;
     }
 
     public Long getGardenId() {
@@ -72,5 +74,9 @@ public class RecentGardenModel {
 
     public String getGardenSize() {
         return gardenSize;
+    }
+
+    public boolean isOwner() {
+        return isOwner;
     }
 }
