@@ -38,14 +38,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,16 +56,12 @@ public class GardensController {
     Logger logger = LoggerFactory.getLogger(GardensController.class);
 
     private final GardenService gardenService;
-
     private final SecurityService securityService;
-
     private final PlantService plantService;
-
     private final WeatherService weatherService;
+    private final GardenTagService gardenTagService;
 
     private final ObjectMapper objectMapper;
-
-    private final GardenTagService gardenTagService;
 
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 

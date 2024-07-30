@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -35,20 +33,17 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class HomePageController {
+
     Logger logger = LoggerFactory.getLogger(HomePageController.class);
+
     private final UserService userService;
-
     private final PlantService plantService;
+    private final GardenService gardenService;
+    private final FriendshipService friendshipService;
+    private final SecurityService securityService;
+    private final UserInteractionService userInteractionService;
 
-    private GardenService gardenService;
-
-    private FriendshipService friendshipService;
-
-    private SecurityService securityService;
-
-    private UserInteractionService userInteractionService;
-
-    private static int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 5;
 
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this

@@ -53,6 +53,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 public class ProfileController {
 
     Logger logger = LoggerFactory.getLogger(ProfileController.class);
+    
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final FileService fileService;

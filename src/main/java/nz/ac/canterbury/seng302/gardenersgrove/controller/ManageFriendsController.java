@@ -40,9 +40,7 @@ public class ManageFriendsController {
     Logger logger = LoggerFactory.getLogger(ManageFriendsController.class);
 
     private final FriendshipService friendshipService;
-
     private final SecurityService securityService;
-
     private final UserService userService;
 
     /**
