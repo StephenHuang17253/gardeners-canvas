@@ -30,24 +30,26 @@ import java.util.Locale;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class UserServiceTest {
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
 
-    private String email1 = "johnDoe@email.com";
-    private String password1 = "1es1P@ssword";
-    private String fName1 = "John";
-    private String lName1 = "Doe";
-    private LocalDate date1 = LocalDate.parse("01/01/2001", formatter);
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
 
-    private String email2 = "janeOde@email.com";
-    private String fName2 = "Jane";
-    private String lName2 = "Ode";
-    private LocalDate date2 = LocalDate.parse("01/01/2000", formatter);
+    private static String email1 = "johnDoe@email.com";
+    private static String password1 = "1es1P@ssword";
+    private static String fName1 = "John";
+    private static String lName1 = "Doe";
+    private static LocalDate date1 = LocalDate.parse("01/01/2001", formatter);
+
+    private static String email2 = "janeOde@email.com";
+    private static String fName2 = "Jane";
+    private static String lName2 = "Ode";
+    private static LocalDate date2 = LocalDate.parse("01/01/2000", formatter);
+
+    private static int banDuration = 2;
 
     @BeforeEach
     void clearRepository_AddUser_LoginUser() {
@@ -87,11 +89,7 @@ class UserServiceTest {
         User user = emailUsers[0];
         long id = user.getId();
 
-        userService.updateUser(id, fName2, lName2, email2, date2);
-
-        User[] emailUsers2 = userRepository.findByEmailAddressIgnoreCase(email2);
-        assertEquals(1, emailUsers2.length);
-        User updatedUser = emailUsers2[0];
+        User updatedUser = userService.updateUser(id, fName2, lName2, email2, date2);
 
         assertEquals(fName2, updatedUser.getFirstName());
         assertEquals(lName2, updatedUser.getLastName());
@@ -115,8 +113,9 @@ class UserServiceTest {
         User user = emailUsers[0];
         assertEquals(email1, user.getEmailAddress());
         assertFalse(user.isBanned());
-        userService.banUser(user, 2);
+        userService.banUser(user, banDuration);
         assertTrue(user.isBanned());
+        assertEquals(banDuration, user.daysUntilUnban());
     }
 
     @Test
@@ -138,6 +137,9 @@ class UserServiceTest {
         assertEquals(0, user.getStrikes());
         userService.strikeUser(user);
         assertEquals(1, user.getStrikes());
+        userService.banUser(user, banDuration);
+        assertTrue(user.isBanned());
+        assertEquals(0, user.getStrikes());
     }
 
 }
