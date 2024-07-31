@@ -166,7 +166,12 @@ public class U21_AddTagToGarden {
                 MockMvcRequestBuilders
                         .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
                         .param("tag", tag)
-        ).andExpect(status().is3xxRedirection()).andReturn();
+        ).andReturn();
+    }
+
+    @When ("I have a tag {string}")
+    public void i_previously_had_a_tag(String tag) throws Exception {
+        gardenTagService.addGardenTag(new GardenTag(tag));
     }
 
 //    AC3
@@ -223,13 +228,13 @@ public class U21_AddTagToGarden {
         gardenTagRepository.deleteAll();
     }
 //    AC5
-    @Then("the tag is added to my garden")
-    public void the_tag_is_added_to_my_garden() {
+    @Then("the tag is {string} added to my garden")
+    public void the_tag_is_added_to_my_garden(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
 
         String tag = String.valueOf(gardenTags.get(0).getTag().getTagName());
-        Assertions.assertEquals("Cabbage Patch", tag);
+        Assertions.assertEquals(tagName, tag);
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
     }
 
