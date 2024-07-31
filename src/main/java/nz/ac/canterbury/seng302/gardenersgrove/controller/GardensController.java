@@ -604,6 +604,8 @@ public class GardensController {
             else
             {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
+                gardenTagService.deleteRelationByTagName(tagName);
+
             }
         }));
         asyncThread.start();

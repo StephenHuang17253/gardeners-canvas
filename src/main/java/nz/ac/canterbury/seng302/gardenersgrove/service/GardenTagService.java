@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,6 +155,22 @@ public class GardenTagService {
         List<GardenTag>  tagList = gardenTagRepository.findByTagNameIgnoreCase(tagName);
         tagList.forEach(item -> item.setTagStatus(tagStatus));
         gardenTagRepository.saveAll(tagList);
+    }
+
+    /**
+     * Delete all tag relations by name (case insensitive)
+     * To be used when tags in determined to be inappropriate
+     * @param tagName tagName to delete
+     */
+    public void deleteRelationByTagName(String tagName)
+    {
+        List<GardenTag> inappropriateTags = gardenTagRepository.findByTagNameIgnoreCase(tagName).stream().toList();
+        List<GardenTagRelation> inappropriateTagRelations = new ArrayList<>();
+        for (GardenTag tag: inappropriateTags)
+        {
+            inappropriateTagRelations.addAll(gardenTagRelationRepository.findGardenTagRelationsByTagIs(tag));
+        }
+        gardenTagRelationRepository.deleteAll(inappropriateTagRelations);
     }
 
 
