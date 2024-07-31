@@ -195,6 +195,7 @@ class GardenTagServiceIntegrationTest {
     void simpleFetchGardenTag_OnSimilarName() {
         GardenTag tag1 = new GardenTag("Test2");
         gardenTagService.addGardenTag(tag1).getId();
+        gardenTagService.updateGardenTagStatus("Test2",TagStatus.APPROPRIATE);
 
         try {
             Assertions.assertEquals("Test2", gardenTagService.getAllSimilar("te").get(0).getTagName());
@@ -212,6 +213,7 @@ class GardenTagServiceIntegrationTest {
         GardenTag tag5 = new GardenTag("Test5");
         GardenTag tag6 = new GardenTag("Test6");
         GardenTag tag7 = new GardenTag("redHerring");
+
         HashSet<String> gardenTagHashSet = new HashSet<>();
         gardenTagHashSet.add(tag1.getTagName());
         gardenTagHashSet.add(tag2.getTagName());
@@ -227,6 +229,14 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag5);
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
+
+        gardenTagService.updateGardenTagStatus("Test",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test2",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test3",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test4",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test5",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test6",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring",TagStatus.APPROPRIATE);
 
         try {
             List<GardenTag> similarSearchResult = gardenTagService.getAllSimilar("test");
@@ -267,6 +277,14 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
 
+        gardenTagService.updateGardenTagStatus("Test",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test2",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test3",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test4",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test5",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test6",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring",TagStatus.APPROPRIATE);
+
         try {
             List<GardenTag> searchResults = gardenTagService.getAllGardenTags();
             Assertions.assertEquals(7, searchResults.size());
@@ -297,6 +315,16 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag5);
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
+
+        gardenTagService.updateGardenTagStatus("redHerring1",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring2",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring3",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring4",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring5",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring6",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring7",TagStatus.APPROPRIATE);
+
+
 
         try {
             List<GardenTag> similarSearchResult = gardenTagService.getAllSimilar("test");
