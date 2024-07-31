@@ -233,6 +233,8 @@ public class U21_AddTagToGarden {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
 
+        gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
+
         String tag = String.valueOf(gardenTags.get(0).getTag().getTagName());
         Assertions.assertEquals(tagName, tag);
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
