@@ -39,13 +39,12 @@ public class PublicGardensController {
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService,
-                                   FriendshipService friendshipService, GardenTagService gardenTagService) {
+            FriendshipService friendshipService, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.gardenTagService = gardenTagService;
     }
-
 
     /**
      * Adds the loggedIn attribute to the model for all requests
@@ -57,15 +56,29 @@ public class PublicGardensController {
         model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
-  
     /**
-     * returns a page with the 10 most recent public gardens based on current page in pagination
-     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
+     * Redirects to pagination page one
+     *
+     * @return redirect to page/1
+     */
+    @GetMapping("/public-gardens")
+    public String publicGardens(Model model) {
+        logger.info("GET /public-gardens");
+        return "redirect:/public-gardens/page/1";
+    }
+
+    /**
+     * returns a page with the 10 most recent public gardens based on current page
+     * in pagination
+     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens,
+     * page 2 gets 11-20 and so on
      *
      * @return thymeleaf BrowsePublicGardens html element
      */
     @GetMapping("/public-gardens/page/{pageNumber}")
-    public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
+    public String publicGardensPagination(
+            @PathVariable Long pageNumber,
+            Model model) {
         logger.info("GET /public-gardens");
 
         List<Garden> allGardens = gardenService.getAllPublicGardens();
@@ -82,10 +95,10 @@ public class PublicGardensController {
         if (pageNumber > lastPage) {
             return "redirect:/public-gardens/page/" + lastPage;
         }
+
         if (pageNumber < 1) {
             return "redirect:/public-gardens/page/1";
         }
-
 
         List<Garden> tenSortedPublicGardens = allGardens.stream()
                 .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
@@ -94,48 +107,34 @@ public class PublicGardensController {
                 .collect(Collectors.toList());
 
         model.addAttribute("publicGardens", tenSortedPublicGardens);
-        model.addAttribute("currentPage", pageNumber);
-        model.addAttribute("totalGardens", totalGardens);
-        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("currentPage", pageNumber + 1);
         model.addAttribute("endIndex", endIndex);
         model.addAttribute("lastPage", lastPage);
         model.addAttribute("SearchErrorText", "");
         model.addAttribute("searchValue", "");
 
-
-        List<String> appliedSearchTagsList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            appliedSearchTagsList.add("tag" + i);
-        }
-
-        model.addAttribute("appliedSearchTagsList", appliedSearchTagsList);
-
         return "browsePublicGardens";
     }
 
     /**
-     * Redirects to pagination page one
-     *
-     * @return redirect to page/1
-     */
-    @GetMapping("/public-gardens")
-    public String publicGardens(Model model) {
-        logger.info("GET /public-gardens");
-        return "redirect:/public-gardens/page/1";
-    }
-
-
-    /**
-     * returns a page with the 10 most recent public gardens based on search and on current page in pagination
-     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
+     * returns a page with the 10 most recent public gardens based on search and on
+     * current page in pagination
+     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens,
+     * page 2 gets 11-20 and so on
      *
      * @return thymeleaf BrowsePublicGardens html element
      */
     @GetMapping("/public-gardens/search/{pageNumber}")
-    public String publicGardens(@RequestParam(name = "searchInput", defaultValue = "", required = false) String searchInput,
-                                @PathVariable Long pageNumber,
-                                Model model) {
+    public String publicGardens(
+            @RequestParam(name = "searchInput", defaultValue = "", required = false) String searchInput,
+            @RequestParam(name = "appliedSearchTagsList", required = false) List<String> appliedSearchTagsList,
+            @PathVariable Long pageNumber,
+            Model model) {
         logger.info("GET /public-gardens/search");
+
+        for (String i : appliedSearchTagsList) {
+            logger.info(i);
+        }
 
         if (Objects.equals(searchInput, "")) {
             return "redirect:/public-gardens/page/1";
@@ -169,13 +168,14 @@ public class PublicGardensController {
             model.addAttribute("startIndex", startIndex + 1);
             model.addAttribute("endIndex", endIndex);
             model.addAttribute("lastPage", lastPage);
-            model.addAttribute("searchValue", searchInput);
 
         } else {
             model = resetModel(model);
-            model.addAttribute("searchValue", searchInput);
             model.addAttribute("SearchErrorText", "No gardens match your search");
         }
+
+        model.addAttribute("searchValue", searchInput);
+        model.addAttribute("appliedSearchTagsList", appliedSearchTagsList);
         return "browsePublicGardens";
     }
 
@@ -206,9 +206,9 @@ public class PublicGardensController {
      */
     @GetMapping("public-gardens/{gardenId}")
     public String viewPublicGarden(@PathVariable Long gardenId,
-                                   @RequestParam(defaultValue = "1") int page,
-                                   HttpServletResponse response,
-                                   Model model) {
+            @RequestParam(defaultValue = "1") int page,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET public-gardens/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -223,12 +223,12 @@ public class PublicGardensController {
         User currentUser = securityService.getCurrentUser();
         User gardenOwner = garden.getOwner();
 
-        FriendshipStatus userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
-
+        FriendshipStatus userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner, currentUser);
 
         if (!garden.getIsPublic() && userOwnerRelationship != FriendshipStatus.ACCEPTED) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+            model.addAttribute("message",
+                    "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
 
         }
@@ -244,12 +244,12 @@ public class PublicGardensController {
         model.addAttribute("isOwner", false);
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("weather", null);
-        model.addAttribute("profilePicture",user.getProfilePictureFilename());
-        model.addAttribute("userName",user.getFirstName() + " " + user.getLastName());
+        model.addAttribute("profilePicture", user.getProfilePictureFilename());
+        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
 
         model.addAttribute("currentPage", page);
         model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex+1);
+        model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
@@ -265,6 +265,4 @@ public class PublicGardensController {
 
     }
 
-
 }
-
