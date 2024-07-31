@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -29,7 +28,7 @@ public class UserService {
 
     /** passwordEncoder to use for encoding passwords before storage */
     private final PasswordEncoder passwordEncoder;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -217,6 +216,11 @@ public class UserService {
     public void banUser(User user, int days) {
         user.setLastBanDate(LocalDateTime.now());
         user.setBanDuration(Duration.ofDays(days));
+        userRepository.save(user);
+    }
+
+    public void resetStrikes(User user) {
+        user.setStrikes(0);
         userRepository.save(user);
     }
 
