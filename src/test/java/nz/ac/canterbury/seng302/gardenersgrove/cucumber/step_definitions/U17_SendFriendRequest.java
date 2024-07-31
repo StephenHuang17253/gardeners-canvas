@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -139,7 +140,9 @@ public class U17_SendFriendRequest {
     // AC1
     @Then("I am shown a 'Manage Friends' page")
     public void i_am_shown_a_manage_friends_page() {
-        String pageName = mvcResult.getModelAndView().getViewName();
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        String pageName = model.getViewName();
         Assertions.assertEquals("manageFriendsPage", pageName);
     }
 
@@ -153,8 +156,11 @@ public class U17_SendFriendRequest {
     // AC2
     @Then("I see a list of my friends with their names, profile pictures, and link to their gardens list")
     public void i_see_a_list_of_my_friends_with_their_names_profile_pictures_and_link_to_their_gardens_list() {
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("userFriends");
+        Assertions.assertNotNull(result);
         for (int i = 0; i < friendsList.size(); i++) {
             Assertions.assertEquals(friendsList.get(i).getFriendName(), result.get(i).getFriendName());
             Assertions.assertEquals(friendsList.get(i).getFriendProfilePicture(),
@@ -199,9 +205,11 @@ public class U17_SendFriendRequest {
 
     @Then("I can see a list of users of the app exactly matching {string} {string} {string}")
     public void i_can_see_a_list_of_users_of_the_app_exactly_matching(String fname, String lname, String email) {
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("searchResults");
-        assert result != null;
+        Assertions.assertNotNull(result);
         for (FriendModel friendModel : result) {
             String matchFullName = friendModel.getFriendName();
             Long matchId = Long.parseLong(friendModel.getFriendGardenLink().split("/")[1]);
@@ -216,7 +224,9 @@ public class U17_SendFriendRequest {
 
     @Then("I can see the error {string}")
     public void i_can_see_the_error(String error) {
-        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("searchErrorText");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        String searchError = (String) model.getModelMap().getAttribute("searchErrorText");
         Assertions.assertEquals(error, searchError);
     }
 
@@ -234,8 +244,11 @@ public class U17_SendFriendRequest {
                         .param("searchInput", email))
                 .andExpect(status().isOk())
                 .andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("searchResults");
+        Assertions.assertNotNull(result);
         FriendModel friendModel = result.get(0);
         Assertions.assertEquals(friendProfilePicture, friendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, friendModel.getFriendName());
@@ -261,8 +274,12 @@ public class U17_SendFriendRequest {
 
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap()
+
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<RequestFriendModel> result = (List<RequestFriendModel>) model.getModelMap()
                 .getAttribute("pendingFriends");
+        Assertions.assertNotNull(result);
         RequestFriendModel requestFriendModel = result.get(0);
         Assertions.assertEquals(friendProfilePicture, requestFriendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, requestFriendModel.getFriendName());
@@ -301,7 +318,9 @@ public class U17_SendFriendRequest {
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("userFriends");
         Assertions.assertNotNull(result);
         FriendModel friendModel = result.get(result.size() - 1);
@@ -329,7 +348,9 @@ public class U17_SendFriendRequest {
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
 
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("userFriends");
         Assertions.assertNotNull(result);
         Assertions.assertEquals(0, result.size());

@@ -28,10 +28,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -190,7 +188,9 @@ public class U9_ViewGarden {
 
     @And("The garden's name {string} and location {string}, {string} are visible")
     public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
-        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
         GardenDetailModel garden = (GardenDetailModel) modelMap.getAttribute("garden");
 
         Assertions.assertNotNull(garden);

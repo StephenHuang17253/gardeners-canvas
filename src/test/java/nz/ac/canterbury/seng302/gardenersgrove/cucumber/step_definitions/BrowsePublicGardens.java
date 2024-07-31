@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -128,9 +129,11 @@ public class BrowsePublicGardens {
 
     @Then("I am shown only gardens whose names or plants include my search string {string}")
     public void i_am_shown_only_gardens_whose_names_or_plants_include_my_search_string(String input) {
-        List<Garden> searchResults = (List<Garden>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<Garden> searchResults = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
-        assert searchResults != null;
+        Assertions.assertNotNull(searchResults);
         for (Garden result : searchResults) {
             Assertions.assertTrue(result.getGardenName().contains(input)
                     || result.getPlants().stream().anyMatch(plant -> plant.getPlantName().contains(input)));
@@ -140,7 +143,9 @@ public class BrowsePublicGardens {
 
     @Then("A message tells me {string}")
     public void a_message_tells_me(String error) {
-        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("searchErrorText");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        String searchError = (String) model.getModelMap().getAttribute("searchErrorText");
         Assertions.assertEquals(error, searchError);
     }
 

@@ -10,7 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -129,7 +130,9 @@ public class U10_Acceptance_Testing {
 
     @Then("I see the edit garden form where all the details are prepopulated")
     public void iSeeTheEditGardenPageWhereAllTheDetailsArePrepopulated() {
-        ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
+        ModelAndView model = editGardenResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
         Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
@@ -144,7 +147,9 @@ public class U10_Acceptance_Testing {
                         .get(gardenUrl)
 
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
+        ModelAndView model = editGardenResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
         Assertions.assertEquals(modelMap.getAttribute("gardenDescription"), expectedGarden.getGardenDescription());
