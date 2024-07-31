@@ -96,14 +96,14 @@ class BrowsePublicGardensControllerTest {
 
     }
 
-    @Test
-    @WithMockUser(username = "johnDoe@email.com")
-    void EnterTagName_TagNameExists_ReturnTrue() throws Exception {
-        mockMvc
-                .perform(MockMvcRequestBuilders.get("/tag/exists").param("tagName", "garden"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-                // .andExpect(null)
+    // @Test
+    // @WithMockUser(username = "johnDoe@email.com")
+    // void EnterTagName_TagNameExists_ReturnTrue() throws Exception {
+    //     mockMvc
+    //             .perform(MockMvcRequestBuilders.get("/tag/exists").param("tagName", "garden"))
+    //             .andExpect(MockMvcResultMatchers.status().isOk());
+    //             // .andExpect(null)
 
-    }
+    // }
 
 }

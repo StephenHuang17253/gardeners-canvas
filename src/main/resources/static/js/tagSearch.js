@@ -1,19 +1,22 @@
 const tagInput = document.getElementById('tagInput');
 const addTagButton = document.getElementById('addTagButton');
-const appliedTags = document.getElementById('appliedTags');
+const appliedTagsList = document.getElementById('appliedTagsList');
 const appliedTagsInputs = document.getElementById('appliedTagsInputs');
 const searchTagErrorText = document.getElementById('searchTagErrorText')
 
 
 const handleButtonClick = async () => {
-    const value = tagInput.value
+    const value = tagInput.value;
 
-    const tagExists = await checkTagExists(value)
+    const tagExists = await checkTagExists(value);
     
     if (!tagExists) {
-        searchTagErrorText.textContent = `No tag matching "${value}"`
-        return
+        searchTagErrorText.textContent = `No tag matching "${value}"`;
+        return;
     }
+
+    appliedTagsList.classList.remove('d-none');
+    searchTagErrorText.textContent = '';
 
     const div1 = document.createElement('div');
     div1.classList.add('p-1');
@@ -24,11 +27,11 @@ const handleButtonClick = async () => {
 
     div2.appendChild(span1);
     div1.appendChild(div2);
-    appliedTags.appendChild(div1);
+    appliedTagsList.appendChild(div1);
 
     const input = document.createElement('input');
     input.value = value;
-    input.name = 'appliedSearchTagsList';
+    input.name = 'appliedTags';
     input.type = 'hidden';
     appliedTagsInputs.appendChild(input);
 
@@ -39,29 +42,12 @@ const handleButtonClick = async () => {
 
 const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-        handleButtonClick()
+        event.preventDefault();
+        handleButtonClick();
+    } else {
+        searchTagErrorText.textContent = '';
     }
 }
-
-
-tagInput.addEventListener('keypress', handleKeyPress);
-addTagButton.addEventListener('click', handleButtonClick);
-
-
-/**
- * Determines the instance based on the current URL path.
- * @returns {string} The instance ("", "test/" or "prod/") based on the URL path.
- */
-const getInstance = () => {
-    const path = window.location.pathname
-    let instance = "";
-    if (path.includes("/test/")) {
-        instance = "test/";
-    } else if (path.includes("/prod/")) {
-        instance = "prod/";
-    }
-    return instance;
-};
 
 /**
  * Fetches tag data
@@ -71,10 +57,18 @@ const getInstance = () => {
 const checkTagExists = async (tagName) => {
     const instance = getInstance();
 
-    const response =  await fetch(`/${instance}tag/exists?tagName=${tagName}`)
-    console.log(response)
-    const a = await response.json();
-    console.log(a)
-    return a
-
+    const response =  await fetch(`/${instance}tag/exists?tagName=${tagName}`);
+    return await response.json();
 }
+
+
+const hideTagSection = () => {
+    if (appliedTagsList.childElementCount === 1) {
+        appliedTagsList.classList.add('d-none');
+    }
+}
+
+
+window.addEventListener("load", hideTagSection);
+tagInput.addEventListener('keypress', handleKeyPress);
+addTagButton.addEventListener('click', handleButtonClick);
