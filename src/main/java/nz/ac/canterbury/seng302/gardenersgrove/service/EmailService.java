@@ -231,7 +231,7 @@ public class EmailService {
     public void sendTagBanWarningEmail(Token token) throws MessagingException {
         String subject = "Tag moderation warning";
         String template = "generalEmail";
-        String mainBody = "Waning: If you add another inappropriate tag your account will be banned for 7 days";
+        String mainBody = "Warning: If you add another inappropriate tag your account will be banned for 7 days";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
 
