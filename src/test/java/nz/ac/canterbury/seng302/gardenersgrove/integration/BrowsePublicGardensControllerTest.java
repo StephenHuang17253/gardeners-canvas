@@ -86,7 +86,7 @@ class BrowsePublicGardensControllerTest {
     @WithMockUser(username = "johnDoe@email.com")
     void GetPublicGardens_GardensAreReturnedInReversCreationDateOrder_Return200() throws Exception {
         mockMvcResult = mockMvc
-                .perform(MockMvcRequestBuilders.get("/public-gardens/page/1"))
+                .perform(MockMvcRequestBuilders.get("/public-gardens/search/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
