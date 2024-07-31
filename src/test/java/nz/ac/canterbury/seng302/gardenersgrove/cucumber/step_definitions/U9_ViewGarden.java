@@ -153,7 +153,6 @@ public class U9_ViewGarden {
                 "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
                 "  }\n" +
                 "}\n";
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonObject = objectMapper.readTree(mockResponse);
         WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
 

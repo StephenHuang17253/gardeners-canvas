@@ -113,7 +113,8 @@ public class U25_MainPage {
         List<FriendModel> friendList = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("recentFriends");
         User user1 = userService.getUserByEmail(email1);
         User user2 = userService.getUserByEmail(email2);
-        assertEquals(friendList.size(), 2);
+        assertNotNull(friendList);
+        assertEquals(2, friendList.size());
         // Most to least recent
         assertEquals(friendList.get(0).getFriendId(), user2.getId());
         assertEquals(friendList.get(1).getFriendId(), user1.getId());
@@ -122,6 +123,7 @@ public class U25_MainPage {
     @Then("There are no recently accessed friends")
     public void there_are_no_recently_accessed_friends() {
         List<FriendModel> friendList = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("recentFriends");
+        assertNotNull(friendList);
         assertTrue(friendList.isEmpty());
     }
 

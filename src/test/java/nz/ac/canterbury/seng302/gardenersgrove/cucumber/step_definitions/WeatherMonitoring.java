@@ -166,6 +166,7 @@ public class WeatherMonitoring {
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         ModelAndView modelAndView = result.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
 
         model = modelAndView.getModel();
         weather = (List<WeatherModel>) model.get("weatherList");
@@ -194,7 +195,6 @@ public class WeatherMonitoring {
 
     @Given("My garden is not set to a location that the location service can find")
     public void myGardenIsNotSetToALocationThatTheLocationServiceCanFind() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonObject = objectMapper.readTree(mockResponse);
         WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
         when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);

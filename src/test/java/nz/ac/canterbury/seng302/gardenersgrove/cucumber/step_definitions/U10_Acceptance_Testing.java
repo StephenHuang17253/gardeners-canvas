@@ -88,14 +88,14 @@ public class U10_Acceptance_Testing {
     }
 
     @Given("{string} {string}, {int} is a user with email {string} and password {string}")
-    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail,
+    public void iAmAUserWithEmailAndPassword(String firstName, String lastName, Integer age, String userEmail,
             String userPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
         LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
 
-        User user = new User(firstName, LastName, userEmail, dateOfBirth);
+        User user = new User(firstName, lastName, userEmail, dateOfBirth);
         user.setVerified(true);
         userService.addUser(user, userPassword);
         Assertions.assertNotNull(userService.getUserByEmail(userEmail));
