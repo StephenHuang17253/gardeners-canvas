@@ -208,7 +208,7 @@ public class UserService {
     }
 
     /**
-     * ban a given user for a given amount of days
+     * ban a given user for a given amount of days, and reset their strikes to 0
      * 
      * @param user the user to ban
      * @param days length of ban
@@ -216,10 +216,6 @@ public class UserService {
     public void banUser(User user, int days) {
         user.setLastBanDate(LocalDateTime.now());
         user.setBanDuration(Duration.ofDays(days));
-        userRepository.save(user);
-    }
-
-    public void resetStrikes(User user) {
         user.setStrikes(0);
         userRepository.save(user);
     }
@@ -260,6 +256,7 @@ public class UserService {
 
     /**
      * Turns a list of user interactions into a list of users
+     * 
      * @param userInteractions a list of recent interaction
      * @return a list of users associated with each recent interaction
      */
