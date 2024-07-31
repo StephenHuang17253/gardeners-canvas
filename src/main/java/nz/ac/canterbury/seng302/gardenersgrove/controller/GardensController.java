@@ -291,6 +291,7 @@ public class GardensController {
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("openModal", inputFlashMap.get("openModal"));
+            model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
         }
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
@@ -394,17 +395,29 @@ public class GardensController {
 
             gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
-            if (!gardenAlreadyHasThisTag && tagResult.valid()) {
+            if (!gardenAlreadyHasThisTag && tagResult.valid() && gardenTag.getTagStatus() != TagStatus.INAPPROPRIATE) {
                 gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
             }
         }
 
-        if (!tagResult.valid() || gardenAlreadyHasThisTag) {
+        Optional<GardenTag> newTag = gardenTagService.getByName(tag);
+
+
+        if (!tagResult.valid() || gardenAlreadyHasThisTag || (newTag.isPresent() &&
+                newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)) {
+
             if (gardenAlreadyHasThisTag) {
                 model.addAttribute("tagErrorText", "This tag has already been added to the garden.");
-            } else {
+            } else if (!tagResult.valid()) {
                 model.addAttribute("tagErrorText", tagResult);
             }
+            if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
+            {
+                model.addAttribute("tagErrorText", "This tag does not meet the language " +
+                        "standards for Gardener's Grove. A warning strike has been added to your account");
+            }
+
+
 
             List<WeatherModel> weatherList;
             weatherList = getGardenWeatherData(garden);
@@ -437,6 +450,12 @@ public class GardensController {
             model.addAttribute("tagsList", tagsList);
 
             return "gardenDetailsPage";
+        }
+
+        if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING)
+        {
+            redirectAttributes.addFlashAttribute("tagMessageText", String.format("Your tag \"%s\" is currently being checked for profanity. " +
+                    "If it follows the language standards for our app, it will be added to your garden.",tag));
         }
 
         redirectAttributes.addAttribute("page", page);
