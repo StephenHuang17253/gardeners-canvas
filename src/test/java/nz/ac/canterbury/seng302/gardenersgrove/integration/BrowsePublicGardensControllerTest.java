@@ -1,8 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,8 @@ class BrowsePublicGardensControllerTest {
     @Autowired
     private GardenService gardenService;
     @Autowired
+    private GardenTagService gardenTagService;
+    @Autowired
     private UserService userService;
     private final MockMvc mockMvc;
 
@@ -40,17 +44,16 @@ class BrowsePublicGardensControllerTest {
     List<Garden> mostRecent10TestGardens = new ArrayList<>();
 
     @Autowired
-    BrowsePublicGardensControllerTest(MockMvc mockMvc){
+    BrowsePublicGardensControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
     @BeforeEach
     void ClearRepository_AddUsersAndGardens() {
 
-        User user1 = new User("John","Doe","johnDoe@email.com", date);
-        userService.addUser(user1,"1es1P@ssword");
-        for (int i = 1; i < 15; i++)
-        {
+        User user1 = new User("John", "Doe", "johnDoe@email.com", date);
+        userService.addUser(user1, "1es1P@ssword");
+        for (int i = 1; i < 15; i++) {
             Garden newGarden = new Garden(
                     "Garden" + i,
                     "",
@@ -65,12 +68,18 @@ class BrowsePublicGardensControllerTest {
                     "172.5796159",
                     user1);
             gardenService.addGarden(newGarden);
-            if (i > 4)
-            {
-                mostRecent10TestGardens.add(0,newGarden);
+            if (i > 4) {
+                mostRecent10TestGardens.add(0, newGarden);
             }
-            
+
         }
+
+        GardenTag tag1 = new GardenTag("garden");
+        GardenTag tag2 = new GardenTag("plants");
+
+        gardenTagService.addGardenTag(tag1);
+        gardenTagService.addGardenTag(tag2);
+
     }
 
     @Test
@@ -81,8 +90,19 @@ class BrowsePublicGardensControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
-        List<Garden> publicGardens = (List<Garden>) mockMvcResult.getModelAndView().getModelMap().getAttribute("publicGardens");
+        List<Garden> publicGardens = (List<Garden>) mockMvcResult.getModelAndView().getModelMap()
+                .getAttribute("publicGardens");
         Assertions.assertEquals(publicGardens.toString(), mostRecent10TestGardens.toString());
+
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    void EnterTagName_TagNameExists_ReturnTrue() throws Exception {
+        mockMvc
+                .perform(MockMvcRequestBuilders.get("/tag/exists").param("tagName", "garden"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+                // .andExpect(null)
 
     }
 

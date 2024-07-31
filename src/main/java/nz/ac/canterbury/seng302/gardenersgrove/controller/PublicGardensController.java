@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -265,6 +266,13 @@ public class PublicGardensController {
 
         return "gardenDetailsPage";
 
+    }
+
+    @GetMapping("/tag/exists")
+    @ResponseBody
+    public Boolean checkTagExists(@RequestParam("tagName") String tagName) {
+       Optional<GardenTag> testTag = gardenTagService.getByName(tagName);
+       return testTag.isPresent();
     }
 
 }
