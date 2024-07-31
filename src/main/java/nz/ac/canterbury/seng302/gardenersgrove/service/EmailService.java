@@ -18,6 +18,9 @@ import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 /**
  * This class is a service class for sending emails defined by the
@@ -222,18 +225,14 @@ public class EmailService {
 
     public void sendTagBanWarningEmail(Token token) throws MessagingException {
         String subject = "Tag moderation warning";
-        String template = "banEmail";
-        String mainBody = "Warning: If you add another inappropriate tag your account will be banned for 7 days";
+        String template = "generalEmail";
+        String mainBody = "Waning: If you add another inappropriate tag your account will be banned for 7 days";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
-        String tokenString = token.getTokenString();
-        int lifetime = (int) token.getLifetime().toMinutes();
 
         Context context = new Context();
         context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
-        context.setVariable("tokenString", tokenString);
-        context.setVariable("lifetime", lifetime);
 
         String toEmail = token.getUser().getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
@@ -241,18 +240,18 @@ public class EmailService {
 
     public void sendTagBanEmail(Token token) throws MessagingException {
         String subject = "Tag moderation ban";
-        String template = "banEmail";
-        String mainBody = "The email is to inform you that due to inappropriate behaviour involving the use of our tag system, you are hereby banned for 7 days";
+        String template = "tagBanEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
-        String tokenString = token.getTokenString();
-        int lifetime = (int) token.getLifetime().toMinutes();
+
+        LocalDate banDate = LocalDate.now();
+        LocalDate unbanDate = banDate.plusDays(7);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 
         Context context = new Context();
         context.setVariable(USERNAME_FIELD, username);
-        context.setVariable("mainBody", mainBody);
-        context.setVariable("tokenString", tokenString);
-        context.setVariable("lifetime", lifetime);
+        context.setVariable("banDate", banDate.format(formatter));
+        context.setVariable("unbanDate", unbanDate.format(formatter));
 
         String toEmail = token.getUser().getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
