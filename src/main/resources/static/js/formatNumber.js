@@ -1,7 +1,7 @@
 
 const isNumber = (input) => /^\d+$/.test(input);
-const hasSign = (input) => /(\+|\-)/.test(input);
-const hasDecimalPoint = (input) => /(\.|,)/.test(input);
+const hasSign = (input) => /[+-]/.test(input);
+const hasDecimalPoint = (input) => /[.,]/.test(input);
 const hasExponent = (input) => /[eE]/.test(input);
 
 const numberInputs = document.querySelectorAll("[data-formatted-number]");

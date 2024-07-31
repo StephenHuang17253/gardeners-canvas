@@ -31,8 +31,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Optional;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
@@ -171,7 +169,6 @@ public class PubliciseGarden {
 
     @And("I am editing an existing garden")
     public void iAmEditingAnExistingGarden() throws Exception {
-        System.out.println(userGarden.getGardenId());
         String gardenUrl = String.format("/my-gardens/%d/edit", userGarden.getGardenId());
         mockMVCGardenForm.perform(
                 MockMvcRequestBuilders
@@ -223,11 +220,9 @@ public class PubliciseGarden {
 
     @Then("an error message appears")
     public void anErrorMessageAppears(){
-        System.out.println(createGardenResult.getModelAndView());
         ModelAndView modelAndView = createGardenResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
         String model = modelAndView.getModel().toString();
-
         Assertions.assertTrue(model.contains("Description must be 512 characters or less and contain some letters"));
     }
 

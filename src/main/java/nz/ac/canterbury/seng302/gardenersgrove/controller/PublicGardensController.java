@@ -69,55 +69,6 @@ public class PublicGardensController {
     }
 
     /**
-     * returns a page with the 10 most recent public gardens based on current page
-     * in pagination
-     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens,
-     * page 2 gets 11-20 and so on
-     *
-     * @return thymeleaf BrowsePublicGardens html element
-     */
-    // @GetMapping("/public-gardens/page/{pageNumber}")
-    // public String publicGardensPagination(
-    // @PathVariable int pageNumber,
-    // Model model) {
-    // logger.info("GET /public-gardens");
-
-    // List<Garden> allGardens = gardenService.getAllPublicGardens();
-    // int totalGardens = allGardens.size();
-    // int startIndex = (pageNumber - 1) * COUNT_PER_PAGE;
-    // int endIndex = Math.min(startIndex + COUNT_PER_PAGE, totalGardens);
-    // int lastPage = (int) Math.ceil((double) totalGardens / COUNT_PER_PAGE);
-
-    // if (lastPage == 0) {
-    // return "redirect:/home";
-    // }
-
-    // if (pageNumber > lastPage) {
-    // return "redirect:/public-gardens/page/" + lastPage;
-    // }
-
-    // if (pageNumber < 1) {
-    // return "redirect:/public-gardens/page/1";
-    // }
-
-    // List<Garden> tenSortedPublicGardens = allGardens.stream()
-    // .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-    // .skip((pageNumber - 1) * COUNT_PER_PAGE)
-    // .limit(COUNT_PER_PAGE)
-    // .collect(Collectors.toList());
-
-    // model.addAttribute("publicGardens", tenSortedPublicGardens);
-    // model.addAttribute("currentPage", pageNumber + 1);
-    // model.addAttribute("totalGardens", totalGardens);
-    // model.addAttribute("startIndex", startIndex + 1);
-    // model.addAttribute("endIndex", endIndex);
-    // model.addAttribute("lastPage", lastPage);
-    // model.addAttribute("searchValue", "");
-
-    // return "browsePublicGardens";
-    // }
-
-    /**
      * returns a page with the 10 most recent public gardens based on search and on
      * current page in pagination
      * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens,
@@ -133,21 +84,21 @@ public class PublicGardensController {
             Model model) {
         logger.info("GET /public-gardens/search");
 
-        String paramString = "";
+        List<String> paramList = new ArrayList<>();
 
         if (!searchInput.equals("")) {
-            if (paramString.isEmpty()) {
-                paramString += "?";
-            }
-            paramString += "searchInput=" + searchInput;
+            paramList.add("searchInput=" + searchInput);
         }
+
         if (appliedTags != null && !appliedTags.isEmpty()) {
-            if (paramString.isEmpty()) {
-                paramString += "?";
-            }
             for (String tagName : appliedTags) {
-                paramString += "&appliedTags=" + tagName;
+                paramList.add("appliedTags=" + tagName);
             }
+        }
+
+        String paramString = "";
+        if (!paramList.isEmpty()) {
+            paramString = "?" + String.join("&", paramList);
         }
 
         if (pageNumber < 1) {
@@ -261,9 +212,16 @@ public class PublicGardensController {
 
     }
 
+    /**
+     * Checks if a tag exists with the name tagName
+     * 
+     * @param tagName tag name to check
+     * @return boolean of if tag exists or not
+     */
     @GetMapping("/tag/exists")
     @ResponseBody
     public Boolean checkTagExists(@RequestParam("tagName") String tagName) {
+        logger.info("GET tag/exists");
         Optional<GardenTag> testTag = gardenTagService.getByName(tagName);
         return testTag.isPresent();
     }

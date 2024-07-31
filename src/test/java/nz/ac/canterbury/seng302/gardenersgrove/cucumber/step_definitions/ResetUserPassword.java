@@ -162,7 +162,6 @@ public class ResetUserPassword {
     @And("I click the submit button")
     public void i_click_the_submit_button() throws Exception {
         String url = "/lost-password";
-        System.out.println(userEmail);
         resetPasswordResult = mockMVC.perform(
                 MockMvcRequestBuilders.post(url)
                         .param("emailAddress", userEmail))

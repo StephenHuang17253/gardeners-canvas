@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,21 +32,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
-import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -64,7 +51,6 @@ public class WeatherMonitoring {
 
     @Autowired
     public GardenTagRelationRepository gardenTagRelationRepository;
-
 
     @Autowired
     public UserRepository userRepository;
@@ -159,11 +145,12 @@ public class WeatherMonitoring {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,
+                userInteractionService);
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService,objectMapper,gardenTagService);
+                weatherService, objectMapper, gardenTagService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
     }
@@ -190,7 +177,7 @@ public class WeatherMonitoring {
         Assertions.assertEquals("10", weather.get(2).getMaxTemp());
         Assertions.assertEquals("8", weather.get(2).getMinTemp());
         Assertions.assertEquals("1.0", weather.get(2).getPrecipitation());
-        Assertions.assertNull( weather.get(2).getWeatherError());
+        Assertions.assertNull(weather.get(2).getWeatherError());
     }
 
     @Then("Future weather for my location is shown")
@@ -216,8 +203,9 @@ public class WeatherMonitoring {
     @Given("My garden is not set to a location that the location service can not find")
     public void myGardenIsNotSetToALocationThatTheLocationServiceCanNotFind() {
         WeatherResponseData mockResponseData = mock(WeatherResponseData.class);
-        Mockito.when(mockResponseData.getRetrievedWeatherData()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
+        Mockito.when(mockResponseData.getRetrievedWeatherData())
+                .thenThrow(new NullPointerException("No such location"));
+        Mockito.when(weatherService.getWeather(Mockito.anyString(), Mockito.anyString())).thenReturn(mockResponseData);
     }
 
     @Then("A Weather error message tells me “Location not found, please update your location to see the weather”")
@@ -256,7 +244,6 @@ public class WeatherMonitoring {
         mockWeatherData.add(sunnyWeatherBeforeYesterday);
         mockWeatherData.add(sunnyWeatherYesterday);
         mockWeatherData.add(rainyWeatherToday);
-
 
         Mockito.when(mockedWeatherData.getRetrievedWeatherData()).thenReturn(mockWeatherData);
         Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);

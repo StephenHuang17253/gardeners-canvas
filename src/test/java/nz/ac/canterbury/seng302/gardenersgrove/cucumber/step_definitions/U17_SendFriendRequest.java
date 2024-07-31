@@ -15,8 +15,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import org.junit.jupiter.api.Assertions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,8 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 public class U17_SendFriendRequest {
-
-    Logger logger = LoggerFactory.getLogger(U17_SendFriendRequest.class);
 
     public static MockMvc mockMVC;
 
@@ -146,7 +142,6 @@ public class U17_SendFriendRequest {
     @Then("I am shown a 'Manage Friends' page")
     public void i_am_shown_a_manage_friends_page() {
         String pageName = mvcResult.getModelAndView().getViewName();
-        logger.info(pageName);
         Assertions.assertEquals("manageFriendsPage", pageName);
     }
 
@@ -336,7 +331,6 @@ public class U17_SendFriendRequest {
                 .andExpect(status().isOk()).andReturn();
 
         List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
-        System.out.println(result);
         Assertions.assertEquals(0, result.size());
     }
 

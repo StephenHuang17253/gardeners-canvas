@@ -5,11 +5,16 @@ const appliedTagsInputs = document.getElementById('appliedTagsInputs');
 const searchTagErrorText = document.getElementById('searchTagErrorText')
 
 
+/**
+ * handles when the user enters a tag, 
+ * check if that tag exists, if so displays an error message, 
+ * otherwise adds it to the list of applied tags for the search
+ */
 const handleButtonClick = async () => {
     const value = tagInput.value;
 
     const tagExists = await checkTagExists(value);
-    
+
     if (!tagExists) {
         tagInput.classList.add('border-danger');
         searchTagErrorText.textContent = `No tag matching "${value}"`;
@@ -42,6 +47,11 @@ const handleButtonClick = async () => {
 
 }
 
+/**
+ * Checks if the user presses enter on the tag input, 
+ * if so then call handleButtonClick, otherwise clear the error text
+ * @param {Event} event - The keydown event.
+ */
 const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -58,12 +68,14 @@ const handleKeyPress = (event) => {
  */
 const checkTagExists = async (tagName) => {
     const instance = getInstance();
-
-    const response =  await fetch(`/${instance}tag/exists?tagName=${tagName}`);
+    const response = await fetch(`/${instance}tag/exists?tagName=${tagName}`);
     return await response.json();
 }
 
 
+/**
+ * Hides the applied tag section
+ */
 const hideTagSection = () => {
     if (appliedTagsList.childElementCount === 1) {
         appliedTagsList.classList.add('d-none');
@@ -71,6 +83,6 @@ const hideTagSection = () => {
 }
 
 
-window.addEventListener("load", hideTagSection);
+window.addEventListener('load', hideTagSection);
 tagInput.addEventListener('keypress', handleKeyPress);
 addTagButton.addEventListener('click', handleButtonClick);

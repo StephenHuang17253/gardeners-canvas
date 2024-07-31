@@ -163,7 +163,6 @@ class GardenTagServiceIntegrationTest {
 
         try {
             Assertions.assertEquals("Test2", gardenTagService.getByName("Test2").get().getTagName());
-            System.out.println(gardenTagService.getAllSimilar("te"));
         } catch (NoSuchElementException exception) {
             fail(exception);
         }

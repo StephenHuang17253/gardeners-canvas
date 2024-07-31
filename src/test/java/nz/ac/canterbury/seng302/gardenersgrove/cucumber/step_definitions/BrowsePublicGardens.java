@@ -204,7 +204,6 @@ public class BrowsePublicGardens {
         int pageSize = 10;
         lastPage = (int) Math.ceil((double) totalGardens / pageSize);
         currentPageUrl = "/public-gardens/search/" + (lastPage + 1); // Add one to access page greater than last page
-        System.out.println(currentPageUrl);
     }
 
     @Then("I am redirected to the first page")
