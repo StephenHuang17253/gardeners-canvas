@@ -1,6 +1,6 @@
 const MIN_TAG_INPUT_LENGTH = 3;
 
-const tagField = document.getElementById("tag")
+const tagField = document.getElementById("tagInput")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
 
 const getDisplayString = (data) => {
@@ -13,7 +13,7 @@ const getDisplayString = (data) => {
  */
 const fillTagField = (data) => {
     tagField.value = getDisplayString(data)
-    document.getElementById("tagForm").submit();
+    document.getElementById("addTagButton").click();
 }
 
 /**
@@ -27,7 +27,7 @@ const hideTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.add(
 const showTagAutocompleteDropdown = () => tagAutocompleteDropdown.classList.remove("d-none");
 
 /**
- * Clears the autocomplete dropdown.
+ * Clears the autocomplete dropdown.searchPublicTagAutocomplete
  * @returns {string}
  */
 const clearTagAutocompleteDropdown = () => tagAutocompleteDropdown.innerHTML = "";
@@ -38,7 +38,7 @@ const clearTagAutocompleteDropdown = () => tagAutocompleteDropdown.innerHTML = "
  */
 const handleTagSuggestionClicked = (tagSuggestion) => {
     fillTagField(tagSuggestion);
-    hideAutocompleteDropdown();
+    hideTagAutocompleteDropdown();
 }
 
 /**

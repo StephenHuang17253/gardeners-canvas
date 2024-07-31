@@ -76,7 +76,7 @@
                             <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
                                 <div class="modal-body">
                                     <div class="input-group rounded">
-                                        <input id="tag" th:name="tag" type="search" class="form-control rounded"
+                                        <input id="tagInput" th:name="tag" type="search" class="form-control rounded"
                                                th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
                                                th:value="${tagText}" placeholder="e.g. vegetable garden"
                                                aria-label="Search" aria-describedby="search-addon" autofocus/>
