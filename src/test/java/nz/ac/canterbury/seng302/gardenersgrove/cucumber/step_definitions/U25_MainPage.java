@@ -79,7 +79,8 @@ public class U25_MainPage {
 
     private static FriendshipService friendshipService;
 
-    public static WeatherService weatherService;
+    @Autowired
+    public WeatherService weatherService;
 
     public static AuthenticationManager authenticationManager;
 
@@ -148,7 +149,6 @@ public class U25_MainPage {
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        weatherService = new WeatherService();
 
 
         HomePageController homePageController = new HomePageController(userService, authenticationManager, gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService);
@@ -232,12 +232,14 @@ public class U25_MainPage {
         when(weatherService.getWeatherForGardens(any())).thenReturn(sampleDataList);
 
         List<WeatherResponseData> result = weatherService.getWeatherForGardens(wateringList);
+
         assertNotNull(result, "The mocked method should not return null");
         assertEquals(1, result.size(), "The mocked method should return a list with one element");
     }
 
     @Then("I can see that {string} need watering in the watering notifications for {string}")
     public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) {
+
         List<Garden> expectedGardens = gardenService.getMatchingGardens(gardenName);
         Garden expectedGarden = expectedGardens.getFirst();
         List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");

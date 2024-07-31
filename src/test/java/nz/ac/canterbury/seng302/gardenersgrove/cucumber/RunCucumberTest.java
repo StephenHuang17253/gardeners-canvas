@@ -4,6 +4,7 @@ import io.cucumber.junit.platform.engine.Constants;
 import io.cucumber.spring.CucumberContextConfiguration;
 import nz.ac.canterbury.seng302.gardenersgrove.GardenersGroveApplication;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import org.junit.platform.suite.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,4 +27,6 @@ import org.springframework.test.context.ContextConfiguration;
 public class RunCucumberTest {
     @MockBean
     public FileService fileservice;
+    @MockBean
+    public WeatherService weatherService;
 }
