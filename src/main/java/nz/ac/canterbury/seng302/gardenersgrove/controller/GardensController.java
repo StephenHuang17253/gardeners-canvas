@@ -38,6 +38,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -368,6 +369,9 @@ public class GardensController {
                                    Model model) {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
+        ValidationResult tagResult = InputValidator.validateTag(tag);
+        boolean gardenAlreadyHasThisTag = false;
+
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -375,20 +379,21 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        GardenTag gardenTag = new GardenTag(tag);
 
-        if (gardenTagService.getByName(tag).isPresent()) {
-            gardenTag = gardenTagService.getByName(tag).get();
-        } else {
-            gardenTagService.addGardenTag(gardenTag);
-        }
+        if (tagResult.valid()) {
+            GardenTag gardenTag = new GardenTag(tag);
 
-        ValidationResult tagResult = InputValidator.validateTag(tag);
+            if (gardenTagService.getByName(tag).isPresent()) {
+                gardenTag = gardenTagService.getByName(tag).get();
+            } else {
+                gardenTagService.addGardenTag(gardenTag);
+            }
 
-        boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+            gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
-        if (!gardenAlreadyHasThisTag && tagResult.valid()) {
-            gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+            if (!gardenAlreadyHasThisTag && tagResult.valid()) {
+                gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+            }
         }
 
         if (!tagResult.valid() || gardenAlreadyHasThisTag) {
@@ -567,6 +572,18 @@ public class GardensController {
         }
         logger.info("Permits left after request: {}", semaphore.availablePermits());
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
+    }
+
+
+    /**
+     * Retrieves tag suggestions from the Garden Tag Repository through the Garden Tag Service
+     * @param query - The search query for tag autocomplete suggestions
+     * @return a list of garden tags whose names are similar to the query
+     */
+    @GetMapping("/tag/suggestions")
+    @ResponseBody
+    public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
+        return gardenTagService.getAllSimilar(query);
     }
 
 }
