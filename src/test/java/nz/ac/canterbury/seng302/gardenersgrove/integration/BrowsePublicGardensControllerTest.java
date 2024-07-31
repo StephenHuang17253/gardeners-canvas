@@ -96,14 +96,38 @@ class BrowsePublicGardensControllerTest {
 
     }
 
-    // @Test
-    // @WithMockUser(username = "johnDoe@email.com")
-    // void EnterTagName_TagNameExists_ReturnTrue() throws Exception {
-    //     mockMvc
-    //             .perform(MockMvcRequestBuilders.get("/tag/exists").param("tagName", "garden"))
-    //             .andExpect(MockMvcResultMatchers.status().isOk());
-    //             // .andExpect(null)
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    void EnterTagName_TagNameExists_ReturnTrue() throws Exception {
+        String fetchUrl = "/tag/exists";
+        mockMvcResult = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get(fetchUrl)
+                        .param("tagName", "garden")
 
-    // }
+        ).andReturn();
+
+        String tagListResponse = mockMvcResult.getResponse().getContentAsString();
+
+        Assertions.assertEquals("true", tagListResponse);
+
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@email.com")
+    void EnterTagName_TagNameDoesNotExists_ReturnFalse() throws Exception {
+        String fetchUrl = "/tag/exists";
+        mockMvcResult = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get(fetchUrl)
+                        .param("tagName", "blue")
+
+        ).andReturn();
+
+        String tagListResponse = mockMvcResult.getResponse().getContentAsString();
+
+        Assertions.assertEquals("false", tagListResponse);
+
+    }
 
 }

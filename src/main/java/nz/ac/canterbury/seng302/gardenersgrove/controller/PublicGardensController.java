@@ -133,16 +133,25 @@ public class PublicGardensController {
             Model model) {
         logger.info("GET /public-gardens/search");
 
-        String paramString = "?";
-        
+        String paramString = "";
+
         if (!searchInput.equals("")) {
+            if (paramString.isEmpty()) {
+                paramString += "?";
+            }
             paramString += "searchInput=" + searchInput;
         }
-
         if (appliedTags != null && !appliedTags.isEmpty()) {
-            for (String tagName: appliedTags) {
+            if (paramString.isEmpty()) {
+                paramString += "?";
+            }
+            for (String tagName : appliedTags) {
                 paramString += "&appliedTags=" + tagName;
             }
+        }
+
+        if (pageNumber < 1) {
+            return "redirect:/public-gardens/search/1" + paramString;
         }
 
         model.addAttribute("paramString", paramString);
@@ -150,21 +159,25 @@ public class PublicGardensController {
         List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput);
 
         List<Garden> tenSortedPublicGardens = matchingGardens.stream()
-                    .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                    .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
-                    .limit(COUNT_PER_PAGE)
-                    .collect(Collectors.toList());
+                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
+                .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
+                .limit(COUNT_PER_PAGE)
+                .collect(Collectors.toList());
 
         int startIndex = 0;
         int endIndex = 0;
-        int lastPage = 1;
+        int totalGardens = matchingGardens.size();
+        int lastPage = Math.max((int) Math.ceil((double) totalGardens / COUNT_PER_PAGE), 1);
+
+        if (pageNumber > lastPage) {
+            return "redirect:/public-gardens/search/" + lastPage + paramString;
+        }
 
         if (!tenSortedPublicGardens.isEmpty()) {
-            int totalGardens = matchingGardens.size();
 
             startIndex = (pageNumber - 1) * COUNT_PER_PAGE + 1;
             endIndex = Math.min(startIndex + COUNT_PER_PAGE, totalGardens);
-            lastPage = (int) Math.ceil((double) totalGardens / COUNT_PER_PAGE);
+
         } else {
             model.addAttribute("searchErrorText", "No gardens match your search");
         }
