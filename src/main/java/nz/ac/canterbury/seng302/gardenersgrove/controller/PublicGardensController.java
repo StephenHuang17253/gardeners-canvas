@@ -132,8 +132,10 @@ public class PublicGardensController {
             Model model) {
         logger.info("GET /public-gardens/search");
 
-        for (String i : appliedSearchTagsList) {
-            logger.info(i);
+        if (appliedSearchTagsList != null) {
+            for (String tag : appliedSearchTagsList) {
+                logger.info(tag);
+            }
         }
 
         if (Objects.equals(searchInput, "")) {
