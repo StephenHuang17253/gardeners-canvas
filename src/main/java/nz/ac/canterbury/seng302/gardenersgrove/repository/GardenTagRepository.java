@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -32,7 +33,7 @@ public interface GardenTagRepository extends CrudRepository<GardenTag, Long> {
      * @param name string to match in each gardenTag object
      * @return none or a GardenTag object
      */
-    List<GardenTag> findByTagNameContainsIgnoreCase(String name);
+    List<GardenTag> findByTagNameContainsIgnoreCaseAndTagStatus(String name, TagStatus tagStatus);
 
     /**
      * Finds garden objects whose name matches to a string in any case

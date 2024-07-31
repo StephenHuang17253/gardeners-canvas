@@ -81,12 +81,13 @@ public class GardenTagService {
 
     /**
      * Returns a list of all tags that contain the query string regardless of case
+     * Only return Appropriate tags and not tags that are pending or inappropriate
      * @param queryString the query string to match
      * @return a list of all matching tags
      */
     public List<GardenTag> getAllSimilar(String queryString)
     {
-        return gardenTagRepository.findByTagNameContainsIgnoreCase(queryString);
+        return gardenTagRepository.findByTagNameContainsIgnoreCaseAndTagStatus(queryString, TagStatus.APPROPRIATE);
     }
 
     /**

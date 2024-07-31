@@ -16,6 +16,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,6 +175,10 @@ public class U21_AddTagToGarden {
         gardenTagService.addGardenTag(new GardenTag("Garden"));
         gardenTagService.addGardenTag(new GardenTag("Vegetable Garden"));
         gardenTagService.addGardenTag(new GardenTag("Rose Garden"));
+
+        gardenTagService.updateGardenTagStatus("Garden",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Vegetable Garden",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Rose Garden",TagStatus.APPROPRIATE);
 
 
         String fetchUrl = "/tag/suggestions";
