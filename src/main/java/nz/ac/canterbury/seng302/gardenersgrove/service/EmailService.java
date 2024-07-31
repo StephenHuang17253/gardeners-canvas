@@ -223,6 +223,11 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
+    /**
+     * Sends a warning email to the user for using too many inappropriate tags
+     *
+     * @param token the token to send information about
+     */
     public void sendTagBanWarningEmail(Token token) throws MessagingException {
         String subject = "Tag moderation warning";
         String template = "generalEmail";
@@ -238,6 +243,11 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
+    /**
+     * Sends a ban email to the user that informs them they have been banned for 7 days
+     *
+     * @param token the token to send information about
+     */
     public void sendTagBanEmail(Token token) throws MessagingException {
         String subject = "Tag moderation ban";
         String template = "tagBanEmail";
