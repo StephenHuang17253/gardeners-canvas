@@ -7,6 +7,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import jakarta.servlet.UnavailableException;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
@@ -17,6 +18,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,10 +38,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -208,28 +212,38 @@ public class U25_MainPage {
     }
 
     @When("I have garden called {string} that needs watering for user {string}")
-    public void iHaveGardenThatNeedsWateringForUser(String gardenName, String email) throws JsonProcessingException {
+    public void iHaveGardenThatNeedsWateringForUser(String gardenName, String email) throws JsonProcessingException, UnavailableException {
         User user = userService.getUserByEmail(email);
         Garden gardenThatNeedsWater = new Garden(gardenName, "This garden is thirsty", "", "", "", "", "", 0.0, false, "",
                 "", user);
         gardenService.addGarden(gardenThatNeedsWater);
 
+        List<Garden> wateringList = new ArrayList<>();
+        wateringList.add(gardenThatNeedsWater);
+
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonObject = objectMapper.readTree(drySampleWeather);
-
         WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
-        
-        when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
+
+        List<WeatherResponseData> sampleDataList = new ArrayList<>();
+        sampleDataList.add(weatherData);
+
+        //doReturn(sampleDataList).when(weatherService).getWeatherForGardens(any());
+        when(weatherService.getWeatherForGardens(any())).thenReturn(sampleDataList);
+
+        List<WeatherResponseData> result = weatherService.getWeatherForGardens(wateringList);
+        assertNotNull(result, "The mocked method should not return null");
+        assertEquals(1, result.size(), "The mocked method should return a list with one element");
     }
 
     @Then("I can see that {string} need watering in the watering notifications for {string}")
     public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) {
-        User user = userService.getUserByEmail(email);
         List<Garden> expectedGardens = gardenService.getMatchingGardens(gardenName);
         Garden expectedGarden = expectedGardens.getFirst();
         List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
-        Boolean containsNewGarden = gardensNeedWatering.contains(expectedGarden);
-        assertTrue(containsNewGarden);
+
+        assertNotNull(gardensNeedWatering, "The list of gardens that need water should not be null");
+        assertTrue(gardensNeedWatering.contains(expectedGarden));
     }
 
 }
