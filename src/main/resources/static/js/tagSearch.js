@@ -11,12 +11,14 @@ const handleButtonClick = async () => {
     const tagExists = await checkTagExists(value);
     
     if (!tagExists) {
+        tagInput.classList.add('border-danger');
         searchTagErrorText.textContent = `No tag matching "${value}"`;
         return;
     }
 
     appliedTagsList.classList.remove('d-none');
     searchTagErrorText.textContent = '';
+    tagInput.classList.remove('border-danger');
 
     const div1 = document.createElement('div');
     div1.classList.add('p-1');
