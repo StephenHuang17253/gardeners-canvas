@@ -6,7 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -180,8 +179,8 @@ public class PlantService {
      * Copy the plant's picture
      * Overloaded method
      *
-     * @param plant        plant to update
-     * @param plantPicture new plant picture
+     * @param plant                plant to update
+     * @param plantPictureFileName plant picture to copy
      */
     public void updatePlantPicture(Plant plant, String plantPictureFileName) {
         String fileExtension = Objects.requireNonNull(plantPictureFileName).split("\\.")[1];

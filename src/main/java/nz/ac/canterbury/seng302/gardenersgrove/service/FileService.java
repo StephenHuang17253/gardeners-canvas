@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 
@@ -39,7 +38,7 @@ public class FileService {
      *
      * @param file Path to the file
      * @return Resource object representing the file
-     * @throws MalformedURLException
+     * @throws MalformedURLException exception when cannot turn file into a resource
      */
     public Resource createResource(Path file) throws MalformedURLException {
         try {
@@ -99,8 +98,8 @@ public class FileService {
      * Saves a file with the given fileName to the rootLocation directory
      * Overloaded method to copy pictures
      *
-     * @param fileName Name to save the file as
-     * @param file     The file to save
+     * @param newFile      Name to save the file as
+     * @param originalFile Name of the file to save
      * @throws IOException exception when could not store the file
      */
     public void saveFile(String newFile, String originalFile) throws IOException {
