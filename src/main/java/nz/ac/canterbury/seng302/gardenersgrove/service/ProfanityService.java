@@ -164,9 +164,9 @@ public class ProfanityService {
                 JsonNode jsonObject = objectMapper.readTree(response.body());
                 ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
 
-                logger.info("Call limit passed: " + profanityResponse.isCallLimitExceeded());
+                logger.info("Call limit passed: " + profanityResponse.callLimitExceeded());
 
-                if (profanityResponse.isCallLimitExceeded())
+                if (profanityResponse.callLimitExceeded())
                 {
                     wasProfanityChecked = false;
                     retryCounter += 1;
@@ -219,7 +219,7 @@ public class ProfanityService {
             returnedData = moderateContent(inputString);
             logger.info("Completed Normal Priority Profanity Check");
         }
-        return returnedData.isHasProfanity();
+        return returnedData.hasProfanity();
     }
 
 

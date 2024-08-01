@@ -8,18 +8,18 @@ import java.util.ArrayList;
  * This entity class is for representing and processing the response given by the profanity service
  */
 public class ProfanityResponseData {
-    JsonNode originalText;
-    JsonNode normalizedText;
-    JsonNode misrepresentation;
-    JsonNode language;
-    JsonNode terms;
-    JsonNode status;
-    JsonNode trackingId;
-    boolean hasProfanity;
-    List<String> foundTerms;
-    String statusCode;
-    String statusDescription;
-    boolean callLimitExceeded;
+    private JsonNode originalText;
+    private JsonNode normalizedText;
+    private JsonNode misrepresentation;
+    private JsonNode language;
+    private JsonNode terms;
+    private JsonNode status;
+    private JsonNode trackingId;
+    private boolean hasProfanity;
+    private List<String> foundTerms;
+    private String statusCode;
+    private String statusDescription;
+    private boolean callLimitExceeded;
     public int errorCode;
 
     @JsonCreator
@@ -66,11 +66,11 @@ public class ProfanityResponseData {
         return trackingId.asText();
     }
 
-    public boolean isHasProfanity() {
+    public boolean hasProfanity() {
         return hasProfanity;
     }
 
-    public boolean isCallLimitExceeded() {return callLimitExceeded;}
+    public boolean callLimitExceeded() {return callLimitExceeded;}
 
     /**
      * Sets the list of found terms from the JSON data.
