@@ -438,6 +438,7 @@ public class PlantFormController {
 
         redirectAttributes.addAttribute("plantId", newPlant.getPlantId());
         redirectAttributes.addAttribute("gardenId", gardenId);
+        redirectAttributes.addAttribute("gardenIdOfOriginalPlant", toCopyPlant.getGarden().getGardenId());
 
         return "redirect:/import-plant/confirm";
     }
@@ -446,13 +447,13 @@ public class PlantFormController {
     /**
      * Cancels copying of plant and deletes copy from database
      *
-     * @param gardenId my garden that was being copied to
-     * @param plantId  id of plant to be deleted
-     * @param response error page
+     * @param gardenIdOfOriginalPlant garden that was being copied from
+     * @param plantId                 id of plant to be deleted
+     * @param response                error page
      * @return redirect to another page
      */
     @PostMapping("/import-plant/cancel")
-    public String cancelImportPlant(@RequestParam("gardenId") Long gardenId,
+    public String cancelImportPlant(@RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
                                     @RequestParam("plantId") Long plantId,
                                     RedirectAttributes redirectAttributes,
                                     HttpServletResponse response) {
@@ -471,23 +472,25 @@ public class PlantFormController {
             return "500";
         }
 
-        redirectAttributes.addAttribute("gardenId", gardenId);
+        redirectAttributes.addAttribute("gardenId", gardenIdOfOriginalPlant);
 
-        return "redirect:/my-gardens/{gardenId}";
+        return "redirect:/public-gardens/{gardenId}";
     }
 
     /**
      * Confirmation form to copy plant
      *
-     * @param gardenId id of the owner's garden the plant is being copied to
-     * @param plantId  id of the new copy of the plant
-     * @param response response for error
-     * @param model    model of attributes
+     * @param gardenId                id of the owner's garden the plant is being copied to
+     * @param plantId                 id of the new copy of the plant
+     * @param gardenIdOfOriginalPlant garden that was being copied from
+     * @param response                response for error
+     * @param model                   model of attributes
      * @return confirmation form
      */
     @GetMapping("/import-plant/confirm")
     public String importPlantConfirmationForm(@RequestParam("gardenId") Long gardenId,
                                               @RequestParam("plantId") Long plantId,
+                                              @RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
                                               HttpServletResponse response,
                                               Model model) {
         logger.info("GET /import-plant/confirm");
@@ -508,9 +511,7 @@ public class PlantFormController {
             return "404";
         }
 
-        //Todo: keep track of old garden Id + clear any unnecessary code
-
-        model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
+        model.addAttribute("gardenIdOfOriginalPlant", gardenIdOfOriginalPlant); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantId", plantId);
@@ -519,6 +520,7 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+
         return "importPlantForm";
     }
 
