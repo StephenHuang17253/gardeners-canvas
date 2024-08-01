@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
@@ -39,6 +40,7 @@ public class HomePageController {
     private final FriendshipService friendshipService;
     private final SecurityService securityService;
     private final UserInteractionService userInteractionService;
+    private final HomePageLayoutService homePageLayoutService;
 
     private static final int PAGE_SIZE = 5;
 
@@ -51,13 +53,14 @@ public class HomePageController {
     @Autowired
     public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
             FriendshipService friendshipService, SecurityService securityService,
-            UserInteractionService userInteractionService) {
+            UserInteractionService userInteractionService, HomePageLayoutService homePageLayoutService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
+        this.homePageLayoutService = homePageLayoutService;
     }
 
     /**
@@ -196,19 +199,16 @@ public class HomePageController {
         return "homePage";
     }
 
-    private List<Garden> getRecentGardens(Long userId) {
+    private List<RecentGardenModel> setRecentGardenModels(Long userId) {
         List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
                 ItemType.GARDEN);
-        return gardenService.getGardensByInteraction(gardenInteractions);
-    }
 
-    private List<RecentGardenModel> setRecentGardenModels(List<Garden> gardenList) {
-        if (gardenList.isEmpty()) {
-            return null;
-        }
+        List<Garden> gardenList = gardenService.getGardensByInteraction(gardenInteractions);
+
         return gardenList.stream()
-                .map(garden -> new RecentGardenModel(garden, garden.getOwner(), securityService.isOwner(garden.getOwner().getId())))
-                .collect(Collectors.toList());
+                .map(garden -> new RecentGardenModel(garden, garden.getOwner(),
+                        securityService.isOwner(garden.getOwner().getId())))
+                .toList();
     }
 
     /**
@@ -241,12 +241,16 @@ public class HomePageController {
         String username = user.getFirstName() + " " + user.getLastName();
         String profilePicture = user.getProfilePictureFilename();
 
-        List<RecentGardenModel> recentGardens = setRecentGardenModels(getRecentGardens(user.getId()));
+        List<RecentGardenModel> recentGardens = setRecentGardenModels(user.getId());
 
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
 
-        if (recentGardens != null) {
+        HomePageLayout homePageLayout = homePageLayoutService.getLayoutByUserId(user.getId());
+
+        model.addAttribute("layout", homePageLayout);
+
+        if (!recentGardens.isEmpty()) {
             List<RecentGardenModel> recentGardensPage1 = recentGardens.subList(0,
                     Math.min(recentGardens.size(), PAGE_SIZE));
             model.addAttribute("recentGardensPage1", recentGardensPage1);

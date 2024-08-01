@@ -3,8 +3,10 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 /**
  * Service class for HomePageLayout objects.
@@ -16,10 +18,12 @@ public class HomePageLayoutService {
      * Interface for generic CRUD operations on a repository for home page layouts.
      */
     private HomePageLayoutRepository homePageLayoutRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public HomePageLayoutService(HomePageLayoutRepository homePageLayoutRepository) {
+    public HomePageLayoutService(HomePageLayoutRepository homePageLayoutRepository, UserRepository userRepository) {
         this.homePageLayoutRepository = homePageLayoutRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -33,13 +37,25 @@ public class HomePageLayoutService {
     }
 
     /**
-     * Retrieves a HomePageLayout object by owner id
-     * If no layout exists returns null
+     * Retrieves a HomePageLayout object by users id, if the user is not found this
+     * returns null, if the user has no layout this creates a new layout for the
+     * user and returns it
      *
      * @param userId the user's id
      */
-    public HomePageLayout getLayoutByOwnerId(long userId) {
-        return homePageLayoutRepository.findByOwnerId(userId).orElse(null);
+    public HomePageLayout getLayoutByUserId(long userId) {
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            return null;
+        }
+
+        HomePageLayout layout = homePageLayoutRepository.findByUserId(userId).orElse(null);
+        if (layout != null) {
+            return layout;
+        }
+
+        HomePageLayout newLayout = new HomePageLayout(user);
+        return updateLayout(newLayout);
     }
 
     /**

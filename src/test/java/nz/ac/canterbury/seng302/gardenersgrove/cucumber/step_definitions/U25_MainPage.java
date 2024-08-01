@@ -23,6 +23,7 @@ import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 import java.util.List;
@@ -50,6 +51,9 @@ public class U25_MainPage {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public SecurityService securityService;
 
     @Autowired
@@ -58,7 +62,10 @@ public class U25_MainPage {
     public static GardenService gardenService;
 
     public static UserService userService;
+
     public static PlantService plantService;
+
+    public static HomePageLayoutService homePageLayoutService;
 
     private static FriendshipService friendshipService;
 
@@ -77,9 +84,10 @@ public class U25_MainPage {
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
+        homePageLayoutService = new HomePageLayoutService(homePageLayoutRepository);
 
         HomePageController homePageController = new HomePageController(userService, gardenService, plantService,
-                friendshipService, securityService, userInteractionService);
+                friendshipService, securityService, userInteractionService, homePageLayoutService);
 
         // Allows us to bypass spring security
         mockMVC = MockMvcBuilders

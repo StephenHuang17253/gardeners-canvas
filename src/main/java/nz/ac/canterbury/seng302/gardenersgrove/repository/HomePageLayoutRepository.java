@@ -17,10 +17,10 @@ public interface HomePageLayoutRepository extends CrudRepository<HomePageLayout,
     Optional<HomePageLayout> findById(long id);
 
     /**
-     * Find HomePageLayout by owner id
+     * Find HomePageLayout by user id
      *
      * @param userId the user's id
      * @return optional layout
      */
-    Optional<HomePageLayout> findByOwnerId(long userId);
+    Optional<HomePageLayout> findByUserId(long userId);
 }
