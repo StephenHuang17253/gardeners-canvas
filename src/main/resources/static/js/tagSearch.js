@@ -20,6 +20,13 @@ const handleButtonClick = async () => {
         searchTagErrorText.textContent = `No tag matching "${value}"`;
         return;
     }
+    const tagAlreadyApplied = Array.from(appliedTagsInputs.querySelectorAll('input[name="appliedTags"]'))
+        .some(input => input.value === value)
+    if (tagAlreadyApplied) {
+        searchTagErrorText.textContent = `"${value}" is already applied`;
+        return;
+    }
+
 
     appliedTagsList.classList.remove('d-none');
     searchTagErrorText.textContent = '';
