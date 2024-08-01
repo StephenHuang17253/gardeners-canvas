@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -93,7 +94,8 @@ public class U21_AddTagToGarden {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
 
-        PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService,
+        PublicGardensController publicGardensController = new PublicGardensController(gardenService,
+                securityService,
                 friendshipService, gardenTagService);
 
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
@@ -118,8 +120,9 @@ public class U21_AddTagToGarden {
 
         User user = userService.getUserByEmail(userEmail);
 
-        Garden publicGarden = gardenService.addGarden(new Garden("A Public Garden with a Tag", "Tag Acceptance Test",
-                "", "", "Christchurch", "", "New Zealand", 0.0, false, "", "", user));
+        Garden publicGarden = gardenService
+                .addGarden(new Garden("A Public Garden with a Tag", "Tag Acceptance Test",
+                        "", "", "Christchurch", "", "New Zealand", 0.0, false, "", "", user));
 
         GardenTag testTag = gardenTagService.addGardenTag(new GardenTag("Veggies"));
         gardenTagService.addGardenTagRelation(new GardenTagRelation(publicGarden, testTag));
@@ -132,7 +135,9 @@ public class U21_AddTagToGarden {
 
     @Then("I see a list of tags that the garden has been marked with by its owner")
     public void i_see_a_list_of_tags_that_the_garden_has_been_marked_with_by_its_owner() {
-        List<String> tagsList = (List<String>) mvcResultPublicGardens.getModelAndView().getModelMap()
+        ModelAndView model = mvcResultPublicGardens.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<String> tagsList = (List<String>) model.getModelMap()
                 .getAttribute("tagsList");
         Assertions.assertNotNull(tagsList);
         String tag = tagsList.get(0);
@@ -180,7 +185,8 @@ public class U21_AddTagToGarden {
     @Then("The following error message is displayed {string}")
     public void the_following_error_message_is_displayed(String errorMessage) {
 
-        String tagErrorText = mvcResultGardens.getModelAndView().getModelMap().getAttribute("tagErrorText").toString();
+        String tagErrorText = mvcResultGardens.getModelAndView().getModelMap().getAttribute("tagErrorText")
+                .toString();
 
         Assertions.assertEquals(errorMessage, tagErrorText);
 

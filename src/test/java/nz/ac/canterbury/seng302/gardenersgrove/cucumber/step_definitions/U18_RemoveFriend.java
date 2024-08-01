@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -49,7 +50,6 @@ public class U18_RemoveFriend {
 
     @Autowired
     public SecurityService securityService;
-
 
     public static GardenService gardenService;
 
@@ -84,21 +84,23 @@ public class U18_RemoveFriend {
         User user = userService.getUserByEmail(receiverEmail);
 
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .post("/manage-friends/remove")
-                                .param("friendId", String.valueOf(user.getId()))
-                                .param("activeTab", "pending"))
+                MockMvcRequestBuilders
+                        .post("/manage-friends/remove")
+                        .param("friendId", String.valueOf(user.getId()))
+                        .param("activeTab", "pending"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
+
     // AC1
     @When("There is user {string} who is logged in with {string}")
     public void there_is_user_who_is_logged_in(String userEmail, String userPassword) throws Exception {
         mockMVC.perform(
-                        post("/login")
-                                .param("emailAddress", userEmail)
-                                .param("password", userPassword))
+                post("/login")
+                        .param("emailAddress", userEmail)
+                        .param("password", userPassword))
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/home"));
     }
+
     // AC1
     @Then("I cannot see or accept the friend request from {string}")
     public void they_cannot_see_or_accept_my_friend_request(String senderEmail) throws Exception {
@@ -108,12 +110,14 @@ public class U18_RemoveFriend {
 
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-
-        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("pendingFriends");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<RequestFriendModel> result = (List<RequestFriendModel>) model.getModelMap().getAttribute("pendingFriends");
         Assertions.assertNotNull(result);
         RequestFriendModel requestFriendModel = result.get(result.size() - 1);
         Assertions.assertNotEquals(userName, requestFriendModel.getFriendName());
     }
+
     // AC2
     @When("I hit the 'Remove Friend' button for user {string}")
     public void i_hit_remove_friend_button_for_user(String email) throws Exception {
@@ -121,12 +125,13 @@ public class U18_RemoveFriend {
         User user = userService.getUserByEmail(email);
 
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .post("/manage-friends/remove")
-                                .param("friendId", String.valueOf(user.getId()))
-                                  .param("activeTab", "pending"))
+                MockMvcRequestBuilders
+                        .post("/manage-friends/remove")
+                        .param("friendId", String.valueOf(user.getId()))
+                        .param("activeTab", "pending"))
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
+
     // AC2
     @Then("That friend {string} is removed from my friends list")
     public void that_friend_is_removed_from_my_friends_list(String email) throws Exception {
@@ -137,14 +142,12 @@ public class U18_RemoveFriend {
 
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("userFriends");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap().getAttribute("userFriends");
         Assertions.assertNotNull(result);
         FriendModel friendModel = result.get(result.size() - 1);
         Assertions.assertNotEquals(userName, friendModel.getFriendName());
     }
-
-
-
 
 }

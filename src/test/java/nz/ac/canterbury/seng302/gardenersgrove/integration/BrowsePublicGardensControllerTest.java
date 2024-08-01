@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -90,7 +91,9 @@ class BrowsePublicGardensControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
-        List<Garden> publicGardens = (List<Garden>) mockMvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mockMvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<Garden> publicGardens = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
         Assertions.assertEquals(publicGardens.toString(), mostRecent10TestGardens.toString());
 
