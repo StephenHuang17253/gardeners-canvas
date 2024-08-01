@@ -433,13 +433,7 @@ public class PlantFormController {
 
         Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId);
         if (toCopyPlant.getPlantPictureFilename() != null) {
-            try {
-                Resource pictureToCopy = fileService.loadFile(toCopyPlant.getPlantPictureFilename());
-                plantService.updatePlantPicture(newPlant, pictureToCopy);
-            } catch (IOException exception) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return "404";
-            }
+            plantService.updatePlantPicture(newPlant, toCopyPlant.getPlantPictureFilename());
         }
 
         redirectAttributes.addAttribute("plantId", newPlant.getPlantId());

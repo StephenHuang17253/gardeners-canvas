@@ -183,8 +183,8 @@ public class PlantService {
      * @param plant        plant to update
      * @param plantPicture new plant picture
      */
-    public void updatePlantPicture(Plant plant, Resource plantPicture) {
-        String fileExtension = Objects.requireNonNull(plantPicture.getFilename()).split("\\.")[1];
+    public void updatePlantPicture(Plant plant, String plantPictureFileName) {
+        String fileExtension = Objects.requireNonNull(plantPictureFileName).split("\\.")[1];
         try {
             String[] allFiles = fileService.getAllFiles();
             // Delete past plant image/s
@@ -194,9 +194,9 @@ public class PlantService {
                 }
             }
 
-            String fileName = "plant_" + plant.getPlantId() + "_picture." + fileExtension.toLowerCase();
-            updatePlantPictureFilename(fileName, plant.getPlantId());
-            fileService.saveFile(fileName, plantPicture);
+            String newFileName = "plant_" + plant.getPlantId() + "_picture." + fileExtension.toLowerCase();
+            updatePlantPictureFilename(newFileName, plant.getPlantId());
+            fileService.saveFile(newFileName, plantPictureFileName);
 
         } catch (IOException error) {
             logger.error(error.getMessage());
@@ -214,7 +214,7 @@ public class PlantService {
         if (targetPlant.isPresent()) {
             Plant plantToDelete = targetPlant.get();
             if (plantToDelete.getPlantPictureFilename() != null) {
-                fileService.deleteFile(String.format("/files/plants/%s", plantToDelete.getPlantPictureFilename()));
+                fileService.deleteFile(plantToDelete.getPlantPictureFilename());
             }
             plantRepository.deleteById(plantId);
         }

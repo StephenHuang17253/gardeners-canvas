@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 
@@ -102,12 +103,13 @@ public class FileService {
      * @param file     The file to save
      * @throws IOException exception when could not store the file
      */
-    public void saveFile(String fileName, Resource file) throws IOException {
+    public void saveFile(String newFile, String originalFile) throws IOException {
         try {
-            Path destinationFile = getRootLocation().resolve(Paths.get(fileName)).normalize().toAbsolutePath();
-
-            Files.copy(file.getInputStream(), destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            Path destinationFile = getRootLocation().resolve(Paths.get(newFile)).normalize().toAbsolutePath();
+            Path toCopy = getRootLocation().resolve(Paths.get(originalFile)).normalize().toAbsolutePath();
+            Files.copy(toCopy, destinationFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException error) {
+            logger.error(error.toString());
             throw new IOException("Could not store the file");
         }
     }
@@ -154,9 +156,10 @@ public class FileService {
      */
     public void deleteFile(String fileName) throws IOException {
         try {
-            Path file = getRootLocation().resolve(fileName);
+            Path file = getRootLocation().resolve(Paths.get(fileName)).normalize().toAbsolutePath();
             Files.delete(file);
         } catch (IOException error) {
+            logger.error(error.getMessage());
             throw new IOException("Could not delete the file");
         }
     }
