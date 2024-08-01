@@ -161,4 +161,19 @@ public class PlantService {
         }
     }
 
+
+    /**
+     * Returns all plants that the user interacted with
+     *
+     * @param userInteractions list of recent user interactions
+     * @return list of plants
+     */
+    public List<Plant> getPlantsByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(userInteraction -> findById(userInteraction.getItemId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
 }

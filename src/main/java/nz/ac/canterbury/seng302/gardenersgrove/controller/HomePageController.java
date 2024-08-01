@@ -212,6 +212,34 @@ public class HomePageController {
     }
 
     /**
+     * Gets all the resent plants that the user has accessed
+     *
+     * @param userId id of current user
+     * @return list of plants
+     */
+    private List<Plant> getRecentPlants(Long userId) {
+        List<UserInteraction> plantInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
+                ItemType.PLANT);
+        return plantService.getPlantsByInteraction(plantInteractions);
+    }
+
+    /**
+     * Sets RecentPlantModels for home page
+     *
+     * @param plantList List of recently accessed Plant objects
+     * @return List of RecentPlantModels
+     */
+    private List<RecentPlantModel> setRecentPlantModels(List<Plant> plantList) {
+        if (plantList.isEmpty()) {
+            return null;
+        }
+
+        return plantList.stream()
+                .map(plant -> new RecentPlantModel(plant, plant.getGarden(), plant.getGarden().getOwner(), securityService.isOwner(plant.getGarden().getOwner().getId())))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Helper function to create a list of friend models. Used for adding to the
      * model of the Manage Friends page.
      * 
@@ -236,6 +264,25 @@ public class HomePageController {
         return friendModels;
     }
 
+    /**
+     * Helper function to add recent plants to give model
+     *
+     * @param model        Model to add plants to
+     * @param recentPlants List of RecentPlantModels
+     */
+    private void updateModelWithRecentPlants(Model model, List<RecentPlantModel> recentPlants) {
+        List<RecentPlantModel> recentPlantsPage1 = recentPlants.subList(0,
+                Math.min(recentPlants.size(), PAGE_SIZE));
+        model.addAttribute("recentPlantsPage1", recentPlantsPage1);
+
+        List<RecentPlantModel> recentPlantsPage2 = null;
+        if (recentPlants.size() > PAGE_SIZE) {
+            recentPlantsPage2 = recentPlants.subList(PAGE_SIZE,
+                    Math.min(recentPlants.size(), PAGE_SIZE * 2));
+        }
+        model.addAttribute("recentPlantsPage2", recentPlantsPage2);
+    }
+
     private String loadUserMainPage(User user, Model model) {
 
         String username = user.getFirstName() + " " + user.getLastName();
@@ -257,6 +304,10 @@ public class HomePageController {
                         Math.min(recentGardens.size(), PAGE_SIZE * 2));
             }
             model.addAttribute("recentGardensPage2", recentGardensPage2);
+        }
+
+        if (recentPlants != null) {
+            updateModelWithRecentPlants(model, recentPlants);
         }
 
         List<FriendModel> recentFriends = createFriendModel(user.getId());
