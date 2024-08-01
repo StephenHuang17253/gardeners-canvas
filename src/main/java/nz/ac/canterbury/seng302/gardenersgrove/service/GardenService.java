@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
@@ -182,7 +183,7 @@ public class GardenService {
      * @param searchValue string input to match
      * @return List of Garden Objects
      */
-    public List<Garden> getMatchingGardens(String searchValue) {
+    public List<Garden> getMatchingGardens(String searchValue, List<GardenTag> tags) {
         searchValue = searchValue.toLowerCase();
         searchValue = "%" + searchValue + "%";
         return gardenRepository.findByGardenNameOrPlantNameContainingIgnoreCase(searchValue);

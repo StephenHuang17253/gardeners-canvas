@@ -107,13 +107,15 @@ public class PublicGardensController {
 
         model.addAttribute("paramString", paramString);
 
-        List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput);
+        List<GardenTag> tags = new ArrayList<>();
 
-        List<Garden> tenSortedPublicGardens = matchingGardens.stream()
-                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
-                .limit(COUNT_PER_PAGE)
-                .collect(Collectors.toList());
+        if (appliedTags != null) {
+            tags = appliedTags.stream()
+                    .map(tagString -> gardenTagService.getByName(tagString).get())
+                    .toList();
+        }
+
+        List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput, tags);
 
         int startIndex = 0;
         int endIndex = 0;
@@ -124,13 +126,22 @@ public class PublicGardensController {
             return "redirect:/public-gardens/search/" + lastPage + paramString;
         }
 
-        if (!tenSortedPublicGardens.isEmpty()) {
+        List<Garden> tenSortedPublicGardens = new ArrayList<>();
+
+        if (matchingGardens.isEmpty()) {
+
+            model.addAttribute("searchErrorText", "No gardens match your search");
+
+        } else {
+
+            tenSortedPublicGardens = matchingGardens.stream()
+                    .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
+                    .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
+                    .limit(COUNT_PER_PAGE)
+                    .collect(Collectors.toList());
 
             startIndex = (pageNumber - 1) * COUNT_PER_PAGE + 1;
             endIndex = Math.min(startIndex + COUNT_PER_PAGE, totalGardens);
-
-        } else {
-            model.addAttribute("searchErrorText", "No gardens match your search");
         }
 
         model.addAttribute("currentPage", pageNumber);
