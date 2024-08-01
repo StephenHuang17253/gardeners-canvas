@@ -75,7 +75,7 @@
                             </div>
                             <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
                                 <div class="modal-body">
-                                    <div class="input-group rounded">
+                                    <div class="input-group rounded mb-2">
                                         <input id="tagInput" th:name="tag" type="search" class="form-control rounded"
                                                th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
                                                th:value="${tagText}" placeholder="e.g. vegetable garden"
@@ -89,8 +89,8 @@
                                     <div class="position-relative">
                                         <ul id="tagAutocompleteSuggestions" class="list-group position-absolute"></ul>
                                     </div>
-                                    <p id="tagErrorText" th:if="${tagErrorText}" class="text-danger fs-6" th:text="${tagErrorText}"></p>
-                                    <p id="tagMessageText" th:if="${tagMessageText}" class="fs-6" th:text="${tagMessageText}"></p>
+                                    <p id="tagErrorText" th:if="${tagErrorText}" class="mb-0 text-danger fs-6" th:text="${tagErrorText}"></p>
+                                    <p id="tagMessageText" th:if="${tagMessageText}" class="mb-0 text-primary fs-6" th:text="${tagMessageText}"></p>
                                 </div>
                             </form>
                             <div class="modal-footer justify-content-center">
