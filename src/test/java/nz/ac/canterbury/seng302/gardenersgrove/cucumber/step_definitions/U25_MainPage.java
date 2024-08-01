@@ -84,7 +84,7 @@ public class U25_MainPage {
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        homePageLayoutService = new HomePageLayoutService(homePageLayoutRepository);
+        homePageLayoutService = new HomePageLayoutService(homePageLayoutRepository, userRepository);
 
         HomePageController homePageController = new HomePageController(userService, gardenService, plantService,
                 friendshipService, securityService, userInteractionService, homePageLayoutService);
