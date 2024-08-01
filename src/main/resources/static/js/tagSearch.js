@@ -89,8 +89,10 @@ const checkTagExists = async (tagName) => {
  * Hides the applied tag section
  */
 const hideTagSection = () => {
-    if (appliedTagsList.querySelectorAll('.p-1').length === 0) {
+    console.log(appliedTagsList.childElementCount)
+    if (appliedTagsList.childElementCount === 1) {
         appliedTagsList.classList.add('d-none');
+
     }
 }
 /**
@@ -102,8 +104,6 @@ const initializeTagHover = (tagElement) => {
     tagElement.onmouseover = () => tagElement.classList.replace('text-bg-success', 'text-bg-danger');
     tagElement.onmouseout = () => tagElement.classList.replace('text-bg-danger', 'text-bg-success');
 };
-window.addEventListener('load', () => {
-    hideTagSection();
-});
+hideTagSection()
 tagInput.addEventListener('keypress', handleKeyPress);
 addTagButton.addEventListener('click', handleButtonClick);
