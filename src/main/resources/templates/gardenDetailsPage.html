@@ -22,7 +22,7 @@
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
                     <div class="p-1" th:each="tag : ${tagsList}">
-                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag})}"></div>
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, isRemovable=${false})}"></div>
                     </div>
                 </div>
 
