@@ -46,6 +46,9 @@ public class U9_ViewGarden {
     public GardenTagRepository gardenTagRepository;
 
     @Autowired
+    public ProfanityService profanityService;
+
+    @Autowired
     public GardenTagRelationRepository gardenTagRelationRepository;
 
     @Autowired
@@ -94,12 +97,12 @@ public class U9_ViewGarden {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
+        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(gardensController).build();
         securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +

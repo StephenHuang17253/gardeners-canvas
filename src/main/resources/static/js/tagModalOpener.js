@@ -1,10 +1,10 @@
 const openTagModal = document.getElementById("openTagModalButton");
-const tagError = document.getElementById("tagErrorText")
+const openModal = document.getElementById("openModal")
 
 window.addEventListener('DOMContentLoaded', () => {
-
-    if (tagError != null) {
+    console.log("openModal value:", openModal)
+    console.log("openModal.innerText:", openModal.innerText)
+    if (openModal !== null) {
         openTagModal.click();
     }
-
 })

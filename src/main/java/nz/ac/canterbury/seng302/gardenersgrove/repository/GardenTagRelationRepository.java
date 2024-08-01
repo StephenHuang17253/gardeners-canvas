@@ -19,7 +19,7 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
 
     /**
      * Finds a GardenTag object by id
-     * 
+     *
      * @param id the GardenTag's id
      * @return none or a GardenTag object
      */
@@ -27,7 +27,7 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
 
     /**
      * Finds a GardenTagRelation object by GardenTag
-     * 
+     *
      * @param tag the GardenTag in the relation
      * @return none or a list of GardenTagRelation objects
      */
@@ -35,7 +35,7 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
 
     /**
      * Finds a GardenTagRelation object by Garden
-     * 
+     *
      * @param garden the Garden in the relation
      * @return none or a list of GardenTagRelation objects
      */
@@ -43,7 +43,7 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
 
     /**
      * Finds a GardenTagRelation object by Garden and GardenTag
-     * 
+     *
      * @param garden the Garden the relation
      * @param tag    the gardenTag in the relation
      * @return none or a GardenTagRelation object
@@ -63,9 +63,13 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
 
     /**
      * Find all GardenTagRelation objects in repo
-     * 
+     *
      * @return list of GardenTagRelation objects
      */
     List<GardenTagRelation> findAll();
+
+
+
+
 
 }

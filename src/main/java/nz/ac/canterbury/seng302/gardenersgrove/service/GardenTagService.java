@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,12 +81,13 @@ public class GardenTagService {
 
     /**
      * Returns a list of all tags that contain the query string regardless of case
+     * Only return Appropriate tags and not tags that are pending or inappropriate
      * @param queryString the query string to match
      * @return a list of all matching tags
      */
     public List<GardenTag> getAllSimilar(String queryString)
     {
-        return gardenTagRepository.findByTagNameContainsIgnoreCase(queryString);
+        return gardenTagRepository.findByTagNameContainsIgnoreCaseAndTagStatus(queryString, TagStatus.APPROPRIATE);
     }
 
     /**
@@ -151,7 +153,7 @@ public class GardenTagService {
      * @param tagStatus new tag status
      */
     public void updateGardenTagStatus(String tagName, TagStatus tagStatus) {
-        List<GardenTag> tagList = gardenTagRepository.findByTagNameContainsIgnoreCase(tagName);
+        List<GardenTag>  tagList = gardenTagRepository.findByTagNameIgnoreCase(tagName);
         tagList.forEach(item -> item.setTagStatus(tagStatus));
         gardenTagRepository.saveAll(tagList);
     }
@@ -159,6 +161,23 @@ public class GardenTagService {
     public List<Garden> getMatchingGardens(String searchValue, List<String> tags) {
         String tagsString = String.join(",", tags);
         return gardenTagRelationRepository.findByGardenNameContainsAndGardenHasTags(searchValue, tagsString);
+    }
+
+
+    /**
+     * Delete all tag relations by name (case insensitive)
+     * To be used when tags in determined to be inappropriate
+     * @param tagName tagName to delete
+     */
+    public void deleteRelationByTagName(String tagName)
+    {
+        List<GardenTag> inappropriateTags = gardenTagRepository.findByTagNameIgnoreCase(tagName).stream().toList();
+        List<GardenTagRelation> inappropriateTagRelations = new ArrayList<>();
+        for (GardenTag tag: inappropriateTags)
+        {
+            inappropriateTagRelations.addAll(gardenTagRelationRepository.findGardenTagRelationsByTagIs(tag));
+        }
+        gardenTagRelationRepository.deleteAll(inappropriateTagRelations);
     }
 
 

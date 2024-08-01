@@ -165,7 +165,8 @@ public class U17_SendFriendRequest {
             Assertions.assertEquals(friendsList.get(i).getFriendName(), result.get(i).getFriendName());
             Assertions.assertEquals(friendsList.get(i).getFriendProfilePicture(),
                     result.get(i).getFriendProfilePicture());
-            Assertions.assertEquals(friendsList.get(i).getFriendGardenLink(), result.get(i).getFriendGardenLink());
+            Assertions.assertEquals(friendsList.get(i).getFriendGardenLink(),
+                    result.get(i).getFriendGardenLink());
         }
 
     }
@@ -395,8 +396,9 @@ public class U17_SendFriendRequest {
 
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-
-        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<RequestFriendModel> result = (List<RequestFriendModel>) model.getModelMap()
                 .getAttribute("declinedFriends");
         Assertions.assertNotNull(result);
         RequestFriendModel requestFriendModel = result.get(result.size() - 1);
@@ -423,8 +425,9 @@ public class U17_SendFriendRequest {
 
         mvcResult = mockMVC.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-
-        List<RequestFriendModel> result = (List<RequestFriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<RequestFriendModel> result = (List<RequestFriendModel>) model.getModelMap()
                 .getAttribute("pendingFriends");
         Assertions.assertNotNull(result);
         RequestFriendModel requestFriendModel = result.get(result.size() - 1);
