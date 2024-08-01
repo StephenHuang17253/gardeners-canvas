@@ -147,9 +147,8 @@ public class ProfanityService {
         {
             try {
 
-                logger.info("Profanity service input: " + content);
                 String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
-                logger.debug("Sent profanity API request : " + new Date().getTime());
+                logger.info("Sent profanity API request: {}", new Date().getTime());
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(endPoint + "/contentmoderator/moderate/v1.0/ProcessText/Screen?text=" + encodedContent))
                         .header("Content-Type", "text/plain")
@@ -157,9 +156,8 @@ public class ProfanityService {
                         .POST(HttpRequest.BodyPublishers.ofString(content))
                         .build();
 
-                logger.info("Sent profanity request to " + request.uri().toString());
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                logger.info("Profanity service response: : " + response.body());
+                logger.info("Profanity service response: {}", response.body());
 
                 JsonNode jsonObject = objectMapper.readTree(response.body());
                 ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
@@ -168,7 +166,6 @@ public class ProfanityService {
 
                 if (profanityResponse.callLimitExceeded())
                 {
-                    wasProfanityChecked = false;
                     retryCounter += 1;
                     logger.warn(String.format("Could not get profanity response due to ratelimit, retrying %d",retryCounter));
                     waitForRateLimit();
@@ -244,7 +241,6 @@ public class ProfanityService {
      * Handles profanity API rate limiting, when called instructs thread to wait for next available time slot.
      */
     private void waitForRateLimit() throws InterruptedException {
-        logger.debug("Scheduled new moderation call at " + new Date().getTime());
         long timeToWait = 0;
         boolean couldUpdate = false;
         while (!couldUpdate) {
