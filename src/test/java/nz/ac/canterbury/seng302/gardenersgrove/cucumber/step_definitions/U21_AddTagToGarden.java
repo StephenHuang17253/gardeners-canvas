@@ -104,7 +104,7 @@ public class U21_AddTagToGarden {
 
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
-        GardensController GardensController = new GardensController(gardenService, securityService,
+        GardensController gardensController = new GardensController(gardenService, securityService,
                 plantService, weatherService, objectMapper, gardenTagService, profanityService);
 
         mockMVCGardens = MockMvcBuilders.standaloneSetup(gardensController).build();
