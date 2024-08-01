@@ -1,11 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RecentPlantModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
@@ -50,8 +48,8 @@ public class HomePageController {
      */
     @Autowired
     public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService,
-            UserInteractionService userInteractionService) {
+                              FriendshipService friendshipService, SecurityService securityService,
+                              UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -62,7 +60,7 @@ public class HomePageController {
 
     /**
      * Redirects GET default url '/' to '/home'
-     * 
+     *
      * @return redirect to /home
      */
     @GetMapping("/")
@@ -242,7 +240,7 @@ public class HomePageController {
     /**
      * Helper function to create a list of friend models. Used for adding to the
      * model of the Manage Friends page.
-     * 
+     *
      * @param id of user to find recent friends of
      * @return friendModels
      */
@@ -289,6 +287,7 @@ public class HomePageController {
         String profilePicture = user.getProfilePictureFilename();
 
         List<RecentGardenModel> recentGardens = setRecentGardenModels(getRecentGardens(user.getId()));
+        List<RecentPlantModel> recentPlants = setRecentPlantModels(getRecentPlants(user.getId()));
 
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
