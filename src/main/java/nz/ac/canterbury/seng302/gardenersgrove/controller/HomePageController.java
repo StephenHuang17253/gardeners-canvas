@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -292,33 +293,67 @@ public class HomePageController {
             profilePicture = user.getProfilePictureFilename();
 
             List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+            List<Garden> gardensRefreshed = new ArrayList<>();
             List<Garden> gardensNeedWatering = new ArrayList<>();
-            List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
-
-            Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
-            for (int i = 0; i < gardens.size(); i++) {
-                gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
-            }
 
             for (Garden garden : gardens) {
+                logger.info("Persisted last location update for garden " + garden.getGardenId() + ": " + garden.getLastLocationUpdate());
+                logger.info("Persisted last water update for garden " + garden.getGardenId() + ": " + garden.getLastWaterCheck());
+                logger.info("Persisted needs watering update for garden " + garden.getGardenId() + ": " + garden.getNeedsWatering());
+                if (garden.getLastLocationUpdate() == null) {
+                    gardensRefreshed.add(garden);
+                } else if (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck())) {
+                    gardensRefreshed.add(garden);
+                }
+                if (garden.getNeedsWatering()) {
+                    gardensNeedWatering.add(garden);
+                }
+            }
+
+            List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardensRefreshed);
+
+            Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
+            for (int i = 0; i < gardensRefreshed.size(); i++) {
+                gardenWeatherMap.put(gardensRefreshed.get(i).getGardenId(), weatherDataList.get(i));
+            }
+
+            for (Garden garden : gardensRefreshed) {
+                logger.info("Checking garden: " + garden.getGardenId());
                 WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
                 if (weatherData != null) {
                     List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
                     if (weatherList.size() > 1) {
                         DailyWeather beforeYesterdayWeather = weatherList.get(0);
                         DailyWeather yesterdayWeather = weatherList.get(1);
-                        if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) {
+                        if ((Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
+                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) || garden.getNeedsWatering()) {
+                            logger.info("Garden needs watering: " + garden.getGardenId());
                             gardensNeedWatering.add(garden);
-                            System.out.println(gardensNeedWatering);
+                            garden.setNeedsWatering(true);
+                            gardenService.changeGardenNeedsWatering(garden.getGardenId(), true);
+                        } else {
+                            garden.setNeedsWatering(false);
+                            gardenService.changeGardenNeedsWatering(garden.getGardenId(), false);
                         }
+                        logger.info("Updated garden needsWatering status: " + garden.getNeedsWatering());
                     }
                 }
             }
+
+            for (Garden garden : gardensRefreshed) {
+                Optional<Garden> updatedGarden = gardenService.getGardenById(garden.getGardenId());
+                if (updatedGarden.isPresent()) {
+                    logger.info("Persisted needsWatering status for garden " + garden.getGardenId() + ": " + updatedGarden.get().getNeedsWatering());
+                    logger.info("Persisted last location update for garden " + garden.getGardenId() + ": " + updatedGarden.get().getLastLocationUpdate());
+                } else {
+                    logger.warn("Garden not found: " + garden.getGardenId());
+                }
+            }
+
             model.addAttribute("gardensNeedWatering", gardensNeedWatering);
             model.addAttribute("profilePicture", profilePicture);
             model.addAttribute("username", username);
-            model.addAttribute("gardens", gardens);
+            model.addAttribute("gardens", gardensRefreshed);
             model.addAttribute("gardenWeatherMap", gardenWeatherMap);
         }
 
