@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PriorityType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -983,7 +984,7 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
-        boolean containsProfanity = profanityService.containsProfanity(testedValue);
+        boolean containsProfanity = profanityService.containsProfanity(testedValue, PriorityType.NORMAL);
 
         if (containsProfanity) {
             this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;

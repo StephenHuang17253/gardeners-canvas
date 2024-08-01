@@ -2,9 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
@@ -25,14 +22,14 @@ public class U22_TagModeration {
 
     @Given("My Tag {string} contained profanity")
     public void my_tag_contained_profanity(String tagName) {
-        Mockito.when(profanityService.containsProfanityLowPriority(Mockito.anyString())).thenReturn(true);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(true);
         gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
     }
 
     @Given("My Tag {string} did not contain profanity")
     public void my_tag_did_not_contain_profanity(String tagName) {
 
-        Mockito.when(profanityService.containsProfanityLowPriority(Mockito.anyString())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(false);
         gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
     }
 

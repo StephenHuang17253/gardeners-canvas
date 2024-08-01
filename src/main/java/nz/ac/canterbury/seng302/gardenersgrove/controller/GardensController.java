@@ -14,6 +14,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PriorityType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
@@ -613,7 +614,7 @@ public class GardensController {
     private void asynchronousTagProfanityCheck(String tagName)
     {
         Thread asyncThread = new Thread((() -> {
-            boolean tagContainsProfanity = profanityService.containsProfanityLowPriority(tagName);
+            boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
             if (!tagContainsProfanity)
             {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.component.ProfanityResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PriorityType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -199,7 +200,7 @@ public class ProfanityService {
      * @param inputString The string to send to the content moderator API Which will check for any profanity.
      * @return True if terms has one or more bad words. If not found return false
      */
-    public boolean containsProfanity(String inputString) {
+    public boolean containsProfanity(String inputString, PriorityType priorityType) {
 
         Boolean precheckResponse = containPriorityPrecheck(inputString);
         if(precheckResponse != null)
@@ -207,32 +208,20 @@ public class ProfanityService {
             return precheckResponse;
         }
 
-        ProfanityResponseData returnedData = moderateContent(inputString);
-        logger.info("Completed Low Profanity Check");
-        return returnedData.isHasProfanity();
-    }
-
-
-    /**
-     * Checks a string to see if it contains any bad words, if so return True.
-     * This function will take longer on average than the normal priority one
-     *
-     * @param inputString The string to send to the content moderator API Which will check for any profanity.
-     * @return True if terms has one or more bad words. If not found return false
-     */
-    public boolean containsProfanityLowPriority(String inputString) {
-
-        Boolean precheckResponse = containPriorityPrecheck(inputString);
-        if(precheckResponse != null)
+        ProfanityResponseData returnedData;
+        if (priorityType == PriorityType.LOW)
         {
-            return precheckResponse;
+            returnedData = moderateContentLowPriority(inputString);
+            logger.info("Completed Low Priority Profanity Check");
         }
-
-
-        ProfanityResponseData returnedData = moderateContentLowPriority(inputString);
-        logger.info("Completed Low Priority Profanity Check");
+        else
+        {
+            returnedData = moderateContent(inputString);
+            logger.info("Completed Normal Priority Profanity Check");
+        }
         return returnedData.isHasProfanity();
     }
+
 
     private Boolean containPriorityPrecheck(String inputString)
     {
