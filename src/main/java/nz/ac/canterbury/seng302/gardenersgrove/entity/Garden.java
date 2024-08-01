@@ -131,7 +131,6 @@ public class Garden {
         this.gardenLatitude = gardenLatitude;
         this.gardenLongitude = gardenLongitude;
         this.isPublic = isPublic;
-        this.owner = owner;
     }
 
     public Long getGardenId() {

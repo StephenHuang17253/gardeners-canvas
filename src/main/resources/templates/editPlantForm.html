@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="~{fragments/header.html}"></head>
 
@@ -24,8 +24,7 @@
                             <div class="ratio ratio-1x1">
                                 <img id="imageToChange"
                                     th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                                    alt="Plant image"
-                                    class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
+                                    alt="Plant" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
 
                             <label

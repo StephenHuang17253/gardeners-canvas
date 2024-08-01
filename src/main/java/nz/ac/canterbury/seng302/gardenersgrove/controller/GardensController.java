@@ -236,7 +236,7 @@ public class GardensController {
                 });
             }
         } catch (Exception e) {
-            logger.error("An error occurred while mapping the weatherListJson: " + e.getMessage());
+            logger.error("An error occurred while mapping the weatherListJson: {}", e.getMessage());
         }
 
         try {
@@ -245,7 +245,7 @@ public class GardensController {
                 weatherList = (List<WeatherModel>) inputFlashMap.get("weatherList");
             }
         } catch (Exception e) {
-            logger.error("An error occurred while getting the weather list from the flash map: " + e.getMessage());
+            logger.error("An error occurred while getting the weather list from the flash map: {}", e.getMessage());
         }
 
         if (weatherList == null || weatherList.isEmpty()) {
@@ -266,7 +266,7 @@ public class GardensController {
                 });
             }
         } catch (Exception e) {
-            logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
+            logger.error("An error occurred while reading the weatherListJson: {}", e.getMessage());
         }
 
         weatherListJson = null;
@@ -274,7 +274,7 @@ public class GardensController {
         try {
             weatherListJson = objectMapper.writeValueAsString(weatherList);
         } catch (Exception e) {
-            logger.error("An error occurred while writing the weatherListJson: " + e.getMessage());
+            logger.error("An error occurred while writing the weatherListJson: {}", e.getMessage());
         }
 
         model.addAttribute("weatherListJson", weatherListJson);
@@ -346,7 +346,7 @@ public class GardensController {
                 weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {
                 });
             } catch (Exception e) {
-                logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
+                logger.error("An error occurred while reading the weatherListJson: {}", e.getMessage());
             }
         }
         redirectAttributes.addFlashAttribute("page", page);

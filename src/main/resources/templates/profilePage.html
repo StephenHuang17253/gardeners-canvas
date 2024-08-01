@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="~{fragments/header.html}"></head>
 
@@ -21,7 +21,7 @@
                         <div class="position-relative w-75">
                             <div class="ratio ratio-1x1">
                                 <img id="imageToChange" th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                                    alt="User's Profile Picture" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
+                                    alt="User Profile" class="image-fluid rounded-circle border object-fit-cover w-100 h-100">
                             </div>
                             <label
                                 class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
