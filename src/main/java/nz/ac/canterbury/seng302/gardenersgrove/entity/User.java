@@ -57,6 +57,10 @@ public class User {
     @Column
     private Integer strikes;
 
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "homePageLayout_id", referencedColumnName = "id")
+    private HomePageLayout homePageLayout;
+
     /**
      * JPA required no-args constructor
      */
