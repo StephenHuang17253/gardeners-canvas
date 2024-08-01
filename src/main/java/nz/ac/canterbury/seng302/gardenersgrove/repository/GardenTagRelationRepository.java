@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.repository;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -43,6 +44,13 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
      * @return none or a GardenTagRelation object
      */
     Optional<GardenTagRelation> findGardenTagRelationsByGardenIsAndTagIs(Garden garden, GardenTag tag);
+
+    @Query("select distinct garden from garden_tag_relation join garden_tag join garden join plant where garden.garden_id = garden_tag_relation.garden_id and garden_tag.tag_id = garden_tag_relation.tag_id and plant.garden_id = garden.garden_id and \n" +
+            "(LOWER(plant.plant_name) LIKE LOWER('%pslant%') or  LOWER(garden.garden_name) LIKE LOWER('%john%') ) and garden_tag.tag_name in ('some','tag')")
+    Optional<GardenTagRelation> findByGardenNameContainsAndGardenHasTags();
+
+
+
 
     /**
      * Find all GardenTagRelation objects in repo
