@@ -16,6 +16,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -77,6 +78,9 @@ public class U21_AddTagToGarden {
     @Autowired
     public FriendshipService friendshipService;
 
+    @Autowired
+    public ProfanityService profanityService;
+
     public static GardenTagService gardenTagService;
 
     private MvcResult mvcResultPublicGardens;
@@ -100,8 +104,8 @@ public class U21_AddTagToGarden {
 
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
-        GardensController gardensController = new GardensController(gardenService, securityService,
-                plantService, weatherService, objectMapper, gardenTagService);
+        GardensController GardensController = new GardensController(gardenService, securityService,
+                plantService, weatherService, objectMapper, gardenTagService, profanityService);
 
         mockMVCGardens = MockMvcBuilders.standaloneSetup(gardensController).build();
 
@@ -162,8 +166,13 @@ public class U21_AddTagToGarden {
         mvcResultGardens = mockMVCGardens.perform(
                 MockMvcRequestBuilders
                         .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
-                        .param("tag", tag))
-                .andExpect(status().is3xxRedirection()).andReturn();
+                        .param("tag", tag)
+        ).andReturn();
+    }
+
+    @When ("I have a tag {string}")
+    public void i_previously_had_a_tag(String tag) throws Exception {
+        gardenTagService.addGardenTag(new GardenTag(tag));
     }
 
     // AC3
@@ -172,6 +181,11 @@ public class U21_AddTagToGarden {
         gardenTagService.addGardenTag(new GardenTag("Garden"));
         gardenTagService.addGardenTag(new GardenTag("Vegetable Garden"));
         gardenTagService.addGardenTag(new GardenTag("Rose Garden"));
+
+        gardenTagService.updateGardenTagStatus("Garden",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Vegetable Garden",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Rose Garden",TagStatus.APPROPRIATE);
+
 
         String fetchUrl = "/tag/suggestions";
         tagResult = mockMVCGardens.perform(
@@ -215,15 +229,16 @@ public class U21_AddTagToGarden {
 
         gardenTagRepository.deleteAll();
     }
-
-    // AC5
-    @Then("the tag is added to my garden")
-    public void the_tag_is_added_to_my_garden() {
+//    AC5
+    @Then("the tag is {string} added to my garden")
+    public void the_tag_is_added_to_my_garden(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
 
+        gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
+
         String tag = String.valueOf(gardenTags.get(0).getTag().getTagName());
-        Assertions.assertEquals("Cabbage Patch", tag);
+        Assertions.assertEquals(tagName, tag);
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
     }
 

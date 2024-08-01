@@ -53,6 +53,9 @@ public class WeatherMonitoring {
     public GardenTagRelationRepository gardenTagRelationRepository;
 
     @Autowired
+    public ProfanityService profanityService;
+
+    @Autowired
     public UserRepository userRepository;
 
     @Autowired
@@ -150,7 +153,7 @@ public class WeatherMonitoring {
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService, objectMapper, gardenTagService);
+                weatherService,objectMapper,gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
     }
