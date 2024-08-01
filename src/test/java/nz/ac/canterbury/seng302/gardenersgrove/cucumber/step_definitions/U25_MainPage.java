@@ -241,7 +241,7 @@ public class U25_MainPage {
     public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) {
 
         List<Garden> expectedGardens = gardenService.getMatchingGardens(gardenName);
-        Garden expectedGarden = expectedGardens.getFirst();
+        Garden expectedGarden = expectedGardens.get(0);
         List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
 
         assertNotNull(gardensNeedWatering, "The list of gardens that need water should not be null");

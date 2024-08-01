@@ -134,6 +134,12 @@ public class GardenService {
         }
     }
 
+    /**
+     * Updates the watering need status of the garden
+     * @param gardenId the garden's id
+     * @param NeedsWatering the boolean attribute used to determine if a garden needs watering
+     * @return the updated garden as saved in the repository
+     */
     public Garden changeGardenNeedsWatering(Long gardenId, boolean NeedsWatering) {
         Optional<Garden> optionalGarden = getGardenById(gardenId);
 

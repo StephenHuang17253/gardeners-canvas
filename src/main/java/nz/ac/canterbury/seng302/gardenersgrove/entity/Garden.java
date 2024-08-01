@@ -259,6 +259,11 @@ public class Garden {
         return lastLocationUpdate;
     }
 
+    /**
+     * Sets the date at which the location was last changed for a garden
+     *
+     * @param lastLocationUpdate date for when the location was changed
+     */
     public void setLastLocationUpdate(LocalDateTime lastLocationUpdate) {
         this.lastLocationUpdate = lastLocationUpdate;
     }

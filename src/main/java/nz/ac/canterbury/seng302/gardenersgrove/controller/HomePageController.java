@@ -120,8 +120,8 @@ public class HomePageController {
                     "New Zealand",
                     15.0,
                     true,
-                    "-43.5214643",
-                    "172.5796159",
+                    "39.147",
+                    "-119.741844",
                     johnDoe);
             sampleGarden = gardenService.addGarden(sampleGarden);
 
@@ -297,9 +297,6 @@ public class HomePageController {
             List<Garden> gardensNeedWatering = new ArrayList<>();
 
             for (Garden garden : gardens) {
-                logger.info("Persisted last location update for garden " + garden.getGardenId() + ": " + garden.getLastLocationUpdate());
-                logger.info("Persisted last water update for garden " + garden.getGardenId() + ": " + garden.getLastWaterCheck());
-                logger.info("Persisted needs watering update for garden " + garden.getGardenId() + ": " + garden.getNeedsWatering());
                 if (garden.getLastLocationUpdate() == null) {
                     gardensRefreshed.add(garden);
                 } else if (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck())) {
@@ -318,16 +315,16 @@ public class HomePageController {
             }
 
             for (Garden garden : gardensRefreshed) {
-                logger.info("Checking garden: " + garden.getGardenId());
                 WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
                 if (weatherData != null) {
                     List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
                     if (weatherList.size() > 1) {
                         DailyWeather beforeYesterdayWeather = weatherList.get(0);
                         DailyWeather yesterdayWeather = weatherList.get(1);
+                        DailyWeather currentWeather = weatherList.get(2);
                         if ((Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")) || garden.getNeedsWatering()) {
-                            logger.info("Garden needs watering: " + garden.getGardenId());
+                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
+                                && Objects.equals(currentWeather.getDescription(), "Sunny")) || garden.getNeedsWatering()) {
                             gardensNeedWatering.add(garden);
                             garden.setNeedsWatering(true);
                             gardenService.changeGardenNeedsWatering(garden.getGardenId(), true);
@@ -335,18 +332,7 @@ public class HomePageController {
                             garden.setNeedsWatering(false);
                             gardenService.changeGardenNeedsWatering(garden.getGardenId(), false);
                         }
-                        logger.info("Updated garden needsWatering status: " + garden.getNeedsWatering());
                     }
-                }
-            }
-
-            for (Garden garden : gardensRefreshed) {
-                Optional<Garden> updatedGarden = gardenService.getGardenById(garden.getGardenId());
-                if (updatedGarden.isPresent()) {
-                    logger.info("Persisted needsWatering status for garden " + garden.getGardenId() + ": " + updatedGarden.get().getNeedsWatering());
-                    logger.info("Persisted last location update for garden " + garden.getGardenId() + ": " + updatedGarden.get().getLastLocationUpdate());
-                } else {
-                    logger.warn("Garden not found: " + garden.getGardenId());
                 }
             }
 
