@@ -76,7 +76,7 @@
                             <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post" autocomplete="off">
                                 <div class="modal-body">
                                     <div class="input-group rounded mb-2">
-                                        <input id="tagInput" th:name="tag" type="search" class="form-control rounded"
+                                        <input id="tagInput" th:name="tag" type="search" class="form-control rounded-start"
                                                th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
                                                th:value="${tagText}" placeholder="e.g. vegetable garden"
                                                aria-label="Search" aria-describedby="search-addon" autofocus/>
@@ -190,6 +190,7 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/gardenTagAutocomplete.js}"></script>
+    <script th:src="@{/js/getInstance.js}"></script>
 </body>
 
 </html>

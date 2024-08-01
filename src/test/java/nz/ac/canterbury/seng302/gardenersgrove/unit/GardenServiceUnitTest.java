@@ -31,8 +31,6 @@ public class GardenServiceUnitTest {
 
     private Garden garden;
 
-    private int gardenId;
-
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
 
     LocalDate date = LocalDate.parse("01/01/2001", formatter);

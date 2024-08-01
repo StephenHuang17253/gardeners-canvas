@@ -2,7 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
@@ -10,12 +9,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,14 +29,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -188,17 +180,20 @@ class GardensControllerIntegrationTests {
     void GetAnIndividualGarden_GardenHasBadLocationValue_Return200ButHasWeatherError() throws Exception {
 
         WeatherResponseData mockResponseData = Mockito.mock(WeatherResponseData.class);
-        Mockito.when(mockResponseData.getRetrievedWeatherData()).thenThrow(new NullPointerException("No such location"));
-        Mockito.when(weatherService.getWeather(Mockito.anyString(),Mockito.anyString())).thenReturn(mockResponseData);
-
+        Mockito.when(mockResponseData.getRetrievedWeatherData())
+                .thenThrow(new NullPointerException("No such location"));
+        Mockito.when(weatherService.getWeather(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(mockResponseData);
 
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders
                         .get("/my-gardens/{gardenId}", gardenList.get(2).getGardenId()))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
         String expectedErrorMessage = "Location not found, please update your location to see the weather";
+        ModelAndView model = result.getModelAndView();
+        Assertions.assertNotNull(model);
         Assertions.assertEquals(expectedErrorMessage,
-                ((List<WeatherModel>) result.getModelAndView().getModel().get("weatherList")).get(0)
+                ((List<WeatherModel>) model.getModel().get("weatherList")).get(0)
                         .getWeatherError());
     }
 
@@ -265,9 +260,11 @@ class GardensControllerIntegrationTests {
                 MockMvcRequestBuilders
                         .get("/my-gardens/{gardenId}", gardenList.get(3).getGardenId()))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-
-        Assertions.assertNull(((List<WeatherModel>) result.getModelAndView().getModel().get("weatherList")).get(0)
-                .getWeatherError());
+        ModelAndView model = result.getModelAndView();
+        Assertions.assertNotNull(model);
+        Assertions.assertNull(
+                ((List<WeatherModel>) model.getModel().get("weatherList")).get(0)
+                        .getWeatherError());
     }
 
     @Test
@@ -359,18 +356,18 @@ class GardensControllerIntegrationTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Vegetable Garden", "Flower Bed", "Herb Garden", "Succulent Area", "Fruit Orchard",
-            "Rose Collection", "Perennial Patch", "Shade Garden", "Rock Garden", "Tropical Zone", "Cottage Garden",
-            "aaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @ValueSource(strings = { "Vegetable Garden", "Flower Bed", "Herb Garden", "Succulent Area", "Fruit Orchard",
+            "Rose Collection", "Perennial Patch", "Shade Garden", "Rock Garden", "Tropical Zone",
+            "Cottage Garden",
+            "aaaaaaaaaaaaaaaaaaaaaaaaa" })
     @WithMockUser(username = "johnDoe@email.com")
     void PostGardenDetailsPage_AddValidTag_Return302(String tagInput) throws Exception {
         Garden garden = gardenList.get(0);
 
-
         // Add tag
         mockMvc
                 .perform(MockMvcRequestBuilders.post("/my-gardens/1/tag").with(csrf())
-                .param("tag", tagInput))
+                        .param("tag", tagInput))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // Garden Tag relation should exist now
@@ -396,7 +393,8 @@ class GardensControllerIntegrationTests {
 
         // Add tag
         mockMvc
-                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId()).with(csrf())
+                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId())
+                        .with(csrf())
                         .param("tag", "Roses"))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
@@ -407,7 +405,8 @@ class GardensControllerIntegrationTests {
 
         // Try add it again
         mockMvc
-                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId()).with(csrf())
+                .perform(MockMvcRequestBuilders.post("/my-gardens/{gardenId}/tag", garden.getGardenId())
+                        .with(csrf())
                         .param("tag", "Roses"))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
@@ -427,12 +426,16 @@ class GardensControllerIntegrationTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Flower@Bed", "Herb$Garden", "Succulent#Area", "Fruit%Orchard", "Rose^Collection",
-            "Perennial&Patch", "Shade*Garden", "Rock(Garden", "Tropical)Zone", "Cottage+Garden", "Garden=Area",
-            "Vegetable|Garden", "Herb~Garden", "Fruit`Orchard", "Succulent;Area", "Tropical)Zone", "Rock<Area",
-            "Shade>Garden", "Cottage/Garden", "Flower?Bed", "Perennial[Patch", "Rose]Collection", "Herb{Garden",
-            "Tropical}Zone", "Succulent;Area", "Fruit`Orchard", "Rock.Garden", "Shade!Garden", "Cottage@Zone",
-            "aaaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @ValueSource(strings = { "Flower@Bed", "Herb$Garden", "Succulent#Area", "Fruit%Orchard", "Rose^Collection",
+            "Perennial&Patch", "Shade*Garden", "Rock(Garden", "Tropical)Zone", "Cottage+Garden",
+            "Garden=Area",
+            "Vegetable|Garden", "Herb~Garden", "Fruit`Orchard", "Succulent;Area", "Tropical)Zone",
+            "Rock<Area",
+            "Shade>Garden", "Cottage/Garden", "Flower?Bed", "Perennial[Patch", "Rose]Collection",
+            "Herb{Garden",
+            "Tropical}Zone", "Succulent;Area", "Fruit`Orchard", "Rock.Garden", "Shade!Garden",
+            "Cottage@Zone",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaa" })
     @WithMockUser(username = "johnDoe@email.com")
     void PostGardenDetailsPage_AddInvalidTag_DontAddTag(String tagInput) throws Exception {
         Garden garden = gardenList.get(0);
@@ -440,7 +443,7 @@ class GardensControllerIntegrationTests {
         // Attempt to add tag
         mockMvc
                 .perform(MockMvcRequestBuilders.post("/my-gardens/1/tag").with(csrf())
-                .param("tag", tagInput))
+                        .param("tag", tagInput))
                 .andExpect(status().isOk());
 
         // Tag shouldn't be added to the garden

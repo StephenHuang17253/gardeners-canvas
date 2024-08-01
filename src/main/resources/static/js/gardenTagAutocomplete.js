@@ -70,6 +70,7 @@ const updateTagAutocompleteDropdown = (tagSuggestions) => {
  * @type {(function(*): Promise<void>)|*}
  */
 const handleTagUpdate = (async (event) => {
+
     if (event.target.value === "") {
         hideTagAutocompleteDropdown();
         return;
@@ -87,7 +88,7 @@ const handleTagUpdate = (async (event) => {
         return;
     }
 
-    updateTagAutocompleteDropdown(tagSuggestions)
+    updateTagAutocompleteDropdown(tagSuggestions);
     showTagAutocompleteDropdown();
 })
 
@@ -109,36 +110,24 @@ const handleTagClick = (event) => {
 }
 
 /**
- * Determines the instance based on the current URL path.
- * @returns {string} The instance ("", "test/" or "prod/") based on the URL path.
- */
-const getInstance = () => {
-    const path = window.location.pathname
-    let instance = "";
-    if (path.includes("/test/")) {
-        instance = "test/";
-    } else if (path.includes("/prod/")) {
-        instance = "prod/";
-    }
-    return instance;
-};
-
-/**
  * Fetches tag data
  * @param query - the query string to search for
  * @returns {Promise<any>} - A promise that resolves with the fetched data
  */
 const fetchTagData = async (query) => {
     const instance = getInstance();
-
     const response =  await fetch(`/${instance}tag/suggestions?query=${query}`)
-    return await response.json()
-
+    return await response.json();
 }
 
-
+const handleEnterKeyPress = (event) => {
+    if (event.key === 'Enter') {
+        hideTagAutocompleteDropdown();
+    }
+}
 
 // Event listeners
+tagField.addEventListener("keypress", handleEnterKeyPress);
 tagField.addEventListener("input", handleTagUpdate);
 tagField.addEventListener("focus", handleTagUpdate);
 tagField.addEventListener("blur", handleTagDeselect);

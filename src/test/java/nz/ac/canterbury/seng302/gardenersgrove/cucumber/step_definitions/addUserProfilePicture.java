@@ -12,8 +12,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -32,8 +30,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @SpringBootTest
 public class addUserProfilePicture {
 
-
-    Logger logger = LoggerFactory.getLogger(EditAUser.class);
     public MockMvc mockMVC;
 
     @Autowired

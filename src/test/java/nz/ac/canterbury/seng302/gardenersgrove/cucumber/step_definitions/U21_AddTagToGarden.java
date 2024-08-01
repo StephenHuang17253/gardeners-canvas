@@ -18,8 +18,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,17 +26,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Objects;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class U21_AddTagToGarden {
-
-    Logger logger = LoggerFactory.getLogger(U21_AddTagToGarden.class);
 
     public static MockMvc mockMVCPublicGardens;
 
@@ -102,15 +98,16 @@ public class U21_AddTagToGarden {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
 
-        PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService,
+        PublicGardensController publicGardensController = new PublicGardensController(gardenService,
+                securityService,
                 friendshipService, gardenTagService);
 
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
-        GardensController GardensController = new GardensController(gardenService, securityService,
+        GardensController gardensController = new GardensController(gardenService, securityService,
                 plantService, weatherService, objectMapper, gardenTagService, profanityService);
 
-        mockMVCGardens = MockMvcBuilders.standaloneSetup(GardensController).build();
+        mockMVCGardens = MockMvcBuilders.standaloneSetup(gardensController).build();
 
     }
 
@@ -127,25 +124,28 @@ public class U21_AddTagToGarden {
 
         User user = userService.getUserByEmail(userEmail);
 
-        Garden publicGarden = gardenService.addGarden(new Garden("A Public Garden with a Tag", "Tag Acceptance Test",
-                "", "", "Christchurch", "", "New Zealand", 0.0, false, "", "", user));
+        Garden publicGarden = gardenService
+                .addGarden(new Garden("A Public Garden with a Tag", "Tag Acceptance Test",
+                        "", "", "Christchurch", "", "New Zealand", 0.0, false, "", "", user));
 
         GardenTag testTag = gardenTagService.addGardenTag(new GardenTag("Veggies"));
         gardenTagService.addGardenTagRelation(new GardenTagRelation(publicGarden, testTag));
 
         mvcResultPublicGardens = mockMVCPublicGardens.perform(
-                        MockMvcRequestBuilders
-                                .get("/public-gardens/{gardenId}", publicGarden.getGardenId())
-                                )
-                        .andExpect(status().isOk()).andReturn();
+                MockMvcRequestBuilders
+                        .get("/public-gardens/{gardenId}", publicGarden.getGardenId()))
+                .andExpect(status().isOk()).andReturn();
     }
 
     @Then("I see a list of tags that the garden has been marked with by its owner")
-    public void i_see_a_list_of_tags_that_the_garden_has_been_marked_with_by_its_owner(){
-        List<String> tagsList = (List<String>) mvcResultPublicGardens.getModelAndView().getModelMap().getAttribute("tagsList");
-        assert tagsList != null;
+    public void i_see_a_list_of_tags_that_the_garden_has_been_marked_with_by_its_owner() {
+        ModelAndView model = mvcResultPublicGardens.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<String> tagsList = (List<String>) model.getModelMap()
+                .getAttribute("tagsList");
+        Assertions.assertNotNull(tagsList);
         String tag = tagsList.get(0);
-        Assertions.assertTrue(Objects.equals(tag, "Veggies"));
+        Assertions.assertEquals("Veggies", tag);
         gardenTagRelationRepository.deleteAll();
         gardenTagRepository.deleteAll();
     }
@@ -154,13 +154,14 @@ public class U21_AddTagToGarden {
     public void i_try_to_add_a_tag_to_the_garden(String tag) throws Exception {
 
         mvcResultGardens = mockMVCGardens.perform(
-                        MockMvcRequestBuilders
-                                .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
-                                .param("tag", tag)
-                        ).andExpect(status().isOk()).andReturn();
+                MockMvcRequestBuilders
+                        .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
+                        .param("tag", tag))
+                .andExpect(status().isOk()).andReturn();
     }
-//    AC5
-    @When ("I enter a valid tag {string}")
+
+    // AC5
+    @When("I enter a valid tag {string}")
     public void i_enter_a_valid_tag(String tag) throws Exception {
         mvcResultGardens = mockMVCGardens.perform(
                 MockMvcRequestBuilders
@@ -174,7 +175,7 @@ public class U21_AddTagToGarden {
         gardenTagService.addGardenTag(new GardenTag(tag));
     }
 
-//    AC3
+    // AC3
     @And("I begin typing the tag {string}")
     public void i_begin_typing_a_tag(String query) throws Exception {
         gardenTagService.addGardenTag(new GardenTag("Garden"));
@@ -198,7 +199,8 @@ public class U21_AddTagToGarden {
     @Then("The following error message is displayed {string}")
     public void the_following_error_message_is_displayed(String errorMessage) {
 
-        String tagErrorText = mvcResultGardens.getModelAndView().getModelMap().getAttribute("tagErrorText").toString();
+        String tagErrorText = mvcResultGardens.getModelAndView().getModelMap().getAttribute("tagErrorText")
+                .toString();
 
         Assertions.assertEquals(errorMessage, tagErrorText);
 
@@ -212,14 +214,14 @@ public class U21_AddTagToGarden {
         Assertions.assertTrue(gardenTags.isEmpty());
 
     }
-// AC3
+
+    // AC3
     @Then("I see autocomplete options for existing tags")
-    public void i_see_autocomplete_options_for_existing_tags() throws JsonProcessingException, UnsupportedEncodingException {
+    public void i_see_autocomplete_options_for_existing_tags()
+            throws JsonProcessingException, UnsupportedEncodingException {
         assert tagResult != null;
         String tagListResponse = tagResult.getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(tagListResponse);
-
-        logger.info(tagListResponse);
 
         Assertions.assertEquals("Garden", jsonNode.get(0).get("tagName").asText());
         Assertions.assertEquals("Vegetable Garden", jsonNode.get(1).get("tagName").asText());
@@ -240,7 +242,7 @@ public class U21_AddTagToGarden {
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
     }
 
-//    AC5
+    // AC5
     @And("the tag shows up in future autocomplete suggestions")
     public void the_tag_shows_up_in_future_autocomplete_suggestions() throws Exception {
         String query = "Cabbage";
@@ -261,8 +263,7 @@ public class U21_AddTagToGarden {
         gardenTagRepository.deleteAll();
     }
 
-
-//    AC6, AC7
+    // AC6, AC7
     @And("The tag {string} is not shown in future autocomplete suggestions")
     public void the_tag_is_not_shown_in_future_autocomplete_suggestions(String query) throws Exception {
         String fetchUrl = "/tag/suggestions";
@@ -274,7 +275,6 @@ public class U21_AddTagToGarden {
         ).andReturn();
 
         String tagListResponse = tagResult.getResponse().getContentAsString();
-        logger.info(tagListResponse);
         Assertions.assertEquals("[]", tagListResponse);
     }
 
