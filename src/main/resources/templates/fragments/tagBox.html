@@ -1,11 +1,7 @@
-<div th:fragment="tagBox(tagName, isRemovable)">
+<div th:fragment="tagBox(tagName)">
     <span class="badge rounded-pill text-bg-success p-2"
           th:text="${tagName}"
           th:data-tag-name="${tagName}"
-          th:onclick="${isRemovable} ? 'removeTag(this)' : null"
-          th:classappend="${isRemovable} ? 'clickable-tag' : null"
-          th:attr="style=${isRemovable} ? 'cursor: pointer;' : null,
-                   onmouseover=${isRemovable} ? 'this.classList.replace(\'text-bg-success\', \'text-bg-danger\')' : null,
-                   onmouseout=${isRemovable} ? 'this.classList.replace(\'text-bg-danger\', \'text-bg-success\')' : null">
+          th:onclick="${isRemovable} ? 'removeTag(this)' : null">
     </span>
 </div>
