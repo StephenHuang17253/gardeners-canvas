@@ -65,7 +65,7 @@ class GardenFormControllerTest {
     @BeforeEach
     void setup() {
 
-        Mockito.when(profanityService.containsProfanity(Mockito.any())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.any(),Mockito.any())).thenReturn(false);
 
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)

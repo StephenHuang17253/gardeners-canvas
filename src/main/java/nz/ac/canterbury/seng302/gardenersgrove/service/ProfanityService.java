@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.component.ProfanityResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PriorityType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -41,6 +43,8 @@ public class ProfanityService {
     private static final long RATE_LIMIT_DELAY_MS = 1500;
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
     String emptyRegex = "^\\s*$";
+
+    Random random = new Random();
 
     /**
      * Service to handle tag database checks.
@@ -80,35 +84,110 @@ public class ProfanityService {
      * NormalizedText string, Misrepresentation boolean, Language string, Terms list, Status object and TrackingID string
      */
     public ProfanityResponseData moderateContent(String content) {
-        try {
+        try
+        {
+            logger.info("sending normal priority call to normal moderation queue");
             waitForRateLimit();
-            logger.info("Profanity service input: " + content);
-            String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
-            logger.debug("Sent profanity API request : " + new Date().getTime());
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(endPoint + "/contentmoderator/moderate/v1.0/ProcessText/Screen?text=" + encodedContent))
-                    .header("Content-Type", "text/plain")
-                    .header("Ocp-Apim-Subscription-Key", moderatorKey)
-                    .POST(HttpRequest.BodyPublishers.ofString(content))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("Profanity service response: : " + response.body());
-
-            JsonNode jsonObject = objectMapper.readTree(response.body());
-            ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
-
-            logger.info("Call limit passed: " + profanityResponse.isCallLimitExceeded());
-            return profanityResponse;
-
-        } catch (IOException | InterruptedException errorException) {
-            if (errorException.getMessage().contains("Moderate have exceeded call rate limit")) {
-                logger.info("Call limit reached!");
-            }
-            Thread.currentThread().interrupt();
-            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
-            return null; ///RETURN ERROR, FIX LATER
         }
+        catch (InterruptedException errorException)
+        {
+            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
+            Thread.currentThread().interrupt();
+            return null;
+        }
+        return  moderateContentApiCall(content);
+
+    }
+
+    /**
+     * Sends post a post request to the bad words API and then returns a JSON
+     * response. Experiences longer than average que times compared to normal function
+     *
+     * @param content The string for which profanity is checked.
+     * @return A return string from the api that has been processed. The return format contains: Original text string,
+     * NormalizedText string, Misrepresentation boolean, Language string, Terms list, Status object and TrackingID string
+     */
+    public ProfanityResponseData moderateContentLowPriority(String content) {
+        try
+        {
+            logger.info("Queuing low priority moderation call in low priority queue");
+            long nextCallSlot = nextFreeCallTimestamp.get();
+            long timeToWait = 0;
+            while (nextCallSlot > new Date().getTime())
+            {
+                timeToWait = nextCallSlot - new Date().getTime();
+                timeToWait = timeToWait + random.nextInt(100,300);
+                Thread.sleep(timeToWait);
+                nextCallSlot = nextFreeCallTimestamp.get();
+            }
+
+
+            logger.info("sending low priority call to normal moderation queue");
+            waitForRateLimit();
+            return  moderateContentApiCall(content);
+        }
+        catch (InterruptedException errorException)
+        {
+            logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
+            Thread.currentThread().interrupt();
+            return null;
+        }
+
+
+    }
+
+
+
+
+    private ProfanityResponseData moderateContentApiCall(String content)
+    {
+        boolean wasProfanityChecked = false;
+        int retryCounter = 0;
+        while (!wasProfanityChecked && retryCounter < 4)
+        {
+            try {
+
+                String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                logger.info("Sent profanity API request: {}", new Date().getTime());
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(endPoint + "/contentmoderator/moderate/v1.0/ProcessText/Screen?text=" + encodedContent))
+                        .header("Content-Type", "text/plain")
+                        .header("Ocp-Apim-Subscription-Key", moderatorKey)
+                        .POST(HttpRequest.BodyPublishers.ofString(content))
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                logger.info("Profanity service response: {}", response.body());
+
+                JsonNode jsonObject = objectMapper.readTree(response.body());
+                ProfanityResponseData profanityResponse = objectMapper.treeToValue(jsonObject, ProfanityResponseData.class);
+
+                logger.info("Call limit passed: " + profanityResponse.callLimitExceeded());
+
+                if (profanityResponse.callLimitExceeded())
+                {
+                    retryCounter += 1;
+                    logger.warn(String.format("Could not get profanity response due to ratelimit, retrying %d",retryCounter));
+                    waitForRateLimit();
+                }
+                else
+                {
+                    wasProfanityChecked = true;
+                    return profanityResponse;
+                }
+
+            } catch (IOException | InterruptedException errorException) {
+                if (errorException.getMessage().contains("Moderate have exceeded call rate limit")) {
+                    logger.info("Call limit reached!");
+                }
+                Thread.currentThread().interrupt();
+                logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s", errorException.getMessage()));
+                return null; ///RETURN ERROR, FIX LATER
+            }
+        }
+
+
+        return null;
     }
 
 
@@ -118,7 +197,31 @@ public class ProfanityService {
      * @param inputString The string to send to the content moderator API Which will check for any profanity.
      * @return True if terms has one or more bad words. If not found return false
      */
-    public boolean containsProfanity(String inputString) {
+    public boolean containsProfanity(String inputString, PriorityType priorityType) {
+
+        Boolean precheckResponse = containPriorityPrecheck(inputString);
+        if(precheckResponse != null)
+        {
+            return precheckResponse;
+        }
+
+        ProfanityResponseData returnedData;
+        if (priorityType == PriorityType.LOW)
+        {
+            returnedData = moderateContentLowPriority(inputString);
+            logger.info("Completed Low Priority Profanity Check");
+        }
+        else
+        {
+            returnedData = moderateContent(inputString);
+            logger.info("Completed Normal Priority Profanity Check");
+        }
+        return returnedData.hasProfanity();
+    }
+
+
+    private Boolean containPriorityPrecheck(String inputString)
+    {
         if (inputString.matches(emptyRegex)) {
             return false;
         }
@@ -130,18 +233,14 @@ public class ProfanityService {
         } else if (previousOccurrenceOfTag.stream().anyMatch(tagStatus -> tagStatus == TagStatus.APPROPRIATE)) {
             return false;
         }
-
-        ProfanityResponseData returnedData = moderateContent(inputString);
-        logger.info(returnedData.toString());
-
-        return returnedData.isHasProfanity();
+        return null;
     }
+
 
     /**
      * Handles profanity API rate limiting, when called instructs thread to wait for next available time slot.
      */
     private void waitForRateLimit() throws InterruptedException {
-        logger.debug("Scheduled new moderation call at " + new Date().getTime());
         long timeToWait = 0;
         boolean couldUpdate = false;
         while (!couldUpdate) {

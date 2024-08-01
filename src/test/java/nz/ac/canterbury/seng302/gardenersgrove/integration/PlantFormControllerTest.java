@@ -64,7 +64,7 @@ class PlantFormControllerTest {
     @BeforeAll
     void before_or_after_all() {
 
-        Mockito.when(profanityService.containsProfanity(Mockito.any())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.any(),Mockito.any())).thenReturn(false);
 
         userService.addUser(mockUser, "1es1P@ssword");
         LocalDate date1 = LocalDate.of(2024, 3, 27);

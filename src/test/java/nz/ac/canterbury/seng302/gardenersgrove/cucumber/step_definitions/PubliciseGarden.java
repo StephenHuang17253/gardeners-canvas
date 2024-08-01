@@ -101,11 +101,11 @@ public class PubliciseGarden {
         profanityService = Mockito.mock(ProfanityService.class);
         weatherService = Mockito.mock(WeatherService.class);
 
-        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(false);
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService, objectMapper, gardenTagService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService, objectMapper, gardenTagService,profanityService);
         GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
 
         mockMVCMyGarden = MockMvcBuilders.standaloneSetup(myGardensController).build();
