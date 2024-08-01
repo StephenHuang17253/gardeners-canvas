@@ -120,8 +120,8 @@ public class HomePageController {
                     "New Zealand",
                     15.0,
                     true,
-                    "39.147",
-                    "-119.741844",
+                    "-43.5214643",
+                    "172.5796159",
                     johnDoe);
             sampleGarden = gardenService.addGarden(sampleGarden);
 
