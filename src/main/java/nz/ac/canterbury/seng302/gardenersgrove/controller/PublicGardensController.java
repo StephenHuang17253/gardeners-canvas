@@ -107,15 +107,13 @@ public class PublicGardensController {
 
         model.addAttribute("paramString", paramString);
 
-        List<GardenTag> tags = new ArrayList<>();
+        List<Garden> matchingGardens;
 
-        if (appliedTags != null) {
-            tags = appliedTags.stream()
-                    .map(tagString -> gardenTagService.getByName(tagString).get())
-                    .toList();
+        if (appliedTags != null && !appliedTags.isEmpty()) {
+            matchingGardens = gardenTagService.getMatchingGardens(searchInput, appliedTags);
+        } else {
+            matchingGardens = gardenService.getMatchingGardens(searchInput);
         }
-
-        List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput, tags);
 
         int startIndex = 0;
         int endIndex = 0;

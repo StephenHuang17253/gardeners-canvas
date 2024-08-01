@@ -151,9 +151,14 @@ public class GardenTagService {
      * @param tagStatus new tag status
      */
     public void updateGardenTagStatus(String tagName, TagStatus tagStatus) {
-        List<GardenTag>  tagList = gardenTagRepository.findByTagNameContainsIgnoreCase(tagName);
+        List<GardenTag> tagList = gardenTagRepository.findByTagNameContainsIgnoreCase(tagName);
         tagList.forEach(item -> item.setTagStatus(tagStatus));
         gardenTagRepository.saveAll(tagList);
+    }
+
+    public List<Garden> getMatchingGardens(String searchValue, List<String> tags) {
+        String tagsString = String.join(",", tags);
+        return gardenTagRelationRepository.findByGardenNameContainsAndGardenHasTags(searchValue, tagsString);
     }
 
 
