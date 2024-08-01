@@ -215,8 +215,9 @@ public class PlantService {
             if (plantToDelete.getPlantPictureFilename() != null) {
                 fileService.deleteFile(plantToDelete.getPlantPictureFilename());
             }
+            Garden garden = plantToDelete.getGarden();
+            garden.getPlants().remove(plantToDelete);
             plantRepository.deleteById(plantId);
         }
-
     }
 }
