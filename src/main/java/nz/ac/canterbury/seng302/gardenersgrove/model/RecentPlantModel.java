@@ -52,7 +52,7 @@ public class RecentPlantModel {
         return ownerName;
     }
 
-    public String plantPictureFileName() {
+    public String getPlantPictureFileName() {
         return plantPictureFileName;
     }
 
