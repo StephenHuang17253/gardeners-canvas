@@ -247,7 +247,6 @@ public class HomePageController {
 
 
         HomePageLayout layout = user.getHomePageLayout();
-        logger.info(layout.toString());
         model.addAttribute("layout", layout);
 
         if (!recentGardens.isEmpty()) {
