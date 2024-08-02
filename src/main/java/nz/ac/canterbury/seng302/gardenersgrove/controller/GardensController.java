@@ -414,12 +414,7 @@ public class GardensController {
                 model.addAttribute("tagErrorText", tagResult);
             }
             if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
-                int userStrikes = -1;
-                try {
-                    userStrikes = securityService.handleStrikeUser(garden.getOwner());
-                } catch (MessagingException e) {
-                    throw new RuntimeException(e);
-                }
+                int userStrikes = securityService.handleStrikeUser(garden.getOwner());
                 logger.info("{} has received a strike", garden.getOwner().getFirstName());
                 logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), garden.getOwner().getStrikes());
                 model.addAttribute("tagErrorText", "This tag does not meet the language " +
@@ -636,11 +631,7 @@ public class GardensController {
             {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
-                try {
-                    securityService.handleStrikeUser(user);
-                } catch (MessagingException e) {
-                    throw new RuntimeException(e);
-                }
+                securityService.handleStrikeUser(user);
                 logger.info("{} has {} strikes", user.getFirstName(), user.getStrikes());
 
             }

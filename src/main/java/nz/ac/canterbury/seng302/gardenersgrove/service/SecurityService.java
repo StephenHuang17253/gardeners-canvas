@@ -35,9 +35,9 @@ public class SecurityService {
 
     Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
-    private static int NUM_STRIKES_FOR_WARN = 5;
+    private final static int NUM_STRIKES_FOR_WARN = 5;
 
-    private static int NUM_STRIKES_FOR_BAN = 5;
+    private final static int NUM_STRIKES_FOR_BAN = 6;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
@@ -161,17 +161,30 @@ public class SecurityService {
         }
     }
 
-    public int handleStrikeUser(User user) throws MessagingException {
+    /**
+     * Wrapper Method to encompass all the logic that may be required when striking a user
+     * @param user that is receiving the strike
+     * @return users total strikes
+     */
+    public int handleStrikeUser(User user) {
+
+        if (Objects.isNull(user.getId()) || Objects.isNull(userService.getUserById(user.getId()))) {
+            throw new IllegalArgumentException(String.format("Invalid user ID: %d", user.getId()));
+        }
         userService.strikeUser(user);
 
-        if (user.getStrikes() == NUM_STRIKES_FOR_WARN) {
-            emailService.sendTagBanWarningEmail(user);
-        } else if(user.getStrikes() == NUM_STRIKES_FOR_BAN) {
-            emailService.sendTagBanEmail(user);
-            // TODO: disable the account
+        try {
+            if (user.getStrikes() == NUM_STRIKES_FOR_WARN) {
+                emailService.sendTagBanWarningEmail(user);
+            } else if(user.getStrikes() == NUM_STRIKES_FOR_BAN) {
+                emailService.sendTagBanEmail(user);
+                // TODO: disable the account
+            }
+        } catch (MessagingException e) {
+            logger.error("Failed to send email for user {}: {}", user.getEmailAddress(), e.getMessage());
         }
-        return user.getStrikes();
 
+        return user.getStrikes();
     }
 
 }
