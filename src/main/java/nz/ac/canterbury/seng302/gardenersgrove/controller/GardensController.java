@@ -515,6 +515,7 @@ public class GardensController {
 
         if (plantPictureResult.valid() && !plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
+            securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
         } else {
             redirectAttributes.addAttribute("plantPictureError", plantPictureResult.toString());
         }
