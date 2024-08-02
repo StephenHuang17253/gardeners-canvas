@@ -50,6 +50,16 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
      */
     Optional<GardenTagRelation> findGardenTagRelationsByGardenIsAndTagIs(Garden garden, GardenTag tag);
 
+    /**
+     * Finds all matching gardens that meet the following criteria:
+     * The garden name or the name of any plant in the garden contains <i>search string</i>
+     * And at least one tag applied to the garden has a garden name that
+     * matches at least one of the tag names in tag string
+     * @param searchValue Garden name to match
+     * @param tagsString Tag names to match, should be a string representing a list of comma separate values
+     *                   e.g "<b>tag1,tag2,tag3</b>". should not contain brackets
+     * @return A list of garden type objects
+     */
     @Query("SELECT DISTINCT g FROM Garden g " +
        "JOIN GardenTagRelation gtr ON g.gardenId = gtr.garden.gardenId " +
        "JOIN GardenTag t ON gtr.tag.tagId = t.tagId " +
@@ -67,9 +77,4 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
      * @return list of GardenTagRelation objects
      */
     List<GardenTagRelation> findAll();
-
-
-
-
-
 }
