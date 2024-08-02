@@ -57,8 +57,8 @@ public class User {
     @Column
     private Integer strikes;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "homePageLayout_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "layout_id")
     private HomePageLayout homePageLayout;
 
     /**
@@ -130,6 +130,11 @@ public class User {
     public void setStrikes(int strikes) {
         this.strikes = strikes;
     }
+
+    public void setHomePageLayout(HomePageLayout homePageLayout) {
+        this.homePageLayout = homePageLayout;
+    }
+
     public Long getId() {
         return id;
     }
@@ -183,6 +188,10 @@ public class User {
 
     public int getStrikes() {
         return strikes;
+    }
+
+    public HomePageLayout getHomePageLayout() {
+        return homePageLayout;
     }
 
     /**

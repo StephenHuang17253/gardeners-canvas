@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -39,7 +41,6 @@ public class HomePageController {
     private final FriendshipService friendshipService;
     private final SecurityService securityService;
     private final UserInteractionService userInteractionService;
-    private final HomePageLayoutService homePageLayoutService;
 
     private static final int PAGE_SIZE = 5;
 
@@ -52,14 +53,13 @@ public class HomePageController {
     @Autowired
     public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
             FriendshipService friendshipService, SecurityService securityService,
-            UserInteractionService userInteractionService, HomePageLayoutService homePageLayoutService) {
+            UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
-        this.homePageLayoutService = homePageLayoutService;
     }
 
     /**
@@ -245,9 +245,7 @@ public class HomePageController {
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
 
-        HomePageLayout homePageLayout = homePageLayoutService.getLayoutByUserId(user.getId());
-
-        model.addAttribute("layout", homePageLayout);
+        model.addAttribute("layout", user.getHomePageLayout());
 
         if (!recentGardens.isEmpty()) {
             List<RecentGardenModel> recentGardensPage1 = recentGardens.subList(0,
@@ -267,5 +265,41 @@ public class HomePageController {
         model.addAttribute("recentFriends", sublistRecentFriends);
 
         return "mainPage";
+    }
+
+    @GetMapping("home/edit")
+    public String editHomePage(Model model) {
+        logger.info("GET /home/edit");
+        User user = securityService.getCurrentUser();
+        model.addAttribute("layout", user.getHomePageLayout());
+        return "editHomePage";
+    }
+
+    /**
+     * This function is called when a POST request is made to /home/edit it handles
+     * updating the home page layout
+     * 
+     * @param requestedFriends show the requested friends section boolean 
+     * @param acceptedFriends show the accepted friends section boolean
+     * @param recentPlants show the recent plants section boolean
+     * @param recentGardens show the recent gardens section boolean
+     * @param notifications show the notifications section boolean
+     * @param model the model to add attributes to
+     * @return redirect to /home
+     */
+    @PostMapping("home/edit")
+    public String saveHomePage(
+            @RequestParam boolean requestedFriends,
+            @RequestParam boolean acceptedFriends,
+            @RequestParam boolean recentPlants,
+            @RequestParam boolean recentGardens,
+            @RequestParam boolean notifications,
+            Model model) {
+        logger.info("POST /home/edit");
+        User user = securityService.getCurrentUser();
+        HomePageLayout newLayout = new HomePageLayout(requestedFriends, acceptedFriends, recentPlants, recentGardens,
+                notifications);
+        userService.updateHomePageLayout(user.getId(), newLayout);
+        return "redirect:/home";
     }
 }

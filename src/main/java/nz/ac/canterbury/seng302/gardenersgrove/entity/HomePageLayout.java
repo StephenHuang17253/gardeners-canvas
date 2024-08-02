@@ -5,18 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 
 @Entity
 public class HomePageLayout {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "layout_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne(mappedBy = "homePageLayout")
-    private User user;
 
     @Column
     private boolean requestedFriends;
@@ -33,23 +29,23 @@ public class HomePageLayout {
     @Column
     private boolean notifications;
 
-    public boolean isRequestedFriends() {
+    public boolean showRequestedFriends() {
         return requestedFriends;
     }
 
-    public boolean isAcceptedFriends() {
+    public boolean showAcceptedFriends() {
         return acceptedFriends;
     }
 
-    public boolean isRecentPlants() {
+    public boolean showRecentPlants() {
         return recentPlants;
     }
 
-    public boolean isRecentGardens() {
+    public boolean showRecentGardens() {
         return recentGardens;
     }
 
-    public boolean isNotifications() {
+    public boolean showNotifications() {
         return notifications;
     }
 
@@ -74,23 +70,25 @@ public class HomePageLayout {
     }
 
     /**
-     * JPA required no-args constructor
+     * Creates a new HomePageLayout object
+     * Also JPA required no-args constructor
+     * 
      */
     public HomePageLayout() {
+        // this.requestedFriends = true;
+        // this.acceptedFriends = true;
+        // this.recentPlants = true;
+        // this.recentGardens = true;
+        // this.notifications = true;
     }
 
-    /**
-     * Creates a new HomePageLayout object for the given user
-     * 
-     * @param user user to create the layout for
-     */
-    public HomePageLayout(User user) {
-        this.user = user;
-        this.requestedFriends = true;
-        this.acceptedFriends = true;
-        this.recentPlants = true;
-        this.recentGardens = true;
-        this.notifications = true;
+    public HomePageLayout(boolean requestedFriends, boolean acceptedFriends, boolean recentPlants,
+            boolean recentGardens, boolean notifications) {
+        this.requestedFriends = requestedFriends;
+        this.acceptedFriends = acceptedFriends;
+        this.recentPlants = recentPlants;
+        this.recentGardens = recentGardens;
+        this.notifications = notifications;
     }
 
 }

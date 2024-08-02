@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -266,6 +267,29 @@ public class UserService {
                 .map(this::getUserById)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Updates the home page layout of a user
+     * 
+     * @param id     id of the user to update layout for
+     * @param layout new layout to set
+     * @return updated user
+     */
+    public User updateHomePageLayout(Long id, HomePageLayout layout) {
+        User user = getUserById(id);
+        user.setHomePageLayout(layout);
+        return userRepository.save(user);
+    }
+    
+    public HomePageLayout getHomePageLayout(Long id) {
+        HomePageLayout layout = getUserById(id).getHomePageLayout();
+        
+        if (layout == null) {
+            layout = new HomePageLayout();
+        }
+
+        
     }
 
 }
