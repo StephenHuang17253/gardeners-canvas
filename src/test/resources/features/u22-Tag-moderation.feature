@@ -10,7 +10,7 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
   Scenario: AC1.1 - Given I am adding a valid tag, when I confirm the tag, then the tag is checked for offensive and
   or inappropriate words.
     Given I as user "dom@email.com" am logged in with "Password1!"
-    And I previouslly added a tag "Bad Language"
+    And I previously added a tag "Bad Language"
     And My Tag "Bad Language" contained profanity
     When I enter a valid tag "Bad Language"
     Then The tag is not added to the garden
