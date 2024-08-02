@@ -10,14 +10,9 @@ import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +27,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 @SpringBootTest
 public class WeatherMonitoring {
@@ -153,7 +150,7 @@ public class WeatherMonitoring {
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService,objectMapper,gardenTagService, profanityService);
+                weatherService,objectMapper,gardenTagService, profanityService, userService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
     }
