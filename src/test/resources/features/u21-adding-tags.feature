@@ -24,7 +24,7 @@ Feature: U21 (Adding tags to gardens) : As Inaya, I want to be able to browse ga
     Given I as user "jace@email.com" am logged in with "TestPassword10!"
     When I enter a valid tag "Cabbage Patch"
     Then the tag is "Cabbage Patch" added to my garden
-    And the tag shows up in future autocomplete suggestions
+    And the tag "Cabbage Patch" shows up in future autocomplete suggestions
 
   Scenario Outline: AC6 - Given I have entered invalid text (i.e. non-alphanumeric characters except spaces, dashes,
   underscore, and apostrophes), when I click the “+” button or press enter, then 

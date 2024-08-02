@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
@@ -41,5 +42,11 @@ public class U22_TagModeration {
             gardenTagService.addGardenTag(new GardenTag(tagName));
         }
 
+    }
+
+    @And("My Tag {string} is currently pending moderation")
+    public void myTagIsCurrentlyPendingModeration(String tagName) {
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(false);
+        gardenTagService.updateGardenTagStatus(tagName, TagStatus.PENDING);
     }
 }
