@@ -230,7 +230,7 @@ public class U21_AddTagToGarden {
         gardenTagRepository.deleteAll();
     }
 //    AC5
-    @Then("the tag is {string} added to my garden")
+    @Then("The tag is {string} added to my garden")
     public void the_tag_is_added_to_my_garden(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
@@ -242,7 +242,7 @@ public class U21_AddTagToGarden {
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
     }
 
-    @Then("the tag is {string} added to my garden as pending")
+    @Then("The tag is {string} added to my garden as pending")
     public void theTagIsAddedToMyGardenAsPending(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
@@ -254,7 +254,7 @@ public class U21_AddTagToGarden {
     }
 
     // AC5
-    @And("the tag {string} shows up in future autocomplete suggestions")
+    @And("The tag {string} shows up in future autocomplete suggestions")
     public void the_tag_shows_up_in_future_autocomplete_suggestions(String tagName) throws Exception {
         String query = tagName;
         String fetchUrl = "/tag/suggestions";

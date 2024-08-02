@@ -21,8 +21,8 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     And I previously added a tag "Good Language"
     And My Tag "Good Language" did not contain profanity
     When I enter a valid tag "Good Language"
-    Then the tag is "Good Language" added to my garden
-    And the tag "Good Language" shows up in future autocomplete suggestions
+    Then The tag is "Good Language" added to my garden
+    And The tag "Good Language" shows up in future autocomplete suggestions
 
   Scenario: AC2 - Given the submitted tag is evaluated for appropriateness, when it is flagged as inappropriate, then an
   error message tells me that the submitted word is not appropriate and the tag is not added to the list of user-defined tags.
@@ -39,7 +39,7 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     And I previously added a tag "Pending Tag"
     And My Tag "Pending Ta" is currently pending moderation
     When I enter a valid tag "Pending Tag"
-    Then the tag is "Pending Tag" added to my garden as pending
+    Then The tag is "Pending Tag" added to my garden as pending
     And The tag "Pending Tag" is not shown in future autocomplete suggestions
 
   Scenario: AC5 - Given the evaluation of a user-defined tag was delayed, when the tag has been evaluated as
