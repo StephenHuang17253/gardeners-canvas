@@ -3,7 +3,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
@@ -18,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -106,7 +106,9 @@ class ManageFriendsControllerIntegrationTest {
         }
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("userFriends");
         for (int i = 0; i < friendsList.size(); i++) {
             Assertions.assertEquals(friendsList.get(i).getFriendName(), result.get(i).getFriendName());
@@ -130,7 +132,9 @@ class ManageFriendsControllerIntegrationTest {
         }
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("userFriends");
         for (int i = 0; i < friendsList.size(); i++) {
             Assertions.assertEquals(friendsList.get(i).getFriendName(), result.get(i).getFriendName());
@@ -147,7 +151,9 @@ class ManageFriendsControllerIntegrationTest {
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/manage-friends"))
                 .andExpect(status().isOk()).andReturn();
-        List<FriendModel> result = (List<FriendModel>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> result = (List<FriendModel>) model.getModelMap()
                 .getAttribute("userFriends");
         Assertions.assertEquals(0, result.size());
 

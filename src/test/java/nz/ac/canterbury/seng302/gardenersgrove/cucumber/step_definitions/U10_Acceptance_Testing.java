@@ -10,7 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -75,7 +76,7 @@ public class U10_Acceptance_Testing {
     public void before_or_after_all() {
         profanityService = Mockito.mock(ProfanityService.class);
 
-        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(false);
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
@@ -88,14 +89,14 @@ public class U10_Acceptance_Testing {
     }
 
     @Given("{string} {string}, {int} is a user with email {string} and password {string}")
-    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail,
+    public void iAmAUserWithEmailAndPassword(String firstName, String lastName, Integer age, String userEmail,
             String userPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
         LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
 
-        User user = new User(firstName, LastName, userEmail, dateOfBirth);
+        User user = new User(firstName, lastName, userEmail, dateOfBirth);
         user.setVerified(true);
         userService.addUser(user, userPassword);
         Assertions.assertNotNull(userService.getUserByEmail(userEmail));
@@ -112,8 +113,8 @@ public class U10_Acceptance_Testing {
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
-        gardenLongitude = garden.getGardenLongitude();
-        gardenLatitude = garden.getGardenLatitude();
+        gardenLongitude = "-43.5214643";
+        gardenLatitude = "172.5796159";
     }
 
     @When("I click the edit garden button")
@@ -129,7 +130,9 @@ public class U10_Acceptance_Testing {
 
     @Then("I see the edit garden form where all the details are prepopulated")
     public void iSeeTheEditGardenPageWhereAllTheDetailsArePrepopulated() {
-        ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
+        ModelAndView model = editGardenResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
         Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
@@ -144,7 +147,9 @@ public class U10_Acceptance_Testing {
                         .get(gardenUrl)
 
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
+        ModelAndView model = editGardenResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
         Assertions.assertEquals(modelMap.getAttribute("gardenDescription"), expectedGarden.getGardenDescription());

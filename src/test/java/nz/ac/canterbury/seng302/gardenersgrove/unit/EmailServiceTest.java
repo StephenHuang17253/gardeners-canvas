@@ -5,12 +5,9 @@ import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.SimpleMailMessage;
@@ -19,7 +16,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.io.IOException;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +39,7 @@ class EmailServiceTest {
         templateEngine = mock(TemplateEngine.class);
         when(templateEngine.process(Mockito.anyString(), Mockito.any(Context.class))).thenReturn("Test Body");
 
-        emailService = spy(new EmailService(mailSender, templateEngine,"test@sender.com","http://test/"));
+        emailService = spy(new EmailService(mailSender, templateEngine, "test@sender.com", "http://test/"));
 
     }
 
@@ -57,7 +53,7 @@ class EmailServiceTest {
 
         emailService.sendPlaintextEmail(toEmail, subject, body);
 
-        verify(mailSender,  timeout(1000).times(1)).send(captor.capture());
+        verify(mailSender, timeout(1000).times(1)).send(captor.capture());
 
         SimpleMailMessage sentMessage = captor.getValue();
         assertEquals(toEmail, sentMessage.getTo()[0]);
@@ -69,7 +65,6 @@ class EmailServiceTest {
     void testSendHTMLEmail() throws MessagingException {
         String toEmail = "test@example.com";
         String subject = "Test Subject";
-        String body = "Test Body";
 
         ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
 
@@ -80,12 +75,12 @@ class EmailServiceTest {
         context.setVariable("tokenString", "testTokenString");
         context.setVariable("lifetime", "testLifeTime");
 
-        emailService.sendHTMLEmail(toEmail, subject,  template, context);
+        emailService.sendHTMLEmail(toEmail, subject, template, context);
 
         verify(mailSender, timeout(1000).times(1)).send(captor.capture());
-        // A wanted but not invoked error here usually means that the asynchronous thread sending the email did not
+        // A wanted but not invoked error here usually means that the asynchronous
+        // thread sending the email did not
         // do so in time before it was expected
-
 
         MimeMessage sentMessage = captor.getValue();
         assertEquals(toEmail, sentMessage.getAllRecipients()[0].toString());
@@ -98,7 +93,8 @@ class EmailServiceTest {
 
         ArgumentCaptor<Context> captor = ArgumentCaptor.forClass(Context.class);
 
-        doNothing().when(emailService).sendHTMLEmail(Mockito.anyString(),Mockito.anyString(),Mockito.anyString(), Mockito.any());
+        doNothing().when(emailService).sendHTMLEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.any());
         Token mockToken = Mockito.mock(Token.class);
         User mockUser = Mockito.mock(User.class);
         Duration mockDuration = Mockito.mock(Duration.class);
@@ -113,13 +109,15 @@ class EmailServiceTest {
 
         emailService.sendResetPasswordEmail(mockToken);
 
-        verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"),eq("Link to Reset Password to Gardener's Grove!"),
-                eq("generalEmail"),captor.capture());
+        verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"),
+                eq("Link to Reset Password to Gardener's Grove!"),
+                eq("generalEmail"), captor.capture());
 
         Context capturedContex = captor.getValue();
 
         assertEquals("Test User", capturedContex.getVariable("username"));
-        assertEquals(String.format("Click the link below to reset your password. %n This link expires in 10 minutes."), capturedContex.getVariable("mainBody"));
+        assertEquals(String.format("Click the link below to reset your password. %n This link expires in 10 minutes."),
+                capturedContex.getVariable("mainBody"));
         assertEquals("http://test/reset-password/TestTokenString", capturedContex.getVariable("url"));
         assertEquals("RESET PASSWORD", capturedContex.getVariable("urlText"));
 
@@ -130,7 +128,8 @@ class EmailServiceTest {
 
         ArgumentCaptor<Context> captor = ArgumentCaptor.forClass(Context.class);
 
-        doNothing().when(emailService).sendHTMLEmail(Mockito.anyString(),Mockito.anyString(),Mockito.anyString(), Mockito.any());
+        doNothing().when(emailService).sendHTMLEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.any());
         User mockUser = Mockito.mock(User.class);
         Duration mockDuration = Mockito.mock(Duration.class);
 
@@ -141,13 +140,14 @@ class EmailServiceTest {
 
         emailService.sendPasswordResetConfirmationEmail(mockUser);
 
-        verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"),eq("Your Password Has Been Updated"),
-                eq("generalEmail"),captor.capture());
+        verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"), eq("Your Password Has Been Updated"),
+                eq("generalEmail"), captor.capture());
 
         Context capturedContex = captor.getValue();
 
         assertEquals("Test User", capturedContex.getVariable("username"));
-        assertEquals("This email is to confirm that your Gardener's Grove account's password has been updated", capturedContex.getVariable("mainBody"));
+        assertEquals("This email is to confirm that your Gardener's Grove account's password has been updated",
+                capturedContex.getVariable("mainBody"));
 
     }
 
@@ -156,7 +156,8 @@ class EmailServiceTest {
 
         ArgumentCaptor<Context> captor = ArgumentCaptor.forClass(Context.class);
 
-        doNothing().when(emailService).sendHTMLEmail(Mockito.anyString(),Mockito.anyString(),Mockito.anyString(), Mockito.any());
+        doNothing().when(emailService).sendHTMLEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.any());
         Token mockToken = Mockito.mock(Token.class);
         User mockUser = Mockito.mock(User.class);
         Duration mockDuration = Mockito.mock(Duration.class);
@@ -171,8 +172,8 @@ class EmailServiceTest {
 
         emailService.sendRegistrationEmail(mockToken);
 
-        verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"),eq("Welcome to Gardener's Grove!"),
-                eq("registrationEmail"),captor.capture());
+        verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"), eq("Welcome to Gardener's Grove!"),
+                eq("registrationEmail"), captor.capture());
 
         Context capturedContex = captor.getValue();
 
