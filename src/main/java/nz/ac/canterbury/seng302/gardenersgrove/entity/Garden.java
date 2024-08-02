@@ -74,6 +74,10 @@ public class Garden {
     @CreatedDate
     private LocalDateTime lastWaterCheck;
 
+    @Column(name = "last_location_update")
+    @CreatedDate
+    private LocalDateTime lastLocationUpdate;
+
     /**
      * JPA required no-args constructor
      */
@@ -106,6 +110,9 @@ public class Garden {
         this.isPublic = isPublic;
         this.owner = owner;
         this.creationDate = LocalDateTime.now();
+        this.lastLocationUpdate = LocalDateTime.now();
+        this.lastWaterCheck = LocalDateTime.of(2023, 12, 12, 11, 11);
+        this.needsWatering = false;
     }
 
     /**
@@ -136,6 +143,7 @@ public class Garden {
         this.owner = owner;
         this.lastWaterCheck = LocalDateTime.of(2023, 12, 12, 11, 11);
         this.needsWatering = false;
+        this.lastLocationUpdate = LocalDateTime.now();;
     }
 
 
@@ -247,6 +255,32 @@ public class Garden {
         this.lastWaterCheck = lastWaterCheck;
     }
 
+    public LocalDateTime getLastLocationUpdate() {
+        return lastLocationUpdate;
+    }
+
+    /**
+     * Sets the date at which the location was last changed for a garden
+     *
+     * @param lastLocationUpdate date for when the location was changed
+     */
+    public void setLastLocationUpdate(LocalDateTime lastLocationUpdate) {
+        this.lastLocationUpdate = lastLocationUpdate;
+    }
+
+    public void updateLocation(String gardenLatitude, String gardenLongitude) {
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
+        this.lastLocationUpdate = LocalDateTime.now();
+    }
+
+    public boolean getNeedsWatering() {
+        return needsWatering;
+    }
+
+    public LocalDateTime getLastWaterCheck() {
+        return lastWaterCheck;
+    }
 
     /**
      * Retrieves a garden's location which is a concatenation of its address

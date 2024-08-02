@@ -54,11 +54,11 @@
                 </svg>
             </a>
             <div class="d-flex flex-row flex-wrap gap-3 mb-3">
-                <div class="container offcanvas offcanvas-start position-fixed z-index-1050" style="top: 9vh" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+                <div class="container offcanvas offcanvas-start" style="top: 9vh" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
                     <h1 class="display-4">Notifications</h1>
                     <p class="lead">These gardens may need watering:</p>
-                    <div class="row">
-                        <div th:each="garden : ${gardensNeedWatering}" class="col-md-4 mb-3">
+                    <div class="col">
+                        <div th:each="garden : ${gardensNeedWatering}" class="col mb-3">
                             <a th:href="@{/my-gardens/{gardenId}(gardenId=${garden.gardenId})}" class="card-link">
                                 <div class="card h-100">
                                     <div class="card-body offcanvas-body">

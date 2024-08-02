@@ -134,7 +134,7 @@ public class WeatherService {
         resetPermitsIfNeeded();
 
         if (chunk.size() > semaphore.availablePermits()) {
-            logger.info("Exceeded location API rate limit for batch request.");
+            logger.info("Exceeded weather API rate limit for batch request.");
             throw new UnavailableException("429");
         }
 
