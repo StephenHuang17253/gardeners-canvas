@@ -447,7 +447,7 @@ public class PlantFormController {
     /**
      * Cancels copying of plant and deletes copy from database
      *
-     * @param gardenIdOfOriginalPlant garden that was being copied from
+     * @param gardenIdOfOriginalPlant garden that was being copied from (used to return to previous garden page)
      * @param plantId                 id of plant to be deleted
      * @param response                error page
      * @return redirect to another page

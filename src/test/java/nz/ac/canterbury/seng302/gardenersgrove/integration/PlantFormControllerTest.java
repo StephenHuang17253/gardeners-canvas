@@ -134,6 +134,12 @@ class PlantFormControllerTest {
                 date1,
                 testGarden.getGardenId()));
 
+        plantList.add(plantService.addPlant("DeleteMe",
+                1,
+                "testDescription2",
+                date1,
+                anotherGarden2.getGardenId()));
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -249,6 +255,29 @@ class PlantFormControllerTest {
     }
 
     @Test
+    @WithMockUser("differentEmail@gmail.com")
+    void cancelImportPlant_validPlant_plantDeleted() throws Exception {
+        Long idOfPlantToBeDeleted = gardenService.getGardenById(anotherGarden2.getGardenId()).get().getPlants().get(0).getPlantId();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/import-plant/cancel").
+                        param("gardenIdOfOriginalPlant", String.valueOf(testGarden.getGardenId()))
+                        .param("plantId", String.valueOf(idOfPlantToBeDeleted)))
+                .andExpect(status().is3xxRedirection());
+        Assertions.assertTrue(plantService.findById(idOfPlantToBeDeleted).isEmpty());
+    }
+
+
+    @Test
+    @WithMockUser(username = "test@gmail.com")
+    void cancelImportPlant_invalidPlant_returns404() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/import-plant/cancel")
+                        .param("gardenIdOfOriginalPlant", String.valueOf(anotherGarden.getGardenId()))
+                        .param("plantId", String.valueOf(0L)))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
     @WithMockUser(username = "test@gmail.com")
     void confirmImportPlant_validInput_returnForm() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/import-plant/confirm").
@@ -285,7 +314,7 @@ class PlantFormControllerTest {
     @Test
     @WithMockUser(username = "test@gmail.com")
     void confirmImportPlant_invalidPlant_returns404() throws Exception {
-        mockMvc.perform(get("/import-plant/confirm").
+        mockMvc.perform(MockMvcRequestBuilders.get("/import-plant/confirm").
                         param("gardenId", String.valueOf(testGarden.getGardenId()))
                         .param("plantId", String.valueOf(0L))
                         .param("gardenIdOfOriginalPlant", String.valueOf(anotherGarden.getGardenId())))
