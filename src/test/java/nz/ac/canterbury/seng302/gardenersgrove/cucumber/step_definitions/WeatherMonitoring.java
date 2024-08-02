@@ -35,9 +35,6 @@ import org.springframework.web.servlet.ModelAndView;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 @SpringBootTest
 public class WeatherMonitoring {
@@ -48,6 +45,9 @@ public class WeatherMonitoring {
 
     @Autowired
     public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
     public GardenTagRelationRepository gardenTagRelationRepository;
@@ -145,7 +145,7 @@ public class WeatherMonitoring {
 
     @Before
     public void before_or_after_all() {
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService,

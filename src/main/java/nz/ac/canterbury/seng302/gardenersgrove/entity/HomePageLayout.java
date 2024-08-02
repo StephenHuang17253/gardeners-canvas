@@ -75,13 +75,22 @@ public class HomePageLayout {
      * 
      */
     public HomePageLayout() {
-        // this.requestedFriends = true;
-        // this.acceptedFriends = true;
-        // this.recentPlants = true;
-        // this.recentGardens = true;
-        // this.notifications = true;
+        this.requestedFriends = true;
+        this.acceptedFriends = true;
+        this.recentPlants = true;
+        this.recentGardens = true;
+        this.notifications = true;
     }
 
+    /**
+     * Creates a new home page layout with the given section visibilities
+     * 
+     * @param requestedFriends
+     * @param acceptedFriends
+     * @param recentPlants
+     * @param recentGardens
+     * @param notifications
+     */
     public HomePageLayout(boolean requestedFriends, boolean acceptedFriends, boolean recentPlants,
             boolean recentGardens, boolean notifications) {
         this.requestedFriends = requestedFriends;
@@ -89,6 +98,17 @@ public class HomePageLayout {
         this.recentPlants = recentPlants;
         this.recentGardens = recentGardens;
         this.notifications = notifications;
+    }
+
+    @Override
+    public String toString() {
+        return "Garden{" +
+                "requestedFriends='" + requestedFriends + "\'" +
+                ", acceptedFriends='" + acceptedFriends + '\'' +
+                ", recentPlants='" + recentPlants + '\'' +
+                ", recentGardens='" + recentGardens + '\'' +
+                ", notifications='" + notifications + '\'' +
+                '}';
     }
 
 }

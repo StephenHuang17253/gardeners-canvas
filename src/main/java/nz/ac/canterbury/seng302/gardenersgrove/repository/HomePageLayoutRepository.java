@@ -15,12 +15,4 @@ public interface HomePageLayoutRepository extends CrudRepository<HomePageLayout,
      * @param id the layouts's id
      */
     Optional<HomePageLayout> findById(long id);
-
-    /**
-     * Find HomePageLayout by user id
-     *
-     * @param userId the user's id
-     * @return optional layout
-     */
-    Optional<HomePageLayout> findByUserId(long userId);
 }

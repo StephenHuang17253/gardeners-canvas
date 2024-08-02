@@ -4,6 +4,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserInteractionRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
@@ -37,6 +38,9 @@ class UserInteractionServiceIntergrationTest {
     @Autowired
     private UserInteractionRepository userInteractionRepository;
 
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
     private UserInteractionService userInteractionService;
 
     private UserService userService;
@@ -51,14 +55,14 @@ class UserInteractionServiceIntergrationTest {
     private static User user2;
     private static User user3;
 
-    private final static Long MAX_LONG = 1000L;
+    private static final Long MAX_LONG = 1000L;
 
     private List<Garden> gardenList = new ArrayList<>();
     private List<Plant> plantList = new ArrayList<>();
 
     @BeforeAll
     void before_or_after_all() {
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         userInteractionService = new UserInteractionService(userInteractionRepository, userService, gardenService,
                 plantService);
         user1 = new User("John", "Doe", "jhonDoe@UserInteractionServiceIntergrationTest.com", LocalDate.of(2003, 5, 2));

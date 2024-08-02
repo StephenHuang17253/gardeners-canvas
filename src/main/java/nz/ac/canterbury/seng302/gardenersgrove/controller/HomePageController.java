@@ -245,7 +245,10 @@ public class HomePageController {
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
 
-        model.addAttribute("layout", user.getHomePageLayout());
+
+        HomePageLayout layout = user.getHomePageLayout();
+        logger.info(layout.toString());
+        model.addAttribute("layout", layout);
 
         if (!recentGardens.isEmpty()) {
             List<RecentGardenModel> recentGardensPage1 = recentGardens.subList(0,
@@ -271,7 +274,8 @@ public class HomePageController {
     public String editHomePage(Model model) {
         logger.info("GET /home/edit");
         User user = securityService.getCurrentUser();
-        model.addAttribute("layout", user.getHomePageLayout());
+        HomePageLayout layout = user.getHomePageLayout();
+        model.addAttribute("layout", layout);
         return "editHomePage";
     }
 
@@ -289,11 +293,11 @@ public class HomePageController {
      */
     @PostMapping("home/edit")
     public String saveHomePage(
-            @RequestParam boolean requestedFriends,
-            @RequestParam boolean acceptedFriends,
-            @RequestParam boolean recentPlants,
-            @RequestParam boolean recentGardens,
-            @RequestParam boolean notifications,
+            @RequestParam(name = "requestedFriends", required = false, defaultValue = "false") boolean requestedFriends,
+            @RequestParam(name = "acceptedFriends", required = false, defaultValue = "false") boolean acceptedFriends,
+            @RequestParam(name = "recentPlants", required = false, defaultValue = "false") boolean recentPlants,
+            @RequestParam(name = "recentGardens", required = false, defaultValue = "false") boolean recentGardens,
+            @RequestParam(name = "notifications", required = false, defaultValue = "false") boolean notifications,
             Model model) {
         logger.info("POST /home/edit");
         User user = securityService.getCurrentUser();

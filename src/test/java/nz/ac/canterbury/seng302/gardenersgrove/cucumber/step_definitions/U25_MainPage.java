@@ -23,6 +23,7 @@ import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 import java.util.List;
@@ -50,6 +51,9 @@ public class U25_MainPage {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public SecurityService securityService;
 
     @Autowired
@@ -74,7 +78,7 @@ public class U25_MainPage {
     @Before
     public void before_or_after_all() {
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
