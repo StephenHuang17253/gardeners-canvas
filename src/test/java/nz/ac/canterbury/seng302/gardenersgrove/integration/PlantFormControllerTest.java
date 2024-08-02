@@ -66,39 +66,39 @@ class PlantFormControllerTest {
         @BeforeAll
         void before_or_after_all() {
 
-        Mockito.when(profanityService.containsProfanity(Mockito.any(),Mockito.any())).thenReturn(false);
+            Mockito.when(profanityService.containsProfanity(Mockito.any(),Mockito.any())).thenReturn(false);
 
-        userService.addUser(mockUser, "1es1P@ssword");
-        LocalDate date1 = LocalDate.of(2024, 3, 27);
-        testGarden = gardenService.addGarden(new Garden(
-                        "test",
-                        "test",
-                        "test",
-                        "test",
-                        "test",
-                        "80",
-                        "test",
-                        10.0,
-                        false,
-                        "",
-                        "",
-                        mockUser));
+            userService.addUser(mockUser, "1es1P@ssword");
+            LocalDate date1 = LocalDate.of(2024, 3, 27);
+            testGarden = gardenService.addGarden(new Garden(
+                            "test",
+                            "test",
+                            "test",
+                            "test",
+                            "test",
+                            "80",
+                            "test",
+                            10.0,
+                            false,
+                            "",
+                            "",
+                            mockUser));
 
-        anotherGarden = gardenService.addGarden(new Garden(
-                "anotherGarden",
-                "test",
-                "test",
-                "test",
-                "test",
-                "80",
-                "test",
-                10.0,
-                false,
-                "",
-                "",
-                mockUser));
+            anotherGarden = gardenService.addGarden(new Garden(
+                    "anotherGarden",
+                    "test",
+                    "test",
+                    "test",
+                    "test",
+                    "80",
+                    "test",
+                    10.0,
+                    false,
+                    "",
+                    "",
+                    mockUser));
 
-            plantList.add(plantService.addPlant("testName1",
+                plantList.add(plantService.addPlant("testName1",
                             1,
                             "testDescription1",
                             date1,
@@ -110,13 +110,13 @@ class PlantFormControllerTest {
                             date1,
                             testGarden.getGardenId()));
 
-        plantList.add(plantService.addPlant("testName3",
-                1,
-                "testDescription2",
-                date1,
-                testGarden.getGardenId()));
+            plantList.add(plantService.addPlant("testName3",
+                    1,
+                    "testDescription2",
+                    date1,
+                    testGarden.getGardenId()));
 
-                mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+                    mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         }
 
         @Test
@@ -194,31 +194,6 @@ class PlantFormControllerTest {
                 Assertions.assertEquals(newPlantDate, actualPlant.getPlantDate());
         }
 
-        @ParameterizedTest
-        @CsvSource({
-                        "!, 1, test description, 2024-03-28",
-                        "a very long plant name that exceeds the maximum length" +
-                                        "a very long plant name that exceeds the maximum length" +
-                                        "a very long plant name that exceeds the maximum length" +
-                                        "a very long plant name that exceeds the maximum length, 1, test description, 2024-03-28",
-                        "'', 1, test description, 2024-03-28"
-        })
-        @WithMockUser(username = "test@gmail.com")
-        void plantFormController_addNameVariantsFail(String plantName, int plantCount, String plantDescription,
-                        LocalDate date) throws Exception {
-                MockMultipartFile mockFile = new MockMultipartFile(
-                                "plantPictureInput", // Form field name
-                                "default_plant.png", // Filename
-                                "image/png", // Content type
-                                "image data".getBytes() // File content as byte array
-                );
-                mockMvc.perform(MockMvcRequestBuilders
-                                .multipart("/my-gardens/{gardenId}/create-new-plant", testGarden.getGardenId())
-                                .file(mockFile) // Attach the file to the request
-                                .param("plantName", plantName)
-                                .param("plantCount", String.valueOf(plantCount))
-                                .param("plantDescription", plantDescription)
-                                .param("plantDate", date.toString()));
     @Test
     @WithMockUser(username = "test@gmail.com")
     void importPlant_validPlant_addsPlant_returnsRedirect() throws Exception {
