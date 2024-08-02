@@ -45,6 +45,8 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -219,53 +221,26 @@ public class U25_MainPage {
     }
 
     @When("I have garden called {string} that needs watering for user {string}")
-    public void iHaveGardenThatNeedsWateringForUser(String gardenName, String email) throws JsonProcessingException, UnavailableException {
+    public void iHaveGardenThatNeedsWateringForUser(String gardenName, String email) throws Exception {
         User user = userService.getUserByEmail(email);
         Garden targetGarden = new Garden(gardenName, "This garden is thirsty", "", "", "", "", "", 0.0, false, "",
                 "", user);
         gardenService.addGarden(targetGarden);
 
-        List<Garden> wateringList = new ArrayList<>();
-        wateringList.add(targetGarden);
+        targetGarden.setNeedsWatering(true);
+        Optional<Garden> testGarden = gardenService.getGardenById(targetGarden.getGardenId());
+        gardenService.changeGardenNeedsWatering(testGarden.get().getGardenId(), true);
 
-        WeatherResponseData mockedWeatherData = mock(WeatherResponseData.class);
-
-        DailyWeather sunnyWeatherToday = new DailyWeather("sunny.png", LocalDate.now(), "Sunny");
-        DailyWeather sunnyWeatherYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(1), "Sunny");
-        DailyWeather sunnyWeatherBeforeYesterday = new DailyWeather("sunny.png", LocalDate.now().minusDays(2), "Sunny");
-
-        List<DailyWeather> mockWeatherData = new ArrayList<>();
-        mockWeatherData.add(sunnyWeatherBeforeYesterday);
-        mockWeatherData.add(sunnyWeatherYesterday);
-        mockWeatherData.add(sunnyWeatherToday);
-
-        List<WeatherResponseData> sampleDataList = new ArrayList<>();
-        sampleDataList.add(weatherData);
-
-        Mockito.when(mockedWeatherData.getRetrievedWeatherData()).thenReturn(mockWeatherData);
-        Mockito.when(weatherService.getWeather(anyString(), anyString())).thenReturn(mockedWeatherData);
-
-        //doReturn(sampleDataList).when(weatherService).getWeatherForGardens(any());
-        when(weatherService.getWeatherForGardens(any())).thenReturn(sampleDataList);
-
-        List<WeatherResponseData> result = weatherService.getWeatherForGardens(wateringList);
-
-        logger.info("List: " + result.getFirst().getRetrievedWeatherData().getFirst());
-
-        assertNotNull(result, "The mocked method should not return null");
-        assertEquals(1, result.size(), "The mocked method should return a list with one element");
+        mvcResult = mockMVC.perform(get("/home")).andExpect(status().isOk()).andReturn();
     }
 
     @Then("I can see that {string} need watering in the watering notifications for {string}")
-    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) {
-
-//        List<Garden> expectedGardens = gardenService.getMatchingGardens(gardenName);
-//        Garden expectedGarden = expectedGardens.get(0);
-
+    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) throws Exception {
+        User user = userService.getUserByEmail(email);
         List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
 
         assertNotNull(gardensNeedWatering, "The list of gardens that need water should not be null");
-        assertTrue(gardensNeedWatering.contains(targetGarden));
+        assertEquals(gardensNeedWatering.getFirst().toString(), user.getGardens().getFirst().toString());
     }
 
 }
