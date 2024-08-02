@@ -46,15 +46,13 @@ import java.util.stream.Collectors;
 public class GardensController {
 
     Logger logger = LoggerFactory.getLogger(GardensController.class);
-
     private final GardenService gardenService;
     private final SecurityService securityService;
     private final PlantService plantService;
     private final WeatherService weatherService;
     private final GardenTagService gardenTagService;
-
     private final ProfanityService profanityService;
-
+    private final UserService userService;
     private final ObjectMapper objectMapper;
 
     private static final int MAX_REQUESTS_PER_SECOND = 10;
@@ -69,17 +67,18 @@ public class GardensController {
      * Constructor for the GardensController with {@link Autowired} to connect
      * this controller with other services
      *
-     * @param gardenService   service to access garden repository
-     * @param securityService service to access security methods
-     * @param plantService    service to access plant repository
-     * @param weatherService    service to perform weather api calls
-     * @param objectMapper    used for JSON conversion
-     * @param gardenTagService    service to access tag repository
+     * @param gardenService         service to access garden repository
+     * @param securityService       service to access security methods
+     * @param plantService          service to access plant repository
+     * @param weatherService        service to perform weather api calls
+     * @param objectMapper          used for JSON conversion
+     * @param gardenTagService      service to access tag repository
+     * @param userService           service to access user repository
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
-                             ProfanityService profanityService) {
+                             WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
+                             ProfanityService profanityService, UserService userService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
@@ -87,6 +86,7 @@ public class GardensController {
         this.gardenTagService = gardenTagService;
         this.objectMapper = objectMapper;
         this.profanityService = profanityService;
+        this.userService = userService;
     }
 
     /**
@@ -391,7 +391,7 @@ public class GardensController {
 
             } else {
                 gardenTagService.addGardenTag(gardenTag);
-                asynchronousTagProfanityCheck(tag);
+                asynchronousTagProfanityCheck(tag, garden.getOwner(), model);
             }
 
             gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
@@ -412,8 +412,10 @@ public class GardensController {
             } else if (!tagResult.valid()) {
                 model.addAttribute("tagErrorText", tagResult);
             }
-            if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
-            {
+            if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
+                userService.strikeUser(garden.getOwner());
+                logger.info("{} has received a strike", garden.getOwner().getFirstName());
+                logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), garden.getOwner().getStrikes());
                 model.addAttribute("tagErrorText", "This tag does not meet the language " +
                         "standards for Gardener's Grove. A warning strike has been added to your account");
             }
@@ -611,7 +613,7 @@ public class GardensController {
         return gardenTagService.getAllSimilar(query);
     }
 
-    private void asynchronousTagProfanityCheck(String tagName)
+    private void asynchronousTagProfanityCheck(String tagName, User user, Model model)
     {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
@@ -623,6 +625,8 @@ public class GardensController {
             {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
+                userService.strikeUser(user);
+                logger.info("{} has {} strikes", user.getFirstName(), user.getStrikes());
 
             }
         }));

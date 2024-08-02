@@ -105,7 +105,7 @@ public class U21_AddTagToGarden {
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
         GardensController gardensController = new GardensController(gardenService, securityService,
-                plantService, weatherService, objectMapper, gardenTagService, profanityService);
+                plantService, weatherService, objectMapper, gardenTagService, profanityService, userService);
 
         mockMVCGardens = MockMvcBuilders.standaloneSetup(gardensController).build();
 
@@ -170,8 +170,8 @@ public class U21_AddTagToGarden {
         ).andReturn();
     }
 
-    @When ("I have a tag {string}")
-    public void i_previously_had_a_tag(String tag) throws Exception {
+    @When ("I previously added a tag {string}")
+    public void i_previously_added_a_tag(String tag) throws Exception {
         gardenTagService.addGardenTag(new GardenTag(tag));
     }
 
