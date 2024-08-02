@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -13,20 +14,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -59,6 +64,8 @@ class PlantFormControllerTest {
 
     User mockUser = new User("Test", "Test", "test@gmail.com", LocalDate.now());
     Garden testGarden;
+
+    Garden anotherGarden;
     List<Plant> plantList = new ArrayList<>();
 
     @BeforeAll
@@ -82,6 +89,20 @@ class PlantFormControllerTest {
                 "",
                 mockUser));
 
+        anotherGarden = gardenService.addGarden(new Garden(
+                "anotherGarden",
+                "test",
+                "test",
+                "test",
+                "test",
+                "80",
+                "test",
+                10.0,
+                false,
+                "",
+                "",
+                mockUser));
+
         plantList.add(plantService.addPlant("testName1",
                 1,
                 "testDescription1",
@@ -89,6 +110,12 @@ class PlantFormControllerTest {
                 testGarden.getGardenId()));
 
         plantList.add(plantService.addPlant("testName2",
+                1,
+                "testDescription2",
+                date1,
+                testGarden.getGardenId()));
+
+        plantList.add(plantService.addPlant("testName3",
                 1,
                 "testDescription2",
                 date1,
@@ -170,6 +197,42 @@ class PlantFormControllerTest {
         Assertions.assertEquals(newPlantDescription, actualPlant.getPlantDescription());
         Assertions.assertEquals(newPlantCount, actualPlant.getPlantCount());
         Assertions.assertEquals(newPlantDate, actualPlant.getPlantDate());
+    }
+
+    @Test
+    @WithMockUser(username = "test@gmail.com")
+    void importPlant_validPlant_addsPlant_returnsRedirect() throws Exception {
+
+        Plant expectedPlant = plantList.get(2);
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/import-plant").
+                        param("gardenId", String.valueOf(anotherGarden.getGardenId()))
+                        .param("plantId", String.valueOf(expectedPlant.getPlantId())))
+                .andExpect(status().is3xxRedirection()).andReturn();
+
+
+        long newPlantId = Long.parseLong((String) response.getModelAndView().getModelMap().getAttribute("plantId"));
+
+        Optional<Garden> updatedGarden = gardenService.getGardenById(anotherGarden.getGardenId());
+        Plant importedPlant = plantService.findById(newPlantId).get();
+        Plant newGardenPlant = updatedGarden.get().getPlants().get(0);
+
+        Assertions.assertEquals(expectedPlant.getPlantName(), importedPlant.getPlantName());
+        Assertions.assertEquals(expectedPlant.getPlantName(), newGardenPlant.getPlantName());
+
+        Assertions.assertEquals(1, updatedGarden.get().getPlants().size());
+        Assertions.assertEquals(importedPlant.getPlantName(), newGardenPlant.getPlantName());
+        Assertions.assertEquals(importedPlant.getPlantPictureFilename(), newGardenPlant.getPlantPictureFilename());
+
+    }
+
+    @Test
+    @WithMockUser(username = "test@gmail.com")
+    void importPlant_invalidPlant_returns404() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/import-plant").
+                param("gardenId", String.valueOf(0L))
+                .param("plantId", String.valueOf(0L)))
+                .andExpect(status().is4xxClientError());
+
     }
 
     @ParameterizedTest
@@ -547,4 +610,5 @@ class PlantFormControllerTest {
         Assertions.assertEquals((int) Double.parseDouble(plantCount.replace(',', '.')), actualPlant.getPlantCount());
 
     }
+
 }
