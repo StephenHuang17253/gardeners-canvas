@@ -36,8 +36,8 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
 
   Scenario: AC3 - Tags that can't be moderated immediately are pending
     Given I as user "dom@email.com" am logged in with "Password1!"
-    And I have a tag "Pending Tag"
-    And My Tag "Good Language" is currently pending moderation
+    And I previously added a tag "Pending Tag"
+    And My Tag "Pending Ta" is currently pending moderation
     When I enter a valid tag "Pending Tag"
     Then the tag is "Pending Tag" added to my garden as pending
     And The tag "Pending Tag" is not shown in future autocomplete suggestions
