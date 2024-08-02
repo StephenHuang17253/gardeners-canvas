@@ -220,8 +220,8 @@ public class UserService {
     }
 
     /**
-     * give a strike to the user
-     * 
+     * Give a strike to the user.
+     * Checks that the user's strikes value isn't null, to accommodate users who existed before this feature.
      * @param user user to strike
      */
     public void strikeUser(User user) {
