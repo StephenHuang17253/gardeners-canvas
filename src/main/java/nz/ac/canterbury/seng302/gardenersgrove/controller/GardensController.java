@@ -69,16 +69,16 @@ public class GardensController {
      * Constructor for the GardensController with {@link Autowired} to connect
      * this controller with other services
      *
-     * @param gardenService   service to access garden repository
-     * @param securityService service to access security methods
-     * @param plantService    service to access plant repository
-     * @param weatherService    service to perform weather api calls
-     * @param objectMapper    used for JSON conversion
-     * @param gardenTagService    service to access tag repository
+     * @param gardenService    service to access garden repository
+     * @param securityService  service to access security methods
+     * @param plantService     service to access plant repository
+     * @param weatherService   service to perform weather api calls
+     * @param objectMapper     used for JSON conversion
+     * @param gardenTagService service to access tag repository
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
+                             WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
                              ProfanityService profanityService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -98,9 +98,9 @@ public class GardensController {
      */
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "All") String filter,
+                            @RequestParam(defaultValue = "All") String filter,
                             HttpServletRequest request,
-            Model model) {
+                            Model model) {
         logger.info("GET /my-gardens");
 
         model.addAttribute("loggedIn", securityService.isLoggedIn());
@@ -203,12 +203,12 @@ public class GardensController {
      */
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String plantPictureError,
-            @RequestParam(required = false) String weatherListJson,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Model model) {
+                                    @RequestParam(defaultValue = "1") int page,
+                                    @RequestParam(required = false) String plantPictureError,
+                                    @RequestParam(required = false) String weatherListJson,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    Model model) {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -292,7 +292,7 @@ public class GardensController {
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("openModal", inputFlashMap.get("openModal"));
-            model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
+            model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
         }
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
@@ -312,16 +312,15 @@ public class GardensController {
      *
      * @param gardenId         - the id of the garden being edited
      * @param makeGardenPublic - the new status of the garden isPublic
-     *
      * @return thymeleaf garden detail page
      */
     @PostMapping("/my-gardens/{gardenId}/public")
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
-            @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
-            RedirectAttributes redirectAttributes,
-            HttpServletResponse response) throws JsonProcessingException {
+                                           @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
+                                           @RequestParam(defaultValue = "1") int page,
+                                           @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
+                                           RedirectAttributes redirectAttributes,
+                                           HttpServletResponse response) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}/public", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -358,18 +357,19 @@ public class GardensController {
 
     /**
      * This function creates a post mapping for adding a tag to a garden
+     *
      * @param gardenId id of garden to add tag to
-     * @param tag tag string
-     * @param page pagination page
+     * @param tag      tag string
+     * @param page     pagination page
      * @return template for garden page or redirect to garden page
      */
     @PostMapping("/my-gardens/{gardenId}/tag")
     public String addGardenTag(@PathVariable Long gardenId,
-                                   @RequestParam("tag") String tag,
-                                   @RequestParam(defaultValue = "1") int page,
-                                   RedirectAttributes redirectAttributes,
-                                   HttpServletResponse response,
-                                   Model model) {
+                               @RequestParam("tag") String tag,
+                               @RequestParam(defaultValue = "1") int page,
+                               RedirectAttributes redirectAttributes,
+                               HttpServletResponse response,
+                               Model model) {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         ValidationResult tagResult = InputValidator.validateTag(tag);
@@ -394,7 +394,7 @@ public class GardensController {
                 asynchronousTagProfanityCheck(tag);
             }
 
-            gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+            gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
             if (!gardenAlreadyHasThisTag && tagResult.valid() && gardenTag.getTagStatus() != TagStatus.INAPPROPRIATE) {
                 gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
@@ -412,12 +412,10 @@ public class GardensController {
             } else if (!tagResult.valid()) {
                 model.addAttribute("tagErrorText", tagResult);
             }
-            if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
-            {
+            if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
                 model.addAttribute("tagErrorText", "This tag does not meet the language " +
                         "standards for Gardener's Grove. A warning strike has been added to your account");
             }
-
 
 
             List<WeatherModel> weatherList;
@@ -453,10 +451,9 @@ public class GardensController {
             return "gardenDetailsPage";
         }
 
-        if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING)
-        {
+        if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING) {
             redirectAttributes.addFlashAttribute("tagMessageText", String.format("Your tag \"%s\" is currently being checked for profanity. " +
-                    "If it follows the language standards for our app, it will be added to your garden.",tag));
+                    "If it follows the language standards for our app, it will be added to your garden.", tag));
         }
 
         redirectAttributes.addAttribute("page", page);
@@ -478,13 +475,13 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}")
     public String updatePlantImage(@PathVariable Long gardenId,
-            @RequestParam("plantId") Long plantId,
-            @RequestParam("weatherListJson") String weatherListJson,
-            @RequestParam("plantPictureInput") MultipartFile plantPicture,
-            @RequestParam(defaultValue = "1") int page,
-            RedirectAttributes redirectAttributes,
-            HttpServletResponse response,
-            Model model) throws JsonProcessingException {
+                                   @RequestParam("plantId") Long plantId,
+                                   @RequestParam("weatherListJson") String weatherListJson,
+                                   @RequestParam("plantPictureInput") MultipartFile plantPicture,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   RedirectAttributes redirectAttributes,
+                                   HttpServletResponse response,
+                                   Model model) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -532,10 +529,10 @@ public class GardensController {
      */
     @GetMapping("/{userId}/gardens")
     public String friendsGardens(Model model,
-            @PathVariable("userId") Long userId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "All") String filter,
-            HttpServletResponse response) {
+                                 @PathVariable("userId") Long userId,
+                                 @RequestParam(defaultValue = "1") int page,
+                                 @RequestParam(defaultValue = "All") String filter,
+                                 HttpServletResponse response) {
         logger.info("GET {}/gardens", userId);
 
         User friend;
@@ -603,6 +600,7 @@ public class GardensController {
 
     /**
      * Retrieves tag suggestions from the Garden Tag Repository through the Garden Tag Service
+     *
      * @param query - The search query for tag autocomplete suggestions
      * @return a list of garden tags whose names are similar to the query
      */
@@ -612,16 +610,12 @@ public class GardensController {
         return gardenTagService.getAllSimilar(query);
     }
 
-    private void asynchronousTagProfanityCheck(String tagName)
-    {
+    private void asynchronousTagProfanityCheck(String tagName) {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
-            if (!tagContainsProfanity)
-            {
+            if (!tagContainsProfanity) {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
-            }
-            else
-            {
+            } else {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
 
@@ -630,9 +624,6 @@ public class GardensController {
         asyncThread.start();
 
     }
-
-
-
 
 
 }
