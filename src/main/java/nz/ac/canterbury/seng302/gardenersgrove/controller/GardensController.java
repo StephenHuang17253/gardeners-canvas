@@ -1,5 +1,35 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PriorityType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -7,44 +37,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.servlet.http.HttpServletRequest;
-import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import jakarta.servlet.UnavailableException;
-import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
-import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 /**
  * Controller for viewing all the created Gardens
@@ -60,6 +52,8 @@ public class GardensController {
     private final PlantService plantService;
     private final WeatherService weatherService;
     private final GardenTagService gardenTagService;
+
+    private final ProfanityService profanityService;
 
     private final ObjectMapper objectMapper;
 
@@ -84,13 +78,15 @@ public class GardensController {
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService) {
+            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
+                             ProfanityService profanityService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
         this.weatherService = weatherService;
         this.gardenTagService = gardenTagService;
         this.objectMapper = objectMapper;
+        this.profanityService = profanityService;
     }
 
     /**
@@ -103,6 +99,7 @@ public class GardensController {
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "All") String filter,
+                            HttpServletRequest request,
             Model model) {
         logger.info("GET /my-gardens");
 
@@ -293,6 +290,13 @@ public class GardensController {
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureError);
 
+        // Used for displaying messages after a redirect e.g. from the verify page
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        if (inputFlashMap != null) {
+            model.addAttribute("openModal", inputFlashMap.get("openModal"));
+            model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
+        }
+
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
         List<String> tagsList = tagRelationsList.stream()
@@ -370,6 +374,9 @@ public class GardensController {
                                    Model model) {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
+        ValidationResult tagResult = InputValidator.validateTag(tag);
+        boolean gardenAlreadyHasThisTag = false;
+
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -377,28 +384,43 @@ public class GardensController {
         }
 
         Garden garden = optionalGarden.get();
-        GardenTag gardenTag = new GardenTag(tag);
 
-        if (gardenTagService.getByName(tag).isPresent()) {
-            gardenTag = gardenTagService.getByName(tag).get();
-        } else {
-            gardenTagService.addGardenTag(gardenTag);
+        if (tagResult.valid()) {
+            GardenTag gardenTag = new GardenTag(tag);
+
+            if (gardenTagService.getByName(tag).isPresent()) {
+                gardenTag = gardenTagService.getByName(tag).get();
+
+            } else {
+                gardenTagService.addGardenTag(gardenTag);
+                asynchronousTagProfanityCheck(tag);
+            }
+
+            gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+
+            if (!gardenAlreadyHasThisTag && tagResult.valid() && gardenTag.getTagStatus() != TagStatus.INAPPROPRIATE) {
+                gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
+            }
         }
 
-        ValidationResult tagResult = InputValidator.validateTag(tag);
+        Optional<GardenTag> newTag = gardenTagService.getByName(tag);
 
-        boolean gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
 
-        if (!gardenAlreadyHasThisTag && tagResult.valid()) {
-            gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
-        }
+        if (!tagResult.valid() || gardenAlreadyHasThisTag || (newTag.isPresent() &&
+                newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)) {
 
-        if (!tagResult.valid() || gardenAlreadyHasThisTag) {
             if (gardenAlreadyHasThisTag) {
                 model.addAttribute("tagErrorText", "This tag has already been added to the garden.");
-            } else {
+            } else if (!tagResult.valid()) {
                 model.addAttribute("tagErrorText", tagResult);
             }
+            if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
+            {
+                model.addAttribute("tagErrorText", "This tag does not meet the language " +
+                        "standards for Gardener's Grove. A warning strike has been added to your account");
+            }
+
+
 
             List<WeatherModel> weatherList;
             weatherList = getGardenWeatherData(garden);
@@ -411,6 +433,7 @@ public class GardensController {
             String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
             handlePagniation(page, plants.size(), model);
 
+            model.addAttribute("openModal", "true");
             model.addAttribute("tagText", tag);
             model.addAttribute("isOwner", true);
             model.addAttribute("garden", new GardenDetailModel(garden));
@@ -432,7 +455,14 @@ public class GardensController {
             return "gardenDetailsPage";
         }
 
+        if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING)
+        {
+            redirectAttributes.addFlashAttribute("tagMessageText", String.format("Your tag \"%s\" is currently being checked for profanity. " +
+                    "If it follows the language standards for our app, it will be added to your garden.",tag));
+        }
+
         redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addFlashAttribute("openModal", "true");
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -570,5 +600,40 @@ public class GardensController {
         logger.info("Permits left after request: {}", semaphore.availablePermits());
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
     }
+
+
+    /**
+     * Retrieves tag suggestions from the Garden Tag Repository through the Garden Tag Service
+     * @param query - The search query for tag autocomplete suggestions
+     * @return a list of garden tags whose names are similar to the query
+     */
+    @GetMapping("/tag/suggestions")
+    @ResponseBody
+    public List<GardenTag> getTagSuggestions(@RequestParam("query") String query) {
+        return gardenTagService.getAllSimilar(query);
+    }
+
+    private void asynchronousTagProfanityCheck(String tagName)
+    {
+        Thread asyncThread = new Thread((() -> {
+            boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
+            if (!tagContainsProfanity)
+            {
+                gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
+            }
+            else
+            {
+                gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
+                gardenTagService.deleteRelationByTagName(tagName);
+
+            }
+        }));
+        asyncThread.start();
+
+    }
+
+
+
+
 
 }

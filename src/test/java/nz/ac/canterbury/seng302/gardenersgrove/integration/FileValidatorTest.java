@@ -50,7 +50,8 @@ class FileValidatorTest {
 
     @Test
     void invalidNameFile_return_INVALID_FILE_TYPE() {
-        assertEquals(ValidationResult.INVALID_FILE_TYPE, FileValidator.validateImage(invalidNameFile, maxSize, fileType));
+        assertEquals(ValidationResult.INVALID_FILE_TYPE,
+                FileValidator.validateImage(invalidNameFile, maxSize, fileType));
     }
 
     @Test
@@ -60,6 +61,7 @@ class FileValidatorTest {
 
     @Test
     void invalidDataFile_return_INVALID_FILE_SIZE() {
-        assertEquals(ValidationResult.INVALID_FILE_SIZE, FileValidator.validateImage(invalidSizeFile, maxSize, fileType));
+        assertEquals(ValidationResult.INVALID_FILE_SIZE,
+                FileValidator.validateImage(invalidSizeFile, maxSize, fileType));
     }
 }

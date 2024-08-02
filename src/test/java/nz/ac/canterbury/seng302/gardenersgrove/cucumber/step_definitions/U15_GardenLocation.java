@@ -15,8 +15,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -75,7 +73,6 @@ public class U15_GardenLocation {
     private Garden expectedGarden;
     private MvcResult createGardenResult;
     private MvcResult locationResult;
-    Logger logger = LoggerFactory.getLogger(U15_GardenLocation.class);
 
     @Before
     public void before_or_after_all() throws IOException, InterruptedException {
@@ -270,7 +267,6 @@ public class U15_GardenLocation {
     // AC5
     @Then("An error message tells me 'City and Country are required'")
     public void city_and_country_error_message() {
-        logger.info(String.valueOf(createGardenResult.getModelAndView()));
         ModelAndView modelAndView = createGardenResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
         String model = modelAndView.getModel().toString();
@@ -296,7 +292,6 @@ public class U15_GardenLocation {
     @Then("LocationService is invoked to make an API request")
     public void location_service_is_invoked() throws UnsupportedEncodingException {
         String responseBody = locationResult.getResponse().getContentAsString();
-        logger.info(responseBody);
         String expectedLocation = "20, Kirkwood Avenue, Upper Riccarton, Christchurch, Christchurch City, Canterbury, 8041, New Zealand";
         Assertions.assertTrue(responseBody.contains(expectedLocation));
     }

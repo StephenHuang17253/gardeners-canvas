@@ -23,7 +23,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -121,8 +120,7 @@ class ProfileControllerTest {
         mockMvc.perform(post("/profile/change-password").with(csrf())
                 .param("currentPassword", currentPassword)
                 .param("newPassword", input)
-                .param("retypePassword", input))
-                .andDo(MockMvcResultHandlers.print());
+                .param("retypePassword", input));
         Mockito.verify(userServiceMock, Mockito.never()).updatePassword(1L, input);
     }
 

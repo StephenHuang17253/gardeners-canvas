@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -163,7 +164,6 @@ class GardenTagServiceIntegrationTest {
 
         try {
             Assertions.assertEquals("Test2", gardenTagService.getByName("Test2").get().getTagName());
-            System.out.println(gardenTagService.getAllSimilar("te"));
         } catch (NoSuchElementException exception) {
             fail(exception);
         }
@@ -195,6 +195,7 @@ class GardenTagServiceIntegrationTest {
     void simpleFetchGardenTag_OnSimilarName() {
         GardenTag tag1 = new GardenTag("Test2");
         gardenTagService.addGardenTag(tag1).getId();
+        gardenTagService.updateGardenTagStatus("Test2",TagStatus.APPROPRIATE);
 
         try {
             Assertions.assertEquals("Test2", gardenTagService.getAllSimilar("te").get(0).getTagName());
@@ -212,6 +213,7 @@ class GardenTagServiceIntegrationTest {
         GardenTag tag5 = new GardenTag("Test5");
         GardenTag tag6 = new GardenTag("Test6");
         GardenTag tag7 = new GardenTag("redHerring");
+
         HashSet<String> gardenTagHashSet = new HashSet<>();
         gardenTagHashSet.add(tag1.getTagName());
         gardenTagHashSet.add(tag2.getTagName());
@@ -227,6 +229,14 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag5);
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
+
+        gardenTagService.updateGardenTagStatus("Test",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test2",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test3",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test4",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test5",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test6",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring",TagStatus.APPROPRIATE);
 
         try {
             List<GardenTag> similarSearchResult = gardenTagService.getAllSimilar("test");
@@ -267,6 +277,14 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
 
+        gardenTagService.updateGardenTagStatus("Test",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test2",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test3",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test4",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test5",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Test6",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring",TagStatus.APPROPRIATE);
+
         try {
             List<GardenTag> searchResults = gardenTagService.getAllGardenTags();
             Assertions.assertEquals(7, searchResults.size());
@@ -297,6 +315,16 @@ class GardenTagServiceIntegrationTest {
         gardenTagService.addGardenTag(tag5);
         gardenTagService.addGardenTag(tag6);
         gardenTagService.addGardenTag(tag7);
+
+        gardenTagService.updateGardenTagStatus("redHerring1",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring2",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring3",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring4",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring5",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring6",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("redHerring7",TagStatus.APPROPRIATE);
+
+
 
         try {
             List<GardenTag> similarSearchResult = gardenTagService.getAllSimilar("test");
@@ -418,6 +446,122 @@ class GardenTagServiceIntegrationTest {
         GardenTag updatedTag2 = gardenTagRepository.findById(testTag2.getId()).get();
         Assertions.assertEquals(TagStatus.APPROPRIATE, updatedTag1.getTagStatus());
         Assertions.assertEquals(TagStatus.PENDING, updatedTag2.getTagStatus());
+    }
+
+    @Test
+    void deleteRelationByTagName_multipleMatchingTags_relationsDeleted() {
+        testGarden = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                15.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com")));
+
+
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag testTag2 = gardenTagService.addGardenTag(new GardenTag("TEsT1"));
+
+        GardenTagRelation testRelation1 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag1));
+        GardenTagRelation testRelation2 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag2));
+
+        gardenTagService.deleteRelationByTagName("test1");
+        Optional<GardenTagRelation> expectedTagRelation1 = gardenTagRelationRepository.findById(testRelation1.getId());
+        Optional<GardenTagRelation> expectedTagRelation2 = gardenTagRelationRepository.findById(testRelation2.getId());
+        Assertions.assertTrue(expectedTagRelation1.isEmpty());
+        Assertions.assertTrue(expectedTagRelation2.isEmpty());
+    }
+
+    @Test
+    void deleteRelationByTagName_singleMatchingMultipleTags_singleRelationDeleted() {
+        testGarden = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                15.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com")));
+
+
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag testTag2 = gardenTagService.addGardenTag(new GardenTag("something else test1"));
+
+        GardenTagRelation testRelation1 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag1));
+        GardenTagRelation testRelation2 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag2));
+
+        gardenTagService.deleteRelationByTagName("test1");
+        Optional<GardenTagRelation> expectedTagRelation1 = gardenTagRelationRepository.findById(testRelation1.getId());
+        Optional<GardenTagRelation> expectedTagRelation2 = gardenTagRelationRepository.findById(testRelation2.getId());
+        Assertions.assertTrue(expectedTagRelation1.isEmpty());
+        Assertions.assertFalse(expectedTagRelation2.isEmpty());
+    }
+
+    @Test
+    void deleteRelationByTagName_singleMatchingTags_relationDeleted() {
+        testGarden = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                15.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com")));
+
+
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+
+        GardenTagRelation testRelation1 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag1));
+
+        gardenTagService.deleteRelationByTagName("test1");
+        Optional<GardenTagRelation> expectedTagRelation1 = gardenTagRelationRepository.findById(testRelation1.getId());
+        Assertions.assertTrue(expectedTagRelation1.isEmpty());
+    }
+
+    @Test
+    void deleteRelationByTagName_noMatchingTag_noRelationsDeleted() {
+        testGarden = gardenService.addGarden(new Garden(
+                "John's Garden",
+                "",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                15.0,
+                false,
+                "-43.5214643",
+                "172.5796159",
+                userService.getUserByEmail("GardenServiceIntegrationTest@ProfileController.com")));
+
+
+        GardenTag testTag1 = gardenTagService.addGardenTag(new GardenTag("test1"));
+        GardenTag testTag2 = gardenTagService.addGardenTag(new GardenTag("TEsT1"));
+
+        GardenTagRelation testRelation1 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag1));
+        GardenTagRelation testRelation2 = gardenTagService.addGardenTagRelation(new GardenTagRelation(testGarden,testTag2));
+
+        gardenTagService.deleteRelationByTagName("something else");
+        Optional<GardenTagRelation> expectedTagRelation1 = gardenTagRelationRepository.findById(testRelation1.getId());
+        Optional<GardenTagRelation> expectedTagRelation2 = gardenTagRelationRepository.findById(testRelation2.getId());
+        Assertions.assertFalse(expectedTagRelation1.isEmpty());
+        Assertions.assertFalse(expectedTagRelation2.isEmpty());
     }
 
 }

@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -60,14 +59,12 @@ class HomePageControllerIntegrationTest {
     @Test
     void mvcMockIsAlive() throws Exception {
         this.mockMvc.perform(get("/"))
-                .andDo(print())
                 .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void getMapping_root_redirectsToHomePage() throws Exception {
         this.mockMvc.perform(get("/"))
-                .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("./home"));
     }
@@ -75,7 +72,6 @@ class HomePageControllerIntegrationTest {
     @Test
     void getMappingNotLoggedIn_Invalid_requestForbidden() throws Exception {
         this.mockMvc.perform(get("/asdassdas"))
-                .andDo(print())
                 .andExpect(status().isForbidden()); // Should be 403 as the user is not logged in
     }
 

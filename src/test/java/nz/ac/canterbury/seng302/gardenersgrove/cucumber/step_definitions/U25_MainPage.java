@@ -18,6 +18,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -25,18 +27,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import io.cucumber.java.Before;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.ManageFriendsController;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -159,7 +159,6 @@ public class U25_MainPage {
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
-
         HomePageController homePageController = new HomePageController(userService, authenticationManager, gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService);
 
         // Allows us to bypass spring security
@@ -174,8 +173,7 @@ public class U25_MainPage {
         Long userId = newUser.getId();
         assertNotNull(newUser);
         List<Friendship> allFriendships = friendshipService.getAllUsersFriends(newUser.getId());
-        for (Friendship friendship: allFriendships)
-        {
+        for (Friendship friendship : allFriendships) {
             Long friendId = friendship.getUser1().getId();
             if (userId.equals(friendId)) {
                 friendId = friendship.getUser2().getId();
@@ -188,6 +186,7 @@ public class U25_MainPage {
         List<Friendship> emptyFriendships = friendshipService.getAllUsersFriends(newUser.getId());
         assertTrue(emptyFriendships.isEmpty());
     }
+
     @When("I look at the recent friends list on the home page")
     public void i_look_at_the_recent_friends_list_on_the_home_page() throws Exception {
         mvcResult = mockMVC.perform(get("/home")).andExpect(status().isOk()).andReturn();
@@ -195,10 +194,13 @@ public class U25_MainPage {
 
     @Then("I see that my friends with emails {string} and {string} are listed in order")
     public void i_see_that_my_friends_with_emails_and_are_listed_in_order(String email1, String email2) {
-        List<FriendModel> friendList = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("recentFriends");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> friendList = (List<FriendModel>) model.getModelMap().getAttribute("recentFriends");
         User user1 = userService.getUserByEmail(email1);
         User user2 = userService.getUserByEmail(email2);
-        assertEquals(friendList.size(), 2);
+        assertNotNull(friendList);
+        assertEquals(2, friendList.size());
         // Most to least recent
         assertEquals(friendList.get(0).getFriendId(), user2.getId());
         assertEquals(friendList.get(1).getFriendId(), user1.getId());
@@ -206,7 +208,10 @@ public class U25_MainPage {
 
     @Then("There are no recently accessed friends")
     public void there_are_no_recently_accessed_friends() {
-        List<FriendModel> friendList = (List<FriendModel>) mvcResult.getModelAndView().getModelMap().getAttribute("recentFriends");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<FriendModel> friendList = (List<FriendModel>) model.getModelMap().getAttribute("recentFriends");
+        assertNotNull(friendList);
         assertTrue(friendList.isEmpty());
     }
 
