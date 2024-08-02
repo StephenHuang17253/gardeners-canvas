@@ -358,6 +358,47 @@ public class GardensController {
     }
 
     /**
+     * Helper to set the model of garden details page for non-blue sky scenarios after tag post-mapping
+     * @param garden entity of the page to be displayed
+     * @param tag text
+     * @param page index
+     * @return filename of thymeleaf template
+     */
+    private String setGardenDetailModel(Garden garden, String tag, int page, Model model){
+        List<WeatherModel> weatherList;
+        weatherList = getGardenWeatherData(garden);
+        if (weatherList.size() > 1) {
+            handleWeatherMessages(weatherList, model);
+        }
+
+        User user = garden.getOwner();
+        List<Plant> plants = garden.getPlants();
+        String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
+        handlePagniation(page, plants.size(), model);
+
+        model.addAttribute("openModal", "true");
+        model.addAttribute("tagText", tag);
+        model.addAttribute("isOwner", true);
+        model.addAttribute("garden", new GardenDetailModel(garden));
+        model.addAttribute("weatherList", weatherList);
+        model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
+        model.addAttribute("currentTime", formattedTime);
+        model.addAttribute("profilePicture", user.getProfilePictureFilename());
+        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+
+        List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+        List<String> tagsList = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("tagsList", tagsList);
+
+        return "gardenDetailsPage";
+    }
+
+    /**
      * This function creates a post mapping for adding a tag to a garden
      * @param gardenId id of garden to add tag to
      * @param tag tag string
@@ -404,7 +445,6 @@ public class GardensController {
 
         Optional<GardenTag> newTag = gardenTagService.getByName(tag);
 
-
         if (!tagResult.valid() || gardenAlreadyHasThisTag || (newTag.isPresent() &&
                 newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)) {
 
@@ -425,40 +465,7 @@ public class GardensController {
                             "If you add another inappropriate tag, you will be banned for a week.");
                 }
             }
-
-
-
-            List<WeatherModel> weatherList;
-            weatherList = getGardenWeatherData(garden);
-            if (weatherList.size() > 1) {
-                handleWeatherMessages(weatherList, model);
-            }
-
-            User user = garden.getOwner();
-            List<Plant> plants = garden.getPlants();
-            String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-            handlePagniation(page, plants.size(), model);
-
-            model.addAttribute("openModal", "true");
-            model.addAttribute("tagText", tag);
-            model.addAttribute("isOwner", true);
-            model.addAttribute("garden", new GardenDetailModel(garden));
-            model.addAttribute("weatherList", weatherList);
-            model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
-            model.addAttribute("currentTime", formattedTime);
-            model.addAttribute("profilePicture", user.getProfilePictureFilename());
-            model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
-
-            List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
-
-            List<String> tagsList = tagRelationsList.stream()
-                    .map(GardenTagRelation::getTag)
-                    .map(GardenTag::getTagName)
-                    .toList();
-
-            model.addAttribute("tagsList", tagsList);
-
-            return "gardenDetailsPage";
+            return setGardenDetailModel(garden,tag,page,model);
         }
 
         if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING)
