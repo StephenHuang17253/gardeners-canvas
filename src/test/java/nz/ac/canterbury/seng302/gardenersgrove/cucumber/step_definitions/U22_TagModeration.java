@@ -57,6 +57,12 @@ public class U22_TagModeration {
         strikes_before = userService.getUserByEmail(userEmail).getStrikes();
     }
 
+    @And("My Tag {string} is currently pending moderation")
+    public void myTagIsCurrentlyPendingModeration(String tagName) {
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(false);
+        gardenTagService.updateGardenTagStatus(tagName, TagStatus.PENDING);
+    }
+
     // U22 AC5
     @Then("Then I {string} get a strike")
     public void i_get_a_strike(String userEmail) {

@@ -21,7 +21,8 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     And I previously added a tag "Good Language"
     And My Tag "Good Language" did not contain profanity
     When I enter a valid tag "Good Language"
-    Then the tag is "Good Language" added to my garden
+    Then The tag is "Good Language" added to my garden
+    And The tag "Good Language" shows up in future autocomplete suggestions
 
   Scenario: AC2 - Given the submitted tag is evaluated for appropriateness, when it is flagged as inappropriate, then an
   error message tells me that the submitted word is not appropriate and the tag is not added to the list of user-defined tags.
@@ -31,6 +32,15 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     When I enter a valid tag "Bad Language 2"
     Then The following error message is displayed "This tag does not meet the language standards for Gardener's Grove. A warning strike has been added to your account"
     And The tag is not added to the garden
+    And The tag "Bad Language 2" is not shown in future autocomplete suggestions
+
+  Scenario: AC3 - Tags that can't be moderated immediately are pending
+    Given I as user "dom@email.com" am logged in with "Password1!"
+    And I previously added a tag "Pending Tag"
+    And My Tag "Pending Ta" is currently pending moderation
+    When I enter a valid tag "Pending Tag"
+    Then The tag is "Pending Tag" added to my garden as pending
+    And The tag "Pending Tag" is not shown in future autocomplete suggestions
 
   Scenario: AC5 - Given the evaluation of a user-defined tag was delayed, when the tag has been evaluated as
   inappropriate, then the tag is removed from the garden it was assigned to, and it is not added to the list of
