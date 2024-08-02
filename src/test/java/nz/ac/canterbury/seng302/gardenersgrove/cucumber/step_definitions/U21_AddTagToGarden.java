@@ -256,7 +256,7 @@ public class U21_AddTagToGarden {
     // AC5
     @And("the tag {string} shows up in future autocomplete suggestions")
     public void the_tag_shows_up_in_future_autocomplete_suggestions(String tagName) throws Exception {
-        String query = "Cabbage";
+        String query = tagName;
         String fetchUrl = "/tag/suggestions";
         tagResult = mockMVCGardens.perform(
                 MockMvcRequestBuilders
