@@ -161,17 +161,16 @@ public class SecurityService {
         }
     }
 
-    public void strikeUser() throws MessagingException {
-        User user = getCurrentUser();
+    public int handleStrikeUser(User user) throws MessagingException {
         userService.strikeUser(user);
 
-        if(user.getStrikes()==NUM_STRIKES_FOR_WARN){
+        if (user.getStrikes() == NUM_STRIKES_FOR_WARN) {
             emailService.sendTagBanWarningEmail(user);
-        } else if(user.getStrikes()==NUM_STRIKES_FOR_BAN){
-            emailService.sendTagBanWarningEmail(user);
-            //TODO: disable the acount
+        } else if(user.getStrikes() == NUM_STRIKES_FOR_BAN) {
+            emailService.sendTagBanEmail(user);
+            // TODO: disable the account
         }
-
+        return user.getStrikes();
 
     }
 

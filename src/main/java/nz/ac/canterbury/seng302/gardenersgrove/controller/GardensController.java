@@ -392,7 +392,7 @@ public class GardensController {
 
             } else {
                 gardenTagService.addGardenTag(gardenTag);
-                asynchronousTagProfanityCheck(tag, garden.getOwner(), model);
+                asynchronousTagProfanityCheck(tag, garden.getOwner());
             }
 
             gardenAlreadyHasThisTag= gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
@@ -414,8 +414,9 @@ public class GardensController {
                 model.addAttribute("tagErrorText", tagResult);
             }
             if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
+                int userStrikes = -1;
                 try {
-                    securityService.strikeUser();
+                    userStrikes = securityService.handleStrikeUser(garden.getOwner());
                 } catch (MessagingException e) {
                     throw new RuntimeException(e);
                 }
@@ -423,6 +424,11 @@ public class GardensController {
                 logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), garden.getOwner().getStrikes());
                 model.addAttribute("tagErrorText", "This tag does not meet the language " +
                         "standards for Gardener's Grove. A warning strike has been added to your account");
+                if (userStrikes == 5) {
+                    model.addAttribute("tagErrorText", "You have added an inappropriate tag for the fifth time." +
+                            " You have been sent a warning email. " +
+                            "If you add another inappropriate tag, you will be banned for a week.");
+                }
             }
 
 
@@ -618,7 +624,7 @@ public class GardensController {
         return gardenTagService.getAllSimilar(query);
     }
 
-    private void asynchronousTagProfanityCheck(String tagName, User user, Model model)
+    private void asynchronousTagProfanityCheck(String tagName, User user)
     {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
@@ -631,7 +637,7 @@ public class GardensController {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
                 try {
-                    securityService.strikeUser();
+                    securityService.handleStrikeUser(user);
                 } catch (MessagingException e) {
                     throw new RuntimeException(e);
                 }
