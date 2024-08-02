@@ -1,4 +1,4 @@
-Feature: U22 (Tag moderation) : As Kaia, I want to make sure that users who repeatedly trying to add inappropriate tags
+Feature: U23 (Deactivate account temporarily) : As Kaia, I want to make sure that users who repeatedly trying to add inappropriate tags
   are prevented to use the app for one week so that they can reflect on their behaviour.
 
   Background:
@@ -11,6 +11,7 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that users who repe
   tells me that I have added an inappropriate tag for the fifth time, and I receive an email warning me that if
   I add another inappropriate tag, my account will be blocked for one week.
     Given I as user "daemon@email.com" am logged in with "Password1!"
+    And I previously added a tag "Caraxes"
     And My Tag "Caraxes" contained profanity
     And I as user "daemon@email.com" currently have 4 strikes
     When I enter a valid tag "Caraxes"
