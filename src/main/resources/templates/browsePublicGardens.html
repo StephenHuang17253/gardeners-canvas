@@ -4,35 +4,73 @@
 <head th:replace="~{fragments/header.html}"></head>
 
 <body>
-<div th:replace="~{fragments/navBar.html :: navBar('browsePublic')}" th:with="loggedIn=${loggedIn}"></div>
-<div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
-     th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
-<div class="container mt-5 bg-white border rounded pt-4">
-    <div class="row mb-4" >
-        <div class="col">
-            <h1 class="mb-3">Public Gardens</h1>
-            <div th:replace="~{fragments/paginationPageOverview.html}"
-                 th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
+    <div th:replace="~{fragments/navBar.html :: navBar('browsePublic')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+        th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container mt-5 bg-white border rounded pt-4">
+
+        <h1 class="text-center mb-4">Public Gardens</h1>
+        <div class="row mb-4">
+            <div class="col">
+                <form th:action="@{/public-gardens/search/1}" method="get"
+                    class="d-flex flex-column align-items-center">
+                    <div id="appliedTagsInputs">
+                        <input type="hidden" th:each="tag : ${appliedTags}" th:value="${tag}" th:name="appliedTags">
+                    </div>
+
+
+                    <div class="input-group rounded w-75 mb-3">
+                        <input type="text" name="searchInput" class="form-control rounded-start" id="friendSearchBar"
+                            placeholder="Search" maxlength="50000" th:value="${searchValue}" />
+
+                        <button type="submit" class="btn btn-success">Search</button>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-center mb-3">
+                        <h3>Search for tags:</h3>
+                        <div class="w-100 position-relative mb-3">
+                            <div class="input-group rounded">
+                                <input id="tagInput" type="search" class="form-control rounded-start"
+                                    placeholder="e.g. vegetable garden" aria-label="Search"
+                                    aria-describedby="search-addon" autocomplete="off" />
+                                <button id="addTagButton" type="button" class="btn btn-success">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                            d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <ul id="tagAutocompleteSuggestions" class="list-group position-absolute"></ul>
+                        </div>
+                        <p id="searchTagErrorText" class="text-danger fs-6"></p>
+                    </div>
+
+                    <div id="appliedTagsList"
+                        class="d-flex flex-row flex-wrap justify-content-center align-items-center gap-2 mb-3">
+                        <h7>Applied tags:</h7>
+                        <div class="p-1" th:each="tag : ${appliedTags}">
+                            <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag})}"></div>
+                        </div>
+                    </div>
+
+                </form>
             </div>
         </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col">
-            <form th:action="@{/public-gardens/search/1}" method="get" class="d-flex">
-                <input type="text" name="searchInput" class="form-control me-2" id="friendSearchBar" placeholder="Search"
-                       maxlength="5000" th:value="${searchValue}" />
-                <button type="submit" class="btn btn-outline-success">Search</button>
-            </form>
+
+        <div th:replace="~{fragments/paginationPageOverview.html}"
+            th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
         </div>
-    </div>
-    <div class="row mb-4" th:if="${SearchErrorText!=''}">
-        <div class="col">
-            <h3 class="text-danger" th:text="${SearchErrorText}"></h3>
+
+        <div class="row mb-4" th:if="${searchErrorText != null}">
+            <div class="col">
+                <h3 class="text-danger" th:text="${searchErrorText}"></h3>
+            </div>
         </div>
-    </div>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2" th:if="${SearchErrorText==''}">
-        <div class="col" th:each="garden : ${publicGardens}">
-            <div th:replace="~{fragments/publicGardensCard.html ::
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2" th:if="${searchErrorText == null}">
+            <div class="col" th:each="garden : ${publicGardens}">
+                <div th:replace="~{fragments/publicGardensCard.html ::
                         publicGardensCard(gardenId=${garden.gardenId},
                         gardenName=${garden.gardenName},
                         gardenLocation=${garden.gardenLocation},
@@ -43,24 +81,24 @@
                         plantImage2=${garden.plants.size() > 1 ? garden.plants[1].plantPictureFilename : null},
                         plantImage3=${garden.plants.size() > 2 ? garden.plants[2].plantPictureFilename : null},
                         numberOfPlants=${garden.plants?.size()})}">
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row mt-4" th:if="${SearchErrorText=='' and searchValue == ''}">
-        <div class="col">
-            <div th:replace="~{fragments/paginationNav.html}"
-                 th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+
+        <div class="row mt-4" th:if="${searchErrorText == null}">
+            <div class="col">
+                <div th:replace="~{fragments/paginationNav.html}"
+                    th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                </div>
             </div>
         </div>
+
+
     </div>
-    <div class="row mt-4" th:if="${SearchErrorText=='' and searchValue != ''}">
-        <div class="col">
-            <div th:replace="~{fragments/searchPaginationNav.html}"
-                 th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, searchValue=${searchValue}">
-            </div>
-        </div>
-    </div>
-</div>
+
+    <script th:src="@{/js/tagSearch.js}"></script>
+    <script th:src="@{/js/gardenTagAutocomplete.js}"></script>
+    <script th:src="@{/js/getInstance.js}"></script>
 </body>
 
 </html>

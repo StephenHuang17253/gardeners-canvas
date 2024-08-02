@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * Entity class of a relation between Garden and a Tag
@@ -16,10 +18,12 @@ public class GardenTagRelation {
 
     @ManyToOne
     @JoinColumn(name = "garden_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Garden garden;
 
     @ManyToOne
     @JoinColumn(name = "tag_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private GardenTag tag;
 
     /**

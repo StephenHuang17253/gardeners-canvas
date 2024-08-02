@@ -30,18 +30,15 @@ import java.util.stream.Collectors;
  */
 @Controller
 public class HomePageController {
+
     Logger logger = LoggerFactory.getLogger(HomePageController.class);
+
     private final UserService userService;
-
     private final PlantService plantService;
-
-    private GardenService gardenService;
-
-    private FriendshipService friendshipService;
-
-    private SecurityService securityService;
-
-    private UserInteractionService userInteractionService;
+    private final GardenService gardenService;
+    private final FriendshipService friendshipService;
+    private final SecurityService securityService;
+    private final UserInteractionService userInteractionService;
 
     private static final int PAGE_SIZE = 5;
 

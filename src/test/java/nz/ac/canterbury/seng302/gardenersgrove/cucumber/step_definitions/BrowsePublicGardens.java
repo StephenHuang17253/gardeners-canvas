@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -128,9 +129,11 @@ public class BrowsePublicGardens {
 
     @Then("I am shown only gardens whose names or plants include my search string {string}")
     public void i_am_shown_only_gardens_whose_names_or_plants_include_my_search_string(String input) {
-        List<Garden> searchResults = (List<Garden>) mvcResult.getModelAndView().getModelMap()
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<Garden> searchResults = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
-        assert searchResults != null;
+        Assertions.assertNotNull(searchResults);
         for (Garden result : searchResults) {
             Assertions.assertTrue(result.getGardenName().contains(input)
                     || result.getPlants().stream().anyMatch(plant -> plant.getPlantName().contains(input)));
@@ -140,7 +143,9 @@ public class BrowsePublicGardens {
 
     @Then("A message tells me {string}")
     public void a_message_tells_me(String error) {
-        String searchError = (String) mvcResult.getModelAndView().getModelMap().getAttribute("SearchErrorText");
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        String searchError = (String) model.getModelMap().getAttribute("searchErrorText");
         Assertions.assertEquals(error, searchError);
     }
 
@@ -162,7 +167,7 @@ public class BrowsePublicGardens {
 
     @When("I click the \"first\" button")
     public void i_click_the_first_button() {
-        currentPageUrl = "/public-gardens/page/1";
+        currentPageUrl = "/public-gardens/search/1";
     }
 
     @When("I click the \"last\" button")
@@ -171,7 +176,7 @@ public class BrowsePublicGardens {
         int totalGardens = allGardens.size();
         int pageSize = 10;
         lastPage = (int) Math.ceil((double) totalGardens / pageSize);
-        currentPageUrl = "/public-gardens/page/" + lastPage;
+        currentPageUrl = "/public-gardens/search/" + lastPage;
     }
 
     @Then("I am taken to the first page")
@@ -194,7 +199,7 @@ public class BrowsePublicGardens {
 
     @When("I try to access a page less than first page")
     public void i_try_to_access_a_page_less_than_first_page() {
-        currentPageUrl = "/public-gardens/page/0";
+        currentPageUrl = "/public-gardens/search/0";
     }
 
     @When("I try to access a page greater than the last page")
@@ -203,8 +208,7 @@ public class BrowsePublicGardens {
         int totalGardens = allGardens.size();
         int pageSize = 10;
         lastPage = (int) Math.ceil((double) totalGardens / pageSize);
-        currentPageUrl = "/public-gardens/page/" + (lastPage + 1); // Add one to access page greater than last page
-        System.out.println(currentPageUrl);
+        currentPageUrl = "/public-gardens/search/" + (lastPage + 1); // Add one to access page greater than last page
     }
 
     @Then("I am redirected to the first page")
@@ -213,7 +217,7 @@ public class BrowsePublicGardens {
                 MockMvcRequestBuilders
                         .get(currentPageUrl))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/public-gardens/page/1"))
+                .andExpect(redirectedUrl("/public-gardens/search/1"))
                 .andReturn();
     }
 
@@ -223,7 +227,7 @@ public class BrowsePublicGardens {
                 MockMvcRequestBuilders
                         .get(currentPageUrl))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/public-gardens/page/" + lastPage))
+                .andExpect(redirectedUrl("/public-gardens/search/" + lastPage))
                 .andReturn();
     }
 }
