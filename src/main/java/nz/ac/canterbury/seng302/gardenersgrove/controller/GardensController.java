@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -413,7 +414,11 @@ public class GardensController {
                 model.addAttribute("tagErrorText", tagResult);
             }
             if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
-                userService.strikeUser(garden.getOwner());
+                try {
+                    securityService.strikeUser();
+                } catch (MessagingException e) {
+                    throw new RuntimeException(e);
+                }
                 logger.info("{} has received a strike", garden.getOwner().getFirstName());
                 logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), garden.getOwner().getStrikes());
                 model.addAttribute("tagErrorText", "This tag does not meet the language " +
@@ -625,7 +630,11 @@ public class GardensController {
             {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
-                userService.strikeUser(user);
+                try {
+                    securityService.strikeUser();
+                } catch (MessagingException e) {
+                    throw new RuntimeException(e);
+                }
                 logger.info("{} has {} strikes", user.getFirstName(), user.getStrikes());
 
             }
