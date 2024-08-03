@@ -370,7 +370,7 @@ public class GardensController {
         List<WeatherModel> weatherList;
         weatherList = getGardenWeatherData(garden);
         if (weatherList.size() > 1) {
-            handleWeatherMessages(weatherList, model);
+            handleWeatherMessages(weatherList, garden, model);
         }
 
         User user = garden.getOwner();
