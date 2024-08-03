@@ -229,9 +229,11 @@ public class EmailService {
      * @param user to send the email
      */
     public void sendTagBanWarningEmail(User user) throws MessagingException {
-        String subject = "Tag moderation warning";
+        String subject = "Account Warning";
         String template = "generalEmail";
-        String mainBody = "Warning: If you add another inappropriate tag your account will be banned for 7 days";
+        String mainBody = "We are sorry to inform you but your Gardener Grove Account recently submitted a tag that breaches our language standards." +
+                "Which has resulted in your account receiving a fifth consecutive strike." +
+                "Warning, if you add another inappropriate tag your account will be banned for 7 days";
 
         String username = user.getFirstName() + " " + user.getLastName();
 
@@ -249,7 +251,7 @@ public class EmailService {
      * @param user to send the email
      */
     public void sendTagBanEmail(User user) throws MessagingException {
-        String subject = "Tag moderation ban";
+        String subject = "Account Banned";
         String template = "tagBanEmail";
 
         String username = user.getFirstName() + " " + user.getLastName();
