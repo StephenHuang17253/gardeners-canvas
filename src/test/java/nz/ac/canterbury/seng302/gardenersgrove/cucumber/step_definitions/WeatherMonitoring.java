@@ -73,6 +73,9 @@ public class WeatherMonitoring {
     @Autowired
     private GardenTagService gardenTagService;
 
+    @Autowired
+    private EmailService emailService;
+
     public static SecurityService securityService;
 
     private static GardenService gardenService;
@@ -146,7 +149,7 @@ public class WeatherMonitoring {
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService,
-                userInteractionService);
+                userInteractionService, emailService);
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,

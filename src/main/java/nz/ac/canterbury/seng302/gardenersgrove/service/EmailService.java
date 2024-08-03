@@ -226,33 +226,35 @@ public class EmailService {
     /**
      * Sends a warning email to the user for using too many inappropriate tags
      *
-     * @param token the token to send information about
+     * @param user to send the email
      */
-    public void sendTagBanWarningEmail(Token token) throws MessagingException {
-        String subject = "Tag moderation warning";
+    public void sendTagBanWarningEmail(User user) throws MessagingException {
+        String subject = "Account Warning";
         String template = "generalEmail";
-        String mainBody = "Warning: If you add another inappropriate tag your account will be banned for 7 days";
+        String mainBody = "We are sorry to inform you but your Gardener Grove Account recently submitted a tag that breaches our language standards." +
+                "Which has resulted in your account receiving a fifth consecutive strike." +
+                "Warning, if you add another inappropriate tag your account will be banned for 7 days";
 
-        String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
+        String username = user.getFirstName() + " " + user.getLastName();
 
         Context context = new Context();
         context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
 
-        String toEmail = token.getUser().getEmailAddress();
+        String toEmail = user.getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
     /**
      * Sends a ban email to the user that informs them they have been banned for 7 days
      *
-     * @param token the token to send information about
+     * @param user to send the email
      */
-    public void sendTagBanEmail(Token token) throws MessagingException {
-        String subject = "Tag moderation ban";
+    public void sendTagBanEmail(User user) throws MessagingException {
+        String subject = "Account Banned";
         String template = "tagBanEmail";
 
-        String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
+        String username = user.getFirstName() + " " + user.getLastName();
 
         LocalDate banDate = LocalDate.now();
         LocalDate unbanDate = banDate.plusDays(7);
@@ -263,7 +265,7 @@ public class EmailService {
         context.setVariable("banDate", banDate.format(formatter));
         context.setVariable("unbanDate", unbanDate.format(formatter));
 
-        String toEmail = token.getUser().getEmailAddress();
+        String toEmail = user.getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
     }
 }

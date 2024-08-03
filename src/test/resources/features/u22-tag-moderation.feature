@@ -48,8 +48,8 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     Given I as user "dom@email.com" am logged in with "Password1!"
     And I previously added a tag "Profane Tag"
     And My Tag "Profane Tag" contained profanity
-    And I as user "dom@email.com" currently have x strikes or none
+    And I as user "dom@email.com" currently have 0 strikes
     When I enter a valid tag "Profane Tag"
     Then The following error message is displayed "This tag does not meet the language standards for Gardener's Grove. A warning strike has been added to your account"
     And The tag is not added to the garden
-    And Then I "dom@email.com" get a strike
+    And I "dom@email.com" get a strike
