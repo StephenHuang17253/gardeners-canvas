@@ -4,6 +4,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -11,13 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 /**
  * Service class for User, defined by the {@link Service} annotation.
@@ -221,13 +220,17 @@ public class UserService {
     }
 
     /**
-     * give a strike to the user
-     * 
+     * Give a strike to the user.
+     * Checks that the user's strikes value isn't null, to accommodate users who existed before this feature.
      * @param user user to strike
      */
     public void strikeUser(User user) {
         int strikes = user.getStrikes();
-        user.setStrikes(strikes + 1);
+        if (Objects.isNull(strikes)) {
+            user.setStrikes(1);
+        } else {
+            user.setStrikes(strikes + 1);
+        }
         userRepository.save(user);
     }
 
