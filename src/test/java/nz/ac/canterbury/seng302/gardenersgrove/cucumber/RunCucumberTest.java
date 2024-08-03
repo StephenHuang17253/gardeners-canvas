@@ -3,8 +3,12 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber;
 import io.cucumber.junit.platform.engine.Constants;
 import io.cucumber.spring.CucumberContextConfiguration;
 import nz.ac.canterbury.seng302.gardenersgrove.GardenersGroveApplication;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import org.junit.platform.suite.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -22,4 +26,10 @@ import org.springframework.test.context.ContextConfiguration;
 @SpringBootTest
 @ActiveProfiles("cucumber")
 public class RunCucumberTest {
+    @MockBean
+    public FileService fileservice;
+    @MockBean
+    public ProfanityService profanityService;
+    @MockBean
+    public EmailService emailService;
 }

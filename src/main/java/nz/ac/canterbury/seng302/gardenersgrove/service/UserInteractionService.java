@@ -22,7 +22,7 @@ public class UserInteractionService {
 
     private final PlantService plantService;
 
-    private static int MAX_INTERACTION_COUNT_PER_TYPE = 10;
+    private static final int MAX_INTERACTION_COUNT_PER_TYPE = 10;
 
     /**
      * UserInteractionService constructor
@@ -85,6 +85,7 @@ public class UserInteractionService {
         return switch (itemType) {
             case GARDEN -> gardenService.getGardenById(itemId).isPresent();
             case PLANT -> plantService.findById(itemId).isPresent();
+            case USER -> userService.getUserById(itemId) != null;
         };
     }
 
@@ -127,4 +128,30 @@ public class UserInteractionService {
 
         return userInteractionRepository.save(userInteraction);
     }
+
+    /**
+     * Remove a user interaction by its user, item id and item type,
+     * If the interaction does not exist, nothing will happen.
+     * @param userId the user who triggered the interaction
+     * @param itemId the item interacted with
+     * @param itemType the item's type
+     */
+    public void removeUserInteraction(Long userId, Long itemId, ItemType itemType) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid user ID: " + userId);
+        }
+
+        if (!isValidItem(itemId, itemType)) {
+            throw new IllegalArgumentException("Invalid item ID: " + itemId + " for item type: " + itemType);
+        }
+
+        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository.findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
+        if (existingInteractionOpt.isPresent()) {
+            UserInteraction userInteraction = existingInteractionOpt.get();
+            userInteractionRepository.delete(userInteraction);
+        }
+
+    }
+
 }

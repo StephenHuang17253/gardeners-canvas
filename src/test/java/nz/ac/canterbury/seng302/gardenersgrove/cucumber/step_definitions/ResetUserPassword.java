@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -139,7 +140,9 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url))
                 .andExpect(status().isOk()).andReturn();
-        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+        ModelAndView model = resetPasswordResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
         assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
 
     }
@@ -162,7 +165,6 @@ public class ResetUserPassword {
     @And("I click the submit button")
     public void i_click_the_submit_button() throws Exception {
         String url = "/lost-password";
-        System.out.println(userEmail);
         resetPasswordResult = mockMVC.perform(
                 MockMvcRequestBuilders.post(url)
                         .param("emailAddress", userEmail))
@@ -175,7 +177,9 @@ public class ResetUserPassword {
 
     @Then("an error message tells me {string}")
     public void an_error_message_tells_me(String errorMessage) {
-        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+        ModelAndView model = resetPasswordResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
         Object errorObject = modelMap.get("emailError");
         String givenErrorMessage = errorObject.toString();
         Assertions.assertEquals(errorMessage, givenErrorMessage, "Error message match");
@@ -187,8 +191,10 @@ public class ResetUserPassword {
     }
 
     @Then("a confirmation message tells me {string}")
-    public void a_confirmation_message_tells_me(String message) throws MessagingException {
-        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+    public void a_confirmation_message_tells_me(String message) {
+        ModelAndView model = resetPasswordResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
         Object messageObject = modelMap.get("message");
         String givenMessage = messageObject.toString();
         Assertions.assertEquals(message, givenMessage, "Message match");
@@ -196,14 +202,16 @@ public class ResetUserPassword {
     }
 
     @When("I enter an email {string} that is known to the system")
-    public void i_enter_an_email_that_is_known_to_the_system(String email) throws MessagingException {
+    public void i_enter_an_email_that_is_known_to_the_system(String email) {
         userEmail = email;
 
     }
 
     @And("an email is sent with a link containing a unique reset token")
-    public void an_email_is_sent_with_a_link_containing_a_unique_reset_token() throws MessagingException {
-        ModelMap modelMap = resetPasswordResult.getModelAndView().getModelMap();
+    public void an_email_is_sent_with_a_link_containing_a_unique_reset_token() {
+        ModelAndView model = resetPasswordResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
         assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
 
     }

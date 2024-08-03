@@ -2,20 +2,21 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service class for User, defined by the {@link Service} annotation.
@@ -26,7 +27,7 @@ public class UserService {
 
     /** passwordEncoder to use for encoding passwords before storage */
     private final PasswordEncoder passwordEncoder;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -206,7 +207,7 @@ public class UserService {
     }
 
     /**
-     * ban a given user for a given amount of days
+     * ban a given user for a given amount of days, and reset their strikes to 0
      * 
      * @param user the user to ban
      * @param days length of ban
@@ -214,16 +215,22 @@ public class UserService {
     public void banUser(User user, int days) {
         user.setLastBanDate(LocalDateTime.now());
         user.setBanDuration(Duration.ofDays(days));
+        user.setStrikes(0);
         userRepository.save(user);
     }
 
     /**
-     * give a strike to the user
+     * Give a strike to the user.
+     * Checks that the user's strikes value isn't null, to accommodate users who existed before this feature.
      * @param user user to strike
      */
     public void strikeUser(User user) {
         int strikes = user.getStrikes();
-        user.setStrikes(strikes + 1);
+        if (Objects.isNull(strikes)) {
+            user.setStrikes(1);
+        } else {
+            user.setStrikes(strikes + 1);
+        }
         userRepository.save(user);
     }
 
@@ -248,6 +255,20 @@ public class UserService {
             }
         }
         return userRepository.findUsersByEmailAddressOrFirstNameAndLastName(fName, lName, email);
+    }
+
+    /**
+     * Turns a list of user interactions into a list of users
+     * 
+     * @param userInteractions a list of recent interaction
+     * @return a list of users associated with each recent interaction
+     */
+    public List<User> getUsersByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(UserInteraction::getItemId)
+                .map(this::getUserById)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
 }

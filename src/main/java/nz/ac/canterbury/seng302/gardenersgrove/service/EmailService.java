@@ -18,6 +18,9 @@ import jakarta.mail.internet.MimeMessage;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 /**
  * This class is a service class for sending emails defined by the
@@ -217,6 +220,52 @@ public class EmailService {
         context.setVariable("mainBody", mainBody);
 
         String toEmail = currentUser.getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
+
+    /**
+     * Sends a warning email to the user for using too many inappropriate tags
+     *
+     * @param user to send the email
+     */
+    public void sendTagBanWarningEmail(User user) throws MessagingException {
+        String subject = "Account Warning";
+        String template = "generalEmail";
+        String mainBody = "We are sorry to inform you but your Gardener Grove Account recently submitted a tag that breaches our language standards." +
+                "Which has resulted in your account receiving a fifth consecutive strike." +
+                "Warning, if you add another inappropriate tag your account will be banned for 7 days";
+
+        String username = user.getFirstName() + " " + user.getLastName();
+
+        Context context = new Context();
+        context.setVariable(USERNAME_FIELD, username);
+        context.setVariable("mainBody", mainBody);
+
+        String toEmail = user.getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
+
+    /**
+     * Sends a ban email to the user that informs them they have been banned for 7 days
+     *
+     * @param user to send the email
+     */
+    public void sendTagBanEmail(User user) throws MessagingException {
+        String subject = "Account Banned";
+        String template = "tagBanEmail";
+
+        String username = user.getFirstName() + " " + user.getLastName();
+
+        LocalDate banDate = LocalDate.now();
+        LocalDate unbanDate = banDate.plusDays(7);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+
+        Context context = new Context();
+        context.setVariable(USERNAME_FIELD, username);
+        context.setVariable("banDate", banDate.format(formatter));
+        context.setVariable("unbanDate", unbanDate.format(formatter));
+
+        String toEmail = user.getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
     }
 }
