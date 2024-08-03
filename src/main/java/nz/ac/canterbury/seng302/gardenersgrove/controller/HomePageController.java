@@ -6,7 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
@@ -23,14 +22,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -205,8 +199,6 @@ public class HomePageController {
 
         logger.info("GET /home");
 
-        model.addAttribute("myGardens", gardenService.getGardens());
-
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
             addDefaultContent();
@@ -287,7 +279,7 @@ public class HomePageController {
             model.addAttribute("recentGardensPage2", null);
         }
         boolean loggedIn = securityService.isLoggedIn();
-        logger.info("mark");
+
         if (loggedIn) {
             user = securityService.getCurrentUser();
             username = user.getFirstName() + " " + user.getLastName();
@@ -308,40 +300,11 @@ public class HomePageController {
                 }
             }
 
-            List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardensRefreshed);
-
-            Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
-            for (int i = 0; i < gardensRefreshed.size(); i++) {
-                gardenWeatherMap.put(gardensRefreshed.get(i).getGardenId(), weatherDataList.get(i));
-            }
-
-            for (Garden garden : gardensRefreshed) {
-                WeatherResponseData weatherData = gardenWeatherMap.get(garden.getGardenId());
-                if (weatherData != null) {
-                    List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
-                    if (weatherList.size() > 1) {
-                        DailyWeather beforeYesterdayWeather = weatherList.get(0);
-                        DailyWeather yesterdayWeather = weatherList.get(1);
-                        DailyWeather currentWeather = weatherList.get(2);
-                        if ((Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
-                                && Objects.equals(currentWeather.getDescription(), "Sunny")) || garden.getNeedsWatering()) {
-                            gardensNeedWatering.add(garden);
-                            garden.setNeedsWatering(true);
-                            gardenService.changeGardenNeedsWatering(garden.getGardenId(), true);
-                        } else {
-                            garden.setNeedsWatering(false);
-                            gardenService.changeGardenNeedsWatering(garden.getGardenId(), false);
-                        }
-                    }
-                }
-            }
-
+            getGardensForWatering(gardensRefreshed, gardensNeedWatering);
             model.addAttribute("gardensNeedWatering", gardensNeedWatering);
             model.addAttribute("profilePicture", profilePicture);
             model.addAttribute("username", username);
-            model.addAttribute("gardens", gardensRefreshed);
-            model.addAttribute("gardenWeatherMap", gardenWeatherMap);
+            model.addAttribute("gardens", gardens);
         }
 
         List<FriendModel> recentFriends = createFriendModel(user.getId());
@@ -350,4 +313,40 @@ public class HomePageController {
 
         return "mainPage";
     }
+
+    private void getGardensForWatering(List<Garden> gardens, List<Garden> gardensNeedWatering) throws UnavailableException {
+        List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
+
+        Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
+        for (int i = 0; i < gardens.size(); i++) {
+            gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
+        }
+
+        for (Garden garden : gardens) {
+            updateGardenWatering(garden, gardenWeatherMap.get(garden.getGardenId()), gardensNeedWatering);
+        }
+    }
+    private void updateGardenWatering(Garden garden, WeatherResponseData weatherData, List<Garden> gardensNeedWatering) {
+        if (weatherData != null) {
+            List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
+            if (weatherList.size() > 2) {
+
+                DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                DailyWeather yesterdayWeather = weatherList.get(1);
+                DailyWeather currentWeather = weatherList.get(2);
+
+                boolean needsWater = garden.getNeedsWatering() || Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny") &&
+                        Objects.equals(yesterdayWeather.getDescription(), "Sunny") &&
+                        Objects.equals(currentWeather.getDescription(), "Sunny");
+
+                garden.setNeedsWatering(needsWater);
+                gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
+
+                if (needsWater) {
+                    gardensNeedWatering.add(garden);
+                }
+            }
+        }
+    }
+
 }

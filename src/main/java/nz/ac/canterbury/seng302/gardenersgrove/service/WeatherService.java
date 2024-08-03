@@ -195,7 +195,7 @@ public class WeatherService {
     }
 
     /**
-     * Pre-existing logic, used to build HTTP request
+     * Constructs an http request for the open-meteo weather api
      *
      * @param garden the garden the request is built for
      * @return HTTP request
@@ -213,7 +213,8 @@ public class WeatherService {
     }
 
     /**
-     * pre-existing logic, handles HTTP response
+     * handles the http response from the api, tries to return that response as weather response data
+     * to read weather info from
      *
      * @param response response from the weather
      * @param garden the garden needing the response data
@@ -231,7 +232,7 @@ public class WeatherService {
     }
 
     /**
-     * pre-existing logic, resets permits
+     * rate limit is 10 calls per second, so if a second has passed this will reset the available permits
      */
     private void resetPermitsIfNeeded() {
         long currentTime = Instant.now().getEpochSecond();
