@@ -1,0 +1,152 @@
+package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
+import org.junit.jupiter.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public class U24_BrowseGardensByTag {
+
+    @Autowired
+    public GardenRepository gardenRepository;
+
+    @Autowired
+    public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public GardenTagRelationRepository gardenTagRelationRepository;
+
+    @Autowired
+    public PlantRepository plantRepository;
+
+    @Autowired
+    public UserRepository userRepository;
+
+    @Autowired
+    public PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public FriendshipRepository friendshipRepository;
+
+    @Autowired
+    public SecurityService securityService;
+
+    @Autowired
+    public UserInteractionService userInteractionService;
+
+    public static MockMvc mockMVC;
+
+    public static GardenService gardenService;
+
+    public static UserService userService;
+
+    public static PlantService plantService;
+
+    public static FileService fileService;
+
+    private static FriendshipService friendshipService;
+
+    private static GardenTagService gardenTagService;
+
+
+    private MvcResult mvcResult;
+
+    private String currentPageUrl;
+    private int lastPage;
+
+    private String searchValue;
+    private GardenTag appliedTag;
+    private Garden targetGarden;
+
+    @Before
+    public void before_or_after_all() {
+
+        userService = new UserService(passwordEncoder, userRepository);
+        gardenService = new GardenService(gardenRepository, userService);
+        plantService = new PlantService(plantRepository, gardenService, fileService);
+        friendshipService = new FriendshipService(friendshipRepository, userService);
+
+        HomePageController homePageController = new HomePageController(userService, gardenService, plantService,
+                friendshipService, securityService, userInteractionService);
+
+        // Allows us to bypass spring security
+        mockMVC = MockMvcBuilders
+                .standaloneSetup(homePageController)
+                .build();
+    }
+
+    @Given("There is a public garden called {string} with tag {string} for user {string}")
+    public void thereIsAPublicGardenCalledWithTagForUser(String gardenName, String tag, String ownersEmail) {
+
+    }
+
+    @And("The user {string} has a garden called {string} that has the tag {string}")
+    public void theUserHasAGardenCalledThatHasTheTag(String ownersEmail, String gardenName, String tag) {
+        User user = userService.getUserByEmail(ownersEmail);
+        targetGarden = gardenService.addGarden(new Garden(gardenName, tag,
+                "", "", "", "", "", 0.0, true, "", "", user));
+    }
+
+    @And("I search input search value {string}")
+    public void iSearchInputSearchValue(String inputValue) {
+        searchValue = inputValue;
+    }
+
+    @And("I apply the tag {string}")
+    public void iApplyTheTag(String tag) {
+        appliedTag = new GardenTag(tag);
+    }
+
+    @When("I submit the search with both search and tag")
+    public void iSubmitTheSearchWithBothSearchAndTag() throws Exception {
+        mvcResult = mockMVC.perform(
+                        MockMvcRequestBuilders
+                                .get("/public-gardens/search/0")
+                                .param("searchInput", searchValue)
+                                .param("appliedTags", appliedTag.getTagName()))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Then("The search results contain the garden called {string}")
+    public void theSearchResultsContainTheGardenCalled(String gardenName) {
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        List<Garden> searchResults = (List<Garden>) model.getModelMap()
+                .getAttribute("publicGardens");
+        Assertions.assertNotNull(searchResults);
+        for (Garden result : searchResults) {
+            Assertions.assertTrue(result.getGardenName().contains(gardenName)
+                    || result.getPlants().stream().anyMatch(plant -> plant.getPlantName().contains(gardenName)));
+        }
+    }
+}
