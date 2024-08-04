@@ -257,4 +257,17 @@ public class U25_MainPage {
     public void iCanSeeAButtonAndMessageThatSays(String message) throws Exception {
         assertEquals(message, model.get("notificationMessage"));
     }
+
+    @Then("I see my recently accessed gardens, friends list, and notifications")
+    public void iSeeMyRecentlyAccessedGardensFriendsListAndNotifications() {
+        assertTrue(model.containsKey("recentFriends"));
+        assertTrue(model.containsKey("notificationMessage"));
+        assertTrue(model.containsKey("recentGardensPage2"));
+    }
+
+    @Then("I see my most recently accessed gardens")
+    public void iSeeMyTopMostRecentlyAccessedGardens() {
+        assertTrue(model.containsKey("recentGardensPage1"));
+    }
+
 }
