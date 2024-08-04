@@ -111,7 +111,6 @@ public class Garden {
         this.owner = owner;
         this.creationDate = LocalDateTime.now();
         this.lastLocationUpdate = LocalDateTime.now();
-        this.lastWaterCheck = LocalDateTime.now();
         this.needsWatering = false;
     }
 
@@ -141,7 +140,6 @@ public class Garden {
         this.gardenLongitude = gardenLongitude;
         this.isPublic = isPublic;
         this.owner = owner;
-        this.lastWaterCheck = LocalDateTime.now();
         this.needsWatering = false;
         this.lastLocationUpdate = LocalDateTime.now();
     }

@@ -290,9 +290,8 @@ public class HomePageController {
             List<Garden> gardensNeedWatering = new ArrayList<>();
 
             for (Garden garden : gardens) {
-                if (garden.getLastLocationUpdate() == null) {
-                    gardensRefreshed.add(garden);
-                } else if (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck())) {
+                if (garden.getLastLocationUpdate() == null || garden.getLastWaterCheck() == null ||
+                        (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck()))) {
                     gardensRefreshed.add(garden);
                 }
                 if (garden.getNeedsWatering()) {
