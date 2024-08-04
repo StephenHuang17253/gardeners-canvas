@@ -174,7 +174,7 @@ public class HomePageController {
 
             }
             Friendship friendship = friendshipService.addFriendship(janeDoe, johnDoe);
-            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.PENDING);
+            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
         }
 
         if (!userService.emailInUse("badguy@email.com")) {
