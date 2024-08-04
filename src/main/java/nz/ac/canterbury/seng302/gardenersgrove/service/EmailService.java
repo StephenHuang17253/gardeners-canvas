@@ -231,9 +231,10 @@ public class EmailService {
     public void sendTagBanWarningEmail(User user) throws MessagingException {
         String subject = "Account Warning";
         String template = "generalEmail";
-        String mainBody = "We are sorry to inform you but your Gardener Grove Account recently submitted a tag that breaches our language standards." +
-                "Which has resulted in your account receiving a fifth consecutive strike." +
-                "Warning, if you add another inappropriate tag your account will be banned for 7 days";
+        String mainBody = """
+                Due to your Gardener's Grove account recently submitting a tag that breaches our language standard,
+                 \nyour account has received its fifth consecutive strike.
+                \nThis is your final warning, if you add another inappropriate tag your account will be banned for 7 days.""";
 
         String username = user.getFirstName() + " " + user.getLastName();
 
