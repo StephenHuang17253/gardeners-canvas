@@ -299,7 +299,22 @@ public class HomePageController {
                 }
             }
 
+
             getGardensForWatering(gardensRefreshed, gardensNeedWatering);
+
+            List<User> pendingFriends = new ArrayList<>();
+            List<Friendship> friendships = friendshipService.getAllUsersFriends(user.getId());
+            List<User> friends = friendships.stream()
+                        .map(Friendship::getUser2)
+                        .toList();
+
+            for (User friend : friends) {
+                if (friendshipService.findFriendship(user, friend).getStatus() == FriendshipStatus.PENDING) {
+                    pendingFriends.add(friend);
+                }
+            }
+
+            model.addAttribute("friendRequests", pendingFriends);
             model.addAttribute("gardensNeedWatering", gardensNeedWatering);
             model.addAttribute("profilePicture", profilePicture);
             model.addAttribute("username", username);
