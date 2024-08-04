@@ -211,7 +211,8 @@ public class GardensController {
             @RequestParam(required = false) String weatherListJson,
             HttpServletRequest request,
             HttpServletResponse response,
-            Model model) {
+            RedirectAttributes redirectAttributes,
+            Model model) throws ServletException {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -319,9 +320,24 @@ public class GardensController {
                 {
                     if (pendingTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
                     {
-                        model.addAttribute("tagMessageText","");
+                        // security service will return old strike count so adding one to account for this tag.
+                        int userStrikes = securityService.getCurrentUser().getStrikes() + 1;
+                        logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), userStrikes);
                         model.addAttribute("tagErrorText", "This tag does not meet the language " +
                                 "standards for Gardener's Grove. A warning strike has been added to your account");
+                        if (userStrikes == 5) {
+                            model.addAttribute("tagErrorText", "You have added an inappropriate tag for the fifth time." +
+                                    " You have been sent a warning email. " +
+                                    "If you add another inappropriate tag, you will be banned for a week.");
+                        }
+                        else if (userStrikes == 6)
+                        {
+                            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+                            redirectAttributes.addFlashAttribute("goodMessage", false);
+                            request.logout();
+                            return "redirect:/login";
+                        }
+                        model.addAttribute("tagMessageText","");
                     }
                     else if (pendingTag.get().getTagStatus() == TagStatus.APPROPRIATE)
                     {
@@ -339,7 +355,12 @@ public class GardensController {
             }
         }
 
-
+        if (garden.getOwner().isBanned()) {
+            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            request.logout();
+            return "redirect:/login";
+        }
 
         model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
@@ -390,6 +411,7 @@ public class GardensController {
         }
         redirectAttributes.addFlashAttribute("page", page);
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
+
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -504,13 +526,6 @@ public class GardensController {
                             " You have been sent a warning email. " +
                             "If you add another inappropriate tag, you will be banned for a week.");
                 }
-
-                if (garden.getOwner().isBanned()) {
-                    redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
-                    redirectAttributes.addFlashAttribute("goodMessage", false);
-                    request.logout();
-                    return "redirect:/login";
-                }
             }
 
 
@@ -532,6 +547,14 @@ public class GardensController {
 
         redirectAttributes.addAttribute("page", page);
         redirectAttributes.addFlashAttribute("openModal", "true");
+
+        if (garden.getOwner().isBanned()) {
+            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            request.logout();
+            return "redirect:/login";
+        }
+
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -692,9 +715,9 @@ public class GardensController {
             }
             else
             {
+                securityService.handleStrikeUser(user);
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
-                securityService.handleStrikeUser(user);
                 logger.info("{} has {} strikes", user.getFirstName(), user.getStrikes());
 
             }
