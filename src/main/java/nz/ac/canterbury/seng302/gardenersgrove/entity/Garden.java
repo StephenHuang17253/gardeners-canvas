@@ -248,6 +248,13 @@ public class Garden {
 
     }
 
+    /**
+     * Overloaded method where you can manually set lastwatercheck for testing purposes
+     * Sets boolean value for if a garden needs watering and sets the date at which that garden was last checked for watering
+     *
+     * @param needsWatering boolean value for if a garden needs watering
+     * @param lastWaterCheck date manually set for when the watering need was last checked
+     */
     public void setNeedsWatering(boolean needsWatering, LocalDateTime lastWaterCheck) {
         this.needsWatering = needsWatering;
         this.lastWaterCheck = lastWaterCheck;
