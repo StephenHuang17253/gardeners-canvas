@@ -173,8 +173,8 @@ public class HomePageController {
                 }
 
             }
-            Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
-            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
+            Friendship friendship = friendshipService.addFriendship(janeDoe, johnDoe);
+            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.PENDING);
         }
 
         if (!userService.emailInUse("badguy@email.com")) {
@@ -305,11 +305,11 @@ public class HomePageController {
             List<User> pendingFriends = new ArrayList<>();
             List<Friendship> friendships = friendshipService.getAllUsersFriends(user.getId());
             List<User> friends = friendships.stream()
-                        .map(Friendship::getUser2)
+                        .map(Friendship::getUser1)
                         .toList();
 
             for (User friend : friends) {
-                if (!Objects.equals(friend.getId(), user.getId()) && friendshipService.findFriendship(user, friend).getStatus() == FriendshipStatus.PENDING) {
+                if (!Objects.equals(friend.getId(), user.getId()) && friendshipService.findFriendship(friend, user).getStatus() == FriendshipStatus.PENDING) {
                         pendingFriends.add(friend);
                 }
             }
