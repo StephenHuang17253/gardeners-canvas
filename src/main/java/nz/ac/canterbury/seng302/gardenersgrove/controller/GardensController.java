@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -413,7 +414,8 @@ public class GardensController {
                                    @RequestParam(defaultValue = "1") int page,
                                    RedirectAttributes redirectAttributes,
                                    HttpServletResponse response,
-                                   Model model) {
+                                   HttpServletRequest request,
+                                   Model model) throws ServletException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         ValidationResult tagResult = InputValidator.validateTag(tag);
@@ -443,6 +445,7 @@ public class GardensController {
             if (!gardenAlreadyHasThisTag && tagResult.valid() && gardenTag.getTagStatus() != TagStatus.INAPPROPRIATE) {
                 gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
             }
+
         }
 
         Optional<GardenTag> newTag = gardenTagService.getByName(tag);
@@ -465,6 +468,13 @@ public class GardensController {
                     model.addAttribute("tagErrorText", "You have added an inappropriate tag for the fifth time." +
                             " You have been sent a warning email. " +
                             "If you add another inappropriate tag, you will be banned for a week.");
+                }
+
+                if (garden.getOwner().isBanned()) {
+                    redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+                    redirectAttributes.addFlashAttribute("goodMessage", false);
+                    request.logout();
+                    return "redirect:/login";
                 }
             }
 
