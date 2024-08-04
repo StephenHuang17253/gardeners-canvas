@@ -1,22 +1,16 @@
 <div
-    th:fragment="plantSearchResultCard(plantId, plantName, plantPicture)">
-    <a th:href="@{/plant-wiki/{plantId}/details(plantId=${plantId})}" >
+    th:fragment="plantSearchResultCard(plantId, plantName, plantSciName, plantPicture)">
+    <a th:href="@{/plant-wiki/{plantId}/details(plantId=${plantId})}" class="text-decoration-none">
         <div class="card h-100 bg-success text-white garden-card">
             <div class="card-body pt-1">
-
-
-
-                <div class="d-flex flex-row gap-1">
-                    <div class="col-10">
+                <div class="position-relative my-2">
+                    <div class="ratio ratio-1x1">
                         <img th:src="@{${plantPicture == '' ? '/images/default_plant.png' : plantPicture}}"
-                             alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
+                             alt="Plant Picture" class="image-fluid rounded w-100 h-100 object-fit-cover">
                     </div>
-
                 </div>
                 <h4 class="card-title mt-1" th:text="${plantName}"></h4>
-                <div class="row">
-
-                </div>
+                <h5 class="card-title mt-1" th:text="${plantSciName}"></h5>
             </div>
         </div>
     </a>

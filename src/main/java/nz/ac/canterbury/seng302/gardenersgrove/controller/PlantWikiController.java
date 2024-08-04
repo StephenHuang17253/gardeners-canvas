@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.UnavailableException;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantInfoModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantSearchModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantInfoService;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -68,7 +70,7 @@ public class PlantWikiController {
 
     /**
      * Helper to handle adding search results to model
-     * and catching any potential exceptions that may ocur
+     * and catching any potential exceptions that may occur
      * @param search term entered by user
      * @param model hashmap of endpoints attributes
      */
@@ -112,6 +114,13 @@ public class PlantWikiController {
         }
     }
 
+    private void addDefaultPlantsToModel(Model model){
+        List<PlantSearchModel> plants = plantInfoService.getAllDefaultPlants().stream()
+                .map(PlantSearchModel::new)
+                .collect(Collectors.toList());
+        model.addAttribute("plants", plants);
+    }
+
     /**
      * This method creates the get mapping for the plant wiki page where users can search for plant information.
      * @param search the query string
@@ -125,13 +134,16 @@ public class PlantWikiController {
     @GetMapping("/plant-wiki")
     public String viewPlantWiki(@RequestParam(name = "search", required = false)
                                 String search,
-                                Model model) throws IOException, InterruptedException {
+                                Model model) {
         logger.info("GET /plant-wiki with search term: {}", search);
 
         if (search != null && !search.isEmpty()) {
             model.addAttribute("searchTerm", search);
             addSearchResultsToModel(search, model);
+            return "plantWikiPage";
         }
+
+        addDefaultPlantsToModel(model);
 
         return "plantWikiPage";
     }
@@ -149,12 +161,21 @@ public class PlantWikiController {
                                    Model model) throws IOException, InterruptedException {
         logger.info("GET /plant-wiki/{}/details", plantId);
 
+        Optional<PlantInfo> plant = plantInfoService.getPlantById(plantId);
+
+        if(plant.isPresent()){
+            PlantInfoModel plantInfo = new PlantInfoModel(plant.get());
+
+            model.addAttribute("plant", plantInfo);
+            return "plantWikiDetailPage";
+        }
+
 
         JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
 
-        PlantInfoModel plant = new PlantInfoModel(plantDetails);
+        PlantInfoModel plantInfo = new PlantInfoModel(plantDetails);
 
-        model.addAttribute("plant", plant);
+        model.addAttribute("plant", plantInfo);
 
 
         return "plantWikiDetailPage";

@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 
 /**
  * Model class for storing plant data from API call, used for the Plant Details page.
@@ -8,10 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class PlantInfoModel {
 
     private String commonName;
-
+    private String scientificName;
 
     // TODO: Sort out the extra information in the plantInfoModel below. Decide what is useful to keep and what isn't.
-    //    private List<String> scientificName;
     //    private List<String> otherName;
     //    private String family;
     //    private String origin;
@@ -61,6 +61,17 @@ public class PlantInfoModel {
         this.description = plantDetails.get("description").asText();
         this.defaultImage = getImageURL(plantDetails);
     }
+    /**
+     * Constructor for a PlantSearchModel for default plants
+     * @param plantInfo entity object
+     */
+    public PlantInfoModel(PlantInfo plantInfo) {
+        this.commonName = plantInfo.getName();
+        this.scientificName = plantInfo.getScientificName();
+        this.defaultImage = plantInfo.getImageURL();
+        this.description = plantInfo.getDescription();
+    }
+
 
     private String getImageURL(JsonNode plantDetails) {
 
@@ -85,4 +96,7 @@ public class PlantInfoModel {
     }
 
 
+    public String getScientificName() {
+        return scientificName;
+    }
 }

@@ -30,6 +30,7 @@
                     <div th:replace="~{fragments/plantSearchResultCard.html :: plantSearchResultCard(
                         plantId=${plant.id},
                         plantName=${plant.commonName},
+                        plantSciName=${plant.scientificName},
                         plantPicture=${plant.image})}
                             ">
                     </div>

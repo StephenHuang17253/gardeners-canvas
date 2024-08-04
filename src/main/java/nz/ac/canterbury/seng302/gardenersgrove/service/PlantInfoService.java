@@ -2,17 +2,23 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantInfoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for obtaining plant information from the Perenual Plant API
@@ -24,6 +30,30 @@ public class PlantInfoService {
     private String perenualPlantAPIKey;
 
     Logger logger = LoggerFactory.getLogger(PlantInfoService.class);
+
+    private PlantInfoRepository plantInfoRepository;
+
+    @Autowired
+    public PlantInfoService(PlantInfoRepository plantInfoRepository) {
+        this.plantInfoRepository = plantInfoRepository;
+    }
+
+    /**
+     * Get all default plants
+     * @return list of all default Plant Info entities
+     */
+    public List<PlantInfo> getAllDefaultPlants(){
+        return plantInfoRepository.findAll();
+    }
+
+    /**
+     * Get a Plant info object by id
+     * @param id of plant info entity
+     * @return plant info entity object
+     */
+    public Optional<PlantInfo> getPlantById(Long id){
+        return plantInfoRepository.findById(id);
+    }
 
     /**
      * Gets the response body of the Perenual API plant list call.

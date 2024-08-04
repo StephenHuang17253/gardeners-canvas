@@ -8,26 +8,21 @@
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
          th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container mt-5 bg-white border rounded pt-4">
-        <div class="row mb-4" >
+        <div class="row">
             <div class="col">
-                <h1 class="mb-3" th:text="${plant.commonName} + ' Details'"></h1>
+                <h1 th:text="${plant.commonName} + ' Details'"></h1>
             </div>
         </div>
         <div class="row mb-4">
-
-            <div class="row mb-4">
-                <p th:text="${plant.commonName}"></p>
-                <img class="w-50" th:src="${plant.defaultImage}" alt="Image not found">
-                <p th:text="${plant.description}"></p>
+            <h5 th:text="${plant.scientificName}" class="fw-light fst-italic text-success"></h5>
+            <div class="w-50 mb-4">
+                <div class="ratio ratio-1x1">
+                    <img th:src="@{${plant.defaultImage == '' ? '/images/default_plant.png' : plant.defaultImage}}"
+                         alt="Plant Picture" class="image-fluid rounded w-100 h-100 object-fit-cover">
+                </div>
             </div>
-
-
-
+            <p th:text="${plant.description}"></p>
         </div>
-
-
-
-
     </div>
 </body>
 
