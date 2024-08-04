@@ -309,8 +309,8 @@ public class HomePageController {
                         .toList();
 
             for (User friend : friends) {
-                if (friend != user || friendshipService.findFriendship(user, friend).getStatus() == FriendshipStatus.PENDING) {
-                    pendingFriends.add(friend);
+                if (!Objects.equals(friend.getId(), user.getId()) && friendshipService.findFriendship(user, friend).getStatus() == FriendshipStatus.PENDING) {
+                        pendingFriends.add(friend);
                 }
             }
 
