@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -43,9 +44,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -96,6 +95,8 @@ public class U25_MainPage {
     public MockMvc mockMVC;
 
     private MvcResult mvcResult;
+
+    private Map<String, Object> model;
 
     private String drySampleWeather = "{\n" +
             "  \"latitude\": -43.5,\n" +
@@ -218,11 +219,16 @@ public class U25_MainPage {
 
     @And("I am on the home page")
     public void iAmOnTheHomePage() throws Exception {
-        String url = "/home";
-        mockMVC.perform(
+
+        mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
-                                .get(url))
-                .andExpect(status().isOk()).andReturn();
+                                .get("/home"))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
+
+        model = modelAndView.getModel();
     }
 
     @When("I have garden called {string} that needs watering for user {string}")
@@ -243,9 +249,12 @@ public class U25_MainPage {
     public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) throws Exception {
         User user = userService.getUserByEmail(email);
         List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
-
         assertNotNull(gardensNeedWatering, "The list of gardens that need water should not be null");
-        assertEquals(gardensNeedWatering.getFirst().toString(), user.getGardens().getFirst().toString());
+        assertEquals(gardensNeedWatering.get(0).toString(), user.getGardens().get(0).toString());
     }
 
+    @Then("I can see a button and message that says {string}")
+    public void iCanSeeAButtonAndMessageThatSays(String message) throws Exception {
+        assertEquals(message, model.get("notificationMessage"));
+    }
 }
