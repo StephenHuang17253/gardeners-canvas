@@ -19,12 +19,17 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,6 +39,9 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
+@AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class U24_BrowseGardensByTag {
 
     @Autowired
@@ -126,13 +134,23 @@ public class U24_BrowseGardensByTag {
         appliedTag = new GardenTag(tag);
     }
 
+
     @When("I submit the search with both search and tag")
     public void iSubmitTheSearchWithBothSearchAndTag() throws Exception {
-        mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get("/public-gardens/search/0")
-                                .param("searchInput", searchValue)
-                                .param("appliedTags", appliedTag.getTagName()))
+        String pageNum = "1";
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get("/public-gardens/search/" + pageNum)
+                .param("searchInput", searchValue)
+                .param("appliedTags", appliedTag.getTagName());
+        //System.out.println(request.);
+
+        mvcResult = mockMVC.perform(request)
+                .andDo(result -> {
+                    System.out.println("Request URL: " + result.getRequest().getRequestURL());
+                    System.out.println("Request Parameters: " + result.getRequest().getParameterMap());
+                    System.out.println("Response Status: " + result.getResponse().getStatus());
+                    System.out.println("Response Content: " + result.getResponse().getContentAsString());
+                })
                 .andExpect(status().isOk())
                 .andReturn();
     }
