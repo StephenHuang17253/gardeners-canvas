@@ -167,7 +167,7 @@ public class GardensController {
         return weatherList;
     }
 
-    private void handleWeatherMessages(List<WeatherModel> weatherList, Model model) {
+    private void handleWeatherMessages(List<WeatherModel> weatherList,  Garden garden, Model model) {
         WeatherModel beforeYesterdayWeather = weatherList.get(0);
         WeatherModel yesterdayWeather = weatherList.get(1);
         WeatherModel currentWeather = weatherList.get(2);
@@ -179,9 +179,11 @@ public class GardensController {
         if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(currentWeather.getDescription(), "Sunny")) {
-            model.addAttribute("message",
-                    "There hasn't been any rain recently, make sure to water your plants if they need it");
+            model.addAttribute("message", "There hasn't been any rain recently, make sure to water your plants if they need it");
             model.addAttribute("goodMessage", false);
+            gardenService.changeGardenNeedsWatering(garden.getGardenId(), true);
+        } else {
+            gardenService.changeGardenNeedsWatering(garden.getGardenId(), false);
         }
     }
 
@@ -254,7 +256,7 @@ public class GardensController {
             weatherList = getGardenWeatherData(garden);
         }
         if (weatherList.size() > 1) {
-            handleWeatherMessages(weatherList, model);
+            handleWeatherMessages(weatherList, garden, model);
         }
 
         User user = garden.getOwner();
@@ -369,7 +371,7 @@ public class GardensController {
         List<WeatherModel> weatherList;
         weatherList = getGardenWeatherData(garden);
         if (weatherList.size() > 1) {
-            handleWeatherMessages(weatherList, model);
+            handleWeatherMessages(weatherList, garden, model);
         }
 
         User user = garden.getOwner();
@@ -474,6 +476,14 @@ public class GardensController {
                     request.logout();
                     return "redirect:/login";
                 }
+            }
+
+
+
+            List<WeatherModel> weatherList;
+            weatherList = getGardenWeatherData(garden);
+            if (weatherList.size() > 1) {
+                handleWeatherMessages(weatherList, garden, model);
             }
             return setGardenDetailModel(garden,tag,page,model);
         }

@@ -20,3 +20,9 @@ Scenario: I Have three recent Friends, they show up in order
   And I accept the pending invite from "thomas@email.com"
   And I look at the recent friends list on the home page
   Then I see that my friends with emails "jerry@email.com" and "thomas@email.com" are listed in order
+
+Scenario: (AC6) I see plants that need watering notifications
+  Given I as user "Liam.smith@email.com" am logged in with "Password1!"
+  And I am on the home page
+  When I have garden called "Thirsty Garden" that needs watering for user "Liam.smith@email.com"
+  Then I can see that "Thirsty Garden" need watering in the watering notifications for "Liam.smith@email.com"
