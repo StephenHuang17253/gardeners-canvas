@@ -418,7 +418,7 @@ public class GardensController {
                                    RedirectAttributes redirectAttributes,
                                    HttpServletResponse response,
                                    HttpServletRequest request,
-                                   Model model) throws ServletException {
+                                   Model model) throws ServletException, InterruptedException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         ValidationResult tagResult = InputValidator.validateTag(tag);
