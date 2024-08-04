@@ -338,10 +338,13 @@ public class HomePageController {
      */
     private void getGardensForWatering(List<Garden> gardens, List<Garden> gardensNeedWatering) throws UnavailableException {
         List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
-
         Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
-        for (int i = 0; i < gardens.size(); i++) {
-            gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
+        for (int i = 0; i < weatherDataList.size(); i++) {
+            if (weatherDataList.get(i) == null) {
+
+            } else {
+                gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
+            }
         }
 
         for (Garden garden : gardens) {
