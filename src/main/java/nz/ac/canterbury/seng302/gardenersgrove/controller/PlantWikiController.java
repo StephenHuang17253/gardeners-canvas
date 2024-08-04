@@ -20,8 +20,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
@@ -69,21 +69,27 @@ public class PlantWikiController {
     }
 
     /**
-     * Helper to handle adding search results to model
+     * Helper to handle adding api call results to model
      * and catching any potential exceptions that may occur
      * @param search term entered by user
      * @param model hashmap of endpoints attributes
      */
-    private void addSearchResultsToModel(String search, Model model){
+    private void addAPIResultsToModel(String search, Long plantId, Model model){
         try {
             acquirePermit();
-            JsonNode plantList = plantInfoService.getPlantListJson(search, true);
+            if(Objects.nonNull(search)){
+                JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
-            List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
-                    .map(PlantSearchModel::new)
-                    .collect(Collectors.toList());
+                List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
+                        .map(PlantSearchModel::new)
+                        .collect(Collectors.toList());
 
-            model.addAttribute("plants", plants);
+                model.addAttribute("plants", plants);
+            } else {
+                JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
+                PlantInfoModel plantInfo = new PlantInfoModel(plantDetails);
+                model.addAttribute("plant", plantInfo);
+            }
 
         } catch (UnavailableException e) {
             logger.error("UnavailableException occurred: {}", e.getMessage());
@@ -114,6 +120,10 @@ public class PlantWikiController {
         }
     }
 
+    /**
+     * Helper to add the default plant info objects to model
+     * @param model hashmap of endpoint attributes
+     */
     private void addDefaultPlantsToModel(Model model){
         List<PlantSearchModel> plants = plantInfoService.getAllDefaultPlants().stream()
                 .map(PlantSearchModel::new)
@@ -126,10 +136,6 @@ public class PlantWikiController {
      * @param search the query string
      * @param model the model
      * @return template for the plant wiki page
-     * @throws IOException          If an I/O error occurs while making the
-     *                              requesting
-     * @throws InterruptedException If an interruption occurs while waiting for
-     *                              response
      */
     @GetMapping("/plant-wiki")
     public String viewPlantWiki(@RequestParam(name = "search", required = false)
@@ -139,7 +145,7 @@ public class PlantWikiController {
 
         if (search != null && !search.isEmpty()) {
             model.addAttribute("searchTerm", search);
-            addSearchResultsToModel(search, model);
+            addAPIResultsToModel(search, null, model);
             return "plantWikiPage";
         }
 
@@ -153,12 +159,10 @@ public class PlantWikiController {
      * @param plantId               id of the plant
      * @param model                 the model
      * @return                      template for the plant details pge
-     * @throws IOException          If an error occurs while making request
-     * @throws InterruptedException If request is interrupted
      */
     @GetMapping("/plant-wiki/{plantId}/details")
     public String viewPlantDetails(@PathVariable Long plantId,
-                                   Model model) throws IOException, InterruptedException {
+                                   Model model) {
         logger.info("GET /plant-wiki/{}/details", plantId);
 
         Optional<PlantInfo> plant = plantInfoService.getPlantById(plantId);
@@ -170,13 +174,7 @@ public class PlantWikiController {
             return "plantWikiDetailPage";
         }
 
-
-        JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
-
-        PlantInfoModel plantInfo = new PlantInfoModel(plantDetails);
-
-        model.addAttribute("plant", plantInfo);
-
+        addAPIResultsToModel(null, plantId, model);
 
         return "plantWikiDetailPage";
     }
