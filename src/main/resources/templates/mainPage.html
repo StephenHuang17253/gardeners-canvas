@@ -116,10 +116,9 @@
                     </a>
                 </div>
             </div>
-            <div th:if="${friendRequests.size() > 0}">
+            <div th:if="${friendRequests.size() > 0}" id="message">
                 <div class="d-flex justify-content-center">
-                    <pre class ="lead text-danger" style="white-space: pre-line; font-family: inherit;">
-                        You have friend requests
+                    <pre class ="lead text-danger" style="white-space: pre-line; font-family: inherit;" th:text="${notificationMessage}">
                         Click below to manage them:
                     </pre>
                 </div>

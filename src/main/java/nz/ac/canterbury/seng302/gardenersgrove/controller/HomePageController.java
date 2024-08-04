@@ -309,12 +309,14 @@ public class HomePageController {
                         .toList();
 
             for (User friend : friends) {
-                if (friendshipService.findFriendship(user, friend).getStatus() == FriendshipStatus.PENDING) {
+                if (friend != user || friendshipService.findFriendship(user, friend).getStatus() == FriendshipStatus.PENDING) {
                     pendingFriends.add(friend);
                 }
             }
 
             model.addAttribute("friendRequests", pendingFriends);
+            model.addAttribute("notificationMessage", "You have friend requests");
+
             model.addAttribute("gardensNeedWatering", gardensNeedWatering);
             model.addAttribute("profilePicture", profilePicture);
             model.addAttribute("username", username);
