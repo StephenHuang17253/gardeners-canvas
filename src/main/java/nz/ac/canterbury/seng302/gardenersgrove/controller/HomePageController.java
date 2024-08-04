@@ -173,7 +173,7 @@ public class HomePageController {
                 }
 
             }
-            Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
+            Friendship friendship = friendshipService.addFriendship(janeDoe, johnDoe);
             friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
         }
 
@@ -299,7 +299,24 @@ public class HomePageController {
                 }
             }
 
+
             getGardensForWatering(gardensRefreshed, gardensNeedWatering);
+
+            List<User> pendingFriends = new ArrayList<>();
+            List<Friendship> friendships = friendshipService.getAllUsersFriends(user.getId());
+            List<User> friends = friendships.stream()
+                        .map(Friendship::getUser1)
+                        .toList();
+
+            for (User friend : friends) {
+                if (!Objects.equals(friend.getId(), user.getId()) && friendshipService.findFriendship(friend, user).getStatus() == FriendshipStatus.PENDING) {
+                        pendingFriends.add(friend);
+                }
+            }
+
+            model.addAttribute("friendRequests", pendingFriends);
+            model.addAttribute("notificationMessage", "You have friend requests");
+
             model.addAttribute("gardensNeedWatering", gardensNeedWatering);
             model.addAttribute("profilePicture", profilePicture);
             model.addAttribute("username", username);
