@@ -2,7 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
-import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -10,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
@@ -20,14 +20,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.Assert;
 
-import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 public class U23_DeactivateAccount {
@@ -88,9 +86,11 @@ public class U23_DeactivateAccount {
 
 
     private MvcResult mvcResultGardens;
-    private MvcResult tagResult;
+    private MvcResult mvcResultAccount;
 
     private Garden garden;
+
+    private User user;
 
     @Before
     public void before_or_after_all() {
@@ -144,4 +144,42 @@ public class U23_DeactivateAccount {
     public void iGetBanned(String email){
         Assertions.assertTrue(userService.getUserByEmail(email).isBanned());
     }
+    @And("I {string} am banned for {int} days")
+    public void iAmBanned(String email, int days) {
+        userService.banUser(userService.getUserByEmail(email), days);
+    }
+    @When("I {string} try to login with password {string}")
+    public void iTryToLoginWithPassword(String email, String password) throws Exception {
+        mvcResultAccount = mockMVCAccount.perform(
+                        post("/login")
+                                .param("emailAddress", email)
+                                .param("password", password)).andReturn();
+    }
+    @Then("I receive an error message {string}")
+    public void iReceiveErrorMessage(String errorMessage) {
+        Assertions.assertEquals(errorMessage, mvcResultAccount.getModelAndView().getModel().get("message"));
+        System.out.println("Current time:"+LocalDateTime.now());
+        System.out.println("Yesterday"+LocalDateTime.now().minusDays(1));
+
+    }
+
+    @When("It is the eighth day of my account {string} being blocked")
+    public void itIsTheEighthDayOfMyAccountBeingBlocked(String email){
+        user = userService.getUserByEmail(email);
+        user.setLastBanDate(null);
+        userRepository.save(user);
+    }
+
+    @Then("On day 8 I {string} am able to log in with {string}")
+    public void iAmAbleToLogIn(String email, String password) throws Exception {
+        mockMVCAccount.perform(
+                post("/login")
+                        .param("emailAddress", email)
+                        .param("password", password)).andExpect(redirectedUrl("/home"));
+
+
+        Assertions.assertFalse(user.isBanned());
+    }
+
+
 }

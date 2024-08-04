@@ -469,7 +469,7 @@ public class GardensController {
                 }
 
                 if (garden.getOwner().isBanned()) {
-                    redirectAttributes.addFlashAttribute("message", "Your account is blocked for 1 week due to inappropriate conduct");
+                    redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
                     redirectAttributes.addFlashAttribute("goodMessage", false);
                     request.logout();
                     return "redirect:/login";
