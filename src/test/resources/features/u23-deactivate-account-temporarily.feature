@@ -19,3 +19,14 @@ Feature: U23 (Deactivate account temporarily) : As Kaia, I want to make sure tha
     And The tag is not added to the garden
     And I "daemon@email.com" get a strike
 
+
+  Scenario: AC2 - I add six inappropriate tags and my account is blocked for 7 days
+    Given I as user "daemon@email.com" am logged in with "Password1!"
+    And I previously added a tag "Dragon"
+    And My Tag "Dragon" contained profanity
+    And I as user "daemon@email.com" currently have 5 strikes
+    When I attempt to enter tag "Dragon"
+    Then I am logged out
+    And A login error message is displayed "Your account is blocked for 1 week due to inappropriate conduct"
+    And The tag is not added to the garden
+    And I "daemon@email.com" get banned
