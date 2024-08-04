@@ -37,7 +37,7 @@ Feature: U23 (Deactivate account temporarily) : As Kaia, I want to make sure tha
     When I "daemon@email.com" try to login with password "Password1!"
     Then I receive an error message "Your account is blocked for 7 days due to inappropriate conduct"
 
-  Scenario: AC4 - I am banned and i try to login
+  Scenario: AC4 - My banned duration has passed and i try to login
     Given I as user "daemon@email.com" am logged in with "Password1!"
     And I "daemon@email.com" am banned for 7 days
     When It is the eighth day of my account "daemon@email.com" being blocked
