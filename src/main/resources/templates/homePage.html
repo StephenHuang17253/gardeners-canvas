@@ -4,53 +4,75 @@
 <head th:replace="~{fragments/header.html}"></head>
 
 <body class="overflow-hidden">
-    <div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
-    <div id="homeImage" class="d-flex align-items-center justify-content-center"
-         th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|">
+<div th:replace="~{fragments/navBar.html :: navBar('home')}" th:with="loggedIn=${loggedIn}"></div>
+<div id="homeImage" class="d-flex align-items-center justify-content-center"
+     th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|">
 
-        <div th:if="${!loggedIn}" class="content z-2">
-            <h1 class="display-4">Welcome, to Gardener's Grove</h1>
-            <p class="lead">Your one-stop shop for everything garden related.</p>
-            <hr class="my-4">
-            <p>Start your journey today! Or continue it...</p>
-            <p class="d-flex flex-row flex-wrap gap-3 mb-3">
-                <a th:href="@{register}">
-                    <button class="btn btn-success btn-lg">Register</button>
-                </a>
-                <a th:href="@{login}">
-                    <button class="btn btn-success btn-lg">Login</button>
-                </a>
-            </p>
-        </div>
+    <div th:if="${!loggedIn}" class="content z-2">
+        <h1 class="display-4">Welcome, to Gardener's Grove</h1>
+        <p class="lead">Your one-stop shop for everything garden related.</p>
+        <hr class="my-4">
+        <p>Start your journey today! Or continue it...</p>
+        <p class="d-flex flex-row flex-wrap gap-3 mb-3">
+            <a th:href="@{register}">
+                <button class="btn btn-success btn-lg">Register</button>
+            </a>
+            <a th:href="@{login}">
+                <button class="btn btn-success btn-lg">Login</button>
+            </a>
+        </p>
+    </div>
 
-        <div th:if="${loggedIn}" class="container-md row gap-0 z-2">
-            <div class="col-3">
-                <div class="ratio ratio-1x1 mt-3 mb-3 ms-auto">
-                    <img id="profilePicture" th:if="${loggedIn}" class="rounded-circle object-fit-cover w-100 h-100"
-                         th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                         alt="User's profile picture">
-                </div>
+    <div th:if="${loggedIn}" class="container-md row gap-0 z-2">
+        <div class="col-3">
+            <div class="ratio ratio-1x1 mt-3 mb-3 ms-auto">
+                <img id="profilePicture" th:if="${loggedIn}" class="rounded-circle object-fit-cover w-100 h-100"
+                     th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                     alt="User's profile picture">
             </div>
-            <div class="col-6">
-                <h1 class="display-4">Welcome back,</h1>
-                <h1 class="display-4 overflow-text">
-                    <b th:text="${username}"></b>,
-                </h1>
-                <h1 class="display-4">to Gardener's Grove</h1>
-                <p class="lead">Your gardens await!</p>
-                <hr class="my-5">
-                <p>Need some inspiration for your Garden? Or have some new plants?</p>
-                <div class="d-flex flex-row flex-wrap gap-3 mb-3">
-                    <a th:href="@{public-gardens}">
-                        <button class="btn btn-success btn-lg">Find Gardens</button>
-                    </a>
-                    <a th:href="@{my-gardens}">
-                        <button class="btn btn-success btn-lg">Your Gardens</button>
-                    </a>
+        </div>
+        <div class="col-6">
+            <h1 class="display-4">Welcome back,</h1>
+            <h1 class="display-4 overflow-text">
+                <b th:text="${username}"></b>,
+            </h1>
+            <h1 class="display-4">to Gardener's Grove</h1>
+            <p class="lead">Your gardens await!</p>
+            <hr class="my-5">
+            <p>Need some inspiration for your Garden? Or have some new plants?</p>
+            <div class="d-flex flex-row flex-wrap gap-3 mb-3">
+                <a th:href="@{public-gardens}">
+                    <button class="btn btn-success btn-lg">Find Gardens</button>
+                </a>
+                <a th:href="@{my-gardens}">
+                    <button class="btn btn-success btn-lg">Your Gardens</button>
+                </a>
+            </div>
+            <a class="btn btn-success position-absolute bottom-1 start-0 end-1 m-3" style="top: 9vh" data-bs-toggle="offcanvas" href="#offcanvas" role="button" aria-controls="offcanvasExample">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
+                </svg>
+            </a>
+            <div class="d-flex flex-row flex-wrap gap-3 mb-3">
+                <div class="container offcanvas offcanvas-start" style="top: 9vh" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+                    <h1 class="display-4">Notifications</h1>
+                    <p class="lead">These gardens may need watering:</p>
+                    <div class="col">
+                        <div th:each="garden : ${gardensNeedWatering}" class="col mb-3">
+                            <a th:href="@{/my-gardens/{gardenId}(gardenId=${garden.gardenId})}" class="card-link">
+                                <div class="card h-100">
+                                    <div class="card-body offcanvas-body">
+                                        <h5 class="card-title" th:text="${#strings.length(garden.gardenName) > 20 ? #strings.substring(garden.gardenName,0,18) + '...' : garden.gardenName}"></h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
 
 </html>
