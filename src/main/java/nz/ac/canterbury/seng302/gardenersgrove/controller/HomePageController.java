@@ -1,5 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.UnavailableException;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -12,15 +15,15 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +45,9 @@ public class HomePageController {
 
     private static final int PAGE_SIZE = 5;
 
+    private final WeatherService weatherService;
+
+
     /**
      * Constructor for the HomePageController with {@link Autowired} to connect this
      * controller with other services
@@ -49,20 +55,31 @@ public class HomePageController {
      * @param userService
      */
     @Autowired
-    public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService,
-            UserInteractionService userInteractionService) {
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager,
+            GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService, UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
+        this.weatherService = weatherService;
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     *
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
      * Redirects GET default url '/' to '/home'
-     * 
+     *
      * @return redirect to /home
      */
     @GetMapping("/")
@@ -74,7 +91,7 @@ public class HomePageController {
     /**
      * Adds a default user and gardens to the database for testing purposes
      */
-    public void addDefautContent() {
+    public void addDefaultContent() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
@@ -178,16 +195,17 @@ public class HomePageController {
      * @return The homePage html page
      */
     @GetMapping("/home")
-    public String home(Model model) {
+    public String home(Model model) throws UnavailableException {
 
         logger.info("GET /home");
 
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
-            addDefautContent();
+            addDefaultContent();
         }
 
         User user = securityService.getCurrentUser();
+
 
         if (user != null) {
             return loadUserMainPage(user, model);
@@ -214,7 +232,7 @@ public class HomePageController {
     /**
      * Helper function to create a list of friend models. Used for adding to the
      * model of the Manage Friends page.
-     * 
+     *
      * @param id of user to find recent friends of
      * @return friendModels
      */
@@ -236,7 +254,7 @@ public class HomePageController {
         return friendModels;
     }
 
-    private String loadUserMainPage(User user, Model model) {
+    private String loadUserMainPage(User user, Model model) throws UnavailableException {
 
         String username = user.getFirstName() + " " + user.getLastName();
         String profilePicture = user.getProfilePictureFilename();
@@ -257,6 +275,35 @@ public class HomePageController {
                         Math.min(recentGardens.size(), PAGE_SIZE * 2));
             }
             model.addAttribute("recentGardensPage2", recentGardensPage2);
+        } else {
+            model.addAttribute("recentGardensPage2", null);
+        }
+        boolean loggedIn = securityService.isLoggedIn();
+
+        if (loggedIn) {
+            user = securityService.getCurrentUser();
+            username = user.getFirstName() + " " + user.getLastName();
+            profilePicture = user.getProfilePictureFilename();
+
+            List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+            List<Garden> gardensRefreshed = new ArrayList<>();
+            List<Garden> gardensNeedWatering = new ArrayList<>();
+
+            for (Garden garden : gardens) {
+                if (garden.getLastLocationUpdate() == null || garden.getLastWaterCheck() == null ||
+                        (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck()))) {
+                    gardensRefreshed.add(garden);
+                }
+                if (garden.getNeedsWatering()) {
+                    gardensNeedWatering.add(garden);
+                }
+            }
+
+            getGardensForWatering(gardensRefreshed, gardensNeedWatering);
+            model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+            model.addAttribute("profilePicture", profilePicture);
+            model.addAttribute("username", username);
+            model.addAttribute("gardens", gardens);
         }
 
         List<FriendModel> recentFriends = createFriendModel(user.getId());
@@ -265,4 +312,54 @@ public class HomePageController {
 
         return "mainPage";
     }
+
+    /**
+     * Helper method that retrieves gardens that need watering.
+     *
+     * @param gardens list of gardens that need to be checked for watering
+     * @param gardensNeedWatering list of gardens that already need watering
+     */
+    private void getGardensForWatering(List<Garden> gardens, List<Garden> gardensNeedWatering) throws UnavailableException {
+        List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
+
+        Map<Long, WeatherResponseData> gardenWeatherMap = new HashMap<>();
+        for (int i = 0; i < gardens.size(); i++) {
+            gardenWeatherMap.put(gardens.get(i).getGardenId(), weatherDataList.get(i));
+        }
+
+        for (Garden garden : gardens) {
+            updateGardenWatering(garden, gardenWeatherMap.get(garden.getGardenId()), gardensNeedWatering);
+        }
+    }
+
+    /**
+     * Checks a garden for if it needs watering, if it does then it adds it to a list
+     *
+     * @param garden the garden being checked for watering status
+     * @param weatherData the weather data being checked for the garden
+     * @param gardensNeedWatering list of all gardens that need watering
+     */
+    private void updateGardenWatering(Garden garden, WeatherResponseData weatherData, List<Garden> gardensNeedWatering) {
+        if (weatherData != null) {
+            List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
+            if (weatherList.size() > 2) {
+
+                DailyWeather beforeYesterdayWeather = weatherList.get(0);
+                DailyWeather yesterdayWeather = weatherList.get(1);
+                DailyWeather currentWeather = weatherList.get(2);
+
+                boolean needsWater = garden.getNeedsWatering() || Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny") &&
+                        Objects.equals(yesterdayWeather.getDescription(), "Sunny") &&
+                        Objects.equals(currentWeather.getDescription(), "Sunny");
+
+                garden.setNeedsWatering(needsWater);
+                gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
+
+                if (needsWater) {
+                    gardensNeedWatering.add(garden);
+                }
+            }
+        }
+    }
+
 }
