@@ -313,6 +313,12 @@ public class HomePageController {
         return "mainPage";
     }
 
+    /**
+     * Helper method that retrieves gardens that need watering.
+     *
+     * @param gardens list of gardens that need to be checked for watering
+     * @param gardensNeedWatering list of gardens that already need watering
+     */
     private void getGardensForWatering(List<Garden> gardens, List<Garden> gardensNeedWatering) throws UnavailableException {
         List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
 
@@ -325,6 +331,14 @@ public class HomePageController {
             updateGardenWatering(garden, gardenWeatherMap.get(garden.getGardenId()), gardensNeedWatering);
         }
     }
+
+    /**
+     * Checks a garden for if it needs watering, if it does then it adds it to a list
+     *
+     * @param garden the garden being checked for watering status
+     * @param weatherData the weather data being checked for the garden
+     * @param gardensNeedWatering list of all gardens that need watering
+     */
     private void updateGardenWatering(Garden garden, WeatherResponseData weatherData, List<Garden> gardensNeedWatering) {
         if (weatherData != null) {
             List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
