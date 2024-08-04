@@ -414,7 +414,7 @@ public class GardensController {
                                    @RequestParam(defaultValue = "1") int page,
                                    RedirectAttributes redirectAttributes,
                                    HttpServletResponse response,
-                                   Model model) {
+                                   Model model) throws InterruptedException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         ValidationResult tagResult = InputValidator.validateTag(tag);
@@ -430,7 +430,7 @@ public class GardensController {
 
         if (tagResult.valid()) {
             pendingTags.add(tag);
-            model.addAttribute("pendingsTags", pendingTags);
+            model.addAttribute("pendingTags", pendingTags);
             GardenTag gardenTag = new GardenTag(tag);
 
             if (gardenTagService.getByName(tag).isPresent()) {
@@ -631,8 +631,7 @@ public class GardensController {
         return gardenTagService.getAllSimilar(query);
     }
 
-    private void asynchronousTagProfanityCheck(String tagName, User user)
-    {
+    private void asynchronousTagProfanityCheck(String tagName, User user) throws InterruptedException {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
             pendingTags.remove(0);
@@ -646,11 +645,9 @@ public class GardensController {
                 gardenTagService.deleteRelationByTagName(tagName);
                 securityService.handleStrikeUser(user);
                 logger.info("{} has {} strikes", user.getFirstName(), user.getStrikes());
-
             }
         }));
         asyncThread.start();
-
     }
 
 
