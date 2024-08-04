@@ -178,7 +178,7 @@ public class SecurityService {
                 emailService.sendTagBanWarningEmail(user);
             } else if(user.getStrikes() == NUM_STRIKES_FOR_BAN) {
                 emailService.sendTagBanEmail(user);
-                // TODO: disable the account
+                userService.banUser(user, 7);
             }
         } catch (MessagingException e) {
             logger.error("Failed to send email for user {}: {}", user.getEmailAddress(), e.getMessage());
