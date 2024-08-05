@@ -21,9 +21,10 @@
                 <input id="gardenIdOfOriginalPlant" th:name="gardenIdOfOriginalPlant"
                        th:value="${gardenIdOfOriginalPlant}" type="hidden"/>
 
-                <div class="col-10">
+                <div class="d-flex justify-content-center mb-3">
                     <img th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                         alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
+                         alt="Plant Picture" class="image-fluid rounded-circle object-fit-cover"
+                         style="width: 100%; max-width: 300px;">
                 </div>
                 <h4 class="card-title mt-1"
                     th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}"></h4>
@@ -38,11 +39,9 @@
                         <button type="button" class="btn btn-success">Submit</button>
                     </a>
                     <button type="submit" class="btn btn-secondary submit-button" formnovalidate>Cancel</button>
-
                 </div>
             </form>
         </div>
-
     </div>
 </div>
 <script th:src="@{/js/preventEnterSubmit.js}"></script>
