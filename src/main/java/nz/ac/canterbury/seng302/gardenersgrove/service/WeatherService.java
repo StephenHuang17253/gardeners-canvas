@@ -16,10 +16,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class WeatherService {
@@ -28,18 +28,17 @@ public class WeatherService {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final int MAX_REQUESTS_PER_SECOND = 10;
-
-    private volatile long lastRequestTime = Instant.now().getEpochSecond();
-
-    private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
+    private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
+    private static final long RATE_LIMIT_DELAY_MS = 100;
+    private static final long RATE_LIMIT_DELAY_BUFFER = 5;
 
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
-    public WeatherResponseData getWeather(String gardenLatitude, String gardenLongitude) {
+    public WeatherResponseData getWeather(String latitude, String longitude) {
+        waitForRateLimit();
         String url = "https://api.open-meteo.com/v1/forecast?latitude="
-                + gardenLatitude
-                + "&longitude=" + gardenLongitude
+                + latitude
+                + "&longitude=" + longitude
                 + "&current=temperature_2m,relative_humidity_2m,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&past_days=2";
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -59,49 +58,27 @@ public class WeatherService {
         return null;
     }
 
-    public List<DailyWeather> getGardenWeatherData(Garden garden) {
-        List<DailyWeather> weatherList = new ArrayList<>();
-        DailyWeather noWeather = null;
-        try {
-            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(),
-                    garden.getGardenLongitude());
-            weatherList.addAll(gardenWeather.getRetrievedWeatherData());
-        } catch (NullPointerException error) {
-            noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
-            noWeather.setError("Location not found, please update your location to see the weather");
-        } catch (UnavailableException e) {
-            noWeather = new DailyWeather("not_found.png", null, null);
-        }
+//    public List<DailyWeather> getGardenWeatherData(Garden garden) {
+//        List<DailyWeather> weatherList = new ArrayList<>();
+//        DailyWeather noWeather = null;
+//        try {
+//            WeatherResponseData gardenWeather = getWeather(garden.getGardenLatitude(),
+//                    garden.getGardenLongitude());
+//            weatherList.addAll(gardenWeather.getRetrievedWeatherData());
+//        } catch (NullPointerException error) {
+//            noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
+//            noWeather.setError("Location not found, please update your location to see the weather");
+//        } catch (UnavailableException e) {
+//            noWeather = new DailyWeather("not_found.png", null, null);
+//        }
+//
+//        if (noWeather != null) {
+//            weatherList.add(noWeather);
+//        }
+//
+//        return weatherList;
+//    }
 
-        if (noWeather != null) {
-            weatherList.add(noWeather);
-        }
-
-        return weatherList;
-    }
-
-    WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) throws UnavailableException {
-
-        long currentTime = Instant.now().getEpochSecond();
-        long timeElapsed = currentTime - lastRequestTime;
-
-        logger.info("Time elapsed: {}", timeElapsed);
-        if (timeElapsed >= 1) {
-            semaphore.drainPermits();
-            semaphore.release(MAX_REQUESTS_PER_SECOND);
-            logger.info("A second or more has elapsed, permits reset to: {}", semaphore.availablePermits());
-            lastRequestTime = currentTime;
-        }
-
-        logger.info("Permits left before request: {}", semaphore.availablePermits());
-
-        if (!semaphore.tryAcquire()) {
-            logger.info("Exceeded location API rate limit of 2 requests per second.");
-            throw new UnavailableException("429");
-        }
-        logger.info("Permits left after request: {}", semaphore.availablePermits());
-        return getWeather(gardenLatitude, gardenLongitude);
-    }
 
     /**
      * Processes multiple weather requests in chunks of gardens
@@ -111,43 +88,14 @@ public class WeatherService {
      * @throws UnavailableException
      */
     public List<WeatherResponseData> getWeatherForGardens(List<Garden> gardens) throws UnavailableException {
-        List<WeatherResponseData> weatherDataList = new ArrayList<>();
-        List<List<Garden>> gardenChunks = chunkGardens(gardens, MAX_REQUESTS_PER_SECOND - 1);
 
-        for (List<Garden> chunk : gardenChunks) {
-            processChunk(chunk, weatherDataList);
-            delayBetweenChunks();
-        }
-
-        logger.info(String.valueOf(weatherDataList.size()));
-
-        return weatherDataList;
-    }
-
-
-    /**
-     * Process chunks of gardens, adds weatherdata to the list
-     *
-     * @param chunk sublist of gardens that will have their weather retrieved together
-     * @param weatherDataList list of weather data
-     * @throws UnavailableException
-     */
-    private void processChunk(List<Garden> chunk, List<WeatherResponseData> weatherDataList) throws UnavailableException {
-        resetPermitsIfNeeded();
-
-        if (chunk.size() > semaphore.availablePermits()) {
-            logger.info("Exceeded weather API rate limit for batch request.");
-            throw new UnavailableException("429");
-        }
-
-        List<CompletableFuture<WeatherResponseData>> futures = chunk.stream()
+        return gardens.stream()
                 .map(this::fetchWeatherData)
-                .toList();
-
-        weatherDataList.addAll(futures.stream()
                 .map(CompletableFuture::join)
-                .toList());
+                .toList();
     }
+
+
 
     /**
      * Fetches weather data through series of HTTP requests
@@ -156,44 +104,14 @@ public class WeatherService {
      * @return async request
      */
     private CompletableFuture<WeatherResponseData> fetchWeatherData(Garden garden) {
-        semaphore.acquireUninterruptibly();
-        logger.info("Permits left after request for garden {}: {}", garden.getGardenId(), semaphore.availablePermits());
-
+        waitForRateLimit();
         HttpRequest request = buildHttpRequest(garden);
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> handleHttpResponse(response, garden))
-                .whenComplete((response, ex) -> semaphore.release());
+                .thenApply(response -> handleHttpResponse(response, garden));
     }
 
-    /**
-     * Splits users gardens into chunks, default size = 9
-     *
-     * @param gardens list of gardens
-     * @param chunkSize size of chunk to split the gardens into sublists of that length
-     * @return 2-dimensional list of chunks of gardens
-     */
-    private List<List<Garden>> chunkGardens(List<Garden> gardens, int chunkSize) {
-        List<List<Garden>> chunks = new ArrayList<>();
-        for (int i = 0; i < gardens.size(); i += chunkSize) {
-            chunks.add(gardens.subList(i, Math.min(gardens.size(), i + chunkSize)));
-        }
-        return chunks;
-    }
 
-    /**
-     * Delays the chunk weather requests to avoid running out of permits
-     *
-     * @throws UnavailableException
-     */
-    private void delayBetweenChunks() throws UnavailableException {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new UnavailableException("Thread interrupted");
-        }
-    }
 
     /**
      * Constructs an http request for the open-meteo weather api
@@ -233,21 +151,31 @@ public class WeatherService {
     }
 
     /**
-     * rate limit is 10 calls per second, so if a second has passed this will reset the available permits
+     * Handles weather API rate limiting, when called instructs thread to wait for next available time slot.
      */
-    private void resetPermitsIfNeeded() {
-        long currentTime = Instant.now().getEpochSecond();
-        long timeElapsed = currentTime - lastRequestTime;
-        logger.info("Time elapsed: {}", timeElapsed);
-
-        if (timeElapsed >= 1) {
-            semaphore.drainPermits();
-            semaphore.release(MAX_REQUESTS_PER_SECOND);
-            logger.info("A second or more has elapsed, permits reset to: {}", semaphore.availablePermits());
-            lastRequestTime = currentTime;
+    private void waitForRateLimit() {
+        long timeToWait = 0;
+        boolean couldUpdate = false;
+        while (!couldUpdate) {
+            long nextCallSlot = nextFreeCallTimestamp.get();
+            if (nextCallSlot < new Date().getTime()) {
+                timeToWait = 0;
+                couldUpdate = nextFreeCallTimestamp.compareAndSet(nextCallSlot, (new Date().getTime() + RATE_LIMIT_DELAY_BUFFER + RATE_LIMIT_DELAY_MS));
+            } else {
+                timeToWait = nextCallSlot - new Date().getTime();
+                couldUpdate = nextFreeCallTimestamp.compareAndSet(nextCallSlot, (nextCallSlot + RATE_LIMIT_DELAY_BUFFER + RATE_LIMIT_DELAY_MS));
+            }
+        }
+        try
+        {
+            Thread.sleep(timeToWait);
+            logger.info("Weather api thread woke to make request after {}",timeToWait);
+        }
+        catch (InterruptedException exception)
+        {
+            logger.error("Thread interrupted while waiting for weather api rate limit");
         }
 
-        logger.info("Permits left before request: {}", semaphore.availablePermits());
     }
 
 }
