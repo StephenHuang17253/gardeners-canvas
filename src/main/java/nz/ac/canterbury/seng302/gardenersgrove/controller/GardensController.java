@@ -528,12 +528,17 @@ public class GardensController {
                 }
             }
 
-
-
             List<WeatherModel> weatherList;
             weatherList = getGardenWeatherData(garden);
             if (weatherList.size() > 1) {
                 handleWeatherMessages(weatherList, garden, model);
+            }
+
+            if (garden.getOwner().isBanned()) {
+                redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+                redirectAttributes.addFlashAttribute("goodMessage", false);
+                request.logout();
+                return "redirect:/login";
             }
             return setGardenDetailModel(garden,tag,page,model);
         }
