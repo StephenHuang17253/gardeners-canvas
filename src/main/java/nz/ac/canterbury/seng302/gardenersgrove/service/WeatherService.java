@@ -119,6 +119,8 @@ public class WeatherService {
             delayBetweenChunks();
         }
 
+        logger.info(String.valueOf(weatherDataList.size()));
+
         return weatherDataList;
     }
 
@@ -144,7 +146,6 @@ public class WeatherService {
 
         weatherDataList.addAll(futures.stream()
                 .map(CompletableFuture::join)
-                .filter(Objects::nonNull)
                 .toList());
     }
 
