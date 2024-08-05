@@ -121,9 +121,15 @@ public class U24_BrowseGardensByTag {
         Garden newGarden = new Garden(gardenName,
                 "", "", "", "", "", "", 0.0, true, "", "",user);
         targetGarden = gardenService.addGarden(newGarden);
+        GardenTag testTagInit = new GardenTag(tag);
+        testTagInit.setTagStatus(TagStatus.APPROPRIATE);
+        GardenTag testTag = gardenTagService.addGardenTag(testTagInit);
+        GardenTagRelation relation = new GardenTagRelation(targetGarden, testTag);
+        gardenTagService.addGardenTagRelation(relation);
 
-        GardenTag testTag = gardenTagService.addGardenTag(new GardenTag(tag));
-        gardenTagService.addGardenTagRelation(new GardenTagRelation(newGarden, testTag));
+        List<GardenTagRelation> savedRelations = gardenTagService.getGardenTagRelationByGarden(targetGarden);
+        Assertions.assertFalse(savedRelations.isEmpty());
+        Assertions.assertEquals(tag, savedRelations.get(0).getTag().getTagName());
     }
 
     @Given("I am on the browse garden page")
@@ -141,35 +147,37 @@ public class U24_BrowseGardensByTag {
         appliedTagName = tag;
     }
 
+    @When("I submit the search with tag")
+    public void iSubmitTheSearchWithTag() throws Exception {
+        mvcResult = mockMVC.perform(
+                        MockMvcRequestBuilders
+                                .get(currentPageUrl)
+                                .param("appliedTags", appliedTagName)
+                                .param("searchInput", ""))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
 
     @When("I submit the search with both search and tag")
     public void iSubmitTheSearchWithBothSearchAndTag() throws Exception {
         mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .get(currentPageUrl)
-                                .param("appliedTags", appliedTagName))
-                                // .param("searchInput", "")) //When Branch is fixed, add in "searchValue"
+                                .param("appliedTags", appliedTagName)
+                                .param("searchInput", searchValue))
                 .andExpect(status().isOk())
                 .andReturn();
     }
 
     @Then("The search results contain the garden called {string}")
-    public void theSearchResultsContainTheGardenCalled(String gardenName) {
-        //ModelAndView modelAndView = mvcResult.getModelAndView().getModel().get("publicGardens");
-        //Model model = modelAndView.getModel().get("public");
-        //Assertions.assertNotNull(model);
-//        List<Garden> searchResults = (List<Garden>) mvcResult.getModelAndView().getModel().get("publicGardens");
-//        System.out.println(gardenRepository.findAllPublicGardens());
-//        System.out.println(searchResults);
-//        Assertions.assertTrue(!searchResults.isEmpty());
-
+    public void theSearchResultsContainTheGardenCalled(String gardenName)  {
+        Garden wantedGarden = gardenService.getMatchingGardens(gardenName).getFirst();
         ModelAndView model = mvcResult.getModelAndView();
         Assertions.assertNotNull(model);
         List<Garden> searchResults = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
-        System.out.println(searchResults);
-        System.out.println(gardenTagService.getGardenTagRelationByGarden(targetGarden).getFirst().toString());
-        System.out.println(appliedTagName);
-        Assertions.assertTrue(!searchResults.isEmpty());
+
+        Assertions.assertFalse(searchResults.isEmpty());
+        Assertions.assertEquals(searchResults.getFirst().toString(), wantedGarden.toString());
     }
 }
