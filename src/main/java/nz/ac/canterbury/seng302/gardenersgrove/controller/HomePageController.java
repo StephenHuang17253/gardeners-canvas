@@ -229,9 +229,11 @@ public class HomePageController {
         model.addAttribute("profilePicture", profilePicture);
         model.addAttribute("username", username);
 
+        // Add home page layout for user
         HomePageLayout layout = user.getHomePageLayout();
         model.addAttribute("layout", layout);
 
+        // Add recent gardens
         List<RecentGardenModel> recentGardens = createRecentGardenModels(user.getId());
 
         List<RecentGardenModel> recentGardensPage1 = null;
@@ -248,17 +250,14 @@ public class HomePageController {
         }
         model.addAttribute("recentGardensPage2", recentGardensPage2);
 
-        user = securityService.getCurrentUser();
-        username = user.getFirstName() + " " + user.getLastName();
-        profilePicture = user.getProfilePictureFilename();
-
+        // Check gardens that need watering and add them
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
         List<Garden> gardensRefreshed = new ArrayList<>();
         List<Garden> gardensNeedWatering = new ArrayList<>();
 
         for (Garden garden : gardens) {
             if (garden.getLastLocationUpdate() == null || garden.getLastWaterCheck() == null ||
-                    (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck()))) {
+                    garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck())) {
                 gardensRefreshed.add(garden);
             }
             if (garden.getNeedsWatering()) {
@@ -269,6 +268,10 @@ public class HomePageController {
         List<Garden> newGardensNeedWatering = getGardensForWatering(gardensRefreshed);
         gardensNeedWatering.addAll(newGardensNeedWatering);
 
+        model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+        model.addAttribute("gardens", gardens);
+
+        // Add all friend requests
         List<User> pendingFriends = new ArrayList<>();
         List<Friendship> friendships = friendshipService.getAllUsersFriends(user.getId());
         List<User> friends = friendships.stream()
@@ -282,25 +285,22 @@ public class HomePageController {
             }
         }
 
+        model.addAttribute("friendRequests", pendingFriends);
+        model.addAttribute("notificationMessage", "You have friend requests");
+
+        // Add all recently interated with plants
         List<UserInteraction> plantInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(
                 user.getId(),
                 ItemType.PLANT);
         List<Plant> recentPlants = plantService.getPlantsByInteraction(plantInteractions);
 
-        List<RecentPlantModel> recentPlantModels = setRecentPlantModels(recentPlants);
+        List<RecentPlantModel> recentPlantModels = createRecentPlantModels(recentPlants);
 
-        if (recentPlantModels != null) {
+        if (!recentPlantModels.isEmpty()) {
             updateModelWithRecentPlants(model, recentPlantModels);
         }
 
-        model.addAttribute("friendRequests", pendingFriends);
-        model.addAttribute("notificationMessage", "You have friend requests");
-
-        model.addAttribute("gardensNeedWatering", gardensNeedWatering);
-        model.addAttribute("profilePicture", profilePicture);
-        model.addAttribute("username", username);
-        model.addAttribute("gardens", gardens);
-
+        // Add recently added friends
         List<FriendModel> recentFriends = createFriendModel(user.getId());
         List<FriendModel> sublistRecentFriends = recentFriends.subList(0, Math.min(PAGE_SIZE, recentFriends.size()));
         model.addAttribute("recentFriends", sublistRecentFriends);
@@ -327,28 +327,12 @@ public class HomePageController {
     }
 
     /**
-     * Gets all the resent plants that the user has accessed
-     *
-     * @param userId id of current user
-     * @return list of plants
-     */
-    private List<Plant> getRecentPlants(Long userId) {
-        List<UserInteraction> plantInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
-                ItemType.PLANT);
-        return plantService.getPlantsByInteraction(plantInteractions);
-    }
-
-    /**
      * Sets RecentPlantModels for home page
      *
      * @param plantList List of recently accessed Plant objects
      * @return List of RecentPlantModels
      */
-    private List<RecentPlantModel> setRecentPlantModels(List<Plant> plantList) {
-        if (plantList.isEmpty()) {
-            return null;
-        }
-
+    private List<RecentPlantModel> createRecentPlantModels(List<Plant> plantList) {
         return plantList.stream()
                 .map(plant -> new RecentPlantModel(plant, plant.getGarden(), plant.getGarden().getOwner(),
                         securityService.isOwner(plant.getGarden().getOwner().getId())))
