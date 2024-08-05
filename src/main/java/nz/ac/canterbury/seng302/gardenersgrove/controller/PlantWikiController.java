@@ -6,7 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantInfoModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantSearchModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantInfoService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +75,7 @@ public class PlantWikiController {
         try {
             acquirePermit();
             if(Objects.nonNull(search)){
+
                 JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
                 List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
@@ -83,6 +83,11 @@ public class PlantWikiController {
                         .collect(Collectors.toList());
 
                 model.addAttribute("plants", plants);
+
+                if (plants.isEmpty()) {
+                    model.addAttribute("searchError", "No plants match your search");
+                }
+
             } else {
                 JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
                 PlantInfoModel plantInfo = new PlantInfoModel(plantDetails);
