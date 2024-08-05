@@ -63,7 +63,6 @@ public class GardensController {
 
     private static final int COUNT_PER_PAGE = 10;
 
-    private List<String> pendingTags = new ArrayList<>();
 
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
@@ -305,6 +304,13 @@ public class GardensController {
 
         List<String> tagsList = tagRelationsList.stream()
                 .map(GardenTagRelation::getTag)
+                .filter(tag -> tag.getTagStatus() == TagStatus.APPROPRIATE)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(tag -> tag.getTagStatus() == TagStatus.PENDING)
                 .map(GardenTag::getTagName)
                 .toList();
 
@@ -396,9 +402,17 @@ public class GardensController {
 
         List<String> tagsList = tagRelationsList.stream()
                 .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.PENDING)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("pendingTags", pendingTags);
         model.addAttribute("tagsList", tagsList);
 
         return "gardenDetailsPage";
@@ -433,8 +447,6 @@ public class GardensController {
         Garden garden = optionalGarden.get();
 
         if (tagResult.valid()) {
-            pendingTags.add(tag);
-            model.addAttribute("pendingTags", pendingTags);
             GardenTag gardenTag = new GardenTag(tag);
 
             if (gardenTagService.getByName(tag).isPresent()) {
@@ -654,7 +666,6 @@ public class GardensController {
     private void asynchronousTagProfanityCheck(String tagName, User user) throws InterruptedException {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
-            pendingTags.remove(0);
             if (!tagContainsProfanity)
             {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
