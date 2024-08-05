@@ -63,11 +63,12 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
     @Query("SELECT DISTINCT g FROM Garden g " +
        "JOIN GardenTagRelation gtr ON g.gardenId = gtr.garden.gardenId " +
        "JOIN GardenTag t ON gtr.tag.tagId = t.tagId " +
-       "JOIN Plant p ON g.gardenId = p.garden.gardenId " +
+       "LEFT JOIN Plant p ON g.gardenId = p.garden.gardenId " +
        "WHERE g.isPublic = true " +
        "AND (LOWER(p.plantName) LIKE LOWER(CONCAT('%', :searchValue, '%')) " +
        "OR LOWER(g.gardenName) LIKE LOWER(CONCAT('%', :searchValue, '%'))) " +
-       "AND t.tagName IN (:tagsString)")
+       "AND t.tagName IN (:tagsString) " +
+            "AND t.tagStatus = 'APPROPRIATE'")
     List<Garden> findByGardenNameContainsAndGardenHasTags(@Param("searchValue") String searchValue,
             @Param("tagsString") String tagsString);
 
