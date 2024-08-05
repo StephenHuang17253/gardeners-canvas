@@ -38,7 +38,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Semaphore;
-import java.util.stream.Collectors;
 
 /**
  * Controller for viewing all the created Gardens
@@ -153,7 +152,7 @@ public class GardensController {
 
             weatherList.addAll(gardenWeather.getRetrievedWeatherData().stream()
                     .map(WeatherModel::new)
-                    .collect(Collectors.toList()));
+                    .toList());
         } catch (NullPointerException error) {
             noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
             noWeather.setError("Location not found, please update your location to see the weather");
@@ -213,7 +212,8 @@ public class GardensController {
             @RequestParam(required = false) String weatherListJson,
             HttpServletRequest request,
             HttpServletResponse response,
-            Model model) {
+            RedirectAttributes redirectAttributes,
+            Model model) throws ServletException {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -241,7 +241,7 @@ public class GardensController {
                 });
             }
         } catch (Exception e) {
-            logger.error("An error occurred while mapping the weatherListJson: " + e.getMessage());
+            logger.error("An error occurred while mapping the weatherListJson: {}", e.getMessage());
         }
 
         try {
@@ -250,7 +250,7 @@ public class GardensController {
                 weatherList = (List<WeatherModel>) inputFlashMap.get("weatherList");
             }
         } catch (Exception e) {
-            logger.error("An error occurred while getting the weather list from the flash map: " + e.getMessage());
+            logger.error("An error occurred while getting the weather list from the flash map: {}", e.getMessage());
         }
 
         if (weatherList == null || weatherList.isEmpty()) {
@@ -271,7 +271,7 @@ public class GardensController {
                 });
             }
         } catch (Exception e) {
-            logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
+            logger.error("An error occurred while reading the weatherListJson: {}", e.getMessage());
         }
 
         weatherListJson = null;
@@ -279,7 +279,7 @@ public class GardensController {
         try {
             weatherListJson = objectMapper.writeValueAsString(weatherList);
         } catch (Exception e) {
-            logger.error("An error occurred while writing the weatherListJson: " + e.getMessage());
+            logger.error("An error occurred while writing the weatherListJson: {}", e.getMessage());
         }
 
         model.addAttribute("weatherListJson", weatherListJson);
@@ -293,12 +293,6 @@ public class GardensController {
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureError);
 
-        // Used for displaying messages after a redirect e.g. from the verify page
-        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        if (inputFlashMap != null) {
-            model.addAttribute("openModal", inputFlashMap.get("openModal"));
-            model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
-        }
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
@@ -315,6 +309,68 @@ public class GardensController {
                 .toList();
 
         model.addAttribute("pendingTags", pendingTags);
+
+        // Used for displaying messages after a redirect e.g. from the verify page
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+        if (inputFlashMap != null) {
+            model.addAttribute("openModal", inputFlashMap.get("openModal"));
+
+            // The below If statements check if the status of a pending tag has
+            // been updated and adjust error messages acrodingly if thats the case
+            if (inputFlashMap.get("pendingTagName") == null)
+            {
+                model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
+            }
+            else
+            {
+                Optional<GardenTag> pendingTag = gardenTagService.getByName(inputFlashMap.get("pendingTagName").toString());
+
+                if (pendingTag.isPresent())
+                {
+                    if (pendingTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
+                    {
+                        // security service will return old strike count so adding one to account for this tag.
+                        int userStrikes = securityService.getCurrentUser().getStrikes() + 1;
+                        logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), userStrikes);
+                        model.addAttribute("tagErrorText", "This tag does not meet the language " +
+                                "standards for Gardener's Grove. A warning strike has been added to your account");
+                        if (userStrikes == 5) {
+                            model.addAttribute("tagErrorText", "You have added an inappropriate tag for the fifth time." +
+                                    " You have been sent a warning email. " +
+                                    "If you add another inappropriate tag, you will be banned for a week.");
+                        }
+                        else if (userStrikes == 6)
+                        {
+                            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+                            redirectAttributes.addFlashAttribute("goodMessage", false);
+                            request.logout();
+                            return "redirect:/login";
+                        }
+                        model.addAttribute("tagMessageText","");
+                    }
+                    else if (pendingTag.get().getTagStatus() == TagStatus.APPROPRIATE)
+                    {
+                        model.addAttribute("tagMessageText","");
+                    }
+                    else
+                    {
+                        model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
+                    }
+                }
+                else
+                {
+                    model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
+                }
+            }
+        }
+
+        if (garden.getOwner().isBanned()) {
+            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            request.logout();
+            return "redirect:/login";
+        }
+
         model.addAttribute("tagsList", tagsList);
         return "gardenDetailsPage";
     }
@@ -359,11 +415,12 @@ public class GardensController {
                 weatherList = objectMapper.readValue(weatherListJson, new TypeReference<List<WeatherModel>>() {
                 });
             } catch (Exception e) {
-                logger.error("An error occurred while reading the weatherListJson: " + e.getMessage());
+                logger.error("An error occurred while reading the weatherListJson: {}", e.getMessage());
             }
         }
         redirectAttributes.addFlashAttribute("page", page);
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
+
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -486,21 +543,19 @@ public class GardensController {
                             " You have been sent a warning email. " +
                             "If you add another inappropriate tag, you will be banned for a week.");
                 }
-
-                if (garden.getOwner().isBanned()) {
-                    redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
-                    redirectAttributes.addFlashAttribute("goodMessage", false);
-                    request.logout();
-                    return "redirect:/login";
-                }
             }
-
-
 
             List<WeatherModel> weatherList;
             weatherList = getGardenWeatherData(garden);
             if (weatherList.size() > 1) {
                 handleWeatherMessages(weatherList, garden, model);
+            }
+
+            if (garden.getOwner().isBanned()) {
+                redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+                redirectAttributes.addFlashAttribute("goodMessage", false);
+                request.logout();
+                return "redirect:/login";
             }
             return setGardenDetailModel(garden,tag,page,model);
         }
@@ -509,10 +564,19 @@ public class GardensController {
         {
             redirectAttributes.addFlashAttribute("tagMessageText", String.format("Your tag \"%s\" is currently being checked for profanity. " +
                     "If it follows the language standards for our app, it will be added to your garden.",tag));
+            redirectAttributes.addFlashAttribute("pendingTagName", tag);
         }
 
         redirectAttributes.addAttribute("page", page);
         redirectAttributes.addFlashAttribute("openModal", "true");
+
+        if (garden.getOwner().isBanned()) {
+            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            request.logout();
+            return "redirect:/login";
+        }
+
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -672,9 +736,9 @@ public class GardensController {
             }
             else
             {
+                securityService.handleStrikeUser(user);
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
-                securityService.handleStrikeUser(user);
                 logger.info("{} has {} strikes", user.getFirstName(), user.getStrikes());
 
             }
