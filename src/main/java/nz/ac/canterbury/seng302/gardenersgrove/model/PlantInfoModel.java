@@ -10,6 +10,7 @@ public class PlantInfoModel {
 
     private String commonName;
     private String scientificName;
+    private String watering;
 
     // TODO: Sort out the extra information in the plantInfoModel below. Decide what is useful to keep and what isn't.
     //    private List<String> otherName;
@@ -18,7 +19,6 @@ public class PlantInfoModel {
     //    private String type;
     //    private String dimensions;
     //    private String cycle;
-    //    private String watering;
     //    private String depthWaterRequirement;
     //    private String volumeWaterRequirement;
     //    private String wateringPeriod;
@@ -58,8 +58,10 @@ public class PlantInfoModel {
      */
     public PlantInfoModel(JsonNode plantDetails) {
         this.commonName = plantDetails.get("common_name").asText();
+        this.scientificName = plantDetails.get("scientific_name").get(0).asText();
         this.description = plantDetails.get("description").asText();
         this.defaultImage = getImageURL(plantDetails);
+        this.watering = plantDetails.get("watering").asText();
     }
     /**
      * Constructor for a PlantSearchModel for default plants
@@ -70,6 +72,7 @@ public class PlantInfoModel {
         this.scientificName = plantInfo.getScientificName();
         this.defaultImage = plantInfo.getImageURL();
         this.description = plantInfo.getDescription();
+        this.watering = plantInfo.getWatering();
     }
 
 
@@ -94,9 +97,10 @@ public class PlantInfoModel {
     public String getDefaultImage() {
         return defaultImage;
     }
-
-
     public String getScientificName() {
         return scientificName;
+    }
+    public String getWatering() {
+        return watering;
     }
 }

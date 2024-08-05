@@ -19,6 +19,7 @@ public class PlantInfo {
     private String description;
     @Column(length = 500)
     private String detailJSONResponseString;
+    private String watering;
 
     /**
      * JPA required no-args constructor
@@ -34,13 +35,14 @@ public class PlantInfo {
      * @param imageURL the image url that contain the plant image
      * @param detailJSONResponseString TODO
      */
-    public PlantInfo(Long id, String name, String scientificName, String imageURL, String description, String detailJSONResponseString){
+    public PlantInfo(Long id, String name, String scientificName, String imageURL, String description, String detailJSONResponseString, String watering){
         this.id = id;
         this.name = name;
         this.scientificName = scientificName;
         this.imageURL = imageURL;
         this.description = description;
         this.detailJSONResponseString = detailJSONResponseString;
+        this.watering = watering;
     }
 
     public Long getId() {
@@ -65,5 +67,8 @@ public class PlantInfo {
 
     public String getDescription() {
         return description;
+    }
+    public String getWatering() {
+        return watering;
     }
 }
