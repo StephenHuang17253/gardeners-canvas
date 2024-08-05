@@ -69,7 +69,7 @@ public class Garden {
     private boolean isPublic;
 
     @Column(name = "needs_watering")
-    private Boolean needsWatering;
+    private boolean needsWatering;
 
     @Column(name = "last_water_check")
     @CreatedDate
@@ -280,7 +280,10 @@ public class Garden {
         this.lastLocationUpdate = LocalDateTime.now();
     }
 
-    public Boolean getNeedsWatering() {
+    public boolean getNeedsWatering() {
+        if(Objects.isNull(needsWatering)){
+            return false;
+        }
         return needsWatering;
     }
 
