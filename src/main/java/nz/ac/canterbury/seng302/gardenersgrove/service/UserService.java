@@ -43,7 +43,8 @@ public class UserService {
      * @param userRepository  interface for user table in persistance
      */
     @Autowired
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, HomePageLayoutRepository homePageLayoutRepository) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository,
+            HomePageLayoutRepository homePageLayoutRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.homePageLayoutRepository = homePageLayoutRepository;
@@ -227,16 +228,14 @@ public class UserService {
 
     /**
      * Give a strike to the user.
-     * Checks that the user's strikes value isn't null, to accommodate users who existed before this feature.
+     * Checks that the user's strikes value isn't null, to accommodate users who
+     * existed before this feature.
+     * 
      * @param user user to strike
      */
     public void strikeUser(User user) {
         int strikes = user.getStrikes();
-        if (Objects.isNull(strikes)) {
-            user.setStrikes(1);
-        } else {
-            user.setStrikes(strikes + 1);
-        }
+        user.setStrikes(strikes + 1);
         userRepository.save(user);
     }
 
