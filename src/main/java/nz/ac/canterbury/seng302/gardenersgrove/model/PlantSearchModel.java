@@ -14,6 +14,8 @@ public class PlantSearchModel {
 
     private String scientificName;
 
+    private String otherNames;
+
     private String image;
 
     /**
@@ -24,6 +26,7 @@ public class PlantSearchModel {
         this.id = plantList.get("id").asLong();
         this.commonName = plantList.get("common_name").asText();
         this.scientificName = plantList.get("scientific_name").get(0).asText();
+        this.otherNames = extractOtherNames(plantList.get("other_name"));
         this.image = getImageURL(plantList);
     }
 
@@ -50,6 +53,25 @@ public class PlantSearchModel {
         return "";
     }
 
+    private String extractOtherNames(JsonNode otherNames) {
+        if (otherNames == null || !otherNames.isArray()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+
+        for (JsonNode node : otherNames) {
+            if (!first) {
+                sb.append(", ");
+            }
+            sb.append(node.asText());
+            first = false;
+        }
+
+        return sb.toString();
+    }
+
     public Long getId() {
         return id;
     }
@@ -62,8 +84,12 @@ public class PlantSearchModel {
         return image;
     }
 
-
     public String getScientificName() {
         return scientificName;
     }
+
+    public String getOtherNames() {
+        return otherNames;
+    }
+
 }
