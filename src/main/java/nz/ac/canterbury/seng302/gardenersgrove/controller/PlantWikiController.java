@@ -34,7 +34,6 @@ import java.util.stream.StreamSupport;
 @Controller
 public class PlantWikiController {
     Logger logger = LoggerFactory.getLogger(PlantWikiController.class);
-    private final SecurityService securityService;
     private final PlantInfoService plantInfoService;
 
     private static final int MAX_REQUESTS_PER_SECOND = 1;
@@ -43,8 +42,7 @@ public class PlantWikiController {
 
 
     @Autowired
-    public PlantWikiController(SecurityService securityService, PlantInfoService plantInfoService) {
-        this.securityService = securityService;
+    public PlantWikiController(PlantInfoService plantInfoService) {
         this.plantInfoService = plantInfoService;
     }
 

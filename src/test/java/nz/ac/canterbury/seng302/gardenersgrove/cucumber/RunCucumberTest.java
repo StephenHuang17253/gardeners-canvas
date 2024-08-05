@@ -5,6 +5,7 @@ import io.cucumber.spring.CucumberContextConfiguration;
 import nz.ac.canterbury.seng302.gardenersgrove.GardenersGroveApplication;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantInfoService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import org.junit.platform.suite.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,4 +33,6 @@ public class RunCucumberTest {
     public ProfanityService profanityService;
     @MockBean
     public EmailService emailService;
+    @MockBean
+    public PlantInfoService plantInfoService;
 }
