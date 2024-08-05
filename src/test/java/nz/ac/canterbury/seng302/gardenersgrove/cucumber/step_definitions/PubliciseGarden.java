@@ -1,7 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -30,6 +28,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Optional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
@@ -102,7 +102,7 @@ public class PubliciseGarden {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService, objectMapper, gardenTagService, profanityService);
+                weatherService, objectMapper, gardenTagService, profanityService, userService);
         GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
                 securityService);
 

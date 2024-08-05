@@ -113,8 +113,8 @@ public class U10_Acceptance_Testing {
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
-        gardenLongitude = garden.getGardenLongitude();
-        gardenLatitude = garden.getGardenLatitude();
+        gardenLongitude = "-43.5214643";
+        gardenLatitude = "172.5796159";
     }
 
     @When("I click the edit garden button")

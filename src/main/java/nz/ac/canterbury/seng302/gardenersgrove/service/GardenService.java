@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -138,6 +139,27 @@ public class GardenService {
     }
 
     /**
+     * Updates the watering need status of the garden
+     * @param gardenId the garden's id
+     * @param NeedsWatering the boolean attribute used to determine if a garden needs watering
+     * @return the updated garden as saved in the repository
+     */
+    public Garden changeGardenNeedsWatering(Long gardenId, boolean NeedsWatering) {
+        Optional<Garden> optionalGarden = getGardenById(gardenId);
+
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setNeedsWatering(NeedsWatering);
+
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+    /**
      * Updates the longitude and latitude of a Garden entity.
      * 
      * @param id        the id of the garden we wish to update the coordinates of
@@ -151,6 +173,7 @@ public class GardenService {
 
             targetGarden.setGardenLatitude(latitude);
             targetGarden.setGardenLongitude(longitude);
+            targetGarden.setLastLocationUpdate(LocalDateTime.now());
 
             return gardenRepository.save(targetGarden);
 
