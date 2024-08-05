@@ -62,6 +62,7 @@ public class GardensController {
 
     private static final int COUNT_PER_PAGE = 10;
 
+
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
     /**
@@ -297,9 +298,17 @@ public class GardensController {
 
         List<String> tagsList = tagRelationsList.stream()
                 .map(GardenTagRelation::getTag)
+                .filter(tag -> tag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(tag -> tag.getTagStatus() == TagStatus.PENDING)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("pendingTags", pendingTags);
 
         // Used for displaying messages after a redirect e.g. from the verify page
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
@@ -450,9 +459,17 @@ public class GardensController {
 
         List<String> tagsList = tagRelationsList.stream()
                 .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.PENDING)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("pendingTags", pendingTags);
         model.addAttribute("tagsList", tagsList);
 
         return "gardenDetailsPage";
@@ -472,7 +489,7 @@ public class GardensController {
                                    RedirectAttributes redirectAttributes,
                                    HttpServletResponse response,
                                    HttpServletRequest request,
-                                   Model model) throws ServletException {
+                                   Model model) throws ServletException, InterruptedException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         ValidationResult tagResult = InputValidator.validateTag(tag);
@@ -710,8 +727,7 @@ public class GardensController {
         return gardenTagService.getAllSimilar(query);
     }
 
-    private void asynchronousTagProfanityCheck(String tagName, User user)
-    {
+    private void asynchronousTagProfanityCheck(String tagName, User user) throws InterruptedException {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
             if (!tagContainsProfanity)
