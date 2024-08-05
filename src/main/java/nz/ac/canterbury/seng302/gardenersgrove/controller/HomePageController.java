@@ -282,10 +282,15 @@ public class HomePageController {
             }
         }
 
-        List<RecentPlantModel> recentPlants = setRecentPlantModels(getRecentPlants(user.getId()));
+        List<UserInteraction> plantInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(
+                user.getId(),
+                ItemType.PLANT);
+        List<Plant> recentPlants = plantService.getPlantsByInteraction(plantInteractions);
 
-        if (recentPlants != null) {
-            updateModelWithRecentPlants(model, recentPlants);
+        List<RecentPlantModel> recentPlantModels = setRecentPlantModels(recentPlants);
+
+        if (recentPlantModels != null) {
+            updateModelWithRecentPlants(model, recentPlantModels);
         }
 
         model.addAttribute("friendRequests", pendingFriends);
