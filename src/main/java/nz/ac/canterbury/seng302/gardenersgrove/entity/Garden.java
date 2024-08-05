@@ -69,7 +69,7 @@ public class Garden {
     private boolean isPublic;
 
     @Column(name = "needs_watering")
-    private boolean needsWatering;
+    private Boolean needsWatering;
 
     @Column(name = "last_water_check")
     @CreatedDate
