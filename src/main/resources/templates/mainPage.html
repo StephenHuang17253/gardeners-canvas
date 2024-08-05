@@ -115,7 +115,8 @@
         </button>
     </div>
 </div>
-<div th:if="${recentPlantsPage1 != null}" class="container my-2 bg-white rounded py-2">
+
+<div th:if="${recentPlantsPage1 != null && layout != null && layout.showRecentPlants}" class="container my-2 bg-white rounded py-2">
     <div id="carouselRecentPlants" class="carousel slide">
         <div class="carousel-inner mx-auto w-100">
             <div class="col">
@@ -189,7 +190,7 @@
                     </a>
                 </div>
             </div>
-            <div th:if="${friendRequests.size() > 0}" id="message">
+            <div th:if="${friendRequests.size() > 0 && layout != null && layout.showRequestedFriends}" id="message">
                 <div class="d-flex justify-content-center">
                     <pre class="lead text-danger" style="white-space: pre-line; font-family: inherit;"
                         th:text="${notificationMessage}">
