@@ -34,6 +34,13 @@ public class WeatherService {
 
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
+    /**
+     *
+     * Runs an API query to get the weather data for a specific location
+     * @param latitude latitude of the target location
+     * @param longitude longitude of the target location
+     * @return WeatherResponseData for the given location
+     */
     public WeatherResponseData getWeather(String latitude, String longitude) {
         waitForRateLimit();
         String url = "https://api.open-meteo.com/v1/forecast?latitude="
@@ -58,30 +65,9 @@ public class WeatherService {
         return null;
     }
 
-//    public List<DailyWeather> getGardenWeatherData(Garden garden) {
-//        List<DailyWeather> weatherList = new ArrayList<>();
-//        DailyWeather noWeather = null;
-//        try {
-//            WeatherResponseData gardenWeather = getWeather(garden.getGardenLatitude(),
-//                    garden.getGardenLongitude());
-//            weatherList.addAll(gardenWeather.getRetrievedWeatherData());
-//        } catch (NullPointerException error) {
-//            noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
-//            noWeather.setError("Location not found, please update your location to see the weather");
-//        } catch (UnavailableException e) {
-//            noWeather = new DailyWeather("not_found.png", null, null);
-//        }
-//
-//        if (noWeather != null) {
-//            weatherList.add(noWeather);
-//        }
-//
-//        return weatherList;
-//    }
-
 
     /**
-     * Processes multiple weather requests in chunks of gardens
+     * Gathers weather data for a list of gardens at a time
      *
      * @param gardens list of gardens
      * @return a list of weather data for gardens
@@ -89,10 +75,15 @@ public class WeatherService {
      */
     public List<WeatherResponseData> getWeatherForGardens(List<Garden> gardens) throws UnavailableException {
 
-        return gardens.stream()
+        // fetches CompletableFutures (basically javascript promises) of weather response data from the api asynchronously
+        List<CompletableFuture<WeatherResponseData>> futures = gardens.stream()
                 .map(this::fetchWeatherData)
-                .map(CompletableFuture::join)
                 .toList();
+
+        // resolves the completableFutures (waits for future to resolve if needed)
+        return new ArrayList<>(futures.stream()
+                .map(CompletableFuture::join)
+                .toList());
     }
 
 
