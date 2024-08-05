@@ -1,15 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
@@ -19,25 +14,17 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.io.UnsupportedEncodingException;
 import java.util.List;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -91,8 +78,6 @@ public class U24_BrowseGardensByTag {
 
 
     private String currentPageUrl;
-    private int lastPage;
-
     private String searchValue;
     private String appliedTagName;
     private Garden targetGarden;
@@ -109,7 +94,6 @@ public class U24_BrowseGardensByTag {
         PublicGardensController publicGardensController = new PublicGardensController(gardenService, securityService,
                 friendshipService, gardenTagService);
 
-        // Allows us to bypass spring security
         mockMVC = MockMvcBuilders
                 .standaloneSetup(publicGardensController)
                 .build();
@@ -176,7 +160,6 @@ public class U24_BrowseGardensByTag {
         Assertions.assertNotNull(model);
         List<Garden> searchResults = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
-
         Assertions.assertFalse(searchResults.isEmpty());
         Assertions.assertEquals(searchResults.getFirst().toString(), wantedGarden.toString());
     }
