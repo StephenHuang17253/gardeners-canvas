@@ -74,6 +74,8 @@ public class U9_ViewGarden {
     @Autowired
     private GardenTagService gardenTagService;
 
+    @Autowired
+    private EmailService emailService;
     private static GardenService gardenService;
 
     private static UserService userService;
@@ -95,9 +97,9 @@ public class U9_ViewGarden {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService, emailService);
 
-        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService, emailService);
         weatherService = Mockito.mock(WeatherService.class);
 
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,

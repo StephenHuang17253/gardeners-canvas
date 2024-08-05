@@ -230,7 +230,7 @@ public class U21_AddTagToGarden {
         gardenTagRepository.deleteAll();
     }
 //    AC5
-    @Then("the tag is {string} added to my garden")
+    @Then("The tag is {string} added to my garden")
     public void the_tag_is_added_to_my_garden(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
@@ -242,10 +242,21 @@ public class U21_AddTagToGarden {
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
     }
 
+    @Then("The tag is {string} added to my garden as pending")
+    public void theTagIsAddedToMyGardenAsPending(String tagName) {
+        List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
+        Assertions.assertNotNull(gardenTags);
+
+        GardenTag tag = gardenTags.get(0).getTag();
+        Assertions.assertEquals(tagName, tag.getTagName());
+        Assertions.assertSame(TagStatus.PENDING, tag.getTagStatus());
+        Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
+    }
+
     // AC5
-    @And("the tag shows up in future autocomplete suggestions")
-    public void the_tag_shows_up_in_future_autocomplete_suggestions() throws Exception {
-        String query = "Cabbage";
+    @And("The tag {string} shows up in future autocomplete suggestions")
+    public void the_tag_shows_up_in_future_autocomplete_suggestions(String tagName) throws Exception {
+        String query = tagName;
         String fetchUrl = "/tag/suggestions";
         tagResult = mockMVCGardens.perform(
                 MockMvcRequestBuilders
@@ -257,7 +268,7 @@ public class U21_AddTagToGarden {
         String tagListResponse = tagResult.getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(tagListResponse);
 
-        Assertions.assertEquals("Cabbage Patch", jsonNode.get(0).get("tagName").asText());
+        Assertions.assertEquals(tagName, jsonNode.get(0).get("tagName").asText());
 
         gardenTagRelationRepository.deleteAll();
         gardenTagRepository.deleteAll();
