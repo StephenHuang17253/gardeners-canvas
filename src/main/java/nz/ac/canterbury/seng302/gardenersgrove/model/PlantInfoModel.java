@@ -58,6 +58,7 @@ public class PlantInfoModel {
      */
     public PlantInfoModel(JsonNode plantDetails) {
         this.commonName = plantDetails.get("common_name").asText();
+        this.scientificName = plantDetails.get("scientific_name").get(0).asText();
         this.description = plantDetails.get("description").asText();
         this.defaultImage = getImageURL(plantDetails);
     }

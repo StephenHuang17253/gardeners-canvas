@@ -36,35 +36,12 @@ public class PlantWikiController {
     Logger logger = LoggerFactory.getLogger(PlantWikiController.class);
     private final PlantInfoService plantInfoService;
 
-    private static final int MAX_REQUESTS_PER_SECOND = 1;
-    private static final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND, true);
-    private static long lastRequestTime = Instant.now().getEpochSecond();
-
 
     @Autowired
     public PlantWikiController(PlantInfoService plantInfoService) {
         this.plantInfoService = plantInfoService;
     }
 
-    /**
-     * Helper function to give user a permit to make an api request
-     * To ensure a rate limit of one call per second
-     * @throws UnavailableException when the last permit granted was less than a second ago
-     */
-    public static synchronized void acquirePermit() throws UnavailableException {
-        long currentTime = Instant.now().getEpochSecond();
-        long timeElapsed = currentTime - lastRequestTime;
-
-        if (timeElapsed >= 1) {
-            semaphore.drainPermits();
-            semaphore.release(MAX_REQUESTS_PER_SECOND);
-            lastRequestTime = currentTime;
-        }
-
-        if (!semaphore.tryAcquire()) {
-            throw new UnavailableException("429");
-        }
-    }
 
     /**
      * Helper to handle adding api call results to model
@@ -74,7 +51,6 @@ public class PlantWikiController {
      */
     private void addAPIResultsToModel(String search, Long plantId, Model model){
         try {
-            acquirePermit();
             if(Objects.nonNull(search)){
                 JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
