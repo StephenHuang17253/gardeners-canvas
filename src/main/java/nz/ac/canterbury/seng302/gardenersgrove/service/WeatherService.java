@@ -146,7 +146,6 @@ public class WeatherService {
 
         weatherDataList.addAll(futures.stream()
                 .map(CompletableFuture::join)
-                .filter(Objects::nonNull)
                 .toList());
     }
 
