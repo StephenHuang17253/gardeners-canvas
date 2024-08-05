@@ -1,5 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import jakarta.servlet.UnavailableException;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
@@ -7,17 +10,25 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserInteractionService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -41,6 +52,7 @@ public class HomePageController {
     private final FriendshipService friendshipService;
     private final SecurityService securityService;
     private final UserInteractionService userInteractionService;
+    private final WeatherService weatherService;
 
     private static final int PAGE_SIZE = 5;
 
@@ -51,8 +63,9 @@ public class HomePageController {
      * @param userService
      */
     @Autowired
-    public HomePageController(UserService userService, GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService,
+    public HomePageController(UserService userService, AuthenticationManager authenticationManager,
+            GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
             UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
@@ -60,11 +73,22 @@ public class HomePageController {
         this.friendshipService = friendshipService;
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
+        this.weatherService = weatherService;
+    }
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     *
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
      * Redirects GET default url '/' to '/home'
-     * 
+     *
      * @return redirect to /home
      */
     @GetMapping("/")
@@ -76,7 +100,7 @@ public class HomePageController {
     /**
      * Adds a default user and gardens to the database for testing purposes
      */
-    public void addDefautContent() {
+    public void addDefaultContent() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
@@ -158,7 +182,7 @@ public class HomePageController {
                 }
 
             }
-            Friendship friendship = friendshipService.addFriendship(johnDoe, janeDoe);
+            Friendship friendship = friendshipService.addFriendship(janeDoe, johnDoe);
             friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
         }
 
@@ -180,24 +204,102 @@ public class HomePageController {
      * @return The homePage html page
      */
     @GetMapping("/home")
-    public String home(Model model) {
+    public String home(Model model) throws UnavailableException {
 
         logger.info("GET /home");
 
         // Add a test user with test gardens and test plants
         if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
-            addDefautContent();
+            addDefaultContent();
         }
 
         User user = securityService.getCurrentUser();
 
-        if (user != null) {
-            return loadUserMainPage(user, model);
+        if (user == null) {
+            return "homePage";
         }
 
-        return "homePage";
+        String username = user.getFirstName() + " " + user.getLastName();
+        String profilePicture = user.getProfilePictureFilename();
+
+        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("username", username);
+
+        HomePageLayout layout = user.getHomePageLayout();
+        model.addAttribute("layout", layout);
+
+        List<RecentGardenModel> recentGardens = setRecentGardenModels(user.getId());
+
+        List<RecentGardenModel> recentGardensPage1 = null;
+        if (!recentGardens.isEmpty()) {
+            recentGardensPage1 = recentGardens.subList(0,
+                    Math.min(recentGardens.size(), PAGE_SIZE));
+        }
+        model.addAttribute("recentGardensPage1", recentGardensPage1);
+
+        List<RecentGardenModel> recentGardensPage2 = null;
+        if (recentGardens.size() > PAGE_SIZE) {
+            recentGardensPage2 = recentGardens.subList(PAGE_SIZE,
+                    Math.min(recentGardens.size(), PAGE_SIZE * 2));
+        }
+        model.addAttribute("recentGardensPage2", recentGardensPage2);
+
+        user = securityService.getCurrentUser();
+        username = user.getFirstName() + " " + user.getLastName();
+        profilePicture = user.getProfilePictureFilename();
+
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        List<Garden> gardensRefreshed = new ArrayList<>();
+        List<Garden> gardensNeedWatering = new ArrayList<>();
+
+        for (Garden garden : gardens) {
+            if (garden.getLastLocationUpdate() == null || garden.getLastWaterCheck() == null ||
+                    (garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck()))) {
+                gardensRefreshed.add(garden);
+            }
+            if (garden.getNeedsWatering()) {
+                gardensNeedWatering.add(garden);
+            }
+        }
+
+        List<Garden> newGardensNeedWatering = getGardensForWatering(gardensRefreshed);
+        gardensNeedWatering.addAll(newGardensNeedWatering);
+
+        List<User> pendingFriends = new ArrayList<>();
+        List<Friendship> friendships = friendshipService.getAllUsersFriends(user.getId());
+        List<User> friends = friendships.stream()
+                .map(Friendship::getUser1)
+                .toList();
+
+        for (User friend : friends) {
+            if (!friend.getId().equals(user.getId())
+                    && friendshipService.findFriendship(friend, user).getStatus() == FriendshipStatus.PENDING) {
+                pendingFriends.add(friend);
+            }
+        }
+
+        model.addAttribute("friendRequests", pendingFriends);
+        model.addAttribute("notificationMessage", "You have friend requests");
+
+        model.addAttribute("gardensNeedWatering", gardensNeedWatering);
+        model.addAttribute("profilePicture", profilePicture);
+        model.addAttribute("username", username);
+        model.addAttribute("gardens", gardens);
+
+        List<FriendModel> recentFriends = createFriendModel(user.getId());
+        List<FriendModel> sublistRecentFriends = recentFriends.subList(0, Math.min(PAGE_SIZE, recentFriends.size()));
+        model.addAttribute("recentFriends", sublistRecentFriends);
+
+        return "mainPage";
+
     }
 
+    /**
+     * creates a list of recent garden models to display
+     * 
+     * @param userId id of current user
+     * @return
+     */
     private List<RecentGardenModel> setRecentGardenModels(Long userId) {
         List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
                 ItemType.GARDEN);
@@ -213,7 +315,7 @@ public class HomePageController {
     /**
      * Helper function to create a list of friend models. Used for adding to the
      * model of the Manage Friends page.
-     * 
+     *
      * @param id of user to find recent friends of
      * @return friendModels
      */
@@ -235,40 +337,67 @@ public class HomePageController {
         return friendModels;
     }
 
-    private String loadUserMainPage(User user, Model model) {
+    /**
+     * Helper method that retrieves gardens that need watering.
+     *
+     * @param gardens list of gardens that need to be checked for
+     *                watering
+     */
+    private List<Garden> getGardensForWatering(List<Garden> gardens) throws UnavailableException {
 
-        String username = user.getFirstName() + " " + user.getLastName();
-        String profilePicture = user.getProfilePictureFilename();
+        List<Garden> gardensNeedWatering = new ArrayList<>();
 
-        List<RecentGardenModel> recentGardens = setRecentGardenModels(user.getId());
+        List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
 
-        model.addAttribute("profilePicture", profilePicture);
-        model.addAttribute("username", username);
+        for (int i = 0; i < gardens.size(); i++) {
+            Garden garden = gardens.get(i);
+            boolean needsWater = gardenNeedsWatering(garden, weatherDataList.get(i));
+            garden.setNeedsWatering(needsWater);
+            gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
 
-
-        HomePageLayout layout = user.getHomePageLayout();
-        model.addAttribute("layout", layout);
-
-        if (!recentGardens.isEmpty()) {
-            List<RecentGardenModel> recentGardensPage1 = recentGardens.subList(0,
-                    Math.min(recentGardens.size(), PAGE_SIZE));
-            model.addAttribute("recentGardensPage1", recentGardensPage1);
-
-            List<RecentGardenModel> recentGardensPage2 = null;
-            if (recentGardens.size() > PAGE_SIZE) {
-                recentGardensPage2 = recentGardens.subList(PAGE_SIZE,
-                        Math.min(recentGardens.size(), PAGE_SIZE * 2));
+            if (needsWater) {
+                gardensNeedWatering.add(garden);
             }
-            model.addAttribute("recentGardensPage2", recentGardensPage2);
         }
 
-        List<FriendModel> recentFriends = createFriendModel(user.getId());
-        List<FriendModel> sublistRecentFriends = recentFriends.subList(0, Math.min(PAGE_SIZE, recentFriends.size()));
-        model.addAttribute("recentFriends", sublistRecentFriends);
-
-        return "mainPage";
+        return gardensNeedWatering;
     }
 
+    /**
+     * Checks a garden for if it needs watering
+     *
+     * @param garden      the garden being checked for watering status
+     * @param weatherData the weather data being checked for the garden
+     * @return boolean for if the garden need watering
+     */
+    private boolean gardenNeedsWatering(Garden garden, WeatherResponseData weatherData) {
+        if (weatherData == null) {
+            return false;
+        }
+
+        List<DailyWeather> weatherList = weatherData.getRetrievedWeatherData();
+
+        if (weatherList.size() <= 2) {
+            return false;
+        }
+
+        DailyWeather beforeYesterdayWeather = weatherList.get(0);
+        DailyWeather yesterdayWeather = weatherList.get(1);
+        DailyWeather currentWeather = weatherList.get(2);
+
+        return garden.getNeedsWatering()
+                || beforeYesterdayWeather.getDescription().equals("Sunny") &&
+                        yesterdayWeather.getDescription().equals("Sunny") &&
+                        currentWeather.getDescription().equals("Sunny");
+
+    }
+
+    /**
+     * Provides the get endpoint for the edit home page form
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping("home/edit")
     public String editHomePage(Model model) {
         logger.info("GET /home/edit");
@@ -282,12 +411,12 @@ public class HomePageController {
      * This function is called when a POST request is made to /home/edit it handles
      * updating the home page layout
      * 
-     * @param requestedFriends show the requested friends section boolean 
-     * @param acceptedFriends show the accepted friends section boolean
-     * @param recentPlants show the recent plants section boolean
-     * @param recentGardens show the recent gardens section boolean
-     * @param notifications show the notifications section boolean
-     * @param model the model to add attributes to
+     * @param requestedFriends show the requested friends section boolean
+     * @param acceptedFriends  show the accepted friends section boolean
+     * @param recentPlants     show the recent plants section boolean
+     * @param recentGardens    show the recent gardens section boolean
+     * @param notifications    show the notifications section boolean
+     * @param model            the model to add attributes to
      * @return redirect to /home
      */
     @PostMapping("home/edit")
@@ -305,4 +434,5 @@ public class HomePageController {
         userService.updateHomePageLayout(user.getId(), newLayout);
         return "redirect:/home";
     }
+
 }
