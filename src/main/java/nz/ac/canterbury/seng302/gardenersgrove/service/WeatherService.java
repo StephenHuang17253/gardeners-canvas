@@ -119,6 +119,8 @@ public class WeatherService {
             delayBetweenChunks();
         }
 
+        logger.info(String.valueOf(weatherDataList.size()));
+
         return weatherDataList;
     }
 
