@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.net.MalformedURLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,16 +46,16 @@ public class PlantFormController {
 
     @Autowired
     public PlantFormController(PlantService plantService, GardenService gardenService, FileService fileService,
-            SecurityService securityService) {
+                               SecurityService securityService) {
         this.plantService = plantService;
         this.gardenService = gardenService;
         this.fileService = fileService;
         this.securityService = securityService;
     }
 
-     /**
+    /**
      * Adds the loggedIn attribute to the model for all requests
-     * 
+     *
      * @param model
      */
     @ModelAttribute
@@ -63,17 +65,17 @@ public class PlantFormController {
 
     /**
      * Maps the createNewPlantForm html page to /create-new-plant url
-     * 
+     *
      * @return thymeleaf createNewPlantForm
      */
     @GetMapping("/my-gardens/{gardenId}/create-new-plant")
     public String newPlantForm(@PathVariable Long gardenId,
-            @RequestParam(name = "plantName", required = false) String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
-            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-            HttpServletResponse response,
-            Model model) {
+                               @RequestParam(name = "plantName", required = false) String plantName,
+                               @RequestParam(name = "plantCount", required = false) String plantCount,
+                               @RequestParam(name = "plantDescription", required = false) String plantDescription,
+                               @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                               HttpServletResponse response,
+                               Model model) {
         logger.info("GET /create-new-plant");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -105,7 +107,7 @@ public class PlantFormController {
      * Logic to handle the confirm new plant form button
      * also validates inputs into form and informs the user if their input is
      * invalid
-     * 
+     *
      * @param plantName        user entered plant name
      * @param plantCount       user entered plant count
      * @param plantDescription user entered plant description
@@ -117,13 +119,13 @@ public class PlantFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/create-new-plant")
     public String submitNewPlantForm(@RequestParam(name = "plantName") String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
-            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-            @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
-            @PathVariable("gardenId") Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+                                     @RequestParam(name = "plantCount", required = false) String plantCount,
+                                     @RequestParam(name = "plantDescription", required = false) String plantDescription,
+                                     @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+                                     @PathVariable("gardenId") Long gardenId,
+                                     HttpServletResponse response,
+                                     Model model) {
         logger.info("POST /create-new-plant");
 
         // logic to handle checking if fields are vaild
@@ -168,7 +170,7 @@ public class PlantFormController {
         model.addAttribute("plantPicture", plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
             return "createNewPlantForm";
         }
 
@@ -182,6 +184,7 @@ public class PlantFormController {
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
+        securityService.addUserInteraction(newPlant.getPlantId(), ItemType.PLANT, LocalDateTime.now());
 
         return "redirect:/my-gardens/{gardenId}";
     }
@@ -190,14 +193,14 @@ public class PlantFormController {
      * Maps the editPlantForm html page to /create-new-plant url
      * Pre populates the values with the plants record from the database,
      * sends user to 404 page if plant is not found
-     * 
+     *
      * @return thymeleaf createNewPlantForm
      */
     @GetMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
-            @PathVariable("plantId") Long plantId,
-            HttpServletResponse response,
-            Model model) {
+                                @PathVariable("plantId") Long plantId,
+                                HttpServletResponse response,
+                                Model model) {
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -243,14 +246,14 @@ public class PlantFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String submiteditPlantForm(@RequestParam(name = "plantName") String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
-            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-            @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
-            @PathVariable("gardenId") Long gardenId,
-            @PathVariable("plantId") Long plantId,
-            HttpServletResponse response,
-            Model model) {
+                                      @RequestParam(name = "plantCount", required = false) String plantCount,
+                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
+                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                                      @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
+                                      @PathVariable("gardenId") Long gardenId,
+                                      @PathVariable("plantId") Long plantId,
+                                      HttpServletResponse response,
+                                      Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
@@ -297,7 +300,7 @@ public class PlantFormController {
         model.addAttribute("plantDate", plantDate);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()){
+                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
             return "editPlantForm";
         }
 
@@ -311,6 +314,8 @@ public class PlantFormController {
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
+        securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
+
         return "redirect:/my-gardens/{gardenId}";
     }
 
@@ -318,7 +323,7 @@ public class PlantFormController {
      * Takes as an input the result of validating the plant name, count, description
      * and date,
      * and prints the appropriate messages.
-     * 
+     *
      * @param plantNameResult        result of validating name (OK or appropriate
      *                               error)
      * @param plantCountResult       result of validating count (OK or appropriate
@@ -327,8 +332,8 @@ public class PlantFormController {
      *                               appropriate error)
      */
     private void plantFormErrorText(Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
-            ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
-            ValidationResult plantDateResult) {
+                                    ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
+                                    ValidationResult plantDateResult) {
 
         if (!plantPictureResult.valid()) {
             model.addAttribute("plantPictureError", plantPictureResult);

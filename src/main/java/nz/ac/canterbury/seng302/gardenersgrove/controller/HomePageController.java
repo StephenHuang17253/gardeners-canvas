@@ -6,10 +6,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.RecentPlantModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
@@ -35,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -88,6 +91,7 @@ public class HomePageController {
 
     /**
      * Redirects GET default url '/' to '/home'
+     *
      *
      * @return redirect to /home
      */
@@ -228,7 +232,7 @@ public class HomePageController {
         HomePageLayout layout = user.getHomePageLayout();
         model.addAttribute("layout", layout);
 
-        List<RecentGardenModel> recentGardens = setRecentGardenModels(user.getId());
+        List<RecentGardenModel> recentGardens = createRecentGardenModels(user.getId());
 
         List<RecentGardenModel> recentGardensPage1 = null;
         if (!recentGardens.isEmpty()) {
@@ -278,6 +282,12 @@ public class HomePageController {
             }
         }
 
+        List<RecentPlantModel> recentPlants = setRecentPlantModels(getRecentPlants(user.getId()));
+
+        if (recentPlants != null) {
+            updateModelWithRecentPlants(model, recentPlants);
+        }
+
         model.addAttribute("friendRequests", pendingFriends);
         model.addAttribute("notificationMessage", "You have friend requests");
 
@@ -300,10 +310,9 @@ public class HomePageController {
      * @param userId id of current user
      * @return
      */
-    private List<RecentGardenModel> setRecentGardenModels(Long userId) {
+    private List<RecentGardenModel> createRecentGardenModels(Long userId) {
         List<UserInteraction> gardenInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
                 ItemType.GARDEN);
-
         List<Garden> gardenList = gardenService.getGardensByInteraction(gardenInteractions);
 
         return gardenList.stream()
@@ -313,8 +322,38 @@ public class HomePageController {
     }
 
     /**
+     * Gets all the resent plants that the user has accessed
+     *
+     * @param userId id of current user
+     * @return list of plants
+     */
+    private List<Plant> getRecentPlants(Long userId) {
+        List<UserInteraction> plantInteractions = userInteractionService.getAllUsersUserInteractionsByItemType(userId,
+                ItemType.PLANT);
+        return plantService.getPlantsByInteraction(plantInteractions);
+    }
+
+    /**
+     * Sets RecentPlantModels for home page
+     *
+     * @param plantList List of recently accessed Plant objects
+     * @return List of RecentPlantModels
+     */
+    private List<RecentPlantModel> setRecentPlantModels(List<Plant> plantList) {
+        if (plantList.isEmpty()) {
+            return null;
+        }
+
+        return plantList.stream()
+                .map(plant -> new RecentPlantModel(plant, plant.getGarden(), plant.getGarden().getOwner(),
+                        securityService.isOwner(plant.getGarden().getOwner().getId())))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Helper function to create a list of friend models. Used for adding to the
      * model of the Manage Friends page.
+     *
      *
      * @param id of user to find recent friends of
      * @return friendModels
@@ -335,6 +374,25 @@ public class HomePageController {
         }
 
         return friendModels;
+    }
+
+    /**
+     * Helper function to add recent plants to give model
+     *
+     * @param model        Model to add plants to
+     * @param recentPlants List of RecentPlantModels
+     */
+    private void updateModelWithRecentPlants(Model model, List<RecentPlantModel> recentPlants) {
+        List<RecentPlantModel> recentPlantsPage1 = recentPlants.subList(0,
+                Math.min(recentPlants.size(), PAGE_SIZE));
+        model.addAttribute("recentPlantsPage1", recentPlantsPage1);
+
+        List<RecentPlantModel> recentPlantsPage2 = null;
+        if (recentPlants.size() > PAGE_SIZE) {
+            recentPlantsPage2 = recentPlants.subList(PAGE_SIZE,
+                    Math.min(recentPlants.size(), PAGE_SIZE * 2));
+        }
+        model.addAttribute("recentPlantsPage2", recentPlantsPage2);
     }
 
     /**
