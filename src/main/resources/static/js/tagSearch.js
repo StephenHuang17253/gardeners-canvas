@@ -33,7 +33,6 @@ const handleButtonClick = async () => {
         return;
     }
 
-
     appliedTagsList.classList.remove('d-none');
     searchTagErrorText.textContent = '';
     tagInput.classList.remove('border-danger');
@@ -42,12 +41,12 @@ const handleButtonClick = async () => {
     div1.classList.add('p-1');
     const div2 = document.createElement('div');
     const span1 = document.createElement('span');
-    span1.classList.add('badge', 'rounded-pill', 'text-bg-success', 'p-2');
+    span1.classList.add('badge', 'rounded-pill', 'text-bg-success', 'p-2', 'cursor-pointer');
     span1.textContent = value;
     span1.setAttribute('data-tag-name', value);
-    span1.onclick = function() { removeTag(this); };
-    span1.style.cursor = 'pointer';
-    initializeTagHover(span1);
+    span1.onclick = () => removeTag(span1);
+    span1.onmouseover = () => span1.classList.replace('text-bg-success', 'text-bg-danger');
+    span1.onmouseout = () => span1.classList.replace('text-bg-danger', 'text-bg-success');
 
     div2.appendChild(span1);
     div1.appendChild(div2);
@@ -58,6 +57,8 @@ const handleButtonClick = async () => {
     input.name = 'appliedTags';
     input.type = 'hidden';
     appliedTagsInputs.appendChild(input);
+
+    tagInput.value = ''
 };
 /**
  *  Finds and removes tag input element
@@ -108,15 +109,6 @@ const hideTagSection = () => {
 
     }
 }
-/**
- * Adds tag cover properties to tag, including red hover effect and cursor effect
- * @param tagElement input tag to apply hover and pointer style to
- **/
-const initializeTagHover = (tagElement) => {
-    tagElement.style.cursor = 'pointer';
-    tagElement.onmouseover = () => tagElement.classList.replace('text-bg-success', 'text-bg-danger');
-    tagElement.onmouseout = () => tagElement.classList.replace('text-bg-danger', 'text-bg-success');
-};
 hideTagSection()
 tagInput.addEventListener('keypress', handleKeyPress);
 addTagButton.addEventListener('click', handleButtonClick);
