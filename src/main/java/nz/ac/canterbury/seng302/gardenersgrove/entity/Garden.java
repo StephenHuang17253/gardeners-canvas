@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Entity class of a Garden, reflecting an entry of garden name, location and
@@ -68,7 +69,7 @@ public class Garden {
     private boolean isPublic;
 
     @Column(name = "needs_watering")
-    private boolean needsWatering;
+    private Boolean needsWatering;
 
     @Column(name = "last_water_check")
     @CreatedDate
@@ -280,6 +281,9 @@ public class Garden {
     }
 
     public boolean getNeedsWatering() {
+        if(Objects.isNull(needsWatering)){
+            return false;
+        }
         return needsWatering;
     }
 

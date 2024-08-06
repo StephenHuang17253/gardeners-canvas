@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -225,9 +226,17 @@ public class PublicGardensController {
 
         List<String> tagsList = tagRelationsList.stream()
                 .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.PENDING)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("pendingTags", pendingTags);
         model.addAttribute("tagsList", tagsList);
 
         return "gardenDetailsPage";
