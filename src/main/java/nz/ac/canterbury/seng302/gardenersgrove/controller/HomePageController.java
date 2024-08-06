@@ -457,17 +457,15 @@ public class HomePageController {
      * This function is called when a POST request is made to /home/edit it handles
      * updating the home page layout
      * 
-     * @param requestedFriends show the requested friends section boolean
-     * @param acceptedFriends  show the accepted friends section boolean
-     * @param recentPlants     show the recent plants section boolean
-     * @param recentGardens    show the recent gardens section boolean
-     * @param notifications    show the notifications section boolean
-     * @param model            the model to add attributes to
+     * @param acceptedFriends show the accepted friends section boolean
+     * @param recentPlants    show the recent plants section boolean
+     * @param recentGardens   show the recent gardens section boolean
+     * @param notifications   show the notifications section boolean
+     * @param model           the model to add attributes to
      * @return redirect to /home
      */
     @PostMapping("home/edit")
     public String saveHomePage(
-            @RequestParam(name = "requestedFriends", required = false, defaultValue = "false") boolean requestedFriends,
             @RequestParam(name = "acceptedFriends", required = false, defaultValue = "false") boolean acceptedFriends,
             @RequestParam(name = "recentPlants", required = false, defaultValue = "false") boolean recentPlants,
             @RequestParam(name = "recentGardens", required = false, defaultValue = "false") boolean recentGardens,
@@ -475,7 +473,7 @@ public class HomePageController {
             Model model) {
         logger.info("POST /home/edit");
         User user = securityService.getCurrentUser();
-        HomePageLayout newLayout = new HomePageLayout(requestedFriends, acceptedFriends, recentPlants, recentGardens,
+        HomePageLayout newLayout = new HomePageLayout(acceptedFriends, recentPlants, recentGardens,
                 notifications);
         userService.updateHomePageLayout(user.getId(), newLayout);
         return "redirect:/home";

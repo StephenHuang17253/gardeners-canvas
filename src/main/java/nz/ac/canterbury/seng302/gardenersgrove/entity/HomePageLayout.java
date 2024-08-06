@@ -18,9 +18,6 @@ public class HomePageLayout {
     private Long id;
 
     @Column
-    private boolean requestedFriends;
-
-    @Column
     private boolean acceptedFriends;
 
     @Column
@@ -31,10 +28,6 @@ public class HomePageLayout {
 
     @Column
     private boolean notifications;
-
-    public boolean showRequestedFriends() {
-        return requestedFriends;
-    }
 
     public boolean showAcceptedFriends() {
         return acceptedFriends;
@@ -50,10 +43,6 @@ public class HomePageLayout {
 
     public boolean showNotifications() {
         return notifications;
-    }
-
-    public void setRequestedFriends(boolean requestedFriends) {
-        this.requestedFriends = requestedFriends;
     }
 
     public void setAcceptedFriends(boolean acceptedFriends) {
@@ -78,7 +67,6 @@ public class HomePageLayout {
      * 
      */
     public HomePageLayout() {
-        this.requestedFriends = true;
         this.acceptedFriends = true;
         this.recentPlants = true;
         this.recentGardens = true;
@@ -88,15 +76,13 @@ public class HomePageLayout {
     /**
      * Creates a new home page layout with the given section visibilities
      * 
-     * @param requestedFriends
      * @param acceptedFriends
      * @param recentPlants
      * @param recentGardens
      * @param notifications
      */
-    public HomePageLayout(boolean requestedFriends, boolean acceptedFriends, boolean recentPlants,
+    public HomePageLayout(boolean acceptedFriends, boolean recentPlants,
             boolean recentGardens, boolean notifications) {
-        this.requestedFriends = requestedFriends;
         this.acceptedFriends = acceptedFriends;
         this.recentPlants = recentPlants;
         this.recentGardens = recentGardens;
@@ -106,7 +92,6 @@ public class HomePageLayout {
     @Override
     public String toString() {
         return "Garden{" +
-                "requestedFriends='" + requestedFriends + "\'" +
                 ", acceptedFriends='" + acceptedFriends + '\'' +
                 ", recentPlants='" + recentPlants + '\'' +
                 ", recentGardens='" + recentGardens + '\'' +
