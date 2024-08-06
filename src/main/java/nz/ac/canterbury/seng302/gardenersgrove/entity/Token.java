@@ -19,6 +19,9 @@ public class Token {
     @Transient
     private static final int TOKEN_LIFETIME = 10;
 
+    @Transient
+    private static final Random random = new Random();
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -50,7 +53,6 @@ public class Token {
      */
     private String generateTokenString(int length) {
         String alphanumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
         StringBuilder token = new StringBuilder(length);
 
         for (int i = 0; i < length; i++) {

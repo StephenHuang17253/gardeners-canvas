@@ -35,9 +35,9 @@ public class SecurityService {
 
     Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
-    private final static int NUM_STRIKES_FOR_WARN = 5;
+    private static final int NUM_STRIKES_FOR_WARN = 5;
 
-    private final static int NUM_STRIKES_FOR_BAN = 6;
+    private static final int NUM_STRIKES_FOR_BAN = 6;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to

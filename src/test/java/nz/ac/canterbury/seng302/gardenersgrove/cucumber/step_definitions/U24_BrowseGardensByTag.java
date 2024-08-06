@@ -54,6 +54,9 @@ public class U24_BrowseGardensByTag {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    private HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public SecurityService securityService;
 
     @Autowired
@@ -85,7 +88,7 @@ public class U24_BrowseGardensByTag {
     @Before
     public void before_or_after_all() {
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);

@@ -12,6 +12,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ResetPasswordController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
@@ -50,6 +51,8 @@ public class ResetUserPassword {
     @Autowired
     public UserRepository userRepository;
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+    @Autowired
     public FileService fileService;
     @Autowired
     public GardenService gardenService;
@@ -84,7 +87,7 @@ public class ResetUserPassword {
     @Before
     public void before_or_after_all() throws MessagingException {
         token = new Token(loggedInUser, null);
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
 
         emailService = mock(EmailService.class);
 
