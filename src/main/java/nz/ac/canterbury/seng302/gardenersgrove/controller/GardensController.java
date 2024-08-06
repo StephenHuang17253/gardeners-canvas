@@ -492,6 +492,8 @@ public class GardensController {
                                    Model model) throws ServletException, InterruptedException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
+        tag = tag.trim();
+
         ValidationResult tagResult = InputValidator.validateTag(tag);
         boolean gardenAlreadyHasThisTag = false;
 

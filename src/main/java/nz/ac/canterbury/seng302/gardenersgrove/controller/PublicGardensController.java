@@ -253,6 +253,7 @@ public class PublicGardensController {
     @ResponseBody
     public Boolean checkTagExists(@RequestParam("tagName") String tagName) {
         logger.info("GET tag/exists");
+        tagName = tagName.trim();
         Optional<GardenTag> testTag = gardenTagService.getByName(tagName);
         return testTag.isPresent();
     }
