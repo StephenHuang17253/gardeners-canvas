@@ -9,20 +9,27 @@
                             <h1 class="modal-title fs-5">Select one of your gardens to add plant to:</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            <select class="form-select col-xxl-3" aria-label="Select garden">
-                                <option class="text-truncate" th:each="garden : ${session.userGardens}"
-                                        th:with="gardenName=${garden.getGardenName}"
-                                        th:text="${#strings.length(gardenName) > 30 ? #strings.substring(gardenName,0,27) + '...' : gardenName}"
-                                        th:value="${garden.getGardenId}">
-                                </option>
-                            </select>
-                        </div>
 
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-success">Add to garden</button>
-                        </div>
+                        <form th:action="@{/import-plant}" method="post">
+
+                            <input type="hidden" th:value="${plantId}" th:name="plantId">
+
+                            <div class="modal-body">
+                                <select class="form-select col-xxl-3" aria-label="Select garden" th:name="gardenId">
+                                    <option class="text-truncate" th:each="garden : ${session.userGardens}"
+                                            th:with="gardenName=${garden.getGardenName}"
+                                            th:text="${#strings.length(gardenName) > 30 ? #strings.substring(gardenName,0,27) + '...' : gardenName}"
+                                            th:value="${garden.getGardenId}">
+                                    </option>
+                                </select>
+                            </div>
+    
+                            <div class="modal-footer justify-content-center">
+                                <button type="submit" class="btn btn-success">Add to garden</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                        
                     </div>
                 </div>
             </div>
