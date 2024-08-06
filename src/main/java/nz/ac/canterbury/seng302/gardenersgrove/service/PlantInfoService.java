@@ -113,6 +113,8 @@ public class PlantInfoService {
         logger.info("Call to Perenual Plant API: " + request);
 
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        logger.info("raw Pernula Response: " + response.body());
+        logger.info("JSON Pernula Response: " + mapper.readTree(response.body()));
         return mapper.readTree(response.body());
 
     }
