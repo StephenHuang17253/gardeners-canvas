@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -27,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
@@ -185,6 +187,7 @@ public class PlantFormController {
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
+        securityService.addUserInteraction(newPlant.getPlantId(), ItemType.PLANT, LocalDateTime.now());
 
         return "redirect:/my-gardens/{gardenId}";
     }
@@ -315,6 +318,8 @@ public class PlantFormController {
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
+        securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
+
         return "redirect:/my-gardens/{gardenId}";
     }
 
@@ -435,6 +440,9 @@ public class PlantFormController {
         if (toCopyPlant.getPlantPictureFilename() != null) {
             plantService.updatePlantPicture(newPlant, toCopyPlant.getPlantPictureFilename());
         }
+        securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
+        securityService.addUserInteraction(newPlant.getPlantId(), ItemType.PLANT, LocalDateTime.now());
+
 
         redirectAttributes.addAttribute("plantId", newPlant.getPlantId());
         redirectAttributes.addAttribute("gardenId", gardenId);
