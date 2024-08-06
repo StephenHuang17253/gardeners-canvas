@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="~{fragments/emailHeader.html}"></head>
 
 <body>
     <div class="container">
-        <h1 th:text="|Kia ora ${username}!|"></h1>
+        <h1 th:text="|Kia ora ${username}!|">Greeting</h1>
         <p>Thank you for registering with Gardener's Grove</p>
         <p>Here is your signup code:</p>
-        <h1 th:text="${tokenString}"></h1>
+        <h1 th:text="${tokenString}">Token string</h1>
         <p th:text="|You have ${lifetime} minutes to complete your registration|"></p>
         <p th:text="|If this was not you, you can ignore this message and the account will be deleted after ${lifetime} minutes|"></p>
     </div>

@@ -10,22 +10,22 @@
                     <!-- First larger image -->
                     <div class="me-2" style="flex: 3; height: 300px;">
                         <img th:src="@{${plantImage1 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage1}}"
-                             alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                             alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                     </div>
                     <!-- Two smaller images stacked on top of each other -->
                     <div class="d-flex flex-column" style="flex: 2; height: 300px;">
                         <div class="small-image overflow-hidden rounded mb-2" style="flex: 1;">
                             <img th:src="@{${plantImage2 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage2}}"
-                                 alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                                 alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                         </div>
                         <div class="small-image overflow-hidden rounded" style="flex: 1;">
                             <img th:src="@{${plantImage3 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage3}}"
-                                 alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                                 alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                         </div>
                     </div>
                 </div>
 
-                <h4 class="card-title mt-1" th:text="${gardenName}"></h4>
+                <h4 class="card-title mt-1" th:text="${gardenName}">Garden Name</h4>
                 <p class="card-text">
                     <small th:text="${gardenDescription}"></small>
                 </p>

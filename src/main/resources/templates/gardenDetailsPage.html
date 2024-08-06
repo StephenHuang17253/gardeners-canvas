@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="~{fragments/header.html :: head (includeWeatherStyles=true)}"></head>
 
@@ -18,10 +18,17 @@
                 </form>
             </div>
             <div>
-                <h1 class="break-word" th:text="${garden.getGardenName()}"></h1>
-                        <div class="p-1" th:each="tag : ${tagsList}">
-                            <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success')}"></div>
-                        </div>
+                <h1 class="break-word" th:text="${garden.getGardenName()}">Garden Name</h1>
+
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
+                    <div class="p-1" th:each="tag : ${tagsList}">
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success')}"></div>
+                    </div>
+
+                    <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary')}"></div>
+                    </div>
+                </div>
 
                         <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
                             <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary')}"></div>
@@ -29,10 +36,10 @@
                 <p class="break-word" th:text="${garden.getGardenDescription()}"></p>
                 <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
                     <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                         alt="User's Profile Picture" class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
+                         alt="User's Profile" class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
                 </div>
                 <h5 th:if="${isOwner}">Owner: You</h5>
-                <h5 class="break-word" th:if="${!isOwner}" th:text="'Owner: ' + ${userName}"></h5>
+                <h5 class="break-word" th:if="${!isOwner}" th:text="'Owner: ' + ${userName}">Owner's Name</h5>
                 <div>
                     <p class="break-word">
                         <strong>
@@ -115,7 +122,7 @@
             </div>
             <div th:if="${isOwner}" class="mt-3 rounded" th:classappend="${gradientClass}">
                 <div class="p-2 text-white">
-                    <h4 th:text="${currentTime}"></h4>
+                    <h4 th:text="${currentTime}">Current Time</h4>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
                     <div class="w-25" th:each="prediction, iterStat : ${weatherList}">
@@ -139,7 +146,7 @@
             </div>
             <div class="watering position-relative w-100 h-40" th:if="${message}" id="messageBox">
                 <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}"></div>
-                <span class="close position-absolute top-0 end-0" onclick="closeMessageBox()" style="cursor: pointer;">×</span>
+                <span class="close position-absolute top-0 end-0 cursor-pointer" onclick="closeMessageBox()">×</span>
             </div>
         </div>
         <div class="container mt-4">

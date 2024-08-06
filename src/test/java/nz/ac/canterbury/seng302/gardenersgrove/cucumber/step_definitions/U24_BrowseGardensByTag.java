@@ -54,6 +54,9 @@ public class U24_BrowseGardensByTag {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    private HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public SecurityService securityService;
 
     @Autowired
@@ -85,7 +88,7 @@ public class U24_BrowseGardensByTag {
     @Before
     public void before_or_after_all() {
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
@@ -155,12 +158,12 @@ public class U24_BrowseGardensByTag {
 
     @Then("The search results contain the garden called {string}")
     public void theSearchResultsContainTheGardenCalled(String gardenName)  {
-        Garden wantedGarden = gardenService.getMatchingGardens(gardenName).getFirst();
+        Garden wantedGarden = gardenService.getMatchingGardens(gardenName).get(0);
         ModelAndView model = mvcResult.getModelAndView();
         Assertions.assertNotNull(model);
         List<Garden> searchResults = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
         Assertions.assertFalse(searchResults.isEmpty());
-        Assertions.assertEquals(searchResults.getFirst().toString(), wantedGarden.toString());
+        Assertions.assertEquals(searchResults.get(0).toString(), wantedGarden.toString());
     }
 }

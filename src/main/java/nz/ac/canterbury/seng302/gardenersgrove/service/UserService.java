@@ -1,8 +1,10 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ public class UserService {
     /** passwordEncoder to use for encoding passwords before storage */
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final HomePageLayoutRepository homePageLayoutRepository;
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -40,9 +43,11 @@ public class UserService {
      * @param userRepository  interface for user table in persistance
      */
     @Autowired
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository,
+            HomePageLayoutRepository homePageLayoutRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.homePageLayoutRepository = homePageLayoutRepository;
     }
 
     /**
@@ -56,15 +61,17 @@ public class UserService {
     }
 
     /**
-     * Adds a user to persistence
+     * Adds a user to persistence with a default home page layout
      *
      * @param user        object to persist
      * @param rawPassword string to encode and add to user
      */
     public void addUser(User user, String rawPassword) {
-
+        HomePageLayout newLayout = new HomePageLayout();
+        homePageLayoutRepository.save(newLayout);
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
+        user.setHomePageLayout(newLayout);
         userRepository.save(user);
     }
 
@@ -221,16 +228,14 @@ public class UserService {
 
     /**
      * Give a strike to the user.
-     * Checks that the user's strikes value isn't null, to accommodate users who existed before this feature.
+     * Checks that the user's strikes value isn't null, to accommodate users who
+     * existed before this feature.
+     * 
      * @param user user to strike
      */
     public void strikeUser(User user) {
         int strikes = user.getStrikes();
-        if (Objects.isNull(strikes)) {
-            user.setStrikes(1);
-        } else {
-            user.setStrikes(strikes + 1);
-        }
+        user.setStrikes(strikes + 1);
         userRepository.save(user);
     }
 
@@ -269,6 +274,20 @@ public class UserService {
                 .map(this::getUserById)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Updates the home page layout of a user
+     * 
+     * @param id     id of the user to update layout for
+     * @param layout new layout to set
+     * @return updated user
+     */
+    public User updateHomePageLayout(Long id, HomePageLayout layout) {
+        User user = getUserById(id);
+        homePageLayoutRepository.save(layout);
+        user.setHomePageLayout(layout);
+        return userRepository.save(user);
     }
 
 }

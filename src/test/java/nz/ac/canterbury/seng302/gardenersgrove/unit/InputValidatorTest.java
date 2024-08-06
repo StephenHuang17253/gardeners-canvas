@@ -37,7 +37,7 @@ class InputValidatorTest {
     static void setup() {
         userServiceMock = Mockito.mock(UserService.class);
         profanityServiceMock = Mockito.mock(ProfanityService.class);
-        InputValidator testValidator = new InputValidator(userServiceMock, profanityServiceMock);
+        new InputValidator(userServiceMock, profanityServiceMock);
     }
 
     @BeforeEach
@@ -379,19 +379,15 @@ class InputValidatorTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {"aB0!bbba", "##aBB0hhhhhhhhhh", "Passw0rd!", "Pass word1!"})
-    public void InputValidator_validatePassword_ValidPassword_return_OK(String password) {
+    void InputValidator_validatePassword_ValidPassword_return_OK(String password) {
         String firstName = "John";
         String lastName = "";
         boolean noLastName = true;
-        LocalDate dateOfBirth = null;
         String emailAddress = "johndoe@gmail.com";
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
         if (noLastName == false) {
             otherFields.add(lastName);
-        }
-        if (!(dateOfBirth == null)) {
-            otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(emailAddress);
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePassword(password, otherFields));
@@ -405,7 +401,7 @@ class InputValidatorTest {
     @ParameterizedTest
     @CsvSource({"aaa", "aaaaaaaa", "000!0000", "password1!", "Password123", "Password!@#", "PASSWORD1!",
             "1D!0", "D!1", "aA!0", "Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
-    public void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password) {
+    void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password) {
         String firstName = "John";
         String lastName = "Doe";
         boolean noLastName = false;
@@ -422,8 +418,6 @@ class InputValidatorTest {
         otherFields.add(emailAddress);
         Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password, otherFields));
     }
-
-    ;
 
     /**
      * Test for valid DOB

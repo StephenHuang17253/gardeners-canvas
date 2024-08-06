@@ -20,7 +20,6 @@ public class ProfanityResponseData {
     private String statusCode;
     private String statusDescription;
     private boolean callLimitExceeded;
-    public int errorCode;
 
     @JsonCreator
     public ProfanityResponseData(JsonNode jsonProfanityData){
@@ -104,7 +103,7 @@ public class ProfanityResponseData {
             JsonNode errorNode = jsonProfanityData.get("error");
             if (errorNode.has("code")) {
                 String codeString = errorNode.get("code").asText();
-                errorCode = Integer.parseInt(codeString);
+                int errorCode = Integer.parseInt(codeString);
                 if (errorCode == 429) {
                     callLimitExceeded = true;
                 }
