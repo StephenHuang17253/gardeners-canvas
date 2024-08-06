@@ -3,6 +3,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * Used for displaying search results from the Plant Wiki.
  */
@@ -19,12 +22,26 @@ public class PlantSearchModel {
     private String image;
 
     /**
+     *
+     * Helper to capitalize words
+     * @param input the word to capitalize
+     * @return capitalize word string
+     */
+
+    private String capitalizeWords(String input) {
+        return Arrays.stream(input.split(" "))
+                .map(word -> word.isEmpty() ? word :
+                        Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+    }
+
+    /**
      * Constructor for a PlantSearchModel
      * @param plantList the JSON response from the API.
      */
     public PlantSearchModel(JsonNode plantList) {
         this.id = plantList.get("id").asLong();
-        this.commonName = plantList.get("common_name").asText();
+        this.commonName = capitalizeWords(plantList.get("common_name").asText());
         this.scientificName = plantList.get("scientific_name").get(0).asText();
         this.otherNames = extractOtherNames(plantList.get("other_name"));
         this.image = getImageURL(plantList);
