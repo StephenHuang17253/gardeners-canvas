@@ -51,6 +51,9 @@ public class U23_DeactivateAccount {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    private HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -84,7 +87,6 @@ public class U23_DeactivateAccount {
 
     public static GardenTagService gardenTagService;
 
-
     private MvcResult mvcResultGardens;
     private MvcResult mvcResultAccount;
 
@@ -95,7 +97,7 @@ public class U23_DeactivateAccount {
     @Before
     public void before_or_after_all() {
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
@@ -116,7 +118,6 @@ public class U23_DeactivateAccount {
         mockMVCAccount = MockMvcBuilders.standaloneSetup(loginPageController).build();
         mockMVCGardens = MockMvcBuilders.standaloneSetup(gardensController).build();
 
-
     }
 
     @When("I attempt to enter tag {string}")
@@ -125,8 +126,8 @@ public class U23_DeactivateAccount {
         mvcResultGardens = mockMVCGardens.perform(
                 MockMvcRequestBuilders
                         .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
-                        .param("tag", tagName)
-                ).andExpect(status().is3xxRedirection())
+                        .param("tag", tagName))
+                .andExpect(status().is3xxRedirection())
                 .andReturn();
     }
 
@@ -136,35 +137,39 @@ public class U23_DeactivateAccount {
     }
 
     @And("A login error message is displayed {string}")
-    public void aLoginMessageIsDisplayed(String errorMessage){
+    public void aLoginMessageIsDisplayed(String errorMessage) {
         Assertions.assertEquals(errorMessage, mvcResultGardens.getFlashMap().get("message"));
     }
 
     @And("I {string} get banned")
-    public void iGetBanned(String email){
+    public void iGetBanned(String email) {
         Assertions.assertTrue(userService.getUserByEmail(email).isBanned());
     }
+
     @And("I {string} am banned for {int} days")
     public void iAmBanned(String email, int days) {
         userService.banUser(userService.getUserByEmail(email), days);
     }
+
     @When("I {string} try to login with password {string}")
     public void iTryToLoginWithPassword(String email, String password) throws Exception {
         mvcResultAccount = mockMVCAccount.perform(
-                        post("/login")
-                                .param("emailAddress", email)
-                                .param("password", password)).andReturn();
+                post("/login")
+                        .param("emailAddress", email)
+                        .param("password", password))
+                .andReturn();
     }
+
     @Then("I receive an error message {string}")
     public void iReceiveErrorMessage(String errorMessage) {
         Assertions.assertEquals(errorMessage, mvcResultAccount.getModelAndView().getModel().get("message"));
-        System.out.println("Current time:"+LocalDateTime.now());
-        System.out.println("Yesterday"+LocalDateTime.now().minusDays(1));
+        System.out.println("Current time:" + LocalDateTime.now());
+        System.out.println("Yesterday" + LocalDateTime.now().minusDays(1));
 
     }
 
     @When("It is the eighth day of my account {string} being blocked")
-    public void itIsTheEighthDayOfMyAccountBeingBlocked(String email){
+    public void itIsTheEighthDayOfMyAccountBeingBlocked(String email) {
         user = userService.getUserByEmail(email);
         user.setLastBanDate(null);
         userRepository.save(user);
@@ -175,11 +180,10 @@ public class U23_DeactivateAccount {
         mockMVCAccount.perform(
                 post("/login")
                         .param("emailAddress", email)
-                        .param("password", password)).andExpect(redirectedUrl("/home"));
-
+                        .param("password", password))
+                .andExpect(redirectedUrl("/home"));
 
         Assertions.assertFalse(user.isBanned());
     }
-
 
 }

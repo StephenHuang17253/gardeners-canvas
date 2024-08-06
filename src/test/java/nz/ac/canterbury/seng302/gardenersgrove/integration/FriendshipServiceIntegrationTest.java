@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
@@ -32,6 +33,9 @@ class FriendshipServiceIntegrationTest {
     @Autowired
     private FriendshipRepository friendshipRepository;
 
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
     private FriendshipService friendshipService;
 
     private UserService userService;
@@ -46,7 +50,7 @@ class FriendshipServiceIntegrationTest {
 
     @BeforeAll
     void before_or_after_all() {
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         user1 = new User("John", "Doe", "jhonDoe@FriendshipServiceIntegrationTest.com", LocalDate.of(2003, 5, 2));

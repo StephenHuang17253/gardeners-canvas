@@ -62,25 +62,24 @@ public class GardensController {
 
     private static final int COUNT_PER_PAGE = 10;
 
-
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
     /**
      * Constructor for the GardensController with {@link Autowired} to connect
      * this controller with other services
      *
-     * @param gardenService         service to access garden repository
-     * @param securityService       service to access security methods
-     * @param plantService          service to access plant repository
-     * @param weatherService        service to perform weather api calls
-     * @param objectMapper          used for JSON conversion
-     * @param gardenTagService      service to access tag repository
-     * @param userService           service to access user repository
+     * @param gardenService    service to access garden repository
+     * @param securityService  service to access security methods
+     * @param plantService     service to access plant repository
+     * @param weatherService   service to perform weather api calls
+     * @param objectMapper     used for JSON conversion
+     * @param gardenTagService service to access tag repository
+     * @param userService      service to access user repository
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-                             WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
-                             ProfanityService profanityService, UserService userService) {
+            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
+            ProfanityService profanityService, UserService userService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
@@ -100,9 +99,9 @@ public class GardensController {
      */
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
-                            @RequestParam(defaultValue = "All") String filter,
-                            HttpServletRequest request,
-                            Model model) {
+            @RequestParam(defaultValue = "All") String filter,
+            HttpServletRequest request,
+            Model model) {
         logger.info("GET /my-gardens");
 
         model.addAttribute("loggedIn", securityService.isLoggedIn());
@@ -167,7 +166,7 @@ public class GardensController {
         return weatherList;
     }
 
-    private void handleWeatherMessages(List<WeatherModel> weatherList,  Garden garden, Model model) {
+    private void handleWeatherMessages(List<WeatherModel> weatherList, Garden garden, Model model) {
         WeatherModel beforeYesterdayWeather = weatherList.get(0);
         WeatherModel yesterdayWeather = weatherList.get(1);
         WeatherModel currentWeather = weatherList.get(2);
@@ -179,7 +178,8 @@ public class GardensController {
         if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
                 && Objects.equals(currentWeather.getDescription(), "Sunny")) {
-            model.addAttribute("message", "There hasn't been any rain recently, make sure to water your plants if they need it");
+            model.addAttribute("message",
+                    "There hasn't been any rain recently, make sure to water your plants if they need it");
             model.addAttribute("goodMessage", false);
             gardenService.changeGardenNeedsWatering(garden.getGardenId(), true);
         } else {
@@ -233,6 +233,8 @@ public class GardensController {
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
+        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
+
         List<WeatherModel> weatherList = null;
 
         try {
@@ -245,7 +247,6 @@ public class GardensController {
         }
 
         try {
-            Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
             if (inputFlashMap != null) {
                 weatherList = (List<WeatherModel>) inputFlashMap.get("weatherList");
             }
@@ -280,6 +281,7 @@ public class GardensController {
             weatherListJson = objectMapper.writeValueAsString(weatherList);
         } catch (Exception e) {
             logger.error("An error occurred while writing the weatherListJson: {}", e.getMessage());
+            logger.error("An error occurred while writing the weatherListJson: {}", e.getMessage());
         }
 
         model.addAttribute("weatherListJson", weatherListJson);
@@ -293,6 +295,50 @@ public class GardensController {
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureError);
 
+        // Used for displaying messages after a redirect e.g. from the verify page
+        if (inputFlashMap != null) {
+            model.addAttribute("openModal", inputFlashMap.get("openModal"));
+            model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+
+            // The below If statements check if the status of a pending tag has
+            // been updated and adjust error messages acrodingly if thats the case
+            if (inputFlashMap.get("pendingTagName") == null) {
+                model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+            } else {
+                Optional<GardenTag> pendingTag = gardenTagService
+                        .getByName(inputFlashMap.get("pendingTagName").toString());
+
+                if (pendingTag.isPresent()) {
+                    if (pendingTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
+                        // security service will return old strike count so adding one to account for
+                        // this tag.
+                        int userStrikes = securityService.getCurrentUser().getStrikes() + 1;
+                        logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), userStrikes);
+                        model.addAttribute("tagErrorText", "This tag does not meet the language " +
+                                "standards for Gardener's Grove. A warning strike has been added to your account");
+                        if (userStrikes == 5) {
+                            model.addAttribute("tagErrorText",
+                                    "You have added an inappropriate tag for the fifth time." +
+                                            " You have been sent a warning email. " +
+                                            "If you add another inappropriate tag, you will be banned for a week.");
+                        } else if (userStrikes == 6) {
+                            redirectAttributes.addFlashAttribute("message",
+                                    "Your account is blocked for 7 days due to inappropriate conduct");
+                            redirectAttributes.addFlashAttribute("goodMessage", false);
+                            request.logout();
+                            return "redirect:/login";
+                        }
+                        model.addAttribute("tagMessageText", "");
+                    } else if (pendingTag.get().getTagStatus() == TagStatus.APPROPRIATE) {
+                        model.addAttribute("tagMessageText", "");
+                    } else {
+                        model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+                    }
+                } else {
+                    model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+                }
+            }
+        }
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
@@ -310,62 +356,9 @@ public class GardensController {
 
         model.addAttribute("pendingTags", pendingTags);
 
-        // Used for displaying messages after a redirect e.g. from the verify page
-        Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        if (inputFlashMap != null) {
-            model.addAttribute("openModal", inputFlashMap.get("openModal"));
-
-            // The below If statements check if the status of a pending tag has
-            // been updated and adjust error messages acrodingly if thats the case
-            if (inputFlashMap.get("pendingTagName") == null)
-            {
-                model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
-            }
-            else
-            {
-                Optional<GardenTag> pendingTag = gardenTagService.getByName(inputFlashMap.get("pendingTagName").toString());
-
-                if (pendingTag.isPresent())
-                {
-                    if (pendingTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)
-                    {
-                        // security service will return old strike count so adding one to account for this tag.
-                        int userStrikes = securityService.getCurrentUser().getStrikes() + 1;
-                        logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), userStrikes);
-                        model.addAttribute("tagErrorText", "This tag does not meet the language " +
-                                "standards for Gardener's Grove. A warning strike has been added to your account");
-                        if (userStrikes == 5) {
-                            model.addAttribute("tagErrorText", "You have added an inappropriate tag for the fifth time." +
-                                    " You have been sent a warning email. " +
-                                    "If you add another inappropriate tag, you will be banned for a week.");
-                        }
-                        else if (userStrikes == 6)
-                        {
-                            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
-                            redirectAttributes.addFlashAttribute("goodMessage", false);
-                            request.logout();
-                            return "redirect:/login";
-                        }
-                        model.addAttribute("tagMessageText","");
-                    }
-                    else if (pendingTag.get().getTagStatus() == TagStatus.APPROPRIATE)
-                    {
-                        model.addAttribute("tagMessageText","");
-                    }
-                    else
-                    {
-                        model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
-                    }
-                }
-                else
-                {
-                    model.addAttribute("tagMessageText",inputFlashMap.get("tagMessageText"));
-                }
-            }
-        }
-
         if (garden.getOwner().isBanned()) {
-            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+            redirectAttributes.addFlashAttribute("message",
+                    "Your account is blocked for 7 days due to inappropriate conduct");
             redirectAttributes.addFlashAttribute("goodMessage", false);
             request.logout();
             return "redirect:/login";
@@ -385,11 +378,11 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}/public")
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
-                                           @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
-                                           @RequestParam(defaultValue = "1") int page,
-                                           @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
-                                           RedirectAttributes redirectAttributes,
-                                           HttpServletResponse response) throws JsonProcessingException {
+            @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}/public", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -420,19 +413,20 @@ public class GardensController {
         redirectAttributes.addFlashAttribute("page", page);
         redirectAttributes.addFlashAttribute("weatherList", weatherList);
 
-
         return "redirect:/my-gardens/{gardenId}";
 
     }
 
     /**
-     * Helper to set the model of garden details page for non-blue sky scenarios after tag post-mapping
+     * Helper to set the model of garden details page for non-blue sky scenarios
+     * after tag post-mapping
+     * 
      * @param garden entity of the page to be displayed
-     * @param tag text
-     * @param page index
+     * @param tag    text
+     * @param page   index
      * @return filename of thymeleaf template
      */
-    private String setGardenDetailModel(Garden garden, String tag, int page, Model model){
+    private String setGardenDetailModel(Garden garden, String tag, int page, Model model) {
         List<WeatherModel> weatherList;
         weatherList = getGardenWeatherData(garden);
         if (weatherList.size() > 1) {
@@ -484,12 +478,12 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}/tag")
     public String addGardenTag(@PathVariable Long gardenId,
-                                   @RequestParam("tag") String tag,
-                                   @RequestParam(defaultValue = "1") int page,
-                                   RedirectAttributes redirectAttributes,
-                                   HttpServletResponse response,
-                                   HttpServletRequest request,
-                                   Model model) throws ServletException, InterruptedException {
+            @RequestParam("tag") String tag,
+            @RequestParam(defaultValue = "1") int page,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response,
+            HttpServletRequest request,
+            Model model) throws ServletException, InterruptedException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         tag = tag.trim();
@@ -516,7 +510,8 @@ public class GardensController {
                 asynchronousTagProfanityCheck(tag, garden.getOwner());
             }
 
-            gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag).isPresent();
+            gardenAlreadyHasThisTag = gardenTagService.getGardenTagRelationByGardenAndTag(garden, gardenTag)
+                    .isPresent();
 
             if (!gardenAlreadyHasThisTag && tagResult.valid() && gardenTag.getTagStatus() != TagStatus.INAPPROPRIATE) {
                 gardenTagService.addGardenTagRelation(new GardenTagRelation(garden, gardenTag));
@@ -545,6 +540,14 @@ public class GardensController {
                             " You have been sent a warning email. " +
                             "If you add another inappropriate tag, you will be banned for a week.");
                 }
+
+                if (garden.getOwner().isBanned()) {
+                    redirectAttributes.addFlashAttribute("message",
+                            "Your account is blocked for 7 days due to inappropriate conduct");
+                    redirectAttributes.addFlashAttribute("goodMessage", false);
+                    request.logout();
+                    return "redirect:/login";
+                }
             }
 
             List<WeatherModel> weatherList;
@@ -554,17 +557,19 @@ public class GardensController {
             }
 
             if (garden.getOwner().isBanned()) {
-                redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+                redirectAttributes.addFlashAttribute("message",
+                        "Your account is blocked for 7 days due to inappropriate conduct");
                 redirectAttributes.addFlashAttribute("goodMessage", false);
                 request.logout();
                 return "redirect:/login";
             }
-            return setGardenDetailModel(garden,tag,page,model);
+            return setGardenDetailModel(garden, tag, page, model);
         }
 
         if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING) {
-            redirectAttributes.addFlashAttribute("tagMessageText", String.format("Your tag \"%s\" is currently being checked for profanity. " +
-                    "If it follows the language standards for our app, it will be added to your garden.",tag));
+            redirectAttributes.addFlashAttribute("tagMessageText",
+                    String.format("Your tag \"%s\" is currently being checked for profanity. " +
+                            "If it follows the language standards for our app, it will be added to your garden.", tag));
             redirectAttributes.addFlashAttribute("pendingTagName", tag);
         }
 
@@ -572,12 +577,12 @@ public class GardensController {
         redirectAttributes.addFlashAttribute("openModal", "true");
 
         if (garden.getOwner().isBanned()) {
-            redirectAttributes.addFlashAttribute("message", "Your account is blocked for 7 days due to inappropriate conduct");
+            redirectAttributes.addFlashAttribute("message",
+                    "Your account is blocked for 7 days due to inappropriate conduct");
             redirectAttributes.addFlashAttribute("goodMessage", false);
             request.logout();
             return "redirect:/login";
         }
-
 
         return "redirect:/my-gardens/{gardenId}";
 
@@ -595,13 +600,13 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}")
     public String updatePlantImage(@PathVariable Long gardenId,
-                                   @RequestParam("plantId") Long plantId,
-                                   @RequestParam("weatherListJson") String weatherListJson,
-                                   @RequestParam("plantPictureInput") MultipartFile plantPicture,
-                                   @RequestParam(defaultValue = "1") int page,
-                                   RedirectAttributes redirectAttributes,
-                                   HttpServletResponse response,
-                                   Model model) throws JsonProcessingException {
+            @RequestParam("plantId") Long plantId,
+            @RequestParam("weatherListJson") String weatherListJson,
+            @RequestParam("plantPictureInput") MultipartFile plantPicture,
+            @RequestParam(defaultValue = "1") int page,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response,
+            Model model) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -649,10 +654,10 @@ public class GardensController {
      */
     @GetMapping("/{userId}/gardens")
     public String friendsGardens(Model model,
-                                 @PathVariable("userId") Long userId,
-                                 @RequestParam(defaultValue = "1") int page,
-                                 @RequestParam(defaultValue = "All") String filter,
-                                 HttpServletResponse response) {
+            @PathVariable("userId") Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "All") String filter,
+            HttpServletResponse response) {
         logger.info("GET {}/gardens", userId);
 
         User friend;
@@ -717,9 +722,9 @@ public class GardensController {
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
     }
 
-
     /**
-     * Retrieves tag suggestions from the Garden Tag Repository through the Garden Tag Service
+     * Retrieves tag suggestions from the Garden Tag Repository through the Garden
+     * Tag Service
      *
      * @param query - The search query for tag autocomplete suggestions
      * @return a list of garden tags whose names are similar to the query
@@ -735,9 +740,7 @@ public class GardensController {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
             if (!tagContainsProfanity) {
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
-            }
-            else
-            {
+            } else {
                 securityService.handleStrikeUser(user);
                 gardenTagService.updateGardenTagStatus(tagName, TagStatus.INAPPROPRIATE);
                 gardenTagService.deleteRelationByTagName(tagName);
@@ -748,6 +751,5 @@ public class GardensController {
         asyncThread.start();
 
     }
-
 
 }

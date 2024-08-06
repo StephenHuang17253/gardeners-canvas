@@ -47,6 +47,9 @@ public class WeatherMonitoring {
     public GardenTagRepository gardenTagRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public GardenTagRelationRepository gardenTagRelationRepository;
 
     @Autowired
@@ -145,7 +148,7 @@ public class WeatherMonitoring {
 
     @Before
     public void before_or_after_all() {
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService,

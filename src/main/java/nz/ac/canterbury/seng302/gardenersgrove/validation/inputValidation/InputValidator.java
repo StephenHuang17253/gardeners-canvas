@@ -492,30 +492,6 @@ public class InputValidator {
     }
 
     /**
-     * Checks if a string is a valid integer
-     * updates local variables with results
-     * ignored if string failed any previous validation
-     *
-     * @return the calling object
-     */
-    private InputValidator validIntegerHelper() {
-        // if this validators input has already failed once, this test wont be run
-        if (!this.passState) {
-            return this;
-        }
-
-        try {
-            Integer.parseInt(testedValue);
-        } catch (NumberFormatException error) {
-            this.validationResult = ValidationResult.INVALID;
-            this.passState = false;
-            return this;
-        }
-        this.validationResult = ValidationResult.OK;
-        return this;
-    }
-
-    /**
      * Checks if a string only contains letters, spaces, hyphens or apostrophes
      * updates local variables with results
      * ignored if string failed any previous validation

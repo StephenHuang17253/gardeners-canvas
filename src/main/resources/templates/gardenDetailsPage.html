@@ -18,7 +18,9 @@
                 </form>
             </div>
             <div>
-                <h1 class="break-word" th:text="${garden.getGardenName()}"></h1>
+                <h1 class="break-word" th:text="${garden.getGardenName()}">Garden Name</h1>
+
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
                         <div class="p-1" th:each="tag : ${tagsList}">
                             <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success', isRemovable=false)}"></div>
                         </div>
@@ -26,6 +28,7 @@
                         <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
                             <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary', isRemovable=false)}"></div>
                         </div>
+                </div>
                 <p class="break-word" th:text="${garden.getGardenDescription()}"></p>
                 <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
                     <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"

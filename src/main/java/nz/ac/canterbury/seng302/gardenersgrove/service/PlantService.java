@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Service class for Plant objects.
@@ -38,7 +36,9 @@ public class PlantService {
     /**
      * PlantService constructor with repository and garden service
      *
+     *
      * @param plantRepository the repository for Plants
+     * @param gardenService   the needed garden service to link plants to gardens
      * @param gardenService   the needed garden service to link plants to gardens
      */
     @Autowired
@@ -179,6 +179,20 @@ public class PlantService {
 
 
     /**
+     * Returns all plants that the user interacted with
+     *
+     * @param userInteractions list of recent user interactions
+     * @return list of plants
+     */
+    public List<Plant> getPlantsByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(userInteraction -> findById(userInteraction.getItemId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
+
+    /**
      * Copy the plant's picture
      * Overloaded method
      *
@@ -203,21 +217,6 @@ public class PlantService {
         } catch (IOException error) {
             logger.error(error.getMessage());
         }
-    }
-
-
-    /**
-     * Returns all plants that the user interacted with
-     *
-     * @param userInteractions list of recent user interactions
-     * @return list of plants
-     */
-    public List<Plant> getPlantsByInteraction(List<UserInteraction> userInteractions) {
-        return userInteractions.stream()
-                .map(userInteraction -> findById(userInteraction.getItemId()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
     }
 
     /**

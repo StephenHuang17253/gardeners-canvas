@@ -18,6 +18,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.ProfileController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
@@ -33,6 +34,8 @@ public class UpdateUserPassword {
     public PasswordEncoder passwordEncoder;
     @Autowired
     public UserRepository userRepository;
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
     @Autowired
     public FileService fileService;
     @Mock
@@ -52,7 +55,7 @@ public class UpdateUserPassword {
     @Before
     public void before_or_after_all() {
         emailService = Mockito.mock(EmailService.class);
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         ProfileController profileController = new ProfileController(authenticationManager, userService, fileService,
                 emailService, securityService);
         mockMVC = MockMvcBuilders.standaloneSetup(profileController).build();

@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,12 +37,15 @@ class HomePageControllerIntegrationTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
     UserService userService;
 
     @BeforeEach
     void before_or_after_all() {
         if (userService == null) {
-            userService = new UserService(passwordEncoder, userRepository);
+            userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         }
 
         String userEmail = "johndoe.test@email.com";
