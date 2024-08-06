@@ -1,0 +1,23 @@
+<div
+    th:fragment="plantSearchResultCard(plantId, plantName, plantSciName, plantOtherNames, plantPicture)">
+    <a th:href="@{/plant-wiki/{plantId}/details(plantId=${plantId})}" class="text-decoration-none">
+        <div class="card h-100 bg-success text-white garden-card">
+            <div class="card-body pt-1">
+                <div class="position-relative my-2">
+                    <div class="ratio ratio-1x1">
+                        <img th:src="@{${plantPicture == '' || plantPicture == 'https://perenual.com/storage/image/upgrade_access.jpg' ? '/images/default_plant.png' : plantPicture}}"
+                             alt="Plant Picture" class="image-fluid rounded w-100 h-100 object-fit-cover">
+                    </div>
+                </div>
+                <h4 class="card-title mt-1" th:text="${plantName}"></h4>
+                <h5 class="card-title mt-1" th:text="${plantSciName}"></h5>
+                <p class="card-title mt-1 fw-light"
+                    th:text="${(plantOtherNames != null && !plantOtherNames.isEmpty()) ? 'Also known as: ' + plantOtherNames : ''}">
+                    <small></small>
+                </p>
+            </div>
+        </div>
+    </a>
+
+
+</div>
