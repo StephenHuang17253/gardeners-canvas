@@ -155,12 +155,12 @@ public class U24_BrowseGardensByTag {
 
     @Then("The search results contain the garden called {string}")
     public void theSearchResultsContainTheGardenCalled(String gardenName)  {
-        Garden wantedGarden = gardenService.getMatchingGardens(gardenName).getFirst();
+        Garden wantedGarden = gardenService.getMatchingGardens(gardenName).get(0);
         ModelAndView model = mvcResult.getModelAndView();
         Assertions.assertNotNull(model);
         List<Garden> searchResults = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
         Assertions.assertFalse(searchResults.isEmpty());
-        Assertions.assertEquals(searchResults.getFirst().toString(), wantedGarden.toString());
+        Assertions.assertEquals(searchResults.get(0).toString(), wantedGarden.toString());
     }
 }
