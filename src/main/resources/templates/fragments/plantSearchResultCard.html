@@ -5,7 +5,7 @@
             <div class="card-body pt-1">
                 <div class="position-relative my-2">
                     <div class="ratio ratio-1x1">
-                        <img th:src="@{${plantPicture == '' ? '/images/default_plant.png' : plantPicture}}"
+                        <img th:src="@{${plantPicture == '' || plantPicture == 'https://perenual.com/storage/image/upgrade_access.jpg' ? '/images/default_plant.png' : plantPicture}}"
                              alt="Plant Picture" class="image-fluid rounded w-100 h-100 object-fit-cover">
                     </div>
                 </div>
