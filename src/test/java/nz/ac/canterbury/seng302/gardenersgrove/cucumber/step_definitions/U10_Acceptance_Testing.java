@@ -76,7 +76,7 @@ public class U10_Acceptance_Testing {
     public void before_or_after_all() {
         profanityService = Mockito.mock(ProfanityService.class);
 
-        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(false);
 
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
@@ -113,8 +113,8 @@ public class U10_Acceptance_Testing {
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
-        gardenLongitude = garden.getGardenLongitude();
-        gardenLatitude = garden.getGardenLatitude();
+        gardenLongitude = "-43.5214643";
+        gardenLatitude = "172.5796159";
     }
 
     @When("I click the edit garden button")

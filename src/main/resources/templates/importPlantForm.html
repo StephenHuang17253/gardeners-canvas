@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header.html}"></head>
+
+<body>
+<div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
+<div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+     th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+<div class="container-md my-5 bg-white rounded py-5 w-50">
+    <div class="row justify-content-center">
+        <div class="text-center py-5">
+            <h1 th:text="'Import Plant to ' + ${gardenName}"></h1>
+        </div>
+        <div class="col-6">
+
+            <form th:action="@{/import-plant/cancel}" method="post"
+                  class="border rounded-3 p-3 bg-white submit-form-once">
+
+                <input id="plantId" th:name="plantId" th:value="${plantId}" type="hidden"/>
+                <input id="gardenIdOfOriginalPlant" th:name="gardenIdOfOriginalPlant"
+                       th:value="${gardenIdOfOriginalPlant}" type="hidden"/>
+
+                <div class="d-flex justify-content-center mb-3">
+                    <img th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
+                         alt="Plant Picture" class="image-fluid rounded-circle object-fit-cover"
+                         style="width: 100%; max-width: 300px;">
+                </div>
+                <h4 class="card-title mt-1"
+                    th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}"></h4>
+                <div class="row">
+                    <p th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </p>
+                    <p th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </p>
+                    <p th:text="${plantDescription}" class="plant-description"></p>
+                </div>
+
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                    <a th:href="@{/public-gardens/{gardenId}(gardenId=${gardenIdOfOriginalPlant})}">
+                        <button type="button" class="btn btn-success">Submit</button>
+                    </a>
+                    <button type="submit" class="btn btn-secondary submit-button" formnovalidate>Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/preventEnterSubmit.js}"></script>
+<script th:src="@{/js/submitFormOnce.js}"></script>
+</body>
+
+</html>

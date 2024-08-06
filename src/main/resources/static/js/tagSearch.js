@@ -11,7 +11,7 @@ const searchTagErrorText = document.getElementById('searchTagErrorText');
  * otherwise adds it to the list of applied tags for the search
  */
 const handleButtonClick = async () => {
-    const value = tagInput.value;
+    const value = tagInput.value.trim();
 
     const tagExists = await checkTagExists(value);
 

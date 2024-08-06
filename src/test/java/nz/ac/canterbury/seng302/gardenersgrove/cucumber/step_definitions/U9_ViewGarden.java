@@ -46,6 +46,9 @@ public class U9_ViewGarden {
     public GardenTagRepository gardenTagRepository;
 
     @Autowired
+    public ProfanityService profanityService;
+
+    @Autowired
     public GardenTagRelationRepository gardenTagRelationRepository;
 
     @Autowired
@@ -71,6 +74,8 @@ public class U9_ViewGarden {
     @Autowired
     private GardenTagService gardenTagService;
 
+    @Autowired
+    private EmailService emailService;
     private static GardenService gardenService;
 
     private static UserService userService;
@@ -92,14 +97,13 @@ public class U9_ViewGarden {
         userService = new UserService(passwordEncoder, userRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService, emailService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
-        mockMVC = MockMvcBuilders.standaloneSetup(gardensController).build();
-        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService, emailService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, weatherService,objectMapper,gardenTagService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
+                weatherService,objectMapper,gardenTagService, profanityService, userService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +

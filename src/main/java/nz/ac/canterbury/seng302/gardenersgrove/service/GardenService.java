@@ -1,12 +1,14 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +47,8 @@ public class GardenService {
     }
 
     /**
-     * Retrieves all gardens from persistence where the owner id matches the inputted id
+     * Retrieves all gardens from persistence where the owner id matches the
+     * inputted id
      *
      * @param id the user's ID
      * @throws IllegalArgumentException if the provided user ID is invalid
@@ -71,7 +74,8 @@ public class GardenService {
      * Adds a new garden
      *
      * @param garden the garden to add
-     * @throws IllegalArgumentException if the user associated with the garden is not in the db
+     * @throws IllegalArgumentException if the user associated with the garden is
+     *                                  not in the db
      */
     public Garden addGarden(Garden garden) throws IllegalArgumentException {
         if (garden.getOwner().getId() != null && userService.getUserById(garden.getOwner().getId()) != null) {
@@ -115,7 +119,8 @@ public class GardenService {
 
     /**
      * Updates the status of the garden's publicity (isPublic)
-     * @param id - the garden's id
+     * 
+     * @param id           - the garden's id
      * @param publicStatus - whether isPublic should be made true or false
      * @return the updated garden as saved in the repository
      */
@@ -134,9 +139,31 @@ public class GardenService {
     }
 
     /**
+     * Updates the watering need status of the garden
+     * @param gardenId the garden's id
+     * @param NeedsWatering the boolean attribute used to determine if a garden needs watering
+     * @return the updated garden as saved in the repository
+     */
+    public Garden changeGardenNeedsWatering(Long gardenId, boolean NeedsWatering) {
+        Optional<Garden> optionalGarden = getGardenById(gardenId);
+
+        if (optionalGarden.isPresent()) {
+            Garden targetGarden = optionalGarden.get();
+
+            targetGarden.setNeedsWatering(NeedsWatering);
+
+            return gardenRepository.save(targetGarden);
+
+        } else {
+            throw new IllegalArgumentException("Invalid garden ID");
+        }
+    }
+
+    /**
      * Updates the longitude and latitude of a Garden entity.
-     * @param id the id of the garden we wish to update the coordinates of
-     * @param latitude the new latitude
+     * 
+     * @param id        the id of the garden we wish to update the coordinates of
+     * @param latitude  the new latitude
      * @param longitude the new longitude
      */
     public Garden updateGardenCoordinates(Long id, String latitude, String longitude) {
@@ -146,6 +173,7 @@ public class GardenService {
 
             targetGarden.setGardenLatitude(latitude);
             targetGarden.setGardenLongitude(longitude);
+            targetGarden.setLastLocationUpdate(LocalDateTime.now());
 
             return gardenRepository.save(targetGarden);
 
@@ -154,8 +182,6 @@ public class GardenService {
         }
     }
 
-
-
     /**
      * Adds plant entity to garden entity plant list
      *
@@ -163,7 +189,7 @@ public class GardenService {
      * @param plant    the new plant to be added to the garden
      * @throws IllegalArgumentException if invalid garden ID
      */
-    public void addPlantToGarden(Long gardenId, Plant plant) throws IllegalArgumentException  {
+    public void addPlantToGarden(Long gardenId, Plant plant) throws IllegalArgumentException {
         Optional<Garden> optionalGarden = getGardenById(gardenId);
 
         if (optionalGarden.isPresent()) {
@@ -177,14 +203,13 @@ public class GardenService {
 
     /**
      * Prepares searchValue for Like and IgnoreCase query.
-     * Finds all gardens whose name includes searchValue, or whose plantNames include the search value
+     * Finds all gardens whose name includes searchValue, or whose plantNames
+     * include the search value
      *
      * @param searchValue string input to match
      * @return List of Garden Objects
      */
     public List<Garden> getMatchingGardens(String searchValue) {
-        searchValue = searchValue.toLowerCase();
-        searchValue = "%" + searchValue + "%";
         return gardenRepository.findByGardenNameOrPlantNameContainingIgnoreCase(searchValue);
     }
 
@@ -199,6 +224,5 @@ public class GardenService {
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
-
 
 }

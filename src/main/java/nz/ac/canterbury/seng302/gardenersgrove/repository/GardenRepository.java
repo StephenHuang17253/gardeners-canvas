@@ -11,7 +11,8 @@ import java.util.Optional;
 
 /**
  * Garden object repository accessor using Spring's @link{CrudRepository}.
- * These (basic) methods are provided for us without the need to write our own implementations
+ * These (basic) methods are provided for us without the need to write our own
+ * implementations
  */
 @Repository
 public interface GardenRepository extends CrudRepository<Garden, Long> {
@@ -45,9 +46,11 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
      * @param searchValue string to be included in garden or plant name
      * @return list of garden objects
      */
-    @Query("SELECT DISTINCT garden FROM Garden garden LEFT JOIN garden.plants plant " +
-            "WHERE garden.isPublic = true AND (LOWER(garden.gardenName) LIKE LOWER(:searchValue) " +
-            "OR LOWER(plant.plantName) LIKE LOWER(:searchValue))")
+    @Query("SELECT DISTINCT g FROM Garden g " +
+            "LEFT JOIN g.plants p " +
+            "WHERE g.isPublic = true " +
+            "AND (LOWER(g.gardenName) LIKE LOWER(CONCAT('%', :searchValue, '%')) " +
+            "OR LOWER(p.plantName) LIKE LOWER(CONCAT('%', :searchValue, '%')))")
     List<Garden> findByGardenNameOrPlantNameContainingIgnoreCase(@Param("searchValue") String searchValue);
 
     /**
@@ -57,6 +60,5 @@ public interface GardenRepository extends CrudRepository<Garden, Long> {
      */
     @Query("SELECT DISTINCT garden FROM Garden garden WHERE (garden.isPublic) = true")
     List<Garden> findAllPublicGardens();
-
 
 }
