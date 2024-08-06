@@ -35,7 +35,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             "https://perenual.com/storage/species_image/4627_lactuca_sativa_merlot/og/52591617943_f131931cd7_b.jpg",
                             "Lettuce (Lactuca sativa) is a popular, leafy, green vegetable. It's easy to grow and a key ingredient in many salads. Crisp, crunchy varieties offer a refreshing, cool taste, while soft, buttery varieties may have a sweeter flavor. Lettuce come in many shapes, sizes, and colors, from soft green Romaine hearts to wavy, ruffled leaves. It is a great source of essential vitamins and minerals such as iron, calcium, magnesium, potassium, and Vitamins A, C, and K. Nowadays, lettuce can be found in grocery stores year-round and is also popular among home-gardeners, due to its easy-to-grow nature.",
                             "",
-                            "Average"),
+                            ""),
                     new PlantInfo(7409L,
                             "Potato",
                             "Solanum Tuberosum",

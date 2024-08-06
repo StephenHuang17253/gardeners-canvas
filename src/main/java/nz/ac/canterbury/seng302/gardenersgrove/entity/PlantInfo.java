@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -28,8 +29,8 @@ public class PlantInfo {
     private String wateringPeriod;
     private String wateringGeneralBenchmarkValue;
     private String wateringGeneralBenchmarkUnit;
-//    private List<String> sunlight;
-//    private List<String> pruningMonth;
+    private String sunlight;
+    private String pruningMonth;
     private int pruningCount;
     private boolean flowers;
     private String floweringSeason;
@@ -55,8 +56,8 @@ public class PlantInfo {
      * @param imageURL the image url that contain the plant image
      * @param detailJSONResponseString TODO
      */
-    public PlantInfo(Long id, String name, String scientificName, String imageURL, String description, String detailJSONResponseString, String watering, String cycle, String wateringPeriod, String wateringGeneralBenchmark, List<String> sunlight, List<String> pruningMonth, int pruningCount, boolean flowers, String floweringSeason, boolean fruits, boolean edibleFruit, String fruitSeason, boolean poisonousToHumans, boolean poisonousToPets, String maintenance, boolean indoor;
-){
+    public PlantInfo(Long id, String name, String scientificName, String imageURL, String description, String detailJSONResponseString, String watering) {
+//                     String cycle, String wateringPeriod, String wateringGeneralBenchmarkUnit, String wateringGeneralBenchmarkValue, List<String> sunlight, List<String> pruningMonth, int pruningCount, boolean flowers, String floweringSeason, boolean fruits, boolean edibleFruit, String fruitSeason, boolean poisonousToHumans, boolean poisonousToPets, String maintenance, boolean indoor) {
         this.id = id;
         this.name = name;
         this.scientificName = scientificName;
@@ -64,22 +65,22 @@ public class PlantInfo {
         this.description = description;
         this.detailJSONResponseString = detailJSONResponseString;
         this.watering = watering;
-        this.cycle = cycle;
-        this.wateringPeriod = plantDetails.get("water_period").asText();
-        this.wateringGeneralBenchmarkValue = plantDetails.get("water_general_benchmark").get("value").asText();
-        this.wateringGeneralBenchmarkUnit = plantDetails.get("water_general_benchmark").get("unit").asText();
-//        this.sunlight = Collections.singletonList(plantDetails.get("sunlight").asText());
-//        this.pruningMonth = Collections.singletonList(plantDetails.get("pruning_month").asText());
-        this.pruningCount = plantDetails.get("pruning_count").asInt();
-        this.flowers = plantDetails.get("flowers").asBoolean();
-        this.floweringSeason = plantDetails.get("flowering_season").asText();
-        this.fruits = plantDetails.get("fruits").asBoolean();
-        this.edibleFruit = plantDetails.get("edible_fruit").asBoolean();
-        this.fruitSeason = plantDetails.get("fruitSeason").asText();
-        this.poisonousToHumans = plantDetails.get("poisonousToHumans").asBoolean();
-        this.poisonousToPets = plantDetails.get("poisonousToPets").asBoolean();
-        this.maintenance = plantDetails.get("maintenance").asText();
-        this.indoor = plantDetails.get("indoor").asBoolean();
+//        this.cycle = cycle;
+//        this.wateringPeriod = wateringPeriod;
+//        this.wateringGeneralBenchmarkValue = wateringGeneralBenchmarkValue;
+//        this.wateringGeneralBenchmarkUnit = wateringGeneralBenchmarkUnit;
+//        this.sunlight = extractStringNames(sunlight);
+//        this.pruningMonth = extractStringNames(pruningMonth);
+//        this.pruningCount = pruningCount;
+//        this.flowers = flowers;
+//        this.floweringSeason = floweringSeason;
+//        this.fruits = fruits;
+//        this.edibleFruit = edibleFruit;
+//        this.fruitSeason = fruitSeason;
+//        this.poisonousToHumans = poisonousToHumans;
+//        this.poisonousToPets = poisonousToPets;
+//        this.maintenance = maintenance;
+//        this.indoor = indoor;
     }
 
     public Long getId() {
@@ -112,8 +113,8 @@ public class PlantInfo {
     public String getWateringPeriod() {return wateringPeriod;};
     public String getWateringGeneralBenchmarkValue() {return wateringGeneralBenchmarkValue;};
     public String getWateringGeneralBenchmarkUnit() {return wateringGeneralBenchmarkUnit;};
-//    public List<String> getSunlight() {return sunlight;};
-//    public List<String> getPruningMonth() {return pruningMonth;};
+    public String getSunlight() {return sunlight;};
+    public String getPruningMonth() {return pruningMonth;};
     public int getPruningCount() {return pruningCount;};
     public boolean getFlowers() {return flowers;};
     public String getFloweringSeason() {return floweringSeason;};
@@ -124,5 +125,24 @@ public class PlantInfo {
     public boolean getPoisonousToPets() {return poisonousToPets;};
     public String getMaintenance() {return maintenance;};
     public boolean getIndoor() {return indoor;};
+
+    private String extractStringNames(List<String> otherNames) {
+        if (otherNames == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+
+        for (String name : otherNames) {
+            if (!first) {
+                sb.append(", ");
+            }
+            sb.append(name);
+            first = false;
+        }
+
+        return sb.toString();
+    }
 
 }

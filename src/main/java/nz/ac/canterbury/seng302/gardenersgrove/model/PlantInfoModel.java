@@ -18,9 +18,11 @@ public class PlantInfoModel {
     private String wateringPeriod;
     private String wateringGeneralBenchmarkValue;
     private String wateringGeneralBenchmarkUnit;
-    private List<String> sunlight;
-    private List<String> pruningMonth;
-    private int pruningCount;
+    private String sunlight;
+    private String pruningMonth;
+    private int pruningCountAmount;
+
+    private String pruningCountInterval;
     private boolean flowers;
     private String floweringSeason;
     private boolean fruits;
@@ -68,22 +70,23 @@ public class PlantInfoModel {
         this.scientificName = plantDetails.get("scientific_name").get(0).asText();
         this.description = plantDetails.get("description").asText();
         this.defaultImage = getImageURL(plantDetails);
-        this.watering = plantDetails.get("watering").asText();
-        this.cycle = plantDetails.get("cycle").asText();
-        this.wateringPeriod = plantDetails.get("water_period").asText();
-        this.wateringGeneralBenchmarkValue = plantDetails.get("water_general_benchmark").get("value").asText();
-        this.wateringGeneralBenchmarkUnit = plantDetails.get("water_general_benchmark").get("unit").asText();
-        this.sunlight = Collections.singletonList(plantDetails.get("sunlight").asText());
-        this.pruningMonth = Collections.singletonList(plantDetails.get("pruning_month").asText());
-        this.pruningCount = plantDetails.get("pruning_count").asInt();
+        this.watering = nullChecker("watering", plantDetails);
+        this.cycle = nullChecker("cycle", plantDetails);
+        this.wateringPeriod = nullChecker("wateringPeriod", plantDetails);
+        this.wateringGeneralBenchmarkValue = nullChecker("value", plantDetails.get("watering_general_benchmark"));
+        this.wateringGeneralBenchmarkUnit = nullChecker("unit", plantDetails.get("watering_general_benchmark"));
+        this.sunlight = nullChecker("sunlight", plantDetails);
+        this.pruningMonth = nullChecker("pruningMonth", plantDetails);
+        this.pruningCountAmount = plantDetails.get("pruning_count").get("amount").asInt();
+        this.pruningCountInterval = nullChecker("interval", plantDetails.get("pruning_count"));
         this.flowers = plantDetails.get("flowers").asBoolean();
-        this.floweringSeason = plantDetails.get("flowering_season").asText();
+        this.floweringSeason = nullChecker("floweringSeason", plantDetails);
         this.fruits = plantDetails.get("fruits").asBoolean();
         this.edibleFruit = plantDetails.get("edible_fruit").asBoolean();
-        this.fruitSeason = plantDetails.get("fruitSeason").asText();
-        this.poisonousToHumans = plantDetails.get("poisonousToHumans").asBoolean();
-        this.poisonousToPets = plantDetails.get("poisonousToPets").asBoolean();
-        this.maintenance = plantDetails.get("maintenance").asText();
+        this.fruitSeason = nullChecker("fruitSeason", plantDetails);
+        this.poisonousToHumans = plantDetails.get("poisonous_to_humans").asBoolean();
+        this.poisonousToPets = plantDetails.get("poisonous_to_pets").asBoolean();
+        this.maintenance = nullChecker("maintenance", plantDetails);
         this.indoor = plantDetails.get("indoor").asBoolean();
     }
     /**
@@ -96,26 +99,33 @@ public class PlantInfoModel {
         this.defaultImage = plantInfo.getImageURL();
         this.description = plantInfo.getDescription();
         this.watering = plantInfo.getWatering();
-        this.cycle = plantInfo.getCycle();
-        this.wateringPeriod = plantInfo.getWateringPeriod();
-        this.wateringGeneralBenchmarkValue = plantInfo.getWateringGeneralBenchmarkValue();
-        this.wateringGeneralBenchmarkUnit = plantInfo.getWateringGeneralBenchmarkUnit();
-//        this.sunlight = Collections.singletonList(plantDetails.get("sunlight").asText());
-//        this.pruningMonth = Collections.singletonList(plantDetails.get("pruning_month").asText());
-        this.pruningCount = plantInfo.getPruningCount();
-        this.flowers = plantInfo.getFlowers();
-        this.floweringSeason = plantInfo.get
-        this.fruits = plantDetails.get("fruits").asBoolean();
-        this.edibleFruit = plantDetails.get("edible_fruit").asBoolean();
-        this.fruitSeason = plantDetails.get("fruitSeason").asText();
-        this.poisonousToHumans = plantDetails.get("poisonousToHumans").asBoolean();
-        this.poisonousToPets = plantDetails.get("poisonousToPets").asBoolean();
-        this.maintenance = plantDetails.get("maintenance").asText();
-        this.indoor = plantDetails.get("indoor").asBoolean();
+//        this.cycle = plantInfo.getCycle();
+//        this.wateringPeriod = plantInfo.getWateringPeriod();
+//        this.wateringGeneralBenchmarkValue = plantInfo.getWateringGeneralBenchmarkValue();
+//        this.wateringGeneralBenchmarkUnit = plantInfo.getWateringGeneralBenchmarkUnit();
+//        this.sunlight = plantInfo.getSunlight();
+//        this.pruningMonth = plantInfo.getPruningMonth();
+//        this.pruningCount = plantInfo.getPruningCount();
+//        this.flowers = plantInfo.getFlowers();
+//        this.floweringSeason = plantInfo.getFloweringSeason();
+//        this.fruits = plantInfo.getFruits();
+//        this.edibleFruit = plantInfo.getEdibleFruit();
+//        this.fruitSeason = plantInfo.getFruitSeason();
+//        this.poisonousToHumans = plantInfo.getPoisonousToHumans();
+//        this.poisonousToPets = plantInfo.getPoisonousToPets();
+//        this.maintenance = plantInfo.getMaintenance();
+//        this.indoor = plantInfo.getIndoor();
 
     }
 
 
+    public String nullChecker(String attribute, JsonNode plantDetails) {
+        JsonNode plantAttribute = plantDetails.get(attribute);
+        if (plantAttribute != null) {
+            return plantAttribute.asText();
+        }
+        return "";
+    }
     private String getImageURL(JsonNode plantDetails) {
 
         if (plantDetails.get("default_image").get("regular_url") != null) {
@@ -148,9 +158,10 @@ public class PlantInfoModel {
     public String getWateringPeriod() {return wateringPeriod;};
     public String getWateringGeneralBenchmarkValue() {return wateringGeneralBenchmarkValue;};
     public String getWateringGeneralBenchmarkUnit() {return wateringGeneralBenchmarkUnit;};
-    public List<String> getSunlight() {return sunlight;};
-    public List<String> getPruningMonth() {return pruningMonth;};
-    public int getPruningCount() {return pruningCount;};
+    public String getSunlight() {return sunlight;};
+    public String getPruningMonth() {return pruningMonth;};
+    public int getPruningCountAmount() {return pruningCountAmount;};
+    public String getPruningCountInterval() {return pruningCountInterval;};
     public boolean getFlowers() {return flowers;};
     public String getFloweringSeason() {return floweringSeason;};
     public boolean getFruits() {return fruits;};
