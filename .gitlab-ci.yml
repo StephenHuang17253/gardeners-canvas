@@ -75,6 +75,7 @@ deploy-staging:
     - echo "export AZURE_ENDPOINT=${AZURE_ENDPOINT}" >> /home/gitlab-runner/staging/.env
     - echo "export AZURE_MODERATOR_KEY=${AZURE_MODERATOR_KEY}" >> /home/gitlab-runner/staging/.env
     - echo "export BASE_URL=${BASE_URL}/test" >> /home/gitlab-runner/staging/.env
+    - echo "export PERENUAL_PLANT_API_KEY=${PERENUAL_PLANT_API_KEY}" >> /home/gitlab-runner/staging/.env
     - sudo systemctl restart staging
   artifacts:
     paths:
@@ -100,6 +101,7 @@ deploy-production:
     - echo "export AZURE_ENDPOINT=${AZURE_ENDPOINT}" >> /home/gitlab-runner/production/.env
     - echo "export AZURE_MODERATOR_KEY=${AZURE_MODERATOR_KEY}" >> /home/gitlab-runner/production/.env
     - echo "export BASE_URL=${BASE_URL}/prod" >> /home/gitlab-runner/production/.env
+    - echo "export PERENUAL_PLANT_API_KEY=${PERENUAL_PLANT_API_KEY}" >> /home/gitlab-runner/production/.env
     - sudo systemctl restart production
   artifacts:
     paths:
