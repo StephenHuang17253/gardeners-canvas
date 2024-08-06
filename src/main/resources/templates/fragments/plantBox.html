@@ -80,7 +80,7 @@
                 <div class="col-2">
                     <button th:if="${!isOwner}" type="button" class="btn p-0 rounded-3" data-bs-toggle="modal"
                         data-bs-target="#importPlantModal">
-                        <img src="@{/images/smallImportPlant.png}" class="w-100 h-100 image-fluid rounded-3"
+                        <img th:src="@{/images/smallImportPlant.png}" class="w-100 h-100 image-fluid rounded-3"
                             alt="Import plant to one of your gardens">
                     </button>
                 </div>
