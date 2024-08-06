@@ -71,9 +71,8 @@ public class WeatherService {
      *
      * @param gardens list of gardens
      * @return a list of weather data for gardens
-     * @throws UnavailableException
      */
-    public List<WeatherResponseData> getWeatherForGardens(List<Garden> gardens) throws UnavailableException {
+    public List<WeatherResponseData> getWeatherForGardens(List<Garden> gardens) {
 
         // fetches CompletableFutures (basically javascript promises) of weather response data from the api asynchronously
         List<CompletableFuture<WeatherResponseData>> futures = gardens.stream()
