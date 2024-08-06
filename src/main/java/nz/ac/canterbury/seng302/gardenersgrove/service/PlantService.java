@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,9 @@ public class PlantService {
     /**
      * PlantService constructor with repository and garden service
      *
+     *
      * @param plantRepository the repository for Plants
+     * @param gardenService   the needed garden service to link plants to gardens
      * @param gardenService   the needed garden service to link plants to gardens
      */
     @Autowired
@@ -174,6 +177,20 @@ public class PlantService {
         }
     }
 
+
+    /**
+     * Returns all plants that the user interacted with
+     *
+     * @param userInteractions list of recent user interactions
+     * @return list of plants
+     */
+    public List<Plant> getPlantsByInteraction(List<UserInteraction> userInteractions) {
+        return userInteractions.stream()
+                .map(userInteraction -> findById(userInteraction.getItemId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
 
     /**
      * Copy the plant's picture

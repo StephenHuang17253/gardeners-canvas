@@ -2,7 +2,8 @@
     th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weatherListJson)">
     <div class="card h-100 bg-success text-white garden-card">
         <div class="card-body pt-1">
-            <div class="modal fade text-black" id="importPlantModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade text-black" id="importPlantModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -17,24 +18,24 @@
                             <div class="modal-body">
                                 <select class="form-select col-xxl-3" aria-label="Select garden" th:name="gardenId">
                                     <option class="text-truncate" th:each="garden : ${session.userGardens}"
-                                            th:with="gardenName=${garden.getGardenName}"
-                                            th:text="${#strings.length(gardenName) > 30 ? #strings.substring(gardenName,0,27) + '...' : gardenName}"
-                                            th:value="${garden.getGardenId}">
+                                        th:with="gardenName=${garden.getGardenName}"
+                                        th:text="${#strings.length(gardenName) > 30 ? #strings.substring(gardenName,0,27) + '...' : gardenName}"
+                                        th:value="${garden.getGardenId}">
                                     </option>
                                 </select>
                             </div>
-    
+
                             <div class="modal-footer justify-content-center">
                                 <button type="submit" class="btn btn-success">Add to garden</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </form>
-                        
+
                     </div>
                 </div>
             </div>
             <div class="text-end">
-                <a th:if="${isOwner}" th:href="@{__${gardenId}__/__${plantId}__/edit}">
+                <a th:if="${isOwner}" th:href="@{__${gardenId}__/__${plantId}__/edit}" aria-label="Plant edit link">
                     <svg width="20" height="20" focusable="false" aria-hidden="true" viewBox="0 0 24 24" fill="#ffffff"
                         tabindex="-1" title="Edit">
                         <path
@@ -51,7 +52,7 @@
                         <div class="ratio ratio-1x1">
                             <img th:id="'imageToChange' + ${plantId}"
                                 th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                                alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
+                                alt="Plant" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
                         </div>
                         <label
                             class="position-absolute top-0 start-0 w-100 h-100 rounded-circle cursor-pointer darken-on-hover">
@@ -59,7 +60,8 @@
                                 <p class="position-absolute top-50 start-50 translate-middle fs-1">+</p>
                             </div>
                             <input id="plantPictureInput" type="file" th:name="plantPictureInput" accept="image/*"
-                                class="visually-hidden" data-image-input th:data-displayed-by="'imageToChange' + ${plantId}"
+                                class="visually-hidden" data-image-input
+                                th:data-displayed-by="'imageToChange' + ${plantId}"
                                 th:data-errored-by="'plantPictureError' + ${plantId}" data-submit-if-valid>
                         </label>
                     </div>
@@ -73,15 +75,18 @@
             <div th:if="${!isOwner}" class="d-flex flex-row gap-1">
                 <div class="col-10">
                     <img th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
-                        alt="Plant Picture" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
+                        alt="Plant" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
                 </div>
                 <div class="col-2">
-                    <button th:if="${!isOwner}" type="button" class="btn p-0 rounded-3" data-bs-toggle="modal" data-bs-target="#importPlantModal">
-                        <img src='/images/smallImportPlant.png' class="w-100 h-100 image-fluid rounded-3" alt="Import plant to one of your gardens">
+                    <button th:if="${!isOwner}" type="button" class="btn p-0 rounded-3" data-bs-toggle="modal"
+                        data-bs-target="#importPlantModal">
+                        <img th:src="@{/images/smallImportPlant.png}" class="w-100 h-100 image-fluid rounded-3"
+                            alt="Import plant to one of your gardens">
                     </button>
                 </div>
             </div>
-            <h4 class="card-title mt-1" th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}"></h4>
+            <h4 class="card-title mt-1"
+                th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}"></h4>
             <div class="row">
                 <p th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </p>
                 <p th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </p>

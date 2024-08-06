@@ -110,13 +110,13 @@ public class PublicGardensController {
 
         model.addAttribute("paramString", paramString);
 
-        List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput);
+        List<Garden> matchingGardens;
 
-        List<Garden> tenSortedPublicGardens = matchingGardens.stream()
-                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
-                .limit(COUNT_PER_PAGE)
-                .collect(Collectors.toList());
+        if (appliedTags != null && !appliedTags.isEmpty()) {
+            matchingGardens = gardenTagService.getMatchingGardens(searchInput, appliedTags);
+        } else {
+            matchingGardens = gardenService.getMatchingGardens(searchInput);
+        }
 
         int startIndex = 0;
         int endIndex = 0;
@@ -127,13 +127,22 @@ public class PublicGardensController {
             return "redirect:/public-gardens/search/" + lastPage + paramString;
         }
 
-        if (!tenSortedPublicGardens.isEmpty()) {
+        List<Garden> tenSortedPublicGardens = new ArrayList<>();
+
+        if (matchingGardens.isEmpty()) {
+
+            model.addAttribute("searchErrorText", "No gardens match your search");
+
+        } else {
+
+            tenSortedPublicGardens = matchingGardens.stream()
+                    .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
+                    .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
+                    .limit(COUNT_PER_PAGE)
+                    .collect(Collectors.toList());
 
             startIndex = (pageNumber - 1) * COUNT_PER_PAGE + 1;
             endIndex = Math.min(startIndex + COUNT_PER_PAGE, totalGardens);
-
-        } else {
-            model.addAttribute("searchErrorText", "No gardens match your search");
         }
 
         model.addAttribute("currentPage", pageNumber);
@@ -244,6 +253,7 @@ public class PublicGardensController {
     @ResponseBody
     public Boolean checkTagExists(@RequestParam("tagName") String tagName) {
         logger.info("GET tag/exists");
+        tagName = tagName.trim();
         Optional<GardenTag> testTag = gardenTagService.getByName(tagName);
         return testTag.isPresent();
     }

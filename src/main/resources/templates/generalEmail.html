@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="~{fragments/emailHeader.html}"></head>
 
 <body>
     <div class="container">
-        <h1 th:text="|Kia ora ${username}!|"></h1>
+        <h1 th:text="|Kia ora ${username}!|">Greeting</h1>
         <p th:text="${mainBody}"></p>
         <a th:href="${url}">
             <p th:text="${urlText}"></p>

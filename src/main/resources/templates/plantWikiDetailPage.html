@@ -7,7 +7,7 @@
     <div th:replace="~{fragments/navBar.html :: navBar('plantWiki')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
          th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
-    <div class="container mt-5 bg-white border rounded pt-4">
+    <div th:if="${plant}" class="container mt-5 bg-white border rounded pt-4">
         <div class="row mx-2">
             <div class="col">
                 <h1 th:text="${plant.commonName} + ' Details'"></h1>
@@ -68,8 +68,9 @@
         </div>
             <p class="text-justify px-5 " th:text="${plant.description}"></p>
 
-
-
+        </div>
+    <div th:if="${searchError} != ''"  class="container mt-5 bg-white border rounded pt-4">
+        <p class="text-danger fs-6" th:text="${searchError}"></p>
     </div>
     </div>
 

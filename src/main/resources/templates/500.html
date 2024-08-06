@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head th:replace="~{fragments/header.html}"></head>
 
 <body>
   <div class="text-center">
     <h1 class="my-3">500 Server Error</h1>
-    <p th:text="${message == null ? 'Our server encountered a bug... and it''s not the good kind! Please hang tight.' : message}"></p>
+    <p
+      th:text="${message == null ? 'Our server encountered a bug... and it''s not the good kind! Please hang tight.' : message}">
+    </p>
   </div>
 </body>
+
+</html>
