@@ -390,7 +390,7 @@ public class HomePageController {
      * @param gardens list of gardens that need to be checked for
      *                watering
      */
-    private List<Garden> getGardensForWatering(List<Garden> gardens) throws UnavailableException {
+    private List<Garden> getGardensForWatering(List<Garden> gardens) {
 
         List<Garden> gardensNeedWatering = new ArrayList<>();
 

@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Service class for Plant objects.
@@ -190,7 +189,7 @@ public class PlantService {
                 .map(userInteraction -> findById(userInteraction.getItemId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

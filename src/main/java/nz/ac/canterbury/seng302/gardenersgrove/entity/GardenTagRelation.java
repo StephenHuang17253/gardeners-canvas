@@ -68,8 +68,8 @@ public class GardenTagRelation {
     public String toString() {
         return "Tag{" +
                 "id=" + tagRelationId +
-                "tagName=" + tag.getTagName() +
-                "gardenName=" + garden.getGardenName() +
+                " tagName=" + tag.getTagName() +
+                " gardenName=" + garden.getGardenName() +
                 '}';
     }
 
