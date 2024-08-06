@@ -19,3 +19,26 @@ Feature: U23 (Deactivate account temporarily) : As Kaia, I want to make sure tha
     And The tag is not added to the garden
     And I "daemon@email.com" get a strike
 
+
+  Scenario: AC2 - I add six inappropriate tags and my account is blocked for 7 days
+    Given I as user "daemon@email.com" am logged in with "Password1!"
+    And I previously added a tag "Dragon"
+    And My Tag "Dragon" contained profanity
+    And I as user "daemon@email.com" currently have 5 strikes
+    When I attempt to enter tag "Dragon"
+    Then I am logged out
+    And A login error message is displayed "Your account is blocked for 7 days due to inappropriate conduct"
+    And The tag is not added to the garden
+    And I "daemon@email.com" get banned
+
+  Scenario: AC3 - I am banned and i try to login
+    Given I as user "daemon@email.com" am logged in with "Password1!"
+    And I "daemon@email.com" am banned for 7 days
+    When I "daemon@email.com" try to login with password "Password1!"
+    Then I receive an error message "Your account is blocked for 7 days due to inappropriate conduct"
+
+  Scenario: AC4 - My banned duration has passed and i try to login
+    Given I as user "daemon@email.com" am logged in with "Password1!"
+    And I "daemon@email.com" am banned for 7 days
+    When It is the eighth day of my account "daemon@email.com" being blocked
+    Then On day 8 I "daemon@email.com" am able to log in with "Password1!"

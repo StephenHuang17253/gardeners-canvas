@@ -4,7 +4,7 @@
 <head th:replace="~{fragments/header.html}"></head>
 
 <body>
-    <div th:replace="~{fragments/navBar.html :: navBar('browsePublic')}" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('plantWiki')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
          th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container mt-5 bg-white border rounded pt-4">

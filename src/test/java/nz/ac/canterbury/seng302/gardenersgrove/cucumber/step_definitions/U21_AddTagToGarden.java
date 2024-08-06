@@ -128,7 +128,10 @@ public class U21_AddTagToGarden {
                 .addGarden(new Garden("A Public Garden with a Tag", "Tag Acceptance Test",
                         "", "", "Christchurch", "", "New Zealand", 0.0, false, "", "", user));
 
-        GardenTag testTag = gardenTagService.addGardenTag(new GardenTag("Veggies"));
+        GardenTag testTag = new GardenTag("Veggies");
+        testTag.setTagStatus(TagStatus.APPROPRIATE);
+        testTag = gardenTagService.addGardenTag(testTag);
+
         gardenTagService.addGardenTagRelation(new GardenTagRelation(publicGarden, testTag));
 
         mvcResultPublicGardens = mockMVCPublicGardens.perform(

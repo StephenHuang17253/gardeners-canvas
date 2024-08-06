@@ -18,11 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -34,7 +32,7 @@ import java.util.stream.StreamSupport;
 public class PlantWikiController {
     Logger logger = LoggerFactory.getLogger(PlantWikiController.class);
     private final PlantInfoService plantInfoService;
-
+    private static final int PLANT_SPECIES_LIMIT = 3000;
 
     @Autowired
     public PlantWikiController(PlantInfoService plantInfoService) {
@@ -56,6 +54,7 @@ public class PlantWikiController {
 
                 List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
                         .map(PlantSearchModel::new)
+                        .filter(plant -> plant.getId() <= PLANT_SPECIES_LIMIT)
                         .collect(Collectors.toList());
 
                 model.addAttribute("plants", plants);

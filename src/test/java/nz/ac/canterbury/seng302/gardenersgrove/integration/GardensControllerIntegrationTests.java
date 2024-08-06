@@ -10,6 +10,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -372,11 +373,14 @@ class GardensControllerIntegrationTests {
 
         // Garden Tag relation should exist now
         GardenTag tag = gardenTagService.getByName(tagInput).get();
+        gardenTagService.updateGardenTagStatus(tagInput, TagStatus.APPROPRIATE);
         Assertions.assertTrue(gardenTagService.getGardenTagRelationByGardenAndTag(garden, tag).isPresent());
 
         // And the tag is visible on the Garden's Details page.
+
         List<String> expectedTagsList = gardenTagService.getGardenTagRelationByGarden(garden).stream()
                 .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
@@ -413,6 +417,7 @@ class GardensControllerIntegrationTests {
         // And the tag is visible on the Garden's Details page, but only once
         List<String> expectedTagsList = gardenTagService.getGardenTagRelationByGarden(garden).stream()
                 .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
