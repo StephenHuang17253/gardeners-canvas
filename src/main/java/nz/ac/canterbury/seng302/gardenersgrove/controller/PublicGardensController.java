@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +41,13 @@ public class PublicGardensController {
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService,
-            FriendshipService friendshipService, GardenTagService gardenTagService) {
+                                   FriendshipService friendshipService, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.gardenTagService = gardenTagService;
     }
+
 
     /**
      * Adds the loggedIn attribute to the model for all requests
@@ -67,6 +69,7 @@ public class PublicGardensController {
         logger.info("GET /public-gardens");
         return "redirect:/public-gardens/search/1";
     }
+
 
     /**
      * returns a page with the 10 most recent public gardens based on search and on
@@ -170,13 +173,24 @@ public class PublicGardensController {
         User currentUser = securityService.getCurrentUser();
         User gardenOwner = garden.getOwner();
 
-        FriendshipStatus userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner, currentUser);
+        if (!garden.getIsPublic() ) {
+            FriendshipStatus userOwnerRelationship;
+            if(Objects.equals(gardenOwner.getId(), currentUser.getId()))
+            {
+                userOwnerRelationship = FriendshipStatus.ACCEPTED;
+            }
+            else
+            {
+                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+            }
 
-        if (!garden.getIsPublic() && userOwnerRelationship != FriendshipStatus.ACCEPTED) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message",
-                    "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
-            return "403";
+
+            if (userOwnerRelationship != FriendshipStatus.ACCEPTED)
+            {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+                return "403";
+            }
 
         }
 
@@ -203,9 +217,17 @@ public class PublicGardensController {
 
         List<String> tagsList = tagRelationsList.stream()
                 .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
                 .map(GardenTag::getTagName)
                 .toList();
 
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.PENDING)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("pendingTags", pendingTags);
         model.addAttribute("tagsList", tagsList);
 
         return "gardenDetailsPage";
@@ -214,7 +236,7 @@ public class PublicGardensController {
 
     /**
      * Checks if a tag exists with the name tagName
-     * 
+     *
      * @param tagName tag name to check
      * @return boolean of if tag exists or not
      */

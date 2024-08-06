@@ -289,10 +289,10 @@ public class U17_SendFriendRequest {
 
     @Given("I {string} have a pending invite from {string}")
     public void i_have_a_pending_invite_from(String receiverEmail, String senderEmail) {
-        User liam = userService.getUserByEmail(senderEmail);
-        User sarah = userService.getUserByEmail(receiverEmail);
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
 
-        Friendship friendship = friendshipService.addFriendship(liam, sarah);
+        Friendship friendship = friendshipService.addFriendship(sender, receiver);
         Assertions.assertEquals(FriendshipStatus.PENDING, friendship.getStatus());
     }
 

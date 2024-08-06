@@ -1,9 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -12,6 +9,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,6 +78,39 @@ class FileServiceTest {
             fileService.loadFile("nonExistentFile.txt");
         });
         assertEquals("Could not read the file", exception.getMessage());
+    }
+
+
+    @Test
+    void testSaveFile_OverloadedMethod_ValidOriginalFile_FileSavedSuccessfully() throws IOException {
+        initDir(2);
+        Path originalFile = tempDir.resolve(mockFilenames[1]);
+        Path savedFile = tempDir.resolve(mockFilenames[0]);
+
+        List<String> previousFileContent = Files.readAllLines(savedFile);
+        fileService.saveFile(mockFilenames[0], mockFilenames[1]);
+
+        assertEquals(Files.readAllLines(originalFile), Files.readAllLines(savedFile));
+        assertNotEquals(previousFileContent,Files.readAllLines(savedFile));
+
+    }
+
+    @Test
+    void testSaveFile_OverloadedMethod_InvalidOriginalFile_ThrowsIOException() throws IOException {
+        initDir(2);
+        Path originalFile = tempDir.resolve(mockFilenames[1]);
+        Path savedFile = tempDir.resolve(mockFilenames[0]);
+
+        List<String> previousFileContent = Files.readAllLines(savedFile);
+
+        Exception exception = assertThrows(IOException.class, () -> {
+            fileService.saveFile(mockFilenames[0], "String.txt");
+        });
+
+        assertEquals("Could not store the file", exception.getMessage());
+        assertNotEquals(Files.readAllLines(originalFile), Files.readAllLines(savedFile));
+        assertEquals(previousFileContent,Files.readAllLines(savedFile));
+
     }
 
     // Todo fix this test

@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,11 +27,11 @@ public class PlantService {
     /**
      * Interface for generic CRUD operations on a repository for Plant types.
      */
-    private PlantRepository plantRepository;
+    private final PlantRepository plantRepository;
 
-    private GardenService gardenService;
+    private final GardenService gardenService;
 
-    private FileService fileService;
+    private final FileService fileService;
 
     Logger logger = LoggerFactory.getLogger(PlantService.class);
 
@@ -127,7 +129,7 @@ public class PlantService {
             oldPlant.setPlantDate(newDate);
             return plantRepository.save(oldPlant);
         } else {
-            throw new IllegalArgumentException("Invalid plant IDD");
+            throw new IllegalArgumentException("Invalid plant ID");
         }
     }
 
@@ -156,7 +158,7 @@ public class PlantService {
      * @param plantPicture new plant picture
      */
     public void updatePlantPicture(Plant plant, MultipartFile plantPicture) {
-        String fileExtension = plantPicture.getOriginalFilename().split("\\.")[1];
+        String fileExtension = Objects.requireNonNull(plantPicture.getOriginalFilename()).split("\\.")[1];
         try {
             String[] allFiles = fileService.getAllFiles();
             // Delete past plant image/s
@@ -169,6 +171,34 @@ public class PlantService {
             String fileName = "plant_" + plant.getPlantId() + "_picture." + fileExtension.toLowerCase();
             updatePlantPictureFilename(fileName, plant.getPlantId());
             fileService.saveFile(fileName, plantPicture);
+
+        } catch (IOException error) {
+            logger.error(error.getMessage());
+        }
+    }
+
+
+    /**
+     * Copy the plant's picture
+     * Overloaded method
+     *
+     * @param plant                plant to update
+     * @param plantPictureFileName plant picture to copy
+     */
+    public void updatePlantPicture(Plant plant, String plantPictureFileName) {
+        String fileExtension = Objects.requireNonNull(plantPictureFileName).split("\\.")[1];
+        try {
+            String[] allFiles = fileService.getAllFiles();
+            // Delete past plant image/s
+            for (String file : allFiles) {
+                if (file.contains("plant_" + plant.getPlantId() + "_plant_picture")) {
+                    fileService.deleteFile(file);
+                }
+            }
+
+            String newFileName = "plant_" + plant.getPlantId() + "_picture." + fileExtension.toLowerCase();
+            updatePlantPictureFilename(newFileName, plant.getPlantId());
+            fileService.saveFile(newFileName, plantPictureFileName);
 
         } catch (IOException error) {
             logger.error(error.getMessage());
@@ -190,4 +220,22 @@ public class PlantService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Deletes plant and its associated picture
+     *
+     * @param plantId id of plant to delete
+     * @throws IOException exception cannot delete plant
+     */
+    public void deletePlant(Long plantId) throws IOException {
+        Optional<Plant> targetPlant = findById(plantId);
+        if (targetPlant.isPresent()) {
+            Plant plantToDelete = targetPlant.get();
+            if (plantToDelete.getPlantPictureFilename() != null) {
+                fileService.deleteFile(plantToDelete.getPlantPictureFilename());
+            }
+            Garden garden = plantToDelete.getGarden();
+            garden.getPlants().remove(plantToDelete);
+            plantRepository.deleteById(plantId);
+        }
+    }
 }

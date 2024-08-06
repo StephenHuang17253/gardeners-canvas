@@ -23,7 +23,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -158,7 +160,8 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
+                plantDateResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
@@ -290,7 +293,8 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
-        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult, plantDateResult);
+        plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
+                plantDateResult);
 
         String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPictureString);
@@ -377,7 +381,7 @@ public class PlantFormController {
 
         String plantPictureString = "/images/default_plant.png";
 
-        if (filename != null && filename.length() != 0) {
+        if (filename != null && !filename.isEmpty()) {
             plantPictureString = MvcUriComponentsBuilder
                     .fromMethodName(PlantFormController.class, "serveFile", filename)
                     .build()
@@ -403,10 +407,127 @@ public class PlantFormController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
         } catch (MalformedURLException error) {
-            error.printStackTrace();
+            logger.error(error.getMessage());
         }
         return null;
 
     }
+
+    /**
+     * Add plant to db and then redirect to confirm copy plant
+     *
+     * @param gardenId           id of garden the plant has to be copied to
+     * @param plantId            id of plant that is being copied
+     * @param redirectAttributes redirectAttributes to send to confirmation form
+     * @param response           response in case of error
+     * @return confirmation of import form
+     */
+    @PostMapping("/import-plant")
+    public String importPlant(@RequestParam("gardenId") Long gardenId,
+                              @RequestParam("plantId") Long plantId, RedirectAttributes redirectAttributes,
+                              HttpServletResponse response) {
+        logger.info("POST /import-plant");
+        Optional<Plant> optionalPlant = plantService.findById(plantId);
+
+        if (optionalPlant.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Plant toCopyPlant = optionalPlant.get();
+
+        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId);
+        if (toCopyPlant.getPlantPictureFilename() != null) {
+            plantService.updatePlantPicture(newPlant, toCopyPlant.getPlantPictureFilename());
+        }
+
+        redirectAttributes.addAttribute("plantId", newPlant.getPlantId());
+        redirectAttributes.addAttribute("gardenId", gardenId);
+        redirectAttributes.addAttribute("gardenIdOfOriginalPlant", toCopyPlant.getGarden().getGardenId());
+
+        return "redirect:/import-plant/confirm";
+    }
+
+
+    /**
+     * Cancels copying of plant and deletes copy from database
+     *
+     * @param gardenIdOfOriginalPlant garden that was being copied from (used to return to previous garden page)
+     * @param plantId                 id of plant to be deleted
+     * @param response                error page
+     * @return redirect to another page
+     */
+    @PostMapping("/import-plant/cancel")
+    public String cancelImportPlant(@RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
+                                    @RequestParam("plantId") Long plantId,
+                                    RedirectAttributes redirectAttributes,
+                                    HttpServletResponse response) {
+        logger.info("POST /import-plant/cancel");
+        Optional<Plant> optionalPlant = plantService.findById(plantId);
+
+        if (optionalPlant.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        try {
+            plantService.deletePlant(plantId);
+        } catch (IOException error) {
+            response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+            return "500";
+        }
+
+        redirectAttributes.addAttribute("gardenId", gardenIdOfOriginalPlant);
+
+        return "redirect:/public-gardens/{gardenId}";
+    }
+
+    /**
+     * Confirmation form to copy plant
+     *
+     * @param gardenId                id of the owner's garden the plant is being copied to
+     * @param plantId                 id of the new copy of the plant
+     * @param gardenIdOfOriginalPlant garden that was being copied from
+     * @param response                response for error
+     * @param model                   model of attributes
+     * @return confirmation form
+     */
+    @GetMapping("/import-plant/confirm")
+    public String importPlantConfirmationForm(@RequestParam("gardenId") Long gardenId,
+                                              @RequestParam("plantId") Long plantId,
+                                              @RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
+                                              HttpServletResponse response,
+                                              Model model) {
+        logger.info("GET /import-plant/confirm");
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+        Garden garden = optionalGarden.get();
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return "403";
+        }
+        Optional<Plant> plantToUpdate = plantService.findById(plantId);
+        if (plantToUpdate.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        model.addAttribute("gardenIdOfOriginalPlant", gardenIdOfOriginalPlant); // Pass gardenId to the form
+        model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
+        String plantPicture = plantToUpdate.get().getPlantPictureFilename();
+        model.addAttribute("plantId", plantId);
+        model.addAttribute("plantPicture", plantPicture);
+        model.addAttribute("plantName", plantToUpdate.get().getPlantName());
+        model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
+        model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
+        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+
+        return "importPlantForm";
+    }
+
 
 }
