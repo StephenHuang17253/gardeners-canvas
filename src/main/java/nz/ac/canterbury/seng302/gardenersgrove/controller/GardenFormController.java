@@ -292,6 +292,7 @@ public class GardenFormController {
             if (coordData.get(0) != null) {
                 String lat = coordData.get(0).get("lat").asText();
                 String lon = coordData.get(0).get("lon").asText();
+                garden.updateLocation(lat, lon);
                 gardenService.updateGardenCoordinates(garden.getGardenId(), lat, lon);
                 logger.info("Forward geocoding request made to get lat and lon");
             }

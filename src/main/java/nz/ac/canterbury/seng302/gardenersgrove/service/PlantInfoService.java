@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.UnavailableException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantInfoRepository;
 import org.slf4j.Logger;
@@ -17,8 +18,11 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
+
 
 /**
  * Service class for obtaining plant information from the Perenual Plant API
@@ -28,6 +32,10 @@ public class PlantInfoService {
 
     @Value("${perenual.plant.api.key}")
     private String perenualPlantAPIKey;
+
+    private static final int MAX_REQUESTS_PER_SECOND = 1;
+    private static final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND, true);
+    private static long lastRequestTime = Instant.now().getEpochSecond();
 
     Logger logger = LoggerFactory.getLogger(PlantInfoService.class);
 
@@ -56,13 +64,35 @@ public class PlantInfoService {
     }
 
     /**
+     * Helper function to give user a permit to make an api request
+     * To ensure a rate limit of one call per second
+     * @throws UnavailableException when the last permit granted was less than a second ago
+     */
+    private static synchronized void acquirePermit() throws UnavailableException {
+        long currentTime = Instant.now().getEpochSecond();
+        long timeElapsed = currentTime - lastRequestTime;
+
+        if (timeElapsed >= 1) {
+            semaphore.drainPermits();
+            semaphore.release(MAX_REQUESTS_PER_SECOND);
+            lastRequestTime = currentTime;
+        }
+
+        if (!semaphore.tryAcquire()) {
+            throw new UnavailableException("429");
+        }
+    }
+
+    /**
      * Gets the response body of the Perenual API plant list call.
      * @param query a string entered by user, the name of the plant they're looking for.
      * @return plantInfo - a JsonNode containing a list of plants with names similar to the query.
      * @throws IOException If an error occurs while making request
      * @throws InterruptedException If request is interrupted
      */
-    public JsonNode getPlantListJson(String query, boolean fakeCall) throws IOException, InterruptedException {
+    public JsonNode getPlantListJson(String query, boolean fakeCall) throws IOException, InterruptedException, UnavailableException {
+
+        acquirePermit();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -99,7 +129,9 @@ public class PlantInfoService {
      * @throws IOException If an error occurs while making request
      * @throws InterruptedException If request is interrupted
      */
-    public JsonNode getPlantDetailsJson(String plantId, boolean fakeCall) throws IOException, InterruptedException {
+    public JsonNode getPlantDetailsJson(String plantId, boolean fakeCall) throws IOException, InterruptedException, UnavailableException {
+
+        acquirePermit();
 
         ObjectMapper mapper = new ObjectMapper();
 

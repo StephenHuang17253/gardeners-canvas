@@ -6,7 +6,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantInfoModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantSearchModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantInfoService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,39 +33,14 @@ import java.util.stream.StreamSupport;
 @Controller
 public class PlantWikiController {
     Logger logger = LoggerFactory.getLogger(PlantWikiController.class);
-    private final SecurityService securityService;
     private final PlantInfoService plantInfoService;
-
-    private static final int MAX_REQUESTS_PER_SECOND = 1;
-    private static final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND, true);
-    private static long lastRequestTime = Instant.now().getEpochSecond();
 
 
     @Autowired
-    public PlantWikiController(SecurityService securityService, PlantInfoService plantInfoService) {
-        this.securityService = securityService;
+    public PlantWikiController(PlantInfoService plantInfoService) {
         this.plantInfoService = plantInfoService;
     }
 
-    /**
-     * Helper function to give user a permit to make an api request
-     * To ensure a rate limit of one call per second
-     * @throws UnavailableException when the last permit granted was less than a second ago
-     */
-    public static synchronized void acquirePermit() throws UnavailableException {
-        long currentTime = Instant.now().getEpochSecond();
-        long timeElapsed = currentTime - lastRequestTime;
-
-        if (timeElapsed >= 1) {
-            semaphore.drainPermits();
-            semaphore.release(MAX_REQUESTS_PER_SECOND);
-            lastRequestTime = currentTime;
-        }
-
-        if (!semaphore.tryAcquire()) {
-            throw new UnavailableException("429");
-        }
-    }
 
     /**
      * Helper to handle adding api call results to model
@@ -76,8 +50,8 @@ public class PlantWikiController {
      */
     private void addAPIResultsToModel(String search, Long plantId, Model model){
         try {
-            acquirePermit();
             if(Objects.nonNull(search)){
+
                 JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
                 List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
@@ -85,6 +59,11 @@ public class PlantWikiController {
                         .collect(Collectors.toList());
 
                 model.addAttribute("plants", plants);
+
+                if (plants.isEmpty()) {
+                    model.addAttribute("searchError", "No plants match your search");
+                }
+
             } else {
                 JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
                 PlantInfoModel plantInfo = new PlantInfoModel(plantDetails);
