@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 
@@ -44,6 +45,9 @@ public class U10_Acceptance_Testing {
     public UserRepository userRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -78,7 +82,7 @@ public class U10_Acceptance_Testing {
 
         Mockito.when(profanityService.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(false);
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
         GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,

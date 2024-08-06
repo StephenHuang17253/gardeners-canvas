@@ -5,7 +5,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**

@@ -56,6 +56,9 @@ public class U21_AddTagToGarden {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -93,7 +96,7 @@ public class U21_AddTagToGarden {
     @Before
     public void before_or_after_all() {
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);

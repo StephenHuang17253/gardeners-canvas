@@ -55,6 +55,9 @@ public class BrowsePublicGardens {
     public FriendshipRepository friendshipRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public SecurityService securityService;
 
     public static GardenService gardenService;
@@ -80,7 +83,7 @@ public class BrowsePublicGardens {
     public void before_or_after_all() {
 
         fileService = new FileService();
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);

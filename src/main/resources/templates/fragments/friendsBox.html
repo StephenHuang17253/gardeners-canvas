@@ -1,10 +1,10 @@
 <div th:fragment="friendsBox(friendsProfilePicture, friendsName,  friendsGardenLink, friendshipStatus, friendId)">
     <div class="card h-100 bg-success text-white garden-card" id="friendsBox">
         <div class="card-body pt-1 text-center">
-            <h4 th:text="${friendsName}" class="card-title justify-content-center"></h4>
+            <h4 th:text="${friendsName}" class="card-title justify-content-center">Friends Name</h4>
             <img id="card-img-top"
                 th:src="@{${friendsProfilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + friendsProfilePicture}}"
-                alt="Profile Image" class="card-img-top rounded justify-content-center mb-4">
+                alt="User Profile" class="card-img-top rounded justify-content-center mb-4">
             <div class="flex-row justify-content-center">
                 <a th:href="@{${friendsGardenLink}}" class="btn btn-light mb-3">
                     Their Gardens

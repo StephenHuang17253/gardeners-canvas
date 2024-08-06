@@ -4,6 +4,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
@@ -27,6 +28,9 @@ public class RegisterANewUser {
 
     @Autowired
     public UserRepository userRepository;
+
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
     public PasswordEncoder passwordEncoder;
@@ -56,7 +60,7 @@ public class RegisterANewUser {
 
     @Before
     public void before_or_after_all() {
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         emailService = Mockito.mock(EmailService.class);
         tokenService = Mockito.mock(TokenService.class);
         gardenService = Mockito.mock(GardenService.class);

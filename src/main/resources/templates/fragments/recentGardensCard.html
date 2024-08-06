@@ -7,17 +7,17 @@
                     <!-- First larger image -->
                     <div class="me-2" style="flex: 3; height: 200px;">
                         <img th:src="@{${plantImage1 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage1}}"
-                             alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                             alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                     </div>
                     <!-- Two smaller images stacked on top of each other -->
                     <div class="d-flex flex-column" style="flex: 2; height: 200px;">
                         <div class="small-image overflow-hidden rounded mb-2" style="flex: 1;">
                             <img th:src="@{${plantImage2 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage2}}"
-                                 alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                                 alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                         </div>
                         <div class="small-image overflow-hidden rounded" style="flex: 1;">
                             <img th:src="@{${plantImage3 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage3}}"
-                                 alt="Plant Image" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                                 alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
                         </div>
                     </div>
                 </div>
@@ -27,11 +27,11 @@
                         <div class="ratio ratio-1x1 ms-auto">
                             <img id="profilePicture" class="rounded-circle object-fit-cover w-100 h-100"
                                  th:src="@{${ownerImage == null ? '/images/default_profile_picture.png' : '/files/users/' + ownerImage}}"
-                                 alt="Owner's profile picture">
+                                 alt="Owner's profile">
                         </div>
                     </div>
                     <div class="row">
-                        <h5 class="card-title" th:text="${gardenName}"></h5>
+                        <h5 class="card-title" th:text="${gardenName}">Garden Name</h5>
                         <p class="card-subtitle">
                             <small th:text="${ownerName}"></small>
                         </p>
