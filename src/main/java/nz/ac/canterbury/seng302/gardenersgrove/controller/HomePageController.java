@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import jakarta.servlet.UnavailableException;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
@@ -208,7 +207,7 @@ public class HomePageController {
      * @return The homePage html page
      */
     @GetMapping("/home")
-    public String home(Model model) throws UnavailableException {
+    public String home(Model model) {
 
         logger.info("GET /home");
 
