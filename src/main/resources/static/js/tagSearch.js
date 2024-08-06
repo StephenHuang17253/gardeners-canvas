@@ -13,6 +13,12 @@ const searchTagErrorText = document.getElementById('searchTagErrorText');
 const handleButtonClick = async () => {
     const value = tagInput.value.trim();
 
+    if (value === "") {
+        tagInput.classList.add('border-danger');
+        searchTagErrorText.textContent = "Please enter a valid tag";
+        return;
+    }
+
     const tagExists = await checkTagExists(value);
 
     if (!tagExists) {
