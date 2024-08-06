@@ -6,6 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+/**
+ * Represents the layout of the home page for a user
+ */
 @Entity
 public class HomePageLayout {
 

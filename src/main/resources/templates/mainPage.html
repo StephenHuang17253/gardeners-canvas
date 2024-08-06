@@ -17,7 +17,8 @@
             </svg>
         </a>
 
-        <a th:if="${layout != null && layout.showNotifications}" class="btn btn-success btn-lg" data-bs-toggle="offcanvas" href="#offcanvas" aria-controls="offcanvasExample">
+        <a th:if="${layout != null && layout.showNotifications}" class="btn btn-success btn-lg"
+            data-bs-toggle="offcanvas" href="#offcanvas" aria-controls="offcanvasExample">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                     d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
@@ -53,6 +54,7 @@
             </div>
         </div>
     </div>
+
     <div th:if="${recentGardensPage1 != null && layout != null && layout.showRecentGardens}"
         class="container my-2 bg-white rounded py-2">
         <div id="carouselRecentGardens" class="carousel slide">
@@ -75,14 +77,14 @@
                                 ownerImage=${garden.ownerImageURL},
                                 ownerName=${garden.ownerName},
                                 isOwner=${garden.isOwner})}">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div th:if="${recentGardensPage2}" class="carousel-item">
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
-                    <div class="col-3" th:each="garden : ${recentGardensPage2}">
-                        <div th:replace="~{fragments/recentGardensCard.html ::
+                <div th:if="${recentGardensPage2}" class="carousel-item">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
+                        <div class="col-3" th:each="garden : ${recentGardensPage2}">
+                            <div th:replace="~{fragments/recentGardensCard.html ::
                                 recentGardensCard(gardenId=${garden.gardenId},
                                 gardenName=${garden.gardenName},
                                 gardenLocation=${garden.gardenLocation},
@@ -94,83 +96,84 @@
                                 ownerImage=${garden.ownerImageURL},
                                 ownerName=${garden.ownerName},
                                 isOwner=${garden.isOwner})}">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <button th:if="${recentGardensPage2}"
+            <button th:if="${recentGardensPage2}"
                 class="carousel-control-prev bg-black bg-opacity-75 rounded-circle my-auto p-2" type="button"
                 data-bs-target="#carouselRecentGardens" data-bs-slide="prev" style="height: 75px; width: 75px">
                 <span class="carousel-control-prev-icon" aria-hidden="true">
                     <span class="visually-hidden">Previous</span>
                 </span>
-        </button>
-        <button th:if="${recentGardensPage2}"
+            </button>
+            <button th:if="${recentGardensPage2}"
                 class="carousel-control-next bg-black bg-opacity-75 rounded-circle my-auto p-2" type="button"
                 data-bs-target="#carouselRecentGardens" data-bs-slide="next" style="height: 75px; width: 75px">
                 <span class="carousel-control-next-icon" aria-hidden="true">
                     <span class="visually-hidden">Next</span>
                 </span>
-        </button>
-    </div>
-</div>
-
-<div th:if="${recentPlantsPage1 != null && layout != null && layout.showRecentPlants}" class="container my-2 bg-white rounded py-2">
-    <div id="carouselRecentPlants" class="carousel slide">
-        <div class="carousel-inner mx-auto w-100">
-            <div class="col">
-                <h2>Recent Plants</h2>
-            </div>
-            <div th:if="${recentPlantsPage1}" class="carousel-item active">
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
-                    <div class="col-3" th:each="plant : ${recentPlantsPage1}">
-                        <div th:replace="~{fragments/recentPlantsCard.html ::
-                                recentPlantsCard(gardenId=${plant.getGardenId},
-                                gardenName=${plant.getGardenName},
-                                plantId=${plant.getPlantId},
-                                plantName=${plant.getPlantName},
-                                plantPicture=${plant.getPlantPictureFileName},
-                                ownerImage=${plant.getOwnerImageFileName},
-                                ownerName=${plant.getOwnerName},
-                                isOwner=${plant.isOwner})}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div th:if="${recentPlantsPage2}" class="carousel-item">
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
-                    <div class="col-3" th:each="plant : ${recentPlantsPage2}">
-                        <div th:replace="~{fragments/recentPlantsCard.html ::
-                                recentPlantsCard(gardenId=${plant.getGardenId},
-                                gardenName=${plant.getGardenName},
-                                plantId=${plant.getPlantId},
-                                plantName=${plant.getPlantName},
-                                plantPicture=${plant.getPlantPictureFileName},
-                                ownerImage=${plant.getOwnerImageFileName},
-                                ownerName=${plant.getOwnerName},
-                                isOwner=${plant.isOwner})}">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </button>
         </div>
-        <button th:if="${recentPlantsPage2}"
+    </div>
+
+    <div th:if="${recentPlantsPage1 != null && layout != null && layout.showRecentPlants}"
+        class="container mb-3 bg-white rounded py-2">
+        <div id="carouselRecentPlants" class="carousel slide">
+            <div class="carousel-inner mx-auto w-100">
+                <div class="col">
+                    <h2>Recent Plants</h2>
+                </div>
+                <div th:if="${recentPlantsPage1}" class="carousel-item active">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
+                        <div class="col-3" th:each="plant : ${recentPlantsPage1}">
+                            <div th:replace="~{fragments/recentPlantsCard.html ::
+                                recentPlantsCard(gardenId=${plant.getGardenId},
+                                gardenName=${plant.getGardenName},
+                                plantId=${plant.getPlantId},
+                                plantName=${plant.getPlantName},
+                                plantPicture=${plant.getPlantPictureFileName},
+                                ownerImage=${plant.getOwnerImageFileName},
+                                ownerName=${plant.getOwnerName},
+                                isOwner=${plant.isOwner})}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${recentPlantsPage2}" class="carousel-item">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
+                        <div class="col-3" th:each="plant : ${recentPlantsPage2}">
+                            <div th:replace="~{fragments/recentPlantsCard.html ::
+                                recentPlantsCard(gardenId=${plant.getGardenId},
+                                gardenName=${plant.getGardenName},
+                                plantId=${plant.getPlantId},
+                                plantName=${plant.getPlantName},
+                                plantPicture=${plant.getPlantPictureFileName},
+                                ownerImage=${plant.getOwnerImageFileName},
+                                ownerName=${plant.getOwnerName},
+                                isOwner=${plant.isOwner})}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button th:if="${recentPlantsPage2}"
                 class="carousel-control-prev bg-black bg-opacity-75 rounded-circle my-auto p-2" type="button"
                 data-bs-target="#carouselRecentPlants" data-bs-slide="prev" style="height: 75px; width: 75px">
                 <span class="carousel-control-prev-icon" aria-hidden="true">
                     <span class="visually-hidden">Previous</span>
                 </span>
-        </button>
-        <button th:if="${recentPlantsPage2}"
+            </button>
+            <button th:if="${recentPlantsPage2}"
                 class="carousel-control-next bg-black bg-opacity-75 rounded-circle my-auto p-2" type="button"
                 data-bs-target="#carouselRecentPlants" data-bs-slide="next" style="height: 75px; width: 75px">
                 <span class="carousel-control-next-icon" aria-hidden="true">
                     <span class="visually-hidden">Next</span>
                 </span>
-        </button>
+            </button>
+        </div>
     </div>
-</div>
 
     <div th:if="${layout != null && layout.showNotifications}" class="d-flex flex-row flex-wrap gap-3 mb-3">
         <div class="container offcanvas offcanvas-start" style="top: 9vh" tabindex="-1" id="offcanvas"
