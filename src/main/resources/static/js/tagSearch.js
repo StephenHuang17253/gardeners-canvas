@@ -2,8 +2,8 @@ const tagInput = document.getElementById('tagInput');
 const addTagButton = document.getElementById('addTagButton');
 const appliedTagsList = document.getElementById('appliedTagsList');
 const appliedTagsInputs = document.getElementById('appliedTagsInputs');
-const searchTagErrorText = document.getElementById('searchTagErrorText');
-
+const searchTagErrorText = document.getElementById('searchTagErrorText')
+const maxTextLength = 50;
 
 /**
  * handles when the user enters a tag, 
@@ -24,6 +24,7 @@ const handleButtonClick = async () => {
     if (!tagExists) {
         tagInput.classList.add('border-danger');
         searchTagErrorText.textContent = `No tag matching "${value}"`;
+        cutOffText(searchTagErrorText, maxTextLength);
         return;
     }
     const tagAlreadyApplied = Array.from(appliedTagsInputs.querySelectorAll('input[name="appliedTags"]'))
@@ -103,12 +104,25 @@ const checkTagExists = async (tagName) => {
  * Hides the applied tag section
  */
 const hideTagSection = () => {
-    console.log(appliedTagsList.childElementCount)
     if (appliedTagsList.childElementCount === 1) {
         appliedTagsList.classList.add('d-none');
-
     }
 }
 hideTagSection()
+
+/**
+ * Cuts off text if it exceeds the max length
+ * @param {HTMLElement} element - The element containing the text
+ * @param {number} maxLength - The maximum length of the text
+ */
+const cutOffText = (element, maxLength) => {
+    let text = element.textContent;
+    if (text.length > maxLength) {
+        element.textContent = text.substring(0, maxLength - 3) + "...\"";
+    }
+}
+
+
+window.addEventListener('load', hideTagSection);
 tagInput.addEventListener('keypress', handleKeyPress);
 addTagButton.addEventListener('click', handleButtonClick);
