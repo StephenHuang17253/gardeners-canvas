@@ -112,6 +112,8 @@ const handleDateUpdate = (event) => {
     const monthDiff = today.getMonth() - dateValue.getMonth();
     const dayDiff = today.getDate() - dateValue.getDate();
 
+    clearDateError();
+
     if (!dateOfBirth.checkValidity()) {
         dateOfBirthJSError.textContent = "Date is not in valid format, DD/MM/YYYY";
         displayDateError();
@@ -126,7 +128,6 @@ const handleDateUpdate = (event) => {
     } else {
         validAge = true;
     }
-
 
     if (!validAge) {
         displayDateError();
