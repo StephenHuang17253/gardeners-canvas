@@ -43,7 +43,7 @@
                         <p class="break-word" th:text="${userName}"></p>
                     </div>
 
-                    <div th:if="${dateOfBirth}" class="mb-3 text-center">
+                    <div th:if="${dateOfBirth != ''}" class="mb-3 text-center">
                         <h3>Date of Birth</h3>
                         <p th:text="${dateOfBirth}"></p>
                     </div>
