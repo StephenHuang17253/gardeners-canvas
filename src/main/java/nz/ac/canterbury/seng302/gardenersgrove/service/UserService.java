@@ -278,15 +278,23 @@ public class UserService {
 
     /**
      * Updates the home page layout of a user
-     * 
-     * @param id     id of the user to update layout for
-     * @param layout new layout to set
+     *
+     * @param id           id of the user to update layout for
+     * @param layoutToCopy new layout to set
      * @return updated user
      */
-    public User updateHomePageLayout(Long id, HomePageLayout layout) {
+    public User updateHomePageLayout(Long id, HomePageLayout layoutToCopy) {
         User user = getUserById(id);
-        homePageLayoutRepository.save(layout);
-        user.setHomePageLayout(layout);
+        if (user.getHomePageLayout() == null) {
+            homePageLayoutRepository.save(layoutToCopy);
+            user.setHomePageLayout(layoutToCopy);
+        } else {
+            HomePageLayout userHomePageLayout = user.getHomePageLayout();
+            userHomePageLayout.setAcceptedFriends(layoutToCopy.showAcceptedFriends());
+            userHomePageLayout.setNotifications(layoutToCopy.showNotifications());
+            userHomePageLayout.setRecentGardens(layoutToCopy.showRecentGardens());
+            userHomePageLayout.setRecentPlants(layoutToCopy.showRecentPlants());
+        }
         return userRepository.save(user);
     }
 
