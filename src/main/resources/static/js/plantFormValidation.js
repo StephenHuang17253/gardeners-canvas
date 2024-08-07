@@ -46,10 +46,13 @@ const handleDateUpdate = (event) => {
 
     let validAge = false;
     if (age > 400 || (age === 400 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
-        plantDateErrorJs.textContent = "The maximum age allowed is 400 years";
+        plantDateErrorJs.textContent = "Plant date cannot be more than 400 years ago.";
+    } else if (age < -1) {
+        plantDateErrorJs.textContent = "Plant date cannot be more than a year in the future.";
     } else {
         validAge = true;
     }
+
 
 
     if (!validAge) {

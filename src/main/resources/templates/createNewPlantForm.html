@@ -74,7 +74,8 @@
                         <label for="plantDate" class="form-label">Plant Date</label>
                         <input id="plantDate" type="date" class="form-control" max="9999-12-30" min="0000-01-01"
                             th:name="plantDate" th:value="*{plantDate}"
-                            th:classappend="${PAErrorText == null ? '' : 'border-danger'}">
+                            th:classappend="${PAErrorText == null ? '' : 'border-danger'}" th:oninvalid="displayDateError()"
+                               th:oninput="clearDateError()">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
                         <p id="plantDateJSError" class="text-danger fs-6" style="display: none;"
                            th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
