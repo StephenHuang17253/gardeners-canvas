@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
@@ -302,10 +303,11 @@ class GardensControllerIntegrationTests {
                 .andReturn();
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        List<Plant> plants = (List<Plant>) modelMap.getAttribute("plants");
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
         Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
-        Assertions.assertEquals(garden.getPlants().size(), gardenDetailModel.getTotalPlants());
+        Assertions.assertEquals(garden.getPlants().size(), plants.size());
         Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
     }
 
@@ -319,10 +321,11 @@ class GardensControllerIntegrationTests {
                 .andReturn();
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
         GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        List<Plant> plants = (List<Plant>) modelMap.getAttribute("plants");
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
         Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
-        Assertions.assertEquals(garden.getPlants().size(), gardenDetailModel.getTotalPlants());
+        Assertions.assertEquals(garden.getPlants().size(), plants.size());
         Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
     }
 
@@ -349,10 +352,11 @@ class GardensControllerIntegrationTests {
                 .andReturn();
         modelMap = mvcResult.getModelAndView().getModelMap();
         gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        List<Plant> plants = (List<Plant>) modelMap.getAttribute("plants");
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
         Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
-        Assertions.assertEquals(garden.getPlants().size(), gardenDetailModel.getTotalPlants());
+        Assertions.assertEquals(garden.getPlants().size(),plants.size());
         Assertions.assertEquals(true, gardenDetailModel.isGardenIsPublic());
     }
 
