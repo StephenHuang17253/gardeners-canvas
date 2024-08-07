@@ -64,6 +64,8 @@ AZURE_ENDPOINT=<your_azure_endpoint>
 
 AZURE_MODERATOR_KEY=<your_azure_key>
 
+PERENUAL_PLANT_API_LEY=<your_perenual_key>
+
 For running locally on port 8080, <your_base_url> will be http://localhost:8080.
 
 Values for <your_email> and <your_app_password> are located on the repository wiki.
@@ -71,6 +73,8 @@ Values for <your_email> and <your_app_password> are located on the repository wi
 To get <your_locationiq_api_key> you can visit [this link](https://my.locationiq.com/register) and get a key for free (credit card not required).
 
 To get <your_azure_endpoint> and <your_azure_key> you can visit [this link] https://azure.microsoft.com/en-us/products/ai-services/ai-content-safety. There is a cost associated unless you are a student, in which case there is a free plan which gives $100 USD credit.
+
+To get <your_perenual_key> you can visit [this link](https://perenual.com/docs/api) and get a key for free (credit card not required).
 
 The credentials for the deployed version be found on the repository within the environment variables. 
 
@@ -110,7 +114,7 @@ Go to jar directory:
 cd build/libs
 ```
 Run the jar on [http://localhost:8080](http://localhost:8080) with the following command. 
-- Note: Fill in <your_locationiq_api_key>, <your_app_password>, and <your_email> with the details you got earlier (instructions on how to receive these values are above). 
+- Note: Fill in <your_locationiq_api_key>, <your_azure_endpoint>, <your_azure_key>, <your_perenual_key>, <your_app_password>, and <your_email> with the details you got earlier (instructions on how to receive these values are above). 
 - You could copy and paste the command into Notepad or any text editor, and then replace the placeholders.
 - e.g. spring.mail.username=gardenersgroveinfo@gmail.com
 
@@ -125,7 +129,8 @@ java -jar gardeners-grove-0.0.1-SNAPSHOT.jar \
 --spring.mail.password=<your_app_password> \
 --spring.base.url=http://localhost:8080 \
 --azure.service.endpoint=<your_azure_endpoint> \
---azure.moderator.token=<your_azure_key>
+--azure.moderator.token=<your_azure_key>\
+--perenual.plant.api.key=<your_perenual_key>
 
 ```
 
@@ -208,6 +213,7 @@ gradlew test
 - [Spring Boot Starter Mail Starter Guide](https://www.baeldung.com/spring-email)
 - [Weather API (Open-Meteo) Docs](https://open-meteo.com/en/docs)
 - [Profanity API (Azure AI Content Safety) Docs](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview)
+- [Plant API (Perenual) Docs](https://perenual.com/docs/api) 
 
 ## Licences
 
@@ -216,3 +222,4 @@ gradlew test
 - [LocationIQ](https://eng-git.canterbury.ac.nz/seng302-2024/team-500/-/wikis/LocationIQ%20Licensing%20Terms)
 - [Open Metro](https://eng-git.canterbury.ac.nz/seng302-2024/team-500/-/wikis/Open-Meteo%20Licensing%20Terms)
 - [Microsoft Azure](https://eng-git.canterbury.ac.nz/seng302-2024/team-500/-/wikis/Microsoft-Azure-for-Students-Subscription-and-MOSA)
+- [Perenual](https://creativecommons.org/licenses/by-sa/2.0/)
