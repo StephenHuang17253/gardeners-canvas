@@ -53,6 +53,10 @@ public class PlantWikiController {
 
                 JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
+                if (plantList.has("X-RateLimit-Remaining") && plantList.get("X-RateLimit-Remaining").asInt() <= 0) {
+                    throw new HttpStatusCodeException(HttpStatus.TOO_MANY_REQUESTS, "Surpassed API Rate Limit") {};
+                }
+
                 List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
                         .map(PlantSearchModel::new)
                         .filter(plant -> plant.getId() <= PLANT_SPECIES_LIMIT)
@@ -78,11 +82,11 @@ public class PlantWikiController {
         } catch (HttpStatusCodeException e) {
             if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
                 logger.error("Rate limit exceeded: {}", e.getMessage());
-                model.addAttribute("error", "Sorry we are unable to perform that action right now. " +
+                model.addAttribute("searchError", "Sorry we are unable to perform that action right now. " +
                         "Please try again tomorrow. In the meantime you may wish to check out our default plants");
             } else {
                 logger.error("HTTP error occurred: {}", e.getMessage());
-                model.addAttribute("error", "An error occurred while retrieving plant data. Please try again later.");
+                model.addAttribute("searchError", "An error occurred while retrieving plant data. Please try again later.");
             }
         } catch (IOException e) {
             logger.error("IOException occurred while fetching plant data: {}", e.getMessage());
