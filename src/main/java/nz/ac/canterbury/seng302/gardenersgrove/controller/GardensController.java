@@ -187,7 +187,7 @@ public class GardensController {
         }
     }
 
-    private void handlePagniation(int page, int listLength, Model model) {
+    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -196,6 +196,8 @@ public class GardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
+        model.addAttribute("plants",plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount",plants.size());
     }
 
     /**
@@ -264,7 +266,7 @@ public class GardensController {
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-        handlePagniation(page, plants.size(), model);
+        handlePagniation(page, plants.size(),garden.getPlants(), model);
 
         try {
             if (weatherListJson != null) {
@@ -436,7 +438,7 @@ public class GardensController {
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-        handlePagniation(page, plants.size(), model);
+        handlePagniation(page, plants.size(),garden.getPlants(), model);
 
         model.addAttribute("openModal", "true");
         model.addAttribute("tagText", tag);

@@ -70,6 +70,19 @@ public class PublicGardensController {
         return "redirect:/public-gardens/search/1";
     }
 
+    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
+        int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("plants",plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount",plants.size());
+    }
+
 
     /**
      * returns a page with the 10 most recent public gardens based on search and on
@@ -206,21 +219,13 @@ public class PublicGardensController {
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
         User user = garden.getOwner();
-        List<Plant> plants = garden.getPlants();
-        int totalPages = (int) Math.ceil((double) plants.size() / COUNT_PER_PAGE);
-        int startIndex = (page - 1) * COUNT_PER_PAGE;
-        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, plants.size());
+        handlePagniation(page,garden.getPlants().size(),garden.getPlants(),model);
 
         model.addAttribute("isOwner", false);
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("weather", null);
         model.addAttribute("profilePicture", user.getProfilePictureFilename());
         model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
-
-        model.addAttribute("currentPage", page);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
