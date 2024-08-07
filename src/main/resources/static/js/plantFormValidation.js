@@ -10,7 +10,9 @@ const plantDescriptionJSError = document.getElementById("plantDescriptionJSError
 const plantCount = document.getElementById("plantCount");
 const plantCountJSError = document.getElementById("plantCountJSError");
 
+const variationSelector1 = 65039;
 const submitButton = document.querySelector('button[type="submit"]');
+
 
 /**
  * Handles the case where the user's input for the date field is invalid.
@@ -155,8 +157,9 @@ const handleDescriptionUpdate = (event) => {
 
     const containsLetterRegex = /[a-zA-Z]/;
 
+    const characterCount = Array.from(descriptionValue).filter(char => !(char.match(/\s/) || char.charCodeAt(0) === variationSelector1)).length;
 
-    if ((!containsLetterRegex.test(filteredValue) && !filteredValue.equals("")) || descriptionValue.length > 64) {
+    if ((!containsLetterRegex.test(filteredValue) && filteredValue !== "") || characterCount > 512) {
         plantDescriptionJSError.textContent = "Description must be 512 characters or less and contain some letters";
         displayDescriptionError();
     } else {
@@ -203,19 +206,19 @@ const handleCountUpdate = (event) => {
         floatValue = parseFloat(countValue.replace(",", "."));
 
         if (isNaN(floatValue)) {
-            plantDescriptionJSError.textContent = "Invalid number format.";
+            plantCountJSError.textContent = "Invalid number format.";
             displayCountError();
             return;
         }
 
         if (floatValue % 1 !== 0 || floatValue > 1000000 || floatValue <= 0) {
-            plantDescriptionJSError.textContent = "Plant count must be a positive whole number between 1 and 1,000,000";
+            plantCountJSError.textContent = "Plant count must be a positive whole number between 1 and 1,000,000";
             displayCountError();
             return;
         }
     } catch (e) {
 
-        plantDescriptionJSError.textContent = "Invalid number format.";
+        plantCountJSError.textContent = "Invalid number format.";
         displayCountError();
         return;
     }
