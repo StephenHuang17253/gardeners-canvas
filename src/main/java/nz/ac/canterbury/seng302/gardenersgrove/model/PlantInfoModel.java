@@ -30,32 +30,6 @@ public class PlantInfoModel {
     private boolean poisonousToPets;
     private String maintenance;
     private boolean indoor;
-
-    // TODO: Sort out the extra information in the plantInfoModel below. Decide what is useful to keep and what isn't.
-    //    private List<String> otherName;
-    //    private String family;
-    //    private String origin;
-    //    private String type;
-    //    private String dimensions;
-    //    private String depthWaterRequirement;
-    //    private String volumeWaterRequirement;
-    //    private List<String> plantAnatomy;
-    //    private int seeds;
-    //    private List<String> attracts;
-    //    private List<String> propagation;
-    //    private List<String> leafColor;
-    //    private boolean edibleLeaf;
-    //    private String growthRate;
-    //    private boolean medicinal;
-    //    private boolean droughtTolerant;
-    //    private boolean saltTolerant;
-    //    private boolean thorny;
-    //    private boolean invasive;
-    //    private boolean rare;
-    //    private String rareLevel;
-    //    private boolean tropical;
-    //    private boolean cuisine;
-    //    private String careLevel;
     private String description;
     private String defaultImage;
 
