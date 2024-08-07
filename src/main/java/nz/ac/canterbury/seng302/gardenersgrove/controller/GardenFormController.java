@@ -225,7 +225,7 @@ public class GardenFormController {
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
-        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
+        ValidationResult streetAddressResult = InputValidator.validateAddressInput(streetAddress);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
@@ -394,7 +394,7 @@ public class GardenFormController {
 
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
-        ValidationResult streetAddressResult = InputValidator.optionalAlphaPlusTextField(streetAddress);
+        ValidationResult streetAddressResult = InputValidator.validateAddressInput(streetAddress);
         ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
         ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
         ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);

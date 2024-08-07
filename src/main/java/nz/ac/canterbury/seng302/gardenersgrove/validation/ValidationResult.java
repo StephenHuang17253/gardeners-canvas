@@ -10,7 +10,7 @@ public enum ValidationResult {
     BLANK("cannot be empty"),
     NOT_PARSABLE("cannot be parsed to a number"),
     NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
-    INVALID_POSTCODE("must only contain numbers, letters, and spaces"),
+    INVALID_POSTCODE("must only contain numbers, letters, hyphens, and spaces"),
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
     INVALID_EMAIL("Email must be in the form 'jane@doe.nz'"),
     EMAIL_TO_LONG("Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters"),
