@@ -164,8 +164,7 @@ public class GardenTagService {
      * @return List of all gardens that match by Name or at least one tag
      * **/
     public List<Garden> getMatchingGardens(String searchValue, List<String> tags) {
-        String tagsString = String.join(",", tags);
-        return gardenTagRelationRepository.findByGardenNameContainsAndGardenHasTags(searchValue, tagsString);
+        return gardenTagRelationRepository.findByGardenNameContainsAndGardenHasTags(searchValue, tags);
     }
 
 
