@@ -1,17 +1,14 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenNavModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +18,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.springframework.ui.Model;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 
 /**
  * This is a basic spring boot controller for the registration form page,
@@ -50,10 +54,7 @@ public class AccountController {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final GardenService gardenService;
-
-    // For development to avoid sending signup emails but print the signup token to
-    // the terminal instead, set to true or remove for production
-    private final boolean SEND_EMAIL = true;
+    private final SecurityService securityService;
 
     /**
      * Constructor for the RegistrationFormController with {@link Autowired} to
@@ -63,15 +64,18 @@ public class AccountController {
      * @param userService           to use for checking persistence to validate
      *                              email and password
      * @param authenticationManager to login user after registration
+     * @param securityService       service to access security methods
      */
     @Autowired
     public AccountController(UserService userService, AuthenticationManager authenticationManager,
-            EmailService emailService, TokenService tokenService, GardenService gardenService) {
+            EmailService emailService, TokenService tokenService, GardenService gardenService,
+            SecurityService securityService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
         this.tokenService = tokenService;
         this.gardenService = gardenService;
+        this.securityService = securityService;
     }
 
     /**
@@ -121,6 +125,16 @@ public class AccountController {
     }
 
     /**
+     * Adds the loggedIn attribute to the model for all requests
+     *
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+    /**
      * handles GET '/register' requests
      *
      * @return registration form
@@ -135,14 +149,10 @@ public class AccountController {
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword, Model model) {
         logger.info("GET /register");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        if(loggedIn)
-        {
+        if (securityService.isLoggedIn()) {
             return "redirect:/home";
         }
 
-        model.addAttribute("loggedIn", loggedIn);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
         model.addAttribute("noLastName", noLastName);
@@ -150,7 +160,7 @@ public class AccountController {
         model.addAttribute("emailAddress", emailAddress);
         model.addAttribute("password", password);
         model.addAttribute("repeatPassword", repeatPassword);
-        return "registrationForm";
+        return "registrationPage";
     }
 
     /**
@@ -181,9 +191,6 @@ public class AccountController {
             Model model) {
         logger.info("POST /register");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
 
@@ -210,14 +217,13 @@ public class AccountController {
 
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
-        if (noLastName == false) {
+        if (!noLastName) {
             otherFields.add(lastName);
         }
-        if (!(dateOfBirth == null)) {
+        if (dateOfBirth != null) {
             otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(emailAddress);
-        InputValidator.validatePassword(password, otherFields);
         validationMap.put("password", InputValidator.validatePassword(password, otherFields));
 
         // Check that all inputs are valid
@@ -249,7 +255,7 @@ public class AccountController {
             model.addAttribute("emailAddress", emailAddress);
             model.addAttribute("dateOfBirth", dateOfBirth);
             model.addAttribute("noLastName", noLastName);
-            return "registrationForm";
+            return "registrationPage";
         }
 
         User user = new User(firstName, lastName, emailAddress, dateOfBirth);
@@ -258,15 +264,10 @@ public class AccountController {
         Token token = new Token(user, null);
 
         tokenService.addToken(token);
-
-        if (SEND_EMAIL) {
-            try {
-                emailService.sendRegistrationEmail(token);
-            } catch (MessagingException e) {
-                logger.info("could not send email to " + user.getEmailAddress());
-            }
-        } else {
-            logger.info("Here is the token: " + token.toString());
+        try {
+            emailService.sendRegistrationEmail(token);
+        } catch (MessagingException e) {
+            logger.error("Couldn't send email to {}", user, e);
         }
 
         return "redirect:/verify/" + user.getEmailAddress();
@@ -287,10 +288,10 @@ public class AccountController {
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("message", inputFlashMap.get("message"));
+            model.addAttribute("goodMessage", inputFlashMap.get("goodMessage"));
         }
 
         model.addAttribute("emailAddress", emailAddress);
-        model.addAttribute("loggedIn", false);
 
         return "verificationPage";
     }
@@ -315,6 +316,7 @@ public class AccountController {
 
         if (token == null || token.isExpired() || !token.getUser().getEmailAddress().equals(emailAddress)) {
             redirectAttributes.addFlashAttribute("message", "Signup code invalid");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
             return "redirect:/verify/" + emailAddress;
         }
 
@@ -323,6 +325,7 @@ public class AccountController {
         tokenService.deleteToken(token);
 
         redirectAttributes.addFlashAttribute("message", "Your account has been activated, please log in");
+        redirectAttributes.addFlashAttribute("goodMessage", true);
         return "redirect:/login";
     }
 
@@ -337,10 +340,8 @@ public class AccountController {
             @RequestParam(name = "password", defaultValue = "") String password, Model model,
             HttpServletRequest request) {
         logger.info("GET /login");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
-        if(loggedIn)
-        {
+
+        if (securityService.isLoggedIn()) {
             return "redirect:/home";
         }
 
@@ -349,13 +350,13 @@ public class AccountController {
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
             model.addAttribute("message", inputFlashMap.get("message"));
+            model.addAttribute("goodMessage", inputFlashMap.get("goodMessage"));
         }
 
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
         model.addAttribute("emailAddress", emailAddress);
         model.addAttribute("password", password);
-        model.addAttribute("loggedIn", false);
 
         return "loginPage";
     }
@@ -370,9 +371,6 @@ public class AccountController {
     public String handleLoginRequest(HttpServletRequest request, @RequestParam String emailAddress,
             @RequestParam String password, HttpSession session, Model model) {
         logger.info("POST /login");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && authentication.getName() != "anonymousUser";
 
         removeIfExpired(emailAddress);
 
@@ -396,9 +394,22 @@ public class AccountController {
         if (!user.isVerified()) {
             return "redirect:/verify/" + user.getEmailAddress();
         }
+        
+        if (user.isBanned()) {
+            int banTimeLeft = user.daysUntilUnban();
+            String message = "Your account is blocked for " + banTimeLeft + " day" + (banTimeLeft == 1 ? "": "s") + " due to inappropriate conduct";
+            model.addAttribute("goodMessage", false);
+            model.addAttribute("message", message);
+            return "loginPage";
+        }
 
         setSecurityContext(emailAddress, password, request.getSession());
-        session.setAttribute("userGardens", gardenService.getAllUsersGardens(user.getId()));
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        List<GardenNavModel> gardenNavModels = new ArrayList<>();
+        for(Garden garden : gardens){
+            gardenNavModels.add(new GardenNavModel(garden.getGardenId(), garden.getGardenName()));
+        }
+        session.setAttribute("userGardens", gardenNavModels);
 
         return "redirect:/home";
 

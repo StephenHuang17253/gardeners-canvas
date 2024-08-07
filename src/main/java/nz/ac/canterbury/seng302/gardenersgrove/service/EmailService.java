@@ -1,41 +1,40 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
-
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 /**
- * This class is a service class for sending emails
- * defined by the {@link Service} annotation.
+ * This class is a service class for sending emails defined by the
+ * {@link Service} annotation.
  */
 @Service
 public class EmailService {
+
     Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    @Autowired
-    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
-        this.mailSender = mailSender;
-        this.templateEngine = templateEngine;
-    }
+    private static final String USERNAME_FIELD = "username";
 
     /**
      * The email address of the sender retrieved from the email.properties file.
@@ -49,6 +48,33 @@ public class EmailService {
     @Value("${spring.base.url}")
     private String baseURL;
 
+    /**
+     * Autowired default constructor for Email Service
+     * @param mailSender mail sender bean
+     * @param templateEngine mail sender bean
+     */
+    @Autowired
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
+
+    /**
+     * <h4 style="color:red;"> CONSTRUCTOR FOR TEST USE ONLY </h4>
+     * Overloaded constructor for email service,
+     * Overwrites application properties usually defined at runtime in order to make testing this service easier
+     * @param mailSender mail sender bean
+     * @param templateEngine mail sender bean
+     * @param overwrittenBaseUrl overwritten url basis (where emails are sent to)
+     * @param overwrittenSenderEmail overwritten sending email address (where emails are sent froim)
+     */
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine, String overwrittenSenderEmail, String overwrittenBaseUrl) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+        this.baseURL = overwrittenBaseUrl;
+        this.senderEmail = overwrittenSenderEmail;
+    }
+
     public String getBaseURL() {
         return baseURL;
     }
@@ -56,10 +82,12 @@ public class EmailService {
     /**
      * Sends a plaintext email to the specified email address with the specified
      * subject and body.
-     * 
+     * Actual email is sent asynchronously to make the app more responsive.
+     * (the send email function takes 5 seconds to run)
+     *
      * @param toEmail the email recipient
      * @param subject the email subject
-     * @param body    the email body
+     * @param body the email body
      * @throws MailException if the email cannot be sent
      */
     public void sendPlaintextEmail(String toEmail, String subject, String body) throws MailException {
@@ -68,12 +96,26 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject(subject);
         message.setText(body);
-        mailSender.send(message);
+
+        Thread asynchronousEmailthread = new Thread(() -> {
+            try
+            {
+                mailSender.send(message);
+                logger.info("Email Sent");
+            }
+            catch (MailException error)
+            {
+                logger.error("Email could not be sent");
+            }
+        });
+        asynchronousEmailthread.start();
     }
 
     /**
-     * Sends an HTML email to the specified email address with the specified subject
-     * 
+     * Sends an HTML email to the specified email address with the specified
+     * subject. Actual email is sent asynchronously to make the app more responsive.
+     * (the send email function takes 5 seconds to run)
+     *
      * @param recipientEmail email of person to receive message
      * @param subject subject of email
      * @param template html template to fill for email
@@ -89,18 +131,29 @@ public class EmailService {
         helper.setTo(recipientEmail);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
-        mailSender.send(message);
-    }
 
+        Thread asynchronousEmailthread = new Thread(() -> {
+            try
+            {
+                mailSender.send(message);
+                logger.info("Email Sent");
+            }
+            catch (MailException error)
+            {
+                logger.error("Email could not be sent");
+            }
+        });
+        asynchronousEmailthread.start();
+    }
 
     /**
      * Sends a registration email to the user with the token
-     * 
+     *
      * @param token the token to send information about
      * @throws MessagingException
      */
     public void sendRegistrationEmail(Token token) throws MessagingException {
-        String subject = "Welcome to Gardeners Grove!";
+        String subject = "Welcome to Gardener's Grove!";
         String template = "registrationEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
@@ -108,7 +161,7 @@ public class EmailService {
         int lifetime = (int) token.getLifetime().toMinutes();
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("tokenString", tokenString);
         context.setVariable("lifetime", lifetime);
 
@@ -116,16 +169,15 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
-
-
     /**
-     * Sends a reset password email to the user with token in reset password link
+     * Sends a reset password email to the user with token in reset password
+     * link
      *
      * @param token the token to use to reset password
      */
     public void sendResetPasswordEmail(Token token) throws MessagingException {
-        logger.info("Sending reset password email to "+token.getUser().getEmailAddress());
-        String subject = "Link to Reset Password to Gardeners Grove!";
+        logger.info("Sending reset password email to {}", token.getUser().getEmailAddress());
+        String subject = "Link to Reset Password to Gardener's Grove!";
         String template = "generalEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
@@ -137,19 +189,18 @@ public class EmailService {
                 .buildAndExpand(tokenString)
                 .toUriString();
         String urlText = "RESET PASSWORD";
-        String mainBody = String.format("Following is the link to resetting your password. \n This link expires in %s minutes.", lifetime);
-        String signOff = "Regards, Gardeners Grove Team 500";
+        String mainBody = String.format("Click the link below to reset your password. %n This link expires in %s minutes.", lifetime);
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
         context.setVariable("url", url);
         context.setVariable("urlText", urlText);
-        context.setVariable("signOff", signOff);
 
         String toEmail = token.getUser().getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
     }
+
 
     /**
      * Sends a confirmation of reset password
@@ -157,20 +208,65 @@ public class EmailService {
      * @param currentUser user to send confirmation of password reset to
      */
     public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
-        logger.info("Sending confirmation email to "+currentUser.getEmailAddress());
+        logger.info("Sending confirmation email to {}",currentUser.getEmailAddress());
         String subject = "Your Password Has Been Updated";
         String template = "generalEmail";
 
         String username = currentUser.getFirstName() + " " + currentUser.getLastName();
-        String mainBody = "This email is to confirm that your Gardeners Grove account's password has been updated";
-        String signOff = "Regards, Gardeners Grove Team 500";
+        String mainBody = "This email is to confirm that your Gardener's Grove account's password has been updated";
 
         Context context = new Context();
-        context.setVariable("username", username);
+        context.setVariable(USERNAME_FIELD, username);
         context.setVariable("mainBody", mainBody);
-        context.setVariable("signOff", signOff);
 
         String toEmail = currentUser.getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
+
+    /**
+     * Sends a warning email to the user for using too many inappropriate tags
+     *
+     * @param user to send the email
+     */
+    public void sendTagBanWarningEmail(User user) throws MessagingException {
+        String subject = "Account Warning";
+        String template = "generalEmail";
+        String mainBody = """
+                Due to your Gardener's Grove account recently submitting a tag that breaches our language standard,
+                 \nyour account has received its fifth consecutive strike.
+                \nThis is your final warning, if you add another inappropriate tag your account will be banned for 7 days.""";
+
+        String username = user.getFirstName() + " " + user.getLastName();
+
+        Context context = new Context();
+        context.setVariable(USERNAME_FIELD, username);
+        context.setVariable("mainBody", mainBody);
+
+        String toEmail = user.getEmailAddress();
+        sendHTMLEmail(toEmail, subject, template, context);
+    }
+
+    /**
+     * Sends a ban email to the user that informs them they have been banned for 7 days
+     *
+     * @param user to send the email
+     */
+    public void sendTagBanEmail(User user) throws MessagingException {
+        String subject = "Account Banned";
+        String template = "tagBanEmail";
+
+        String username = user.getFirstName() + " " + user.getLastName();
+
+        LocalDate banDate = LocalDate.now();
+        LocalDate unbanDate = banDate.plusDays(7);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+
+        Context context = new Context();
+        context.setVariable(USERNAME_FIELD, username);
+        context.setVariable("banDate", banDate.format(formatter));
+        context.setVariable("unbanDate", unbanDate.format(formatter));
+
+        String toEmail = user.getEmailAddress();
         sendHTMLEmail(toEmail, subject, template, context);
     }
 }

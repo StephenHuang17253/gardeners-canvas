@@ -5,6 +5,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @SpringBootTest
 public class LoginUser {
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
 
     @Autowired
     public UserRepository userRepository;
+
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
     public PasswordEncoder passwordEncoder;
@@ -45,20 +49,20 @@ public class LoginUser {
 
     @Before
     public void before_or_after_all() {
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
         AccountController loginPageController = new AccountController(userService, authenticationManager,
                 emailService,
-                tokenService, gardenService);
+                tokenService, gardenService, securityService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(loginPageController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(loginPageController).build();
 
     }
 
     @When("I as user {string} am logged in with {string}")
     public void iAsUserAmLoggedInWith(String userEmail, String userPassword) throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 post("/login")
                         .param("emailAddress", userEmail)
                         .param("password", userPassword))
@@ -67,7 +71,7 @@ public class LoginUser {
 
     @Given("I am not logged in")
     public void iAmNotLoggedIn() throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 post("/logout"));
     }
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{fragments/header.html}"></head>
+
+<body>
+<div th:replace="~{fragments/navBar.html :: navBar('register')}" th:with="loggedIn=${loggedIn}"></div>
+<div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+     th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+<div class="container-md my-5 bg-white rounded py-5 w-50">
+    <div class="row justify-content-center">
+        <div class="text-center py-5">
+            <h1>Registration</h1>
+        </div>
+        <div class="col-6">
+            <form th:action="@{/register}" method="post" class="border rounded-3 p-3">
+
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name *</label>
+                    <input id="firstName" type="text" class="form-control" th:name="firstName"
+                           th:value="*{firstName}" autofocus
+                           th:classappend="${firstNameError == null ? '' : 'border-danger'}">
+                    <p th:if="${firstNameError}" class="text-danger fs-6" th:text="${firstNameError}"></p>
+                    <p id="firstNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'First name must be 64 characters long or less'"></p>
+                </div>
+
+                <div class="mb-3" id="lastNameDiv">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input id="lastName" type="text" class="form-control" th:name="lastName" th:value="*{lastName}"
+                           th:classappend="${lastNameError == null ? '' : 'border-danger'}">
+                    <p th:if="${lastNameError}" class="text-danger fs-6" th:text="${lastNameError}"></p>
+                    <p id="lastNameJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Last name must be 64 characters long or less'"></p>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input id="lastNameCheck" class="form-check-input" type="checkbox" th:name="noLastName"
+                           th:checked="${noLastName}" onchange="hideLastName(event.target.checked)">
+                    <label for="lastNameCheck" class="form-check-label">
+                        I have no Surname
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                    <input id="dateOfBirth" type="date" class="form-control" th:name="dateOfBirth"
+                           th:value="*{dateOfBirth}" max="9999-12-30"
+                           th:oninvalid="displayDateError()" th:oninput="clearDateError()"
+                           th:classappend="${dateOfBirthError == null ? '' : 'border-danger'}">
+                    <p id="dateOfBirthError" th:if="${dateOfBirthError}" class="text-danger fs-6"
+                       th:text="${dateOfBirthError}"></p>
+                    <p id="dateOfBirthJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="emailAddress" class="form-label">Email Address *</label>
+                    <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
+                           th:value="*{emailAddress}"
+                           th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
+                    <p id="emailError" th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    <p id="emailJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Email must be in the form \'jane@doe.nz\''"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password *</label>
+                    <input id="password" type="password" class="form-control" th:name="password"
+                           th:value="*{password}" th:classappend="${passwordError == null ? '' : 'border-danger'}">
+                    <p th:if="${passwordError}" class="text-danger fs-6" th:text="${passwordError}"></p>
+                    <p id="passwordJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'"></p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="repeatPassword" class="form-label">Repeat Password *</label>
+                    <input id="repeatPassword" type="password" class="form-control" th:name="repeatPassword"
+                           th:value="*{repeatPassword}"
+                           th:classappend="${passwordMatchingError == null ? '' : 'border-danger'}">
+                    <p th:if="${passwordMatchingError}" class="text-danger fs-6" th:text="${passwordMatchingError}">
+                    </p>
+                    <p id="repeatPasswordJSError" class="text-danger fs-6" style="display: none;"
+                       th:text="'Passwords do not match'"></p>
+                </div>
+
+                <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                    <button type="submit" class="btn btn-success">Sign Up</button>
+                    <a th:href="@{/home}">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/preventEnterSubmit.js}"></script>
+<script th:src="@{/js/inputCharacterLimit.js}"></script>
+<script th:src="@{/js/noLastName.js}"></script>
+<script th:src="@{/js/accountFormValidation.js}"></script>
+</body>
+
+</html>

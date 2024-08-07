@@ -3,20 +3,17 @@ package nz.ac.canterbury.seng302.gardenersgrove.integration;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,88 +28,118 @@ import java.util.Locale;
 @SpringBootTest
 @Import(UserService.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class UserServiceTest {
-
-    Logger logger = LoggerFactory.getLogger(UserServiceTest.class);
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-    LocalDate date = LocalDate.parse("01/01/2001", formatter);
+class UserServiceTest {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
     private UserService userService;
 
-    /**
-     * Clear the repository and add a user to the repository. Then login the user
-     */
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+
+    private static String email1 = "johnDoe@email.com";
+    private static String password1 = "1es1P@ssword";
+    private static String fName1 = "John";
+    private static String lName1 = "Doe";
+    private static LocalDate date1 = LocalDate.parse("01/01/2001", formatter);
+
+    private static String email2 = "janeOde@email.com";
+    private static String fName2 = "Jane";
+    private static String lName2 = "Ode";
+    private static LocalDate date2 = LocalDate.parse("01/01/2000", formatter);
+
+    private static int banDuration = 2;
+
     @BeforeEach
-    void ClearRepository_AddUser_LoginUser() {
-        userService = new UserService(passwordEncoder, userRepository);
+    void clearRepository_AddUser_LoginUser() {
         userRepository.deleteAll();
-        userService.addUser(new User("John",
-                "Doe",
-                "johnDoe@email.com",
-                date),
-                "1es1P@ssword");
-        // set up an authenticated user
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("johnDoe@email.com",
-                "1es1P@ssword");
-
-        Authentication authentication = authenticationManager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        User user = new User(fName1, lName1, email1, date1);
+        userService.addUser(user, password1);
     }
 
-    /**
-     * Test that the user is added to the repository
-     */
     @Test
-    public void AddedNewUser_UserInPersistence() {
+    void addedNewUser_UserInPersistence() {
         List<User> allUsers = userRepository.findAll();
-        Assertions.assertEquals(allUsers.get(0).getFirstName(), "John");
-        Assertions.assertEquals(allUsers.get(0).getLastName(), "Doe");
-        Assertions.assertEquals(allUsers.get(0).getEmailAddress(), "johnDoe@email.com");
-        Assertions.assertEquals(allUsers.get(0).getDateOfBirth(), date);
-        Assertions.assertNotEquals(allUsers.get(0).getEncodedPassword(), "1es1P@ssword");
+        assertEquals(1, allUsers.size());
+        User foundUser = allUsers.get(0);
+
+        assertEquals(fName1, foundUser.getFirstName());
+        assertEquals(lName1, foundUser.getLastName());
+        assertEquals(email1, foundUser.getEmailAddress());
+        assertEquals(date1, foundUser.getDateOfBirth());
+        assertNotEquals(password1, foundUser.getEncodedPassword());
     }
 
-    /**
-     * Test that the user is updated in the repository and the number of users in
-     * the repository is the same
-     */
     @Test
-    public void UpdateUserEmailAddress_SameNumberOfUsersInPersistence() {
-        String fName = "John";
-        String lName = "Doe";
-        String email = "john@email.com";
-        long id = userRepository.findByEmailAddressIgnoreCase("johnDoe@email.com")[0].getId();
-        userService.updateUser(id, fName, lName, email, date);
-        Assertions.assertEquals(userRepository.findAll().size(), 1);
+    void updateUserEmailAddress_SameNumberOfUsersInPersistence() {
+        User[] emailUsers = userRepository.findByEmailAddressIgnoreCase(email1);
+        assertEquals(1, emailUsers.length);
+        User user = emailUsers[0];
+        long id = user.getId();
+        userService.updateUser(id, fName1, lName1, email1, date1);
+        assertEquals(1, userRepository.findAll().size());
     }
 
-    /**
-     * Test that the user is updated in the repository and the user's email address
-     * and other values are updated
-     */
     @Test
-    public void UpdateAllUserDetails_AllDetailsUpdatedForUser() {
-        String fName = "Jane";
-        String lName = "Ode";
-        String email = "janeOde@email.com";
-        LocalDate newDate = LocalDate.parse("01/01/2000", formatter);
-        long id = userRepository.findByEmailAddressIgnoreCase("johnDoe@email.com")[0].getId();
-        userService.updateUser(id, fName, lName, email, newDate);
-        List<User> allUsers = userRepository.findAll();
-        Assertions.assertEquals(allUsers.get(0).getFirstName(), "Jane");
-        Assertions.assertEquals(allUsers.get(0).getLastName(), "Ode");
-        Assertions.assertEquals(allUsers.get(0).getEmailAddress(), "janeOde@email.com");
-        Assertions.assertEquals(allUsers.get(0).getDateOfBirth(), newDate);
+    void updateAllUserDetails_AllDetailsUpdatedForUser() {
 
+        User[] emailUsers = userRepository.findByEmailAddressIgnoreCase(email1);
+        assertEquals(1, emailUsers.length);
+        User user = emailUsers[0];
+        long id = user.getId();
+
+        User updatedUser = userService.updateUser(id, fName2, lName2, email2, date2);
+
+        assertEquals(fName2, updatedUser.getFirstName());
+        assertEquals(lName2, updatedUser.getLastName());
+        assertEquals(email2, updatedUser.getEmailAddress());
+        assertEquals(date2, updatedUser.getDateOfBirth());
+    }
+
+    @Test
+    void createUser_UserNotBanned() {
+        User[] emailUsers = userRepository.findByEmailAddressIgnoreCase(email1);
+        assertEquals(1, emailUsers.length);
+        User user = emailUsers[0];
+        assertEquals(email1, user.getEmailAddress());
+        assertFalse(user.isBanned());
+    }
+
+    @Test
+    void createUser_BanThem_UserIsBanned() {
+        User[] emailUsers = userRepository.findByEmailAddressIgnoreCase(email1);
+        assertEquals(1, emailUsers.length);
+        User user = emailUsers[0];
+        assertEquals(email1, user.getEmailAddress());
+        assertFalse(user.isBanned());
+        userService.banUser(user, banDuration);
+        assertTrue(user.isBanned());
+        assertEquals(banDuration, user.daysUntilUnban());
+    }
+
+    @Test
+    void createUser_GiveStrike_UserHasStrike() {
+        User[] emailUsers = userRepository.findByEmailAddressIgnoreCase(email1);
+        assertEquals(1, emailUsers.length);
+        User user = emailUsers[0];
+        assertEquals(0, user.getStrikes());
+        userService.strikeUser(user);
+        assertEquals(1, user.getStrikes());
+    }
+
+    @Test
+    void userHadStrikes_GetsBanned_StrikesCleared() {
+        User[] emailUsers = userRepository.findByEmailAddressIgnoreCase(email1);
+        assertEquals(1, emailUsers.length);
+        User user = emailUsers[0];
+        assertEquals(email1, user.getEmailAddress());
+        assertEquals(0, user.getStrikes());
+        userService.strikeUser(user);
+        assertEquals(1, user.getStrikes());
+        userService.banUser(user, banDuration);
+        assertTrue(user.isBanned());
+        assertEquals(0, user.getStrikes());
     }
 
 }

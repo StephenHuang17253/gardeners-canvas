@@ -8,15 +8,14 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.GardenFormController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
+
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,8 +24,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -35,17 +34,18 @@ import java.util.Optional;
 @SpringBootTest
 public class U10_Acceptance_Testing {
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     private ProfanityService profanityService;
-
-    private InputValidator inputValidator;
 
     @Autowired
     public GardenRepository gardenRepository;
 
     @Autowired
     public UserRepository userRepository;
+
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
     public PasswordEncoder passwordEncoder;
@@ -56,9 +56,8 @@ public class U10_Acceptance_Testing {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
-
 
     public static GardenService gardenService;
 
@@ -70,8 +69,8 @@ public class U10_Acceptance_Testing {
     String gardenCountry;
     String gardenSize;
 
-    String gardenLongitude = "";
-    String gardenLatitude = "";
+    String gardenLongitude = "-43.5214643";
+    String gardenLatitude = "172.5796159";
 
     private Garden expectedGarden;
 
@@ -80,28 +79,28 @@ public class U10_Acceptance_Testing {
     @Before
     public void before_or_after_all() {
         profanityService = Mockito.mock(ProfanityService.class);
-        inputValidator = new InputValidator(userService, profanityService);
 
-        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(false);
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
 
         GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
                 securityService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
     }
 
     @Given("{string} {string}, {int} is a user with email {string} and password {string}")
-    public void iAmAUserWithEmailAndPassword(String firstName, String LastName, Integer age, String userEmail, String userPassword) {
+    public void iAmAUserWithEmailAndPassword(String firstName, String lastName, Integer age, String userEmail,
+            String userPassword) {
         int birthYear = 2024 - age;
         String dob = "01/01/" + birthYear;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
         LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
 
-        User user = new User(firstName, LastName, userEmail, dateOfBirth);
+        User user = new User(firstName, lastName, userEmail, dateOfBirth);
         user.setVerified(true);
         userService.addUser(user, userPassword);
         Assertions.assertNotNull(userService.getUserByEmail(userEmail));
@@ -110,7 +109,7 @@ public class U10_Acceptance_Testing {
     @Given("User {string} has a garden {string} located in {string}, {string}")
     public void iAsUserHaveAGardenLocatedIn(String userEmail, String gardenName, String city, String country) {
         User user = userService.getUserByEmail(userEmail);
-        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, "","", user);
+        Garden garden = new Garden(gardenName, "", "", "", city, "", country, 0.0, false, "", "", user);
         gardenService.addGarden(garden);
         Assertions.assertEquals(garden.getGardenId(),
                 userService.getUserByEmail(userEmail).getGardens().get(0).getGardenId());
@@ -118,23 +117,26 @@ public class U10_Acceptance_Testing {
         this.gardenName = gardenName;
         gardenCity = garden.getGardenCity();
         gardenCountry = garden.getGardenCountry();
-        gardenLongitude = garden.getGardenLongitude();
-        gardenLatitude = garden.getGardenLatitude();
+        gardenLongitude = "-43.5214643";
+        gardenLatitude = "172.5796159";
     }
 
     @When("I click the edit garden button")
     public void iClickTheEditGardenButton() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
-        editGardenResult = MOCK_MVC.perform(
+        editGardenResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .get(gardenUrl)
 
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
     }
 
     @Then("I see the edit garden form where all the details are prepopulated")
-    public void iSeeTheEditGardenFormWhereAllTheDetailsArePrepopulated() {
-        ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
+    public void iSeeTheEditGardenPageWhereAllTheDetailsArePrepopulated() {
+        ModelAndView model = editGardenResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
         Assertions.assertEquals(modelMap.getAttribute("city"), expectedGarden.getGardenCity());
@@ -144,12 +146,14 @@ public class U10_Acceptance_Testing {
     @Given("I am on the garden edit form")
     public void i_am_on_the_garden_edit_form() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
-        editGardenResult = MOCK_MVC.perform(
+        editGardenResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .get(gardenUrl)
 
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-        ModelMap modelMap = editGardenResult.getModelAndView().getModelMap();
+        ModelAndView model = editGardenResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
 
         Assertions.assertEquals(modelMap.getAttribute("gardenName"), expectedGarden.getGardenName());
         Assertions.assertEquals(modelMap.getAttribute("gardenDescription"), expectedGarden.getGardenDescription());
@@ -163,8 +167,9 @@ public class U10_Acceptance_Testing {
     }
 
     @Given("I enter valid garden values for the {string}, {string}, {string}, {string} and {string}")
-    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String description, String city, String country,
-                                                                   String size) {
+    public void i_enter_valid_garden_values_for_the_and_optionally(String name, String description, String city,
+            String country,
+            String size) {
         gardenName = name;
         gardenCity = city;
         gardenCountry = country;
@@ -175,7 +180,7 @@ public class U10_Acceptance_Testing {
     @When("I click the Submit button on the edit garden form")
     public void i_click_the_submit_button_on_the_edit_plant_form() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
-        editGardenResult = MOCK_MVC.perform(
+        editGardenResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", gardenName)

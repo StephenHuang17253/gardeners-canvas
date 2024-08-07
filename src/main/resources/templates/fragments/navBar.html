@@ -1,0 +1,91 @@
+<!--
+Fragment that runs the nav bar, to add the navbar to you page:
+insert into the HTML body at the top:
+"
+<div th:replace="~{fragments/navBar.html :: navBar('linkToHighlight')}" th:with="loggedIn=${loggedIn}"></div>
+"
+Where linkToHighlight is the name of the tab that you want to be highlighted in the navbar while on this page
+The page on which this is used must have the header imported from ./header.html which contains the necessary CSS and JS imports.
+Editing content below will change the nav bar on all pages where it is implemented
+-->
+
+<nav th:fragment="navBar(activeParam)" id="navbar" class="navbar sticky-top navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+
+        <a class="navbar-brand cursor-pointer" onclick="navigateTo('/')">
+            <img th:src="@{/images/gardens_grove_title_logo.svg}" width="300" height="65" alt="Garden">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto">
+
+                <li th:if="${loggedIn == null ? false : loggedIn}" class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'create' ? 'active' : ''}|"
+                        onclick="navigateTo('/create-new-garden')">Create Garden</a>
+                </li>
+
+                <li th:if="${loggedIn == null ? false : loggedIn}" class="nav-item dropdown">
+                    <a th:class="|nav-link cursor-pointer dropdown-toggle ${activeParam == 'gardens' ? 'active' : ''}|"
+                        onclick="navigateTo('/my-gardens')" data-bs-toggle="dropdown" aria-expanded="false">
+                        My Gardens
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item overflow-text"
+                            th:href="@{/my-gardens/{gardenId}(gardenId=${garden.getGardenId})}"
+                            th:each="garden : ${session.userGardens}" th:text="${garden.getGardenName}"></a>
+                    </div>
+                </li>
+
+                <li th:if="${loggedIn == null ? false : loggedIn}" class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'browsePublic' ? 'active' : ''}|"
+                        onclick="navigateTo('/public-gardens')">Browse Gardens</a>
+                </li>
+
+                <li th:if="${loggedIn == null ? false : loggedIn}" class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'manageFriends' ? 'active' : ''}|"
+                        onclick="navigateTo('/manage-friends')">Manage Friends</a>
+                </li>
+
+                <li th:if="${loggedIn == null ? false : loggedIn}" class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'plantWiki' ? 'active' : ''}|"
+                       onclick="navigateTo('/plant-wiki')">Plant Wiki</a>
+                </li>
+
+            </ul>
+
+
+            <ul th:if="${loggedIn == null ? true : !loggedIn}" class="navbar-nav">
+                <li class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'register' ? 'active' : ''}|"
+                        onclick="navigateTo('/register')">Register</a>
+                </li>
+
+                <li class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'login' ? 'active' : ''}|"
+                        onclick="navigateTo('/login')">Login</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav" th:if="${loggedIn == null ? false : loggedIn}">
+                <li class="nav-item">
+                    <a th:class="|nav-link cursor-pointer ${activeParam == 'profile' ? 'active' : ''}|"
+                        onclick="navigateTo('/profile')">Profile</a>
+                </li>
+
+                <li class="nav-item">
+                    <form id="logoutForm" th:action="@{/logout}" method="post">
+                        <a type="submit" class="nav-link cursor-pointer"
+                            onclick="document.getElementById('logoutForm').submit()">Logout</a>
+                    </form>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <script th:src="@{/js/navBar.js}"></script>
+</nav>

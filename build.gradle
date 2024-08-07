@@ -27,7 +27,7 @@ dependencies {
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation "org.mariadb.jdbc:mariadb-java-client:3.0.4"
-
+	implementation 'org.webjars:bootstrap:5.3.3'
 
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -60,6 +60,7 @@ sonar {
 		property "sonar.sourceEncoding", "UTF-8"
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"
+		property "sonar.coverage.jacoco.xmlReportPath", "${buildDir}/jacoco/test-report.xml"
 	}
 }
 
@@ -112,23 +113,7 @@ tasks.register("cucumber", Test) {
 	finalizedBy "cucumberTestReport"
 }
 
-jacocoTestReport { // Generate a report for all generated test data
-	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
-		return !project.hasProperty('skipTestReport')
-	}
 
-	mustRunAfter test, integration, cucumber
-
-	executionData fileTree(project.rootDir) {
-		include '**/*.exec'
-	}
-	reports {
-		xml.required = true
-		xml.destination file("${buildDir}/jacoco/test-report.xml")
-		csv.required = false
-		html.destination file("${buildDir}/jacoco/html")
-	}
-}
 
 tasks.register("unitTestReport", JacocoReport) { // Generate a report for unit tests
 	group = 'verification'
@@ -147,6 +132,8 @@ tasks.register("unitTestReport", JacocoReport) { // Generate a report for unit t
 	reports {
 		// The jacoco coverage report will ge generated in the destination below
 		html.destination file("${buildDir}/reports/coverage/test")
+		xml.required = true
+		xml.destination file("${buildDir}/reports/coverage/test.xml")
 	}
 }
 
@@ -167,6 +154,8 @@ tasks.register("integrationTestReport", JacocoReport) { // Generate a report for
 	reports {
 		// The jacoco coverage report will ge generated in the destination below
 		html.destination file("${buildDir}/reports/coverage/integration")
+		xml.required = true
+		xml.destination file("${buildDir}/reports/coverage/integration.xml")
 	}
 }
 
@@ -187,6 +176,35 @@ tasks.register("cucumberTestReport", JacocoReport) { // Generate a report for cu
 	reports {
 		// The jacoco coverage report will ge generated in the destination below
 		html.destination file("${buildDir}/reports/coverage/cucumber")
+		xml.required = true
+		xml.destination file("${buildDir}/reports/coverage/cucumber.xml")
 	}
+
+
 }
 
+jacocoTestReport { // Generate a report for all generated test data
+	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
+		return !project.hasProperty('skipTestReport')
+	}
+
+	mustRunAfter test, integration, cucumber
+
+	executionData fileTree(project.rootDir) {
+		include '**/*.exec'
+	}
+	reports {
+		xml.required = true
+		xml.destination file("${buildDir}/jacoco/test-report.xml")
+		csv.required = false
+		html.destination file("${buildDir}/jacoco/html")
+	}
+}
+tasks.named("check") {
+	dependsOn test, integration, cucumber
+}
+// Ensure jacocoTestReport is ran after each specific test report.
+// The 'overall' coverage will then include each of the test tasks ran.
+tasks.named("unitTestReport").configure { finalizedBy "jacocoTestReport" }
+tasks.named("integrationTestReport").configure { finalizedBy "jacocoTestReport" }
+tasks.named("cucumberTestReport").configure { finalizedBy "jacocoTestReport" }

@@ -2,14 +2,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
-import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.AccountController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +24,13 @@ import java.util.Locale;
 @SpringBootTest
 public class RegisterANewUser {
 
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public UserRepository userRepository;
+
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
     public PasswordEncoder passwordEncoder;
@@ -47,6 +47,8 @@ public class RegisterANewUser {
 
     public TokenService tokenService;
 
+    @Autowired
+    public SecurityService securityService;
 
     String firstName;
     String lastName;
@@ -57,27 +59,29 @@ public class RegisterANewUser {
     LocalDate dateOfBirth;
 
     @Before
-    public void before_or_after_all() throws MessagingException {
-        userService = new UserService(passwordEncoder, userRepository);
+    public void before_or_after_all() {
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         emailService = Mockito.mock(EmailService.class);
         tokenService = Mockito.mock(TokenService.class);
         gardenService = Mockito.mock(GardenService.class);
 
-        AccountController accountController = new AccountController(userService, authenticationManager, emailService, tokenService,gardenService);
+        AccountController accountController = new AccountController(userService, authenticationManager, emailService,
+                tokenService, gardenService, securityService);
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(accountController).build();
+        mockMVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
     @Given("There exists a user with email {string}")
     public void there_exists_a_user_with_email(String email) {
-        User user = new User("Admin","Test",email,null);
-        userService.addUser(user,"AlphabetSoup10!");
+        User user = new User("Admin", "Test", email, null);
+        userService.addUser(user, "AlphabetSoup10!");
         Assertions.assertNotNull(userService.getUserByEmail(email));
 
     }
 
     @When("I enter valid values for my first name {string} and last name {string}, email address {string}, password {string}, repeat password {string} and optionally date of birth {string}")
-    public void i_enter_valid_values_for_my_first_name_and_last_name_email_address_password_repeat_password_and_date_of_birth(String fname, String lname, String email, String pass, String repeatPass, String dob){
+    public void i_enter_valid_values_for_my_first_name_and_last_name_email_address_password_repeat_password_and_date_of_birth(
+            String fname, String lname, String email, String pass, String repeatPass, String dob) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         dateOfBirth = LocalDate.parse(dob, formatter);
         firstName = fname;
@@ -88,12 +92,12 @@ public class RegisterANewUser {
     }
 
     @When("I click the check box marked \"I have no surname\"")
-    public void i_click_the_check_box_marked_I_have_no_surname(){
+    public void i_click_the_check_box_marked_I_have_no_surname() {
         noLastName = true;
     }
 
     @When("I enter invalid values for my first name {string} and last name {string}")
-    public void i_enter_invalid_values_for_my_first_name_and_last_name(String fname, String lname){
+    public void i_enter_invalid_values_for_my_first_name_and_last_name(String fname, String lname) {
         String dob = "10/10/2001";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         dateOfBirth = LocalDate.parse(dob, formatter);
@@ -105,7 +109,7 @@ public class RegisterANewUser {
     }
 
     @When("I enter invalid value for my email {string}")
-    public void i_enter_invalid_value_for_my_email(String email){
+    public void i_enter_invalid_value_for_my_email(String email) {
         String dob = "10/10/2001";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         dateOfBirth = LocalDate.parse(dob, formatter);
@@ -117,7 +121,7 @@ public class RegisterANewUser {
     }
 
     @When("I enter an invalid value for date of birth {string}")
-    public void i_enter_an_invalid_value_for_date_of_birth(String dob){
+    public void i_enter_an_invalid_value_for_date_of_birth(String dob) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         dateOfBirth = LocalDate.parse(dob, formatter);
         firstName = "James";
@@ -139,20 +143,18 @@ public class RegisterANewUser {
         repeatPassword = repeatPass;
     }
 
-
     @And("I click the \"Sign Up\" button")
     public void i_click_sign_up_button() throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/register")
                         .param("firstName", firstName)
                         .param("lastName", lastName)
                         .param("noLastName", String.valueOf(noLastName))
                         .param("dateOfBirth", String.valueOf(dateOfBirth))
-                        .param("emailAddress",emailAddress)
+                        .param("emailAddress", emailAddress)
                         .param("password", password)
-                        .param("repeatPassword", repeatPassword)
-        );
+                        .param("repeatPassword", repeatPassword));
 
     }
 
@@ -163,7 +165,7 @@ public class RegisterANewUser {
 
     @Then("No account is created")
     public void no_account_is_created() {
-        Assertions.assertNull(userService.getUserByEmailAndPassword(emailAddress,password));
+        Assertions.assertNull(userService.getUserByEmailAndPassword(emailAddress, password));
     }
 
 }

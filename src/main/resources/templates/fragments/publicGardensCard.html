@@ -1,0 +1,53 @@
+<div th:fragment="publicGardensCard(gardenId, gardenName, gardenLocation, gardenSize, gardenDescription, isPublic, plantImage1, plantImage2, plantImage3, numberOfPlants)">
+    <a th:href="@{/public-gardens/{gardenId}(gardenId=${gardenId})}" class="text-decoration-none">
+        <div class="card h-100 bg-success text-white garden-card">
+            <div class="card-body pt-1">
+                <p th:if="${isPublic != null}" class="card-text mb-0">
+                    <small th:if="${isPublic}">Public</small>
+                    <small th:if="${!isPublic}">Private</small>
+                </p>
+                <div class="d-flex w-100" style="max-width: 400px;">
+                    <!-- First larger image -->
+                    <div class="me-2" style="flex: 3; height: 300px;">
+                        <img th:src="@{${plantImage1 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage1}}"
+                             alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                    </div>
+                    <!-- Two smaller images stacked on top of each other -->
+                    <div class="d-flex flex-column" style="flex: 2; height: 300px;">
+                        <div class="small-image overflow-hidden rounded mb-2" style="flex: 1;">
+                            <img th:src="@{${plantImage2 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage2}}"
+                                 alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                        </div>
+                        <div class="small-image overflow-hidden rounded" style="flex: 1;">
+                            <img th:src="@{${plantImage3 == null ? '/images/default_plant.png' : '/files/plants/' + plantImage3}}"
+                                 alt="Plant" class="img-fluid rounded w-100 h-100 object-fit-cover"/>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="card-title mt-1" th:text="${gardenName}">Garden Name</h4>
+                <p class="card-text">
+                    <small th:text="${gardenDescription}"></small>
+                </p>
+                <p class="card-text mb-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.9638 6.96986C11.9638 6.96986 8.88872 7.27638 7.27853 5.93455C5.66835 4.59273 6.03618 2.03015 6.03618 2.03015C6.03618 2.03015 9.11128 1.72362 10.7215 3.06545C12.3317 4.40727 11.9638 6.96986 11.9638 6.96986Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.0362 6.96986C12.0362 6.96986 15.1113 7.27638 16.7215 5.93455C18.3317 4.59273 17.9638 2.03015 17.9638 2.03015C17.9638 2.03015 14.8887 1.72362 13.2785 3.06545C11.6683 4.40727 12.0362 6.96986 12.0362 6.96986Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M5 14H19L17 22H7L5 14Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                    <small th:text="${numberOfPlants}"></small>
+                </p>
+                <p class="card-text mb-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows" viewBox="0 0 16 16">
+                        <path d="M1.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L2.707 7.5h10.586l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L13.293 8.5H2.707l1.147 1.146a.5.5 0 0 1-.708.708z"/>
+                    </svg>
+                    <small th:if="${#strings.equals(gardenSize, 0.0)}"> not specified</small>
+                    <small th:if="${not #strings.equals(gardenSize, 0.0)}" th:utext="${gardenSize} + ' m&sup2;'"></small>
+                </p>
+                <p class="card-text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+                        <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
+                        <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                    </svg>
+                    <small><span th:text="${gardenLocation}"></span></small>
+                </p>
+            </div>
+        </div>
+    </a>
+</div>

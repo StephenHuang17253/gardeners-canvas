@@ -5,6 +5,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Entity class of a Garden, reflecting an entry of garden name, location and
@@ -55,7 +56,6 @@ public class Garden {
     @CreatedDate
     private LocalDateTime creationDate;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -67,10 +67,23 @@ public class Garden {
     @Column(nullable = false)
     private boolean isPublic;
 
+    @Column(name = "needs_watering")
+    private Boolean needsWatering;
+
+    @Column(name = "last_water_check")
+    @CreatedDate
+    private LocalDateTime lastWaterCheck;
+
+    @Column(name = "last_location_update")
+    @CreatedDate
+    private LocalDateTime lastLocationUpdate;
+
     /**
      * JPA required no-args constructor
      */
-    public Garden() {}
+    public Garden() {
+    }
+
     /**
      * Creates a new Garden object.
      * 
@@ -84,8 +97,10 @@ public class Garden {
      * @param isPublic       the visibility of the garden
      * @param owner          the User object that owns the garden
      */
-    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb, String gardenCity,
-            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude, User owner) {
+    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb,
+            String gardenCity,
+            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude,
+            String gardenLongitude, User owner) {
         this.gardenName = gardenName;
         this.gardenDescription = gardenDescription;
         this.gardenAddress = gardenAddress;
@@ -99,6 +114,8 @@ public class Garden {
         this.isPublic = isPublic;
         this.owner = owner;
         this.creationDate = LocalDateTime.now();
+        this.lastLocationUpdate = LocalDateTime.now();
+        this.needsWatering = false;
     }
 
     /**
@@ -113,8 +130,10 @@ public class Garden {
      * @param gardenSize     the size of the garden
      * @param isPublic       the visibility of the garden
      */
-    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb, String gardenCity,
-                  String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude, String gardenLongitude) {
+    public Garden(String gardenName, String gardenDescription, String gardenAddress, String gardenSuburb,
+            String gardenCity,
+            String gardenPostcode, String gardenCountry, Double gardenSize, Boolean isPublic, String gardenLatitude,
+            String gardenLongitude) {
         this.gardenName = gardenName;
         this.gardenDescription = gardenDescription;
         this.gardenAddress = gardenAddress;
@@ -127,8 +146,9 @@ public class Garden {
         this.gardenLongitude = gardenLongitude;
         this.isPublic = isPublic;
         this.owner = owner;
+        this.needsWatering = false;
+        this.lastLocationUpdate = LocalDateTime.now();
     }
-
 
     public Long getGardenId() {
         return gardenId;
@@ -197,14 +217,26 @@ public class Garden {
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
+
     public void setGardenSize(double gardenSize) {
         this.gardenSize = gardenSize;
     }
 
-    public String getGardenLongitude() { return gardenLongitude;}
-    public void setGardenLongitude(String gardenLongitude) {this.gardenLongitude = gardenLongitude;}
-    public String getGardenLatitude() { return gardenLatitude;}
-    public void setGardenLatitude(String gardenLatitude) {this.gardenLatitude = gardenLatitude;}
+    public String getGardenLongitude() {
+        return gardenLongitude;
+    }
+
+    public void setGardenLongitude(String gardenLongitude) {
+        this.gardenLongitude = gardenLongitude;
+    }
+
+    public String getGardenLatitude() {
+        return gardenLatitude;
+    }
+
+    public void setGardenLatitude(String gardenLatitude) {
+        this.gardenLatitude = gardenLatitude;
+    }
 
     public User getOwner() {
         return owner;
@@ -220,6 +252,59 @@ public class Garden {
 
     public void setIsPublic(boolean isPublic) {
         this.isPublic = isPublic;
+    }
+
+    /**
+     * Sets boolean value for if a garden needs watering and sets the date at which that garden was last checked for watering
+     *
+     * @param needsWatering boolean value for if a garden needs watering
+     */
+    public void setNeedsWatering(boolean needsWatering) {
+        this.needsWatering = needsWatering;
+        this.lastWaterCheck = LocalDateTime.now();
+
+    }
+
+    /**
+     * Overloaded method where you can manually set lastwatercheck for testing purposes
+     * Sets boolean value for if a garden needs watering and sets the date at which that garden was last checked for watering
+     *
+     * @param needsWatering boolean value for if a garden needs watering
+     * @param lastWaterCheck date manually set for when the watering need was last checked
+     */
+    public void setNeedsWatering(boolean needsWatering, LocalDateTime lastWaterCheck) {
+        this.needsWatering = needsWatering;
+        this.lastWaterCheck = lastWaterCheck;
+    }
+
+    public LocalDateTime getLastLocationUpdate() {
+        return lastLocationUpdate;
+    }
+
+    /**
+     * Sets the date at which the location was last changed for a garden
+     *
+     * @param lastLocationUpdate date for when the location was changed
+     */
+    public void setLastLocationUpdate(LocalDateTime lastLocationUpdate) {
+        this.lastLocationUpdate = lastLocationUpdate;
+    }
+
+    public void updateLocation(String gardenLatitude, String gardenLongitude) {
+        this.gardenLatitude = gardenLatitude;
+        this.gardenLongitude = gardenLongitude;
+        this.lastLocationUpdate = LocalDateTime.now();
+    }
+
+    public boolean getNeedsWatering() {
+        if(Objects.isNull(needsWatering)){
+            return false;
+        }
+        return needsWatering;
+    }
+
+    public LocalDateTime getLastWaterCheck() {
+        return lastWaterCheck;
     }
 
     /**

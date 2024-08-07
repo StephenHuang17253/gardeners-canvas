@@ -1,20 +1,15 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
-<head>
-  <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-  <style>
-    table td{
-      vertical-align:top;
-      border:solid 1px #888;
-      padding:10px;
-    }
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
-  </style>
-</head>
+<head th:replace="~{fragments/header.html}"></head>
+
 <body>
-<div class = "main-container">
-<h1>404 Object Not Found</h1>
-
-</div>
+  <div class="text-center">
+    <h1 class="my-3">404 Object Not Found</h1>
+    <p
+      th:text="${message == null ? 'Oops! You''ve wandered into the weeds. Let''s get you back to the garden.' : message}">
+    </p>
+  </div>
 </body>
+
+</html>

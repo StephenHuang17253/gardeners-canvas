@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,10 +13,7 @@ import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -29,19 +28,28 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 
-
 @SpringBootTest
 public class U9_ViewGarden {
-    public static MockMvc MOCK_MVC;
+    public static MockMvc mockMVC;
 
     @Autowired
     public GardenRepository gardenRepository;
+
+    @Autowired
+    public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public ProfanityService profanityService;
+
+    @Autowired
+    public GardenTagRelationRepository gardenTagRelationRepository;
 
     @Autowired
     public FriendshipRepository friendshipRepository;
@@ -50,20 +58,32 @@ public class U9_ViewGarden {
     public UserRepository userRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public PasswordEncoder passwordEncoder;
 
     @Autowired
     public AuthenticationManager authenticationManager;
 
+    @Autowired
+    public UserInteractionService userInteractionService;
+
+    @Autowired
+    public ObjectMapper objectMapper;
+
     public SecurityService securityService;
 
+    @Autowired
+    private GardenTagService gardenTagService;
+
+    @Autowired
+    private EmailService emailService;
     private static GardenService gardenService;
 
     private static UserService userService;
 
     private static PlantService plantService;
-
-    private static FileService fileService;
 
     private static FriendshipService friendshipService;
 
@@ -77,18 +97,17 @@ public class U9_ViewGarden {
     @Before
     public void before_or_after_all() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService, emailService);
 
-        GardensController gardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(gardensController).build();
-        securityService = new SecurityService(userService, authenticationManager, friendshipService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService, emailService);
         weatherService = Mockito.mock(WeatherService.class);
 
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
-        MOCK_MVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
+                weatherService,objectMapper,gardenTagService, profanityService, userService);
+        mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse ="{\n" +
                 "  \"latitude\": -43.5,\n" +
@@ -139,7 +158,6 @@ public class U9_ViewGarden {
                 "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
                 "  }\n" +
                 "}\n";
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonObject = objectMapper.readTree(mockResponse);
         WeatherResponseData weatherData = new WeatherResponseData(jsonObject);
 
@@ -152,7 +170,7 @@ public class U9_ViewGarden {
         User user = userService.getUserByEmail(userEmail);
 
         String gardenId = String.valueOf(user.getGardens().get(0).getGardenId());
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 get("/my-gardens/{gardenId}", gardenId)).andExpect(MockMvcResultMatchers.status().isOk());
 
     }
@@ -161,7 +179,7 @@ public class U9_ViewGarden {
     @When("I try to visit user {string}'s garden, {string}")
     public void iTryToVisitGarden(String userEmail, String gardenName) throws Exception {
         User user = userService.getUserByEmail(userEmail);
-        resultActions = MOCK_MVC.perform(
+        resultActions = mockMVC.perform(
                 get("/my-gardens/{gardenId}", user.getGardens().get(0).getGardenId()));
     }
 
@@ -176,11 +194,15 @@ public class U9_ViewGarden {
     }
 
     @And("The garden's name {string} and location {string}, {string} are visible")
-    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry)
-            throws Exception {
-        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-        Assertions.assertEquals(modelMap.getAttribute("gardenName"), gardenName);
-        Assertions.assertEquals(modelMap.getAttribute("gardenLocation"), gardenCity + ", " + gardenCountry);
+    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
+        ModelAndView model = mvcResult.getModelAndView();
+        Assertions.assertNotNull(model);
+        ModelMap modelMap = model.getModelMap();
+        GardenDetailModel garden = (GardenDetailModel) modelMap.getAttribute("garden");
+
+        Assertions.assertNotNull(garden);
+        Assertions.assertEquals(gardenName, garden.getGardenName());
+        Assertions.assertEquals(gardenCity + ", " + gardenCountry, garden.getGardenLocation());
 
     }
 }

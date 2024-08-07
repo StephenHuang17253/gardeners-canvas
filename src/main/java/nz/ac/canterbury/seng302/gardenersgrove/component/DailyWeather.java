@@ -45,7 +45,7 @@ public class DailyWeather {
         if (date == null) {
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d");
         return date.format(formatter);
     }
 
@@ -60,7 +60,7 @@ public class DailyWeather {
         return (description == null) ? null : description;
     }
     public String getMinTemp() {
-        return (minTemp == null) ? null : minTemp.toString();
+        return (minTemp == null) ? null : String.valueOf(Math.round(minTemp));
     }
 
     public void setMinTemp(Double minTemp) {
@@ -68,7 +68,7 @@ public class DailyWeather {
     }
 
     public String getMaxTemp() {
-        return (maxTemp == null) ? null : maxTemp.toString();
+        return (maxTemp == null) ? null : String.valueOf(Math.round(maxTemp));
     }
 
     public void setMaxTemp(Double maxTemp) {
@@ -76,7 +76,7 @@ public class DailyWeather {
     }
 
     public String getTemp() {
-        return (currentTemp == null) ? null : currentTemp.toString();
+        return (currentTemp == null) ? null : String.valueOf(Math.round(currentTemp));
     }
 
     public void setCurrentTemp(Double currentTemp) {
@@ -105,5 +105,13 @@ public class DailyWeather {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public void setWeatherIcon(String urlToWeatherIcon) {
+        this.urlToWeatherIcon = urlToWeatherIcon;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

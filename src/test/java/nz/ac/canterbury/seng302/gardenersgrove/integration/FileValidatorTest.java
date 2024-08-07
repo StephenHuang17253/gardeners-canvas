@@ -12,7 +12,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileTyp
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 
-public class FileValidatorTest {
+class FileValidatorTest {
 
     private static MultipartFile validNameFile;
     private static MultipartFile invalidNameFile;
@@ -23,7 +23,7 @@ public class FileValidatorTest {
 
     @BeforeAll
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-    public static void setUp() {
+    static void setUp() {
 
         String validFilename = "client_filename.png";
         String invalidFilename = "filename.txt";
@@ -44,22 +44,24 @@ public class FileValidatorTest {
     }
 
     @Test
-    public void validNameFile_return_OK() {
+    void validNameFile_return_OK() {
         assertEquals(ValidationResult.OK, FileValidator.validateImage(validNameFile, maxSize, fileType));
     }
 
     @Test
-    public void invalidNameFile_return_INVALID_FILE_TYPE() {
-        assertEquals(ValidationResult.INVALID_FILE_TYPE, FileValidator.validateImage(invalidNameFile, maxSize, fileType));
+    void invalidNameFile_return_INVALID_FILE_TYPE() {
+        assertEquals(ValidationResult.INVALID_FILE_TYPE,
+                FileValidator.validateImage(invalidNameFile, maxSize, fileType));
     }
 
     @Test
-    public void validDataFile_return_OK() {
+    void validDataFile_return_OK() {
         assertEquals(ValidationResult.OK, FileValidator.validateImage(validSizeFile, maxSize, fileType));
     }
 
     @Test
-    public void invalidDataFile_return_INVALID_FILE_SIZE() {
-        assertEquals(ValidationResult.INVALID_FILE_SIZE, FileValidator.validateImage(invalidSizeFile, maxSize, fileType));
+    void invalidDataFile_return_INVALID_FILE_SIZE() {
+        assertEquals(ValidationResult.INVALID_FILE_SIZE,
+                FileValidator.validateImage(invalidSizeFile, maxSize, fileType));
     }
 }

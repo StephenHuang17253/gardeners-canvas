@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,69 +33,89 @@ import java.util.Objects;
  */
 @Controller
 public class ResetPasswordController {
+
     private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
+    
     private final UserService userService;
-    private EmailService emailService;
-    private TokenService tokenService;
+    private final EmailService emailService;
+    private final TokenService tokenService;
+    private final SecurityService securityService;
 
     @Autowired
-    public ResetPasswordController(UserService userService, TokenService tokenService, EmailService emailService) {
+    public ResetPasswordController(UserService userService, TokenService tokenService, EmailService emailService, SecurityService securityService) {
         this.userService = userService;
         this.emailService = emailService;
         this.tokenService = tokenService;
+        this.securityService = securityService;
     }
 
+
+    /**
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
+     */
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
+    }
+
+  
     /**
      * Get form for entering email if user has forgotten their password
-     * @return lostPasswordForm
+     *
+     * @return lostPasswordPage
      */
     @GetMapping("/lost-password")
-    public String lostPassword(@RequestParam(name = "email", defaultValue = "") String emailAddress,
+    public String lostPassword(@RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
                                Model model) {
         logger.info("GET /lost-password");
-        model.addAttribute("email", emailAddress);
-        return "lostPasswordForm";
+        model.addAttribute("emailAddress", emailAddress);
+        return "lostPasswordPage";
     }
 
     /**
      * Post form for entering email if user has forgotten their password
      * Checks if input values are valid and then sends reset password link to email entered
-     * @param email input email to send reset password link to
-     * @param model to collect field values and error messages
-     * @return lostPasswordForm
+     *
+     * @param emailAddress input email to send reset password link to
+     * @param model        to collect field values and error messages
+     * @return lostPasswordPage
      */
     @PostMapping("/lost-password")
-    public String emailChecker(@RequestParam("email") String email,
+    public String emailChecker(@RequestParam("emailAddress") String emailAddress,
                                Model model) {
 
         logger.info("POST /lost-password");
-        boolean isRegistered = userService.emailInUse(email);
-        ValidationResult emailValidation = InputValidator.validateEmail(email);
-        model.addAttribute("email", email);
-        if (!emailValidation.valid()){
+        boolean isRegistered = userService.emailInUse(emailAddress);
+        ValidationResult emailValidation = InputValidator.validateEmail(emailAddress);
+        model.addAttribute("emailAddress", emailAddress);
+        if (!emailValidation.valid()) {
             model.addAttribute("emailError", emailValidation);
-        } else  {
+        } else {
             model.addAttribute("message", "An email was sent to the address if it was recognised");
+            model.addAttribute("goodMessage", true);
             if (isRegistered) {
-                User currentUser = userService.getUserByEmail(email);
+                User currentUser = userService.getUserByEmail(emailAddress);
                 Token token = new Token(currentUser, null);
                 tokenService.addToken(token);
                 model.addAttribute("emailSent", "An email was delivered");
                 try {
                     emailService.sendResetPasswordEmail(token);
                 } catch (MessagingException e) {
-                    logger.info("could not send email to " + email);
+                    logger.info("could not send email to {}", emailAddress);
                 }
             }
         }
-        return "lostPasswordForm";
+        return "lostPasswordPage";
     }
 
 
     /**
      * Get form for entering in new passwords (for resetting passwords)
      * Checks token in url is valid
-     * @param resetToken unique temp token for resetting password
+     *
+     * @param resetToken         unique temp token for resetting password
      * @param redirectAttributes to add message before redirecting to different page
      * @return form for resetting password
      */
@@ -102,17 +124,17 @@ public class ResetPasswordController {
                                 RedirectAttributes redirectAttributes) {
         logger.info("GET /reset-password");
 
-
         Token token = tokenService.getTokenByTokenString(resetToken);
         if (token == null || token.isExpired()) {
             if (token != null) {
                 tokenService.deleteToken(token);
             }
             redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
             return "redirect:/login";
         }
 
-        return "resetPasswordForm";
+        return "resetPasswordPage";
     }
 
     /**
@@ -120,20 +142,30 @@ public class ResetPasswordController {
      * Checks if input values are valid and then resets the password
      * Sends confirmation email to user
      * Also deletes the token to ensure it cannot be reused
-     * @param resetToken token to identify user whose password has to be reset
-     * @param password new password
+     *
+     * @param resetToken     token to identify user whose password has to be reset
+     * @param password       new password
      * @param retypePassword new password
-     * @param model to collect field values and error messages
-     * @return resetPasswordForm or loginPage if reset password is successful
+     * @param model          to collect field values and error messages
+     * @return resetPasswordPage or loginPage if reset password is successful
      */
     @PostMapping("/reset-password/{token}")
     public String passwordChecker(@PathVariable("token") String resetToken,
                                   @RequestParam("password") String password,
                                   @RequestParam("retypePassword") String retypePassword,
-                                  Model model) {
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
         logger.info("POST /reset-password");
 
         Token token = tokenService.getTokenByTokenString(resetToken);
+        if (token == null || token.isExpired()) {
+            if (token != null) {
+                tokenService.deleteToken(token);
+            }
+            redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
+            redirectAttributes.addFlashAttribute("goodMessage", false);
+            return "redirect:/login";
+        }
         User user = token.getUser();
         String emailAddress = user.getEmailAddress();
         String firstName = user.getFirstName();
@@ -146,10 +178,10 @@ public class ResetPasswordController {
 
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
-        if (noLastName == false) {
+        if (!noLastName) {
             otherFields.add(lastName);
         }
-        if (!(dateOfBirth == null)) {
+        if (dateOfBirth != null) {
             otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(emailAddress);
@@ -157,10 +189,10 @@ public class ResetPasswordController {
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
-            return "resetPasswordForm";
+            return "resetPasswordPage";
         } else if (!Objects.equals(password, retypePassword)) {
             model.addAttribute("passwordError", "The passwords do not match");
-            return "resetPasswordForm";
+            return "resetPasswordPage";
         } else {
             User currentUser = token.getUser();
             userService.updatePassword(currentUser.getId(), password);
@@ -170,7 +202,6 @@ public class ResetPasswordController {
             } catch (MessagingException e) {
                 logger.error("Password reset confirmation email not sent");
             }
-
         }
         return "redirect:/login";
     }

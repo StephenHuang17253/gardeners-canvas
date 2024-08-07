@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,5 +49,24 @@ public class LocationService {
         logger.info("Location API request, query = '" + query + "'");
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
+    }
+
+    public JsonNode getLatitudeLongitude(String query) throws IOException, InterruptedException {
+        String encodedQuery = URLEncoder.encode(query, "UTF-8");
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://us1.locationiq.com/v1/search?key=" + locationIqAccessToken + "&q=" + encodedQuery + "&format=json"
+
+                ))
+                .header("accept", "application/json")
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        logger.info("Location API forward geocoding request, query = '" + query + "'");
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return objectMapper.readTree(response.body());
     }
 }

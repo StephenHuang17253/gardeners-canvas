@@ -1,0 +1,10 @@
+<div th:fragment="tagBox(tagName, badgeColour, isRemovable)">
+    <span class="badge rounded-pill p-2"
+          th:classappend="${badgeColour} + (${isRemovable} ? ' cursor-pointer' : '')"
+          th:text="${tagName}"
+          th:data-tag-name="${tagName}"
+          th:onclick="${isRemovable} ? 'removeTag(this)' : null"
+          th:onmouseover="${isRemovable} ? 'this.classList.replace(\'text-bg-success\', \'text-bg-danger\');' : null"
+          th:onmouseout="${isRemovable} ? 'this.classList.replace(\'text-bg-danger\', \'text-bg-success\');' : null">
+    </span>
+</div>

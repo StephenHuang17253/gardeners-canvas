@@ -1,13 +1,13 @@
 package nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PriorityType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -155,6 +155,30 @@ public class InputValidator {
     }
 
     /**
+     * This function is called by methods which require checking a input length
+     * containing emojis
+     *
+     * @param length - int, the character limit
+     * @return the calling object
+     */
+    private InputValidator lengthHelperWithEmojis(int length) {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        String cleanedValue = testedValue.replaceAll("\\s+", "");
+        if (cleanedValue.codePointCount(0, cleanedValue.length()) > length) {
+            this.validationResult = ValidationResult.LENGTH_OVER_LIMIT;
+            validationResult.updateMessage("must be less than or equal to  " + length + " characters");
+            this.passState = false;
+            return this;
+        }
+        this.validationResult = ValidationResult.OK;
+        return this;
+    }
+
+    /**
      * Checks input against a criteria:
      * This function only allows non blank strings containing only alphanumeric
      * characters and select punctuation
@@ -225,20 +249,31 @@ public class InputValidator {
     public static ValidationResult validateGardenAreaInput(String text) {
         return new InputValidator(text)
                 .numberCommaSingleHelper()
-                .areaHelper(8000000.0, 0.01)
+                .gardenAreaHelper(8000000.0, 0.01)
                 .getResult();
     }
 
+    /**
+     * Checks input against a criteria: This function only allows numbers, letters, hyphens, commas, dots, slashes and spaces.
+     * @param text - text to validate
+     * @return ValidationResult enum state (Enum explains pass/fail, and why)
+     */
+    public static ValidationResult validateAddressInput(String text) {
+        return new InputValidator(text)
+                .gardenLocationHelper()
+                .lengthHelper(200)
+                .getResult();
+    }
+
+    /**
+     * Checks input against a criteria: This function only allows numbers, letters, hyphens and spaces.
+     * @param text - text to validate
+     * @return ValidationResult enum state (Enum explains pass/fail, and why)
+     */
     public static ValidationResult validatePostcodeInput(String text) {
         return new InputValidator(text)
                 .postcodeHelper()
-                .getResult();
-    }
-
-    public static ValidationResult numberCommaSingleTextField(String text, int length) {
-        return new InputValidator(text)
-                .numberCommaSingleHelper()
-                .lengthHelper(length)
+                .lengthHelper(10)
                 .getResult();
     }
 
@@ -266,7 +301,7 @@ public class InputValidator {
      */
     public static ValidationResult validateDescription(String text) {
         ValidationResult result = new InputValidator(text)
-                .lengthHelper(512)
+                .lengthHelperWithEmojis(512)
                 .NotOnlyNumOrSpecChar()
                 .getResult();
 
@@ -369,15 +404,19 @@ public class InputValidator {
     }
 
     /**
-     * Checks if the given plantCount is a valid integer between 1 and 1,000,000
+     * Checks if the given plantCount is a valid integer between 1 and 1,000,000 or
+     * if empty string
      *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
-        ValidationResult result = new InputValidator(plantCount)
-                .validIntegerHelper()
+        if (plantCount.equals("")) {
+            return ValidationResult.OK;
+        }
+        ValidationResult result = new InputValidator(String.valueOf(plantCount))
+                .validWholeNumberHelper()
                 .maxNumberHelper(1000000)
                 .minNumberHelper(1)
                 .getResult();
@@ -385,6 +424,60 @@ public class InputValidator {
             result = ValidationResult.INVALID_PLANT_COUNT;
         }
         return result;
+    }
+
+
+    /**
+     * Validate a new garden tag
+     * 25 characters or less and alpha numeric or _ - ' " and space
+     * @param tag tag string to validate
+     * @return ValidationResult with this.isValid() returning true if valid, false
+     *   otherwise and this.getErrorMessage() returning the error message
+     */
+    public static ValidationResult validateTag(String tag) {
+        ValidationResult result = new InputValidator(tag)
+                .lengthHelperWithEmojis(25).getResult();
+        if (!result.valid()) {
+            result.updateMessage("A tag cannot exceed 25 characters");
+            return result;
+        }
+        if (!tag.matches("^[a-zA-Z0-9\\s\\-'\"_]*$")) {
+            result = ValidationResult.NON_ALPHA_PLUS;
+            result.updateMessage("The tag name must only contain alphanumeric characters, spaces, -, _, ', or \"");
+            return result;
+        }
+        return result;
+    }
+
+
+
+    /**
+     * Checks if a string represents a valid float that is also a whole number
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator validWholeNumberHelper() {
+        if (!this.passState) {
+            return this;
+        }
+
+        try {
+            float floatValue = Float.parseFloat(testedValue.replace(",", "."));
+            if (floatValue % 1 != 0) { // Checks if float isn't a whole number (i.e. its not an integer)
+                this.validationResult = ValidationResult.INVALID_PLANT_COUNT;
+                this.passState = false;
+                return this;
+            }
+        } catch (NumberFormatException e) {
+            this.validationResult = ValidationResult.INVALID;
+            this.passState = false;
+            return this;
+        }
+
+        this.validationResult = ValidationResult.OK;
+        return this;
     }
 
     /**
@@ -402,30 +495,6 @@ public class InputValidator {
 
         if (testedValue.isBlank()) {
             this.validationResult = ValidationResult.BLANK;
-            this.passState = false;
-            return this;
-        }
-        this.validationResult = ValidationResult.OK;
-        return this;
-    }
-
-    /**
-     * Checks if a string is a valid integer
-     * updates local variables with results
-     * ignored if string failed any previous validation
-     *
-     * @return the calling object
-     */
-    private InputValidator validIntegerHelper() {
-        // if this validators input has already failed once, this test wont be run
-        if (!this.passState) {
-            return this;
-        }
-
-        try {
-            Integer.parseInt(testedValue);
-        } catch (NumberFormatException error) {
-            this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
         }
@@ -673,19 +742,27 @@ public class InputValidator {
     }
 
     private InputValidator plantAgeHelper() {
-        // if this validators input has already failed once, this test wont be run
+        // if this validator's input has already failed once, this test won't be run
         if (!this.passState) {
             return this;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
         LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
 
+        LocalDate oneYearFromNow = LocalDate.now().plusYears(1);
+
+        if (inputtedDate.isAfter(oneYearFromNow)) {
+            this.validationResult = ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE;
+            this.passState = false;
+            return this;
+        }
+
         long yearsDifference = ChronoUnit.YEARS.between(
                 inputtedDate,
                 LocalDate.now());
 
-        if (yearsDifference > 120) {
-            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_120;
+        if (yearsDifference > 400 || testedValue == null) {
+            this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
         }
@@ -742,6 +819,53 @@ public class InputValidator {
     }
 
     /**
+     * Checks if a string contains any non ( alphanumeric plus allowed punctuation)
+     * characters
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator gardenLocationHelper() {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        boolean stringPasses = true;
+        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-", "/" };
+        // checks if all letters in this string are alpha numeric, if a letter fails it
+        // checks it against
+        // the allowed punctuation list, if that fails the string is marked as invalid
+        for (Character letter : testedValue.toCharArray()) {
+            if (!Character.isLetterOrDigit(letter)) {
+
+                for (String punctuation : allowedPunctuation) {
+                    stringPasses = false;
+                    if (punctuation.equals(letter.toString())) {
+                        stringPasses = true;
+                        break;
+                    }
+                }
+                if (!stringPasses) {
+                    break;
+                }
+            }
+        }
+
+        // sets this items result to ok if string passes and to "Non alpha plus" if it
+        // fails
+        if (stringPasses) {
+            this.validationResult = ValidationResult.OK;
+        } else {
+            this.validationResult = ValidationResult.INVALID_STREET;
+            this.passState = false;
+        }
+        return this;
+
+    }
+
+    /**
      * Checks if a string contains only numbers and up to 1 comma character
      * updates local variables with results
      * ignored if string failed any previous validation
@@ -753,6 +877,14 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
+
+        // checks if number is a negative number
+        if (!testedValue.isBlank() && testedValue.strip().charAt(0) == '-') {
+            validationResult = ValidationResult.NON_NUMERIC_COMMA;
+            passState = false;
+            return this;
+        }
+
         boolean stringPasses = true;
         int allowedCommaNumber = 1; // allowed number of commas or full stops
 
@@ -763,18 +895,22 @@ public class InputValidator {
                     continue;
                 }
 
+                if (letter.equals("-".toCharArray()[0])) {
+                    try {
+                        Double.parseDouble(testedValue.replace(',', '.'));
+                    } catch (Exception e) {
+                        validationResult = ValidationResult.NON_NUMERIC_COMMA;
+                        passState = false;
+                        return this;
+                    }
+                    continue;
+                }
+
                 stringPasses = false;
                 if ((letter.toString().equals(",") || letter.toString().equals(".")) && allowedCommaNumber > 0) {
                     stringPasses = true;
                     allowedCommaNumber -= 1;
                 }
-            }
-
-            if (letter.equals("-".toCharArray()[0])) {
-                validationResult = ValidationResult.NON_NUMERIC_COMMA;
-                passState = false;
-                return this;
-
             }
 
         }
@@ -812,7 +948,7 @@ public class InputValidator {
      * @param minArea min area of garden
      * @return the calling object
      */
-    private InputValidator areaHelper(Double maxArea, Double minArea) {
+    private InputValidator gardenAreaHelper(Double maxArea, Double minArea) {
         // if this validators input has already failed once, this test wont be run
         if (!this.passState) {
             return this;
@@ -845,7 +981,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[a-zA-Z0-9 ]*$")) {
+        if (!testedValue.matches("^[a-zA-Z0-9- ]*$")) {
             this.validationResult = ValidationResult.INVALID_POSTCODE;
             this.passState = false;
             return this;
@@ -859,9 +995,9 @@ public class InputValidator {
             return this;
         }
 
-        String filteredValue = testedValue.replace(" ", "");
+        String filteredValue = testedValue.replaceAll("\\s+", "");
 
-        if (!filteredValue.equals("") && filteredValue.matches("^[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$")) {
+        if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
@@ -882,7 +1018,7 @@ public class InputValidator {
         if (!this.passState) {
             return this;
         }
-        boolean containsProfanity = profanityService.containsProfanity(testedValue);
+        boolean containsProfanity = profanityService.containsProfanity(testedValue, PriorityType.NORMAL);
 
         if (containsProfanity) {
             this.validationResult = ValidationResult.DESCRIPTION_CONTAINS_PROFANITY;
@@ -903,11 +1039,19 @@ public class InputValidator {
      * @return the calling object
      */
     private InputValidator minNumberHelper(int minValue) {
+
         if (!this.passState) {
             return this;
         }
 
-        if (Integer.parseInt(testedValue) < minValue) {
+        try {
+            int snippedTestValue = (int) Double.parseDouble(testedValue.replace(",", "."));
+            if (snippedTestValue < minValue) {
+                this.validationResult = ValidationResult.INVALID;
+                this.passState = false;
+                return this;
+            }
+        } catch (Exception e) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
@@ -926,11 +1070,18 @@ public class InputValidator {
      * @return the calling object
      */
     private InputValidator maxNumberHelper(int maxValue) {
+
         if (!this.passState) {
             return this;
         }
-
-        if (Integer.parseInt(testedValue) > maxValue) {
+        try {
+            int snippedTestValue = (int) Double.parseDouble(testedValue.replace(",", "."));
+            if (snippedTestValue > maxValue) {
+                this.validationResult = ValidationResult.INVALID;
+                this.passState = false;
+                return this;
+            }
+        } catch (Exception e) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;

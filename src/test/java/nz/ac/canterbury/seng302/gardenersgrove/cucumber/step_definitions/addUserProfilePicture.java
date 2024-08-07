@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -10,42 +9,28 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 @SpringBootTest
 public class addUserProfilePicture {
 
-
-    Logger logger = LoggerFactory.getLogger(EditAUser.class);
-    public MockMvc MOCK_MVC;
+    public MockMvc mockMVC;
 
     @Autowired
     public UserRepository userRepository;
@@ -62,6 +47,8 @@ public class addUserProfilePicture {
     public EmailService emailService;
     public FileService fileService;
     public UserService userService;
+    @Autowired
+    public SecurityService securityService;
 
     String firstName = "John";
     String lastName = "Doe";
@@ -70,12 +57,6 @@ public class addUserProfilePicture {
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
 
     private static MockMultipartFile mockImage;
-
-
-    @Before
-    public void before_or_after_all() throws IOException {
-
-    }
 
     @Given("I am logged in and on the profile page")
     public void i_am_logged_in_and_on_the_profile_page() throws IOException {
@@ -96,10 +77,10 @@ public class addUserProfilePicture {
 
 
         ProfileController profileController = new ProfileController(authenticationManager,userService,
-                fileService, emailService);
+                fileService, emailService, securityService);
 
         // Allows us to bypass spring security
-        MOCK_MVC = MockMvcBuilders
+        mockMVC = MockMvcBuilders
                 .standaloneSetup(profileController)
                 .build();
     }
@@ -114,7 +95,7 @@ public class addUserProfilePicture {
     @WithMockUser(username="johndoe.test@email.com")
     @When("I submit my profile picture")
     public void i_submit_my_profile_picture() throws Exception {
-        MOCK_MVC.perform(
+        mockMVC.perform(
                 MockMvcRequestBuilders
                         .multipart("/profile").file(mockImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)

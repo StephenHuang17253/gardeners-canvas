@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -10,15 +11,16 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.GardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRelationRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTagRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputValidator;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,15 +37,24 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @SpringBootTest
 public class PubliciseGarden {
 
-    public static MockMvc MOCK_MVC_MY_GARDEN;
+    public static MockMvc mockMVCMyGarden;
 
-    public static MockMvc MOCK_MVC_GARDEN_FORM;
+    public static MockMvc mockMVCGardenForm;
 
     @Autowired
     public GardenRepository gardenRepository;
 
     @Autowired
+    public GardenTagRepository gardenTagRepository;
+
+    @Autowired
+    public GardenTagRelationRepository gardenTagRelationRepository;
+
+    @Autowired
     public UserRepository userRepository;
+
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
     public PasswordEncoder passwordEncoder;
@@ -54,8 +65,14 @@ public class PubliciseGarden {
     @Autowired
     public SecurityService securityService;
 
-    @MockBean
+    @Autowired
     private LocationService locationService;
+
+    @Autowired
+    private GardenTagService gardenTagService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Mock
     private WeatherService weatherService;
@@ -66,10 +83,7 @@ public class PubliciseGarden {
 
     private static PlantService plantService;
 
-    private static FileService fileService;
     private ProfanityService profanityService;
-
-    private InputValidator inputValidator;
 
     private User user;
 
@@ -81,58 +95,61 @@ public class PubliciseGarden {
 
     private MvcResult createGardenResult;
 
-
     @Before
     public void before_or_after_all() {
 
         profanityService = Mockito.mock(ProfanityService.class);
         weatherService = Mockito.mock(WeatherService.class);
-        inputValidator = new InputValidator(userService, profanityService);
 
-        Mockito.when(profanityService.containsProfanity(Mockito.anyString())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(false);
 
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
-        GardensController myGardensController = new GardensController(gardenService, securityService, plantService, fileService, weatherService);
-        GardenFormController gardenFormController = new GardenFormController(gardenService,locationService,securityService);
+        GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
+                weatherService, objectMapper, gardenTagService, profanityService, userService);
+        GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
+                securityService);
 
-        MOCK_MVC_MY_GARDEN = MockMvcBuilders.standaloneSetup(myGardensController).build();
-        MOCK_MVC_GARDEN_FORM = MockMvcBuilders.standaloneSetup(gardenFormController).build();
+        mockMVCMyGarden = MockMvcBuilders.standaloneSetup(myGardensController).build();
+        mockMVCGardenForm = MockMvcBuilders.standaloneSetup(gardenFormController).build();
 
     }
-//    AC1
+
+    // AC1
     @Given("User {string} is on my garden details page for {string}")
     public void userIsOnMyGardenDetailsPageFor(String userEmail, String garden) {
-       user = userService.getUserByEmail(userEmail);
-       userGarden = user.getGardens().get(0);
-       Assertions.assertEquals(garden, userGarden.getGardenName());
+        user = userService.getUserByEmail(userEmail);
+        userGarden = user.getGardens().get(0);
+        Assertions.assertEquals(garden, userGarden.getGardenName());
     }
-//    AC1
+
+    // AC1
     @When("I mark a checkbox labelled \"Make my garden public\"")
     public void iMarkACheckboxLabelledMakeMyGardenPublic() throws Exception {
-       String myGardenUrl = String.format("/my-gardens/%d/public", userGarden.getGardenId());
-        MOCK_MVC_MY_GARDEN.perform(
-                        MockMvcRequestBuilders
-                                .post(myGardenUrl)
-                                .param("makeGardenPublic", String.valueOf(true))
-                                .with(csrf()))
+        String myGardenUrl = String.format("/my-gardens/%d/public", userGarden.getGardenId());
+        mockMVCMyGarden.perform(
+                MockMvcRequestBuilders
+                        .post(myGardenUrl)
+                        .param("makeGardenPublic", String.valueOf(true))
+                        .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 
     }
 
-    //    AC1
+    // AC1
     @Then("My garden will be visible in search results")
     public void myGardenWillBeVisibleInSearchResults() {
         Optional<Garden> testGarden = gardenService.getGardenById(userGarden.getGardenId());
         Assertions.assertTrue(testGarden.get().getIsPublic());
     }
-//    AC2, AC4
+
+    // AC2, AC4
     @When("I add an optional description")
     public void iAddAnOptionalDescription() {
         description = "is a vegetable patch";
     }
 
-//    AC3,AC5
+    // AC3,AC5
     @When("I remove the description of the garden")
     public void iRemoveTheDescriptionOfTheGarden() {
         description = "";
@@ -140,7 +157,7 @@ public class PubliciseGarden {
 
     @And("I am creating a new garden {string}")
     public void iAmCreatingANewGarden(String gardenName) throws Exception {
-        createGardenResult = MOCK_MVC_GARDEN_FORM.perform(
+        createGardenResult = mockMVCGardenForm.perform(
                 MockMvcRequestBuilders
                         .post("/create-new-garden")
                         .param("gardenName", gardenName)
@@ -151,17 +168,16 @@ public class PubliciseGarden {
                         .param("country", "New Zealand")
                         .param("postcode", "")
                         .param("gardenSize", "")
-                        .param("latitude", "")
-                        .param("longitude", "")
-                        .with(csrf())
-        ).andReturn();
+                        .param("latitude", "-43.5214643")
+                        .param("longitude", "172.5796159")
+                        .with(csrf()))
+                .andReturn();
     }
 
     @And("I am editing an existing garden")
     public void iAmEditingAnExistingGarden() throws Exception {
-        System.out.println(userGarden.getGardenId());
         String gardenUrl = String.format("/my-gardens/%d/edit", userGarden.getGardenId());
-        MOCK_MVC_GARDEN_FORM.perform(
+        mockMVCGardenForm.perform(
                 MockMvcRequestBuilders
                         .post(gardenUrl)
                         .param("gardenName", userGarden.getGardenName())
@@ -172,23 +188,24 @@ public class PubliciseGarden {
                         .param("country", userGarden.getGardenCountry())
                         .param("postcode", userGarden.getGardenPostcode())
                         .param("gardenSize", String.valueOf(1))
-                        .param("latitude", "")
-                        .param("longitude", "")
-        ).andExpect(MockMvcResultMatchers.status().is3xxRedirection());
-
+                        .param("latitude", "-43.5214643")
+                        .param("longitude", "172.5796159"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 
     }
 
     @Then("the new description is persisted")
     public void theNewDescriptionIsPersisted() {
-        newGarden = gardenService.getAllUsersGardens(user.getId()).get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
+        newGarden = gardenService.getAllUsersGardens(user.getId())
+                .get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
         Assertions.assertEquals(description, newGarden.getGardenDescription());
 
     }
 
     @Then("the new description is deleted")
     public void theNewDescriptionIsDeleted() {
-        newGarden = gardenService.getAllUsersGardens(user.getId()).get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
+        newGarden = gardenService.getAllUsersGardens(user.getId())
+                .get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
         Assertions.assertEquals("", newGarden.getGardenDescription());
     }
 
@@ -210,15 +227,11 @@ public class PubliciseGarden {
     }
 
     @Then("an error message appears")
-    public void anErrorMessageAppears(){
-        System.out.println(createGardenResult.getModelAndView());
+    public void anErrorMessageAppears() {
         ModelAndView modelAndView = createGardenResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
         String model = modelAndView.getModel().toString();
-
-        Assertions.assertTrue(model.contains("Description must be 512 characters or less and contain some text"));
+        Assertions.assertTrue(model.contains("Description must be 512 characters or less and contain some letters"));
     }
-
-
 
 }

@@ -1,39 +1,85 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
-    <head>
-        <meta http-equiv="Content-Type" context="text/html; charset=UTF-8">
-        <title>My Gardens</title>
-        <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-        <link th:href="@{/css/navBar.css}" rel="stylesheet">
-        <link th:href="@{/css/tableList.css}" rel="stylesheet">
-        <link th:href="@{/css/infoBox.css}" rel="stylesheet">
-    </head>
 
-    <body>
-    <div th:replace="fragmentExample/fragments/navBar.html :: navBar('gardens')" th:with="loggedIn=${loggedIn}"></div>
-        <div class = "main-container">
-            <div class="tableList-header">
-                <h1 class="tableList-header-title"> Your Gardens </h1>
-                <br>
-            </div>
-            <br>
-            <div class="tableList-table-contain">
-                <div class="tableList-table-count">
-                    <br>
-                    <span th:text="${session.userGardens?.size() ?: 0} + ' Gardens'"> </span>
-                </div>
-                <div th:each="garden : ${session.userGardens}">
-                    <div th:replace="fragmentExample/fragments/gardenBox.html ::
-                        gardenBox(gardenId=${garden.getGardenId},
-                        gardenName=${garden.getGardenName},
-                        gardenLocation=${garden.getGardenLocation},
-                        gardenSize=${garden.getGardenSize},
-                        numberOfPlants=${garden.getPlants?.size()})">
+<head th:replace="~{fragments/header.html}"></head>
+
+<body>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded pt-5 pb-5" style="width: 60%;">
+        <div class="d-flex justify-content-center align-items-center ratio ratio-1x1 mx-auto mt-5 mb-5" style="width: 15%">
+            <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                 alt="User's Profile" class="img-fluid rounded-circle border" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="mb-3 text-center">
+            <h3 th:text="${userName}">Username</h3>
+        </div>
+        <div class="mb-3 text-center">
+            <p>
+                <strong>
+                    <span th:text="${publicGardensCount}"></span> Public Garden<span th:if="${publicGardensCount}>1">s</span>
+                </strong> · <span th:text="${privateGardensCount}"></span> Private Garden<span th:if="${privateGardensCount}>1">s</span>
+            </p>
+        </div>
+        <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
+            <a th:href="@{/create-new-garden}">
+                <button type="button" class="btn bg-success" style="color: white">Create Garden</button>
+            </a>
+            <a th:href="@{/profile/edit}">
+                <button type="button" class="btn bg-success" style="color: white">Edit Profile</button>
+            </a>
+        </div>
+        <div class="container mt-4">
+            <div class="row mb-4">
+                <div class="col">
+                    <h1 class="mb-3">Your Gardens</h1>
+                    <div th:replace="~{fragments/paginationPageOverview.html}"
+                         th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
                     </div>
-
+                    <div class="btn-group mt-3" aria-label="Filter Gardens">
+                        <a th:href="@{/my-gardens(filter='All')}"
+                           class="btn"
+                           th:classappend="${filter == 'All'} ? 'bg-success text-white' : 'btn-outline-success'">
+                            All
+                        </a>
+                        <a th:href="@{/my-gardens(filter='Public')}"
+                           class="btn"
+                           th:classappend="${filter == 'Public'} ? 'bg-success text-white' : 'btn-outline-success'">
+                            Public
+                        </a>
+                        <a th:href="@{/my-gardens(filter='Private')}"
+                           class="btn"
+                           th:classappend="${filter == 'Private'} ? 'bg-success text-white' : 'btn-outline-success'">
+                            Private
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                <div class="col" th:each="garden : ${myGardens}">
+                    <div th:replace="~{fragments/myGardensCard.html ::
+                                myGardensCard(gardenId=${garden.gardenId},
+                                gardenName=${garden.gardenName},
+                                gardenLocation=${garden.gardenLocation},
+                                gardenSize=${garden.gardenSize},
+                                gardenDescription=${garden.gardenDescription},
+                                isPublic=${garden.isPublic},
+                                plantImage1=${garden.plants.size() > 0 ? garden.plants[0].plantPictureFilename : null},
+                                plantImage2=${garden.plants.size() > 1 ? garden.plants[1].plantPictureFilename : null},
+                                plantImage3=${garden.plants.size() > 2 ? garden.plants[2].plantPictureFilename : null},
+                                numberOfPlants=${garden.plants?.size()})}">
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col">
+                    <div th:replace="~{fragments/gardenPaginationNav.html}"
+                         th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, filter=${filter}">
+                    </div>
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>

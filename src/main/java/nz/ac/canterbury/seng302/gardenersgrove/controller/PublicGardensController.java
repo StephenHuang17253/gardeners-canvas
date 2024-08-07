@@ -1,22 +1,28 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTagService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,61 +34,29 @@ public class PublicGardensController {
     Logger logger = LoggerFactory.getLogger(PublicGardensController.class);
 
     private final GardenService gardenService;
-
+    private final SecurityService securityService;
+    private final GardenTagService gardenTagService;
+    private final FriendshipService friendshipService;
+    private static final int COUNT_PER_PAGE = 10;
 
     @Autowired
-    public PublicGardensController(GardenService gardenService) {
+    public PublicGardensController(GardenService gardenService, SecurityService securityService,
+                                   FriendshipService friendshipService, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
+        this.securityService = securityService;
+        this.friendshipService = friendshipService;
+        this.gardenTagService = gardenTagService;
     }
 
+
     /**
-     * returns a page with the 10 most recent public gardens based on current page in pagination
-     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
-     *
-     * @return thymeleaf BrowsePublicGardens html element
+     * Adds the loggedIn attribute to the model for all requests
+     * 
+     * @param model
      */
-    @GetMapping("/public-gardens/page/{pageNumber}")
-    public String publicGardensPagination(@PathVariable Long pageNumber, Model model) {
-        logger.info("GET /public-gardens");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
-
-        List<Garden> allGardens = gardenService.getAllPublicGardens();
-        int totalGardens = allGardens.size();
-        int pageSize = 10;
-        int startIndex = Math.toIntExact((pageNumber - 1) * pageSize);
-        int endIndex = Math.min(startIndex + pageSize, totalGardens);
-        int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
-
-        if (lastPage == 0) {
-            return "redirect:/home";
-        }
-
-        if (pageNumber > lastPage) {
-            return "redirect:/public-gardens/page/" + lastPage;
-        }
-        if (pageNumber < 1) {
-            return "redirect:/public-gardens/page/1";
-        }
-
-
-        List<Garden> tenSortedPublicGardens = allGardens.stream()
-                .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                .skip((pageNumber - 1) * pageSize)
-                .limit(pageSize)
-                .collect(Collectors.toList());
-
-        model.addAttribute("publicGardens", tenSortedPublicGardens);
-        model.addAttribute("currentPage", pageNumber);
-        model.addAttribute("totalGardens", totalGardens);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
-        model.addAttribute("lastPage", lastPage);
-        model.addAttribute("SearchErrorText", "");
-        model.addAttribute("searchValue", "");
-        return "browsePublicGardens";
+    @ModelAttribute
+    public void addLoggedInAttribute(Model model) {
+        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -93,93 +67,200 @@ public class PublicGardensController {
     @GetMapping("/public-gardens")
     public String publicGardens(Model model) {
         logger.info("GET /public-gardens");
+        return "redirect:/public-gardens/search/1";
+    }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
+        int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
+        int startIndex = (page - 1) * COUNT_PER_PAGE;
+        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
 
-        return "redirect:/public-gardens/page/1";
+        model.addAttribute("currentPage", page);
+        model.addAttribute("lastPage", totalPages);
+        model.addAttribute("startIndex", startIndex + 1);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("plants",plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount",plants.size());
     }
 
 
     /**
-     * returns a page with the 10 most recent public gardens based on search and on current page in pagination
-     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens, page 2 gets 11-20 and so on
+     * returns a page with the 10 most recent public gardens based on search and on
+     * current page in pagination
+     * Page number index starts at 1, so page 1 gets gardens 1-10 latest gardens,
+     * page 2 gets 11-20 and so on
      *
      * @return thymeleaf BrowsePublicGardens html element
      */
     @GetMapping("/public-gardens/search/{pageNumber}")
-    public String publicGardens(@RequestParam(name = "searchInput", defaultValue = "", required = false) String searchInput,
-                                @PathVariable Long pageNumber,
-                                Model model) {
+    public String publicGardens(
+            @RequestParam(name = "searchInput", defaultValue = "", required = false) String searchInput,
+            @RequestParam(name = "appliedTags", required = false) List<String> appliedTags,
+            @PathVariable int pageNumber,
+            Model model) {
         logger.info("GET /public-gardens/search");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
-        model.addAttribute("loggedIn", loggedIn);
+        List<String> paramList = new ArrayList<>();
 
-        if (Objects.equals(searchInput, "")) {
-            return "redirect:/public-gardens/page/1";
+        if (!searchInput.equals("")) {
+            paramList.add("searchInput=" + searchInput);
         }
 
-        List<Garden> matchingGardens = gardenService.getMatchingGardens(searchInput);
-
-        if (!matchingGardens.isEmpty()) {
-            int totalGardens = matchingGardens.size();
-            int pageSize = 10;
-            int startIndex = Math.toIntExact((pageNumber - 1) * pageSize);
-            int endIndex = Math.min(startIndex + pageSize, totalGardens);
-            int lastPage = (int) Math.ceil((double) totalGardens / pageSize);
-
-            if (pageNumber > lastPage) {
-                return "redirect:/public-gardens/search/" + lastPage;
+        if (appliedTags != null && !appliedTags.isEmpty()) {
+            for (String tagName : appliedTags) {
+                paramList.add("appliedTags=" + tagName);
             }
-            if (pageNumber < 1) {
-                return "redirect:/public-gardens/search/1";
-            }
+        }
 
-            List<Garden> tenSortedPublicGardens = matchingGardens.stream()
+        String paramString = "";
+        if (!paramList.isEmpty()) {
+            paramString = "?" + String.join("&", paramList);
+        }
+
+        if (pageNumber < 1) {
+            return "redirect:/public-gardens/search/1" + paramString;
+        }
+
+        model.addAttribute("paramString", paramString);
+
+        List<Garden> matchingGardens;
+
+        if (appliedTags != null && !appliedTags.isEmpty()) {
+            matchingGardens = gardenTagService.getMatchingGardens(searchInput, appliedTags);
+        } else {
+            matchingGardens = gardenService.getMatchingGardens(searchInput);
+        }
+
+        int startIndex = 0;
+        int endIndex = 0;
+        int totalGardens = matchingGardens.size();
+        int lastPage = Math.max((int) Math.ceil((double) totalGardens / COUNT_PER_PAGE), 1);
+
+        if (pageNumber > lastPage) {
+            return "redirect:/public-gardens/search/" + lastPage + paramString;
+        }
+
+        List<Garden> tenSortedPublicGardens = new ArrayList<>();
+
+        if (matchingGardens.isEmpty()) {
+
+            model.addAttribute("searchErrorText", "No gardens match your search");
+
+        } else {
+
+            tenSortedPublicGardens = matchingGardens.stream()
                     .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
-                    .skip((pageNumber - 1) * pageSize)
-                    .limit(pageSize)
+                    .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
+                    .limit(COUNT_PER_PAGE)
                     .collect(Collectors.toList());
 
-            model.addAttribute("publicGardens", tenSortedPublicGardens);
-            model.addAttribute("currentPage", pageNumber);
-            model.addAttribute("totalGardens", totalGardens);
-            model.addAttribute("startIndex", startIndex + 1);
-            model.addAttribute("endIndex", endIndex);
-            model.addAttribute("lastPage", lastPage);
-            model.addAttribute("SearchErrorText", "");
-            model.addAttribute("searchValue", searchInput);
-        } else {
-            model = resetModel(model);
-            model.addAttribute("searchValue", searchInput);
-            model.addAttribute("SearchErrorText", "No gardens match your search");
+            startIndex = (pageNumber - 1) * COUNT_PER_PAGE + 1;
+            endIndex = Math.min(startIndex + COUNT_PER_PAGE, totalGardens);
         }
+
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("publicGardens", tenSortedPublicGardens);
+        model.addAttribute("totalGardens", matchingGardens.size());
+        model.addAttribute("startIndex", startIndex);
+        model.addAttribute("lastPage", lastPage);
+        model.addAttribute("endIndex", endIndex);
+        model.addAttribute("searchValue", searchInput);
+        model.addAttribute("appliedTags", appliedTags);
         return "browsePublicGardens";
     }
 
-
     /**
-     * Resets model send to Browse gardens page
+     * Get Mapping of the /my-gardens/{gardenId} endpoint
+     * Garden Details page of all the plants belonging to the garden
      *
-     * @param model model to reset
-     * @return model with default values
+     * @param gardenId id of the garden used in the end-point path
+     * @return thymeleaf createNewGardenForm
      */
-    Model resetModel(Model model) {
-        List<Garden> emptyGardensList = new ArrayList<>();
-        model.addAttribute("publicGardens", emptyGardensList);
-        model.addAttribute("currentPage", 1);
-        model.addAttribute("totalGardens", 0);
-        model.addAttribute("startIndex", 0);
-        model.addAttribute("endIndex", 0);
-        model.addAttribute("lastPage", 1);
-        model.addAttribute("SearchErrorText", "");
-        model.addAttribute("searchValue", "");
-        return model;
+    @GetMapping("public-gardens/{gardenId}")
+    public String viewPublicGarden(@PathVariable Long gardenId,
+            @RequestParam(defaultValue = "1") int page,
+            HttpServletResponse response,
+            Model model) {
+        logger.info("GET public-gardens/{}", gardenId);
+
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Garden garden = optionalGarden.get();
+
+        User currentUser = securityService.getCurrentUser();
+        User gardenOwner = garden.getOwner();
+
+        if (!garden.getIsPublic() ) {
+            FriendshipStatus userOwnerRelationship;
+            if(Objects.equals(gardenOwner.getId(), currentUser.getId()))
+            {
+                userOwnerRelationship = FriendshipStatus.ACCEPTED;
+            }
+            else
+            {
+                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+            }
+
+
+            if (userOwnerRelationship != FriendshipStatus.ACCEPTED)
+            {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+                return "403";
+            }
+
+        }
+
+        securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
+
+        User user = garden.getOwner();
+        handlePagniation(page,garden.getPlants().size(),garden.getPlants(),model);
+
+        model.addAttribute("isOwner", false);
+        model.addAttribute("garden", new GardenDetailModel(garden));
+        model.addAttribute("weather", null);
+        model.addAttribute("profilePicture", user.getProfilePictureFilename());
+        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+
+        List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
+
+        List<String> tagsList = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.APPROPRIATE)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        List<String> pendingTags = tagRelationsList.stream()
+                .map(GardenTagRelation::getTag)
+                .filter(gardenTag -> gardenTag.getTagStatus() == TagStatus.PENDING)
+                .map(GardenTag::getTagName)
+                .toList();
+
+        model.addAttribute("pendingTags", pendingTags);
+        model.addAttribute("tagsList", tagsList);
+
+        return "gardenDetailsPage";
+
     }
 
+    /**
+     * Checks if a tag exists with the name tagName
+     *
+     * @param tagName tag name to check
+     * @return boolean of if tag exists or not
+     */
+    @GetMapping("/tag/exists")
+    @ResponseBody
+    public Boolean checkTagExists(@RequestParam("tagName") String tagName) {
+        logger.info("GET tag/exists");
+        tagName = tagName.trim();
+        Optional<GardenTag> testTag = gardenTagService.getByName(tagName);
+        return testTag.isPresent();
+    }
 
 }
-

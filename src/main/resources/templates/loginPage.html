@@ -1,41 +1,55 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head>
-  <meta http-equiv="Content-Type" context="text/html; charset=UTF-8" />
-  <link th:href="@{/css/baseCss.css}" rel="stylesheet">
-  <link th:href="@{/css/loginPage.css}" rel="stylesheet">
-  <link th:href="@{/css/navBar.css}" rel="stylesheet">
-  <title>Login Page</title>
-</head>
+<head th:replace="~{fragments/header.html}"></head>
 
 <body>
-  <div th:replace="fragmentExample/fragments/navBar.html :: navBar('login')" th:with="loggedIn=${loggedIn}"></div>
-  <div class="container">
-    <h1>Login</h1>
-    <form th:action="@{login}" method="POST">
-      <div>
-        <label for="emailAddress">Email</label>
-        <input type="email" class="form-control" id="emailAddress" placeholder="email" th:name="emailAddress"
-          th:value="*{emailAddress}" required autofocus />
-        <p th:if="${emailAddressError}" class="error" th:text="${emailAddressError}"></p>
-      </div>
-      <div>
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" placeholder="password" th:name="password"
-          th:value="*{password}" required />
-        <p th:if="${loginError}" class="error" th:text="${loginError}"></p>
-      </div>
-      <div class="buttons">
-        <button type="submit" class="user_button" formnovalidate>Sign In</button>
-        <a th:href="@{home}"><button type="button" class="user_button">Cancel</button></a>
-      </div>
-      <a th:href="@{register}" class="link">Not registered? Create an account</a>
-      <p th:if="${message}" th:text="${message}"></p>
-      <a th:href="@{lost-password}" class="link">Forgot your Password?</a>
-    </form>
-  </div>
-  <script th:src="@{/js/preventEnterSubmit.js}"></script>
+    <div th:replace="~{fragments/navBar.html :: navBar('login')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded py-5 w-50">
+        <div class="row justify-content-center">
+            <div class="text-center py-5">
+                <h1>Login</h1>
+            </div>
+            <div class="col-6">
+                <form th:action="@{/login}" method="post" class="border rounded-3 p-3">
+
+                    <div class="mb-3">
+                        <label for="emailAddress" class="form-label">Email Address *</label>
+                        <input id="emailAddress" type="text" class="form-control" th:name="emailAddress"
+                            th:value="*{emailAddress}" autofocus
+                            th:classappend="${emailAddressError == null ? '' : 'border-danger'}">
+                        <p th:if="${emailAddressError}" class="text-danger fs-6" th:text="${emailAddressError}"></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password *</label>
+                        <input id="password" type="password" class="form-control" th:name="password"
+                            th:value="*{password}" th:classappend="${loginError == null ? '' : 'border-danger'}">
+                        <p th:if="${loginError}" class="text-danger fs-6" th:text="${loginError}"></p>
+                    </div>
+
+                    <div class="d-flex flex-row flex-wrap justify-content-center gap-3 mb-3">
+                        <button type="submit" class="btn btn-success" formnovalidate>Sign In</button>
+                        <a th:href="@{/home}">
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                        </a>
+                    </div>
+
+                    <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}">
+                    </div>
+
+                    <div class="d-flex flex-column justify-content-center gap-3 text-center">
+                        <a th:href="@{/register}">Not registered? Create an account</a>
+                        <a th:href="@{/lost-password}">Forgot your Password?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/preventEnterSubmit.js}"></script>
+    <script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 
 </html>
