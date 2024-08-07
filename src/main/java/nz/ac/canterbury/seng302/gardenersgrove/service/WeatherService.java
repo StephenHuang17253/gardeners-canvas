@@ -127,7 +127,6 @@ public class WeatherService {
     private WeatherResponseData handleHttpResponse(HttpResponse<String> response, Garden garden) {
         try {
             JsonNode jsonObject = objectMapper.readTree(response.body());
-            logger.info("Weather for garden {}: {}", garden.getGardenId(), jsonObject);
             return new WeatherResponseData(jsonObject);
         } catch (Exception e) {
             logger.error("Error parsing weather data for garden {}: {}", garden.getGardenId(), e.toString());
