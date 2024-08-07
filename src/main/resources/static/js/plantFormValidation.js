@@ -74,7 +74,7 @@ const handleDateUpdate = (event) => {
 }
 
 /**
- * Handles the case where the user's input for the first/last name field is invalid.
+ * Handles the case where the user's input for the name field is invalid.
  * Sets the border of the input to red, and makes the error message visible.
  * @param {HTMLElement} inputField - The input field element (firstName or lastName).
  * @param {HTMLElement} errorField - The error message element (firstNameJSError or lastNameJSError).
@@ -99,7 +99,7 @@ const clearNameError = (inputField, errorField) => {
 }
 
 /**
- * Handles updates (char input) to the input field for names (first name or last name).
+ * Handles updates (char input) to the input field for name.
  * @param {{target: HTMLElement}} event - The input event.
  * @param {HTMLElement} errorField - The error message element.
  * @returns {void}
@@ -119,7 +119,7 @@ const handleNameUpdate = (event, errorField) => {
 }
 
 /**
- * Handles the case where the user's input for the first/last name field is invalid.
+ * Handles the case where the user's input for the description field is invalid.
  * Sets the border of the input to red, and makes the error message visible.
  * @param {HTMLElement} inputField - The input field element (firstName or lastName).
  * @param {HTMLElement} errorField - The error message element (firstNameJSError or lastNameJSError).
@@ -165,7 +165,7 @@ const handleDescriptionUpdate = (event) => {
 }
 
 /**
- * Handles the case where the user's input for the first/last name field is invalid.
+ * Handles the case where the user's input for the count is invalid.
  * Sets the border of the input to red, and makes the error message visible.
  * @param {HTMLElement} inputField - The input field element (firstName or lastName).
  * @param {HTMLElement} errorField - The error message element (firstNameJSError or lastNameJSError).
@@ -190,7 +190,7 @@ const clearCountError = () => {
 }
 
 /**
- * Handles updates (char input) to the input field for description.
+ * Handles updates to the input field for count.
  * @param {{target: HTMLElement}} event - The input event.
  * @param {HTMLElement} errorField - The error message element.
  * @returns {void}
