@@ -2,8 +2,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.UnavailableException;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import org.slf4j.Logger;
@@ -14,7 +12,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,9 +32,9 @@ public class WeatherService {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
     /**
-     *
      * Runs an API query to get the weather data for a specific location
-     * @param latitude latitude of the target location
+     *
+     * @param latitude  latitude of the target location
      * @param longitude longitude of the target location
      * @return WeatherResponseData for the given location
      */
@@ -56,6 +53,7 @@ public class WeatherService {
         try {
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             JsonNode jsonObject = objectMapper.readTree(response.body());
+            logger.info("weather retrieval successful");
             return new WeatherResponseData(jsonObject);
 
         } catch (Exception weatherApiError) {
@@ -85,7 +83,6 @@ public class WeatherService {
     }
 
 
-
     /**
      * Fetches weather data through series of HTTP requests
      *
@@ -99,7 +96,6 @@ public class WeatherService {
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> handleHttpResponse(response, garden));
     }
-
 
 
     /**
@@ -125,7 +121,7 @@ public class WeatherService {
      * to read weather info from
      *
      * @param response response from the weather
-     * @param garden the garden needing the response data
+     * @param garden   the garden needing the response data
      * @return JSON that holds weather data
      */
     private WeatherResponseData handleHttpResponse(HttpResponse<String> response, Garden garden) {
@@ -154,13 +150,10 @@ public class WeatherService {
                 couldUpdate = nextFreeCallTimestamp.compareAndSet(nextCallSlot, (nextCallSlot + RATE_LIMIT_DELAY_BUFFER + RATE_LIMIT_DELAY_MS));
             }
         }
-        try
-        {
+        try {
             Thread.sleep(timeToWait);
-            logger.info("Weather api thread woke to make request after {}",timeToWait);
-        }
-        catch (InterruptedException exception)
-        {
+            logger.info("Weather api thread woke to make request after {}", timeToWait);
+        } catch (InterruptedException exception) {
             logger.error("Thread interrupted while waiting for weather api rate limit");
         }
 

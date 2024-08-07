@@ -449,6 +449,12 @@ public class HomePageController {
         logger.info("GET /home/edit");
         User user = securityService.getCurrentUser();
         HomePageLayout layout = user.getHomePageLayout();
+        if (layout == null) {
+            HomePageLayout newLayout = new HomePageLayout(false, false, false,
+                    false);
+            userService.updateHomePageLayout(user.getId(), newLayout);
+            layout = user.getHomePageLayout();
+        }
         model.addAttribute("layout", layout);
         return "editHomePage";
     }

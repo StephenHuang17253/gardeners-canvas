@@ -24,17 +24,17 @@
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
                     <div class="p-1" th:each="tag : ${tagsList}">
-                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success')}"></div>
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success',isRemovable=false)}"></div>
                     </div>
 
                     <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
-                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary')}"></div>
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary',isRemovable=false)}"></div>
                     </div>
                 </div>
 
                     <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
                         <div
-                            th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary')}">
+                            th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary',isRemovable=false)}">
                         </div>
                     </div>
                 </div>
