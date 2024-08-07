@@ -23,7 +23,7 @@
         </p>
     </div>
 
-    <div class="container mt-4">
+    <div th:if="${gardensCount > 0}" class="container mt-4">
         <div class="row mb-4">
             <div class="col">
                 <h1 class="mb-3" th:text="${firstName} + '\'s Gardens'">User's Gardens</h1>
