@@ -319,7 +319,6 @@ public class PlantFormController {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
         securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
-
         return "redirect:/my-gardens/{gardenId}";
     }
 
@@ -361,6 +360,8 @@ public class PlantFormController {
 
         // notifies the user that the plant Description is invalid (if applicable)
         if (!plantDescriptionResult.valid()) {
+            plantDescriptionResult.updateMessage(
+                    "Description must be 512 characters or less and contain some letters");
             model.addAttribute("PDErrorText", plantDescriptionResult);
         }
 

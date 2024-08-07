@@ -761,7 +761,7 @@ public class InputValidator {
                 inputtedDate,
                 LocalDate.now());
 
-        if (yearsDifference > 400) {
+        if (yearsDifference > 400 || testedValue == null) {
             this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
