@@ -156,7 +156,7 @@ const handleDescriptionUpdate = (event) => {
     const containsLetterRegex = /[a-zA-Z]/;
 
 
-    if (!containsLetterRegex.test(filteredValue) || descriptionValue.length > 64) {
+    if ((!containsLetterRegex.test(filteredValue) && !filteredValue.equals("")) || descriptionValue.length > 64) {
         plantDescriptionJSError.textContent = "Description must be 512 characters or less and contain some letters";
         displayDescriptionError();
     } else {
@@ -224,6 +224,12 @@ const handleCountUpdate = (event) => {
 }
 
 
+/**
+ * Validates the form on the client-side when the user presses the Submit button.
+ * If there is an invalid input, prevent the submission of the form.
+ * @param {Event} event - The input event.
+ * @returns {void}
+ */
 const handleFormSubmit = (event) => {
     handleDateUpdate({ target: plantDate });
     handleNameUpdate({ target: plantName }, plantNameJSError);

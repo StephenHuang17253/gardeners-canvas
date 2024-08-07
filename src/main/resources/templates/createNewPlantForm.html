@@ -46,7 +46,7 @@
                             th:value="*{plantName}" th:classappend="${PNErrorText == null ? '' : 'border-danger'}"
                             autofocus>
                         <p th:if="${PNErrorText}" class="text-danger fs-6" th:text="${PNErrorText}"></p>
-                        <p id="plantNameJSError" class="text-danger fs-6" style="display: none;"
+                        <p id="plantNameJSError" class="text-danger fs-6 d-none"
                            th:text="'Plant name cannot be greater than 64 characters in length'"></p>
                     </div>
 
@@ -56,7 +56,7 @@
                             th:value="*{plantCount}" th:classappend="${PCErrorText == null ? '' : 'border-danger'}"
                             data-formatted-number>
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
-                        <p id="plantCountJSError" class="text-danger fs-6" style="display: none;"
+                        <p id="plantCountJSError" class="text-danger fs-6 d-none"
                            th:text="'Plant count must be a positive whole number between 1 and 1,000,000'"></p>
                     </div>
 
@@ -71,7 +71,7 @@
                         <p id="plantDescriptionCounter" class="fs-6"></p>
                         <p id="plantDescriptionError" th:if="${PDErrorText}" class="text-danger fs-6"
                             th:text="${PDErrorText}"></p>
-                        <p id="plantDescriptionJSError" class="text-danger fs-6" style="display: none;"
+                        <p id="plantDescriptionJSError" class="text-danger fs-6 d-none"
                            th:text="'Description must be 512 characters or less and contain some letters'"></p>
 
                     </div>
@@ -83,7 +83,7 @@
                             th:classappend="${PAErrorText == null ? '' : 'border-danger'}" th:oninvalid="displayDateError()"
                                th:oninput="clearDateError()">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
-                        <p id="plantDateJSError" class="text-danger fs-6" style="display: none;"
+                        <p id="plantDateJSError" class="text-danger fs-6 d-none"
                            th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
                     </div>
 
