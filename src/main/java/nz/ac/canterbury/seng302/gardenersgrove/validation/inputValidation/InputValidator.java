@@ -253,16 +253,27 @@ public class InputValidator {
                 .getResult();
     }
 
-    public static ValidationResult validatePostcodeInput(String text) {
+    /**
+     * Checks input against a criteria: This function only allows numbers, letters, hyphens, commas, dots, slashes and spaces.
+     * @param text - text to validate
+     * @return ValidationResult enum state (Enum explains pass/fail, and why)
+     */
+    public static ValidationResult validateAddressInput(String text) {
         return new InputValidator(text)
-                .postcodeHelper()
+                .gardenLocationHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
-    public static ValidationResult numberCommaSingleTextField(String text, int length) {
+    /**
+     * Checks input against a criteria: This function only allows numbers, letters, hyphens and spaces.
+     * @param text - text to validate
+     * @return ValidationResult enum state (Enum explains pass/fail, and why)
+     */
+    public static ValidationResult validatePostcodeInput(String text) {
         return new InputValidator(text)
-                .numberCommaSingleHelper()
-                .lengthHelper(length)
+                .postcodeHelper()
+                .lengthHelper(10)
                 .getResult();
     }
 
@@ -808,6 +819,53 @@ public class InputValidator {
     }
 
     /**
+     * Checks if a string contains any non ( alphanumeric plus allowed punctuation)
+     * characters
+     * updates local variables with results
+     * ignored if string failed any previous validation
+     *
+     * @return the calling object
+     */
+    private InputValidator gardenLocationHelper() {
+        // if this validators input has already failed once, this test wont be run
+        if (!this.passState) {
+            return this;
+        }
+
+        boolean stringPasses = true;
+        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-", "/" };
+        // checks if all letters in this string are alpha numeric, if a letter fails it
+        // checks it against
+        // the allowed punctuation list, if that fails the string is marked as invalid
+        for (Character letter : testedValue.toCharArray()) {
+            if (!Character.isLetterOrDigit(letter)) {
+
+                for (String punctuation : allowedPunctuation) {
+                    stringPasses = false;
+                    if (punctuation.equals(letter.toString())) {
+                        stringPasses = true;
+                        break;
+                    }
+                }
+                if (!stringPasses) {
+                    break;
+                }
+            }
+        }
+
+        // sets this items result to ok if string passes and to "Non alpha plus" if it
+        // fails
+        if (stringPasses) {
+            this.validationResult = ValidationResult.OK;
+        } else {
+            this.validationResult = ValidationResult.INVALID_STREET;
+            this.passState = false;
+        }
+        return this;
+
+    }
+
+    /**
      * Checks if a string contains only numbers and up to 1 comma character
      * updates local variables with results
      * ignored if string failed any previous validation
@@ -923,7 +981,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^[a-zA-Z0-9 ]*$")) {
+        if (!testedValue.matches("^[a-zA-Z0-9- ]*$")) {
             this.validationResult = ValidationResult.INVALID_POSTCODE;
             this.passState = false;
             return this;
