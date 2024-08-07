@@ -488,7 +488,7 @@ class InputValidatorTest {
      * @param streetAddress string input for a garden's street address
      */
     @ParameterizedTest
-    @ValueSource(strings = {"20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road"})
+    @ValueSource(strings = {"20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road", "1/14 Ilam Road"})
     void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateAddressInput(streetAddress));
     }
@@ -509,9 +509,9 @@ class InputValidatorTest {
      * @param streetAddress - string input for a garden's street address
      */
     @ParameterizedTest
-    @ValueSource(strings = {"116 !@#$%^&*()_+-=[]{};:',.<>/?| Road"})
+    @ValueSource(strings = {"116 !@#$%^&*()_+-=[]{};:',.<>?| Road"})
     void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
-        Assertions.assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.validateAddressInput(streetAddress));
+        Assertions.assertEquals(ValidationResult.INVALID_STREET, InputValidator.validateAddressInput(streetAddress));
     }
 
     /**

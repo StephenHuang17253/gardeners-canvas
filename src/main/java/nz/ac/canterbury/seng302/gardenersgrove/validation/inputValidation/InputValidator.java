@@ -858,7 +858,7 @@ public class InputValidator {
         if (stringPasses) {
             this.validationResult = ValidationResult.OK;
         } else {
-            this.validationResult = ValidationResult.NON_ALPHA_PLUS;
+            this.validationResult = ValidationResult.INVALID_STREET;
             this.passState = false;
         }
         return this;

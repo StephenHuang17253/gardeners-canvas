@@ -10,6 +10,7 @@ public enum ValidationResult {
     BLANK("cannot be empty"),
     NOT_PARSABLE("cannot be parsed to a number"),
     NON_ALPHA_PLUS("must only include letters, numbers, spaces, commas, dots, hyphens or apostrophes"),
+    INVALID_STREET("must only include letters, numbers, spaces, commas, dots, hyphens, slashes or apostrophes"),
     INVALID_POSTCODE("must only contain numbers, letters, hyphens, and spaces"),
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
     INVALID_EMAIL("Email must be in the form 'jane@doe.nz'"),
