@@ -56,21 +56,21 @@ public interface GardenTagRelationRepository extends CrudRepository<GardenTagRel
      * And at least one tag applied to the garden has a garden name that
      * matches at least one of the tag names in tag string
      * @param searchValue Garden name to match
-     * @param tagsString Tag names to match, should be a string representing a list of comma separate values
-     *                   e.g "<b>tag1,tag2,tag3</b>". should not contain brackets
+     * @param tags Tag list to match, should be a list of strings representing tag names
      * @return A list of garden type objects
      */
     @Query("SELECT DISTINCT g FROM Garden g " +
-       "JOIN GardenTagRelation gtr ON g.gardenId = gtr.garden.gardenId " +
-       "JOIN GardenTag t ON gtr.tag.tagId = t.tagId " +
-       "LEFT JOIN Plant p ON g.gardenId = p.garden.gardenId " +
-       "WHERE g.isPublic = true " +
-       "AND (LOWER(p.plantName) LIKE LOWER(CONCAT('%', :searchValue, '%')) " +
-       "OR LOWER(g.gardenName) LIKE LOWER(CONCAT('%', :searchValue, '%'))) " +
-       "AND t.tagName IN (:tagsString) " +
+            "JOIN GardenTagRelation gtr ON g.gardenId = gtr.garden.gardenId " +
+            "JOIN GardenTag t ON gtr.tag.tagId = t.tagId " +
+            "LEFT JOIN Plant p ON g.gardenId = p.garden.gardenId " +
+            "WHERE g.isPublic = true " +
+            "AND (LOWER(p.plantName) LIKE LOWER(CONCAT('%', :searchValue, '%')) " +
+            "OR LOWER(g.gardenName) LIKE LOWER(CONCAT('%', :searchValue, '%'))) " +
+            "AND t.tagName IN (:tags) " +
             "AND t.tagStatus = 'APPROPRIATE'")
     List<Garden> findByGardenNameContainsAndGardenHasTags(@Param("searchValue") String searchValue,
-            @Param("tagsString") String tagsString);
+                                                             @Param("tags") List<String> tags);
+
 
     /**
      * Find all GardenTagRelation objects in repo

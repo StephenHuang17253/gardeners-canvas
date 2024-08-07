@@ -29,10 +29,10 @@
                     <div class="d-flex flex-column align-items-center mb-3">
                         <h3>Search for tags:</h3>
                         <div class="w-100 position-relative mb-3">
-                            <div class="input-group rounded">
+                            <div class="input-group rounded justify-content-center">
                                 <input id="tagInput" type="search" class="form-control rounded-start"
                                     placeholder="e.g. vegetable garden" aria-label="Search"
-                                    aria-describedby="search-addon" autocomplete="off" />
+                                    aria-describedby="search-addon" autocomplete="off" style="max-width:25vw" />
                                 <button id="addTagButton" type="button" class="btn btn-success">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                         class="bi bi-plus-lg" viewBox="0 0 16 16">
@@ -50,7 +50,7 @@
                         class="d-flex flex-row flex-wrap justify-content-center align-items-center gap-2 mb-3">
                         <h7>Applied tags:</h7>
                         <div class="p-1" th:each="tag : ${appliedTags}">
-                            <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success') }"></div>
+                            <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success', isRemovable=true) }"></div>
                         </div>
                     </div>
 
@@ -99,6 +99,7 @@
     <script th:src="@{/js/tagSearch.js}"></script>
     <script th:src="@{/js/gardenTagAutocomplete.js}"></script>
     <script th:src="@{/js/getInstance.js}"></script>
+    <script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 
 </html>
