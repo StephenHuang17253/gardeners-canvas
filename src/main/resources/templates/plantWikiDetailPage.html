@@ -9,8 +9,8 @@
          th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div th:if="${plant}" class="container mt-5 bg-white border rounded pt-4">
         <div class="row mx-2">
-            <div class="col">
-                <h1 th:text="${plant.commonName} + ' Details'"></h1>
+            <div class="col mb-4">
+                <h1 th:text="${plant.commonName}"></h1>
                 <h5 th:text="${plant.scientificName}" class="fw-light fst-italic text-success"></h5>
             </div>
         </div>
@@ -40,7 +40,6 @@
                     <hr th:if="${plant.watering != '' || plant.wateringGeneralBenchmarkUnit != '' || plant.wateringGeneralBenchmarkValue != ''}">
 
                     <p th:if="${plant.sunlight != ''}" th:text="'Light Requirements : ' + ${plant.sunlight}"></p>
-<!--                    <p th:if="${plant.watering != ''}" th:text="'Watering : ' + ${plant.watering}"></p>-->
                     <p th:if="${plant.wateringGeneralBenchmarkValue != '' && plant.wateringGeneralBenchmarkUnit != ''}"  th:text="'Water plant every '+ ${plant.wateringGeneralBenchmarkValue} + ' ' + ${plant.wateringGeneralBenchmarkUnit}"></p>
                     <hr th:if="${plant.pruningCountInterval != '' || plant.pruningCountInterval != '' || plant.pruningMonth != ''}">
                     <p th:if="${plant.pruningCountAmount !='' && plant.pruningCountInterval != ''}" th:text="'Pruning : ' + ${plant.pruningCountAmount} + ' x ' + ${plant.pruningCountInterval}"></p>
@@ -69,9 +68,7 @@
             <p class="text-justify px-5 " th:text="${plant.description}"></p>
 
         </div>
-    <div th:if="${searchError} != ''"  class="container mt-5 bg-white border rounded pt-4">
-        <p class="text-danger fs-6" th:text="${searchError}"></p>
-    </div>
+
     </div>
 
 

@@ -3,8 +3,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Model class for storing plant data from API call, used for the Plant Details page.
@@ -159,23 +157,23 @@ public class PlantInfoModel {
         return watering;
     }
 
-    public String getCycle() {return cycle;};
-    public String getWateringPeriod() {return wateringPeriod;};
-    public String getWateringGeneralBenchmarkValue() {return wateringGeneralBenchmarkValue;};
-    public String getWateringGeneralBenchmarkUnit() {return wateringGeneralBenchmarkUnit;};
-    public String getSunlight() {return sunlight;};
-    public String getPruningMonth() {return pruningMonth;};
-    public String getPruningCountAmount() {return pruningCountAmount;};
-    public String getPruningCountInterval() {return pruningCountInterval;};
-    public boolean getFlowers() {return flowers;};
-    public String getFloweringSeason() {return floweringSeason;};
-    public boolean getFruits() {return fruits;};
-    public boolean getEdibleFruit() {return edibleFruit;};
-    public String getFruitSeason() {return fruitSeason;};
-    public boolean getPoisonousToHumans() {return poisonousToHumans;};
-    public boolean getPoisonousToPets() {return poisonousToPets;};
-    public String getMaintenance() {return maintenance;};
-    public boolean getIndoor() {return indoor;};
+    public String getCycle() {return cycle;}
+    public String getWateringPeriod() {return wateringPeriod;}
+    public String getWateringGeneralBenchmarkValue() {return wateringGeneralBenchmarkValue;}
+    public String getWateringGeneralBenchmarkUnit() {return wateringGeneralBenchmarkUnit;}
+    public String getSunlight() {return sunlight;}
+    public String getPruningMonth() {return pruningMonth;}
+    public String getPruningCountAmount() {return pruningCountAmount;}
+    public String getPruningCountInterval() {return pruningCountInterval;}
+    public boolean getFlowers() {return flowers;}
+    public String getFloweringSeason() {return floweringSeason;}
+    public boolean getFruits() {return fruits;}
+    public boolean getEdibleFruit() {return edibleFruit;}
+    public String getFruitSeason() {return fruitSeason;}
+    public boolean getPoisonousToHumans() {return poisonousToHumans;}
+    public boolean getPoisonousToPets() {return poisonousToPets;}
+    public String getMaintenance() {return maintenance;}
+    public boolean getIndoor() {return indoor;}
 
 
 
