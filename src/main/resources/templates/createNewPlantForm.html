@@ -76,6 +76,8 @@
                             th:name="plantDate" th:value="*{plantDate}"
                             th:classappend="${PAErrorText == null ? '' : 'border-danger'}">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
+                        <p id="plantDateJSError" class="text-danger fs-6" style="display: none;"
+                           th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
@@ -94,6 +96,7 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/formatNumber.js}"></script>
     <script th:src="@{/js/submitFormOnce.js}"></script>
+    <script th:src="@{/js/plantFormValidation.js}"></script>
 </body>
 
 </html>
