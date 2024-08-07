@@ -319,7 +319,6 @@ public class PlantFormController {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
         securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
-        logger.info("date " + plantDate);
         return "redirect:/my-gardens/{gardenId}";
     }
 
