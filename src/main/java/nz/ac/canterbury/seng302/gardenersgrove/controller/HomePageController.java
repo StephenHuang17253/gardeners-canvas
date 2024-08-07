@@ -66,9 +66,9 @@ public class HomePageController {
      */
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager,
-            GardenService gardenService, PlantService plantService,
-            FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
-            UserInteractionService userInteractionService) {
+                              GardenService gardenService, PlantService plantService,
+                              FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
+                              UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -90,7 +90,6 @@ public class HomePageController {
 
     /**
      * Redirects GET default url '/' to '/home'
-     *
      *
      * @return redirect to /home
      */
@@ -310,7 +309,7 @@ public class HomePageController {
 
     /**
      * creates a list of recent garden models to display
-     * 
+     *
      * @param userId id of current user
      * @return
      */
@@ -341,7 +340,6 @@ public class HomePageController {
     /**
      * Helper function to create a list of friend models. Used for adding to the
      * model of the Manage Friends page.
-     *
      *
      * @param id of user to find recent friends of
      * @return friendModels
@@ -433,14 +431,14 @@ public class HomePageController {
 
         return garden.getNeedsWatering()
                 || beforeYesterdayWeather.getDescription().equals("Sunny") &&
-                        yesterdayWeather.getDescription().equals("Sunny") &&
-                        currentWeather.getDescription().equals("Sunny");
+                yesterdayWeather.getDescription().equals("Sunny") &&
+                currentWeather.getDescription().equals("Sunny");
 
     }
 
     /**
      * Provides the get endpoint for the edit home page form
-     * 
+     *
      * @param model
      * @return
      */
@@ -450,8 +448,7 @@ public class HomePageController {
         User user = securityService.getCurrentUser();
         HomePageLayout layout = user.getHomePageLayout();
         if (layout == null) {
-            HomePageLayout newLayout = new HomePageLayout(false, false, false,
-                    false);
+            HomePageLayout newLayout = new HomePageLayout();
             userService.updateHomePageLayout(user.getId(), newLayout);
             layout = user.getHomePageLayout();
         }
@@ -462,7 +459,7 @@ public class HomePageController {
     /**
      * This function is called when a POST request is made to /home/edit it handles
      * updating the home page layout
-     * 
+     *
      * @param acceptedFriends show the accepted friends section boolean
      * @param recentPlants    show the recent plants section boolean
      * @param recentGardens   show the recent gardens section boolean
