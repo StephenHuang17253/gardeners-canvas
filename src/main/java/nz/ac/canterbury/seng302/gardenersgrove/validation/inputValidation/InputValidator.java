@@ -261,6 +261,7 @@ public class InputValidator {
     public static ValidationResult validateAddressInput(String text) {
         return new InputValidator(text)
                 .gardenLocationHelper()
+                .lengthHelper(200)
                 .getResult();
     }
 
@@ -272,6 +273,7 @@ public class InputValidator {
     public static ValidationResult validatePostcodeInput(String text) {
         return new InputValidator(text)
                 .postcodeHelper()
+                .lengthHelper(10)
                 .getResult();
     }
 

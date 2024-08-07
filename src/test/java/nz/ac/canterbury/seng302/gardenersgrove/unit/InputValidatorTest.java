@@ -490,7 +490,7 @@ class InputValidatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road"})
     void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
-        Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalAlphaPlusTextField(streetAddress));
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateAddressInput(streetAddress));
     }
 
     /**
@@ -499,15 +499,19 @@ class InputValidatorTest {
      * @param streetAddress string input for a garden's street address
      */
     @ParameterizedTest
-    @ValueSource(strings = {"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenea"})
+    @ValueSource(strings = {"Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"})
     void InputValidator_isValidStreetAddress_invalidStreetAddress_return_LENGTH_OVER_LIMIT(String streetAddress) {
-        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.validateAddressInput(streetAddress));
     }
 
+    /**
+     * Test for invalid garden street address
+     * @param streetAddress - string input for a garden's street address
+     */
     @ParameterizedTest
-    @ValueSource(strings = {"116 !@#$%^&*()_+-=[]{};:',.<>/?| Road", "\""})
+    @ValueSource(strings = {"116 !@#$%^&*()_+-=[]{};:',.<>/?| Road"})
     void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
-        Assertions.assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField(streetAddress, 96));
+        Assertions.assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.validateAddressInput(streetAddress));
     }
 
     /**
@@ -516,7 +520,7 @@ class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = {"8041", "23020392", "SN6 8TL"})
+    @ValueSource(strings = {"8041", "23020392", "SN6 8TL", "80-41"})
     void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode));
     }

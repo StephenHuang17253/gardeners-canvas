@@ -226,9 +226,9 @@ public class GardenFormController {
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
         ValidationResult streetAddressResult = InputValidator.validateAddressInput(streetAddress);
-        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
-        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
-        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 100);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 200);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 100);
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
@@ -395,9 +395,9 @@ public class GardenFormController {
         ValidationResult gardenNameResult = InputValidator.compulsoryAlphaPlusTextField(gardenName);
         ValidationResult gardenDescriptionResult = InputValidator.validateDescription(gardenDescription);
         ValidationResult streetAddressResult = InputValidator.validateAddressInput(streetAddress);
-        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb);
-        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city);
-        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country);
+        ValidationResult suburbResult = InputValidator.optionalAlphaPlusTextField(suburb, 100);
+        ValidationResult cityResult = InputValidator.compulsoryAlphaPlusTextField(city, 200);
+        ValidationResult countryResult = InputValidator.compulsoryAlphaPlusTextField(country, 100);
         ValidationResult postcodeResult = InputValidator.validatePostcodeInput(postcode);
         ValidationResult gardenSizeResult = InputValidator.validateGardenAreaInput(gardenSize);
 
@@ -472,7 +472,7 @@ public class GardenFormController {
         // notifies the user that the street address is invalid (if applicable)
         if (!streetAddressResult.valid()) {
             if (streetAddressResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                streetAddressResult.updateMessage("cannot be longer than 96 characters");
+                streetAddressResult.updateMessage("cannot be longer than 200 characters");
             }
             model.addAttribute("AddressErrorText", "Address " + streetAddressResult);
         }
@@ -480,7 +480,7 @@ public class GardenFormController {
         // notifies the user that the suburb is invalid (if applicable)
         if (!suburbResult.valid()) {
             if (suburbResult == ValidationResult.LENGTH_OVER_LIMIT) {
-                suburbResult.updateMessage("cannot be longer than 96 characters");
+                suburbResult.updateMessage("cannot be longer than 100 characters");
             }
             model.addAttribute("SuburbErrorText", "Suburb " + suburbResult);
         }
