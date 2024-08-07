@@ -71,7 +71,7 @@
                                         stroke-linecap="round" stroke-linejoin="round"></path>
                                 </g>
                             </svg>
-                            <span th:text="${garden.getTotalPlants()}"></span>
+                            <span th:text="${plantCount}"></span>
                         </strong>
                     </p>
                     <p class="break-word">
@@ -180,8 +180,6 @@
                 </div>
             </div>
             <div class="watering position-relative w-100 h-40" th:if="${message}" id="messageBox">
-                <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}">
-                </div>
                 <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}"></div>
                 <span class="close position-absolute top-0 end-0 cursor-pointer" onclick="closeMessageBox()">×</span>
             </div>
@@ -192,13 +190,13 @@
                     <h1 class="mb-3">Plants</h1>
                     <p class="text-muted">
                         Showing results <span th:text="${startIndex}"></span> to <span th:text="${endIndex}"></span> of
-                        <span th:text="${garden.getTotalPlants()}"></span>
+                        <span th:text="${plantCount}"></span>
                     </p>
                 </div>
             </div>
             <input type="hidden" id="gardenId" th:value="${garden.getGardenId()}" />
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                <div class="col" th:each="plant : ${garden.getPlants()}">
+                <div class="col" th:each="plant : ${plants}">
                     <div th:replace="~{fragments/plantBox.html :: plantBox(
                     plantId=${plant.getPlantId()},
                     plantName=${plant.getPlantName()},

@@ -15,8 +15,6 @@ public class GardenDetailModel {
     private String gardenDescription;
     private String gardenLocation;
     private Double gardenSize;
-    private List<Plant> plants;
-    private int totalPlants;
 
 
     /**
@@ -31,8 +29,6 @@ public class GardenDetailModel {
         this.gardenDescription = garden.getGardenDescription();
         this.gardenLocation = garden.getGardenLocation();
         this.gardenSize = garden.getGardenSize();
-        this.plants = garden.getPlants();
-        this.totalPlants = plants.size();
     }
 
     public Long getGardenId() {
@@ -58,11 +54,4 @@ public class GardenDetailModel {
         return gardenSize;
     }
 
-    public List<Plant> getPlants() {
-        return plants;
-    }
-
-    public int getTotalPlants() {
-        return totalPlants;
-    }
 }
