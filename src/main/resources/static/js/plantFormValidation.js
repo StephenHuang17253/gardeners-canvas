@@ -34,9 +34,11 @@ const clearDateError = () => {
 const handleDateUpdate = (event) => {
     const dateValue = new Date(event.target.value);
     const today = new Date();
+    const timeDiff = today - dateValue;
     const age = today.getFullYear() - dateValue.getFullYear();
     const monthDiff = today.getMonth() - dateValue.getMonth();
     const dayDiff = today.getDate() - dateValue.getDate();
+    const trueDayDiff = timeDiff / (1000 * 60 * 60 * 24);
 
     if (!plantDate.checkValidity()) {
         plantDateErrorJs.textContent = "Date is not in valid format, DD/MM/YYYY";
@@ -47,7 +49,7 @@ const handleDateUpdate = (event) => {
     let validAge = false;
     if (age > 400 || (age === 400 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)))) {
         plantDateErrorJs.textContent = "Plant date cannot be more than 400 years ago.";
-    } else if (age < -1) {
+    } else if (trueDayDiff < -365) {
         plantDateErrorJs.textContent = "Plant date cannot be more than a year in the future.";
     } else {
         validAge = true;
