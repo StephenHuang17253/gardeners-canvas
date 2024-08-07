@@ -157,6 +157,17 @@ public class GardenTagService {
         tagList.forEach(item -> item.setTagStatus(tagStatus));
         gardenTagRepository.saveAll(tagList);
     }
+    /**
+     * Get matching gardens by searchValue and matching tags
+     * @param searchValue string contained in Garden Name
+     * @param tags Tags to match garden
+     * @return List of all gardens that match by Name or at least one tag
+     * **/
+    public List<Garden> getMatchingGardens(String searchValue, List<String> tags) {
+        String tagsString = String.join(",", tags);
+        return gardenTagRelationRepository.findByGardenNameContainsAndGardenHasTags(searchValue, tagsString);
+    }
+
 
     /**
      * Delete all tag relations by name (case insensitive)

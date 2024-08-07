@@ -12,16 +12,16 @@ import java.util.Locale;
  * Note: This is about past, current and future weather data
  */
 public class WeatherResponseData {
-    List<Integer> SUNNY_WEATHER_CODES = List.of(0, 1, 2);
-    List<Integer> OVERCAST_WEATHER_CODES = List.of(3, 45, 48, 51);
-    JsonNode current;
-    JsonNode daily;
-    JsonNode jsonTempMax;
-    JsonNode jsonTempMin;
-    JsonNode jsonDailyWeatherCodes;
-    JsonNode jsonDailyPrecipitationSum;
-    JsonNode jsonDates;
-    List<DailyWeather> retrievedWeatherData;
+    private static final List<Integer> SUNNY_WEATHER_CODES = List.of(0, 1, 2);
+    private static final List<Integer> OVERCAST_WEATHER_CODES = List.of(3, 45, 48, 51);
+    private JsonNode current;
+    private JsonNode daily;
+    private JsonNode jsonTempMax;
+    private JsonNode jsonTempMin;
+    private JsonNode jsonDailyWeatherCodes;
+    private JsonNode jsonDailyPrecipitationSum;
+    private JsonNode jsonDates;
+    private List<DailyWeather> retrievedWeatherData;
 
 
     /**
@@ -47,7 +47,6 @@ public class WeatherResponseData {
     void improveCurrentWeatherForecast() {
         int weatherCode = current.get("weather_code").asInt();
         List<String> weatherDescriptionAndIcon = getWeatherDescriptionAndIcon(weatherCode);
-        LocalDate currentTime = LocalDate.now();
 
         DailyWeather currentWeather = retrievedWeatherData.get(2);
         currentWeather.setDescription(weatherDescriptionAndIcon.get(0));

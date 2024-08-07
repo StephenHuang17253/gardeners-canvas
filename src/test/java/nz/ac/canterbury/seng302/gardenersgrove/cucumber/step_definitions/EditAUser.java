@@ -7,6 +7,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
@@ -57,6 +58,9 @@ public class EditAUser {
     @Autowired
     public FriendshipRepository friendshipRepository;
 
+    @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
 
     @Autowired
     public FileService fileService;
@@ -74,7 +78,7 @@ public class EditAUser {
         if (scenario.getSourceTagNames().contains("@NotRequiresSetup")) {
             return;
         }
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         tokenRepository.deleteAll();
         friendshipRepository.deleteAll();
         userRepository.deleteAll();

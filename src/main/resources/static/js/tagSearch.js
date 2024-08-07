@@ -3,6 +3,7 @@ const addTagButton = document.getElementById('addTagButton');
 const appliedTagsList = document.getElementById('appliedTagsList');
 const appliedTagsInputs = document.getElementById('appliedTagsInputs');
 const searchTagErrorText = document.getElementById('searchTagErrorText')
+const maxTextLength = 50;
 
 
 /**
@@ -11,13 +12,14 @@ const searchTagErrorText = document.getElementById('searchTagErrorText')
  * otherwise adds it to the list of applied tags for the search
  */
 const handleButtonClick = async () => {
-    const value = tagInput.value;
+    const value = tagInput.value.trim();
 
     const tagExists = await checkTagExists(value);
 
     if (!tagExists) {
         tagInput.classList.add('border-danger');
         searchTagErrorText.textContent = `No tag matching "${value}"`;
+        cutOffText(searchTagErrorText, maxTextLength);
         return;
     }
 
@@ -79,6 +81,18 @@ const checkTagExists = async (tagName) => {
 const hideTagSection = () => {
     if (appliedTagsList.childElementCount === 1) {
         appliedTagsList.classList.add('d-none');
+    }
+}
+
+/**
+ * Cuts off text if it exceeds the max length
+ * @param {HTMLElement} element - The element containing the text
+ * @param {number} maxLength - The maximum length of the text
+ */
+const cutOffText = (element, maxLength) => {
+    let text = element.textContent;
+    if (text.length > maxLength) {
+        element.textContent = text.substring(0, maxLength - 3) + "...\"";
     }
 }
 

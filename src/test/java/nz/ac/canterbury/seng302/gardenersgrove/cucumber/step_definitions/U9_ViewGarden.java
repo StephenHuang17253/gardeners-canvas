@@ -58,6 +58,9 @@ public class U9_ViewGarden {
     public UserRepository userRepository;
 
     @Autowired
+    public HomePageLayoutRepository homePageLayoutRepository;
+
+    @Autowired
     public PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -94,7 +97,7 @@ public class U9_ViewGarden {
     @Before
     public void before_or_after_all() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
-        userService = new UserService(passwordEncoder, userRepository);
+        userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService, emailService);

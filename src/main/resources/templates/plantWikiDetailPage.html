@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{fragments/header.html}"></head>
+
+<body>
+    <div th:replace="~{fragments/navBar.html :: navBar('plantWiki')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div th:if="${plant}" class="container mt-5 bg-white border rounded pt-4">
+        <div class="row">
+            <div class="col">
+                <h1 th:text="${plant.commonName} + ' Details'"></h1>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <h5 th:text="${plant.scientificName}" class="fw-light fst-italic text-success"></h5>
+            <div class="w-50 mb-4">
+                <div class="ratio ratio-1x1">
+                    <img th:src="@{${plant.defaultImage == '' ? '/images/default_plant.png' : plant.defaultImage}}"
+                         alt="Plant Picture" class="image-fluid rounded w-100 h-100 object-fit-cover">
+                </div>
+            </div>
+            <p th:text="${plant.description}"></p>
+            <div class="text-center">
+                <a href="https://perenual.com/" target="_blank">Plant Info data by Perenual API</a>
+            </div>
+        </div>
+    </div>
+    <div th:if="${searchError} != ''"  class="container mt-5 bg-white border rounded pt-4">
+        <p class="text-danger fs-6" th:text="${searchError}"></p>
+    </div>
+</body>
+
+</html>
