@@ -1,10 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-
 
 /**
  * Plant Info SpringBoot Entity object
@@ -22,7 +20,6 @@ public class PlantInfo {
     @Column(length = 500)
     private String detailJSONResponseString;
     private String watering;
-
     private String cycle;
     private String wateringPeriod;
     private String wateringGeneralBenchmarkValue;
@@ -116,7 +113,6 @@ public class PlantInfo {
     public String getPruningMonth() {return pruningMonth;}
     public String getPruningCountInterval() {return pruningCountInterval;}
     public String getPruningCountAmount() {return pruningCountAmount;}
-
     public boolean getFlowers() {return flowers;}
     public String getFloweringSeason() {return floweringSeason;}
     public boolean getFruits() {return fruits;}
@@ -126,7 +122,4 @@ public class PlantInfo {
     public boolean getPoisonousToPets() {return poisonousToPets;}
     public String getMaintenance() {return maintenance;}
     public boolean getIndoor() {return indoor;}
-
-
-
 }

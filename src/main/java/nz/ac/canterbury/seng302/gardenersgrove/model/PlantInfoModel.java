@@ -118,6 +118,12 @@ public class PlantInfoModel {
     }
 
 
+    /**
+     * Checks if the attribute value returned from plantDetails is null
+     * @param attribute - value to get from plantDetails
+     * @param plantDetails - JSON response from Perenual API
+     * @return "" if attribute value is null, or the value as string
+     */
     public String nullChecker(String attribute, JsonNode plantDetails) {
         if (plantDetails == null) {
             return "";
@@ -129,6 +135,12 @@ public class PlantInfoModel {
         return "";
     }
 
+    /**
+     * Goes through images for a plant from the plantDetails
+     * Finds whichever is not null
+     * @param plantDetails - the JSON response from Perenual API
+     * @return the imageURL or empty string is unavailable
+     */
     private String getImageURL(JsonNode plantDetails) {
 
         if (plantDetails.get("default_image").get("regular_url") != null) {
@@ -158,7 +170,6 @@ public class PlantInfoModel {
     }
 
     public String getCycle() {return cycle;}
-    public String getWateringPeriod() {return wateringPeriod;}
     public String getWateringGeneralBenchmarkValue() {return wateringGeneralBenchmarkValue;}
     public String getWateringGeneralBenchmarkUnit() {return wateringGeneralBenchmarkUnit;}
     public String getSunlight() {return sunlight;}
@@ -176,37 +187,21 @@ public class PlantInfoModel {
     public boolean getIndoor() {return indoor;}
 
 
-
-
-//    private String extractStringNames(List<String> otherNames) {
-//        if (otherNames == null) {
-//            return "";
-//        }
-//
-//        StringBuilder sb = new StringBuilder();
-//        boolean first = true;
-//
-//        for (String name : otherNames) {
-//            if (!first) {
-//                sb.append(", ");
-//            }
-//            sb.append(name);
-//            first = false;
-//        }
-//
-//        return sb.toString();
-//    }
-
-
-    private String extractStringNames(JsonNode otherNames) {
-        if (otherNames == null || !otherNames.isArray()) {
+    /**
+     * Takes a List<String> from the JSON data
+     * Converts to String with commas separating strings
+     * @param stringList the JsonNode data
+     * @return String of all the values with commas
+     */
+    private String extractStringNames(JsonNode stringList) {
+        if (stringList == null || !stringList.isArray()) {
             return "";
         }
 
         StringBuilder sb = new StringBuilder();
         boolean first = true;
 
-        for (JsonNode node : otherNames) {
+        for (JsonNode node : stringList) {
             if (!first) {
                 sb.append(", ");
             }
