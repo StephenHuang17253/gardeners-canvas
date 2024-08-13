@@ -13,6 +13,9 @@ const downloadGLTFButton = document.getElementById('download-gltf');
 const downloadOBJButton = document.getElementById('download-obj');
 const FOV = 75;
 
+const GRID_SIZE = 7;
+const TILE_SIZE = 10;
+
 // link used to download the file
 const link = document.createElement('a');
 link.style.display = 'none';
@@ -132,9 +135,11 @@ const init = () => {
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    // Prevent camera from going below the ground
+    controls.maxPolarAngle = Math.PI / 2 - 0.1;
 
     const grassTexture = loadGrassTexture();
-    const grid = createTileGrid(7, 7, 10, grassTexture, 0.2,1.56);
+    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
     scene.add(grid);
 
     loader = new GLTFLoader();
@@ -147,7 +152,7 @@ const init = () => {
 
 // Loads a basic cube model
 const loadCube = () => {
-    const geometry = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshPhongMaterial({ color: 'tan', shininess: 10 })
     cubeModel = new THREE.Mesh(geometry, material);
     cubeModel.name = 'cube';
@@ -155,30 +160,23 @@ const loadCube = () => {
 }
 
 // Loads a model from a url and gives it a name
-const loadModel = (url, name) => {
-    const group = new THREE.Group();
-    loader.load(url, gltf => {
-        const model = gltf.scene;
-        // model is rendered as a child of a group, get first child and rename it
-        model.children[0].name = name;
-        group.add(model);
+const loadModel = async (path, name) => {
+    const loader = new GLTFLoader(); // Assuming GLTF format
+    const model = await loader.loadAsync(path);
+    model.scene.traverse((child) => {
+        child.name = name;
     });
-    return group;
+    return model.scene;
 }
+
 
 // Loads a plant model
-const loadPlant = () => {
-    plantModel = loadModel('../models/fiddle_leaf_plant.glb', 'plant1');
-    plantModel.position.set(0, 0, 10);
-    scene.add(plantModel);
+const loadPlant = async (filename, position) => {
+    plantModel = await loadModel(`../models/${filename}`, filename);
+    plantModel.position.copy(position); // Set the model's position
+    scene.add(plantModel); // Add the model to the scene
 }
 
-// Loads a different plant model
-const loadPlant2 = () => {
-    plantModel = loadModel('../models/banana_plant_with_pot.glb', 'plant2');
-    plantModel.position.set(10, 0, 0);
-    scene.add(plantModel);
-}
 
 // Adds a light to the scene
 const addLight = () => {
@@ -208,28 +206,30 @@ const animate = () => {
         infoBox.innerText = text;
     }
 
-
     renderer.render(scene, camera);
 }
 
 const loadHDRI = (url) => {
     const loader = new EXRLoader();
-    loader.load(url, (texture) => {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
-        scene.background = texture;
-        scene.environment = texture;
-    }, undefined, (error) => {
-        console.error('An error occurred while loading the EXR file:', error);
-    });
+    loader.load(
+        url,
+        texture => {
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            scene.background = texture;
+            scene.environment = texture;
+        },
+        undefined,
+        error => console.error('An error occurred while loading the EXR file:', error)
+    );
 };
 
 init();
 
 addLight();
 
-loadPlant();
+loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
 
-loadPlant2();
+loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
 
 loadCube();
 
@@ -272,9 +272,8 @@ const onClick = (event) => {
     const intersects = getIntersects();
     if (intersects.length > 0) {
         const object = intersects[0].object;
-        const newColor = new THREE.Color(Math.random() * 0xffffff);
         if (object.material.uniforms && object.material.uniforms.uBaseColor) {
-            object.material.uniforms.uBaseColor.value = newColor;
+            object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
         }
     }
 }
@@ -284,22 +283,25 @@ const onKeyDown = (event) => {
     if (!pointer) {
         return;
     }
-    event.preventDefault();
     const cameraDirection = new THREE.Vector3();
     camera.getWorldDirection(cameraDirection);
     const up = new THREE.Vector3(0, 1, 0);
     const movementScalar = 0.5;
     switch (event.key) {
         case 'ArrowLeft':
+            event.preventDefault();
             camera.position.add(cameraDirection.cross(up).normalize().multiplyScalar(-movementScalar));
             break;
         case 'ArrowRight':
+            event.preventDefault();
             camera.position.add(cameraDirection.cross(up).normalize().multiplyScalar(movementScalar));
             break;
         case 'ArrowUp':
+            event.preventDefault();
             camera.position.y += movementScalar;
             break;
         case 'ArrowDown':
+            event.preventDefault();
             camera.position.y -= movementScalar;
             break;
         default:
