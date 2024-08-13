@@ -15,11 +15,59 @@ const FOV = 75;
 
 const GRID_SIZE = 7;
 const TILE_SIZE = 10;
+const MIN_CAMERA_DIST = TILE_SIZE / 2;
+const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 // link used to download the file
 const link = document.createElement('a');
 link.style.display = 'none';
 document.body.appendChild(link);
+
+
+// Initialises main components of the scene
+const init = () => {
+    scene = new THREE.Scene();
+    // axes = new THREE.AxesHelper(2);
+    // axes.name = 'axes';
+    // scene.add(axes);
+
+    camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
+    camera.position.set(5, 5, 5);
+    camera.lookAt(scene.position);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    // Prevent camera from going below the ground
+    controls.maxPolarAngle = Math.PI / 2 - 0.1;
+    // Prevent camera from going too far away or too close
+    controls.minDistance = MIN_CAMERA_DIST;
+    controls.maxDistance = MAX_CAMERA_DIST;
+
+    // Attempting to try and stop camera from going too far away
+    // controls.addEventListener('change', () => {
+    //     const distance = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+    //     if (distance > MAX_CAMERA_DIST) {
+    //         console.log('Distance too far');
+    //         console.log(camera.position);
+
+    //         camera.position.set(5, 5, 5);
+    //         camera.lookAt(scene.position);
+    //         // camera.position.normalize().multiplyScalar(MAX_CAMERA_DISTANCE);
+    //     }
+    // });
+    
+    loader = new GLTFLoader();
+    raycaster = new THREE.Raycaster();
+    pointer = null;
+
+    gltfExporter = new GLTFExporter();
+    objExporter = new OBJExporter();
+}
 
 const vertexShader = `
     varying vec2 vUv;
@@ -136,55 +184,26 @@ const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturatio
             grid.add(tile);
 
             // Load and position the plant at the center of the tile
-            const plantPosition = new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset);
-            const plantModel = await loadPlant('fern.glb', plantPosition, 10);
+            // const plantPosition = new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset);
+            // const plantModel = await loadPlant('fern.glb', plantPosition, 10);
 
             // Adjust the plant's position above the tile if necessary
-            plantModel.position.y += tileSize / 2;
+            // plantModel.position.y += tileSize / 2;
 
-            grid.add(plantModel);
-            plantPromises.push(
-                loadPlant(plantFilename, plantPosition, plantScale)
-                    .then(plantModel => {
-                        // Adjust the plant's position above the tile if necessary
-                        plantModel.position.y += tileSize / 2;
-                        grid.add(plantModel);
-                    })
-            );
+            // grid.add(plantModel);
+            // plantPromises.push(
+            //     loadPlant(plantFilename, plantPosition, plantScale)
+            //         .then(plantModel => {
+            //             // Adjust the plant's position above the tile if necessary
+            //             plantModel.position.y += tileSize / 2;
+            //             grid.add(plantModel);
+            //         })
+            // );
         }
     }
-    await Promise.all(plantPromises);
+    // await Promise.all(plantPromises);
     return grid;
 };
-
-// Initialises main components of the scene
-const init = () => {
-    scene = new THREE.Scene();
-    // axes = new THREE.AxesHelper(2);
-    // axes.name = 'axes';
-    // scene.add(axes);
-
-    camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
-    camera.position.set(5, 5, 5);
-    camera.lookAt(scene.position);
-
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
-
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    // Prevent camera from going below the ground
-    controls.maxPolarAngle = Math.PI / 2 - 0.1;
-
-    loader = new GLTFLoader();
-    raycaster = new THREE.Raycaster();
-    pointer = null;
-
-    gltfExporter = new GLTFExporter();
-    objExporter = new OBJExporter();
-}
 
 // Loads a basic cube model
 const loadCube = () => {
@@ -252,11 +271,11 @@ createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56)
         scene.add(grid); // Add the grid with plants to the scene
     });
 
-// loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
-//
-// loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
-//
-// loadPlant('fern.glb', new THREE.Vector3(0, 0, 0), 10);
+loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
+
+loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
+
+loadPlant('fern.glb', new THREE.Vector3(0, 0, 0), 10);
 
 // loadCube();
 
@@ -293,17 +312,17 @@ const onWindowResize = () => {
     renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-// // Change the color of the object that is clicked
-// const onClick = (event) => {
-//     updatePointer(event);
-//     const intersects = getIntersects();
-//     if (intersects.length > 0) {
-//         const object = intersects[0].object;
-//         if (object.material.uniforms && object.material.uniforms.uBaseColor) {
-//             object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
-//         }
-//     }
-// }
+// Change the color of the object that is clicked
+const onClick = (event) => {
+    updatePointer(event);
+    // const intersects = getIntersects();
+    // if (intersects.length > 0) {
+    //     const object = intersects[0].object;
+    //     if (object.material.uniforms && object.material.uniforms.uBaseColor) {
+    //         object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
+    //     }
+    // }
+}
 
 // Move the camera in the direction of the arrow keys
 const onKeyDown = (event) => {
