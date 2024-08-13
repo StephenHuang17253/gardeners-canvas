@@ -1,8 +1,8 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+import * as THREE from '/webjars/three/0.167.1/build/three.module.js';
+// import { GLTFLoader } from '/webjars/three/0.167.1/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from '/webjars/three/0.167.1/examples/jsm/controls/OrbitControls.js';
+// import { GLTFExporter } from '/webjars/three/0.167.1/examples/jsm/exporters/GLTFExporter.js';
+// import { OBJExporter } from '/webjars/three/0.167.1/examples/jsm/exporters/OBJExporter.js';
 
 let axes, scene, camera, renderer, loader, light, raycaster, plantModel, cubeModel, pointer, controls, gltfExporter, objExporter;
 
@@ -26,6 +26,7 @@ const init = () => {
 
     camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
     camera.position.set(5, 5, 5);
+    camera.lookAt(scene.position);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -35,12 +36,12 @@ const init = () => {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    loader = new GLTFLoader();
+    // loader = new GLTFLoader();
     raycaster = new THREE.Raycaster();
-    pointer = new THREE.Vector2();
+    pointer = null;
 
-    gltfExporter = new GLTFExporter();
-    objExporter = new OBJExporter();
+    // gltfExporter = new GLTFExporter();
+    // objExporter = new OBJExporter();
 }
 
 // Loads a basic cube model
@@ -97,12 +98,15 @@ const animate = () => {
 
     light.position.copy(camera.position);
 
-    const intersects = getIntersects();
-    let text = '';
-    if (intersects.length > 0) {
-        text = intersects[0].object.name;
+    if (pointer) {
+        const intersects = getIntersects();
+        let text = '';
+        if (intersects.length > 0) {
+            text = intersects[0].object.name;
+        }
+        infoBox.innerText = text;
     }
-    infoBox.innerText = text;
+
 
     renderer.render(scene, camera);
 }
@@ -111,9 +115,9 @@ init();
 
 addLight();
 
-loadPlant();
+// loadPlant();
 
-loadPlant2();
+// loadPlant2();
 
 loadCube();
 
@@ -121,6 +125,9 @@ renderer.setAnimationLoop(animate);
 
 // Updates the pointer position
 const updatePointer = (event) => {
+    if (!pointer) {
+        pointer = new THREE.Vector2();
+    }
     const bounds = container.getBoundingClientRect();
     pointer.x = ((event.clientX - bounds.left) / container.clientWidth) * 2 - 1;
     pointer.y = - ((event.clientY - bounds.top) / container.clientHeight) * 2 + 1;
@@ -134,6 +141,7 @@ const onMouseMove = (event) => {
 
 // Resets the user selection to default, allows things to be highlighted again
 const onMouseOut = () => {
+    pointer = null;
     document.body.style.userSelect = 'auto';
 }
 
@@ -156,6 +164,10 @@ const onClick = (event) => {
 
 // Move the camera in the direction of the arrow keys
 const onKeyDown = (event) => {
+    if (!pointer) {
+        return;
+    }
+    event.preventDefault();
     const cameraDirection = new THREE.Vector3();
     camera.getWorldDirection(cameraDirection);
     const up = new THREE.Vector3(0, 1, 0);
@@ -211,8 +223,7 @@ const onDownloadButtonClick = (fileType) => {
             );
             break;
         case 'obj':
-            const data = objExporter.parse(scene);
-            saveString(data, 'scene.obj');
+            saveString(objExporter.parse(scene), 'scene.obj');
             break;
         default:
             break;
@@ -225,7 +236,7 @@ window.addEventListener('load', updatePointer);
 container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
 container.addEventListener('click', onClick);
-downloadGLTFButton.addEventListener('click', () => onDownloadButtonClick('gltf'));
-downloadOBJButton.addEventListener('click', () => onDownloadButtonClick('obj'));
+// downloadGLTFButton.addEventListener('click', () => onDownloadButtonClick('gltf'));
+// downloadOBJButton.addEventListener('click', () => onDownloadButtonClick('obj'));
 
 console.log(scene.children);
