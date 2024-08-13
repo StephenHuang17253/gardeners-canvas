@@ -16,6 +16,10 @@ const FOV = 75;
 const GRID_SIZE = 7;
 const TILE_SIZE = 10;
 
+const plantFilename = 'fern.glb';
+const plantScale = 10;
+
+
 // link used to download the file
 const link = document.createElement('a');
 link.style.display = 'none';
@@ -123,11 +127,13 @@ const createTile = (texture, size, hueShift, saturation) => {
     return tile;
 };
 
-// Create the grid of tiles
-const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturation) => {
+// Create the grid of tiles and return their center positions
+const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2; // Center the grid
-    const plantPromises = [];
+
+    // Array to store the positions of the tile centers
+    const positions = [];
 
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
@@ -135,28 +141,32 @@ const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturatio
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
 
-            // Load and position the plant at the center of the tile
-            const plantPosition = new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset);
-            const plantModel = await loadPlant('fern.glb', plantPosition, 10);
-
-            // Adjust the plant's position above the tile if necessary
-            plantModel.position.y += tileSize / 2;
-
-            grid.add(plantModel);
-            plantPromises.push(
-                loadPlant(plantFilename, plantPosition, plantScale)
-                    .then(plantModel => {
-                        // Adjust the plant's position above the tile if necessary
-                        plantModel.position.y += tileSize / 2;
-                        grid.add(plantModel);
-                    })
-            );
+            // Store the center position of the tile
+            positions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    await Promise.all(plantPromises);
-    return grid;
-};
 
+    // Add the grid of tiles to the scene
+    scene.add(grid);
+
+    // Return the array of positions
+    return positions;
+};
+// Load plants at the saved positions
+const loadPlantsAtPositions = async (positions, plantFilename, plantScale = 1) => {
+    const plantPromises = [];
+
+    for (const position of positions) {
+        plantPromises.push(loadPlant(plantFilename, position, plantScale).then(plantModel => {
+            // Adjust the plant's position above the tile if necessary
+            plantModel.position.y += tileSize / 2;
+            scene.add(plantModel);
+        }));
+    }
+
+    // Wait for all plants to be loaded
+    await Promise.all(plantPromises);
+};
 // Initialises main components of the scene
 const init = () => {
     scene = new THREE.Scene();
@@ -247,10 +257,11 @@ init();
 addLight();
 
 const grassTexture = loadGrassTexture();
-createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56)
-    .then(grid => {
-        scene.add(grid); // Add the grid with plants to the scene
-    });
+// Step 1: Create the grid and save the positions
+const positions = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
+
+// Step 2: Load plants separately at the saved positions
+loadPlantsAtPositions(positions, plantFilename, plantScale);
 
 // loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
 //
@@ -294,16 +305,16 @@ const onWindowResize = () => {
 }
 
 // // Change the color of the object that is clicked
-// const onClick = (event) => {
-//     updatePointer(event);
-//     const intersects = getIntersects();
-//     if (intersects.length > 0) {
-//         const object = intersects[0].object;
-//         if (object.material.uniforms && object.material.uniforms.uBaseColor) {
-//             object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
-//         }
-//     }
-// }
+const onClick = (event) => {
+    updatePointer(event);
+    const intersects = getIntersects();
+    if (intersects.length > 0) {
+        const object = intersects[0].object;
+        if (object.material.uniforms && object.material.uniforms.uBaseColor) {
+            object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
+        }
+    }
+}
 
 // Move the camera in the direction of the arrow keys
 const onKeyDown = (event) => {
