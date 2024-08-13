@@ -72,6 +72,27 @@ const fragmentShader = `
     }
 `;
 
+// Loads a model from a url and gives it a name
+const loadModel = async (path, name) => {
+    const loader = new GLTFLoader(); // Assuming GLTF format
+    const model = await loader.loadAsync(path);
+    model.scene.traverse((child) => {
+        child.name = name;
+    });
+    return model.scene;
+}
+
+// Loads a plant model and scales it
+const loadPlant = async (filename, position, scaleFactor = 1) => {
+    const plantModel = await loadModel(`../models/${filename}`, filename);
+    plantModel.position.copy(position); // Set the model's position
+
+    // Scale the model
+    plantModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+    scene.add(plantModel); // Add the model to the scene
+}
+
 
 // Load the grass texture
 const loadGrassTexture = () => {
@@ -103,26 +124,45 @@ const createTile = (texture, size, hueShift, saturation) => {
 };
 
 // Create the grid of tiles
-const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
+const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturation) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2; // Center the grid
+    const plantPromises = [];
 
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const tile = createTile(texture, tileSize, hueShift, saturation);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
+
+            // Load and position the plant at the center of the tile
+            const plantPosition = new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset);
+            const plantModel = await loadPlant('fern.glb', plantPosition, 10);
+
+            // Adjust the plant's position above the tile if necessary
+            plantModel.position.y += tileSize / 2;
+
+            grid.add(plantModel);
+            plantPromises.push(
+                loadPlant(plantFilename, plantPosition, plantScale)
+                    .then(plantModel => {
+                        // Adjust the plant's position above the tile if necessary
+                        plantModel.position.y += tileSize / 2;
+                        grid.add(plantModel);
+                    })
+            );
         }
     }
+    await Promise.all(plantPromises);
     return grid;
 };
 
 // Initialises main components of the scene
 const init = () => {
     scene = new THREE.Scene();
-    axes = new THREE.AxesHelper(2);
-    axes.name = 'axes';
-    scene.add(axes);
+    // axes = new THREE.AxesHelper(2);
+    // axes.name = 'axes';
+    // scene.add(axes);
 
     camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
     camera.position.set(5, 5, 5);
@@ -137,10 +177,6 @@ const init = () => {
     controls.enableDamping = true;
     // Prevent camera from going below the ground
     controls.maxPolarAngle = Math.PI / 2 - 0.1;
-
-    const grassTexture = loadGrassTexture();
-    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
-    scene.add(grid);
 
     loader = new GLTFLoader();
     raycaster = new THREE.Raycaster();
@@ -159,23 +195,6 @@ const loadCube = () => {
     scene.add(cubeModel);
 }
 
-// Loads a model from a url and gives it a name
-const loadModel = async (path, name) => {
-    const loader = new GLTFLoader(); // Assuming GLTF format
-    const model = await loader.loadAsync(path);
-    model.scene.traverse((child) => {
-        child.name = name;
-    });
-    return model.scene;
-}
-
-
-// Loads a plant model
-const loadPlant = async (filename, position) => {
-    plantModel = await loadModel(`../models/${filename}`, filename);
-    plantModel.position.copy(position); // Set the model's position
-    scene.add(plantModel); // Add the model to the scene
-}
 
 
 // Adds a light to the scene
@@ -227,11 +246,19 @@ init();
 
 addLight();
 
-loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
+const grassTexture = loadGrassTexture();
+createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56)
+    .then(grid => {
+        scene.add(grid); // Add the grid with plants to the scene
+    });
 
-loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
+// loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
+//
+// loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
+//
+// loadPlant('fern.glb', new THREE.Vector3(0, 0, 0), 10);
 
-loadCube();
+// loadCube();
 
 loadHDRI('../textures/skybox.exr');
 
@@ -266,17 +293,17 @@ const onWindowResize = () => {
     renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-// Change the color of the object that is clicked
-const onClick = (event) => {
-    updatePointer(event);
-    const intersects = getIntersects();
-    if (intersects.length > 0) {
-        const object = intersects[0].object;
-        if (object.material.uniforms && object.material.uniforms.uBaseColor) {
-            object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
-        }
-    }
-}
+// // Change the color of the object that is clicked
+// const onClick = (event) => {
+//     updatePointer(event);
+//     const intersects = getIntersects();
+//     if (intersects.length > 0) {
+//         const object = intersects[0].object;
+//         if (object.material.uniforms && object.material.uniforms.uBaseColor) {
+//             object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
+//         }
+//     }
+// }
 
 // Move the camera in the direction of the arrow keys
 const onKeyDown = (event) => {
