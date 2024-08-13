@@ -4,19 +4,21 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="img-src 'self' https://perenual.com/ data:image/" />
+    <meta http-equiv="Content-Security-Policy" content="img-src 'self' https://perenual.com/" />
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
     <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
-    <script type="module" th:src="@{/webjars/three/0.167.1/build/three.module.js}"></script>
-    <!-- <script type="module" th:src="@{/webjars/three/0.167.1/examples/jsm/loaders/GLTFLoader.js}"></script> -->
-    <script type="module" th:src="@{/webjars/three/0.167.1/examples/jsm/controls/OrbitControls.js}"></script>
-    <!-- <script type="module" th:src="@{/webjars/three/0.167.1/examples/jsm/exporters/GLTFExporter.js}"></script>
-    <script type="module" th:src="@{/webjars/three/0.167.1/examples/jsm/exporters/OBJExporter.js}"></script> -->
     <title>Gardener's Grove</title>
     <link rel="icon" th:href="@{/images/gardeners_grove_fern_logo.svg}" type="image/svg+xml">
     <link th:if="${includeWeatherStyles}" th:href="@{/css/weatherTimes.css}" rel="stylesheet">
     <th:block th:if="${include3js}">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <script type="importmap" th:inline="javascript"> { 
+                "imports": { 
+                    "three": "[(@{/webjars/three/0.167.1/build/three.module.js})]", 
+                    "three/addons/": "[(@{/webjars/three/0.167.1/examples/jsm/})]" 
+                } 
+            } 
+        </script>
     </th:block>
 </head>

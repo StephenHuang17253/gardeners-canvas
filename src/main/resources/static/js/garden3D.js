@@ -1,8 +1,8 @@
-import * as THREE from '/webjars/three/0.167.1/build/three.module.js';
-// import { GLTFLoader } from '/webjars/three/0.167.1/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from '/webjars/three/0.167.1/examples/jsm/controls/OrbitControls.js';
-// import { GLTFExporter } from '/webjars/three/0.167.1/examples/jsm/exporters/GLTFExporter.js';
-// import { OBJExporter } from '/webjars/three/0.167.1/examples/jsm/exporters/OBJExporter.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 
 let axes, scene, camera, renderer, loader, light, raycaster, plantModel, cubeModel, pointer, controls, gltfExporter, objExporter;
 
@@ -36,12 +36,12 @@ const init = () => {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
 
-    // loader = new GLTFLoader();
+    loader = new GLTFLoader();
     raycaster = new THREE.Raycaster();
     pointer = null;
 
-    // gltfExporter = new GLTFExporter();
-    // objExporter = new OBJExporter();
+    gltfExporter = new GLTFExporter();
+    objExporter = new OBJExporter();
 }
 
 // Loads a basic cube model
@@ -115,9 +115,9 @@ init();
 
 addLight();
 
-// loadPlant();
+loadPlant();
 
-// loadPlant2();
+loadPlant2();
 
 loadCube();
 
@@ -236,7 +236,7 @@ window.addEventListener('load', updatePointer);
 container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
 container.addEventListener('click', onClick);
-// downloadGLTFButton.addEventListener('click', () => onDownloadButtonClick('gltf'));
-// downloadOBJButton.addEventListener('click', () => onDownloadButtonClick('obj'));
+downloadGLTFButton.addEventListener('click', () => onDownloadButtonClick('gltf'));
+downloadOBJButton.addEventListener('click', () => onDownloadButtonClick('obj'));
 
 console.log(scene.children);
