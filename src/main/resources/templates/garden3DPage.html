@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{fragments/header.html :: head (include3js=true)}"></head>
+
+<body>
+
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div class="container-md bg-white rounded pt-3">
+        <div class="container text-center">
+            <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}"></h1>
+        </div>
+    </div>
+    <div id="container" style="width: 100vw; height: 75vh"></div>
+    <div class="container-md bg-white rounded pt-3">
+        <div class="container text-center">
+            <p id="info-box"></p>
+            <button id="download-button">Click to download this scene</button>
+        </div>
+    </div>
+
+    <script th:src="@{/js/inputCharacterLimit.js}"></script>
+    <script th:src="@{/js/getInstance.js}"></script>
+    <script type="module" th:src="@{/js/garden3D.js}"></script>
+</body>
+
+</html>
