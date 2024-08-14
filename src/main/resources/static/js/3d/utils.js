@@ -1,31 +1,37 @@
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as THREE from 'three';
-// Loads a model from a url and gives it a name
-const loadModel = async (path, name) => {
-    const loader = new GLTFLoader(); // Assuming GLTF format
-    const model = await loader.loadAsync(path);
+
+/**
+ * Load gltf 3d model with named parts to be used in scene
+ * @param filename
+ * @param name
+ * @param gltfLoader
+ * @returns {Promise<*>}
+ */
+const loadModel = async (filename, name, gltfLoader) => {
+    const model = await gltfLoader.loadAsync(`../models/${filename}`);
     model.scene.traverse((child) => {
         child.name = name;
     });
     return model.scene;
-}
+};
 
-
-// Load the grass texture
-const loadTexture = (filenamePath) => {
-    const loader = new THREE.TextureLoader();
-    return loader.load(filenamePath);
+/**
+ * Load texture to be used in scene
+ * @param filenamePath string path of texture to be loaded
+ * @param textureLoader instance
+ * @returns loaded texture
+ */
+const loadTexture = (filenamePath, textureLoader) => {
+    return textureLoader.load(filenamePath);
 };
 
 // Loads a plant model and scales it
-const loadAsset = async (filename, scene, position, scaleFactor = 1) => {
-    const plantModel = await loadModel(`../models/${filename}`, filename);
-    plantModel.position.copy(position); // Set the model's position
+const addModelToScene = (model, scene, position, scaleFactor = 1) => {
+    model.position.copy(position);
+    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    // Scale the model
-    plantModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    scene.add(model);
+};
 
-    scene.add(plantModel); // Add the model to the scene
-}
-
-export {loadModel, loadTexture, loadAsset};
+export {loadModel, loadTexture, addModelToScene};

@@ -1,4 +1,4 @@
-import { loadTexture, loadAsset } from './utils.js';
+import { loadTexture, addModelToScene } from './utils.js';
 import * as THREE from 'three';
 const vertexShader = `
     varying vec2 vUv;
@@ -101,12 +101,11 @@ const createTileGrid = (scene, rows, cols, tileSize, texture, hueShift, saturati
     return positions;
 };
 // Load plants at the saved positions
-const loadPlantsAtPositions = async (scene, positions, plantFilename, plantScale = 1) => {
+const loadPlantsAtPositions = async (scene, positions, plantModel, plantScale = 1) => {
     const plantPromises = [];
 
     for (const position of positions) {
-        plantPromises.push(loadAsset(plantFilename, scene, position, plantScale).then(plantModel => {
-            // Adjust the plant's position above the tile if necessary
+        plantPromises.push(addModelToScene(plantModel, scene, position, plantScale).then(plantModel => {
             plantModel.position.y += tileSize / 2;
             scene.add(plantModel);
         }));

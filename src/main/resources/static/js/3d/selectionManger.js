@@ -40,8 +40,8 @@ const applyOutline = (object, scene) => {
         vertexShader: outlineShader.vertexShader,
         fragmentShader: outlineShader.fragmentShader,
         // side: THREE.BackSide, // Render the outline behind the original object
-        depthTest: false, // Disable depth testing to ensure the outline is always visible
-        depthWrite: false, // Prevent writing to the depth buffer
+        depthTest: false,
+        depthWrite: false,
         transparent: true
     });
 

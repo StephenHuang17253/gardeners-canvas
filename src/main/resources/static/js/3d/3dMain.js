@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { applyOutline } from './selectionManger.js';
-import { loadTexture, loadAsset } from './utils.js';
+import {loadTexture, addModelToScene, loadModel} from './utils.js';
 import { createTileGrid, loadPlantsAtPositions } from './tiles.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
@@ -19,8 +20,8 @@ const FOV = 75;
 const GRID_SIZE = 7;
 const TILE_SIZE = 10;
 
-const plantFilename = 'fern.glb';
-const plantScale = 10;
+const textureLoader = new THREE.TextureLoader();
+const gltfLoader = new GLTFLoader();
 
 // link used to download the file
 const link = document.createElement('a');
@@ -101,7 +102,7 @@ init();
 
 addLight();
 
-const grassTexture = loadTexture('../textures/grass-tileable.jpg');
+const grassTexture = loadTexture('../textures/grass-tileable.jpg',textureLoader);
 
 const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 
@@ -111,7 +112,9 @@ const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTe
 //
 // loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
 //
-loadAsset('fern.glb', scene, new THREE.Vector3(0, 0, 20), 2);
+
+const fernModel = await loadModel('fern.glb','fern', gltfLoader);
+addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
 
 loadHDRI('../textures/skybox.exr');
 
@@ -166,9 +169,9 @@ const updatePointer = (event) => {
     pointer.y = - ((event.clientY - bounds.top) / container.clientHeight) * 2 + 1;
 }
 
+// stops page elements from being highlighted when double clicks occur on the canvas
 const onMouseMove = (event) => {
     updatePointer(event);
-    // stops page elements from being highlighted when double clicks occur on the canvas
     document.body.style.userSelect = 'none';
 }
 
