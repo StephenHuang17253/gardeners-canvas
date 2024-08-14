@@ -205,8 +205,6 @@ const loadCube = () => {
     scene.add(cubeModel);
 }
 
-
-
 // Adds a light to the scene
 const addLight = () => {
     light = new THREE.AmbientLight(0xffffff);
@@ -261,13 +259,13 @@ const grassTexture = loadGrassTexture();
 const positions = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 
 // Step 2: Load plants separately at the saved positions
-// loadPlantsAtPositions(positions, plantFilename, plantScale);
+// loadPlantsAtPositions(positions, plantFilename, 1);
 
 // loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
 //
 // loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
 //
-loadPlant('fern.glb', new THREE.Vector3(0, 0, 0), 1);
+loadPlant('fern.glb', new THREE.Vector3(0, 0, 20), 2);
 
 // loadCube();
 
@@ -326,7 +324,7 @@ const outlineShader = {
 function applyOutline(object) {
     const baseOutlineThickness = 0.05; // Base thickness of the outline
     const outlineColor = new THREE.Color(0xffa500); // Orange color
-    const outlineAlpha = 0.5; // Set transparency (0.0 is fully transparent, 1.0 is fully opaque)
+    const outlineAlpha = 0.25; // Set transparency (0.0 is fully transparent, 1.0 is fully opaque)
 
     // Use a fixed thickness or adjust it based on the object's scale
     const scale = object.scale;
@@ -348,24 +346,26 @@ function applyOutline(object) {
         transparent: true
     });
 
-    // Create a new mesh for the outline
-    const outlineMesh = new THREE.Mesh(object.geometry, outlineMaterial);
-    outlineMesh.position.copy(object.position);
-    outlineMesh.scale.copy(object.scale); // Use the current scale
-    console.log('Object scale for outline:', object.scale);
-    outlineMesh.rotation.copy(object.rotation);
+    object.traverse((child) => {
+        if (child.isMesh) {
+            const outlineMesh = new THREE.Mesh(child.geometry.clone(), outlineMaterial);
+            const worldPosition = new THREE.Vector3();
+            const worldScale = new THREE.Vector3();
+            child.getWorldPosition(worldPosition);
+            child.getWorldScale(worldScale);
+            console.log('Mesh World Position:', worldPosition);
+            outlineMesh.position.copy(worldPosition);
+            outlineMesh.scale.copy(worldScale);
+            outlineMesh.rotation.copy(child.rotation);
 
-    // Add the outline mesh to the scene
-    // Set render order to ensure outline is rendered first
-    outlineMesh.renderOrder = 1; // Ensure the outline is rendered before the main object
+            scene.add(outlineMesh);
 
-    // Add the outline mesh to the scene
-    scene.add(outlineMesh);
-
-    // Optionally, remove the outline after a delay
-    setTimeout(() => {
-        scene.remove(outlineMesh);
-    }, 1000); // Outline duration in milliseconds
+            // Optionally, remove the outline after a delay
+            setTimeout(() => {
+                scene.remove(outlineMesh);
+            }, 1000); // Outline duration in milliseconds
+        }
+    });
 }
 
 
