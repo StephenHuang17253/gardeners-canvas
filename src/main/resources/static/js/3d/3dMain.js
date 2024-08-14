@@ -116,7 +116,7 @@ const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTe
 const fernModel = await loadModel('fern.glb','fern', gltfLoader);
 addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
 
-loadHDRI('../textures/skybox.exr');
+loadHDRI('../textures/night.exr');
 
 renderer.setAnimationLoop(animate);
 
