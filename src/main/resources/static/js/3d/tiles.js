@@ -1,4 +1,4 @@
-import { loadTexture, loadAsset } from 'utils.js';
+import { loadTexture, loadAsset } from './utils.js';
 import * as THREE from 'three';
 const vertexShader = `
     varying vec2 vUv;

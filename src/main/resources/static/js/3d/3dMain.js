@@ -8,7 +8,7 @@ import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 
-let scene, camera, renderer, loader, light, raycaster, pointer, controls, gltfExporter, objExporter;
+let scene, camera, renderer, light, raycaster, pointer, controls, gltfExporter, objExporter;
 
 const container = document.getElementById('container');
 const infoBox = document.getElementById('info-box');
@@ -45,7 +45,6 @@ const init = () => {
     // Prevent camera from going below the ground
     controls.maxPolarAngle = Math.PI / 2 - 0.1;
 
-    loader = new GLTFLoader();
     raycaster = new THREE.Raycaster();
     pointer = null;
 
