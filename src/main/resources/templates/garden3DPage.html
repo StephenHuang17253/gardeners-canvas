@@ -8,7 +8,7 @@
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md bg-white rounded pt-3">
         <div class="container text-center">
-            <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}"></h1>
+            <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}">Garden Name</h1>
         </div>
     </div>
     <div id="container" style="width: 100vw; height: 75vh"></div>
@@ -17,6 +17,7 @@
             <p id="info-box"></p>
             <button id="download-gltf">Download GLTF</button>
             <button id="download-obj">Download OBJ</button>
+            <button id="download-jpg">Download JPG</button>
         </div>
     </div>
 

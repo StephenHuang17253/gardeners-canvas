@@ -1,27 +1,27 @@
 import * as THREE from 'three';
 import { applyOutline } from './selectionManger.js';
-import {loadTexture, addModelToScene, loadModel} from './utils.js';
+import { loadTexture, addModelToScene, loadModel } from './utils.js';
 import { createTileGrid, loadPlantsAtPositions } from './tiles.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 
-let scene, camera, renderer, light, raycaster, pointer, controls, gltfExporter, objExporter;
+let scene, camera, renderer, light, raycaster, pointer, controls, gltfExporter, objExporter, textureLoader, gltfLoader;
 
 const container = document.getElementById('container');
 const infoBox = document.getElementById('info-box');
 const downloadGLTFButton = document.getElementById('download-gltf');
 const downloadOBJButton = document.getElementById('download-obj');
+const downloadJPGButton = document.getElementById('download-jpg');
 const FOV = 75;
 
 const GRID_SIZE = 7;
 const TILE_SIZE = 10;
-
-const textureLoader = new THREE.TextureLoader();
-const gltfLoader = new GLTFLoader();
+const MIN_CAMERA_DIST = TILE_SIZE / 2;
+const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 // link used to download the file
 const link = document.createElement('a');
@@ -36,21 +36,26 @@ const init = () => {
     camera.position.set(5, 5, 5);
     camera.lookAt(scene.position);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    // Prevent camera from going below the ground
     controls.maxPolarAngle = Math.PI / 2 - 0.1;
+    controls.minDistance = MIN_CAMERA_DIST;
+    controls.maxDistance = MAX_CAMERA_DIST;
+    controls.minTargetRadius = MIN_CAMERA_DIST;
+    controls.maxTargetRadius = MAX_CAMERA_DIST;
 
     raycaster = new THREE.Raycaster();
     pointer = null;
 
     gltfExporter = new GLTFExporter();
     objExporter = new OBJExporter();
+
+    textureLoader = new THREE.TextureLoader();
+    gltfLoader = new GLTFLoader();
 }
 
 // Adds a light to the scene
@@ -67,8 +72,6 @@ const getIntersects = () => {
 
 // Method that gets called every frame
 const animate = () => {
-
-    controls.update();
 
     light.position.copy(camera.position);
 
@@ -102,18 +105,14 @@ init();
 
 addLight();
 
-const grassTexture = loadTexture('../textures/grass-tileable.jpg',textureLoader);
+const grassTexture = loadTexture('../textures/grass-tileable.jpg', textureLoader);
 
 const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 
 // loadPlantsAtPositions(scene, positions, plantFilename, 1);
 
-// loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
-//
-// loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
-//
 
-const fernModel = await loadModel('fern.glb','fern', gltfLoader);
+const fernModel = await loadModel('fern.glb', 'fern', gltfLoader);
 addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
 
 loadHDRI('../textures/skybox.exr');
@@ -125,38 +124,6 @@ const onWindowResize = () => {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
-}
-
-// Move the camera in the direction of the arrow keys
-const onKeyDown = (event) => {
-    if (!pointer) {
-        return;
-    }
-    const cameraDirection = new THREE.Vector3();
-    camera.getWorldDirection(cameraDirection);
-    const up = new THREE.Vector3(0, 1, 0);
-    const movementScalar = 0.5;
-    switch (event.key) {
-        case 'ArrowLeft':
-            event.preventDefault();
-            camera.position.add(cameraDirection.cross(up).normalize().multiplyScalar(-movementScalar));
-            break;
-        case 'ArrowRight':
-            event.preventDefault();
-            camera.position.add(cameraDirection.cross(up).normalize().multiplyScalar(movementScalar));
-            break;
-        case 'ArrowUp':
-            event.preventDefault();
-            camera.position.y += movementScalar;
-            break;
-        case 'ArrowDown':
-            event.preventDefault();
-            camera.position.y -= movementScalar;
-            break;
-        default:
-            break;
-    }
-    camera.updateProjectionMatrix();
 }
 
 // Updates the pointer position
@@ -191,20 +158,15 @@ const onClick = (event) => {
     }
 }
 
-const save = (blob, filename) => {
-    link.href = URL.createObjectURL(blob);
+const saveFile = (data, filename) => {
+    document.body.appendChild(link);
+    link.href = data
     link.download = filename;
     link.click();
+    document.body.removeChild(link);
 }
 
-const saveString = (text, filename) => {
-    save(new Blob([text], { type: 'text/plain' }), filename);
-}
-
-
-const saveArrayBuffer = (buffer, filename) => {
-    save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
-}
+const createDataUrl = (text, type) => URL.createObjectURL(new Blob([text], { type: type }));
 
 const onDownloadButtonClick = (fileType) => {
     switch (fileType) {
@@ -213,24 +175,35 @@ const onDownloadButtonClick = (fileType) => {
                 scene,
                 result => {
                     if (result instanceof ArrayBuffer) {
-                        saveArrayBuffer(result, 'scene.glb');
+                        saveFile(createDataUrl(result, 'application/octet-stream'), 'scene.glb');
                     } else {
-                        const output = JSON.stringify(result, null, 2);
-                        saveString(output, 'scene.gltf');
+                        const output = JSON.stringify(result, null, 1);
+                        saveFile(createDataUrl(output, 'text/plain'), 'scene.gltf');
                     }
                 },
                 error => console.log('An error happened while saving the scene')
             );
             break;
         case 'obj':
-            saveString(objExporter.parse(scene), 'scene.obj');
+            const objData = objExporter.parse(scene);
+            saveFile(createDataUrl(objData, 'text/plain'), 'scene.obj');
+            break;
+        case 'jpg':
+            try {
+                const strMime = "image/jpeg";
+                const strDownloadMime = "image/octet-stream";
+                const imgData = renderer.domElement.toDataURL(strMime);
+                saveFile(imgData.replace(strMime, strDownloadMime), "scene.jpg");
+            } catch (e) {
+                console.log(e);
+                return;
+            }
             break;
         default:
             break;
     }
 }
 
-window.addEventListener('keydown', onKeyDown);
 window.addEventListener('resize', onWindowResize);
 window.addEventListener('load', updatePointer);
 container.addEventListener('mousemove', onMouseMove);
@@ -238,5 +211,6 @@ container.addEventListener('mouseout', onMouseOut);
 container.addEventListener('click', onClick);
 downloadGLTFButton.addEventListener('click', () => onDownloadButtonClick('gltf'));
 downloadOBJButton.addEventListener('click', () => onDownloadButtonClick('obj'));
+downloadJPGButton.addEventListener('click', () => onDownloadButtonClick('jpg'));
 
 console.log(scene.children);
