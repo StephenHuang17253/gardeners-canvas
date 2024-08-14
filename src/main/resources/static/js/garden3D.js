@@ -261,13 +261,13 @@ const grassTexture = loadGrassTexture();
 const positions = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 
 // Step 2: Load plants separately at the saved positions
-loadPlantsAtPositions(positions, plantFilename, plantScale);
+// loadPlantsAtPositions(positions, plantFilename, plantScale);
 
 // loadPlant('fiddle_leaf_plant.glb', new THREE.Vector3(0, 0, 10));
 //
 // loadPlant('banana_plant_with_pot.glb', new THREE.Vector3(0, 0, -10));
 //
-// loadPlant('fern.glb', new THREE.Vector3(0, 0, 0), 10);
+loadPlant('fern.glb', new THREE.Vector3(0, 0, 0), 1);
 
 // loadCube();
 
@@ -303,6 +303,71 @@ const onWindowResize = () => {
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
 }
+const outlineShader = {
+    vertexShader: `
+        uniform float outlineThickness;
+        void main() {
+            // Adjust position by adding the scaled normal
+            vec4 pos = modelViewMatrix * vec4(position + normal * outlineThickness, 1.0);
+            gl_Position = projectionMatrix * pos;
+        }
+    `,
+    fragmentShader: `
+        uniform vec3 outlineColor;
+        uniform float outlineAlpha; // New uniform for alpha transparency
+        
+        void main() {
+            gl_FragColor = vec4(outlineColor, outlineAlpha); // Use alpha for transparency
+        }
+    `
+};
+
+
+function applyOutline(object) {
+    const baseOutlineThickness = 0.05; // Base thickness of the outline
+    const outlineColor = new THREE.Color(0xffa500); // Orange color
+    const outlineAlpha = 0.5; // Set transparency (0.0 is fully transparent, 1.0 is fully opaque)
+
+    // Use a fixed thickness or adjust it based on the object's scale
+    const scale = object.scale;
+    const maxScale = Math.max(scale.x, scale.y, scale.z);
+    const adjustedThickness = baseOutlineThickness / maxScale;
+
+    // Create the outline material
+    const outlineMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            outlineThickness: { value: adjustedThickness },
+            outlineColor: { value: outlineColor },
+            outlineAlpha: { value: outlineAlpha } //
+        },
+        vertexShader: outlineShader.vertexShader,
+        fragmentShader: outlineShader.fragmentShader,
+        // side: THREE.BackSide, // Render the outline behind the original object
+        depthTest: false, // Disable depth testing to ensure the outline is always visible
+        depthWrite: false, // Prevent writing to the depth buffer
+        transparent: true
+    });
+
+    // Create a new mesh for the outline
+    const outlineMesh = new THREE.Mesh(object.geometry, outlineMaterial);
+    outlineMesh.position.copy(object.position);
+    outlineMesh.scale.copy(object.scale); // Use the current scale
+    console.log('Object scale for outline:', object.scale);
+    outlineMesh.rotation.copy(object.rotation);
+
+    // Add the outline mesh to the scene
+    // Set render order to ensure outline is rendered first
+    outlineMesh.renderOrder = 1; // Ensure the outline is rendered before the main object
+
+    // Add the outline mesh to the scene
+    scene.add(outlineMesh);
+
+    // Optionally, remove the outline after a delay
+    setTimeout(() => {
+        scene.remove(outlineMesh);
+    }, 1000); // Outline duration in milliseconds
+}
+
 
 // // Change the color of the object that is clicked
 const onClick = (event) => {
@@ -310,9 +375,8 @@ const onClick = (event) => {
     const intersects = getIntersects();
     if (intersects.length > 0) {
         const object = intersects[0].object;
-        if (object.material.uniforms && object.material.uniforms.uBaseColor) {
-            object.material.uniforms.uBaseColor.value = new THREE.Color(Math.random() * 0xffffff);
-        }
+        console.log('Clicked Object scale for outline:', object.scale);
+        applyOutline(object);
     }
 }
 
