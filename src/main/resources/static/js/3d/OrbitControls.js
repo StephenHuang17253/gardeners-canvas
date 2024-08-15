@@ -66,16 +66,12 @@ class OrbitControls extends THREE.EventDispatcher {
         // "target" sets the location of focus, where the camera orbits around
         this.target = new THREE.Vector3();
 
-        // Sets the 3D cursor (similar to Blender), from which the maxTargetRadius takes effect
+        // Sets the 3D cursor (similar to Blender), from which the maxRadius takes effect
         this.cursor = new THREE.Vector3();
 
-        // How far you can dolly in and out
-        this.minDistance = 0;
-        this.maxDistance = Infinity;
-
-        // Limit camera target within a spherical area around the cursor
-        this.minTargetRadius = 0;
-        this.maxTargetRadius = Infinity;
+        // How far you can dolly in and out and limit camera target within a spherical area around the cursor
+        this.minRadius = 0;
+        this.maxRadius = Infinity;
 
         // How far you can orbit vertically, upper and lower limits.
         // Range is 0 to Math.PI radians.
@@ -197,7 +193,7 @@ class OrbitControls extends THREE.EventDispatcher {
 
             // Limit the target distance from the cursor to create a sphere around the center of interest
             this.target.sub(this.cursor);
-            this.target.clampLength(this.minTargetRadius, this.maxTargetRadius);
+            this.target.clampLength(this.minRadius, this.maxRadius);
             this.target.add(this.cursor);
             // prevent camera from going below ground
             this.target.y = Math.max(this.target.y, MIN_TARGET_HEIGHT);
@@ -268,7 +264,7 @@ class OrbitControls extends THREE.EventDispatcher {
 
         const dollyIn = (dollyScale) => scale *= dollyScale;
 
-        const clampDistance = (dist) => Math.max(this.minDistance, Math.min(this.maxDistance, dist));
+        const clampDistance = (dist) => Math.max(this.minRadius, Math.min(this.maxRadius, dist));
 
         //
         // event callbacks - update the camera state
@@ -722,7 +718,6 @@ class OrbitControls extends THREE.EventDispatcher {
 
         update();
     }
-
 }
 
 export { OrbitControls };

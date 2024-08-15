@@ -1,15 +1,12 @@
 import * as THREE from 'three';
 import { applyOutline } from './selectionManager.js';
-import { loadTexture, addModelToScene, loadModel } from './utils.js';
+import { addModelToScene } from './utils.js';
 import { createTileGrid, loadPlantsAtPositions } from './tiles.js';
 import { OrbitControls } from './OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { Loader } from './Loader.js';
+import { Exporter } from './Exporter.js';
 
-import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
-import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
-
-let scene, camera, renderer, manager, light, raycaster, pointer, controls, gltfExporter, objExporter, textureLoader, gltfLoader, exrLoader;
+let scene, camera, renderer, manager, light, raycaster, pointer, controls, exporter, loader;
 
 const container = document.getElementById('container');
 const downloadGLTFButton = document.getElementById('download-gltf');
@@ -26,6 +23,7 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 // link used to download files
 const link = document.createElement('a');
+const gardenName = 'My Favourite Garden';
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -42,36 +40,31 @@ const init = () => {
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
-    manager = new THREE.LoadingManager();
+    loader = new Loader();
 
-    manager.onLoad = () => {
+    loader.setOnLoad(() => {
         loadingImg.classList.add('d-none');
         loadingDiv.classList.add('fadeOut');
         setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
-    };
+    });
 
-    manager.onError = () => {
+    loader.setOnError(() => {
         loadingImg.classList.add('d-none');
         loadingDiv.innerText = 'There was an error loading your garden';
-    };
+    });
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.maxPolarAngle = Math.PI / 2 - 0.1;
-    controls.minDistance = MIN_CAMERA_DIST;
-    controls.maxDistance = MAX_CAMERA_DIST;
-    controls.minTargetRadius = MIN_CAMERA_DIST;
-    controls.maxTargetRadius = MAX_CAMERA_DIST;
+    controls.minRadius = MIN_CAMERA_DIST;
+    controls.maxRadius = MAX_CAMERA_DIST;
 
     raycaster = new THREE.Raycaster();
     pointer = null;
 
-    gltfExporter = new GLTFExporter(manager);
-    objExporter = new OBJExporter(manager);
-
-    textureLoader = new THREE.TextureLoader(manager);
-    gltfLoader = new GLTFLoader(manager);
-    exrLoader = new EXRLoader(manager);
+    exporter = new Exporter(link, gardenName);
 };
+
+init();
 
 /**
  * Adds a light to the scene
@@ -108,38 +101,29 @@ const animate = () => {
     renderer.render(scene, camera);
 };
 
-/**
- * Loads an EXR image and sets it as the background and environment of the scene
- * @param {String} path 
- */
-const loadEXR = (path) => {
-    exrLoader.load(
-        path,
-        texture => {
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            scene.background = texture;
-            scene.environment = texture;
-        },
-        undefined,
-        error => console.error('An error occurred while loading the EXR file:', error)
-    );
-};
+renderer.setAnimationLoop(animate);
 
-init();
+
 addLight();
-loadEXR('../textures/nightbox.exr');
 
-const grassTexture = loadTexture('../textures/grass-tileable.jpg', textureLoader);
+loader.loadBackground(
+    '../textures/nightbox.exr',
+    texture => {
+        scene.background = texture;
+        scene.environment = texture;
+    }
+);
+
+const grassTexture = loader.loadTexture('../textures/grass-tileable.jpg');
 
 const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 
 // loadPlantsAtPositions(scene, positions, plantFilename, 1);
 
-const fernModel = await loadModel('fern.glb', 'fern', gltfLoader);
+const fernModel = await loader.loadModel('fern.glb', 'fern');
 
 addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
 
-renderer.setAnimationLoop(animate);
 
 /**
  * On window resize event, update the camera aspect ratio and renderer size
@@ -194,77 +178,13 @@ const onClick = (event) => {
     }
 };
 
-/**
- * 
- * @param {String} data - data to create a data url for
- * @param {String} type - mime type of the data
- * @returns {String} data url for the created data
- */
-const createDataUrl = (data, type) => URL.createObjectURL(new Blob([data], { type: type }));
-
-/**
- * Saves the data to a file with the given filename
- * @param {String} dataURL - url of data to save
- * @param {String} filename - name of the file to save
- */
-const downloadFile = (dataURL, filename) => {
-    document.body.appendChild(link);
-    link.href = dataURL;
-    link.download = filename;
-    link.click();
-    document.body.removeChild(link);
-};
-
-/**
- * On download button click, download the scene as a file with the given file extension
- * @param {String} fileType - file extension of the file to download, gltf, obj, or jpg 
- */
-const onDownloadButtonClick = (fileType) => {
-    switch (fileType) {
-        case 'gltf': {
-            gltfExporter.parse(
-                scene,
-                result => {
-                    if (result instanceof ArrayBuffer) {
-                        downloadFile(createDataUrl(result, 'application/octet-stream'), 'scene.glb');
-                    } else {
-                        const output = JSON.stringify(result, null, 1);
-                        downloadFile(createDataUrl(output, 'text/plain'), 'scene.gltf');
-                    }
-                },
-                error => console.log('An error happened while saving the scene')
-            );
-            break;
-        }
-        case 'obj': {
-            const objData = objExporter.parse(scene);
-            downloadFile(createDataUrl(objData, 'text/plain'), 'scene.obj');
-            break;
-        }
-        case 'jpg': {
-            try {
-                const strMime = "image/jpeg";
-                const strDownloadMime = "image/octet-stream";
-                const imgData = renderer.domElement.toDataURL(strMime);
-                downloadFile(imgData.replace(strMime, strDownloadMime), "scene.jpg");
-            } catch (error) {
-                console.log(error);
-                return;
-            }
-            break;
-        }
-        default:
-            break;
-    }
-};
-
 window.addEventListener('resize', onWindowResize);
 window.addEventListener('load', updatePointer);
 container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
 container.addEventListener('click', onClick);
-downloadGLTFButton.addEventListener('click', () => onDownloadButtonClick('gltf'));
-downloadOBJButton.addEventListener('click', () => onDownloadButtonClick('obj'));
-downloadJPGButton.addEventListener('click', () => onDownloadButtonClick('jpg'));
+downloadGLTFButton.addEventListener('click', () => exporter.downloadGLTF(scene));
+downloadOBJButton.addEventListener('click', () => exporter.downloadOBJ(scene));
+downloadJPGButton.addEventListener('click', () => exporter.downloadJPEG(renderer));
 
 console.log(scene.children);
