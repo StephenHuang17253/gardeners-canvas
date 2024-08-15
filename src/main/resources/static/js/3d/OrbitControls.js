@@ -36,8 +36,25 @@ const STATE = {
     TOUCH_DOLLY_ROTATE: 6
 };
 
+
+/**
+ * @class OrbitControls
+ * @extends THREE.EventDispatcher
+ * 
+ * This class provides orbit controls for a camera in a 3D scene.
+ * It allows the user to orbit around a target point, zoom in and out, and pan the camera.
+ * 
+ * @param {THREE.Camera} camera - The camera to be controlled.
+ * @param {HTMLElement} domElement - The DOM element to which the controls will be attached.
+ */
 class OrbitControls extends THREE.EventDispatcher {
 
+    /**
+     * Constructs a new instance of the OrbitControls class.
+     * 
+     * @param {THREE.Camera} camera - The camera object to be controlled.
+     * @param {HTMLElement} domElement - The DOM element to which the controls will be attached.
+     */
     constructor(camera, domElement) {
 
         super();
@@ -79,10 +96,22 @@ class OrbitControls extends THREE.EventDispatcher {
         // public methods
         //
 
+        /**
+         * Gets the current polar angle of the camera to the target.
+         * @returns {number} The current polar angle of the camera.
+         */
         this.getPolarAngle = () => spherical.phi;
 
+        /**
+         * Gets the current azimuthal angle of the camera to the target.
+         * @returns {number} The current azimuthal angle of the camera.
+         */
         this.getAzimuthalAngle = () => spherical.theta;
 
+        /**
+         * Gets the current distance of the camera to the target.
+         * @returns {number} The current distance of the camera to the target.
+         */
         this.getDistance = () => this.camera.position.distanceTo(this.target);
 
         //
@@ -115,6 +144,9 @@ class OrbitControls extends THREE.EventDispatcher {
 
         let controlActive = false;
 
+        /**
+         * Updates the camera state, occurs after a input event.
+         */
         const update = () => {
             const offset = new THREE.Vector3();
 
@@ -212,14 +244,14 @@ class OrbitControls extends THREE.EventDispatcher {
             v.setFromMatrixColumn(cameraMatrix, 0); // Get X column of cameraMatrix
             v.multiplyScalar(-distance);
             panOffset.add(v);
-        }
+        };
 
         const panUp = (distance, cameraMatrix) => {
             const v = new THREE.Vector3();
             v.setFromMatrixColumn(cameraMatrix, 1); // Get Y column of cameraMatrix
             v.multiplyScalar(distance);
             panOffset.add(v);
-        }
+        };
 
         const pan = (deltaX, deltaY) => {
             const position = this.camera.position;
@@ -230,7 +262,7 @@ class OrbitControls extends THREE.EventDispatcher {
             // we use only clientHeight here so aspect ratio does not distort speed
             panLeft(2 * deltaX * targetDistance / this.domElement.clientHeight, this.camera.matrix);
             panUp(2 * deltaY * targetDistance / this.domElement.clientHeight, this.camera.matrix);
-        }
+        };
 
         const dollyOut = (dollyScale) => scale /= dollyScale;
 
@@ -255,7 +287,7 @@ class OrbitControls extends THREE.EventDispatcher {
             rotateUp(TWO_PI * rotateDelta.y / this.domElement.clientHeight);
             rotateStart.copy(rotateEnd);
             update();
-        }
+        };
 
         const handleMouseMoveDolly = (event) => {
             dollyEnd.set(event.clientX, event.clientY);
@@ -267,7 +299,7 @@ class OrbitControls extends THREE.EventDispatcher {
             }
             dollyStart.copy(dollyEnd);
             update();
-        }
+        };
 
         const handleMouseMovePan = (event) => {
             panEnd.set(event.clientX, event.clientY);
@@ -275,7 +307,7 @@ class OrbitControls extends THREE.EventDispatcher {
             pan(panDelta.x, panDelta.y);
             panStart.copy(panEnd);
             update();
-        }
+        };
 
         const handleMouseWheel = (event) => {
             if (event.deltaY < 0) {
@@ -284,12 +316,12 @@ class OrbitControls extends THREE.EventDispatcher {
                 dollyOut(getZoomScale(event.deltaY));
             }
             update();
-        }
+        };
 
         const handleKeyDown = (event) => {
             let needsUpdate = false;
             switch (event.code) {
-                case KEYS.UP:
+                case KEYS.UP: {
                     if (event.shiftKey) {
                         rotateUp(TWO_PI * this.rotateSpeed / this.domElement.clientHeight);
                     } else {
@@ -297,7 +329,8 @@ class OrbitControls extends THREE.EventDispatcher {
                     }
                     needsUpdate = true;
                     break;
-                case KEYS.BOTTOM:
+                }
+                case KEYS.BOTTOM: {
                     if (event.shiftKey) {
                         rotateUp(- TWO_PI * this.rotateSpeed / this.domElement.clientHeight);
                     } else {
@@ -305,7 +338,8 @@ class OrbitControls extends THREE.EventDispatcher {
                     }
                     needsUpdate = true;
                     break;
-                case KEYS.LEFT:
+                }
+                case KEYS.LEFT: {
                     if (event.shiftKey) {
                         rotateLeft(TWO_PI * this.rotateSpeed / this.domElement.clientHeight);
                     } else {
@@ -313,7 +347,8 @@ class OrbitControls extends THREE.EventDispatcher {
                     }
                     needsUpdate = true;
                     break;
-                case KEYS.RIGHT:
+                }
+                case KEYS.RIGHT: {
                     if (event.shiftKey) {
                         rotateLeft(- TWO_PI * this.rotateSpeed / this.domElement.clientHeight);
                     } else {
@@ -321,13 +356,14 @@ class OrbitControls extends THREE.EventDispatcher {
                     }
                     needsUpdate = true;
                     break;
+                }
             }
             if (needsUpdate) {
                 // prevent the browser from scrolling on cursor keys
                 event.preventDefault();
                 update();
             }
-        }
+        };
 
         const handleTouchStartRotate = (event) => {
             if (pointers.length === 1) {
@@ -338,7 +374,7 @@ class OrbitControls extends THREE.EventDispatcher {
                 const y = 0.5 * (event.pageY + position.y);
                 rotateStart.set(x, y);
             }
-        }
+        };
 
         const handleTouchStartPan = (event) => {
             if (pointers.length === 1) {
@@ -349,7 +385,7 @@ class OrbitControls extends THREE.EventDispatcher {
                 const y = 0.5 * (event.pageY + position.y);
                 panStart.set(x, y);
             }
-        }
+        };
 
         const handleTouchStartDolly = (event) => {
             const position = getSecondPointerPosition(event);
@@ -357,17 +393,17 @@ class OrbitControls extends THREE.EventDispatcher {
             const dy = event.pageY - position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             dollyStart.set(0, distance);
-        }
+        };
 
         const handleTouchStartDollyPan = (event) => {
             handleTouchStartDolly(event);
             handleTouchStartPan(event);
-        }
+        };
 
         const handleTouchStartDollyRotate = (event) => {
             handleTouchStartDolly(event);
             handleTouchStartRotate(event);
-        }
+        };
 
         const handleTouchMoveRotate = (event) => {
             if (pointers.length == 1) {
@@ -383,7 +419,7 @@ class OrbitControls extends THREE.EventDispatcher {
             rotateLeft(TWO_PI * rotateDelta.x / element.clientHeight); // yes, height
             rotateUp(TWO_PI * rotateDelta.y / element.clientHeight);
             rotateStart.copy(rotateEnd);
-        }
+        };
 
         const handleTouchMovePan = (event) => {
             if (pointers.length === 1) {
@@ -397,7 +433,7 @@ class OrbitControls extends THREE.EventDispatcher {
             panDelta.subVectors(panEnd, panStart).multiplyScalar(this.panSpeed);
             pan(panDelta.x, panDelta.y);
             panStart.copy(panEnd);
-        }
+        };
 
         const handleTouchMoveDolly = (event) => {
             const position = getSecondPointerPosition(event);
@@ -408,17 +444,17 @@ class OrbitControls extends THREE.EventDispatcher {
             dollyDelta.set(0, Math.pow(dollyEnd.y / dollyStart.y, this.zoomSpeed));
             dollyOut(dollyDelta.y);
             dollyStart.copy(dollyEnd);
-        }
+        };
 
         const handleTouchMoveDollyPan = (event) => {
             handleTouchMoveDolly(event);
             handleTouchMovePan(event);
-        }
+        };
 
         const handleTouchMoveDollyRotate = (event) => {
             handleTouchMoveDolly(event);
             handleTouchMoveRotate(event);
-        }
+        };
 
         //
         // event handlers - FSM: listen for events and reset state
@@ -437,7 +473,7 @@ class OrbitControls extends THREE.EventDispatcher {
             } else {
                 onMouseDown(event);
             }
-        }
+        };
 
         const onPointerMove = (event) => {
             if (event.pointerType === 'touch') {
@@ -445,48 +481,55 @@ class OrbitControls extends THREE.EventDispatcher {
             } else {
                 onMouseMove(event);
             }
-        }
+        };
 
         const onPointerUp = (event) => {
             removePointer(event);
             switch (pointers.length) {
-                case 0:
+                case 0: {
                     this.domElement.releasePointerCapture(event.pointerId);
                     this.domElement.removeEventListener('pointermove', onPointerMove);
                     this.domElement.removeEventListener('pointerup', onPointerUp);
                     this.dispatchEvent(_endEvent);
                     state = STATE.NONE;
                     break;
-                case 1:
+                }
+                case 1: {
                     const pointerId = pointers[0];
                     const position = pointerPositions[pointerId];
                     // minimal placeholder event - allows state correction on pointer-up
                     onTouchStart({ pointerId: pointerId, pageX: position.x, pageY: position.y });
                     break;
+                }
             }
-        }
+        };
 
         const onMouseDown = (event) => {
             let mouseAction;
             switch (event.button) {
-                case 0:
+                case 0: {
                     mouseAction = MOUSE_BUTTONS.LEFT;
                     break;
-                case 1:
+                }
+                case 1: {
                     mouseAction = MOUSE_BUTTONS.MIDDLE;
                     break;
-                case 2:
+                }
+                case 2: {
                     mouseAction = MOUSE_BUTTONS.RIGHT;
                     break;
-                default:
+                }
+                default: {
                     mouseAction = -1;
+                }
             }
             switch (mouseAction) {
-                case THREE.MOUSE.DOLLY:
+                case THREE.MOUSE.DOLLY: {
                     handleMouseDownDolly(event);
                     state = STATE.DOLLY;
                     break;
-                case THREE.MOUSE.ROTATE:
+                }
+                case THREE.MOUSE.ROTATE: {
                     if (event.shiftKey) {
                         handleMouseDownPan(event);
                         state = STATE.PAN;
@@ -495,7 +538,8 @@ class OrbitControls extends THREE.EventDispatcher {
                         state = STATE.ROTATE;
                     }
                     break;
-                case THREE.MOUSE.PAN:
+                }
+                case THREE.MOUSE.PAN: {
                     if (event.shiftKey) {
                         handleMouseDownRotate(event);
                         state = STATE.ROTATE;
@@ -504,27 +548,32 @@ class OrbitControls extends THREE.EventDispatcher {
                         state = STATE.PAN;
                     }
                     break;
-                default:
+                }
+                default: {
                     state = STATE.NONE;
+                }
             }
             if (state !== STATE.NONE) {
                 this.dispatchEvent(_startEvent);
             }
-        }
+        };
 
         const onMouseMove = (event) => {
             switch (state) {
-                case STATE.ROTATE:
+                case STATE.ROTATE: {
                     handleMouseMoveRotate(event);
                     break;
-                case STATE.DOLLY:
+                }
+                case STATE.DOLLY: {
                     handleMouseMoveDolly(event);
                     break;
-                case STATE.PAN:
+                }
+                case STATE.PAN: {
                     handleMouseMovePan(event);
                     break;
+                }
             }
-        }
+        };
 
         const onMouseWheel = (event) => {
             if (state !== STATE.NONE) return;
@@ -538,11 +587,15 @@ class OrbitControls extends THREE.EventDispatcher {
             };
             switch (event.deltaMode) {
                 case 1: // LINE_MODE
-                    newEvent.deltaY *= 16;
-                    break;
+                    {
+                        newEvent.deltaY *= 16;
+                        break;
+                    }
                 case 2: // PAGE_MODE
-                    newEvent.deltaY *= 100;
-                    break;
+                    {
+                        newEvent.deltaY *= 100;
+                        break;
+                    }
             }
             // detect if event was triggered by pinching
             if (event.ctrlKey && !controlActive) {
@@ -550,72 +603,86 @@ class OrbitControls extends THREE.EventDispatcher {
             }
             handleMouseWheel(newEvent);
             this.dispatchEvent(_endEvent);
-        }
+        };
 
         const onKeyDown = (event) => handleKeyDown(event);
 
         const onTouchStart = (event) => {
             trackPointer(event);
             switch (pointers.length) {
-                case 1:
+                case 1: {
                     switch (TOUCHES.ONE) {
-                        case THREE.TOUCH.ROTATE:
+                        case THREE.TOUCH.ROTATE: {
                             handleTouchStartRotate(event);
                             state = STATE.TOUCH_ROTATE;
                             break;
-                        case THREE.TOUCH.PAN:
+                        }
+                        case THREE.TOUCH.PAN: {
                             handleTouchStartPan(event);
                             state = STATE.TOUCH_PAN;
                             break;
-                        default:
+                        }
+                        default: {
                             state = STATE.NONE;
+                        }
                     }
                     break;
-                case 2:
+                }
+                case 2: {
                     switch (TOUCHES.TWO) {
-                        case THREE.TOUCH.DOLLY_PAN:
+                        case THREE.TOUCH.DOLLY_PAN: {
                             handleTouchStartDollyPan(event);
                             state = STATE.TOUCH_DOLLY_PAN;
                             break;
-                        case THREE.TOUCH.DOLLY_ROTATE:
+                        }
+                        case THREE.TOUCH.DOLLY_ROTATE: {
                             handleTouchStartDollyRotate(event);
                             state = STATE.TOUCH_DOLLY_ROTATE;
                             break;
-                        default:
+                        }
+                        default: {
                             state = STATE.NONE;
+                        }
                     }
                     break;
-                default:
+                }
+                default: {
                     state = STATE.NONE;
+                }
             }
             if (state !== STATE.NONE) {
                 this.dispatchEvent(_startEvent);
             }
-        }
+        };
 
         const onTouchMove = (event) => {
             trackPointer(event);
             switch (state) {
-                case STATE.TOUCH_ROTATE:
+                case STATE.TOUCH_ROTATE: {
                     handleTouchMoveRotate(event);
                     update();
                     break;
-                case STATE.TOUCH_PAN:
+                }
+                case STATE.TOUCH_PAN: {
                     handleTouchMovePan(event);
                     update();
                     break;
-                case STATE.TOUCH_DOLLY_PAN:
+                }
+                case STATE.TOUCH_DOLLY_PAN: {
                     handleTouchMoveDollyPan(event);
                     update();
                     break;
-                case STATE.TOUCH_DOLLY_ROTATE:
+                }
+                case STATE.TOUCH_DOLLY_ROTATE: {
                     handleTouchMoveDollyRotate(event);
                     update();
                     break;
-                default:
+                }
+                default: {
                     state = STATE.NONE;
+                }
             }
-        }
+        };
 
         const onContextMenu = (event) => event.preventDefault();
 
@@ -629,7 +696,7 @@ class OrbitControls extends THREE.EventDispatcher {
                     return;
                 }
             }
-        }
+        };
 
         const isTrackingPointer = (event) => pointers.includes(event.pointerId);
 
@@ -640,12 +707,12 @@ class OrbitControls extends THREE.EventDispatcher {
                 pointerPositions[event.pointerId] = position;
             }
             position.set(event.pageX, event.pageY);
-        }
+        };
 
         const getSecondPointerPosition = (event) => {
             const pointerId = (event.pointerId === pointers[0]) ? pointers[1] : pointers[0];
             return pointerPositions[pointerId];
-        }
+        };
 
         this.domElement.addEventListener('contextmenu', onContextMenu);
         this.domElement.addEventListener('pointerdown', onPointerDown);

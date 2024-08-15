@@ -1,5 +1,13 @@
 import * as THREE from 'three';
 
+const OUTLINE_THICKNESS = 0.05;
+const OUTLINE_COLOR = new THREE.Color(0xffa500);
+const OUTLINE_ALPHA = 0.25; // Set transparency (0.0 is fully transparent, 1.0 is fully opaque)
+const OUTLINE_DURATION = 1000; // Duration of the outline effect in milliseconds
+
+/**
+ * Shader code for the outline effect.
+ */
 const outlineShader = {
     vertexShader: `
         uniform float outlineThickness;
@@ -16,26 +24,25 @@ const outlineShader = {
         void main() {
             gl_FragColor = vec4(outlineColor, outlineAlpha); // Use alpha for transparency
         }
-    `
+`
 };
 
-
+/**
+ * Applies an outline effect to the given object in the scene.
+ * 
+ * @param {THREE.Object3D} object - The object to apply the outline effect to.
+ * @param {THREE.Scene} scene - The scene where the object is located.
+ */
 const applyOutline = (object, scene) => {
-    const baseOutlineThickness = 0.05; // Base thickness of the outline
-    const outlineColor = new THREE.Color(0xffa500); // Orange color
-    const outlineAlpha = 0.25; // Set transparency (0.0 is fully transparent, 1.0 is fully opaque)
-
-    // Use a fixed thickness or adjust it based on the object's scale
     const scale = object.scale;
     const maxScale = Math.max(scale.x, scale.y, scale.z);
-    const adjustedThickness = baseOutlineThickness / maxScale;
+    const adjustedThickness = OUTLINE_THICKNESS / maxScale;
 
-    // Create the outline material
     const outlineMaterial = new THREE.ShaderMaterial({
         uniforms: {
             outlineThickness: { value: adjustedThickness },
-            outlineColor: { value: outlineColor },
-            outlineAlpha: { value: outlineAlpha } //
+            outlineColor: { value: OUTLINE_COLOR },
+            outlineAlpha: { value: OUTLINE_ALPHA }
         },
         vertexShader: outlineShader.vertexShader,
         fragmentShader: outlineShader.fragmentShader,
@@ -45,7 +52,7 @@ const applyOutline = (object, scene) => {
         transparent: true
     });
 
-    object.traverse((child) => {
+    object.traverse(child => {
         if (child.isMesh) {
             const outlineMesh = new THREE.Mesh(child.geometry.clone(), outlineMaterial);
             const worldPosition = new THREE.Vector3();
@@ -55,16 +62,11 @@ const applyOutline = (object, scene) => {
             outlineMesh.position.copy(worldPosition);
             outlineMesh.scale.copy(worldScale);
             outlineMesh.rotation.copy(child.rotation);
-
             scene.add(outlineMesh);
-
-            // Optionally, remove the outline after a delay
-            setTimeout(() => {
-                scene.remove(outlineMesh);
-            }, 1000); // Outline duration in milliseconds
+            setTimeout(() => scene.remove(outlineMesh), OUTLINE_DURATION);
         }
     });
-}
+};
 
 
 export { applyOutline };
