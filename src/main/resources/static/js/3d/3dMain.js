@@ -9,13 +9,14 @@ import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 
-let scene, camera, renderer, light, raycaster, pointer, controls, gltfExporter, objExporter, textureLoader, gltfLoader, exrLoader;
+let scene, camera, renderer, manager, light, raycaster, pointer, controls, gltfExporter, objExporter, textureLoader, gltfLoader, exrLoader;
 
 const container = document.getElementById('container');
-const infoBox = document.getElementById('info-box');
 const downloadGLTFButton = document.getElementById('download-gltf');
 const downloadOBJButton = document.getElementById('download-obj');
 const downloadJPGButton = document.getElementById('download-jpg');
+const loadingDiv = document.getElementById('loading-div');
+const loadingImg = document.getElementById('loading-img');
 const FOV = 75;
 
 const GRID_SIZE = 7;
@@ -41,6 +42,19 @@ const init = () => {
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
+    manager = new THREE.LoadingManager();
+
+    manager.onLoad = () => {
+        loadingImg.classList.add('d-none');
+        loadingDiv.classList.add('fadeOut');
+        setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
+    };
+
+    manager.onError = () => {
+        loadingImg.classList.add('d-none');
+        loadingDiv.innerText = 'There was an error loading your garden';
+    };
+
     controls = new OrbitControls(camera, renderer.domElement);
     controls.maxPolarAngle = Math.PI / 2 - 0.1;
     controls.minDistance = MIN_CAMERA_DIST;
@@ -51,12 +65,12 @@ const init = () => {
     raycaster = new THREE.Raycaster();
     pointer = null;
 
-    gltfExporter = new GLTFExporter();
-    objExporter = new OBJExporter();
+    gltfExporter = new GLTFExporter(manager);
+    objExporter = new OBJExporter(manager);
 
-    textureLoader = new THREE.TextureLoader();
-    gltfLoader = new GLTFLoader();
-    exrLoader = new EXRLoader();
+    textureLoader = new THREE.TextureLoader(manager);
+    gltfLoader = new GLTFLoader(manager);
+    exrLoader = new EXRLoader(manager);
 };
 
 /**
@@ -72,6 +86,9 @@ const addLight = () => {
  * @returns {THREE.Object3D[]} An array of objects that the raycaster intersects with
  */
 const getIntersects = () => {
+    if (!pointer) {
+        return [];
+    }
     raycaster.setFromCamera(pointer, camera);
     return raycaster.intersectObjects(scene.children, true);
 };
@@ -83,13 +100,9 @@ const animate = () => {
 
     light.position.copy(camera.position);
 
-    if (pointer) {
-        const intersects = getIntersects();
-        let text = '';
-        if (intersects.length > 0) {
-            text = intersects[0].object.name;
-        }
-        infoBox.innerText = text;
+    const intersects = getIntersects();
+    if (intersects.length > 0 && intersects[0].object.name !== '') {
+        console.log(intersects[0].object.name);
     }
 
     renderer.render(scene, camera);

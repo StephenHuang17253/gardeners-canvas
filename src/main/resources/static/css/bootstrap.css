@@ -61,3 +61,18 @@
     word-break: break-word;
     overflow-wrap: break-word;
 }
+
+.fadeOut {
+    animation: fadeOutAnimation ease 1s;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes fadeOutAnimation {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }

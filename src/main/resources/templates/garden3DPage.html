@@ -3,7 +3,7 @@
 
 <head th:replace="~{fragments/header.html :: head (include3js=true)}"></head>
 
-<body>
+<body class="vw-100 vh-100">
 
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
     <div class="container-md bg-white rounded pt-3">
@@ -11,18 +11,29 @@
             <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}">Garden Name</h1>
         </div>
     </div>
-    <div id="container" style="width: 100vw; height: 75vh"></div>
-    <div class="container-md bg-white rounded pt-3">
-        <div class="container text-center">
-            <p id="info-box"></p>
-            <button id="download-gltf">Download GLTF</button>
-            <button id="download-obj">Download OBJ</button>
-            <button id="download-jpg">Download JPG</button>
+
+    <div class="w-100 h-75 position-relative">
+
+        <div class="dropdown position-absolute top-0 end-0 m-3">
+            <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Export Layout
+            </button>
+            <ul class="dropdown-menu">
+                <li><button class="dropdown-item" id="download-gltf">GLTF</button></li>
+                <li><button class="dropdown-item" id="download-obj">OBJ</button></li>
+                <li><button class="dropdown-item" id="download-jpg">JPG</button></li>
+            </ul>
         </div>
+
+        <div id="loading-div"
+            class="position-absolute w-100 h-100 bg-success d-flex align-items-center justify-content-center">
+            <img id="loading-img" th:src="@{/images/loading.gif}" alt="Loading">
+        </div>
+
+        <div class="w-100 h-100" id="container"></div>
     </div>
 
-    <script th:src="@{/js/inputCharacterLimit.js}"></script>
-    <script th:src="@{/js/getInstance.js}"></script>
     <script type="module" th:src="@{/js/3d/3dMain.js}"></script>
 </body>
 
