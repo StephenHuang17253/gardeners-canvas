@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { applyOutline } from './selectionManger.js';
+import { applyOutline } from './selectionManager.js';
 import { loadTexture, addModelToScene, loadModel } from './utils.js';
 import { createTileGrid, loadPlantsAtPositions } from './tiles.js';
 import { OrbitControls } from './OrbitControls.js';
@@ -9,7 +9,7 @@ import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 
-let scene, camera, renderer, light, raycaster, pointer, controls, gltfExporter, objExporter, textureLoader, gltfLoader;
+let scene, camera, renderer, light, raycaster, pointer, controls, gltfExporter, objExporter, textureLoader, gltfLoader, exrLoader;
 
 const container = document.getElementById('container');
 const infoBox = document.getElementById('info-box');
@@ -23,12 +23,12 @@ const TILE_SIZE = 10;
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
-// link used to download the file
+// link used to download files
 const link = document.createElement('a');
-link.style.display = 'none';
-document.body.appendChild(link);
 
-// Initialises main components of the scene
+/**
+ * Initialises threejs components, e.g. scene, camera, renderer, controls
+ */
 const init = () => {
     scene = new THREE.Scene();
 
@@ -56,21 +56,29 @@ const init = () => {
 
     textureLoader = new THREE.TextureLoader();
     gltfLoader = new GLTFLoader();
-}
+    exrLoader = new EXRLoader();
+};
 
-// Adds a light to the scene
+/**
+ * Adds a light to the scene
+ */
 const addLight = () => {
     light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
-}
+};
 
-// Returns an array of objects that the raycaster intersects with
+/**
+ * Gets the objects that the raycaster intersects with
+ * @returns {THREE.Object3D[]} An array of objects that the raycaster intersects with
+ */
 const getIntersects = () => {
     raycaster.setFromCamera(pointer, camera);
     return raycaster.intersectObjects(scene.children, true);
-}
+};
 
-// Method that gets called every frame
+/**
+ * Renders the scene
+ */
 const animate = () => {
 
     light.position.copy(camera.position);
@@ -85,12 +93,15 @@ const animate = () => {
     }
 
     renderer.render(scene, camera);
-}
+};
 
-const loadHDRI = (url) => {
-    const loader = new EXRLoader();
-    loader.load(
-        url,
+/**
+ * Loads an EXR image and sets it as the background and environment of the scene
+ * @param {String} path 
+ */
+const loadEXR = (path) => {
+    exrLoader.load(
+        path,
         texture => {
             texture.mapping = THREE.EquirectangularReflectionMapping;
             scene.background = texture;
@@ -102,8 +113,8 @@ const loadHDRI = (url) => {
 };
 
 init();
-
 addLight();
+loadEXR('../textures/nightbox.exr');
 
 const grassTexture = loadTexture('../textures/grass-tileable.jpg', textureLoader);
 
@@ -111,22 +122,25 @@ const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTe
 
 // loadPlantsAtPositions(scene, positions, plantFilename, 1);
 
-
 const fernModel = await loadModel('fern.glb', 'fern', gltfLoader);
-addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
 
-loadHDRI('../textures/night.exr');
+addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
 
 renderer.setAnimationLoop(animate);
 
-// Resize the renderer and fixes camera perspective when the window is resized
+/**
+ * On window resize event, update the camera aspect ratio and renderer size
+ */
 const onWindowResize = () => {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
-}
+};
 
-// Updates the pointer position
+/**
+ * Updates the pointer position
+ * @param {MouseEvent} event - mouse event that triggered the update
+ */
 const updatePointer = (event) => {
     if (!pointer) {
         pointer = new THREE.Vector2();
@@ -134,21 +148,30 @@ const updatePointer = (event) => {
     const bounds = container.getBoundingClientRect();
     pointer.x = ((event.clientX - bounds.left) / container.clientWidth) * 2 - 1;
     pointer.y = - ((event.clientY - bounds.top) / container.clientHeight) * 2 + 1;
-}
+};
 
-// stops page elements from being highlighted when double clicks occur on the canvas
+/**
+ * On mouse move event on the canvas, update the pointer position, and prevent user selection
+ * @param {MouseEvent} event - mouse event that triggered the update
+ */
 const onMouseMove = (event) => {
     updatePointer(event);
     document.body.style.userSelect = 'none';
-}
+};
 
-// Resets the user selection to default, allows things to be highlighted again
+/**
+ * On mouse out event on the canvas, set the pointer to null and allow user selection
+ */
 const onMouseOut = () => {
     pointer = null;
     document.body.style.userSelect = 'auto';
-}
+};
 
-// Highlight the object selected
+/**
+ * On click event on the canvas, update the pointer position, 
+ * and apply the outline effect to the first object that the pointer intersects
+ * @param {MouseEvent} event - mouse event that triggered the update
+ */
 const onClick = (event) => {
     updatePointer(event);
     const intersects = getIntersects();
@@ -156,53 +179,71 @@ const onClick = (event) => {
         const object = intersects[0].object;
         applyOutline(object, scene);
     }
-}
+};
 
-const saveFile = (data, filename) => {
+/**
+ * 
+ * @param {String} data - data to create a data url for
+ * @param {String} type - mime type of the data
+ * @returns {String} data url for the created data
+ */
+const createDataUrl = (data, type) => URL.createObjectURL(new Blob([data], { type: type }));
+
+/**
+ * Saves the data to a file with the given filename
+ * @param {String} dataURL - url of data to save
+ * @param {String} filename - name of the file to save
+ */
+const downloadFile = (dataURL, filename) => {
     document.body.appendChild(link);
-    link.href = data
+    link.href = dataURL;
     link.download = filename;
     link.click();
     document.body.removeChild(link);
-}
+};
 
-const createDataUrl = (text, type) => URL.createObjectURL(new Blob([text], { type: type }));
-
+/**
+ * On download button click, download the scene as a file with the given file extension
+ * @param {String} fileType - file extension of the file to download, gltf, obj, or jpg 
+ */
 const onDownloadButtonClick = (fileType) => {
     switch (fileType) {
-        case 'gltf':
+        case 'gltf': {
             gltfExporter.parse(
                 scene,
                 result => {
                     if (result instanceof ArrayBuffer) {
-                        saveFile(createDataUrl(result, 'application/octet-stream'), 'scene.glb');
+                        downloadFile(createDataUrl(result, 'application/octet-stream'), 'scene.glb');
                     } else {
                         const output = JSON.stringify(result, null, 1);
-                        saveFile(createDataUrl(output, 'text/plain'), 'scene.gltf');
+                        downloadFile(createDataUrl(output, 'text/plain'), 'scene.gltf');
                     }
                 },
                 error => console.log('An error happened while saving the scene')
             );
             break;
-        case 'obj':
+        }
+        case 'obj': {
             const objData = objExporter.parse(scene);
-            saveFile(createDataUrl(objData, 'text/plain'), 'scene.obj');
+            downloadFile(createDataUrl(objData, 'text/plain'), 'scene.obj');
             break;
-        case 'jpg':
+        }
+        case 'jpg': {
             try {
                 const strMime = "image/jpeg";
                 const strDownloadMime = "image/octet-stream";
                 const imgData = renderer.domElement.toDataURL(strMime);
-                saveFile(imgData.replace(strMime, strDownloadMime), "scene.jpg");
-            } catch (e) {
-                console.log(e);
+                downloadFile(imgData.replace(strMime, strDownloadMime), "scene.jpg");
+            } catch (error) {
+                console.log(error);
                 return;
             }
             break;
+        }
         default:
             break;
     }
-}
+};
 
 window.addEventListener('resize', onWindowResize);
 window.addEventListener('load', updatePointer);

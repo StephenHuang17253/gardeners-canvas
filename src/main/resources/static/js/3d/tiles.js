@@ -1,5 +1,9 @@
-import { loadTexture, addModelToScene } from './utils.js';
+import { addModelToScene } from './utils.js';
 import * as THREE from 'three';
+
+/**
+ * Custom vertex shader for the tile material
+ */
 const vertexShader = `
     varying vec2 vUv;
     void main() {
@@ -8,7 +12,9 @@ const vertexShader = `
     }
 `;
 
-// Fragment shader
+/**
+ * Custom fragment shader for the tile material
+ */
 const fragmentShader = `
     uniform sampler2D uTexture;
     uniform float uHue;
@@ -52,21 +58,35 @@ const fragmentShader = `
 `;
 
 
-// Create a tile material with custom shader
-const createTileMaterial = (texture, hueShift, saturation) => {
-    return new THREE.ShaderMaterial({
-        uniforms: {
-            uTexture: { value: texture },
-            uHue: { value: hueShift },  // Adjust hue
-            uSaturation: { value: saturation },  // Adjust saturation
-            uBaseColor: { value: new THREE.Color(0xffffff) }// Default to white, no color tint
-        },
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader
-    });
-};
 
-// Create the tile mesh
+/**
+ * Creates a tile material with the given parameters.
+ *
+ * @param {THREE.Texture} texture - The texture to be applied to the material.
+ * @param {number} hueShift - The amount to adjust the hue.
+ * @param {number} saturation - The amount to adjust the saturation.
+ * @returns {THREE.ShaderMaterial} The created tile material.
+ */
+const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMaterial({
+    uniforms: {
+        uTexture: { value: texture },
+        uHue: { value: hueShift },
+        uSaturation: { value: saturation },
+        uBaseColor: { value: new THREE.Color(0xffffff) }
+    },
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader
+});
+
+/**
+ * Creates a tile mesh with the given texture, size, hue shift, and saturation.
+ *
+ * @param {string} texture - The texture of the tile.
+ * @param {number} size - The size of the tile.
+ * @param {number} hueShift - The hue shift value.
+ * @param {number} saturation - The saturation value.
+ * @returns {THREE.Mesh} The created tile mesh.
+ */
 const createTile = (texture, size, hueShift, saturation) => {
     const geometry = new THREE.PlaneGeometry(size, size);
     const material = createTileMaterial(texture, hueShift, saturation);
@@ -75,44 +95,52 @@ const createTile = (texture, size, hueShift, saturation) => {
     return tile;
 };
 
-// Create the grid of tiles and return their center positions
+/**
+ * Creates a tile grid in the scene.
+ * 
+ * @param {THREE.Scene} scene - The scene in which the tile grid will be created.
+ * @param {number} rows - The number of rows in the grid.
+ * @param {number} cols - The number of columns in the grid.
+ * @param {number} tileSize - The size of each tile in the grid.
+ * @param {THREE.Texture} texture - The texture to be applied to each tile.
+ * @param {number} hueShift - The hue shift value for the tiles.
+ * @param {number} saturation - The saturation value for the tiles.
+ * @returns {Array<THREE.Vector3>} - An array of tile center positions.
+ */
 const createTileGrid = (scene, rows, cols, tileSize, texture, hueShift, saturation) => {
     const grid = new THREE.Group();
-    const offset = (rows - 1) * tileSize / 2; // Center the grid
-
-    // Array to store the positions of the tile centers
-    const positions = [];
-
+    const offset = (rows - 1) * tileSize / 2;
+    const tileCenterpositions = [];
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const tile = createTile(texture, tileSize, hueShift, saturation);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
-
-            // Store the center position of the tile
-            positions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
+            tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-
-    // Add the grid of tiles to the scene
     scene.add(grid);
-
-    // Return the array of positions
-    return positions;
+    return tileCenterpositions;
 };
-// Load plants at the saved positions
+
+/**
+ * Loads plants at specified positions in the scene.
+ * 
+ * @param {THREE.Scene} scene - The scene where the plants will be loaded.
+ * @param {Array<THREE.Vector3>} positions - The positions where the plants will be placed.
+ * @param {THREE.Object3D} plantModel - The model of the plant to be loaded.
+ * @param {number} [plantScale=1] - The scale of the plant model.
+ * @returns {Promise<void>} - A promise that resolves when all plants are loaded and added to the scene.
+ */
 const loadPlantsAtPositions = async (scene, positions, plantModel, plantScale = 1) => {
     const plantPromises = [];
-
     for (const position of positions) {
         plantPromises.push(addModelToScene(plantModel, scene, position, plantScale).then(plantModel => {
             plantModel.position.y += tileSize / 2;
             scene.add(plantModel);
         }));
     }
-
-    // Wait for all plants to be loaded
     await Promise.all(plantPromises);
 };
 
-export {createTileGrid, loadPlantsAtPositions};
+export { createTileGrid, loadPlantsAtPositions };
