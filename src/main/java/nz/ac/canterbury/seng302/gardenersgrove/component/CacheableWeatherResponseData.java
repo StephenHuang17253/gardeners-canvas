@@ -41,7 +41,7 @@ public class CacheableWeatherResponseData {
 
     public boolean isExpired()
     {
-        return (new Date().getTime() - this.creationTime) > 10000;
+        return (new Date().getTime() - this.creationTime) > 3600000;
 
     }
 }
