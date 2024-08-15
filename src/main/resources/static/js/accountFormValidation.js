@@ -53,7 +53,7 @@ const clearNameError = (inputField, errorField) => {
  */
 const handleNameUpdate = (event, errorField) => {
     let nameValue = event.target.value;
-    const validNameRegex = /^[A-Za-z\s\-']+$/;
+    const validNameRegex = /^[\p{L}][\p{L} \-'’]*$/u;
     let firstOrLast;
     if (errorField === firstNameJSError) {
         firstOrLast = "First"
