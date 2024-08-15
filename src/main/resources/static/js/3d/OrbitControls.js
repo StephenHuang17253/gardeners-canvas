@@ -36,7 +36,6 @@ const STATE = {
     TOUCH_DOLLY_ROTATE: 6
 };
 
-
 /**
  * @class OrbitControls
  * @extends THREE.EventDispatcher
@@ -166,22 +165,6 @@ class OrbitControls extends THREE.EventDispatcher {
 
             spherical.theta += sphericalDelta.theta;
             spherical.phi += sphericalDelta.phi;
-
-            // restrict theta to be between desired limits
-            let min = this.minAzimuthAngle;
-            let max = this.maxAzimuthAngle;
-
-            if (isFinite(min) && isFinite(max)) {
-                if (min < - Math.PI) min += TWO_PI; else if (min > Math.PI) min -= TWO_PI;
-                if (max < - Math.PI) max += TWO_PI; else if (max > Math.PI) max -= TWO_PI;
-                if (min <= max) {
-                    spherical.theta = Math.max(min, Math.min(max, spherical.theta));
-                } else {
-                    spherical.theta = (spherical.theta > (min + max) / 2) ?
-                        Math.max(min, spherical.theta) :
-                        Math.min(max, spherical.theta);
-                }
-            }
 
             // restrict phi to be between desired limits
             spherical.phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, spherical.phi));
