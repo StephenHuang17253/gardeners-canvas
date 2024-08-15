@@ -16,6 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,7 +39,7 @@ public class WeatherService {
     private static final ConcurrentHashMap<String, CacheableWeatherResponseData> cachedWeatherResults = new ConcurrentHashMap<>();
     private static final ConcurrentLinkedQueue<CacheableWeatherResponseData> linkedWeatherResults = new ConcurrentLinkedQueue<>();
     private static AtomicInteger retreivalsSinceCacheClean = new AtomicInteger(0);
-    private static final Integer CACHE_CLEAN_THRESHOLD = 1;
+    private static final Integer CACHE_CLEAN_THRESHOLD = 100;
 
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -177,14 +178,25 @@ public class WeatherService {
      */
     public List<WeatherResponseData> getWeatherForGardens(List<Garden> gardens) {
 
-        // fetches CompletableFutures (basically javascript promises) of weather response data from the api asynchronously
-        List<CompletableFuture<WeatherResponseData>> futures = gardens.stream()
-                .map(this::fetchWeatherData)
-                .toList();
+        HashMap<String,CompletableFuture<WeatherResponseData>> distinctWeatherQueries = new HashMap<>();
+        for (Garden garden: gardens)
+        {
+            String locationId = makeCacheLocationIdentifier(garden.getGardenLatitude(),garden.getGardenLongitude());
+            if ((!cachedWeatherResults.containsKey(locationId) || cachedWeatherResults.get(locationId).isExpired()))
+            {
+                if(!distinctWeatherQueries.containsKey(locationId))
+                {
+                    distinctWeatherQueries.put(locationId,fetchWeatherData(garden));
+                }
+            }
+        }
+        distinctWeatherQueries.forEach((key,weatherFuture) -> cacheWeatherResponse(key,weatherFuture.join()));
+
 
         // resolves the completableFutures (waits for future to resolve if needed)
-        return new ArrayList<>(futures.stream()
-                .map(CompletableFuture::join)
+        return new ArrayList<>(gardens.stream()
+                .map((garden -> makeCacheLocationIdentifier(garden.getGardenLatitude(), garden.getGardenLongitude())))
+                .map(this::getCachedResponse)
                 .toList());
     }
 
