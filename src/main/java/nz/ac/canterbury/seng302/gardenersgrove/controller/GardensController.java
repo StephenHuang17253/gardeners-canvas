@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 
 /**
  * Controller for viewing all the created Gardens
@@ -58,7 +57,6 @@ public class GardensController {
 
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 
-    private final Semaphore semaphore = new Semaphore(MAX_REQUESTS_PER_SECOND);
 
     private static final int COUNT_PER_PAGE = 10;
 
@@ -701,26 +699,6 @@ public class GardensController {
 
     WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) throws UnavailableException {
 
-        long currentTime = Instant.now().getEpochSecond();
-        long timeElapsed = currentTime - lastRequestTime;
-
-        logger.info("Time elapsed: {}", timeElapsed);
-        // Every second, the number of available permits is reset to 2
-        if (timeElapsed >= 1) {
-            semaphore.drainPermits();
-            semaphore.release(MAX_REQUESTS_PER_SECOND);
-            logger.info("A second or more has elapsed, permits reset to: {}", semaphore.availablePermits());
-            lastRequestTime = currentTime;
-        }
-
-        logger.info("Permits left before request: {}", semaphore.availablePermits());
-
-        // Check if rate limit exceeded
-        if (!semaphore.tryAcquire()) {
-            logger.info("Exceeded location API rate limit of 2 requests per second.");
-            throw new UnavailableException("429");
-        }
-        logger.info("Permits left after request: {}", semaphore.availablePermits());
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
     }
 
