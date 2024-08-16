@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -38,7 +37,7 @@ public class WeatherService {
 
     private static final ConcurrentHashMap<String, CacheableWeatherResponseData> cachedWeatherResults = new ConcurrentHashMap<>();
     private static final ConcurrentLinkedQueue<CacheableWeatherResponseData> linkedWeatherResults = new ConcurrentLinkedQueue<>();
-    private static AtomicInteger retreivalsSinceCacheClean = new AtomicInteger(0);
+    private static final AtomicInteger retrievalsSinceCacheClean = new AtomicInteger(0);
     private static final Integer CACHE_CLEAN_THRESHOLD = 100;
 
     private static final HttpClient httpClient = HttpClient.newHttpClient();
@@ -73,10 +72,10 @@ public class WeatherService {
         {
             return null;
         }
-        int currentCacheAge = retreivalsSinceCacheClean.addAndGet(1);
+        int currentCacheAge = retrievalsSinceCacheClean.addAndGet(1);
         if (currentCacheAge >= CACHE_CLEAN_THRESHOLD)
         {
-            retreivalsSinceCacheClean.compareAndSet(currentCacheAge,0);
+            retrievalsSinceCacheClean.compareAndSet(currentCacheAge,0);
             cleanOldCacheData();
         }
 
