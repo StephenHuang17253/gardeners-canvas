@@ -19,7 +19,7 @@ const getDisplayString = (data) => {
 const fillTagField = (data) => {
     tagField.value = getDisplayString(data)
     if (form) {
-        form.submit()
+        form.submit();
     } else {
         document.getElementById("addTagButton").click();
     }
