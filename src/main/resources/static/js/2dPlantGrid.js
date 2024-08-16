@@ -20,9 +20,9 @@ var plantName = "plant"
 var plantList = [];
 
 var stage = new Konva.Stage({
-    container: 'container',
     width: stageWidth,
     height: stageHeight,
+    container: 'container'
 });
 
 var layer = new Konva.Layer();

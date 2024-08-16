@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:replace="~{fragments/header.html}">
+<!--<head th:replace="~{fragments/header.html}">-->
+<head th:replace="~{fragments/header.html}"  th:with="loggedIn=${loggedIn}">
     <title>Konva Grid Demo</title>
     <style>
         body {
@@ -10,14 +11,11 @@
             background-color: #f0f0f0;
         }
     </style>
-    <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 </head>
 <body>
 <div id="container" class="justify-content-center"></div>
 <button type="submit" class="btn btn-success submit-button" formnovalidate>Submit</button>
-<div>
-<script th:src="@{/js/2dPlantGrid.js}"></script>
-</div>
 
+<script type="module" th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
 </html>
