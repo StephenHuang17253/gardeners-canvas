@@ -42,9 +42,6 @@ const STATE = {
  * 
  * This class provides orbit controls for a camera in a 3D scene.
  * It allows the user to orbit around a target point, zoom in and out, and pan the camera.
- * 
- * @param {THREE.Camera} camera - The camera to be controlled.
- * @param {HTMLElement} domElement - The DOM element to which the controls will be attached.
  */
 class OrbitControls extends THREE.EventDispatcher {
 
@@ -77,37 +74,10 @@ class OrbitControls extends THREE.EventDispatcher {
         this.minPolarAngle = 0; // radians
         this.maxPolarAngle = PI_OVER_TWO - MIN_TARGET_HEIGHT; // radians
 
-        // How far you can orbit horizontally, upper and lower limits.
-        // If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
-        this.minAzimuthAngle = - Infinity; // radians
-        this.maxAzimuthAngle = Infinity; // radians
-
         this.zoomSpeed = 1.0;
         this.rotateSpeed = 1.0;
         this.panSpeed = 1.0;
         this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
-
-        //
-        // public methods
-        //
-
-        /**
-         * Gets the current polar angle of the camera to the target.
-         * @returns {number} The current polar angle of the camera.
-         */
-        this.getPolarAngle = () => spherical.phi;
-
-        /**
-         * Gets the current azimuthal angle of the camera to the target.
-         * @returns {number} The current azimuthal angle of the camera.
-         */
-        this.getAzimuthalAngle = () => spherical.theta;
-
-        /**
-         * Gets the current distance of the camera to the target.
-         * @returns {number} The current distance of the camera to the target.
-         */
-        this.getDistance = () => this.camera.position.distanceTo(this.target);
 
         //
         // internals
@@ -701,6 +671,25 @@ class OrbitControls extends THREE.EventDispatcher {
 
         update();
     }
+
+        /**
+         * Gets the current polar angle of the camera to the target.
+         * @returns {number} The current polar angle of the camera.
+         */
+        getPolarAngle = () => spherical.phi;
+
+        /**
+         * Gets the current azimuthal angle of the camera to the target.
+         * @returns {number} The current azimuthal angle of the camera.
+         */
+        getAzimuthalAngle = () => spherical.theta;
+
+        /**
+         * Gets the current distance of the camera to the target.
+         * @returns {number} The current distance of the camera to the target.
+         */
+        getDistance = () => this.camera.position.distanceTo(this.target);
+
 }
 
 export { OrbitControls };

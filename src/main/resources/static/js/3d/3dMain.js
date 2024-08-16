@@ -6,18 +6,22 @@ import { OrbitControls } from './OrbitControls.js';
 import { Loader } from './Loader.js';
 import { Exporter } from './Exporter.js';
 
-let scene, camera, renderer, light, raycaster, pointer, exporter, loader;
+let scene, camera, renderer, light, raycaster, pointer, exporter, loader, controls;
 
 const container = document.getElementById('container');
+
 const downloadGLTFButton = document.getElementById('download-gltf');
 const downloadOBJButton = document.getElementById('download-obj');
 const downloadJPGButton = document.getElementById('download-jpg');
+
 const loadingDiv = document.getElementById('loading-div');
 const loadingImg = document.getElementById('loading-img');
+
 const FOV = 75;
 
 const GRID_SIZE = 7;
 const TILE_SIZE = 10;
+
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
@@ -53,7 +57,7 @@ const init = () => {
         loadingDiv.innerText = 'There was an error loading your garden';
     });
 
-    const controls = new OrbitControls(camera, renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
     controls.maxPolarAngle = Math.PI / 2 - 0.1;
     controls.minRadius = MIN_CAMERA_DIST;
     controls.maxRadius = MAX_CAMERA_DIST;
