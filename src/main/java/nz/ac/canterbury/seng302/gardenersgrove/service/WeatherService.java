@@ -44,6 +44,12 @@ public class WeatherService {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
 
+    /**
+     * Make a location identifier for the weather data cache form a latitude and longitude
+     * @param latitude the input latitude
+     * @param longitude the input longitude
+     * @return the location identifier or null if either lat or long inputted are empty.
+     */
     private String makeCacheLocationIdentifier(String latitude, String longitude)
     {
         if (latitude.isEmpty() || longitude.isBlank())
@@ -56,6 +62,11 @@ public class WeatherService {
         return String.format("%.2f,%.2f",latitdueDouble,longtitudeDouble);
     }
 
+    /**
+     * check weather data cache for a specific locations
+     * @param locationIdentifier the location identifier to check for
+     * @return the correct weather data or null if not valid datt can be found
+     */
     private WeatherResponseData getCachedResponse(String locationIdentifier)
     {
         if (locationIdentifier == null)
@@ -90,12 +101,18 @@ public class WeatherService {
             }
             else
             {
+                cleanOldCacheData();
                 return null;
             }
 
         }
     }
 
+    /**
+     * Store a weather response in this cache
+     * @param locationIdentifier the location identifier for the cached weather data
+     * @param weatherResponseData the weather data to cache
+     */
     private void cacheWeatherResponse(String locationIdentifier, WeatherResponseData weatherResponseData)
     {
         CacheableWeatherResponseData cacheableWeatherResponseData = new CacheableWeatherResponseData(locationIdentifier,weatherResponseData);
@@ -103,9 +120,15 @@ public class WeatherService {
         linkedWeatherResults.add(cacheableWeatherResponseData);
     }
 
+    /**
+     * checks the oldest record in the cached weather data to see if it has expired
+     * if it is expired, remove it and all other expired records in order
+     * terminate when hitting the firs valid record or the end of the list (whichever comes first)
+     * @return the number of removed records
+     */
     private int cleanOldCacheData()
     {
-        logger.info("Cleaning old cache data");
+        logger.debug("Cleaning old cache data");
         int clearedRecords = 0;
         try
         {
@@ -116,14 +139,14 @@ public class WeatherService {
                     CacheableWeatherResponseData oldCachedData = linkedWeatherResults.poll();
                     cachedWeatherResults.remove(oldCachedData.getLocationIdentifier());
                     clearedRecords += 1;
-                    logger.info("removed {}",oldCachedData);
+                    logger.trace("removed {}",oldCachedData);
                 }
                 catch (NullPointerException nullPointerException)
                 {
-                    logger.warn("Old cache record failed to clear");
+                    logger.info("Old cache record failed to finish clearing, cache may be empty");
                 }
             }
-            logger.info("cache cleaning complete");
+            logger.info("cleaned {} old weather data cache values", clearedRecords);
             logger.debug("Hash table size {}", cachedWeatherResults.size());
             logger.debug("Oldest living records ageshould be in {} mili seconds",new Date().getTime() - linkedWeatherResults.peek().getCreationTime());
         }
@@ -183,7 +206,9 @@ public class WeatherService {
 
 
     /**
-     * Gathers weather data for a list of gardens at a time
+     * Run through the locations of all gardens and check which ones do not have a location closed to them cached
+     * run a garden weather query for every garden without a cached response
+     * then return weather data for every garden from cache
      *
      * @param gardens list of gardens
      * @return a list of weather data for gardens
