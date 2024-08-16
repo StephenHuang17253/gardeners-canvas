@@ -3,6 +3,11 @@ const form = document.getElementById("tagForm");
 const tagField = document.getElementById("tagInput")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
 
+/**
+ * Gets the name of a tag
+ * @param data the tag
+ * @returns {string} the tag name
+ */
 const getDisplayString = (data) => {
     return data.tagName;
 }
