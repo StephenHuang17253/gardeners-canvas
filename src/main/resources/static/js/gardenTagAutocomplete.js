@@ -13,7 +13,11 @@ const getDisplayString = (data) => {
  */
 const fillTagField = (data) => {
     tagField.value = getDisplayString(data)
-    form.submit()
+    if (form) {
+        form.submit()
+    } else {
+        document.getElementById("addTagButton").click();
+    }
 }
 
 /**
