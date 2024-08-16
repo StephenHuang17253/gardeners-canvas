@@ -46,6 +46,10 @@ public class WeatherService {
 
     private String makeCacheLocationIdentifier(String latitude, String longitude)
     {
+        if (latitude.isEmpty() || longitude.isBlank())
+        {
+            return null;
+        }
         Double latitdueDouble = Double.parseDouble(latitude);
         Double longtitudeDouble = Double.parseDouble(longitude);
 
@@ -54,6 +58,10 @@ public class WeatherService {
 
     private WeatherResponseData getCachedResponse(String locationIdentifier)
     {
+        if (locationIdentifier == null)
+        {
+            return null;
+        }
         int currentCacheAge = retreivalsSinceCacheClean.addAndGet(1);
         if (currentCacheAge >= CACHE_CLEAN_THRESHOLD)
         {
@@ -138,6 +146,10 @@ public class WeatherService {
      */
     public WeatherResponseData getWeather(String latitude, String longitude) {
         WeatherResponseData cachedResponse = getCachedResponse(makeCacheLocationIdentifier(latitude,longitude));
+        if(latitude.isEmpty() || longitude.isEmpty())
+        {
+            return null;
+        }
         if (cachedResponse != null)
         {
             logger.info("Using cached weather response");
@@ -182,9 +194,9 @@ public class WeatherService {
         for (Garden garden: gardens)
         {
             String locationId = makeCacheLocationIdentifier(garden.getGardenLatitude(),garden.getGardenLongitude());
-            if ((!cachedWeatherResults.containsKey(locationId) || cachedWeatherResults.get(locationId).isExpired()))
+            if (locationId != null && (!cachedWeatherResults.containsKey(locationId) || cachedWeatherResults.get(locationId).isExpired()))
             {
-                if(!distinctWeatherQueries.containsKey(locationId))
+                if(locationId != null && !distinctWeatherQueries.containsKey(locationId))
                 {
                     distinctWeatherQueries.put(locationId,fetchWeatherData(garden));
                 }
