@@ -25,6 +25,8 @@ var stage = new Konva.Stage({
     container: 'container'
 });
 
+let selected = false
+
 var layer = new Konva.Layer();
 stage.add(layer);
 
