@@ -88,28 +88,6 @@ class OrbitControls extends THREE.EventDispatcher {
         this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
         //
-        // public methods
-        //
-
-        /**
-         * Gets the current polar angle of the camera to the target.
-         * @returns {number} The current polar angle of the camera.
-         */
-        this.getPolarAngle = () => spherical.phi;
-
-        /**
-         * Gets the current azimuthal angle of the camera to the target.
-         * @returns {number} The current azimuthal angle of the camera.
-         */
-        this.getAzimuthalAngle = () => spherical.theta;
-
-        /**
-         * Gets the current distance of the camera to the target.
-         * @returns {number} The current distance of the camera to the target.
-         */
-        this.getDistance = () => this.camera.position.distanceTo(this.target);
-
-        //
         // internals
         //
 
@@ -701,6 +679,25 @@ class OrbitControls extends THREE.EventDispatcher {
 
         update();
     }
+
+    /**
+     * Gets the current polar angle of the camera to the target.
+     * @returns {number} The current polar angle of the camera.
+     */
+    getPolarAngle = () => spherical.phi;
+
+    /**
+     * Gets the current azimuthal angle of the camera to the target.
+     * @returns {number} The current azimuthal angle of the camera.
+     */
+    getAzimuthalAngle = () => spherical.theta;
+
+    /**
+     * Gets the current distance of the camera to the target.
+     * @returns {number} The current distance of the camera to the target.
+     */
+    getDistance = () => this.camera.position.distanceTo(this.target);
+
 }
 
 export { OrbitControls };
