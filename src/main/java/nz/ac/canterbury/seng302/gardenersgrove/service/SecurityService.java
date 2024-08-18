@@ -71,7 +71,6 @@ public class SecurityService {
      * @return boolean of if the current logged, in user matches the owner id of a garden
      */
     public boolean isOwner(Long ownerId){
-        logger.info("Security check");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByEmail(authentication.getName());
         return Objects.equals(user.getId(), ownerId);
