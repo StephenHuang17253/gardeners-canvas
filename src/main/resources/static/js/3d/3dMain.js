@@ -81,7 +81,7 @@ init();
 addLight();
 
 loader.loadBackground(
-    '../textures/nightbox.exr',
+    '../textures/skybox.exr',
     texture => {
         scene.background = texture;
         scene.environment = texture;
