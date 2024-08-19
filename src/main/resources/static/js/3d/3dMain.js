@@ -1,18 +1,13 @@
 import * as THREE from 'three';
 import { applyOutline } from './selectionManager.js';
 import { addModelToScene } from './utils.js';
-import { createTileGrid, loadPlantsAtPositions } from './tiles.js';
+import { createTileGrid } from './tiles.js';
 import { OrbitControls } from './OrbitControls.js';
 import { Loader } from './Loader.js';
-import { Exporter } from './Exporter.js';
 
-let scene, camera, renderer, light, raycaster, pointer, exporter, loader, controls;
+let scene, camera, renderer, light, raycaster, pointer, loader, controls;
 
 const container = document.getElementById('container');
-
-const downloadGLTFButton = document.getElementById('download-gltf');
-const downloadOBJButton = document.getElementById('download-obj');
-const downloadJPGButton = document.getElementById('download-jpg');
 
 const loadingDiv = document.getElementById('loading-div');
 const loadingImg = document.getElementById('loading-img');
@@ -69,8 +64,6 @@ const init = () => {
 
     raycaster = new THREE.Raycaster();
     pointer = null;
-
-    exporter = new Exporter(link, gardenName);
 };
 
 init();
@@ -191,8 +184,5 @@ window.addEventListener('load', updatePointer);
 container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
 container.addEventListener('click', onClick);
-downloadGLTFButton.addEventListener('click', () => exporter.downloadGLTF(scene));
-downloadOBJButton.addEventListener('click', () => exporter.downloadOBJ(scene));
-downloadJPGButton.addEventListener('click', () => exporter.downloadJPG(renderer));
 
 console.log(scene.children);
