@@ -3,7 +3,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,8 +75,8 @@ public class GardensController {
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
-            WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
-            ProfanityService profanityService, UserService userService) {
+                             WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
+                             ProfanityService profanityService, UserService userService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
@@ -97,9 +96,9 @@ public class GardensController {
      */
     @GetMapping("/my-gardens")
     public String myGardens(@RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "All") String filter,
-            HttpServletRequest request,
-            Model model) {
+                            @RequestParam(defaultValue = "All") String filter,
+                            HttpServletRequest request,
+                            Model model) {
         logger.info("GET /my-gardens");
 
         model.addAttribute("loggedIn", securityService.isLoggedIn());
@@ -185,7 +184,7 @@ public class GardensController {
         }
     }
 
-    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
+    private void handlePagniation(int page, int listLength, List<Plant> plants, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -194,8 +193,8 @@ public class GardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants",plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount",plants.size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount", plants.size());
     }
 
     /**
@@ -207,13 +206,13 @@ public class GardensController {
      */
     @GetMapping("/my-gardens/{gardenId}")
     public String showGardenDetails(@PathVariable Long gardenId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String plantPictureError,
-            @RequestParam(required = false) String weatherListJson,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            RedirectAttributes redirectAttributes,
-            Model model) throws ServletException {
+                                    @RequestParam(defaultValue = "1") int page,
+                                    @RequestParam(required = false) String plantPictureError,
+                                    @RequestParam(required = false) String weatherListJson,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    RedirectAttributes redirectAttributes,
+                                    Model model) throws ServletException {
         logger.info("GET /my-gardens/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -264,7 +263,7 @@ public class GardensController {
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-        handlePagniation(page, plants.size(),garden.getPlants(), model);
+        handlePagniation(page, plants.size(), garden.getPlants(), model);
 
         try {
             if (weatherListJson != null) {
@@ -301,7 +300,7 @@ public class GardensController {
             model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
 
             // The below If statements check if the status of a pending tag has
-            // been updated and adjust error messages acrodingly if thats the case
+            // been updated and adjust error messages accordingly if that's the case
             if (inputFlashMap.get("pendingTagName") == null) {
                 model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
             } else {
@@ -378,11 +377,11 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}/public")
     public String updateGardenPublicStatus(@PathVariable Long gardenId,
-            @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
-            RedirectAttributes redirectAttributes,
-            HttpServletResponse response) throws JsonProcessingException {
+                                           @RequestParam(name = "makeGardenPublic", required = false, defaultValue = "false") boolean makeGardenPublic,
+                                           @RequestParam(defaultValue = "1") int page,
+                                           @RequestParam(value = "weatherListJson", required = false) String weatherListJson,
+                                           RedirectAttributes redirectAttributes,
+                                           HttpServletResponse response) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}/public", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -420,7 +419,7 @@ public class GardensController {
     /**
      * Helper to set the model of garden details page for non-blue sky scenarios
      * after tag post-mapping
-     * 
+     *
      * @param garden entity of the page to be displayed
      * @param tag    text
      * @param page   index
@@ -436,7 +435,7 @@ public class GardensController {
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-        handlePagniation(page, plants.size(),garden.getPlants(), model);
+        handlePagniation(page, plants.size(), garden.getPlants(), model);
 
         model.addAttribute("openModal", "true");
         model.addAttribute("tagText", tag);
@@ -478,12 +477,12 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}/tag")
     public String addGardenTag(@PathVariable Long gardenId,
-            @RequestParam("tag") String tag,
-            @RequestParam(defaultValue = "1") int page,
-            RedirectAttributes redirectAttributes,
-            HttpServletResponse response,
-            HttpServletRequest request,
-            Model model) throws ServletException, InterruptedException {
+                               @RequestParam("tag") String tag,
+                               @RequestParam(defaultValue = "1") int page,
+                               RedirectAttributes redirectAttributes,
+                               HttpServletResponse response,
+                               HttpServletRequest request,
+                               Model model) throws ServletException, InterruptedException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         tag = tag.trim();
@@ -600,13 +599,13 @@ public class GardensController {
      */
     @PostMapping("/my-gardens/{gardenId}")
     public String updatePlantImage(@PathVariable Long gardenId,
-            @RequestParam("plantId") Long plantId,
-            @RequestParam("weatherListJson") String weatherListJson,
-            @RequestParam("plantPictureInput") MultipartFile plantPicture,
-            @RequestParam(defaultValue = "1") int page,
-            RedirectAttributes redirectAttributes,
-            HttpServletResponse response,
-            Model model) throws JsonProcessingException {
+                                   @RequestParam("plantId") Long plantId,
+                                   @RequestParam("weatherListJson") String weatherListJson,
+                                   @RequestParam("plantPictureInput") MultipartFile plantPicture,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   RedirectAttributes redirectAttributes,
+                                   HttpServletResponse response,
+                                   Model model) throws JsonProcessingException {
         logger.info("POST /my-gardens/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -654,10 +653,10 @@ public class GardensController {
      */
     @GetMapping("/{userId}/gardens")
     public String friendsGardens(Model model,
-            @PathVariable("userId") Long userId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "All") String filter,
-            HttpServletResponse response) {
+                                 @PathVariable("userId") Long userId,
+                                 @RequestParam(defaultValue = "1") int page,
+                                 @RequestParam(defaultValue = "All") String filter,
+                                 HttpServletResponse response) {
         logger.info("GET {}/gardens", userId);
 
         User friend;
