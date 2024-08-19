@@ -17,7 +17,7 @@
             <form th:action="@{/plant-wiki}" method="get" class="d-flex">
                 <input type="text" name="search" class="form-control me-2" id="friendSearchBar" placeholder="Search"
                        maxlength="5000" th:value="${searchTerm}" />
-                <button type="submit" class="btn btn-outline-success">Search</button>
+                <button type="submit" class="btn btn-outline-primary">Search</button>
             </form>
 
             <p th:if="${searchError} != ''" class="text-danger fs-6" th:text="${searchError}"></p>

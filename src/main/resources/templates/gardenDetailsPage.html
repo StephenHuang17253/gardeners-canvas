@@ -24,7 +24,7 @@
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
                     <div class="p-1" th:each="tag : ${tagsList}">
-                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success',isRemovable=false)}"></div>
+                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-primary',isRemovable=false)}"></div>
                     </div>
 
                     <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
@@ -112,7 +112,7 @@
                                             th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
                                             th:value="${tagText}" placeholder="e.g. vegetable garden"
                                             aria-label="Search" aria-describedby="search-addon" autofocus />
-                                        <button type="submit" class="btn btn-success">
+                                        <button type="submit" class="btn btn-primary">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                                                 <path fill-rule="evenodd"
@@ -138,14 +138,14 @@
 
 
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                    <button id="openTagModalButton" type="button" class="btn bg-success text-white"
+                    <button id="openTagModalButton" type="button" class="btn bg-primary text-white"
                         data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
 
                     <a th:href="@{__${garden.getGardenId()}__/create-new-plant}">
-                        <button type="button" class="btn bg-success text-white">Create Plant</button>
+                        <button type="button" class="btn bg-primary text-white">Create Plant</button>
                     </a>
                     <a th:href="@{__${garden.getGardenId()}__/edit}">
-                        <button type="button" class="btn bg-success text-white">Edit Garden</button>
+                        <button type="button" class="btn bg-primary text-white">Edit Garden</button>
                     </a>
                 </div>
 

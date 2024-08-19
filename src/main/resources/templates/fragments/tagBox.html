@@ -4,7 +4,7 @@
           th:text="${tagName}"
           th:data-tag-name="${tagName}"
           th:onclick="${isRemovable} ? 'removeTag(this)' : null"
-          th:onmouseover="${isRemovable} ? 'this.classList.replace(\'text-bg-success\', \'text-bg-danger\');' : null"
-          th:onmouseout="${isRemovable} ? 'this.classList.replace(\'text-bg-danger\', \'text-bg-success\');' : null">
+          th:onmouseover="${isRemovable} ? 'this.classList.replace(\'text-bg-primary\', \'text-bg-danger\');' : null"
+          th:onmouseout="${isRemovable} ? 'this.classList.replace(\'text-bg-danger\', \'text-bg-primary\');' : null">
     </span>
 </div>

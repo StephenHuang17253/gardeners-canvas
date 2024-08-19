@@ -23,10 +23,10 @@
         </div>
         <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
             <a th:href="@{/create-new-garden}">
-                <button type="button" class="btn bg-success" style="color: white">Create Garden</button>
+                <button type="button" class="btn bg-primary" style="color: white">Create Garden</button>
             </a>
             <a th:href="@{/profile/edit}">
-                <button type="button" class="btn bg-success" style="color: white">Edit Profile</button>
+                <button type="button" class="btn bg-primary" style="color: white">Edit Profile</button>
             </a>
         </div>
         <div class="container mt-4">
@@ -39,17 +39,17 @@
                     <div class="btn-group mt-3" aria-label="Filter Gardens">
                         <a th:href="@{/my-gardens(filter='All')}"
                            class="btn"
-                           th:classappend="${filter == 'All'} ? 'bg-success text-white' : 'btn-outline-success'">
+                           th:classappend="${filter == 'All'} ? 'bg-primary text-white' : 'btn-outline-primary'">
                             All
                         </a>
                         <a th:href="@{/my-gardens(filter='Public')}"
                            class="btn"
-                           th:classappend="${filter == 'Public'} ? 'bg-success text-white' : 'btn-outline-success'">
+                           th:classappend="${filter == 'Public'} ? 'bg-primary text-white' : 'btn-outline-primary'">
                             Public
                         </a>
                         <a th:href="@{/my-gardens(filter='Private')}"
                            class="btn"
-                           th:classappend="${filter == 'Private'} ? 'bg-success text-white' : 'btn-outline-success'">
+                           th:classappend="${filter == 'Private'} ? 'bg-primary text-white' : 'btn-outline-primary'">
                             Private
                         </a>
                     </div>

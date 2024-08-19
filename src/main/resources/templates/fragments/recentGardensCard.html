@@ -1,7 +1,7 @@
 <div th:fragment="recentGardensCard(gardenId, gardenName, gardenLocation, gardenSize,
  plantImage1, plantImage2, plantImage3, numberOfPlants, ownerImage, ownerName, isOwner)">
     <a th:href="${isOwner} ? @{/my-gardens/{gardenId}(gardenId=${gardenId})} : @{/public-gardens/{gardenId}(gardenId=${gardenId})}" class="text-decoration-none">
-        <div class="card h-100 bg-success text-white garden-card">
+        <div class="card h-100 bg-primary text-white garden-card">
             <div class="card-body">
                 <div class="d-flex w-100">
                     <!-- First larger image -->

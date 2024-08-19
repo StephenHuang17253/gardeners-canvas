@@ -9,11 +9,11 @@
         th:style="|background-image: url('@{/images/landingPlant.JPG}'); color:white;|"></div>
 
     <div class="position-fixed m-2 d-flex flex-column gap-2">
-        <a th:href="@{/home/edit}" class="btn btn-success btn-lg">
+        <a th:href="@{/home/edit}" class="btn btn-primary btn-lg">
             Edit Home Page
         </a>
 
-        <a th:if="${layout != null && layout.showNotifications}" class="btn btn-success btn-lg"
+        <a th:if="${layout != null && layout.showNotifications}" class="btn btn-primary btn-lg"
             data-bs-toggle="offcanvas" href="#offcanvas" aria-controls="offcanvasExample">
             Notifications
         </a>
@@ -38,10 +38,10 @@
             <p>Need some inspiration for your Garden? Or have some new plants?</p>
             <div class="d-flex flex-row flex-wrap gap-3 mb-3">
                 <a th:href="@{public-gardens}">
-                    <button class="btn btn-success btn-lg">Find Gardens</button>
+                    <button class="btn btn-primary btn-lg">Find Gardens</button>
                 </a>
                 <a th:href="@{my-gardens}">
-                    <button class="btn btn-success btn-lg">Your Gardens</button>
+                    <button class="btn btn-primary btn-lg">Your Gardens</button>
                 </a>
             </div>
         </div>
@@ -175,7 +175,7 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-2">
             <div class="col-3" th:each="friend : ${recentFriends}">
                 <a th:href="@{${friend.getFriendGardenLink}}" class="text-reset text-decoration-none">
-                    <div class="card h-100 bg-success text-white garden-card">
+                    <div class="card h-100 bg-primary text-white garden-card">
                         <div class="card-body pt-1 text-center">
                             <h4 th:text="${friend.getFriendName}" class="card-title justify-content-center">Friend Name
                             </h4>
@@ -216,7 +216,7 @@
                 </div>
                 <div class="d-flex justify-content-center">
                     <a th:href="@{manage-friends}">
-                        <button class="btn btn-success btn-lg mb-3">Manage Friends</button>
+                        <button class="btn btn-primary btn-lg mb-3">Manage Friends</button>
                     </a>
                 </div>
             </div>

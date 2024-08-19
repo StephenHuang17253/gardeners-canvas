@@ -1,6 +1,6 @@
 <div th:fragment="publicGardensCard(gardenId, gardenName, gardenLocation, gardenSize, gardenDescription, isPublic, plantImage1, plantImage2, plantImage3, numberOfPlants)">
     <a th:href="@{/public-gardens/{gardenId}(gardenId=${gardenId})}" class="text-decoration-none">
-        <div class="card h-100 bg-success text-white garden-card">
+        <div class="card h-100 bg-primary text-white garden-card">
             <div class="card-body pt-1">
                 <p th:if="${isPublic != null}" class="card-text mb-0">
                     <small th:if="${isPublic}">Public</small>
