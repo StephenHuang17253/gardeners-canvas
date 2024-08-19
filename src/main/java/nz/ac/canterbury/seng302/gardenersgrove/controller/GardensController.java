@@ -568,7 +568,7 @@ public class GardensController {
         if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING) {
             redirectAttributes.addFlashAttribute("tagMessageText",
                     String.format("Your tag \"%s\" is currently being checked for profanity. " +
-                            "If it follows the language standards for our app, it will be added to your garden.", tag));
+                            "If it follows the language standards for our app, it will be permanently added to your garden.", tag));
             redirectAttributes.addFlashAttribute("pendingTagName", tag);
         }
 
