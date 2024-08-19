@@ -1,63 +1,64 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.2'
-	id 'jacoco'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id "java"
+	id "org.springframework.boot" version "3.2.2"
+	id "jacoco"
+	id "io.spring.dependency-management" version "1.1.4"
 	id "org.sonarqube" version "4.0.0.2929"
-	id 'org.siouan.frontend-jdk21' version '8.1.0'
+	id "org.siouan.frontend-jdk21" version "8.1.0"
 }
 
-group = 'LEAF'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+group = "LEAF"
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = "17"
+
 
 repositories {
 	mavenCentral()
 }
 
+
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'com.h2database:h2'
-	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation "org.springframework.boot:spring-boot-starter"
+	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	implementation "org.springframework.boot:spring-boot-starter-security"
+	implementation "com.h2database:h2"
+	implementation "io.github.cdimascio:dotenv-java:3.0.0"
+	implementation "org.springframework.boot:spring-boot-starter-mail"
 	implementation "org.mariadb.jdbc:mariadb-java-client:3.0.4"
-	implementation 'org.webjars:bootstrap:5.3.3'
+	implementation "org.webjars:bootstrap:5.3.3"
 
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	// Use JUnit Jupiter for testing.
-	//    testImplementation libs.junit.jupiter
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
+	developmentOnly "org.springframework.boot:spring-boot-devtools"
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "org.springframework.security:spring-security-test"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
 	//Cucumber dependencies
-	testImplementation 'io.cucumber:cucumber-java:7.15.0'
-	testImplementation 'io.cucumber:cucumber-spring:7.15.0'
-	testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.15.0'
-	testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
+	testImplementation "io.cucumber:cucumber-java:7.15.0"
+	testImplementation "io.cucumber:cucumber-spring:7.15.0"
+	testImplementation "io.cucumber:cucumber-junit-platform-engine:7.15.0"
+	testImplementation "org.junit.platform:junit-platform-suite:1.10.2"
 
-	testImplementation 'org.springframework.security:spring-security-test'
-
+	testImplementation "org.springframework.security:spring-security-test"
 }
 
 
 frontend {
-	nodeVersion = '20.15.1'
-	assembleScript = 'run scss'
-	cleanScript = 'run clean'
+	nodeVersion = "20.15.1"
+	assembleScript = "run scss"
+	cleanScript = "run clean"
 	verboseModeEnabled = true
 }
 
-tasks.register('buildJar') {
-	dependsOn 'assembleFrontend', 'bootJar'
+
+tasks.register("buildJar") {
+	dependsOn "assembleFrontend", "bootJar"
 }
 
 
@@ -77,7 +78,8 @@ sonar {
 	}
 }
 
-tasks.named('test') {
+
+tasks.named("test") {
 	// Use JUnit Platform for unit tests.
 	useJUnitPlatform()
 	finalizedBy jacocoTestReport
@@ -90,11 +92,8 @@ tasks.named('test') {
 
 	// The unitTestReport will be run after the unit test task has completed
 	finalizedBy "jacocoTestReport"
-
 }
 
-
-// tasks below taken from ATDD workshop
 
 tasks.register("integration", Test) {
 	useJUnitPlatform()
@@ -108,6 +107,7 @@ tasks.register("integration", Test) {
 	// The integrationTestReport will be run after the integration test task has completed
 	finalizedBy "integrationTestReport"
 }
+
 
 tasks.register("cucumber", Test) {
 	testLogging.showStandardStreams = true
@@ -127,12 +127,11 @@ tasks.register("cucumber", Test) {
 }
 
 
-
 tasks.register("unitTestReport", JacocoReport) { // Generate a report for unit tests
-	group = 'verification'
+	group = "verification"
 
 	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
-		return !project.hasProperty('skipTestReport')
+		return !project.hasProperty("skipTestReport")
 	}
 
 	dependsOn test
@@ -150,11 +149,12 @@ tasks.register("unitTestReport", JacocoReport) { // Generate a report for unit t
 	}
 }
 
+
 tasks.register("integrationTestReport", JacocoReport) { // Generate a report for integration tests
-	group = 'verification'
+	group = "verification"
 
 	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
-		return !project.hasProperty('skipTestReport')
+		return !project.hasProperty("skipTestReport")
 	}
 
 	dependsOn integration
@@ -172,11 +172,12 @@ tasks.register("integrationTestReport", JacocoReport) { // Generate a report for
 	}
 }
 
+
 tasks.register("cucumberTestReport", JacocoReport) { // Generate a report for cucumber tests
-	group = 'verification'
+	group = "verification"
 
 	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
-		return !project.hasProperty('skipTestReport')
+		return !project.hasProperty("skipTestReport")
 	}
 
 	dependsOn cucumber
@@ -192,19 +193,18 @@ tasks.register("cucumberTestReport", JacocoReport) { // Generate a report for cu
 		xml.required = true
 		xml.destination file("${buildDir}/reports/coverage/cucumber.xml")
 	}
-
-
 }
+
 
 jacocoTestReport { // Generate a report for all generated test data
 	onlyIf { // Allow the report to be skipped when -PskipTestReport is passed via commandline
-		return !project.hasProperty('skipTestReport')
+		return !project.hasProperty("skipTestReport")
 	}
 
 	mustRunAfter test, integration, cucumber
 
 	executionData fileTree(project.rootDir) {
-		include '**/*.exec'
+		include "**/*.exec"
 	}
 	reports {
 		xml.required = true
@@ -213,11 +213,15 @@ jacocoTestReport { // Generate a report for all generated test data
 		html.destination file("${buildDir}/jacoco/html")
 	}
 }
+
+
 tasks.named("check") {
 	dependsOn test, integration, cucumber
 }
+
+
 // Ensure jacocoTestReport is ran after each specific test report.
-// The 'overall' coverage will then include each of the test tasks ran.
+// The "overall" coverage will then include each of the test tasks ran.
 tasks.named("unitTestReport").configure { finalizedBy "jacocoTestReport" }
 tasks.named("integrationTestReport").configure { finalizedBy "jacocoTestReport" }
 tasks.named("cucumberTestReport").configure { finalizedBy "jacocoTestReport" }
