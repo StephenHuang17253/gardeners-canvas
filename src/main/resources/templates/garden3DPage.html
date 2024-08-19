@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{fragments/header.html :: head (include3js=true)}"></head>
+
+<body class="vw-100 vh-100">
+
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div class="container-md bg-white rounded pt-3">
+        <div class="container text-center">
+            <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}">Garden Name</h1>
+        </div>
+    </div>
+
+    <div class="w-100 h-75 position-relative">
+        <div id="loading-div"
+            class="position-absolute w-100 h-100 bg-success d-flex align-items-center justify-content-center">
+            <img id="loading-img" th:src="@{/images/loading.gif}" alt="Loading">
+        </div>
+
+        <div class="w-100 h-100" id="container"></div>
+    </div>
+
+    <script type="module" th:src="@{/js/3d/3dMain.js}"></script>
+</body>
+
+</html>
