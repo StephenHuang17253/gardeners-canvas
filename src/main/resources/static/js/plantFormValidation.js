@@ -109,8 +109,6 @@ const clearNameError = (inputField, errorField) => {
 const handleNameUpdate = (event, errorField) => {
     let nameValue = event.target.value;
     const validNameRegex = /^[\p{L}\p{M}\p{N}\s,.''\-]*$/u;
-
-    const validNameRege = /^[A-Za-z0-9\s,.'\-]+$/;
     if (nameValue.length > 64) {
         errorField.textContent = "Plant name cannot be greater than 64 characters in length";
         displayNameError(event.target, errorField);
