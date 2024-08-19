@@ -6,7 +6,7 @@ plugins {
 	id 'jacoco'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id "org.sonarqube" version "4.0.0.2929"
-
+	id 'org.siouan.frontend-jdk21' version '8.1.0'
 }
 
 group = 'LEAF'
@@ -47,6 +47,19 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 }
+
+
+frontend {
+	nodeVersion = '20.15.1'
+	assembleScript = 'run scss'
+	cleanScript = 'run clean'
+	verboseModeEnabled = true
+}
+
+tasks.register('buildJar') {
+	dependsOn 'assembleFrontend', 'bootJar'
+}
+
 
 jacoco {
 	toolVersion = "0.8.9"

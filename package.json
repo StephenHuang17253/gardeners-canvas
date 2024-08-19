@@ -1,0 +1,11 @@
+{
+    "packageManager": "npm@10.8.1",
+    "scripts": {
+        "clean": "echo Maybe implement this at some point",
+        "scss": "node-sass src/main/scss -o src/main/resources/static/css/bootstrap"
+    },
+    "dependencies": {
+        "bootstrap": "^5.3.3",
+        "node-sass": "9.0.0"
+    }
+}

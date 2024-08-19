@@ -41,17 +41,26 @@ cucumber-test:
 
 sonarqube-report:
   stage: sonarqube
-  script:
-    ./gradlew sonarqube
+  script: ./gradlew sonarqube
 
 # builds all branches, except dev and main
 branch-build:
   stage: build
   script:
-    - ./gradlew bootJar
+    - ./gradlew buildJar
+
   artifacts:
     paths:
       - build/libs
+
+  cache:
+    key:
+      files:
+        - build.gradle
+        - package-lock.json
+    paths:
+      - node/
+
   except:
     - tags
     - main
