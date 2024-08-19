@@ -28,12 +28,14 @@ public class GridItemLocation {
     @Column(name = "y_coord")
     private int yCoordinate;
 
+    public GridItemLocation(){}
+
     public GridItemLocation(Long objectId, GridItemType itemType, Garden garden, int xCoordinate, int yCoordinate) {
-        objectId = objectId;
-        itemType = itemType;
-        garden = garden;
-        xCoordinate = xCoordinate;
-        yCoordinate = yCoordinate;
+        this.objectId = objectId;
+        this.itemType = itemType;
+        this.garden = garden;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
     }
 
     public Long getId() {

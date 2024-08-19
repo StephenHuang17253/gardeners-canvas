@@ -34,6 +34,7 @@ class GridItemLocationServiceIntegrationTest {
     private UserService userService;
 
     private Garden garden2D;
+    private Garden garden2D2;
 
     private User owner;
 
@@ -63,6 +64,23 @@ class GridItemLocationServiceIntegrationTest {
                         userService.getUserByEmail("GridItemLocationServiceIntegrationTest@IntegrationTest.com"));
             }
             gardenService.addGarden(garden2D);
+
+            if (garden2D2 == null) {
+                garden2D2 = new Garden(
+                        "2D2 Garden",
+                        "",
+                        "114 Ilam Road",
+                        "Ilam",
+                        "Christchurch",
+                        "8041",
+                        "New Zealand",
+                        15.0,
+                        false,
+                        "-43.5214643",
+                        "172.5796159",
+                        userService.getUserByEmail("GridItemLocationServiceIntegrationTest@IntegrationTest.com"));
+            }
+            gardenService.addGarden(garden2D2);
         }
     }
 
@@ -97,5 +115,71 @@ class GridItemLocationServiceIntegrationTest {
             gridItemLocationService.updateGridItemLocation(testGridItemLocation);
         });
     }
+
+    @Test
+    void addGridItemLocation_AttemptToAddGridItem_AddsItem() {
+
+        GridItemLocation testGridItemLocation = new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                0,
+                6
+        );
+        GridItemLocation saveGridItemLocation = gridItemLocationService.addGridItemLocation(testGridItemLocation);
+
+        Assertions.assertNotNull(gridItemLocationService.getGridItemLocationById(saveGridItemLocation.getId()).get());
+    }
+
+    @Test
+    void addGridItemLocation_AttemptToAddGridItemInSameLocation_DoesNotAddItem() {
+
+        GridItemLocation testGridItemLocation1 = new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                1,
+                6
+        );
+
+        GridItemLocation testGridItemLocation2 = new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                1,
+                6
+        );
+        gridItemLocationService.addGridItemLocation(testGridItemLocation1);
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            gridItemLocationService.addGridItemLocation(testGridItemLocation2);
+        });
+    }
+
+    @Test
+    void addGridItemLocation_AttemptToAddGridItemInSameLocationDifferentGardens_AddsItem() {
+
+        GridItemLocation testGridItemLocation1 = new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                6
+        );
+
+        GridItemLocation testGridItemLocation2 = new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D2,
+                2,
+                6
+        );
+
+        GridItemLocation savedGrid1 =  gridItemLocationService.addGridItemLocation(testGridItemLocation1);
+        GridItemLocation savedGrid2 =  gridItemLocationService.addGridItemLocation(testGridItemLocation2);
+
+        Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(savedGrid1.getId()).isPresent());
+        Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(savedGrid2.getId()).isPresent());
+    }
+
 
 }

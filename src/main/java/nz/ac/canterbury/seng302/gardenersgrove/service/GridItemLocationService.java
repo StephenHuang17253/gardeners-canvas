@@ -63,9 +63,11 @@ public class GridItemLocationService {
      */
     public GridItemLocation addGridItemLocation(GridItemLocation gridItemLocation) throws IllegalArgumentException {
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
+
         List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
                 .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&
                         gridItem.getYCoordinates() == gridItemLocation.getYCoordinates())).toList();
+
         if (overlappingLocation.isEmpty()) {
             return gridItemLocationRepository.save(gridItemLocation);
         } else {
