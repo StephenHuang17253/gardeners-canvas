@@ -18,8 +18,11 @@ const FILE_EXTENSIONS = {
     GLB: 'glb',
 };
 
+// Error name for when the user cancels the file picker dialog
 const CANCEL_SAVE = 'AbortError';
+// Directory to open to when using file picker for first time
 const DOWNLOADS_DIR = 'downloads';
+// ID to save the selected location for repeated file picker use
 const FILE_PICKER_ID = 'filePickerID';
 
 /**
