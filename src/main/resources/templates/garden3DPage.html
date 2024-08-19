@@ -13,6 +13,19 @@
     </div>
 
     <div class="w-100 h-75 position-relative">
+
+        <div class="dropdown position-absolute top-0 end-0 m-3">
+            <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Export Layout
+            </button>
+            <ul class="dropdown-menu">
+                <li><button class="dropdown-item" id="download-gltf">GLTF</button></li>
+                <li><button class="dropdown-item" id="download-obj">OBJ</button></li>
+                <li><button class="dropdown-item" id="download-jpg">JPG</button></li>
+            </ul>
+        </div>
+
         <div id="loading-div"
             class="position-absolute w-100 h-100 bg-success d-flex align-items-center justify-content-center">
             <img id="loading-img" th:src="@{/images/loading.gif}" alt="Loading">
