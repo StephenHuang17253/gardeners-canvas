@@ -63,7 +63,7 @@ class GridItemLocationServiceIntegrationTest {
                         "172.5796159",
                         userService.getUserByEmail("GridItemLocationServiceIntegrationTest@IntegrationTest.com"));
             }
-            gardenService.addGarden(garden2D);
+            garden2D = gardenService.addGarden(garden2D);
 
             if (garden2D2 == null) {
                 garden2D2 = new Garden(
@@ -80,7 +80,7 @@ class GridItemLocationServiceIntegrationTest {
                         "172.5796159",
                         userService.getUserByEmail("GridItemLocationServiceIntegrationTest@IntegrationTest.com"));
             }
-            gardenService.addGarden(garden2D2);
+            garden2D2 = gardenService.addGarden(garden2D2);
         }
     }
 
