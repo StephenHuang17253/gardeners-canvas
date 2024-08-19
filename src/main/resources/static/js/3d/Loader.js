@@ -12,7 +12,6 @@ class Loader {
      * @constructor
      */
     constructor() {
-
         this.manager = new THREE.LoadingManager();
         this.textureLoader = new THREE.TextureLoader(this.manager);
         this.gltfLoader = new GLTFLoader(this.manager);

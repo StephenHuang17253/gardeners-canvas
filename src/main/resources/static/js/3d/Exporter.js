@@ -2,12 +2,34 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 
-const MIME_TYPES = { APP_STREAM: 'application/octet-stream', TEXT_PLAIN: 'text/plain', IMAGE_JPEG: 'image/jpeg', IMAGE_STREAM: 'image/octet-stream' };
+// Code for opening the file picker to save a file is based on the following article:
+// https://web.dev/patterns/files/save-a-file
 
+const MIME_TYPES = {
+    APP_STREAM: 'application/octet-stream',
+    TEXT_PLAIN: 'text/plain',
+    IMAGE_JPG: 'image/jpeg',
+};
+
+const FILE_EXTENSIONS = {
+    OBJ: 'obj',
+    JPG: 'jpg',
+    GLTF: 'gtlf',
+    GLB: 'glb',
+}
+
+const CANCEL_SAVE = 'AbortError';
+
+const DOWNLOADS_DIR = 'downloads';
+
+/**
+ * Exporter class to handle exporting scenes as GLTF, GLB, OBJ, and JPG files
+ */
 class Exporter {
 
     /**
      * Create a new Exporter object
+     * 
      * @param {Element} link - link element to use for downloading files
      * @param {String} gardenName - name of the garden to use for the filename
      */
@@ -19,61 +41,108 @@ class Exporter {
     }
 
     /**
+     * Save the blob to a file using a link element
      * 
-     * @param {String} data - data to create a data url for
-     * @param {String} type - mime type of the data
-     * @returns {String} data url for the created data
+     * @param {Blob} blob - blob to save
+     * @param {String} filename - name of the file to save the blob to
      */
-    createDataUrl = (data, type) => URL.createObjectURL(new Blob([data], { type: type }));
-
-    /**
-     * Saves the data to a file with the given filename
-     * @param {String} dataURL - url of data to save
-     * @param {String} filename - name of the file to save
-     */
-    downloadFile = (dataURL, filename) => {
+    saveWithLink = (blob, filename) => {
+        const blobURL = URL.createObjectURL(blob);
         document.body.appendChild(this.link);
-        this.link.href = dataURL;
+        this.link.href = blobURL;
         this.link.download = filename;
         this.link.click();
-        document.body.removeChild(this.link);
+        setTimeout(() => {
+            URL.revokeObjectURL(blobURL);
+            document.body.removeChild(this.link);
+        }, 1000);
+    };
+
+    /**
+     * Save the blob to a file using the File System Access API
+     * 
+     * @param {Blob} blob - blob to save
+     * @param {String} filename - name of the file to save the blob to 
+     */
+    saveWithFilePicker = async (blob, filename) => {
+        const handle = await showSaveFilePicker({
+            suggestedName: filename,
+            startIn: DOWNLOADS_DIR,
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+    };
+
+    /**
+     * Save the blob to a file using the File System Access API if it is supported, otherwise use a link element
+     * 
+     * @param {Blob} blob 
+     * @param {String} filename
+     */
+    saveFile = async (blob, filename) => {
+        // Checks that the browser supports the File System Access API.
+        const supportsFileSystemAccess = 'showSaveFilePicker' in window && window.self === window.top;
+
+        if (supportsFileSystemAccess) {
+            try {
+                await this.saveWithFilePicker(blob, filename);
+                return;
+            } catch (err) {
+                // Fail silently if the user has simply canceled the dialog
+                if (err.name === CANCEL_SAVE) {
+                    console.error(err.name, err.message);
+                    return;
+                }
+            }
+        }
+        // Fallback if the File System Access API is not supported
+        this.saveWithLink(blob, filename);
     };
 
     /**
      * Download the scene as a GLTF file or a GLB file if the scene is too large
+     * 
      * @param {THREE.Scene} scene - scene to download as a GLTF, or GLB file
      */
     downloadGLTF = (scene) => {
         this.gltfExporter.parse(
             scene,
             result => {
+                let blob, extension;
                 if (result instanceof ArrayBuffer) {
-                    this.downloadFile(this.createDataUrl(result, MIME_TYPES.APP_STREAM), `${this.gardenName}.glb`);
+                    blob = new Blob([result], { type: MIME_TYPES.APP_STREAM });
+                    extension = FILE_EXTENSIONS.GLB;
                 } else {
+                    extension = FILE_EXTENSIONS.GLTF;
                     const output = JSON.stringify(result, null, 1);
-                    this.downloadFile(this.createDataUrl(output, MIME_TYPES.TEXT_PLAIN), `${this.gardenName}.gltf`);
+                    blob = new Blob([output], { type: MIME_TYPES.TEXT_PLAIN });
                 }
-            },
-            undefined // error callback
+                this.saveFile(blob, `${this.gardenName}.${extension}`);
+            }
         );
     };
 
     /**
      * Download the scene as an OBJ file
+     * 
      * @param {THREE.Scene} scene - scene to download as an OBJ file
      */
     downloadOBJ = (scene) => {
-        const objData = objExporter.parse(scene);
-        this.downloadFile(this.createDataUrl(objData, MIME_TYPES.TEXT_PLAIN), `${this.gardenName}.obj`);
-    }
+        const objData = this.objExporter.parse(scene);
+        const blob = new Blob([objData], { type: MIME_TYPES.TEXT_PLAIN });
+        this.saveFile(blob, `${this.gardenName}.${FILE_EXTENSIONS.OBJ}`);
+    };
 
     /**
-     * Download the scene as a JPEG file
+     * Download the scene as a JPG file
+     * 
      * @param {THREE.WebGLRenderer} renderer - renderer to download the scene from 
      */
-    downloadJPEG = (renderer) => {
-        const imgData = renderer.domElement.toDataURL(MIME_TYPES.IMAGE_JPEG);
-        this.downloadFile(imgData.replace(MIME_TYPES.IMAGE_JPEG, MIME_TYPES.IMAGE_STREAM), `${this.gardenName}.jpg`);
+    downloadJPG = (renderer) => {
+        renderer.domElement.toBlob(blob => {
+            this.saveFile(blob, `${this.gardenName}.${FILE_EXTENSIONS.JPG}`);
+        }, MIME_TYPES.IMAGE_JPG, 1);
     };
 
 }

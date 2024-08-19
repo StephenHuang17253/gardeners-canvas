@@ -39,7 +39,12 @@ const init = () => {
     camera.position.set(5, 5, 5);
     camera.lookAt(scene.position);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer = new THREE.WebGLRenderer(
+        {
+            antialias: true,
+            preserveDrawingBuffer: true
+        }
+    );
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
@@ -58,7 +63,7 @@ const init = () => {
     });
 
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.maxPolarAngle = Math.PI / 2 - 0.1;
+    controls.maxPolarAngle = Math.PI / 2;
     controls.minRadius = MIN_CAMERA_DIST;
     controls.maxRadius = MAX_CAMERA_DIST;
 
@@ -127,7 +132,6 @@ const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTe
 const fernModel = await loader.loadModel('fern.glb', 'fern');
 
 addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
-
 
 /**
  * On window resize event, update the camera aspect ratio and renderer size
