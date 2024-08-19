@@ -255,6 +255,7 @@ public class InputValidator {
 
     /**
      * Checks input against a criteria: This function only allows numbers, letters, hyphens, commas, dots, slashes and spaces.
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -267,6 +268,7 @@ public class InputValidator {
 
     /**
      * Checks input against a criteria: This function only allows numbers, letters, hyphens and spaces.
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -282,7 +284,7 @@ public class InputValidator {
      *
      * @param name string input in text field
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateName(String name) {
         return new InputValidator(name)
@@ -326,7 +328,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateUniqueEmail(String email) {
 
@@ -341,7 +343,7 @@ public class InputValidator {
      *
      * @param email
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateEmail(String email) {
         return new InputValidator(email)
@@ -355,7 +357,7 @@ public class InputValidator {
      * @param password
      * @param otherFields other input fields to test likeness with password
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePassword(String password, List<String> otherFields) {
         ValidationResult result = new InputValidator(password)
@@ -374,7 +376,7 @@ public class InputValidator {
      *
      * @param dob
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDOB(String dob) {
         return new InputValidator(dob)
@@ -395,7 +397,7 @@ public class InputValidator {
      *
      * @param date
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateDate(String date) {
         return new InputValidator(date)
@@ -409,7 +411,7 @@ public class InputValidator {
      *
      * @param plantCount the plant count to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *         otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validatePlantCount(String plantCount) {
         if (plantCount.equals("")) {
@@ -430,9 +432,10 @@ public class InputValidator {
     /**
      * Validate a new garden tag
      * 25 characters or less and alpha numeric or _ - ' " and space
+     *
      * @param tag tag string to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *   otherwise and this.getErrorMessage() returning the error message
+     * otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateTag(String tag) {
         ValidationResult result = new InputValidator(tag)
@@ -448,7 +451,6 @@ public class InputValidator {
         }
         return result;
     }
-
 
 
     /**
@@ -537,7 +539,7 @@ public class InputValidator {
             return this;
         }
         if (testedValue.length() > MAX_EMAIL_LENGTH) {
-            this.validationResult = ValidationResult.EMAIL_TO_LONG;
+            this.validationResult = ValidationResult.EMAIL_TOO_LONG;
             this.passState = false;
             return this;
         }
@@ -554,7 +556,7 @@ public class InputValidator {
         String localPart = parts[0];
         String domainPart = parts[1];
         if (localPart.length() > 64 || domainPart.length() > 255) {
-            this.validationResult = ValidationResult.EMAIL_TO_LONG;
+            this.validationResult = ValidationResult.EMAIL_TOO_LONG;
             this.passState = false;
             return this;
         }
@@ -786,7 +788,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-" };
+        String[] allowedPunctuation = new String[]{" ", ",", ".", "'", "-"};
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
@@ -833,7 +835,7 @@ public class InputValidator {
         }
 
         boolean stringPasses = true;
-        String[] allowedPunctuation = new String[] { " ", ",", ".", "'", "-", "/" };
+        String[] allowedPunctuation = new String[]{" ", ",", ".", "'", "-", "/"};
         // checks if all letters in this string are alpha numeric, if a letter fails it
         // checks it against
         // the allowed punctuation list, if that fails the string is marked as invalid
