@@ -55,10 +55,6 @@ Editing content below will change the nav bar on all pages where it is implement
                     <a th:class="|nav-link cursor-pointer ${activeParam == 'plantWiki' ? 'active' : ''}|"
                        onclick="navigateTo('/plant-wiki')">Plant Wiki</a>
                 </li>
-                <li th:if="${loggedIn == null ? false : loggedIn}" class="nav-item">
-                    <a th:class="|nav-link cursor-pointer ${activeParam == '3DGarden' ? 'active' : ''}|"
-                       onclick="navigateTo('/3D-garden/10001')">3D Garden</a>
-                </li>
 
             </ul>
 

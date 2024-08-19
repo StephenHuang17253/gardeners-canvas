@@ -1,11 +1,9 @@
 import * as THREE from 'three';
-import { applyOutline } from './selectionManager.js';
-import { addModelToScene } from './utils.js';
 import { createTileGrid } from './tiles.js';
-import { OrbitControls } from './OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Loader } from './Loader.js';
 
-let scene, camera, renderer, light, raycaster, pointer, loader, controls;
+let scene, camera, renderer, light, loader, controls;
 
 const container = document.getElementById('container');
 
@@ -20,10 +18,6 @@ const TILE_SIZE = 10;
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
-// link used to download files
-const link = document.createElement('a');
-const gardenName = 'My Favourite Garden';
-
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
  */
@@ -36,8 +30,7 @@ const init = () => {
 
     renderer = new THREE.WebGLRenderer(
         {
-            antialias: true,
-            preserveDrawingBuffer: true
+            antialias: true
         }
     );
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -61,12 +54,7 @@ const init = () => {
     controls.maxPolarAngle = Math.PI / 2;
     controls.minRadius = MIN_CAMERA_DIST;
     controls.maxRadius = MAX_CAMERA_DIST;
-
-    raycaster = new THREE.Raycaster();
-    pointer = null;
 };
-
-init();
 
 /**
  * Adds a light to the scene
@@ -76,35 +64,19 @@ const addLight = () => {
     scene.add(light);
 };
 
-/**
- * Gets the objects that the raycaster intersects with
- * @returns {THREE.Object3D[]} An array of objects that the raycaster intersects with
- */
-const getIntersects = () => {
-    if (!pointer) {
-        return [];
-    }
-    raycaster.setFromCamera(pointer, camera);
-    return raycaster.intersectObjects(scene.children, true);
+/** Add model to scene
+* 
+* @param {Object} model - The model to be added to the scene.
+* @param {Object} position - The position at which the model will be placed in the scene.
+* @param {number} [scaleFactor=1] - The scale factor to be applied to the model. Default value is 1.
+*/
+const addModelToScene = (model, position, scaleFactor = 1) => {
+    model.position.copy(position);
+    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    scene.add(model);
 };
 
-/**
- * Renders the scene
- */
-const animate = () => {
-
-    light.position.copy(camera.position);
-
-    const intersects = getIntersects();
-    if (intersects.length > 0 && intersects[0].object.name !== '') {
-        console.log(intersects[0].object.name);
-    }
-
-    renderer.render(scene, camera);
-};
-
-renderer.setAnimationLoop(animate);
-
+init();
 
 addLight();
 
@@ -118,13 +90,26 @@ loader.loadBackground(
 
 const grassTexture = loader.loadTexture('../textures/grass-tileable.jpg');
 
-const positions = createTileGrid(scene, GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
-
-// loadPlantsAtPositions(scene, positions, plantFilename, 1);
+const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
+scene.add(grid);
 
 const fernModel = await loader.loadModel('fern.glb', 'fern');
 
-addModelToScene(fernModel, scene, new THREE.Vector3(0, 0, 20), 2);
+addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 2);
+
+/**
+ * Renders the scene
+ */
+const animate = () => {
+    light.position.copy(camera.position);
+    renderer.render(scene, camera);
+};
+
+renderer.setAnimationLoop(animate);
+
+/** 
+ * Event Handlers
+ */
 
 /**
  * On window resize event, update the camera aspect ratio and renderer size
@@ -136,53 +121,21 @@ const onWindowResize = () => {
 };
 
 /**
- * Updates the pointer position
- * @param {MouseEvent} event - mouse event that triggered the update
+ * On mouse move event on the canvas prevent user selection
  */
-const updatePointer = (event) => {
-    if (!pointer) {
-        pointer = new THREE.Vector2();
-    }
-    const bounds = container.getBoundingClientRect();
-    pointer.x = ((event.clientX - bounds.left) / container.clientWidth) * 2 - 1;
-    pointer.y = - ((event.clientY - bounds.top) / container.clientHeight) * 2 + 1;
-};
-
-/**
- * On mouse move event on the canvas, update the pointer position, and prevent user selection
- * @param {MouseEvent} event - mouse event that triggered the update
- */
-const onMouseMove = (event) => {
-    updatePointer(event);
+const onMouseMove = () => {
     document.body.style.userSelect = 'none';
 };
 
 /**
- * On mouse out event on the canvas, set the pointer to null and allow user selection
+ * On mouse out event on the canvas allow user selection
  */
 const onMouseOut = () => {
-    pointer = null;
     document.body.style.userSelect = 'auto';
 };
 
-/**
- * On click event on the canvas, update the pointer position, 
- * and apply the outline effect to the first object that the pointer intersects
- * @param {MouseEvent} event - mouse event that triggered the update
- */
-const onClick = (event) => {
-    updatePointer(event);
-    const intersects = getIntersects();
-    if (intersects.length > 0) {
-        const object = intersects[0].object;
-        applyOutline(object, scene);
-    }
-};
-
 window.addEventListener('resize', onWindowResize);
-window.addEventListener('load', updatePointer);
 container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
-container.addEventListener('click', onClick);
 
 console.log(scene.children);

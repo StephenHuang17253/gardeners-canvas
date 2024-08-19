@@ -1,4 +1,3 @@
-import { addModelToScene } from './utils.js';
 import * as THREE from 'three';
 
 /**
@@ -57,8 +56,6 @@ const fragmentShader = `
     }
 `;
 
-
-
 /**
  * Creates a tile material with the given parameters.
  *
@@ -96,18 +93,17 @@ const createTile = (texture, size, hueShift, saturation) => {
 };
 
 /**
- * Creates a tile grid in the scene.
+ * Creates a tile grid.
  * 
- * @param {THREE.Scene} scene - The scene in which the tile grid will be created.
  * @param {number} rows - The number of rows in the grid.
  * @param {number} cols - The number of columns in the grid.
  * @param {number} tileSize - The size of each tile in the grid.
  * @param {THREE.Texture} texture - The texture to be applied to each tile.
  * @param {number} hueShift - The hue shift value for the tiles.
  * @param {number} saturation - The saturation value for the tiles.
- * @returns {Array<THREE.Vector3>} - An array of tile center positions.
+ * @returns {{THREE.Group, Array<THREE.Vector3>}} - Object with the grid to add to scene and an array of tile center positions.
  */
-const createTileGrid = (scene, rows, cols, tileSize, texture, hueShift, saturation) => {
+const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
     const tileCenterpositions = [];
@@ -119,28 +115,7 @@ const createTileGrid = (scene, rows, cols, tileSize, texture, hueShift, saturati
             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    scene.add(grid);
-    return tileCenterpositions;
+    return { grid, tileCenterpositions };
 };
 
-/**
- * Loads plants at specified positions in the scene.
- * 
- * @param {THREE.Scene} scene - The scene where the plants will be loaded.
- * @param {Array<THREE.Vector3>} positions - The positions where the plants will be placed.
- * @param {THREE.Object3D} plantModel - The model of the plant to be loaded.
- * @param {number} [plantScale=1] - The scale of the plant model.
- * @returns {Promise<void>} - A promise that resolves when all plants are loaded and added to the scene.
- */
-const loadPlantsAtPositions = async (scene, positions, plantModel, plantScale = 1) => {
-    const plantPromises = [];
-    for (const position of positions) {
-        plantPromises.push(addModelToScene(plantModel, scene, position, plantScale).then(plantModel => {
-            plantModel.position.y += tileSize / 2;
-            scene.add(plantModel);
-        }));
-    }
-    await Promise.all(plantPromises);
-};
-
-export { createTileGrid, loadPlantsAtPositions };
+export { createTileGrid };
