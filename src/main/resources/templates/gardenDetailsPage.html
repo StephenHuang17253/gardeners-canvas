@@ -154,12 +154,17 @@
                         </div>
                     </div>
                 </div>
+
+
                 <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
                     <button id="openTagModalButton" type="button" class="btn bg-success text-white"
                         data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
 
                     <a th:href="@{__${garden.getGardenId()}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
+                    </a>
+                    <a th:href="@{/2D-garden/__${garden.getGardenId()}__}">
+                        <button type="button" class="btn bg-success text-white">View in 2D</button>
                     </a>
                 </div>
 
