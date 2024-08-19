@@ -1,5 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
@@ -77,7 +78,17 @@ public class GridItemLocationService {
      * @param gridItemLocation the GridItemLocation to update
      * @return the GridItemLocation to update
      */
-    public GridItemLocation updateGridItemLocation(GridItemLocation gridItemLocation) throws IllegalArgumentException {
+    public GridItemLocation updateGridItemLocation(GridItemLocation gridItemLocation) throws IllegalArgumentException, EntityNotFoundException {
+
+        if (gridItemLocation.getId() == null) {
+            throw new IllegalArgumentException("Grid item id cannot be null");
+        }
+
+        Optional<GridItemLocation> optionalGridItemLocation = gridItemLocationRepository.findById((gridItemLocation.getId()));
+        if (optionalGridItemLocation.isEmpty()) {
+            throw new EntityNotFoundException("Grid item not found");
+        }
+
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
         List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
                 .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&

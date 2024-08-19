@@ -19,12 +19,22 @@ public class GridItemLocation {
     @JoinColumn(name = "garden_id")
     private Garden garden;
 
+    @Column(name = "object_id")
+    private Long objectId;
+
     @Column(name = "x_coord")
     private int xCoordinate;
 
     @Column(name = "y_coord")
     private int yCoordinate;
 
+    public GridItemLocation(Long objectId, GridItemType itemType, Garden garden, int xCoordinate, int yCoordinate) {
+        objectId = objectId;
+        itemType = itemType;
+        garden = garden;
+        xCoordinate = xCoordinate;
+        yCoordinate = yCoordinate;
+    }
 
     public Long getId() {
         return id;
