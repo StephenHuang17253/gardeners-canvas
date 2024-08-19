@@ -193,6 +193,6 @@ container.addEventListener('mouseout', onMouseOut);
 container.addEventListener('click', onClick);
 downloadGLTFButton.addEventListener('click', () => exporter.downloadGLTF(scene));
 downloadOBJButton.addEventListener('click', () => exporter.downloadOBJ(scene));
-downloadJPGButton.addEventListener('click', () => exporter.downloadJPEG(renderer));
+downloadJPGButton.addEventListener('click', () => exporter.downloadJPG(renderer));
 
 console.log(scene.children);

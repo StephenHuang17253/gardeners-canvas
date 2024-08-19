@@ -16,11 +16,11 @@ const FILE_EXTENSIONS = {
     JPG: 'jpg',
     GLTF: 'gtlf',
     GLB: 'glb',
-}
+};
 
 const CANCEL_SAVE = 'AbortError';
-
 const DOWNLOADS_DIR = 'downloads';
+const FILE_PICKER_ID = 'filePickerID';
 
 /**
  * Exporter class to handle exporting scenes as GLTF, GLB, OBJ, and JPG files
@@ -68,6 +68,7 @@ class Exporter {
         const handle = await showSaveFilePicker({
             suggestedName: filename,
             startIn: DOWNLOADS_DIR,
+            id: FILE_PICKER_ID,
         });
         const writable = await handle.createWritable();
         await writable.write(blob);
@@ -75,7 +76,7 @@ class Exporter {
     };
 
     /**
-     * Save the blob to a file using the File System Access API if it is supported, otherwise use a link element
+     * Save the blob to a file using a file picker if it is supported, otherwise use a link element
      * 
      * @param {Blob} blob 
      * @param {String} filename
@@ -90,10 +91,7 @@ class Exporter {
                 return;
             } catch (err) {
                 // Fail silently if the user has simply canceled the dialog
-                if (err.name === CANCEL_SAVE) {
-                    console.error(err.name, err.message);
-                    return;
-                }
+                if (err.name === CANCEL_SAVE) return;
             }
         }
         // Fallback if the File System Access API is not supported
@@ -114,9 +112,9 @@ class Exporter {
                     blob = new Blob([result], { type: MIME_TYPES.APP_STREAM });
                     extension = FILE_EXTENSIONS.GLB;
                 } else {
-                    extension = FILE_EXTENSIONS.GLTF;
                     const output = JSON.stringify(result, null, 1);
                     blob = new Blob([output], { type: MIME_TYPES.TEXT_PLAIN });
+                    extension = FILE_EXTENSIONS.GLTF;
                 }
                 this.saveFile(blob, `${this.gardenName}.${extension}`);
             }
