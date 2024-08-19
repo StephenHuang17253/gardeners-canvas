@@ -1,13 +1,14 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Service class that manages GridItemLocation objects
@@ -15,12 +16,10 @@ import java.util.List;
 @Service
 public class GridItemLocationService {
 
-
     /**
      * Interface for generic CRUD operations on a repository for GridItemLocation types.
      */
     private final GridItemLocationRepository gridItemLocationRepository;
-
 
     /**
      * GridItemLocationService constructor with repository.
@@ -40,6 +39,15 @@ public class GridItemLocationService {
 
     /**
      * Get GridItemLocation by garden
+     * @param id of the GridItemLocation
+     * @return list of GridItemLocations with that garden
+     */
+    public Optional<GridItemLocation> getGridItemLocationById(Long id) {
+        return gridItemLocationRepository.findById(id);
+    }
+
+    /**
+     * Get GridItemLocation by garden
      * @param garden in the relation
      * @return list of GridItemLocations with that garden
      */
@@ -50,7 +58,7 @@ public class GridItemLocationService {
     /**
      * Saves a GridItemLocation to the repository
      * @param gridItemLocation the GridItemLocation to save
-     * @return the GridItemLocation to save (with filled in id field)
+     * @return the GridItemLocation to save
      */
     public GridItemLocation addGridItemLocation(GridItemLocation gridItemLocation) throws IllegalArgumentException {
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
@@ -64,6 +72,31 @@ public class GridItemLocationService {
         }
     }
 
+    /**
+     * Updates a GridItemLocation in the repository
+     * @param gridItemLocation the GridItemLocation to update
+     * @return the GridItemLocation to update
+     */
+    public GridItemLocation updateGridItemLocation(GridItemLocation gridItemLocation) throws IllegalArgumentException {
+        List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
+        List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
+                .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&
+                        gridItem.getYCoordinates() == gridItemLocation.getYCoordinates())).toList();
+        if (overlappingLocation.isEmpty() || (overlappingLocation.size() == 1
+                && Objects.equals(overlappingLocation.get(0).getId(), gridItemLocation.getId()))) {
+            return gridItemLocationRepository.save(gridItemLocation);
+        } else {
+            throw new IllegalArgumentException("Item already exists at this location");
+        }
+    }
 
+    /**
+     * Remove a gridItemLocation from the repository
+     * @param gridItemLocation the gridItemLocation to remove
+     */
+    public void removeGardenTagRelation(GridItemLocation gridItemLocation)
+    {
+        gridItemLocationRepository.delete(gridItemLocation);
+    }
 
 }
