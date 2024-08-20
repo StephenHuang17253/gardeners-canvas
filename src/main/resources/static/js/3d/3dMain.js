@@ -96,6 +96,7 @@ scene.add(grid);
 
 const fernModel = await loader.loadModel('fern.glb', 'fern');
 const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
+const treeModel = await loader.loadModel('tree.glb', 'tree');
 
 addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
 
@@ -110,6 +111,7 @@ creeperModel.traverse((child) => {
     }
 });
 addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
+addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
 
 /**
  * Renders the scene
