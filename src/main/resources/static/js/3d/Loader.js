@@ -41,7 +41,7 @@ class Loader {
     /**
      * Load gltf 3d model, gives all parts the same name
      * 
-     * @param {string} filename - The filename of the 3D model to be loaded.
+     * @param {string} path - The filename of the 3D model to be loaded.
      * @param {string} name - The name to be assigned to all parts of the loaded model.
      * @returns {Promise<Object>} - A promise that resolves to the loaded model scene.
      */

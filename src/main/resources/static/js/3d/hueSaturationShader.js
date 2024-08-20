@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-// Fragment shader code as a string
 const fragmentShader = `
     uniform float hue;
     uniform float saturation;
@@ -47,6 +46,14 @@ const vertexShader = `
     }
 `;
 
+/**
+ * Function to apply colour adjustment to materials
+ * @param mapTexture
+ * @param hueValue
+ * @param saturationValue
+ * @param brightness
+ * @returns {*} ShaderMaterial
+ */
 const createHueSaturationMaterial = (mapTexture, hueValue, saturationValue, brightness) => {
     return new THREE.ShaderMaterial({
         uniforms: {
