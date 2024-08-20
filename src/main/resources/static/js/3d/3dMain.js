@@ -39,7 +39,8 @@ const init = () => {
 
     renderer = new THREE.WebGLRenderer(
         {
-            antialias: true
+            antialias: true,
+            preserveDrawingBuffer: true,
         }
     );
     renderer.setPixelRatio(window.devicePixelRatio);
