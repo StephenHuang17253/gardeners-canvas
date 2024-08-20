@@ -251,7 +251,7 @@ public class HomePageController {
 
         // Check gardens that need watering and add them
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<Garden> gardensNeedWatering = getGardensForWatering(gardenService.getAllUsersGardens(user.getId()));
+        List<Garden> gardensNeedWatering = getGardensForWatering(gardens);
 
         model.addAttribute("gardensNeedWatering", gardensNeedWatering);
         model.addAttribute("gardens", gardens);
@@ -375,6 +375,9 @@ public class HomePageController {
      *                watering
      */
     private List<Garden> getGardensForWatering(List<Garden> gardens) {
+        if(gardens.isEmpty()){
+            return gardens;
+        }
 
         List<Garden> gardensNeedWatering = new ArrayList<>();
 
