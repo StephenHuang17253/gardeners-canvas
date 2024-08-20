@@ -1,10 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTagRelation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
