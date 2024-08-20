@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createTileGrid } from './tiles.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Loader } from './Loader.js';
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
 
 let scene, camera, renderer, light, loader, controls;
 
@@ -94,8 +95,21 @@ const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0
 scene.add(grid);
 
 const fernModel = await loader.loadModel('fern.glb', 'fern');
+const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
 
-addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 2);
+addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
+
+creeperModel.traverse((child) => {
+    if (child.isMesh) {
+        child.material = createHueSaturationMaterial(
+            child.material.map,
+            0.2,
+            1.56,
+            2
+        );
+    }
+});
+addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
 
 /**
  * Renders the scene
