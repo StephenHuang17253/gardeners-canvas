@@ -12,20 +12,20 @@ public class GridItemLocation {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "item_type")
+    @Column(name = "item_type", nullable = false)
     private GridItemType itemType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "garden_id", nullable = false)
     private Garden garden;
 
-    @Column(name = "object_id")
+    @Column(name = "object_id", nullable = false)
     private Long objectId;
 
-    @Column(name = "x_coord")
+    @Column(name = "x_coord", nullable = false)
     private int xCoordinate;
 
-    @Column(name = "y_coord")
+    @Column(name = "y_coord", nullable = false)
     private int yCoordinate;
 
     /**
