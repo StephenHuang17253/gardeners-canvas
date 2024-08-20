@@ -2,7 +2,7 @@
     th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weatherListJson)">
     <div class="card h-100 bg-success text-white garden-card">
         <div class="card-body pt-1">
-            <div class="modal fade text-black" id="importPlantModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade text-black" th:id=`importPlantModal-${plantId}` tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -12,7 +12,6 @@
                         </div>
 
                         <form th:action="@{/import-plant}" method="post">
-
                             <input type="hidden" th:value="${plantId}" th:name="plantId">
 
                             <div class="modal-body">
@@ -79,7 +78,7 @@
                 </div>
                 <div class="col-2">
                     <button th:if="${!isOwner}" type="button" class="btn p-0 rounded-3" data-bs-toggle="modal"
-                        data-bs-target="#importPlantModal">
+                            th:attr="data-bs-target='#`importPlantModal-${plantId}`'"  >
                         <img th:src="@{/images/smallImportPlant.png}" class="w-100 h-100 image-fluid rounded-3"
                             alt="Import plant to one of your gardens">
                     </button>
