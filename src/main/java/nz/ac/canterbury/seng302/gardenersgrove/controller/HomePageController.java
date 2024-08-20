@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -396,14 +397,15 @@ public class HomePageController {
         for (int i = 0; i < gardens.size(); i++) {
             Garden garden = gardens.get(i);
             boolean needsWater = gardenNeedsWatering(garden, weatherDataList.get(i));
-            garden.setNeedsWatering(needsWater);
-            gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
 
+            if(!Objects.equals(needsWater, garden.getNeedsWatering())) {
+                garden.setNeedsWatering(needsWater);
+                gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
+            }
             if (needsWater) {
                 gardensNeedWatering.add(garden);
             }
         }
-
         return gardensNeedWatering;
     }
 
