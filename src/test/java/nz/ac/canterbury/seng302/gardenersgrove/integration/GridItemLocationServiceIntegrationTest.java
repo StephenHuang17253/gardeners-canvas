@@ -256,6 +256,67 @@ class GridItemLocationServiceIntegrationTest {
         Assertions.assertEquals(1, gridItemLocationsForGarden.size());
     }
 
+    @Test
+    void getAllGridItemLocations_GetAllGridItemLocation_ReturnListWithTwoRecords() {
+        gridItemLocationRepository.deleteAll();
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                6
+        ));
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D2,
+                1,
+                6
+        ));
+
+        List<GridItemLocation> gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
+
+        Assertions.assertEquals(2, gridItemLocationsForGarden.size());
+    }
+
+    @Test
+    void removeGridItemLocation_removeOneGridItemLocation_ReturnListWithOneRecords() {
+        gridItemLocationRepository.deleteAll();
+
+        GridItemLocation testLocation1 = gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                6
+        ));
+
+        GridItemLocation testLocation2 = gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D2,
+                1,
+                6
+        ));
+
+        List<GridItemLocation> gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
+
+        Assertions.assertEquals(2, gridItemLocationsForGarden.size());
+
+        gridItemLocationService.removeGridItemLocation(testLocation1);
+        gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
+
+        Assertions.assertEquals(1, gridItemLocationsForGarden.size());
+
+        Assertions.assertFalse(gridItemLocationService.getGridItemLocationById(testLocation1.getId()).isPresent());
+        Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(testLocation2.getId()).isPresent());
+
+
+
+    }
+
 
 
 }

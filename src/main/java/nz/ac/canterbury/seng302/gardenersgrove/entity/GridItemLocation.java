@@ -28,8 +28,20 @@ public class GridItemLocation {
     @Column(name = "y_coord")
     private int yCoordinate;
 
+    /**
+     * Zero Argument JPA constructor
+     */
     public GridItemLocation(){}
 
+    /**
+     * Constructor for GridItemLocation object.
+     * (Used to store the location of a plant or decoration on the 2D grid of our 2D garden view)
+     * @param objectId id of the plant or decoration
+     * @param itemType enum, PLANT or DECORATION
+     * @param garden the garden the 2D view is for
+     * @param xCoordinate the x-coordinate on the grid
+     * @param yCoordinate the y-coordinate on the grid
+     */
     public GridItemLocation(Long objectId, GridItemType itemType, Garden garden, int xCoordinate, int yCoordinate) {
         this.objectId = objectId;
         this.itemType = itemType;

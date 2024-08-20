@@ -107,7 +107,7 @@ public class GridItemLocationService {
      * Remove a gridItemLocation from the repository
      * @param gridItemLocation the gridItemLocation to remove
      */
-    public void removeGardenTagRelation(GridItemLocation gridItemLocation)
+    public void removeGridItemLocation(GridItemLocation gridItemLocation)
     {
         gridItemLocationRepository.delete(gridItemLocation);
     }
