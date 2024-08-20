@@ -13,7 +13,9 @@ class Loader {
      */
     constructor() {
         this.manager = new THREE.LoadingManager();
-        this.manager.setURLModifier(url => `${getInstance()}${url}`);
+        this.manager.setURLModifier(url => {
+            console.log(window.location.href);
+            return `${getInstance()}${url}`});
         this.textureLoader = new THREE.TextureLoader(this.manager);
         this.gltfLoader = new GLTFLoader(this.manager);
         this.exrLoader = new EXRLoader(this.manager);
