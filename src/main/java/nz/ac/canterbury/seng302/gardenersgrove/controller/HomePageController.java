@@ -251,21 +251,7 @@ public class HomePageController {
 
         // Check gardens that need watering and add them
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<Garden> gardensRefreshed = new ArrayList<>();
-        List<Garden> gardensNeedWatering = new ArrayList<>();
-
-        for (Garden garden : gardens) {
-            if (garden.getLastLocationUpdate() == null || garden.getLastWaterCheck() == null ||
-                    garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck())) {
-                gardensRefreshed.add(garden);
-            }
-            if (garden.getNeedsWatering()) {
-                gardensNeedWatering.add(garden);
-            }
-        }
-
-        List<Garden> newGardensNeedWatering = getGardensForWatering(gardensRefreshed);
-        gardensNeedWatering.addAll(newGardensNeedWatering);
+        List<Garden> gardensNeedWatering = getGardensForWatering(gardenService.getAllUsersGardens(user.getId()));
 
         model.addAttribute("gardensNeedWatering", gardensNeedWatering);
         model.addAttribute("gardens", gardens);
