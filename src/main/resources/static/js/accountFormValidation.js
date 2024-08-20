@@ -172,13 +172,10 @@ const handleEmailUpdate = (event) => {
     const emailRegex = /^[\p{L}\p{M}\p{N}]{1,}(?:[._-][\p{L}\p{M}\p{N}]+)*@[a-zA-Z0-9-]{1,}\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/u;
     const [localPart, domainPart] = emailValue.split('@');
 
-    if (emailValue.length > MAX_EMAIL_LENGTH) {
-        emailJSError.textContent = "Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters";
-        displayEmailError();
-    } else if (!emailRegex.test(emailValue)) {
+    if (!emailRegex.test(emailValue)) {
         emailJSError.textContent = "Email must be in the form 'jane@doe.nz'";
         displayEmailError();
-    } else if (localPart.length > 64 || domainPart.length > 255) {
+    } else if (emailValue.length > MAX_EMAIL_LENGTH || localPart.length > 64 || domainPart.length > 255) {
         emailJSError.textContent = "Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters";
         displayEmailError();
     } else {
