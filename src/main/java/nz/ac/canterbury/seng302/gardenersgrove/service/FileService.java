@@ -163,4 +163,20 @@ public class FileService {
         }
     }
 
+    /**
+     * Takes String of an image filename and returns what extension type is in header format.
+     * @param filename Name of File
+     * @return String of image type in the format image/*extentiontype*. Used for content type headers.
+     */
+    public String getImageFileType(String filename) {
+        if (filename.endsWith(".svg") || filename.endsWith(".SVG")) {
+            return "image/svg+xml";
+        } else if (filename.endsWith(".png") || filename.endsWith(".PNG")) {
+            return "image/png";
+        } else if (filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".jpeg") || filename.endsWith(".JPEG")) {
+            return "image/jpeg";
+        } else {
+            return "unknown";
+        }
+    }
 }
