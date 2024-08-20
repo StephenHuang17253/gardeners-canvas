@@ -49,9 +49,6 @@ branch-build:
   stage: build
   script:
     - ./gradlew bootJar
-  artifacts:
-    paths:
-      - build/libs
   except:
     - tags
     - main
@@ -77,9 +74,6 @@ deploy-staging:
     - echo "export BASE_URL=${BASE_URL}/test" >> /home/gitlab-runner/staging/.env
     - echo "export PERENUAL_PLANT_API_KEY=${PERENUAL_PLANT_API_KEY}" >> /home/gitlab-runner/staging/.env
     - sudo systemctl restart staging
-  artifacts:
-    paths:
-      - build/libs
   only:
     - dev
 
@@ -103,8 +97,5 @@ deploy-production:
     - echo "export BASE_URL=${BASE_URL}/prod" >> /home/gitlab-runner/production/.env
     - echo "export PERENUAL_PLANT_API_KEY=${PERENUAL_PLANT_API_KEY}" >> /home/gitlab-runner/production/.env
     - sudo systemctl restart production
-  artifacts:
-    paths:
-      - build/libs
   only:
     - tags
