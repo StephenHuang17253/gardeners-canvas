@@ -99,6 +99,7 @@ const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
 const treeModel = await loader.loadModel('tree.glb', 'tree');
 const flowerModel = await loader.loadModel('flower.glb', 'flower');
 const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
+const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
 
 addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
 
@@ -116,6 +117,7 @@ addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
 addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
 addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
 addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
+addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
 /**
  * Renders the scene
  */
