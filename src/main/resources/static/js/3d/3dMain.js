@@ -81,14 +81,14 @@ init();
 addLight();
 
 loader.loadBackground(
-    '../textures/nightbox.exr',
+    'skybox.exr',
     texture => {
         scene.background = texture;
         scene.environment = texture;
     }
 );
 
-const grassTexture = loader.loadTexture('../textures/grass-tileable.jpg');
+const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
 const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 scene.add(grid);
