@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createTileGrid } from './tiles.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Loader } from './Loader.js';
-import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 
 let scene, camera, renderer, light, loader, controls;
 
@@ -39,12 +39,6 @@ const init = () => {
     container.appendChild(renderer.domElement);
 
     loader = new Loader();
-
-    loader.setOnLoad(() => {
-        loadingImg.classList.add('d-none');
-        loadingDiv.classList.add('fadeOut');
-        setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
-    });
 
     loader.setOnError(() => {
         loadingImg.classList.add('d-none');
@@ -162,3 +156,7 @@ container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
 
 console.log(scene.children);
+
+loadingImg.classList.add('d-none');
+loadingDiv.classList.add('fadeOut');
+setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);

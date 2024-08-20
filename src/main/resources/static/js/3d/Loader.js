@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
-// import { getInstance } from '../getInstance';
 
 /**
  * Class to handle loading of textures and 3D models
@@ -14,6 +13,7 @@ class Loader {
      */
     constructor() {
         this.manager = new THREE.LoadingManager();
+        this.manager.setURLModifier(url => `${getInstance()}${url}`);
         this.textureLoader = new THREE.TextureLoader(this.manager);
         this.gltfLoader = new GLTFLoader(this.manager);
         this.exrLoader = new EXRLoader(this.manager);
@@ -37,7 +37,7 @@ class Loader {
      * @param {String} path - path to the texture 
      * @returns {THREE.Texture} - The loaded texture
      */
-    loadTexture = (path) => this.textureLoader.load(`/${getInstance()}textures/${path}`);
+    loadTexture = (path) => this.textureLoader.load(`/textures/${path}`);
 
     /**
      * Load gltf 3d model, gives all parts the same name
@@ -47,7 +47,7 @@ class Loader {
      * @returns {Promise<Object>} - A promise that resolves to the loaded model scene.
      */
     loadModel = async (path, name) => {
-        const model = await this.gltfLoader.loadAsync(`/${getInstance()}models/${path}`);
+        const model = await this.gltfLoader.loadAsync(`/models/${path}`);
         model.scene.traverse((child) => {
             child.name = name;
         });
@@ -62,7 +62,7 @@ class Loader {
      */
     loadBackground = (path, onLoad) => {
         this.exrLoader.load(
-            `/${getInstance()}textures/${path}`,
+            `/textures/${path}`,
             texture => {
                 texture.mapping = THREE.EquirectangularReflectionMapping;
                 onLoad(texture);
