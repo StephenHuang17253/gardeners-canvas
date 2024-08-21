@@ -127,10 +127,6 @@ addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
 addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
 addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
 
-setTimeout(() => {
-    loadingDiv.parentElement.removeChild(loadingDiv);
-}, 500);
-
 /**
  * Renders the scene
  */
