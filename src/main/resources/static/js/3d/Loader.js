@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 
+const BASE_URL = window.location.origin;
+
 /**
  * Class to handle loading of textures and 3D models
  */
@@ -13,17 +15,18 @@ class Loader {
      */
     constructor() {
         this.manager = new THREE.LoadingManager();
+
         this.manager.setURLModifier(url => {
-            console.log(window.location.origin);
-            console.log(url);
+
+            const newBaseUrl = `${BASE_URL}/${getInstance()}`;
+
             if (url.startsWith('blob:')) {
-                return url;
+                return url.replace(`${BASE_URL}/`, newBaseUrl);
             }
 
-            const res =`${window.location.origin}/${getInstance()}${url}`;
-            console.log(res);
-            return res;
+            return `${newBaseUrl}${url}`;
         });
+
         this.textureLoader = new THREE.TextureLoader(this.manager);
         this.gltfLoader = new GLTFLoader(this.manager);
         this.exrLoader = new EXRLoader(this.manager);
