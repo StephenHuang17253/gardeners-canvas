@@ -20,7 +20,7 @@ class Loader {
                 return url;
             }
 
-            const res =`${window.location.origin}/${url}`;
+            const res =`${window.location.origin}/${getInstance()}${url}`;
             console.log(res);
             return res;
         });
