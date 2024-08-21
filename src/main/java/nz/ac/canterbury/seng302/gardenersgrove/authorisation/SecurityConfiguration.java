@@ -73,7 +73,7 @@ public class SecurityConfiguration {
 
                 request.requestMatchers("/", "/register", "/login", "/home", "/static/**", "/css/**", "/js/**",
                         "/Images/**","/images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**", "/reset-password",
-                                "/lost-password", "/reset-password/**","/webjars/**")
+                                "/lost-password", "/reset-password/**","/webjars/**", "/2d")
                         .permitAll()
                         // Any other request requires authentication
                         .anyRequest()

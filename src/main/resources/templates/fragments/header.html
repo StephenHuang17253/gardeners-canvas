@@ -22,4 +22,10 @@
             }
         }
     </script>
+    <script th:src="@{/webjars/konva/9.3.14/konva.min.js}"></script>
+    <title>Gardener's Grove</title>
+    <link rel="icon" th:href="@{/images/gardeners_grove_fern_logo.svg}" type="image/svg+xml">
+    <th:block th:if="${includeWeatherStyles}">
+        <link th:href="@{/css/weatherTimes.css}" rel="stylesheet">
+    </th:block>
 </head>
