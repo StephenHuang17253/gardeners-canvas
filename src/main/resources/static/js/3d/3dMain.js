@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createTileGrid } from './tiles.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Loader } from './Loader.js';
+import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 
 let scene, camera, renderer, light, loader, controls;
 
@@ -39,12 +40,6 @@ const init = () => {
 
     loader = new Loader();
 
-    loader.setOnLoad(() => {
-        loadingImg.classList.add('d-none');
-        loadingDiv.classList.add('fadeOut');
-        setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
-    });
-
     loader.setOnError(() => {
         loadingImg.classList.add('d-none');
         loadingDiv.innerText = 'There was an error loading your garden';
@@ -81,22 +76,44 @@ init();
 addLight();
 
 loader.loadBackground(
-    '../textures/skybox.exr',
+    'skybox.exr',
     texture => {
         scene.background = texture;
         scene.environment = texture;
     }
 );
 
-const grassTexture = loader.loadTexture('../textures/grass-tileable.jpg');
+const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
 const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 scene.add(grid);
 
 const fernModel = await loader.loadModel('fern.glb', 'fern');
+const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
+const treeModel = await loader.loadModel('tree.glb', 'tree');
+const flowerModel = await loader.loadModel('flower.glb', 'flower');
+const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
+const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
+const climberModel = await loader.loadModel('climber.glb', 'climber');
 
-addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 2);
+addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
 
+creeperModel.traverse((child) => {
+    if (child.isMesh) {
+        child.material = createHueSaturationMaterial(
+            child.material.map,
+            0.2,
+            1.56,
+            2
+        );
+    }
+});
+addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
+addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
+addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
+addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
+addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
+addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
 /**
  * Renders the scene
  */
@@ -139,3 +156,7 @@ container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
 
 console.log(scene.children);
+
+loadingImg.classList.add('d-none');
+loadingDiv.classList.add('fadeOut');
+setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);

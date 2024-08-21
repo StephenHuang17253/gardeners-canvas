@@ -404,9 +404,10 @@ public class PlantFormController {
         logger.info("GET /files/plants/{}", filename);
         try {
             Resource file = fileService.loadFile(filename);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                    .body(file);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename\"" + file.getFilename() + "\"");
+            headers.add(HttpHeaders.CONTENT_TYPE, fileService.getImageFileType(filename));
+            return ResponseEntity.ok().headers(headers).body(file);
         } catch (MalformedURLException error) {
             logger.error(error.getMessage());
         }
