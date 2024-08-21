@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createTileGrid } from './tiles.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Loader } from './Loader.js';
-import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from './Exporter.js';
 
 let scene, camera, renderer, controls, loader, exporter, light;
@@ -177,3 +177,7 @@ downloadJPGButton.addEventListener('click', () => exporter.downloadJPG(renderer)
 
 
 console.log(scene.children);
+
+loadingImg.classList.add('d-none');
+loadingDiv.classList.add('fadeOut');
+setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
