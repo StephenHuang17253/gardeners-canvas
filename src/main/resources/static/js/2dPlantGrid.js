@@ -11,8 +11,8 @@ const gridWidth = GRID_COLUMNS * GRID_SIZE;
 const gridHeight = GRID_ROWS * GRID_SIZE;
 
 // Calculate the offsets to center the grid
-const offsetX = (stageWidth - gridWidth) / 2;
-const offsetY = (stageHeight - gridHeight) / 2;
+const offsetX = (stageWidth - gridWidth) / 3;
+const offsetY = (stageHeight - gridHeight) / 3;
 
 let plantPosition = 100;
 const plantName = "plant";
