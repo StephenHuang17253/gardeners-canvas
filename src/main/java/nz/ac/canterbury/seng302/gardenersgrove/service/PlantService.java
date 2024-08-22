@@ -95,6 +95,7 @@ public class PlantService {
      * @param plantDescription plant's description
      * @param plantDate        date of planting
      * @param gardenId         id of garden the plant belongs to
+     * @param plantCategory    category the plant belongs to
      * @throws IllegalArgumentException if invalid garden ID
      */
     public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId, PlantCategory plantCategory) {
