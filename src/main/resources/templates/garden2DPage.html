@@ -18,16 +18,17 @@
 
         <div class="container text-center">
 
-
             <div>
                 <h1 class="break-word" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
-                <h1>To be implemented.</h1>
+                <button type="submit" class="btn btn-success submit-button">Add Plant</button>
+            </div>
+
+            <div id="container" style="width: 60%;">
+                <script th:src="@{/js/2dPlantGrid.js}"></script>
             </div>
 
         </div>
     </div>
-
-
 
 </body>
 </html>

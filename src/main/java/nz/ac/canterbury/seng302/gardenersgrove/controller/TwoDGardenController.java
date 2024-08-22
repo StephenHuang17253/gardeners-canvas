@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class twoDGardenController {
+public class TwoDGardenController {
 
     @GetMapping("/2d")
     public String twoDGardenPlan() {
