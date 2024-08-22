@@ -78,7 +78,8 @@ const addLight = () => {
 * @param {Object} position - The position at which the model will be placed in the scene.
 * @param {number} [scaleFactor=1] - The scale factor to be applied to the model. Default value is 1.
 */
-const addModelToScene = (model, position, scaleFactor = 1) => {
+const addModelToScene = async (model, position, scaleFactor = 1) => {
+    await renderer.compileAsync( model, camera, scene );
     model.position.copy(position);
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
