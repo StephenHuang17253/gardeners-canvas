@@ -34,11 +34,10 @@
                                 <button type="submit" th:if="${!#lists.isEmpty(session.userGardens)}"
                                         class="btn btn-success">Add to garden
                                 </button>
-                                <a th:href="@{/create-new-garden}"
-                                   class="btn btn-success" th:if="${#lists.isEmpty(session.userGardens)}"
-                                   data-bs-dismiss="modal">
+                                <button th:if="${#lists.isEmpty(session.userGardens)}" type="button"
+                                        class="btn btn-success" onclick="window.location.href='/create-new-garden'">
                                     Create Garden
-                                </a>
+                                </button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </form>
