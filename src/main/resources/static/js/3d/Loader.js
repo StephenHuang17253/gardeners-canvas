@@ -80,6 +80,11 @@ class Loader {
         )
     };
 
+    newLoaderTest = (path, onload) => {
+        const newLoader = new GLTFLoader();
+        newLoader.load(`models/creeper.glb`, )
+    }
+
     /**
      * Load background texture
      * 
