@@ -12,6 +12,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserInteractionService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -120,7 +121,8 @@ class UserInteractionServiceIntergrationTest {
                 3,
                 "Plant owned by John",
                 LocalDate.of(2003, 5, 2),
-                1L);
+                1L,
+                PlantCategory.TREE);
         plantList.add(plant1);
     }
 
