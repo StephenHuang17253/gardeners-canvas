@@ -108,11 +108,11 @@ const clearNameError = (inputField, errorField) => {
  */
 const handleNameUpdate = (event, errorField) => {
     let nameValue = event.target.value;
-    const validNameRegex = /^[A-Za-z\s\-']+$/;
+    const validNameRegex = /^[\p{L}\p{M}\p{N}\s,.''\-]*$/u;
     if (nameValue.length > 64) {
         errorField.textContent = "Plant name cannot be greater than 64 characters in length";
         displayNameError(event.target, errorField);
-    } else if (!validNameRegex.test(nameValue) || nameValue === "") {
+    } else if (!validNameRegex.test(nameValue) || !nameValue.trim()) {
         errorField.textContent = "Plant name cannot be empty and must only include letters, numbers, spaces, dots, hyphens or apostrophes";
         displayNameError(event.target, errorField);
     } else {
@@ -201,8 +201,14 @@ const clearCountError = () => {
 const handleCountUpdate = (event) => {
     const countValue = event.target.value;
 
+
     let floatValue;
     try {
+        if (countValue === '') {
+            clearCountError();
+            return;
+        }
+
         floatValue = parseFloat(countValue.replace(",", "."));
 
         if (isNaN(floatValue)) {
