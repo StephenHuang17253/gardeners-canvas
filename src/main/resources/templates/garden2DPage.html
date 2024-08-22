@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<head th:replace="~{fragments/header.html}"></head>
+<head th:replace="~{fragments/header.html}"><title>a</title></head>
 
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
@@ -19,14 +19,17 @@
         <div class="container text-center">
 
 
-            <div>
+            <div class="justify-content-center">
                 <h1 class="break-word" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
-                <h1>To be implemented.</h1>
+                <button type="submit" class="btn btn-success submit-button">Add Plant</button>
+
+                <div id="container" class="justify-content-center"></div>
             </div>
 
         </div>
     </div>
 
+    <script th:src="@{/js/2dPlantGrid.js}"></script>
 
 
 </body>
