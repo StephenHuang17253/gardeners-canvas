@@ -59,12 +59,25 @@ class Loader {
      * @param {string} name - The name to be assigned to all parts of the loaded model.
      * @returns {Promise<Object>} - A promise that resolves to the loaded model scene.
      */
-    loadModel = async (path, name) => {
-        const model = await this.gltfLoader.loadAsync(`models/${path}`);
-        model.scene.traverse((child) => {
-            child.name = name;
-        });
-        return model.scene;
+    loadModel = (path, name, onload) => {
+        // const model = await this.gltfLoader.loadAsync(`models/${path}`);
+        // model.scene.traverse((child) => {
+        //     child.name = name;
+        // });
+        // return model.scene;
+        this.gltfLoader.load(
+            `models/${path}`,
+            (gltf) => {
+                const model = gltf.scene; 
+                // console.log('first onload', typeof model);
+                model.scene.traverse((child) => {
+                    child.name = name;
+                });
+                onload(model)
+            },
+            undefined,
+            undefined
+        )
     };
 
     /**
