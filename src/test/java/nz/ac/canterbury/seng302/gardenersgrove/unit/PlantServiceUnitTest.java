@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -79,8 +80,8 @@ class PlantServiceUnitTest {
                 "-43.5214643",
                 "172.5796159",
                 owner));
-        Plant plant1 = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting1, garden);
-        Plant plant2 = new Plant("Jane's Plant", 4, "Plant owned by Jane", dateOfPlanting2, garden);
+        Plant plant1 = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting1, garden, PlantCategory.TREE);
+        Plant plant2 = new Plant("Jane's Plant", 4, "Plant owned by Jane", dateOfPlanting2, garden,PlantCategory.TREE);
         UserInteraction userInteraction1 = new UserInteraction(owner, 1L, ItemType.PLANT, LocalDateTime.now());
         UserInteraction userInteraction2 = new UserInteraction(owner, 2L, ItemType.PLANT, LocalDateTime.now());
         List<UserInteraction> userInteractions = List.of(userInteraction1, userInteraction2);

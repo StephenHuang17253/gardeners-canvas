@@ -20,6 +20,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +134,7 @@ public class HomePageController {
 
             for (int k = 0; k < 12; k++) {
                 plantService.addPlant("Test Plant #" + k, 2,
-                        "test", LocalDate.now(), sampleGarden.getGardenId());
+                        "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.TREE);
             }
         }
 
@@ -181,7 +182,7 @@ public class HomePageController {
 
                 for (int k = 0; k < 1; k++) {
                     plantService.addPlant("Test Plant " + k, 2,
-                            "test", LocalDate.now(), sampleGarden.getGardenId());
+                            "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.TREE);
                 }
 
             }
