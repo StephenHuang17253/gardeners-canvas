@@ -12,11 +12,11 @@
                         </div>
 
                         <form th:action="@{/import-plant}" method="post">
-
                             <input type="hidden" th:value="${plantId}" th:name="plantId">
 
-                            <div class="modal-body">
-                                <select class="form-select col-xxl-3" aria-label="Select garden" th:name="gardenId">
+                            <div class="modal-body" th:if="${session.userGardens.size() != 0}">
+                                <select class="form-select col-xxl-3"
+                                        aria-label="Select garden" th:name="gardenId">
                                     <option class="text-truncate" th:each="garden : ${session.userGardens}"
                                         th:with="gardenName=${garden.getGardenName}"
                                         th:text="${#strings.length(gardenName) > 30 ? #strings.substring(gardenName,0,27) + '...' : gardenName}"
@@ -24,9 +24,20 @@
                                     </option>
                                 </select>
                             </div>
+                            <div class="modal-body" th:if="${session.userGardens.size() == 0}">
+                                <p id="missingGardenErrorText" class="mb-0 text-danger fs-6"
+                                   th:text="${'You do not have any gardens. You cannot import a plant. Please cancel or create a new garden first'}"></p>
+                            </div>
+
 
                             <div class="modal-footer justify-content-center">
-                                <button type="submit" class="btn btn-success">Add to garden</button>
+                                <button th:if="${session.userGardens.size() != 0}" type="submit"
+                                        class="btn btn-success">Add to garden
+                                </button>
+                                <button th:if="${session.userGardens.size() == 0}" type="button"
+                                        class="btn btn-success" onclick="window.location.href='/create-new-garden'">
+                                    Create garden
+                                </button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </form>
