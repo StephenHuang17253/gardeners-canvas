@@ -47,6 +47,7 @@ const init = () => {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
+    window.createImageBitmap = undefined;
 
     loader = new Loader();
 
