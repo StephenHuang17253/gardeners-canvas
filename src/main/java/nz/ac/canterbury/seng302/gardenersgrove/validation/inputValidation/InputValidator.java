@@ -515,7 +515,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^\\p{L}[\\p{L} \\-'’]*$")) {
+        if (!testedValue.matches("^[\\p{L}\\p{M}][\\p{L}\\p{M} \\-'’]*$")) {
             this.validationResult = ValidationResult.INVALID_USERNAME;
             this.passState = false;
             return this;

@@ -36,9 +36,11 @@ _*Thoose features require environment variables._
 
 | Account Type | Email | Password | Gmail Password | Use: |
 |--------------|-------|----------|----------------|------|
-| Default User | gardenersgrovetest@gmail.com | Password1! | Password10! | This account is initialised and pre-verified on startup, allowing developers to skip verification steps, to more quickly test features during development. |
+| Existing User | sheldoncooper@email.com | Password1! | None | This account is initialised and pre-verified on startup, and has some friends, and pending requests to & from other users. This is a good account for testing the friendship functionality. |
+| Existing User | georgecoopersr@email.com | Password1! | None | This account is initialised and pre-verified on startup. |
 | Test User | gardenersgrovetest1@gmail.com | Password10! | Password10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so the email is not in use. |
 | Test User | gardenersgrovetest2@gmail.com | Password10! | TestPassword10! | This account is used when you want/need to go through the account creation steps. It is not created on app startup so the email is not in use. |
+| Existing User | gardenersgrovetest@gmail.com | Password1! | Password10! | This account is initialised and pre-verified on startup, allowing developers to skip verification steps, to more quickly test features during development. |
 
 ## How to run
 ### 1 - Running the project with full functionality

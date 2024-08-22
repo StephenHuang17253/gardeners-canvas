@@ -29,6 +29,7 @@ dependencies {
 	implementation "org.mariadb.jdbc:mariadb-java-client:3.0.4"
 	implementation 'org.webjars:bootstrap:5.3.3'
 	implementation 'org.webjars.npm:konva:9.3.14'
+	implementation 'org.webjars.npm:three:0.167.1'
 
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -62,6 +63,18 @@ sonar {
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"
 		property "sonar.coverage.jacoco.xmlReportPath", "${buildDir}/jacoco/test-report.xml"
+
+		// For pipelines run for a branch build only
+		if (System.env.CI_MERGE_REQUEST_IID == null || System.env.CI_MERGE_REQUEST_IID.trim().isEmpty()) {
+			property "sonar.branch.name", "$System.env.CI_COMMIT_REF_NAME"
+		}
+		// For pipelines run as part of a merge request
+		else {
+			property "sonar.pullrequest.key", "$System.env.CI_MERGE_REQUEST_IID"
+			property "sonar.pullrequest.branch", "$System.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+			property "sonar.pullrequest.base", "$System.env.CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+		}
+
 	}
 }
 

@@ -158,7 +158,7 @@ public class U25_MainPage {
     Logger logger = LoggerFactory.getLogger(U25_MainPage.class);
     // Setup
     @Before
-    public void before_or_after_all() {
+    public void before_or_after_all() throws JsonProcessingException {
 
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
@@ -171,6 +171,12 @@ public class U25_MainPage {
         mockMVC = MockMvcBuilders
                 .standaloneSetup(homePageController)
                 .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode weatherNode = objectMapper.readTree(drySampleWeather);
+        WeatherResponseData weather = new WeatherResponseData(weatherNode);
+
+        Mockito.when(weatherService.getWeatherForGardens(Mockito.anyList())).thenReturn(List.of(weather));
     }
 
     @Given("I am a user with email {string} and no recently added friends")

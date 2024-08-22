@@ -1,8 +1,13 @@
 const MIN_TAG_INPUT_LENGTH = 3;
-
+const form = document.getElementById("tagForm");
 const tagField = document.getElementById("tagInput")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
 
+/**
+ * Gets the name of a tag
+ * @param data the tag
+ * @returns {string} the tag name
+ */
 const getDisplayString = (data) => {
     return data.tagName;
 }
@@ -13,7 +18,11 @@ const getDisplayString = (data) => {
  */
 const fillTagField = (data) => {
     tagField.value = getDisplayString(data)
-    document.getElementById("addTagButton").click();
+    if (form) {
+        form.submit();
+    } else {
+        document.getElementById("addTagButton").click();
+    }
 }
 
 /**

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:replace="~{fragments/header.html :: head (include3js=true)}"></head>
+
+<body class="vw-100 vh-100">
+
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div class="container-md bg-white rounded pt-3">
+        <div class="container text-center">
+            <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}">Garden Name</h1>
+        </div>
+    </div>
+
+    <div class="w-100 h-75 position-relative">
+        <div id="loading-div"
+            class="position-absolute w-100 h-100 bg-success d-flex align-items-center justify-content-center">
+            <img id="loading-img" th:src="@{/images/loading.gif}" alt="Loading">
+        </div>
+
+        <div class="w-100 h-100" id="container"></div>
+    </div>
+    <footer class="text-center mt-4">
+        <ul class="list-unstyled">
+            <li>
+                <a href="https://sketchfab.com/3d-models/garden-lattice-pack-wood-2b448f42a86f4bd28915c777c06abcb9" target="_blank">
+                    Garden Lattice Pack Wood by Antipode
+                </a>
+                - Downloaded from Sketchfab
+            </li>
+            <li>
+                <a href="https://sketchfab.com/3d-models/ivy-high-poly-f10e66e2e77a4dda9a7147cd89f2082b" target="_blank">
+                    Ivy (High Poly) by VROD
+                </a>
+                - Downloaded from Sketchfab
+            </li>
+            <li>
+                <a href="https://sketchfab.com/3d-models/green-creeper-plant-f1005205b134402db0a1c986b15c803d" target="_blank">
+                    Green Creeper Plant by Tsukari
+                </a>
+                - Downloaded from Sketchfab
+            </li>
+        </ul>
+    </footer>
+
+
+    <script type="module" th:src="@{/js/3d/3dMain.js}"></script>
+</body>
+
+</html>
