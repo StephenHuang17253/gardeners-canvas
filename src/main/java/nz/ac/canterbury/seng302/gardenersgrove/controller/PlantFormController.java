@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -183,7 +184,7 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, PlantCategory.TREE);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
@@ -445,7 +446,7 @@ public class PlantFormController {
 
         Plant toCopyPlant = optionalPlant.get();
 
-        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId);
+        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId, PlantCategory.TREE);
         if (toCopyPlant.getPlantPictureFilename() != null) {
             plantService.updatePlantPicture(newPlant, toCopyPlant.getPlantPictureFilename());
         }

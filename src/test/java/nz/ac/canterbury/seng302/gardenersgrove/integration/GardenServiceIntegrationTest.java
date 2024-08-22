@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -258,7 +259,7 @@ class GardenServiceIntegrationTest {
         // Given
         Garden garden = userService.getUserById(1L).getGardens().get(0);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
 
         // When
         gardenService.addPlantToGarden(1L, plant);
@@ -291,7 +292,7 @@ class GardenServiceIntegrationTest {
                 "172.5796159",
                 user);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gardenService.addPlantToGarden(4L, plant);

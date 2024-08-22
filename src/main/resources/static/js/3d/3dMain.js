@@ -1,12 +1,17 @@
 import * as THREE from 'three';
 import { createTileGrid } from './tiles.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './OrbitControls.js';
 import { Loader } from './Loader.js';
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
+import { Exporter } from './Exporter.js';
 
-let scene, camera, renderer, light, loader, controls;
+let scene, camera, renderer, controls, loader, exporter, light;
 
 const container = document.getElementById('container');
+
+const downloadGLTFButton = document.getElementById('download-gltf');
+const downloadOBJButton = document.getElementById('download-obj');
+const downloadJPGButton = document.getElementById('download-jpg');
 
 const loadingDiv = document.getElementById('loading-div');
 const loadingImg = document.getElementById('loading-img');
@@ -18,6 +23,10 @@ const TILE_SIZE = 10;
 
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
+
+// link used to download files
+const link = document.createElement('a');
+const gardenName = 'My Favourite Garden';
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -31,12 +40,14 @@ const init = () => {
 
     renderer = new THREE.WebGLRenderer(
         {
-            antialias: true
+            antialias: true,
+            preserveDrawingBuffer: true,
         }
     );
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
+    window.createImageBitmap = undefined;
 
     loader = new Loader();
 
@@ -49,6 +60,8 @@ const init = () => {
     controls.maxPolarAngle = Math.PI / 2;
     controls.minRadius = MIN_CAMERA_DIST;
     controls.maxRadius = MAX_CAMERA_DIST;
+
+    exporter = new Exporter(link, gardenName);
 };
 
 /**
@@ -96,8 +109,6 @@ const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
 const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
 const climberModel = await loader.loadModel('climber.glb', 'climber');
 
-addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
-
 creeperModel.traverse((child) => {
     if (child.isMesh) {
         child.material = createHueSaturationMaterial(
@@ -108,12 +119,15 @@ creeperModel.traverse((child) => {
         );
     }
 });
+
+addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
 addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
 addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
 addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
 addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
 addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
 addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
+
 /**
  * Renders the scene
  */
@@ -154,6 +168,10 @@ const onMouseOut = () => {
 window.addEventListener('resize', onWindowResize);
 container.addEventListener('mousemove', onMouseMove);
 container.addEventListener('mouseout', onMouseOut);
+downloadGLTFButton.addEventListener('click', () => exporter.downloadGLTF(scene));
+downloadOBJButton.addEventListener('click', () => exporter.downloadOBJ(scene));
+downloadJPGButton.addEventListener('click', () => exporter.downloadJPG(renderer));
+
 
 console.log(scene.children);
 
