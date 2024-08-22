@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -250,21 +251,7 @@ public class HomePageController {
 
         // Check gardens that need watering and add them
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
-        List<Garden> gardensRefreshed = new ArrayList<>();
-        List<Garden> gardensNeedWatering = new ArrayList<>();
-
-        for (Garden garden : gardens) {
-            if (garden.getLastLocationUpdate() == null || garden.getLastWaterCheck() == null ||
-                    garden.getLastLocationUpdate().isAfter(garden.getLastWaterCheck())) {
-                gardensRefreshed.add(garden);
-            }
-            if (garden.getNeedsWatering()) {
-                gardensNeedWatering.add(garden);
-            }
-        }
-
-        List<Garden> newGardensNeedWatering = getGardensForWatering(gardensRefreshed);
-        gardensNeedWatering.addAll(newGardensNeedWatering);
+        List<Garden> gardensNeedWatering = getGardensForWatering(gardens);
 
         model.addAttribute("gardensNeedWatering", gardensNeedWatering);
         model.addAttribute("gardens", gardens);
@@ -388,6 +375,9 @@ public class HomePageController {
      *                watering
      */
     private List<Garden> getGardensForWatering(List<Garden> gardens) {
+        if(gardens.isEmpty()){
+            return gardens;
+        }
 
         List<Garden> gardensNeedWatering = new ArrayList<>();
 
@@ -396,14 +386,15 @@ public class HomePageController {
         for (int i = 0; i < gardens.size(); i++) {
             Garden garden = gardens.get(i);
             boolean needsWater = gardenNeedsWatering(garden, weatherDataList.get(i));
-            garden.setNeedsWatering(needsWater);
-            gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
 
+            if(!Objects.equals(needsWater, garden.getNeedsWatering())) {
+                garden.setNeedsWatering(needsWater);
+                gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
+            }
             if (needsWater) {
                 gardensNeedWatering.add(garden);
             }
         }
-
         return gardensNeedWatering;
     }
 
