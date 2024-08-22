@@ -33,13 +33,13 @@ class Loader {
     }
 
     /**
-     * Set the function to be called when loading is complete for all loaders
+     * Set the function to be called when loading is complete for each item
      * @param {() => void} callback - function to be called when loading is complete
      */
     setOnLoad = (callback) => this.manager.onLoad = callback;
 
     /**
-     * Set the function to be called when an error occurs during loading
+     * Set the function to be called when an error occurs during loading an item
      * @param {() => void} callback - function to be called when an error occurs during loading
      */
     setOnError = (callback) => this.manager.onError = callback;
