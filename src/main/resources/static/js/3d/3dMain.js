@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createTileGrid } from './tiles.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './OrbitControls.js';
 import { Loader } from './Loader.js';
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from './Exporter.js';
