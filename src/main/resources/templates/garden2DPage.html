@@ -10,17 +10,22 @@
     <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 20vw; height: 90vh; overflow-y: auto;">
         <span class="fs-4">Palette Window</span>
         <hr>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <div class="col" th:each="plant : ${plants}">
-                <div>
-                    <a class="break-word" th:text="${plant.getPlantPictureFilename()}"></a>
-                    <a class="break-word" th:text="${plant.getPlantName()}"></a>
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
+                    <div class="w-100 plant-item" th:data-plant-name="${plant.getPlantName()}" th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
+                        <img th:src="@{${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}}"
+                             alt="Plant"
+                             class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
+                             style="max-width: 100px;">
+                        <a class="d-block break-word text-white mt-2" th:text="${plant.getPlantName()}"></a>
+                    </div>
                 </div>
             </div>
-        </ul>
+        </div>
+
         <hr>
         <div class="d-flex flex-column align-items-start">
-            <button type="submit" class="btn btn-success">Add Plant</button>
             <button type="button" class="btn bg-success text-white mb-2">Save Garden</button>
             <button type="button" class="btn bg-warning text-white mb-2">Clear All</button>
             <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn bg-success text-white">Return to Garden Details</a>
