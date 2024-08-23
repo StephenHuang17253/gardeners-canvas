@@ -13,9 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service class for Plant objects.
@@ -257,5 +255,9 @@ public class PlantService {
             garden.getPlants().remove(plantToDelete);
             plantRepository.deleteById(plantId);
         }
+    }
+
+    public List<PlantCategory> getPlantCategories() {
+        return Arrays.asList(PlantCategory.values());
     }
 }

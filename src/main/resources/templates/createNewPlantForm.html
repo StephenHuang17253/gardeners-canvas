@@ -63,12 +63,12 @@
                     <div class="mb-3 btn-group w-100">
                         <label for="plantCategory" class="form-label">Plant Category * </label>
                         <button id="plantCategory" type="button" class="btn border dropdown-toggle w-100"
-                               data-bs-toggle="dropdown" aria-expanded="false">
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Plant Category
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item overflow-text"
-                               th:each="catgoey : ${PlantCategory ca}" th:text="${garden.getGardenName}"></a>
+                               th:each="category : ${categories}" th:text="${category}" th:value="*{category}" onclick="onDropdownItemSelect(this)"></a>
                         </div>
                     </div>
 
@@ -116,6 +116,8 @@
     <script th:src="@{/js/formatNumber.js}"></script>
     <script th:src="@{/js/submitFormOnce.js}"></script>
     <script th:src="@{/js/plantFormValidation.js}"></script>
+    <script th:src="@{/js/dropdown.js}"></script>
+
 </body>
 
 </html>

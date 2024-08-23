@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -98,6 +99,7 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
+        model.addAttribute("categories", plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
@@ -541,4 +543,11 @@ public class PlantFormController {
 
         return "importPlantForm";
     }
+
+
+//    @GetMapping("/plantCategories")
+//    public List<PlantCategory> getPlantCategories(Model model){
+//        model.addAttribute("categories", plantService.getPlantCategories());
+//        return plantService.getPlantCategories();
+//    }
 }
