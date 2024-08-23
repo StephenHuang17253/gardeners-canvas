@@ -60,6 +60,18 @@
                            th:text="'Plant count must be a positive whole number between 1 and 1,000,000'"></p>
                     </div>
 
+                    <div class="mb-3 btn-group w-100">
+                        <label for="plantCategory" class="form-label">Plant Category * </label>
+                        <button id="plantCategory" type="button" class="btn border dropdown-toggle w-100"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                        Plant Category
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item overflow-text"
+                               th:each="catgoey : ${PlantCategory ca}" th:text="${garden.getGardenName}"></a>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="plantDescription" class="form-label">Plant Description</label>
                         <textarea id="plantDescription" class="form-control" th:name="plantDescription"
