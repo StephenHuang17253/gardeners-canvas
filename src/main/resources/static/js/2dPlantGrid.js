@@ -1,7 +1,8 @@
 const signUpButton = document.querySelector('button[type="submit"]');
 
-const stageWidth = window.innerWidth;
-const stageHeight = window.innerHeight;
+const outerContainer = document.getElementById("TwoDContainer");
+const stageWidth = outerContainer.clientWidth;
+const stageHeight = outerContainer.clientWidth /2;
 const GRID_SIZE = 100;  // Size of each grid cell
 const GRID_COLUMNS = 6;  // Number of columns in the grid
 const GRID_ROWS = 6;  // Number of rows in the grid
