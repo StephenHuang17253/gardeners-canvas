@@ -9,6 +9,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -162,7 +163,7 @@ public class BrowsePublicGardens {
             garden = gardenService.addGarden(garden);
             for (int i = 0; i < plantNo; i++) {
                 String plantName = gardenName + " " + (i + 1);
-                plantService.addPlant(plantName, 2, gardenName, LocalDate.now(), garden.getGardenId());
+                plantService.addPlant(plantName, 2, gardenName, LocalDate.now(), garden.getGardenId(), PlantCategory.TREE);
             }
         }
 
