@@ -29,7 +29,7 @@ let selected = false;
 const layer = new Konva.Layer();
 stage.add(layer);
 
-// Create a grid of squares
+// Creates a grid of squares
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
         const rect = new Konva.Rect({
@@ -48,7 +48,10 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
 
 let selectedPlant = null;  // Track the currently selected plant
 
-const handleFormSubmit = (event) => {
+/**
+ * Handles the adding of a plant to the stage produced by konva
+ */
+const handleAddPlant = () => {
     plantPosition -= 10;
     const plantImage = new Image();
     plantImage.src = '/images/default_plant.png';
@@ -98,7 +101,9 @@ const handleFormSubmit = (event) => {
     };
 };
 
-// Click event to place the plant at the correct grid position
+/**
+ * Handles the clicking of any plant on the stage
+ */
 stage.on('click', function (e) {
     if (selected && selectedPlant) {
         const mousePos = stage.getPointerPosition();
