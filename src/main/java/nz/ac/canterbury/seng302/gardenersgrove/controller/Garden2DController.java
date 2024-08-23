@@ -58,6 +58,7 @@ public class Garden2DController {
 
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
+        model.addAttribute("plants", garden.getPlants());
         return "garden2DPage";
     }
 

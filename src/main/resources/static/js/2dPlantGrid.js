@@ -1,22 +1,14 @@
-const signUpButton = document.querySelector('button[type="submit"]');
+const stageWidth = window.innerWidth * 0.8;
+const stageHeight = window.innerHeight * 0.9;
+const GRID_SIZE = 100;
+const GRID_COLUMNS = 6;
+const GRID_ROWS = 6;
 
-const stageWidth = window.innerWidth * 0.59;
-const stageHeight = window.innerHeight;
-
-const GRID_SIZE = 100;  // Size of each grid cell
-const GRID_COLUMNS = 6;  // Number of columns in the grid
-const GRID_ROWS = 6;  // Number of rows in the grid
-
-// Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
 const gridHeight = GRID_ROWS * GRID_SIZE;
 
-// Calculate the offsets to center the grid
 const offsetX = (stageWidth - gridWidth) / 2;
 const offsetY = (stageHeight - gridHeight) / 2;
-
-let plantPosition = 100;
-const plantName = "plant";
 
 const stage = new Konva.Stage({
     width: stageWidth,
@@ -24,12 +16,10 @@ const stage = new Konva.Stage({
     container: 'container'
 });
 
-let selected = false;
-
 const layer = new Konva.Layer();
 stage.add(layer);
 
-// Creates a grid of squares
+// Create grid
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
         const rect = new Konva.Rect({
@@ -46,83 +36,109 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
     }
 }
 
-let selectedPlant = null;  // Track the currently selected plant
+let selectedPlantInfo = null;
+let highlightedPaletteItem = null;
+let selectedPlant = null;
 
-/**
- * Handles the adding of a plant to the stage produced by konva
- */
-const handleAddPlant = () => {
-    plantPosition -= 10;
+function createPlant(x, y, imageSrc, plantName) {
     const plantImage = new Image();
-    plantImage.src = '/images/default_plant.png';
-    let currentPlantName = plantName + plantPosition.toString();
+    plantImage.src = imageSrc;
 
     plantImage.onload = function() {
         const plant = new Konva.Image({
-            x: offsetX + 20 + plantPosition,
-            y: offsetY + 20 + plantPosition,
+            x: x,
+            y: y,
             image: plantImage,
             width: GRID_SIZE,
             height: GRID_SIZE,
+            name: plantName,
             draggable: true,
-            name: currentPlantName,
         });
-        layer.add(plant);
 
         plant.on('dragmove', function () {
-            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
-            plant.position({
-                x: x,
-                y: y,
-            });
+            let newX = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+            let newY = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+            plant.position({x: newX, y: newY});
         });
 
-        // Click event to select and highlight the plant
         plant.on('click', function (e) {
             if (selectedPlant) {
-                // Deselect the previous plant
                 selectedPlant.stroke(null);
                 selectedPlant.strokeWidth(0);
             }
-
             selectedPlant = plant;
-            selected = true;
-
-            plant.stroke('blue');  // Highlight the selected plant
+            plant.stroke('blue');
             plant.strokeWidth(4);
             layer.draw();
-
             e.cancelBubble = true;
         });
 
+        layer.add(plant);
         layer.draw();
     };
-};
+}
 
-/**
- * Handles the clicking of any plant on the stage
- */
+document.querySelectorAll('.plant-item').forEach(item => {
+    item.addEventListener('click', function() {
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = 'none';
+        }
+        this.style.border = '3px solid blue';
+        highlightedPaletteItem = this;
+
+        selectedPlantInfo = {
+            name: this.getAttribute('data-plant-name'),
+            image: this.getAttribute('data-plant-image')
+        };
+        item.disable();
+    });
+});
+
 stage.on('click', function (e) {
-    if (selected && selectedPlant) {
+    if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
-        selectedPlant.position({
-            x: x,
-            y: y,
-        });
+        createPlant(x, y, selectedPlantInfo.image, selectedPlantInfo.name);
 
-        selectedPlant.stroke(null);  // Remove highlight after placement
+        selectedPlantInfo = null;
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = 'none';
+            highlightedPaletteItem = null;
+        }
+    } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
+        const mousePos = stage.getPointerPosition();
+        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+
+        selectedPlant.position({x: x, y: y});
+        selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
         layer.draw();
 
-        // Deselect the plant
         selectedPlant = null;
-        selected = false;
+
+        document.querySelectorAll('.plant-item')
     }
 });
 
-signUpButton.addEventListener('click', handleFormSubmit);
+const clearAllButton = document.querySelector('.btn.bg-warning');
+if (clearAllButton) {
+    clearAllButton.addEventListener('click', function() {
+        layer.find('Image').forEach(node => node.destroy());
+        layer.draw();
+    });
+} else {
+    console.error('Clear All button not found');
+}
+
+const saveGardenButton = document.querySelector('.btn.bg-success');
+if (saveGardenButton) {
+    saveGardenButton.addEventListener('click', function() {
+        console.log('Save garden');
+        // Implement save functionality here
+    });
+} else {
+    console.error('Save Garden button not found');
+}

@@ -1,0 +1,14 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/header.html}"  th:with="loggedIn=${loggedIn}"></head>
+<body>
+    <div th:replace="~{fragments/navBar.html}" th:with="loggedIn=${loggedIn}"></div>
+    <h1>2D Garden View</h1>
+
+    <button type="submit" class="btn btn-success submit-button">Add Plant</button>
+
+    <div id="container" class="justify-content-center"></div>
+    <script th:src="@{/js/2dPlantGrid.js}"></script>
+</body>
+</html>
