@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class TokenTest {
@@ -43,12 +42,12 @@ public class TokenTest {
         assertTrue(token.isExpired());
     }
 
-//    @Test
-//    public void tokenCreation_DelayLessThanLifetime_IsNotExpired() throws InterruptedException {
-//        int lifetimeSeconds = 1;
-//        Duration lifeTime = Duration.ofSeconds(lifetimeSeconds);
-//        Token token = new Token(user, lifeTime);
-//        Thread.sleep(lifetimeSeconds * 1000 - 5);
-//        assertFalse(token.isExpired());
-//    }
+    @Test
+    public void tokenCreation_DelayLessThanLifetime_IsNotExpired() throws InterruptedException {
+        int lifetimeSeconds = 1;
+        Duration lifeTime = Duration.ofSeconds(lifetimeSeconds);
+        Token token = new Token(user, lifeTime);
+        Thread.sleep(lifetimeSeconds * 1000 - 5);
+        assertFalse(token.isExpired());
+    }
 }
