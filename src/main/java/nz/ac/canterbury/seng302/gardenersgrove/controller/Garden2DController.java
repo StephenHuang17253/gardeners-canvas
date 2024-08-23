@@ -27,16 +27,16 @@ public class Garden2DController {
     private final SecurityService securityService;
 
     @Autowired
-    public Garden2DController(GardenService gardenService, SecurityService securityService){
+    public Garden2DController(GardenService gardenService, SecurityService securityService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
 
     }
 
     @GetMapping("/2D-garden/{gardenId}")
-    public String getGarden3DPage(@PathVariable Long gardenId,
+    public String getGarden2DPage(@PathVariable Long gardenId,
                                   HttpServletResponse response,
-                                  Model model){
+                                  Model model) {
         logger.info("GET /2D-garden/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -61,5 +61,17 @@ public class Garden2DController {
         model.addAttribute("plants", garden.getPlants());
         return "garden2DPage";
     }
+
+    //post method <-- save method
+    //save2DGarden
+    // parameters are objects (plants) <-- their ids
+    // object type
+    // and their location
+    // list of tuples with above three items
+    // garden Id
+
+    //loop through each item/id/thing and update GritItemLocation
+
+    //redirect back to "/2D-garden/{gardenId}"
 
 }
