@@ -40,11 +40,11 @@ let selectedPlantInfo = null;
 let highlightedPaletteItem = null;
 let selectedPlant = null;
 
-function createPlant(x, y, imageSrc, plantName) {
+function createPlant(x, y, imageSrc, plantName, plantId) {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
-    plantImage.onload = function() {
+    plantImage.onload = function () {
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -52,6 +52,7 @@ function createPlant(x, y, imageSrc, plantName) {
             width: GRID_SIZE,
             height: GRID_SIZE,
             name: plantName,
+            id: plantId.toString(),
             draggable: true,
         });
 
@@ -79,7 +80,7 @@ function createPlant(x, y, imageSrc, plantName) {
 }
 
 document.querySelectorAll('.plant-item').forEach(item => {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function () {
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = 'none';
         }
@@ -88,7 +89,8 @@ document.querySelectorAll('.plant-item').forEach(item => {
 
         selectedPlantInfo = {
             name: this.getAttribute('data-plant-name'),
-            image: this.getAttribute('data-plant-image')
+            image: this.getAttribute('data-plant-image'),
+            id: this.getAttribute('data-plant-id')
         };
         item.disable();
     });
@@ -100,7 +102,7 @@ stage.on('click', function (e) {
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
-        createPlant(x, y, selectedPlantInfo.image, selectedPlantInfo.name);
+        createPlant(x, y, selectedPlantInfo.image, selectedPlantInfo.name, selectedPlantInfo.id);
 
         selectedPlantInfo = null;
         if (highlightedPaletteItem) {
@@ -125,7 +127,7 @@ stage.on('click', function (e) {
 
 const clearAllButton = document.querySelector('.btn.bg-warning');
 if (clearAllButton) {
-    clearAllButton.addEventListener('click', function() {
+    clearAllButton.addEventListener('click', function () {
         layer.find('Image').forEach(node => node.destroy());
         layer.draw();
     });
@@ -135,7 +137,7 @@ if (clearAllButton) {
 
 const saveGardenButton = document.querySelector('.btn.bg-success');
 if (saveGardenButton) {
-    saveGardenButton.addEventListener('click', function() {
+    saveGardenButton.addEventListener('click', function () {
         console.log('Save garden');
         // Implement save functionality here
     });
