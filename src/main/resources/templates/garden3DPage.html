@@ -12,6 +12,15 @@
         </div>
     </div>
 
+    <div class="d-flex flex-row flex-wrap justify-content-center mt-2 mb-4 gap-3">
+        <a th:href="@{/my-gardens/__${garden.getGardenId()}__}">
+            <button type="button" class="btn bg-success text-white">Garden Details</button>
+        </a>
+        <a th:href="@{/2D-garden/__${garden.getGardenId()}__}">
+            <button type="button" class="btn bg-success text-white">Edit in 2D</button>
+        </a>
+    </div>
+
     <div class="w-100 h-75 position-relative">
 
         <div class="dropdown position-absolute top-0 end-0 m-3">
