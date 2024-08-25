@@ -95,7 +95,7 @@ class GridItemLocationServiceIntegrationTest {
         );
         testGridItemLocation.setId(1L);
 
-        Assertions.assertThrows(EntityNotFoundException.class,() -> {
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {
             gridItemLocationService.updateGridItemLocation(testGridItemLocation);
         });
     }
@@ -110,7 +110,7 @@ class GridItemLocationServiceIntegrationTest {
                 0,
                 6
         );
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gridItemLocationService.updateGridItemLocation(testGridItemLocation);
         });
     }
@@ -149,7 +149,7 @@ class GridItemLocationServiceIntegrationTest {
                 6
         );
         gridItemLocationService.addGridItemLocation(testGridItemLocation1);
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gridItemLocationService.addGridItemLocation(testGridItemLocation2);
         });
     }
@@ -173,8 +173,8 @@ class GridItemLocationServiceIntegrationTest {
                 6
         );
 
-        GridItemLocation savedGrid1 =  gridItemLocationService.addGridItemLocation(testGridItemLocation1);
-        GridItemLocation savedGrid2 =  gridItemLocationService.addGridItemLocation(testGridItemLocation2);
+        GridItemLocation savedGrid1 = gridItemLocationService.addGridItemLocation(testGridItemLocation1);
+        GridItemLocation savedGrid2 = gridItemLocationService.addGridItemLocation(testGridItemLocation2);
 
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(savedGrid1.getId()).isPresent());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(savedGrid2.getId()).isPresent());
@@ -314,9 +314,20 @@ class GridItemLocationServiceIntegrationTest {
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(testLocation2.getId()).isPresent());
 
 
-
     }
 
+
+    void getMatchingGridItem_validParams_returnsCorrectMatch() {
+    }
+
+    void getMatchingGridItem_invalidGridItemType_returnsNull() {
+    }
+
+    void getMatchingGridItem_invalidItemID_returnsNull() {
+    }
+
+    void getMatchingGridItem_invalidGarden_returnsNull() {
+    }
 
 
 }
