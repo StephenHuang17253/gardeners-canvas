@@ -139,7 +139,17 @@ const saveGardenButton = document.querySelector('.btn.bg-success');
 if (saveGardenButton) {
     saveGardenButton.addEventListener('click', function () {
         console.log('Save garden');
-        // Implement save functionality here
+        let idList = [];
+        let xCoordList = [];
+        let yCoordList = [];
+        layer.find('Image').forEach(node => {
+            idList.push(node.id);
+            xCoordList.push(node.x);
+            yCoordList.push(node.y);
+        });
+        document.getElementById("idList").value = JSON.stringify(idList);
+        document.getElementById("xCoordList").value = JSON.stringify(xCoordList);
+        document.getElementById("yCoordList").value = JSON.stringify(yCoordList);
     });
 } else {
     console.error('Save Garden button not found');
