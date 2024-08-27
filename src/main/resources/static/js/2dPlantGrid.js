@@ -92,7 +92,6 @@ document.querySelectorAll('.plant-item').forEach(item => {
             image: this.getAttribute('data-plant-image'),
             id: this.getAttribute('data-plant-id')
         };
-        item.disable();
     });
 });
 
@@ -143,13 +142,14 @@ if (saveGardenButton) {
         let xCoordList = [];
         let yCoordList = [];
         layer.find('Image').forEach(node => {
-            idList.push(node.id);
-            xCoordList.push(node.x);
-            yCoordList.push(node.y);
+            idList.push(node.id());
+            xCoordList.push(node.x());
+            yCoordList.push(node.y());
         });
         document.getElementById("idList").value = JSON.stringify(idList);
         document.getElementById("xCoordList").value = JSON.stringify(xCoordList);
         document.getElementById("yCoordList").value = JSON.stringify(yCoordList);
+
     });
 } else {
     console.error('Save Garden button not found');
