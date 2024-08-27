@@ -134,23 +134,36 @@ if (clearAllButton) {
     console.error('Clear All button not found');
 }
 
-const saveGardenButton = document.querySelector('.btn.bg-success');
-if (saveGardenButton) {
-    saveGardenButton.addEventListener('click', function () {
-        console.log('Save garden');
-        let idList = [];
-        let xCoordList = [];
-        let yCoordList = [];
-        layer.find('Image').forEach(node => {
-            idList.push(node.id());
-            xCoordList.push(node.x());
-            yCoordList.push(node.y());
-        });
-        document.getElementById("idList").value = JSON.stringify(idList);
-        document.getElementById("xCoordList").value = JSON.stringify(xCoordList);
-        document.getElementById("yCoordList").value = JSON.stringify(yCoordList);
+/**
+ * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
+ */
+document.getElementById('saveGardenForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    let idList = [];
+    let xCoordList = [];
+    let yCoordList = [];
 
+    // Assuming 'layer.find('Image')' is correctly defined elsewhere
+    layer.find('Image').forEach(node => {
+        idList.push(node.id());
+        xCoordList.push(node.x());
+        yCoordList.push(node.y());
     });
-} else {
-    console.error('Save Garden button not found');
-}
+
+    // Ensure these elements exist
+    let idListInput = document.getElementById("idList");
+    let xCoordListInput = document.getElementById("xCoordList");
+    let yCoordListInput = document.getElementById("yCoordList");
+
+
+    if (idListInput && xCoordListInput && yCoordListInput) {
+        idListInput.value = JSON.stringify(idList);
+        xCoordListInput.value = JSON.stringify(xCoordList);
+        yCoordListInput.value = JSON.stringify(yCoordList);
+        // Manually submit the form
+        event.target.submit();
+
+    } else {
+        console.error('One or more hidden inputs not found');
+    }
+});

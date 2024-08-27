@@ -126,11 +126,11 @@ public class Garden2DController {
             return "403";
         }
 
+        logger.info((String) idList);
+
         if (idList == null || xCoordList == null || yCoordList == null) {
             return "redirect:/2D-garden/{gardenId}";
         }
-
-        logger.info(idList);
 
         //all items on grid are plants at the moment
         //ToDo: garden2DLayout.forEach(item -> updateGardenGrid(item[0], item[1], item[2], item[3],garden));

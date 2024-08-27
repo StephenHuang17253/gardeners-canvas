@@ -26,13 +26,13 @@
                 </div>
             </div>
         </div>
-        <form th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" method="post">
-            <input type="hidden" th:id="idList" th:value="${''}"/>
-            <input type="hidden" th:id="xCoordList" th:value="${''}"/>
-            <input type="hidden" th:id="yCoordList" th:value="${''}"/>
+        <form th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm" method="post">
+            <input type="hidden" id="idList" name="idList" th:value="''"/>
+            <input type="hidden" id="xCoordList" name="xCoordList" th:value="''"/>
+            <input type="hidden" id="yCoordList" name="yCoordList" th:value="''"/>
             <hr>
             <div class="d-flex flex-column align-items-start">
-                <button type="submit" class="btn bg-success text-white mb-2">Save Garden</button>
+                <button type="submit" id="saveGarden" class="btn bg-success text-white mb-2">Save Garden</button>
                 <button type="button" class="btn bg-warning text-white mb-2">Clear All</button>
                 <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn bg-success text-white">Return to
                     Garden
@@ -51,7 +51,6 @@
         </div>
     </div>
 </div>
-
 <script th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
 </html>
