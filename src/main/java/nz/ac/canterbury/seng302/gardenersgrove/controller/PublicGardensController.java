@@ -195,6 +195,8 @@ public class PublicGardensController {
         User currentUser = securityService.getCurrentUser();
         User gardenOwner = garden.getOwner();
 
+        boolean isOwner = (Objects.equals(currentUser.getId(), gardenOwner.getId()));
+
         if (!garden.getIsPublic() ) {
             FriendshipStatus userOwnerRelationship;
             if(Objects.equals(gardenOwner.getId(), currentUser.getId()))
@@ -218,14 +220,13 @@ public class PublicGardensController {
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
-        User user = garden.getOwner();
         handlePagniation(page,garden.getPlants().size(),garden.getPlants(),model);
 
-        model.addAttribute("isOwner", false);
+        model.addAttribute("isOwner", isOwner);
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("weather", null);
-        model.addAttribute("profilePicture", user.getProfilePictureFilename());
-        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+        model.addAttribute("profilePicture", gardenOwner.getProfilePictureFilename());
+        model.addAttribute("userName", gardenOwner.getFirstName() + " " + gardenOwner.getLastName());
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
