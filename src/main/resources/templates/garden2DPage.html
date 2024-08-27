@@ -27,11 +27,9 @@
             </div>
         </div>
         <form th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" method="post">
-            <input type="hidden" id="idList" th:value="''"/>
-            <input type="hidden" id="xCoordList" th:value="''"/>
-            <input type="hidden" id="yCoordList" th:value="''"/>
-
-
+            <input type="hidden" th:id="idList" th:value="${''}"/>
+            <input type="hidden" th:id="xCoordList" th:value="${''}"/>
+            <input type="hidden" th:id="yCoordList" th:value="${''}"/>
             <hr>
             <div class="d-flex flex-column align-items-start">
                 <button type="submit" class="btn bg-success text-white mb-2">Save Garden</button>
