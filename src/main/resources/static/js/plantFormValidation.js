@@ -201,8 +201,14 @@ const clearCountError = () => {
 const handleCountUpdate = (event) => {
     const countValue = event.target.value;
 
+
     let floatValue;
     try {
+        if (countValue === '') {
+            clearCountError();
+            return;
+        }
+
         floatValue = parseFloat(countValue.replace(",", "."));
 
         if (isNaN(floatValue)) {

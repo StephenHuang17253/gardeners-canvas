@@ -15,8 +15,9 @@
                         <form th:action="@{/import-plant}" method="post">
                             <input type="hidden" th:value="${plantId}" th:name="plantId">
 
-                            <div class="modal-body">
-                                <select class="form-select col-xxl-3" aria-label="Select garden" th:name="gardenId">
+                            <div class="modal-body" th:if="${!#lists.isEmpty(session.userGardens)}">
+                                <select class="form-select col-xxl-3"
+                                        aria-label="Select garden" th:name="gardenId">
                                     <option class="text-truncate" th:each="garden : ${session.userGardens}"
                                             th:with="gardenName=${garden.getGardenName}"
                                             th:text="${#strings.length(gardenName) > 30 ? #strings.substring(gardenName,0,27) + '...' : gardenName}"
@@ -24,9 +25,20 @@
                                     </option>
                                 </select>
                             </div>
+                            <div class="modal-body" th:if="${#lists.isEmpty(session.userGardens)}">
+                                <p id="missingGardenErrorText" class="mb-0 text-danger fs-6"
+                                   th:text="${'You do not have any gardens. You cannot import a plant. Please cancel or create a new garden first'}"></p>
+                            </div>
+
 
                             <div class="modal-footer justify-content-center">
-                                <button type="submit" class="btn btn-success">Add to garden</button>
+                                <button type="submit" th:if="${!#lists.isEmpty(session.userGardens)}"
+                                        class="btn btn-success">Add to garden
+                                </button>
+                                <button th:if="${#lists.isEmpty(session.userGardens)}" type="button"
+                                        class="btn btn-success" onclick="window.location.href='/create-new-garden'">
+                                    Create Garden
+                                </button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </form>
@@ -77,7 +89,7 @@
                     <img th:src="@{${plantPicture == null ? '/images/default_plant.png' : '/files/plants/' + plantPicture}}"
                          alt="Plant" class="image-fluid rounded-circle w-100 h-100 object-fit-cover">
                 </div>
-                <div  class="col-2">
+                <div class="col-2">
                     <button th:if="${!isOwner}" type="button" class="btn p-0 rounded-3" data-bs-toggle="modal"
                             th:attr="data-bs-target='#importPlantModal'+${plantId}" >
                         <img th:src="@{/images/smallImportPlant.png}" class="w-100 h-100 image-fluid rounded-3"

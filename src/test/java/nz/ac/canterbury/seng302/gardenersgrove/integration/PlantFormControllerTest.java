@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.ProfanityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -120,25 +121,29 @@ class PlantFormControllerTest {
                 1,
                 "testDescription1",
                 date1,
-                testGarden.getGardenId()));
+                testGarden.getGardenId(),
+                PlantCategory.TREE));
 
         plantList.add(plantService.addPlant("testName2",
                 1,
                 "testDescription2",
                 date1,
-                testGarden.getGardenId()));
+                testGarden.getGardenId(),
+                PlantCategory.TREE));
 
         plantList.add(plantService.addPlant("testName3",
                 1,
                 "testDescription2",
                 date1,
-                testGarden.getGardenId()));
+                testGarden.getGardenId(),
+                PlantCategory.TREE));
 
         plantList.add(plantService.addPlant("DeleteMe",
                 1,
                 "testDescription2",
                 date1,
-                anotherGarden2.getGardenId()));
+                anotherGarden2.getGardenId(),
+                PlantCategory.TREE));
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
