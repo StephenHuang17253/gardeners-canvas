@@ -106,9 +106,10 @@ public class Garden2DController {
 
     //redirect back to "/2D-garden/{gardenId}"
     @PostMapping("/2D-garden/{gardenId}/save")
-    public String save2DGarden(@PathVariable Long gardenId, @RequestParam("idList") Object idList, @RequestParam("xCoordList") Object xCoordList, @RequestParam("yCoordList") Object yCoordList, HttpServletResponse response, Model model) {
+    public String save2DGarden(@PathVariable Long gardenId, @RequestParam(value = "idList", required = false) String idList, @RequestParam(value = "xCoordList", required = false) String xCoordList, @RequestParam(value = "yCoordList", required = false) String yCoordList, HttpServletResponse response, Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
 
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -125,14 +126,16 @@ public class Garden2DController {
             return "403";
         }
 
-        logger.info(idList.toString());
-        logger.info(xCoordList.toString());
-        logger.info(yCoordList.toString());
+        if (idList == null || xCoordList == null || yCoordList == null) {
+            return "redirect:/2D-garden/{gardenId}";
+        }
+
+        logger.info(idList);
 
         //all items on grid are plants at the moment
         //ToDo: garden2DLayout.forEach(item -> updateGardenGrid(item[0], item[1], item[2], item[3],garden));
 
-        return "redirect:/2D-garden/{gardenId}/save";
+        return "redirect:/2D-garden/{gardenId}";
 
     }
 
