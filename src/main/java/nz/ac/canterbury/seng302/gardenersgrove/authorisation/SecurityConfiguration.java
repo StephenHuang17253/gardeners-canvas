@@ -66,7 +66,14 @@ public class SecurityConfiguration {
         // this (i.e. how the authorisation is handled below)
         // See https://github.com/spring-projects/spring-security/issues/12546
         http.authorizeHttpRequests(auth -> auth.requestMatchers(AntPathRequestMatcher.antMatcher("/h2/**")).permitAll())
-                .headers(headers -> headers.frameOptions(Customizer.withDefaults()).disable())
+                .headers(headers -> headers.frameOptions(Customizer.withDefaults())
+                .contentSecurityPolicy(cps -> cps.policyDirectives("default-src 'self' blob:; " +
+                        "script-src 'self' 'unsafe-inline'; " +
+                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                        "img-src 'self' blob: https://perenual.com/storage/species_image/ data:; " +
+                        "connect-src 'self' blob:"))
+                )
+
                 .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**")))
                 .authorizeHttpRequests(request ->
                 // Allow "/", "/register", and "/login" to anyone (permitAll)
