@@ -16,7 +16,9 @@
         <a th:href="@{/my-gardens/__${garden.getGardenId()}__}">
             <button type="button" class="btn bg-success text-white">Garden Details</button>
         </a>
-        <a th:href="@{/2D-garden/__${garden.getGardenId()}__}">
+
+
+        <a th:if="${isOwner}" th:href="@{/2D-garden/__${garden.getGardenId()}__}">
             <button type="button" class="btn bg-success text-white">Edit in 2D</button>
         </a>
     </div>
