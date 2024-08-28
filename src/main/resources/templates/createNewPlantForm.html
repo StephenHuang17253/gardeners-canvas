@@ -62,10 +62,14 @@
 
                     <div class="mb-3 btn-group w-100">
                         <label for="plantCategory" class="form-label">Plant Category * </label>
-                        <button id="plantCategory" type="button" class="btn border dropdown-toggle w-100"
-                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <input id="plantCategory" type="hidden" class="form-control" th:name="plantCategory" th:value="*{plantCategory}">
+                        <button id="plantCategoryButton" type="button" class="btn border dropdown-toggle w-100"
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:classappend="${PCErrorText == null ? '' : 'border-danger'}">
                         Plant Category
                         </button>
+                        <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
+                        <p id="plantCategoryJSError" class="text-danger fs-6 " style="display: none"
+                           th:text="'Plant Category must be selected'"></p>
                         <div class="dropdown-menu">
                             <a class="dropdown-item overflow-text"
                                th:each="category : ${categories}" th:text="${category}" th:value="*{category}" onclick="onDropdownItemSelect(this)"></a>

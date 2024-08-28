@@ -78,6 +78,7 @@ public class PlantFormController {
                                @RequestParam(name = "plantCount", required = false) String plantCount,
                                @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+                               @RequestParam(name = "plantCategory", required = false) String plantCategory,
                                HttpServletResponse response,
                                Model model) {
         logger.info("GET /create-new-plant");
@@ -96,6 +97,7 @@ public class PlantFormController {
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
+        model.addAttribute("plantCategory", plantCategory);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
@@ -128,6 +130,7 @@ public class PlantFormController {
                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
                                      @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+                                     @RequestParam(name = "plantCategory", required = false) String plantCategory,
                                      @PathVariable("gardenId") Long gardenId,
                                      HttpServletResponse response,
                                      Model model) {
@@ -163,11 +166,13 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
+
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
                 plantDateResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
+        model.addAttribute("plantCategory", plantCategory);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
 
@@ -186,7 +191,10 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, PlantCategory.TREE);
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, PlantCategory.valueOf(plantCategory.toUpperCase()));
+
+        logger.info(newPlant.toString());
+
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
