@@ -4,6 +4,14 @@ const GRID_SIZE = 100;
 const GRID_COLUMNS = 6;
 const GRID_ROWS = 6;
 
+const stageWidth = window.innerWidth * 0.59;
+const stageHeight = window.innerHeight;
+
+const GRID_SIZE = 100;  // Size of each grid cell
+const GRID_COLUMNS = 6;  // Number of columns in the grid
+const GRID_ROWS = 6;  // Number of rows in the grid
+
+// Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
 const gridHeight = GRID_ROWS * GRID_SIZE;
 
@@ -40,14 +48,18 @@ let selectedPlantInfo = null;
 let highlightedPaletteItem = null;
 let selectedPlant = null;
 
-function createPlant(x, y, imageSrc, plantName) {
+/**
+ * Handles the adding of a plant to the stage produced by konva
+ */
+const handleAddPlant = () => {
+    plantPosition -= 10;
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
     plantImage.onload = function() {
         const plant = new Konva.Image({
-            x: x,
-            y: y,
+            x: offsetX + 20 + plantPosition,
+            y: offsetY + 20 + plantPosition,
             image: plantImage,
             width: GRID_SIZE,
             height: GRID_SIZE,
@@ -94,13 +106,14 @@ document.querySelectorAll('.plant-item').forEach(item => {
     });
 });
 
+/**
+ * Handles the clicking of any plant on the stage
+ */
 stage.on('click', function (e) {
     if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
-        createPlant(x, y, selectedPlantInfo.image, selectedPlantInfo.name);
 
         selectedPlantInfo = null;
         if (highlightedPaletteItem) {
@@ -117,28 +130,11 @@ stage.on('click', function (e) {
         selectedPlant.strokeWidth(0);
         layer.draw();
 
+        // Deselect the plant
         selectedPlant = null;
 
         document.querySelectorAll('.plant-item')
     }
 });
 
-const clearAllButton = document.querySelector('.btn.bg-warning');
-if (clearAllButton) {
-    clearAllButton.addEventListener('click', function() {
-        layer.find('Image').forEach(node => node.destroy());
-        layer.draw();
-    });
-} else {
-    console.error('Clear All button not found');
-}
-
-const saveGardenButton = document.querySelector('.btn.bg-success');
-if (saveGardenButton) {
-    saveGardenButton.addEventListener('click', function() {
-        console.log('Save garden');
-        // Implement save functionality here
-    });
-} else {
-    console.error('Save Garden button not found');
-}
+signUpButton.addEventListener('click', handleFormSubmit);

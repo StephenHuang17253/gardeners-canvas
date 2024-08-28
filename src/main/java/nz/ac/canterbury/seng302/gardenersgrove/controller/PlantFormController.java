@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -183,7 +184,7 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, PlantCategory.TREE);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
@@ -222,12 +223,18 @@ public class PlantFormController {
             return "404";
         }
 
+        String plantCount = String.valueOf(plantToUpdate.get().getPlantCount());
+
+        if (Objects.equals(plantCount, "0")){
+            plantCount = "";
+        }
+
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
-        model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
+        model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
         model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
         return "editPlantForm"; // Return the view for creating a new plant
@@ -295,6 +302,7 @@ public class PlantFormController {
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
                 plantDateResult);
+
 
         String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPictureString);
@@ -404,9 +412,10 @@ public class PlantFormController {
         logger.info("GET /files/plants/{}", filename);
         try {
             Resource file = fileService.loadFile(filename);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                    .body(file);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename\"" + file.getFilename() + "\"");
+            headers.add(HttpHeaders.CONTENT_TYPE, fileService.getImageFileType(filename));
+            return ResponseEntity.ok().headers(headers).body(file);
         } catch (MalformedURLException error) {
             logger.error(error.getMessage());
         }
@@ -425,7 +434,8 @@ public class PlantFormController {
      */
     @PostMapping("/import-plant")
     public String importPlant(@RequestParam("gardenId") Long gardenId,
-                              @RequestParam("plantId") Long plantId, RedirectAttributes redirectAttributes,
+                              @RequestParam("plantId") Long plantId,
+                              RedirectAttributes redirectAttributes,
                               HttpServletResponse response) {
         logger.info("POST /import-plant");
         Optional<Plant> optionalPlant = plantService.findById(plantId);
@@ -437,7 +447,7 @@ public class PlantFormController {
 
         Plant toCopyPlant = optionalPlant.get();
 
-        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId);
+        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId, PlantCategory.TREE);
         if (toCopyPlant.getPlantPictureFilename() != null) {
             plantService.updatePlantPicture(newPlant, toCopyPlant.getPlantPictureFilename());
         }

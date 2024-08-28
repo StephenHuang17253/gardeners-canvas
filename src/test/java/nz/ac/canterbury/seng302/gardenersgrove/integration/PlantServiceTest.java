@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -79,7 +80,7 @@ class PlantServiceTest {
         Mockito.when(plantService.getPlants()).thenReturn(mockPlantsList);
 
         // When
-        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
+        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L,PlantCategory.TREE);
         Plant resultPlant = plantService.getPlants().get(0);
 
         // Then
@@ -109,7 +110,7 @@ class PlantServiceTest {
                 "-43.5214643",
                 "172.5796159",
                 owner);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
         List<Plant> mockPlantsList = new ArrayList<>();
         mockPlantsList.add(plant);
 
@@ -120,7 +121,7 @@ class PlantServiceTest {
         Mockito.when(plantRepository.findAll()).thenReturn(mockPlantsList);
 
         // When
-        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
+        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L, PlantCategory.TREE);
         Plant resultPlant = plantService.getPlants().get(0);
 
         // Then
@@ -150,7 +151,7 @@ class PlantServiceTest {
                 "-43.5214643",
                 "172.5796159",
                 owner);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
 
         // Mocks for addPlant
         Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
@@ -159,7 +160,7 @@ class PlantServiceTest {
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
 
         // When
-        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
+        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L, PlantCategory.TREE);
         Optional<Plant> resultOptionalPlant = plantService.findById(1L);
 
         // Then
@@ -191,8 +192,8 @@ class PlantServiceTest {
                 "-43.5214643",
                 "172.5796159",
                 owner);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
-        Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
+        Plant newPlant = new Plant("Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, garden, PlantCategory.TREE);
 
         // Mocks for addPlant
         Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
@@ -201,7 +202,7 @@ class PlantServiceTest {
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
 
         // When
-        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
+        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L,PlantCategory.TREE);
         Plant resultPlant = plantService.updatePlant(1L, newPlant);
 
         // Then
@@ -231,7 +232,7 @@ class PlantServiceTest {
                 "-43.5214643",
                 "172.5796159",
                 owner);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
 
         // Mocks for addPlant
         Mockito.when(gardenService.getGardenById(1L)).thenReturn(Optional.of(garden));
@@ -240,7 +241,7 @@ class PlantServiceTest {
         Mockito.when(plantRepository.findById(1L)).thenReturn(Optional.of(plant));
 
         // When
-        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L);
+        plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L, PlantCategory.TREE);
         Plant resultPlant = plantService.updatePlant(1L, "Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting);
 
         // Then
@@ -250,5 +251,6 @@ class PlantServiceTest {
         Assertions.assertEquals(newDateOfPlanting, resultPlant.getPlantDate());
         Assertions.assertEquals(garden, resultPlant.getGarden());
     }
+
 
 }

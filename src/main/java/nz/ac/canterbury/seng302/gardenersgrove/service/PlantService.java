@@ -4,6 +4,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,25 @@ public class PlantService {
     }
 
     /**
+     * Retrieves all plants belonging to a particular plant category
+     * @param plantCategory the plant category used in the query
+     * @return a list of plants belonging to that category
+     */
+    public List<Plant> getPlantsByCategory(PlantCategory plantCategory) {
+        return plantRepository.findPlantsByPlantCategoryIs(plantCategory);
+    }
+
+    /**
+     * Retrieves all plant objects belonging to a particular plant category and garden.
+     * @param garden the garden the plant belongs to
+     * @param plantCategory the category the plant belongs to
+     * @return list of plant objects belonging to that garden and category.
+     */
+    public List<Plant> getPlantsByGardenAndCategory(Garden garden, PlantCategory plantCategory) {
+        return plantRepository.findPlantsByGardenIsAndPlantCategoryIs(garden, plantCategory);
+    }
+
+    /**
      * Adds a new plant
      *
      * @param plantName        plant's name
@@ -75,12 +95,13 @@ public class PlantService {
      * @param plantDescription plant's description
      * @param plantDate        date of planting
      * @param gardenId         id of garden the plant belongs to
+     * @param plantCategory    category the plant belongs to
      * @throws IllegalArgumentException if invalid garden ID
      */
-    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId) {
+    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId, PlantCategory plantCategory) {
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isPresent()) {
-            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get());
+            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get(), plantCategory);
             gardenService.addPlantToGarden(gardenId, plant);
             return plantRepository.save(plant);
         } else {

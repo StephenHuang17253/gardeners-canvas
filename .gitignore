@@ -47,3 +47,8 @@ target/
 
 ### testing data ###
 **/data.sql
+
+### Custom bootstrap SCSS ###
+**/src/main/**/bootstrap/*
+node/
+node_modules/
