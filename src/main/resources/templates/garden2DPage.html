@@ -25,6 +25,10 @@
                         <a class="d-block break-word text-white mt-2" th:text="${plant.getPlantName()}"></a>
                     </div>
                 </div>
+                <div th:replace="~{fragments/plant2DPaginationNav.html}"
+                     th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
+                          startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                </div>
             </div>
         </div>
 
