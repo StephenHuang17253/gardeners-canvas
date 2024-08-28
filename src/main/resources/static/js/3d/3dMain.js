@@ -102,31 +102,31 @@ const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0
 scene.add(grid);
 
 const fernModel = await loader.loadModel('fern.glb', 'fern');
-const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
-const treeModel = await loader.loadModel('tree.glb', 'tree');
-const flowerModel = await loader.loadModel('flower.glb', 'flower');
-const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
-const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
-const climberModel = await loader.loadModel('climber.glb', 'climber');
+// const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
+// const treeModel = await loader.loadModel('tree.glb', 'tree');
+// const flowerModel = await loader.loadModel('flower.glb', 'flower');
+// const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
+// const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
+// const climberModel = await loader.loadModel('climber.glb', 'climber');
 
-creeperModel.traverse((child) => {
-    if (child.isMesh) {
-        child.material = createHueSaturationMaterial(
-            child.material.map,
-            0.2,
-            1.56,
-            2
-        );
-    }
-});
+// creeperModel.traverse((child) => {
+//     if (child.isMesh) {
+//         child.material = createHueSaturationMaterial(
+//             child.material.map,
+//             0.2,
+//             1.56,
+//             2
+//         );
+//     }
+// });
 
 addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
-addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
-addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
-addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
-addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
-addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
-addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
+// addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
+// addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
+// addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
+// addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
+// addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
+// addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
 
 /**
  * Renders the scene

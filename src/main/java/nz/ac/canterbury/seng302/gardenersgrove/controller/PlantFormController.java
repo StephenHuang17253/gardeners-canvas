@@ -436,7 +436,8 @@ public class PlantFormController {
      */
     @PostMapping("/import-plant")
     public String importPlant(@RequestParam("gardenId") Long gardenId,
-                              @RequestParam("plantId") Long plantId, RedirectAttributes redirectAttributes,
+                              @RequestParam("plantId") Long plantId,
+                              RedirectAttributes redirectAttributes,
                               HttpServletResponse response) {
         logger.info("POST /import-plant");
         Optional<Plant> optionalPlant = plantService.findById(plantId);
