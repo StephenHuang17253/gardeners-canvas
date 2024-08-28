@@ -109,16 +109,16 @@ const fernModel = await loader.loadModel('fern.glb', 'fern');
 // const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
 // const climberModel = await loader.loadModel('climber.glb', 'climber');
 
-creeperModel.traverse((child) => {
-    if (child.isMesh) {
-        child.material = createHueSaturationMaterial(
-            child.material.map,
-            0.2,
-            1.56,
-            2
-        );
-    }
-});
+// creeperModel.traverse((child) => {
+//     if (child.isMesh) {
+//         child.material = createHueSaturationMaterial(
+//             child.material.map,
+//             0.2,
+//             1.56,
+//             2
+//         );
+//     }
+// });
 
 addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
 // addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
