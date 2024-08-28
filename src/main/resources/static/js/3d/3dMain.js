@@ -121,12 +121,12 @@ creeperModel.traverse((child) => {
 });
 
 addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
-addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
-addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
-addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
-addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
-addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
-addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
+// addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
+// addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
+// addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
+// addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
+// addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
+// addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
 
 /**
  * Renders the scene
