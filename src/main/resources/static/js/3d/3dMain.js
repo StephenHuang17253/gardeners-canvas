@@ -102,12 +102,12 @@ const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0
 scene.add(grid);
 
 const fernModel = await loader.loadModel('fern.glb', 'fern');
-const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
-const treeModel = await loader.loadModel('tree.glb', 'tree');
-const flowerModel = await loader.loadModel('flower.glb', 'flower');
-const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
-const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
-const climberModel = await loader.loadModel('climber.glb', 'climber');
+// const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
+// const treeModel = await loader.loadModel('tree.glb', 'tree');
+// const flowerModel = await loader.loadModel('flower.glb', 'flower');
+// const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
+// const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
+// const climberModel = await loader.loadModel('climber.glb', 'climber');
 
 creeperModel.traverse((child) => {
     if (child.isMesh) {
