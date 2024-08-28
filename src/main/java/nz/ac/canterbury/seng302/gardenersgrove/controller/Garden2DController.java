@@ -29,7 +29,7 @@ public class Garden2DController {
 
     private final SecurityService securityService;
 
-    private static final int COUNT_PER_PAGE = 10;
+    private static final int COUNT_PER_PAGE = 6;
 
     @Autowired
     public Garden2DController(GardenService gardenService, SecurityService securityService){
