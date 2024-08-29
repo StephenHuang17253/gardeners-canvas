@@ -34,7 +34,7 @@ public class Garden2DController {
     }
 
     @GetMapping("/2D-garden/{gardenId}")
-    public String getGarden3DPage(@PathVariable Long gardenId,
+    public String getGarden2DPage(@PathVariable Long gardenId,
                                   HttpServletResponse response,
                                   Model model){
         logger.info("GET /2D-garden/{}", gardenId);

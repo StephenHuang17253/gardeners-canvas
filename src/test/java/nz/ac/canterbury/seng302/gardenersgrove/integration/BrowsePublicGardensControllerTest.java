@@ -42,7 +42,7 @@ class BrowsePublicGardensControllerTest {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
     LocalDate date = LocalDate.parse("01/01/2001", formatter);
 
-    List<Garden> mostRecent10TestGardens = new ArrayList<>();
+    List<Garden> mostRecent9TestGardens = new ArrayList<>();
 
     @Autowired
     BrowsePublicGardensControllerTest(MockMvc mockMvc) {
@@ -69,8 +69,8 @@ class BrowsePublicGardensControllerTest {
                     "172.5796159",
                     user1);
             gardenService.addGarden(newGarden);
-            if (i > 4) {
-                mostRecent10TestGardens.add(0, newGarden);
+            if (i > 5) {
+                mostRecent9TestGardens.add(0, newGarden);
             }
 
         }
@@ -95,7 +95,7 @@ class BrowsePublicGardensControllerTest {
         Assertions.assertNotNull(model);
         List<Garden> publicGardens = (List<Garden>) model.getModelMap()
                 .getAttribute("publicGardens");
-        Assertions.assertEquals(publicGardens.toString(), mostRecent10TestGardens.toString());
+        Assertions.assertEquals(publicGardens.toString(), mostRecent9TestGardens.toString());
 
     }
 

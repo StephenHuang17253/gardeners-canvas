@@ -21,7 +21,7 @@ class Loader {
             const newBaseUrl = `${BASE_URL}/${getInstance()}`;
 
             if (url.startsWith('blob:')) {
-                return url.replace(`${BASE_URL}/`, newBaseUrl);
+                return url;
             }
 
             return `${newBaseUrl}${url}`;
