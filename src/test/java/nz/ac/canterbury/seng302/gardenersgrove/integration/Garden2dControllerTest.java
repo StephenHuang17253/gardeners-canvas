@@ -32,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -101,7 +102,7 @@ public class Garden2dControllerTest {
                 userService.getUserByEmail(user1.getEmailAddress())));
         gardenList.add(garden1);
         for(int i = 0; i < COUNT_PER_PAGE+1; i++) {
-            plantList.add(plantService.addPlant("testName1",
+            plantList.add(plantService.addPlant(String.valueOf(i),
                     1,
                     "testDescription1",
                     date,
@@ -141,6 +142,7 @@ public class Garden2dControllerTest {
         Garden garden = gardenList.get(0);
         Long gardenId = gardenList.get(0).getGardenId();
         List<Plant> expectedPlants = plantList.subList(0, COUNT_PER_PAGE);
+        expectedPlants.sort(Comparator.comparing(Plant::getPlantName));
         MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders.get("/2D-garden/"+gardenId))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
