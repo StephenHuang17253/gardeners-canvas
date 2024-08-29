@@ -239,14 +239,18 @@ public class PlantFormController {
             plantCount = "";
         }
 
+
+
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
+        model.addAttribute("plantCategory", plantToUpdate.get().getPlantCategory());
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
-        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate().toString());
+        model.addAttribute("categories", plantService.getPlantCategories());
         return "editPlantForm"; // Return the view for creating a new plant
     }
 
@@ -270,6 +274,7 @@ public class PlantFormController {
                                       @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                       @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
                                       @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
+                                      @RequestParam(name = "plantCategory") String plantCategory,
                                       @PathVariable("gardenId") Long gardenId,
                                       @PathVariable("plantId") Long plantId,
                                       HttpServletResponse response,
@@ -320,6 +325,7 @@ public class PlantFormController {
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
+        model.addAttribute("plantCategory", plantCategory);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
                 || !plantDescriptionResult.valid() || !plantDateResult.valid()) {

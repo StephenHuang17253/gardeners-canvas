@@ -60,10 +60,10 @@
                            th:text="'Plant count must be a positive whole number between 1 and 1,000,000'"></p>
                     </div>
 
-                    <div class="mb-3 btn-group w-100">
+                    <div class="mb-3 ">
                         <label for="plantCategory" class="form-label">Plant Category * </label>
                         <input id="plantCategory" type="hidden" class="form-control" th:name="plantCategory" th:value="*{plantCategory}">
-                        <button id="plantCategoryButton" type="button" class="btn border dropdown-toggle w-100"
+                        <button id="plantCategoryButton" type="button" class="btn border dropdown-toggle w-100 form-control"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:classappend="${PCErrorText == null ? '' : 'border-danger'}">
                         Plant Category
                         </button>
