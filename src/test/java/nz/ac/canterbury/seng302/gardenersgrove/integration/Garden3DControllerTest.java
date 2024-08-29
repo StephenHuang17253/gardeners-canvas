@@ -139,8 +139,6 @@ class Garden3DControllerTest {
     void Get3DGarden_UserNotOwnerButGardenIsPublic_Return200() throws Exception {
         Garden garden = gardenList.get(1);
         Long gardenId = garden.getGardenId();
-        List<Plant> expectedPlants = plantList.subList(0, COUNT_PER_PAGE);
-        expectedPlants.sort(Comparator.comparing(Plant::getPlantName));
         mockMvc.perform(MockMvcRequestBuilders.get("/3D-garden/{gardenId}", gardenId))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
