@@ -65,8 +65,8 @@ public class GridItemLocationService {
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
 
         List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
-                .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&
-                        gridItem.getYCoordinates() == gridItemLocation.getYCoordinates())).toList();
+                .filter(gridItem -> (gridItem.getXCoordinate() == gridItemLocation.getXCoordinate() &&
+                        gridItem.getYCoordinate() == gridItemLocation.getYCoordinate())).toList();
 
         if (overlappingLocation.isEmpty()) {
             return gridItemLocationRepository.save(gridItemLocation);
@@ -93,8 +93,8 @@ public class GridItemLocationService {
 
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
         List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
-                .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&
-                        gridItem.getYCoordinates() == gridItemLocation.getYCoordinates())).toList();
+                .filter(gridItem -> (gridItem.getXCoordinate() == gridItemLocation.getXCoordinate() &&
+                        gridItem.getYCoordinate() == gridItemLocation.getYCoordinate())).toList();
         if (overlappingLocation.isEmpty() || (overlappingLocation.size() == 1
                 && Objects.equals(overlappingLocation.get(0).getId(), gridItemLocation.getId()))) {
             return gridItemLocationRepository.save(gridItemLocation);

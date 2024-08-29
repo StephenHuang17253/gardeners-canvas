@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
+import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +51,17 @@ public class Garden3DController {
         return "garden3DPage";
     }
 
+    /**
+     * returns a list of item locations as displayable items with coordinates and names
+     *
+     * @param gardenId of the garden to get layout for
+     * @param response object to be returned to caller
+     * @param model
+     * @return a list of displayable items
+     */
+    @ResponseBody
     @GetMapping("/3D-garden-layout/{gardenId}")
-    public List<GridItemLocation> get3DGardenLayout(@PathVariable Long gardenId,
+    public List<DisplayableItem> get3DGardenLayout(@PathVariable Long gardenId,
             HttpServletResponse response,
             Model model) {
         logger.info("GET /3D-garden-layout/{}", gardenId);
@@ -64,7 +75,9 @@ public class Garden3DController {
 
         Garden garden = optionalGarden.get();
 
-        return gridItemLocationService.getGridItemLocationByGarden(garden);
+        List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
+
+        return plantLocations.stream().map(plantLocation -> new DisplayableItem(plantLocation.getXCoordinate(),plantLocation.getYCoordinate(),"testName","testModel")).toList();
     }
 
 }

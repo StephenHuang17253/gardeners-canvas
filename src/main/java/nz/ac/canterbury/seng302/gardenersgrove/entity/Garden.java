@@ -349,7 +349,7 @@ public class Garden {
                 ", description='" + gardenDescription + '\'' +
                 ", location='" + getGardenLocation() + '\'' +
                 ", size='" + gardenSize + '\'' +
-                ", owner_id='" + owner.getId() + '\'' +
+                ", ownerId='" + owner.getId() + '\'' +
                 ", plants='" + plants + '\'' +
                 ", isPublic='" + isPublic + '\'' +
                 '}';

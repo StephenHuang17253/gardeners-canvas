@@ -74,7 +74,7 @@ public class GridItemLocation {
         this.garden = garden;
     }
 
-    public int getXCoordinates() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
@@ -82,7 +82,7 @@ public class GridItemLocation {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getYCoordinates() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 

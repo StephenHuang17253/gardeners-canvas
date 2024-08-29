@@ -31,10 +31,8 @@ const gardenName = 'My Favourite Garden';
 const idInput = document.getElementById("gardenId");
 
 const instance = getInstance();
-const j = `/${instance}3D-garden-layout/${idInput.value}`
-const response = await fetch(j);
-const l =  await response.json();
-console.log(l);
+const response = await fetch(`/${instance}3D-garden-layout/${idInput.value}`);
+console.log(await response.json());
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls

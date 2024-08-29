@@ -97,6 +97,9 @@ public class U25_MainPage {
     @Autowired
     public UserInteractionService userInteractionService;
 
+    @Autowired
+    GridItemLocationService gridItemLocationService;
+
     public MockMvc mockMVC;
 
     private MvcResult mvcResult;
@@ -165,7 +168,7 @@ public class U25_MainPage {
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
-        HomePageController homePageController = new HomePageController(userService, authenticationManager, gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService);
+        HomePageController homePageController = new HomePageController(userService, authenticationManager, gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService,gridItemLocationService);
 
         // Allows us to bypass spring security
         mockMVC = MockMvcBuilders
