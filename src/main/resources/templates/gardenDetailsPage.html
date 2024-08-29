@@ -107,6 +107,10 @@
                                th:href="@{/my-gardens/__${garden.getGardenId()}__}">Garden details</a>
                         </li>
                         <li class="nav-item">
+                            <a id="2d-tab" class="nav-link link-success"
+                               th:href="@{/2D-garden/__${garden.getGardenId()}__}">2d Layout</a>
+                        </li>
+                        <li class="nav-item">
                             <a id="3d-tab" class="nav-link link-success"
                                th:href="@{/3D-garden/__${garden.getGardenId()}__}">3D Garden</a>
                         </li>
@@ -162,9 +166,6 @@
 
                     <a th:href="@{__${garden.getGardenId()}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
-                    </a>
-                    <a th:href="@{/2D-garden/__${garden.getGardenId()}__}">
-                        <button type="button" class="btn bg-success text-white">View in 2D</button>
                     </a>
                 </div>
 
