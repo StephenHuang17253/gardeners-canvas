@@ -33,8 +33,8 @@ public class GridItemLocationService {
     }
 
     /**
-     * Gets all Garden tags currently stored in the underlying repository
-     * @return all tags in underlying repository as a List of tags
+     * Gets all Garden locations currently stored in the underlying repository
+     * @return all locations in underlying repository as a List of locations
      */
     public List<GridItemLocation> getAllGridItemLocations() {return gridItemLocationRepository.findAll();}
 

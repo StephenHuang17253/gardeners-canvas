@@ -28,6 +28,14 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const link = document.createElement('a');
 const gardenName = 'My Favourite Garden';
 
+const idInput = document.getElementById("gardenId");
+
+const instance = getInstance();
+const j = `/${instance}3D-garden-layout/${idInput.value}`
+const response = await fetch(j);
+const l =  await response.json();
+console.log(l);
+
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
  */
