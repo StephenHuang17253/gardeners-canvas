@@ -71,8 +71,8 @@ public class Garden3DController {
 
         }
 
-
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
+        model.addAttribute("isOwner", securityService.isOwner(garden.getOwner().getId()));
         return "garden3DPage";
     }
 
