@@ -6,9 +6,19 @@
 <body class="vw-100 vh-100">
 
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
-    <div class="container-md bg-white rounded pt-3">
-        <div class="container text-center">
-            <h1 class="break-word" th:text="${garden.getGardenName() + ' 3D view'}">Garden Name</h1>
+    <div class="container-md bg-white rounded p-1">
+        <div class="d-flex flex-row flex-wrap justify-content-center align-items-center gap-2">
+            <a th:href="@{/my-gardens/__${garden.getGardenId()}__}">
+                <button type="button" class="btn btn-outline-success">Garden Details</button>
+            </a>
+
+            <div class="text-center mx-3">
+                <h1 class="h5 text-break" th:text="${garden.getGardenName() + ' 3D view'}">Garden Name 3D View</h1>
+            </div>
+
+            <a th:href="@{/2D-garden/__${garden.getGardenId()}__}">
+                <button type="button" class="btn btn-outline-success">View 2D Layout</button>
+            </a>
         </div>
     </div>
 
