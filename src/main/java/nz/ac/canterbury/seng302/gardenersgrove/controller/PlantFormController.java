@@ -239,7 +239,15 @@ public class PlantFormController {
             plantCount = "";
         }
 
+        LocalDate plantDateLocal = plantToUpdate.get().getPlantDate();
 
+        String plantDate = "";
+
+        if (plantDateLocal != null) {
+            plantDate = plantDateLocal.toString();
+        } else {
+            plantDate = null;
+        }
 
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
@@ -249,7 +257,7 @@ public class PlantFormController {
         model.addAttribute("plantCategory", plantToUpdate.get().getPlantCategory());
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
-        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate().toString());
+        model.addAttribute("plantDate", plantDate);
         model.addAttribute("categories", plantService.getPlantCategories());
         return "editPlantForm"; // Return the view for creating a new plant
     }
