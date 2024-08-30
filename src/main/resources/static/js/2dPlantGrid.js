@@ -1,22 +1,21 @@
-const signUpButton = document.querySelector('button[type="submit"]');
+const stageWidth = window.innerWidth * 0.8;
+const stageHeight = window.innerHeight * 0.9;
+const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
+const GRID_COLUMNS = 7;
+const GRID_ROWS = 7;
 
-const stageWidth = window.innerWidth * 0.59;
-const stageHeight = window.innerHeight;
-
-const GRID_SIZE = 100;  // Size of each grid cell
-const GRID_COLUMNS = 6;  // Number of columns in the grid
-const GRID_ROWS = 6;  // Number of rows in the grid
 
 // Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
 const gridHeight = GRID_ROWS * GRID_SIZE;
 
-// Calculate the offsets to center the grid
 const offsetX = (stageWidth - gridWidth) / 2;
 const offsetY = (stageHeight - gridHeight) / 2;
 
 let plantPosition = 100;
 const plantName = "plant";
+
+const saveGardenButton = document.querySelector('.btn.bg-success');
 
 const stage = new Konva.Stage({
     width: stageWidth,
@@ -24,12 +23,10 @@ const stage = new Konva.Stage({
     container: 'container'
 });
 
-let selected = false;
-
 const layer = new Konva.Layer();
 stage.add(layer);
 
-// Creates a grid of squares
+// Create grid
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
         const rect = new Konva.Rect({
@@ -46,28 +43,30 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
     }
 }
 
-let selectedPlant = null;  // Track the currently selected plant
+let selectedPlantInfo = null;
+let highlightedPaletteItem = null;
+let selectedPlant = null;
 
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = () => {
+const handleAddPlant = (imageSrc, x, y) => {
     plantPosition -= 10;
-    const plantImage = new Image();
-    plantImage.src = '/images/default_plant.png';
     let currentPlantName = plantName + plantPosition.toString();
+    const plantImage = new Image();
+    plantImage.src = imageSrc;
 
     plantImage.onload = function() {
         const plant = new Konva.Image({
-            x: offsetX + 20 + plantPosition,
-            y: offsetY + 20 + plantPosition,
+            x: x,
+            y: y,
             image: plantImage,
             width: GRID_SIZE,
             height: GRID_SIZE,
+            name: plantName,
             draggable: true,
-            name: currentPlantName,
         });
-        layer.add(plant);
+
 
         plant.on('dragmove', function () {
             let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
@@ -79,50 +78,85 @@ const handleAddPlant = () => {
             });
         });
 
-        // Click event to select and highlight the plant
+
         plant.on('click', function (e) {
             if (selectedPlant) {
-                // Deselect the previous plant
                 selectedPlant.stroke(null);
                 selectedPlant.strokeWidth(0);
             }
-
             selectedPlant = plant;
-            selected = true;
-
-            plant.stroke('blue');  // Highlight the selected plant
+            plant.stroke('blue');
             plant.strokeWidth(4);
             layer.draw();
-
             e.cancelBubble = true;
         });
 
+        layer.add(plant);
         layer.draw();
     };
-};
+}
+
+document.querySelectorAll('.plant-item').forEach(item => {
+    item.addEventListener('click', function() {
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = 'none';
+        }
+        this.style.border = '3px solid blue';
+        highlightedPaletteItem = this;
+
+        selectedPlantInfo = {
+            name: this.getAttribute('data-plant-name'),
+            image: this.getAttribute('data-plant-image')
+        };
+    });
+});
 
 /**
  * Handles the clicking of any plant on the stage
  */
 stage.on('click', function (e) {
-    if (selected && selectedPlant) {
+    if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
+        const mousePos = stage.getPointerPosition();
+        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+        handleAddPlant(selectedPlantInfo.image, x, y)
+        selectedPlantInfo = null;
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = 'none';
+            highlightedPaletteItem = null;
+        }
+    } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
-        selectedPlant.position({
-            x: x,
-            y: y,
-        });
-
-        selectedPlant.stroke(null);  // Remove highlight after placement
+        selectedPlant.position({x: x, y: y});
+        selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
         layer.draw();
 
         // Deselect the plant
         selectedPlant = null;
-        selected = false;
+
+        document.querySelectorAll('.plant-item')
     }
 });
 
-signUpButton.addEventListener('click', handleFormSubmit);
+const clearAllButton = document.querySelector('.btn.bg-warning');
+if (clearAllButton) {
+    clearAllButton.addEventListener('click', function() {
+        layer.find('Image').forEach(node => node.destroy());
+        layer.draw();
+    });
+}
+
+window.addEventListener('resize', () => {
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight;
+    stage.width(newWidth);
+    stage.height(newHeight);
+    stage.draw();
+});
+
+
+
