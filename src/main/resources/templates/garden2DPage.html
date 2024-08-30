@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
-
 <head th:replace="~{fragments/header.html}"><title>Garden</title></head>
-
-<body style="height: 100%; overflow-y:hidden;">
+<body style="height: 100vh">
 <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 
-<div class="d-flex">
-    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 20vw; overflow-y: auto;">
+<div class="d-flex h-100">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark align-items-center" style="width: 20vw; max-height: 90vh; overflow-y: auto;">
         <span class="fs-4">Palette Window</span>
         <hr>
         <div class="container">
             <div class="row mb-4">
-                <div class="d-flex flex-row align-items-start">
+                <div class="d-flex flex-row justify-content-center">
                     <button type="button" class="btn bg-success text-white mb-2">Save Garden</button>
                     <button type="button" class="btn bg-warning text-white mb-2">Clear All</button>
                 </div>
@@ -25,25 +23,23 @@
                         <a class="d-block break-word text-white mt-2" th:text="${plant.getPlantCount() > 0} ? ${plant.getPlantName()} + ' (x' + ${plant.getPlantCount()} + ')' : ${plant.getPlantName()}"></a>
                     </div>
                 </div>
-                <div th:replace="~{fragments/plant2DPaginationNav.html}"
-                     th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
-                          startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
-                </div>
             </div>
         </div>
 
-        <hr>
-        <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn bg-success text-white">Return to Garden Details</a>
+        <div class="mt-auto">
+            <div th:replace="~{fragments/plant2DPaginationNav.html}"
+                 th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
+                              startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+            </div>
+            <hr>
+            <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn bg-success text-white">Return to Garden Details</a>
+        </div>
     </div>
-
-    <div class="d-flex flex-column align-items-stretch flex-grow-1">
-        <div class="bg-white rounded-top p-2 d-flex justify-content-between align-items-center">
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+        <div class="bg-white p-2 text-center">
             <h1 class="break-word" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
         </div>
-
-        <div class="d-flex flex-grow-1 align-items-center justify-content-center p-3">
-            <div id="container" class="w-100" style="max-height: 100%; overflow-y: auto;"></div>
-        </div>
+        <div id="container" class="flex-grow-1 overflow-auto"></div>
     </div>
 </div>
 

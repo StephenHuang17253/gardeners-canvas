@@ -1,6 +1,6 @@
 const stageWidth = window.innerWidth * 0.8;
 const stageHeight = window.innerHeight * 0.9;
-const GRID_SIZE = 100;
+const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
 const GRID_COLUMNS = 7;
 const GRID_ROWS = 7;
 
@@ -149,6 +149,14 @@ if (clearAllButton) {
         layer.draw();
     });
 }
+
+window.addEventListener('resize', () => {
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight;
+    stage.width(newWidth);
+    stage.height(newHeight);
+    stage.draw();
+});
 
 
 
