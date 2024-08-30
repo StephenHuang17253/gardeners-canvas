@@ -237,10 +237,10 @@ const handleCountUpdate = (event) => {
 
 
 /**
- * Handles the case where the user's input for the count is invalid.
+ * Handles the case where the user's input for the category is invalid.
  * Sets the border of the input to red, and makes the error message visible.
- * @param {HTMLElement} inputField - The input field element (firstName or lastName).
- * @param {HTMLElement} errorField - The error message element (firstNameJSError or lastNameJSError).
+ * @param {HTMLElement} inputField - The input field element (plantCategory).
+ * @param {HTMLElement} errorField - The error message element (plantCategoryJSError).
  * @returns {void}
  */
 const displayCategoryError = () => {
@@ -261,6 +261,13 @@ const clearCategoryError = () => {
     plantCategoryJSError.style.display = "none";
 }
 
+
+/**
+ * Handles updates to the input field for category.
+ * @param {{target: HTMLElement}} event - The input event.
+ * @param {HTMLElement} errorField - The error message element.
+ * @returns {void}
+ */
 const handleCategoryUpdate = (event) => {
     let categoryValue = event.target.value;
     console.log("Category:" + categoryValue)

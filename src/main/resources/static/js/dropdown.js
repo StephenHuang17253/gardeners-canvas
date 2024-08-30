@@ -4,6 +4,6 @@ function onDropdownItemSelect(item) {
 }
 
 
-function onDropdownInputChange(item) {
-    document.getElementById("plantCategoryButton").innerHTML = item.value;
-}
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("plantCategoryButton").innerHTML = document.getElementById("plantCategory").value.toString()
+})

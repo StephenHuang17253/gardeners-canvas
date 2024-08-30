@@ -346,7 +346,9 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
+        PlantCategory plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+
+        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate, plantCategoryValue);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
