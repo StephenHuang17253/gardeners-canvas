@@ -52,7 +52,8 @@ public class Garden3DController {
     }
 
     /**
-     * returns a list of item locations as displayable items with coordinates and names
+     * returns a list of item locations as displayable items with coordinates and
+     * names
      *
      * @param gardenId of the garden to get layout for
      * @param response object to be returned to caller
@@ -77,7 +78,8 @@ public class Garden3DController {
 
         List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        return plantLocations.stream().map(plantLocation -> new DisplayableItem(plantLocation.getXCoordinate(),plantLocation.getYCoordinate(),"testName","testModel")).toList();
+        return plantLocations.stream().map(plantLocation -> new DisplayableItem(plantLocation.getXCoordinate(),
+                plantLocation.getYCoordinate(), "testName", "testModel")).toList();
     }
 
 }

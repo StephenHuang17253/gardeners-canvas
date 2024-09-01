@@ -31,14 +31,17 @@ public class GridItemLocation {
     /**
      * Zero Argument JPA constructor
      */
-    public GridItemLocation(){}
+    public GridItemLocation() {
+    }
 
     /**
      * Constructor for GridItemLocation object.
-     * (Used to store the location of a plant or decoration on the 2D grid of our 2D garden view)
-     * @param objectId id of the plant or decoration
-     * @param itemType enum, PLANT or DECORATION
-     * @param garden the garden the 2D view is for
+     * (Used to store the location of a plant or decoration on the 2D grid of our 2D
+     * garden view)
+     * 
+     * @param objectId    id of the plant or decoration
+     * @param itemType    enum, PLANT or DECORATION
+     * @param garden      the garden the 2D view is for
      * @param xCoordinate the x-coordinate on the grid
      * @param yCoordinate the y-coordinate on the grid
      */
@@ -90,8 +93,16 @@ public class GridItemLocation {
         this.yCoordinate = yCoordinate;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "GridItemLocation{" +
+                "id=" + id +
+                ", itemType=" + itemType +
+                ", garden=" + garden +
+                ", objectId=" + objectId +
+                ", xCoordinate=" + xCoordinate +
+                ", yCoordinate=" + yCoordinate +
+                '}';
+    }
 
 }
