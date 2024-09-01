@@ -328,6 +328,10 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
+        if (plantCategory == null || plantCategory.isEmpty()) {
+            plantCategoryResult = ValidationResult.INVALID_CATEGORY;
+        }
+
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
                 plantDateResult, plantCategoryResult);
 
@@ -339,6 +343,7 @@ public class PlantFormController {
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
         model.addAttribute("plantCategory", plantCategory);
+        model.addAttribute("categories", plantService.getPlantCategories());
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
                 || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
