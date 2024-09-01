@@ -5,5 +5,9 @@ function onDropdownItemSelect(item) {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById("plantCategoryButton").innerHTML = document.getElementById("plantCategory").value.toString()
+    const plantCategoryValue = document.getElementById("plantCategory").value.toString()
+    if (plantCategoryValue) {
+        document.getElementById("plantCategoryButton").innerHTML = plantCategoryValue
+    }
+
 })

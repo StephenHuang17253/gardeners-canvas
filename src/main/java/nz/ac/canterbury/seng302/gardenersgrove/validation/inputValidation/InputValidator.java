@@ -426,6 +426,11 @@ public class InputValidator {
         return result;
     }
 
+    public static ValidationResult validatePlantCategory(String plantCategory) {
+        return new InputValidator(plantCategory)
+                .lengthHelper(200)
+                .getResult();
+    }
 
     /**
      * Validate a new garden tag

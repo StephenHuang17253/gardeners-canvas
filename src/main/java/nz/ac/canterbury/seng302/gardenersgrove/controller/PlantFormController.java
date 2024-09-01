@@ -31,7 +31,6 @@ import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -130,7 +129,7 @@ public class PlantFormController {
                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
                                      @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
-                                     @RequestParam(name = "plantCategory", required = false) String plantCategory,
+                                     @RequestParam(name = "plantCategory") String plantCategory,
                                      @PathVariable("gardenId") Long gardenId,
                                      HttpServletResponse response,
                                      Model model) {
@@ -142,6 +141,7 @@ public class PlantFormController {
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
+        ValidationResult plantCategoryResult = InputValidator.validatePlantCategory(plantCategory);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -168,7 +168,7 @@ public class PlantFormController {
 
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
-                plantDateResult);
+                plantDateResult, plantCategoryResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
@@ -181,7 +181,7 @@ public class PlantFormController {
         model.addAttribute("plantPicture", plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
+                || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
             return "createNewPlantForm";
         }
 
@@ -192,8 +192,6 @@ public class PlantFormController {
         }
 
         Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, PlantCategory.valueOf(plantCategory.toUpperCase()));
-
-        logger.info(newPlant.toString());
 
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
@@ -312,6 +310,8 @@ public class PlantFormController {
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
+        ValidationResult plantCategoryResult = InputValidator.validatePlantCategory(plantCategory);
+
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
         } else {
@@ -324,7 +324,7 @@ public class PlantFormController {
         }
 
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
-                plantDateResult);
+                plantDateResult, plantCategoryResult);
 
 
         String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
@@ -336,7 +336,7 @@ public class PlantFormController {
         model.addAttribute("plantCategory", plantCategory);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
+                || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
             return "editPlantForm";
         }
 
@@ -370,7 +370,7 @@ public class PlantFormController {
      */
     private void plantFormErrorText(Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
                                     ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
-                                    ValidationResult plantDateResult) {
+                                    ValidationResult plantDateResult, ValidationResult plantCategoryResult) {
 
         if (!plantPictureResult.valid()) {
             model.addAttribute("plantPictureError", plantPictureResult);
@@ -401,6 +401,10 @@ public class PlantFormController {
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
+        }
+
+        if (!plantCategoryResult.valid()) {
+            model.addAttribute("PCAErrorText", null);
         }
 
     }
@@ -568,11 +572,4 @@ public class PlantFormController {
 
         return "importPlantForm";
     }
-
-
-//    @GetMapping("/plantCategories")
-//    public List<PlantCategory> getPlantCategories(Model model){
-//        model.addAttribute("categories", plantService.getPlantCategories());
-//        return plantService.getPlantCategories();
-//    }
 }

@@ -68,9 +68,6 @@ const handleDateUpdate = (event) => {
     } else {
         validAge = true;
     }
-
-
-
     if (!validAge) {
         displayDateError();
     } else {
@@ -244,7 +241,7 @@ const handleCountUpdate = (event) => {
  * @returns {void}
  */
 const displayCategoryError = () => {
-    plantCategory.setCustomValidity(" "); // ignore underline, is fine (appears because I'm using a param)
+    plantCategory.setCustomValidity(" ");
     plantCategory.classList.add("border-danger");
     plantCategoryJSError.style.display = "block";
 }
@@ -256,11 +253,10 @@ const displayCategoryError = () => {
  * @returns {void}
  */
 const clearCategoryError = () => {
-    plantCategory.setCustomValidity(""); // ignore underline, is fine (appears because I'm using a param)
+    plantCategory.setCustomValidity("");
     plantCategory.classList.remove("border-danger");
     plantCategoryJSError.style.display = "none";
 }
-
 
 /**
  * Handles updates to the input field for category.
@@ -270,16 +266,12 @@ const clearCategoryError = () => {
  */
 const handleCategoryUpdate = (event) => {
     let categoryValue = event.target.value;
-    console.log("Category:" + categoryValue)
-
-    console.log("Event:" + event)
-
     if (categoryValue.length === 0) {
         displayCategoryError();
-        return;
+    } else {
+        clearCategoryError();
     }
 
-    clearCategoryError();
 }
 
 
@@ -290,13 +282,16 @@ const handleCategoryUpdate = (event) => {
  * @returns {void}
  */
 const handleFormSubmit = (event) => {
+    console.log(plantCategory.checkValidity())
+    console.log(plantName.checkValidity())
+
     handleDateUpdate({ target: plantDate });
     handleNameUpdate({ target: plantName }, plantNameJSError);
     handleDescriptionUpdate({target: plantDescription});
     handleCountUpdate({target: plantCount});
     handleCategoryUpdate({target: plantCategory});
     // Prevent form submission if there are any validation errors
-    if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity()) {
+    if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity() || !plantCategory.checkValidity()) {
         event.preventDefault();
     }
 }
