@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -10,11 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -82,12 +80,12 @@ class Garden3DControllerTest {
 
     private MvcResult mockMvcResult;
 
-    private Long gardenId;
+    private final int itemXCoord = 5;
+    private final int itemYCoord = 5;
+    private final String itemName = "testName";
+    private final String itemModelName = "testModel";
 
-    private int itemXCoord = 5;
-    private int itemYCoord = 5;
-    private String itemName = "testName";
-    private String itemModelName = "testModel";
+    private final String userEmail = "john.uniqueEmail@gmail.com";
 
     @BeforeEach
     void before_or_after_all() {
@@ -98,21 +96,19 @@ class Garden3DControllerTest {
             plantService = new PlantService(plantRepository, gardenService, fileService);
         }
 
-        String userEmail = "johndoe.test@email.com";
         if (!userService.emailInUse(userEmail)) {
             User user = new User("John", "Doe", userEmail, null);
             userService.addUser(user, "AlphabetSoup10!");
             Garden garden = new Garden("test garden", "hello", "the white house", "", "", "", "murica", 12.0, false,
                     null, null, user);
             gardenService.addGarden(garden);
-            gardenId = garden.getGardenId();
             Plant plant = plantService.addPlant("test plant", 1, "hello", null, garden.getGardenId(), null);
             GridItemLocation newLocation = new GridItemLocation(
                     plant.getPlantId(),
                     GridItemType.PLANT,
                     garden,
-                    5,
-                    5);
+                    itemXCoord,
+                    itemYCoord);
             gridItemLocationService.addGridItemLocation(newLocation);
         }
     }
@@ -123,18 +119,22 @@ class Garden3DControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "johndoe.test@email.com")
+    @WithMockUser(username = "john.uniqueEmail@gmail.com")
     void gardenHasAPlantWithALocation_WhenCallMade_LocationForPlantIsReturned() throws Exception {
-        mockMvcResult= this.mockMvc.perform(MockMvcRequestBuilders.get("/3D-garden-layout/" + gardenId))
+        User user = userService.getUserByEmail(userEmail);
+        List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
+        assertEquals(gardens.size(), 1);
+        Long gardenId = gardens.get(0).getGardenId();
+        mockMvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/3D-garden-layout/" + gardenId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andReturn();
         JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
         JsonNode item = jsonNode.get(0);
-        Assertions.assertEquals(item.get("xCoordinate").asInt(), itemXCoord);
-        Assertions.assertEquals(item.get("yCoordinate").asInt(), itemYCoord);
-        Assertions.assertEquals(item.get("name").asText(), itemName);
-        Assertions.assertEquals(item.get("modelName").asText(), itemModelName);
+        assertEquals(item.get("xCoordinate").asInt(), itemXCoord);
+        assertEquals(item.get("yCoordinate").asInt(), itemYCoord);
+        assertEquals(item.get("name").asText(), itemName);
+        assertEquals(item.get("modelName").asText(), itemModelName);
     }
 
 }
