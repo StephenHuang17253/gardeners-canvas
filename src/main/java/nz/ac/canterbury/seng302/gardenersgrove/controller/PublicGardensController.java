@@ -37,7 +37,7 @@ public class PublicGardensController {
     private final SecurityService securityService;
     private final GardenTagService gardenTagService;
     private final FriendshipService friendshipService;
-    private static final int COUNT_PER_PAGE = 10;
+    private static final int COUNT_PER_PAGE = 9;
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService,
