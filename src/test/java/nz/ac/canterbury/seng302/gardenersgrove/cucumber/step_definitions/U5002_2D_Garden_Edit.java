@@ -66,7 +66,7 @@ public class U5002_2D_Garden_Edit {
     @Given("I as user {string} is on my two-D garden page for {string}")
     public void iAsUserIsOnMyDGardenPageFor(String email, String gardenName) throws Exception {
         user = userService.getUserByEmail(email);
-        garden = user.getGardens().getFirst();
+        garden = user.getGardens().get(0);
         mvcResult = mockMVC.perform(
                         MockMvcRequestBuilders
                                 .get("/2D-garden/{gardenId}", garden.getGardenId()))

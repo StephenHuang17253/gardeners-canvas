@@ -66,13 +66,13 @@ public class UserService {
      * @param user        object to persist
      * @param rawPassword string to encode and add to user
      */
-    public void addUser(User user, String rawPassword) {
+    public User addUser(User user, String rawPassword) {
         HomePageLayout newLayout = new HomePageLayout();
         homePageLayoutRepository.save(newLayout);
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         user.setHomePageLayout(newLayout);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     /**
