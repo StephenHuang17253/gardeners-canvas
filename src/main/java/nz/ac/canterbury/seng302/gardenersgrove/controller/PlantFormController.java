@@ -161,6 +161,10 @@ public class PlantFormController {
             plantDateResult = InputValidator.validatePlantDate(dateString);
         }
 
+        if (plantCategory == null || plantCategory.isEmpty()) {
+            plantCategoryResult = ValidationResult.INVALID_CATEGORY;
+        }
+
         // Plant image is optional
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
@@ -175,6 +179,7 @@ public class PlantFormController {
         model.addAttribute("plantCategory", plantCategory);
         model.addAttribute("plantDescription", plantDescription);
         model.addAttribute("plantDate", plantDate);
+        model.addAttribute("categories", plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
@@ -404,7 +409,7 @@ public class PlantFormController {
         }
 
         if (!plantCategoryResult.valid()) {
-            model.addAttribute("PCAErrorText", null);
+            model.addAttribute("PCAErrorText", plantCategoryResult);
         }
 
     }
