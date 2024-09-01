@@ -78,6 +78,10 @@ public class Garden {
     @CreatedDate
     private LocalDateTime lastLocationUpdate;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "garden_id")
+    private List<GridItemLocation> itemLocations = new ArrayList<>();
+
     /**
      * JPA required no-args constructor
      */
