@@ -123,6 +123,19 @@ public class Garden {
     }
 
     /**
+     * Removes a grid item location from this garden such that it can be deleted.
+     * This is required as JPA
+     * <a href="https://stackoverflow.com/questions/22688402/delete-not-working-with-jparepository/52525033#52525033">
+     *  will not delete objects still linked in bidirectional relationships </a>
+     *  Should only be called by the pre delete method in gridItemLocation entity.
+     * @param gridItemLocation the grid item location to remove from this garden
+     */
+    protected void dismissGridLocation(GridItemLocation gridItemLocation)
+    {
+        this.itemLocations.remove(gridItemLocation);
+    }
+
+    /**
      * Creates a new Garden object without owner used for update Garden.
      *
      * @param gardenName     the name of the garden

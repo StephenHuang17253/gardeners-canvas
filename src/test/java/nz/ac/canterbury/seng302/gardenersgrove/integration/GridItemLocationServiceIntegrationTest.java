@@ -284,7 +284,7 @@ class GridItemLocationServiceIntegrationTest {
     @Test
     void removeGridItemLocation_removeOneGridItemLocation_ReturnListWithOneRecords() {
         gridItemLocationRepository.deleteAll();
-
+        Assertions.assertEquals(0, gridItemLocationRepository.findAll().size());
         GridItemLocation testLocation1 = gridItemLocationService.addGridItemLocation(new GridItemLocation(
                 1L,
                 GridItemType.PLANT,
