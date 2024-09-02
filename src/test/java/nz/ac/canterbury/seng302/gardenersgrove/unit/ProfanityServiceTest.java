@@ -31,6 +31,8 @@ class ProfanityServiceTest {
 
     private String profanitySentence = "Hello there John Doe";
 
+    private HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
+
     @BeforeEach
     void init() {
         httpClientMock = Mockito.mock(HttpClient.class);
@@ -44,8 +46,6 @@ class ProfanityServiceTest {
 
     @Test
     void moderateContent_ProfanityMatchesApiCall_CorrectApiCallResponse() throws IOException, InterruptedException {
-
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
         Mockito.when(mockHttpResponse.body()).thenReturn(
                 "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
         Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
@@ -58,7 +58,6 @@ class ProfanityServiceTest {
 
     @Test
     void containsProfanity_NoProfanityFound_returnsFalse() throws IOException, InterruptedException {
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
         Mockito.when(mockHttpResponse.body()).thenReturn(
                 "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":null,\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
         Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
@@ -68,7 +67,6 @@ class ProfanityServiceTest {
 
     @Test
     void containsProfanity_profanityFound_returnsTrue() throws IOException, InterruptedException {
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
         Mockito.when(mockHttpResponse.body()).thenReturn(
                 "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
         Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
@@ -78,7 +76,6 @@ class ProfanityServiceTest {
 
     @Test
     void containsProfanityCall_BackToBackCalls_CallsRateLimited() throws IOException, InterruptedException {
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
         Mockito.when(mockHttpResponse.body()).thenReturn(
                 "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
         Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
@@ -129,7 +126,6 @@ class ProfanityServiceTest {
         GardenTag matchingTag = new GardenTag(profanitySentence);
         matchingTag.setTagStatus(TagStatus.PENDING);
         Mockito.when(gardenTagServiceMock.getAllSimilar(profanitySentence)).thenReturn(List.of(matchingTag));
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
         Mockito.when(mockHttpResponse.body()).thenReturn(
                 "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
         Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
