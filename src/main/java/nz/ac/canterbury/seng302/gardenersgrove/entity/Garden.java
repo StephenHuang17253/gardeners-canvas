@@ -166,6 +166,17 @@ public class Garden {
         this.lastLocationUpdate = LocalDateTime.now();
     }
 
+    /**
+     * removes tha association between a garden and GridItemLocation before it is deleted.
+     * This avoids grid items trying to de register themselves from gardens when deleted, which causes a concurent
+     * modification exception
+     */
+    @PreRemove
+    public void removeGardenGridAssociations()
+    {
+        itemLocations.forEach(location -> location.setGarden(null));
+    }
+
     public Long getGardenId() {
         return gardenId;
     }
