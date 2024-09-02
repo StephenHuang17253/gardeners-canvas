@@ -14,6 +14,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
  */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class GardenersGroveApplication {
+	
 	/**
 	 * Main entry point, runs the Spring application
 	 * 
@@ -31,10 +32,7 @@ public class GardenersGroveApplication {
 	 */
 	@Bean
 	CommandLineRunner init(FileService fileService) {
-		return (args) -> {
-			// imageService.deleteAll();
-			fileService.init();
-		};
+		return args -> fileService.init();
 	}
 
 }
