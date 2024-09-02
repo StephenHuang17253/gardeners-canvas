@@ -84,7 +84,7 @@ class Garden3DControllerTest {
     private final String janeEmail = "janeDoe@Garden3dControllerTest.com";
 
     @BeforeAll
-    void before_each() {
+    void before_all() {
         User user;
         user = new User("John", "Doe", johnEmail, date);
         user1 = userService.addUser(user, "1es1P@ssword");

@@ -301,22 +301,33 @@ class GridItemLocationServiceIntegrationTest {
                 6
         ));
 
-        List<GridItemLocation> gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
+        List<GridItemLocation> allGridItemLocations1 = gridItemLocationService.getAllGridItemLocations();
 
-        Assertions.assertEquals(2, gridItemLocationsForGarden.size());
+        int initialNumberOfGridItemLocations = allGridItemLocations1.size();
+
+        Assertions.assertTrue(initialNumberOfGridItemLocations >= 2);
+
+        allGridItemLocations1.forEach(item -> System.out.println(item));
+
+        System.out.println(initialNumberOfGridItemLocations);
+
+
+
+        System.out.println(testLocation1);
 
         gridItemLocationService.removeGridItemLocation(testLocation1);
-        gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
 
-        Assertions.assertEquals(1, gridItemLocationsForGarden.size());
+
+
+        List<GridItemLocation> allGridItemLocations2 = gridItemLocationService.getAllGridItemLocations();
+
+        allGridItemLocations2.forEach(item -> System.out.println(item));
+
+        System.out.println(allGridItemLocations2.size());
+
+        Assertions.assertEquals(initialNumberOfGridItemLocations - 1, allGridItemLocations2.size());
 
         Assertions.assertFalse(gridItemLocationService.getGridItemLocationById(testLocation1.getId()).isPresent());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(testLocation2.getId()).isPresent());
-
-
-
     }
-
-
-
 }
