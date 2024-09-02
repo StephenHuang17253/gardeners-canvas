@@ -122,9 +122,9 @@ document.querySelectorAll('.plant-item').forEach(item => {
  * Handles the clicking of any plant on the stage
  */
 stage.on('click', function (e) {
-    console.log("name: " + selectedPlantInfo.name + "count: " + selectedPlantInfo.count)
     if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
         if (selectedPlantInfo.count > 0) {
+
             const mousePos = stage.getPointerPosition();
             let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
             let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
@@ -137,26 +137,23 @@ stage.on('click', function (e) {
                 updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
             }
 
-            if (selectedPlantInfo.count === 0) {
-
-                if (highlightedPaletteItem) {
-                    highlightedPaletteItem.style.border = 'none';
-                    highlightedPaletteItem = null;
-                }
+            selectedPlantInfo = null;
+            if (highlightedPaletteItem) {
+                highlightedPaletteItem.style.border = 'none';
+                highlightedPaletteItem = null;
             }
-        } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
-            const mousePos = stage.getPointerPosition();
-            let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
-            selectedPlant.position({x: x, y: y});
-            selectedPlant.stroke(null);
-            selectedPlant.strokeWidth(0);
-            layer.draw();
-
-            // Deselect the plant
-            selectedPlant = null;
         }
+    } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
+        const mousePos = stage.getPointerPosition();
+        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+
+        selectedPlant.position({x: x, y: y});
+        selectedPlant.stroke(null);
+        selectedPlant.strokeWidth(0);
+        layer.draw();
+
+        selectedPlant = null;
     }
 });
 
