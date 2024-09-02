@@ -15,6 +15,10 @@ const offsetY = (stageHeight - gridHeight) / 2;
 let plantPosition = 100;
 const plantName = "plant";
 
+let plantCount = 0;
+
+const originalPlantCounts = {};
+
 const saveGardenButton = document.querySelector('.btn.bg-success');
 
 const stage = new Konva.Stage({
@@ -97,6 +101,9 @@ const handleAddPlant = (imageSrc, x, y) => {
 }
 
 document.querySelectorAll('.plant-item').forEach(item => {
+    const plantName = item.getAttribute('data-plant-name');
+    const plantCount = parseInt(item.getAttribute('data-plant-count'));
+    originalPlantCounts[plantName] = plantCount;
     item.addEventListener('click', function() {
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = 'none';
@@ -106,48 +113,94 @@ document.querySelectorAll('.plant-item').forEach(item => {
 
         selectedPlantInfo = {
             name: this.getAttribute('data-plant-name'),
-            image: this.getAttribute('data-plant-image')
+            image: this.getAttribute('data-plant-image'),
+            count: parseInt(this.getAttribute('data-plant-count'))
         };
     });
 });
-
 /**
  * Handles the clicking of any plant on the stage
  */
 stage.on('click', function (e) {
+    console.log("name: " + selectedPlantInfo.name + "count: " + selectedPlantInfo.count)
     if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
-        const mousePos = stage.getPointerPosition();
-        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-        handleAddPlant(selectedPlantInfo.image, x, y)
-        selectedPlantInfo = null;
-        if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = 'none';
-            highlightedPaletteItem = null;
+        if (selectedPlantInfo.count > 0) {
+            const mousePos = stage.getPointerPosition();
+            let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+            let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+            plantCount = plantCount - 1
+            handleAddPlant(selectedPlantInfo.image, x, y)
+            selectedPlantInfo.count -= 1
+
+            if (highlightedPaletteItem) {
+                highlightedPaletteItem.setAttribute('data-plant-count', selectedPlantInfo.count);
+                updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
+            }
+
+            if (selectedPlantInfo.count === 0) {
+                selectedPlantInfo = null;
+                if (highlightedPaletteItem) {
+                    highlightedPaletteItem.style.border = 'none';
+                    highlightedPaletteItem = null;
+                }
+            }
+        } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
+            const mousePos = stage.getPointerPosition();
+            let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+            let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+
+            selectedPlant.position({x: x, y: y});
+            selectedPlant.stroke(null);
+            selectedPlant.strokeWidth(0);
+            layer.draw();
+
+            // Deselect the plant
+            selectedPlant = null;
+
+            document.querySelectorAll('.plant-item')
         }
-    } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
-        const mousePos = stage.getPointerPosition();
-        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
-        selectedPlant.position({x: x, y: y});
-        selectedPlant.stroke(null);
-        selectedPlant.strokeWidth(0);
-        layer.draw();
-
-        // Deselect the plant
-        selectedPlant = null;
-
-        document.querySelectorAll('.plant-item')
     }
 });
+
+/**
+ * Resets the plant count to its original value
+ * @param {HTMLElement} plantItem - The plant item element
+ */
+function resetPlantCount(plantItem) {
+    const plantName = plantItem.getAttribute('data-plant-name');
+    const originalCount = originalPlantCounts[plantName];
+    plantItem.setAttribute('data-plant-count', originalCount);
+    updatePlantCountDisplay(plantItem, originalCount);
+}
 
 const clearAllButton = document.querySelector('.btn.bg-warning');
 if (clearAllButton) {
     clearAllButton.addEventListener('click', function() {
         layer.find('Image').forEach(node => node.destroy());
         layer.draw();
+
+        document.querySelectorAll('.plant-item').forEach(item => {
+            resetPlantCount(item);
+        });
+        selectedPlantInfo = null;
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = 'none';
+            highlightedPaletteItem = null;
+        }
     });
+}
+
+/**
+ * Updates the displayed plant count in the HTML
+ * @param {HTMLElement} plantItem - The plant item element
+ * @param {number} count - The new count
+ */
+function updatePlantCountDisplay(plantItem, count) {
+    const plantName = plantItem.getAttribute('data-plant-name');
+    const countDisplay = plantItem.querySelector('a');
+    if (countDisplay) {
+        countDisplay.textContent = count > 0 ? `${plantName} (x${count})` : plantName;
+    }
 }
 
 window.addEventListener('resize', () => {
