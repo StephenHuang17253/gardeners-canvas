@@ -138,7 +138,7 @@ stage.on('click', function (e) {
             }
 
             if (selectedPlantInfo.count === 0) {
-                selectedPlantInfo = null;
+
                 if (highlightedPaletteItem) {
                     highlightedPaletteItem.style.border = 'none';
                     highlightedPaletteItem = null;
@@ -156,8 +156,6 @@ stage.on('click', function (e) {
 
             // Deselect the plant
             selectedPlant = null;
-
-            document.querySelectorAll('.plant-item')
         }
     }
 });
