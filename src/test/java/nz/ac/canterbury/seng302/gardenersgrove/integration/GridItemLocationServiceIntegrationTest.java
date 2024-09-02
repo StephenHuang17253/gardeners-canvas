@@ -284,8 +284,6 @@ class GridItemLocationServiceIntegrationTest {
     @Test
     void removeGridItemLocation_removeOneGridItemLocation_ReturnListWithOneRecords() {
         gridItemLocationRepository.deleteAll();
-        gridItemLocationRepository.findAll().stream().forEach((entity)-> gridItemLocationRepository.deleteById(entity.getId()));
-        List<GridItemLocation> justForDebug = gridItemLocationRepository.findAll();
         Assertions.assertEquals(0, gridItemLocationRepository.findAll().size());
         GridItemLocation testLocation1 = gridItemLocationService.addGridItemLocation(new GridItemLocation(
                 1L,
