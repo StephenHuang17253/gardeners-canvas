@@ -61,7 +61,10 @@ public class GridItemLocation {
     @PreRemove
     protected void removeSelfFromParent()
     {
-        this.garden.dismissGridLocation(this);
+        if (this.garden != null)
+        {
+            this.garden.dismissGridLocation(this);
+        }
     }
 
     public Long getId() {
