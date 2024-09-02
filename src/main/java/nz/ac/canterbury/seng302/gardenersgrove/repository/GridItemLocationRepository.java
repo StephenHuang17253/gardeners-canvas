@@ -35,5 +35,7 @@ public interface GridItemLocationRepository extends CrudRepository<GridItemLocat
      */
     List<GridItemLocation> findAll();
 
+    void deleteById(long id);
+
 
 }

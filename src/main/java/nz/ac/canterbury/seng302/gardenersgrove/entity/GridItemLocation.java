@@ -15,7 +15,7 @@ public class GridItemLocation {
     @Column(name = "item_type")
     private GridItemType itemType;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "garden_id")
     private Garden garden;
 
