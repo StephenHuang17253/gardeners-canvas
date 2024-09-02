@@ -1,14 +1,21 @@
 const stageWidth = window.innerWidth * 0.8;
 const stageHeight = window.innerHeight * 0.9;
-const GRID_SIZE = 100;
-const GRID_COLUMNS = 6;
-const GRID_ROWS = 6;
+const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
+const GRID_COLUMNS = 7;
+const GRID_ROWS = 7;
 
+
+// Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
 const gridHeight = GRID_ROWS * GRID_SIZE;
 
 const offsetX = (stageWidth - gridWidth) / 2;
 const offsetY = (stageHeight - gridHeight) / 2;
+
+let plantPosition = 100;
+const plantName = "plant";
+
+const saveGardenButton = document.querySelector('.btn.bg-success');
 
 const stage = new Konva.Stage({
     width: stageWidth,
@@ -40,7 +47,12 @@ let selectedPlantInfo = null;
 let highlightedPaletteItem = null;
 let selectedPlant = null;
 
-function createPlant(x, y, imageSrc, plantName, plantId) {
+/**
+ * Handles the adding of a plant to the stage produced by konva
+ */
+const handleAddPlant = (imageSrc, x, y, plantId) => {
+    plantPosition -= 10;
+    let currentPlantName = plantName + plantPosition.toString();
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
@@ -56,10 +68,15 @@ function createPlant(x, y, imageSrc, plantName, plantId) {
             draggable: true,
         });
 
+
         plant.on('dragmove', function () {
-            let newX = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let newY = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-            plant.position({x: newX, y: newY});
+            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+
+            plant.position({
+                x: x,
+                y: y,
+            });
         });
 
         plant.on('click', function (e) {
@@ -95,14 +112,15 @@ document.querySelectorAll('.plant-item').forEach(item => {
     });
 });
 
+/**
+ * Handles the clicking of any plant on the stage
+ */
 stage.on('click', function (e) {
     if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
-        createPlant(x, y, selectedPlantInfo.image, selectedPlantInfo.name, selectedPlantInfo.id);
-
+        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
         selectedPlantInfo = null;
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = 'none';
@@ -118,6 +136,7 @@ stage.on('click', function (e) {
         selectedPlant.strokeWidth(0);
         layer.draw();
 
+        // Deselect the plant
         selectedPlant = null;
 
         document.querySelectorAll('.plant-item')
@@ -130,8 +149,6 @@ if (clearAllButton) {
         layer.find('Image').forEach(node => node.destroy());
         layer.draw();
     });
-} else {
-    console.error('Clear All button not found');
 }
 
 /**
@@ -167,3 +184,14 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
         console.error('One or more hidden inputs not found');
     }
 });
+
+window.addEventListener('resize', () => {
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight;
+    stage.width(newWidth);
+    stage.height(newHeight);
+    stage.draw();
+});
+
+
+
