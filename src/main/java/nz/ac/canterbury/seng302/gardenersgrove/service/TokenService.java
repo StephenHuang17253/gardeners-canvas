@@ -28,6 +28,7 @@ public class TokenService {
 
     /**
      * get token by id
+     * 
      * @param id of token
      * @return token
      */
@@ -37,6 +38,7 @@ public class TokenService {
 
     /**
      * Get user's token. Should be unique due to regulations on database
+     * 
      * @param user user whose token has to be found
      * @return unique token belonging to user
      */
@@ -45,7 +47,9 @@ public class TokenService {
     }
 
     /**
-     * Add token to repository and delete any tokens the new token's user already has
+     * Add token to repository and delete any tokens the new token's user already
+     * has
+     * 
      * @param token verification token
      */
     public void addToken(Token token) {
@@ -58,6 +62,7 @@ public class TokenService {
 
     /**
      * Get token from persistence by token string
+     * 
      * @param tokenString unique string identifying token
      * @return token Unique token with user details
      */
@@ -68,6 +73,7 @@ public class TokenService {
 
     /**
      * Get all tokens in persistence
+     * 
      * @return list of all tokens
      */
     public List<Token> getAllTokens() {
@@ -76,6 +82,7 @@ public class TokenService {
 
     /**
      * Delete token from persistence
+     * 
      * @param token unique token
      */
     public void deleteToken(Token token) {

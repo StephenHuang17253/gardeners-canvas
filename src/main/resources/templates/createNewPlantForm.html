@@ -47,7 +47,7 @@
                             autofocus>
                         <p th:if="${PNErrorText}" class="text-danger fs-6" th:text="${PNErrorText}"></p>
                         <p id="plantNameJSError" class="text-danger fs-6 " style="display: none"
-                           th:text="'Plant name cannot be greater than 64 characters in length'"></p>
+                            th:text="'Plant name cannot be greater than 64 characters in length'"></p>
                     </div>
 
                     <div class="mb-3">
@@ -57,7 +57,7 @@
                             data-formatted-number>
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
                         <p id="plantCountJSError" class="text-danger fs-6 " style="display: none"
-                           th:text="'Plant count must be a positive whole number between 1 and 1,000,000'"></p>
+                            th:text="'Plant count must be a positive whole number between 1 and 1,000,000'"></p>
                     </div>
 
                     <div class="mb-3">
@@ -72,7 +72,7 @@
                         <p id="plantDescriptionError" th:if="${PDErrorText}" class="text-danger fs-6"
                             th:text="${PDErrorText}"></p>
                         <p id="plantDescriptionJSError" class="text-danger fs-6 " style="display: none"
-                           th:text="'Description must be 512 characters or less and contain some letters'"></p>
+                            th:text="'Description must be 512 characters or less and contain some letters'"></p>
 
                     </div>
 
@@ -80,15 +80,15 @@
                         <label for="plantDate" class="form-label">Plant Date</label>
                         <input id="plantDate" type="date" class="form-control" max="9999-12-30" min="0000-01-01"
                             th:name="plantDate" th:value="*{plantDate}"
-                            th:classappend="${PAErrorText == null ? '' : 'border-danger'}" th:oninvalid="displayDateError()"
-                               th:oninput="clearDateError()">
+                            th:classappend="${PAErrorText == null ? '' : 'border-danger'}"
+                            th:oninvalid="displayDateError()" th:oninput="clearDateError()">
                         <p th:if="${PAErrorText}" class="text-danger fs-6" th:text="${PAErrorText}"></p>
                         <p id="plantDateJSError" class="text-danger fs-6" style="display: none"
-                           th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
+                            th:text="'Date is not in valid format, DD/MM/YYYY'"></p>
                     </div>
 
                     <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                        <button type="submit" class="btn btn-success submit-button" >Submit</button>
+                        <button type="submit" class="btn btn-success submit-button">Submit</button>
                         <a th:href="@{/my-gardens/{gardenId}(gardenId=${gardenId})}">
                             <button type="button" class="btn btn-secondary">Cancel</button>
                         </a>

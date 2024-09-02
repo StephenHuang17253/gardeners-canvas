@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-// taken from ATDD workshop
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")

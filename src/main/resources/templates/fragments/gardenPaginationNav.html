@@ -9,23 +9,28 @@
         </li>
 
         <li class="page-item" th:if="${currentPage - 2 > 0}">
-            <a class="page-link" th:href="@{/my-gardens(page=${currentPage - 2}, filter=${filter})}" style="color: #198754;" th:text="${currentPage - 2}"></a>
+            <a class="page-link" th:href="@{/my-gardens(page=${currentPage - 2}, filter=${filter})}"
+                style="color: #198754;" th:text="${currentPage - 2}"></a>
         </li>
 
         <li class="page-item" th:if="${currentPage - 1 > 0}">
-            <a class="page-link" th:href="@{/my-gardens(page=${currentPage - 1}, filter=${filter})}" style="color: #198754;" th:text="${currentPage - 1}"></a>
+            <a class="page-link" th:href="@{/my-gardens(page=${currentPage - 1}, filter=${filter})}"
+                style="color: #198754;" th:text="${currentPage - 1}"></a>
         </li>
 
         <li class="page-item active">
-            <span class="page-link" th:text="${currentPage}" style="background-color: #198754; border-color: #198754;"></span>
+            <span class="page-link" th:text="${currentPage}"
+                style="background-color: #198754; border-color: #198754;"></span>
         </li>
 
         <li class="page-item" th:if="${currentPage + 1 <= lastPage}">
-            <a class="page-link" th:href="@{/my-gardens(page=${currentPage + 1}, filter=${filter})}" style="color: #198754;" th:text="${currentPage + 1}"></a>
+            <a class="page-link" th:href="@{/my-gardens(page=${currentPage + 1}, filter=${filter})}"
+                style="color: #198754;" th:text="${currentPage + 1}"></a>
         </li>
 
         <li class="page-item" th:if="${currentPage + 2 <= lastPage}">
-            <a class="page-link" th:href="@{/my-gardens(page=${currentPage + 2}, filter=${filter})}" style="color: #198754;" th:text="${currentPage + 2}"></a>
+            <a class="page-link" th:href="@{/my-gardens(page=${currentPage + 2}, filter=${filter})}"
+                style="color: #198754;" th:text="${currentPage + 2}"></a>
         </li>
 
         <li class="page-item disabled" th:if="${currentPage < lastPage - 2}">
@@ -33,7 +38,8 @@
         </li>
 
         <li class="page-item">
-            <a class="page-link" th:href="@{/my-gardens(page=${lastPage}, filter=${filter})}" style="color: #198754;">Last</a>
+            <a class="page-link" th:href="@{/my-gardens(page=${lastPage}, filter=${filter})}"
+                style="color: #198754;">Last</a>
         </li>
     </ul>
 </nav>

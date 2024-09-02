@@ -1,7 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.model;
 
 /**
- * class of objects hat can be passed to the three js javascript to indicate what plants or decorations are
+ * class of objects hat can be passed to the three js javascript to indicate
+ * what plants or decorations are
  * stored in what locations
  */
 public class DisplayableItem {
@@ -15,10 +16,11 @@ public class DisplayableItem {
 
     /**
      * create a new Displayable object
+     * 
      * @param xCoordinate x location of object
      * @param yCoordinate y location of object
-     * @param name name of represented object e.g plant name
-     * @param modelName name of model used to display in 3d, e.g tree.obj
+     * @param name        name of represented object e.g plant name
+     * @param modelName   name of model used to display in 3d, e.g tree.obj
      */
     public DisplayableItem(int xCoordinate, int yCoordinate, String name, String modelName) {
         this.xCoordinate = xCoordinate;

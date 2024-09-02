@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -25,13 +27,16 @@ class ProfanityServiceTest {
 
     private GardenTagService gardenTagServiceMock;
 
+    private ObjectMapper objectMapper;
+
     private String profanitySentence = "Hello there John Doe";
 
     @BeforeEach
     void init() {
         httpClientMock = Mockito.mock(HttpClient.class);
         gardenTagServiceMock = Mockito.mock(GardenTagService.class);
-        profanityService = new ProfanityService(httpClientMock, gardenTagServiceMock);
+        objectMapper = new ObjectMapper();
+        profanityService = new ProfanityService(httpClientMock, gardenTagServiceMock, objectMapper);
         ReflectionTestUtils.setField(profanityService, "endPoint",
                 "https://gg-content-moderator.cognitiveservices.anImaginaryWebsite.com/");
         ReflectionTestUtils.setField(profanityService, "moderatorKey", "NotARealKey123");

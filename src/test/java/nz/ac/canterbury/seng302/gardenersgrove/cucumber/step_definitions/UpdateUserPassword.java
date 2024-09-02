@@ -30,20 +30,27 @@ public class UpdateUserPassword {
 
     @Autowired
     public AuthenticationManager authenticationManager;
+
     @Autowired
     public PasswordEncoder passwordEncoder;
+
     @Autowired
     public UserRepository userRepository;
+
     @Autowired
     public HomePageLayoutRepository homePageLayoutRepository;
+
     @Autowired
     public FileService fileService;
+
     @Mock
     public EmailService emailService;
+
     @Autowired
     public SecurityService securityService;
 
     public static MockMvc mockMVC;
+
     public static UserService userService;
 
     User loggedInUser;
@@ -56,10 +63,10 @@ public class UpdateUserPassword {
     public void before_or_after_all() {
         emailService = Mockito.mock(EmailService.class);
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
-        ProfileController profileController = new ProfileController(authenticationManager, userService, fileService,
+        ProfileController profileController = new ProfileController(authenticationManager, userService,
+                fileService,
                 emailService, securityService);
         mockMVC = MockMvcBuilders.standaloneSetup(profileController).build();
-
     }
 
     @Given("I as user {string} with password {string} am on the change password page")
@@ -83,8 +90,7 @@ public class UpdateUserPassword {
                         .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", newPass)
-                        .param("retypePassword", retypePass))
-                .andReturn();
+                        .param("retypePassword", retypePass));
     }
 
     @Then("The password does not get updated")
@@ -104,8 +110,7 @@ public class UpdateUserPassword {
                         .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", weakPassword)
-                        .param("retypePassword", weakPassword))
-                .andReturn();
+                        .param("retypePassword", weakPassword));
     }
 
     @When("I enter fully compliant password: {string}")
@@ -115,8 +120,7 @@ public class UpdateUserPassword {
                         .post("/profile/change-password")
                         .param("currentPassword", currentPassword)
                         .param("newPassword", compliantPassword)
-                        .param("retypePassword", compliantPassword))
-                .andReturn();
+                        .param("retypePassword", compliantPassword));
     }
 
     @When("I enter an old password {string} that does not match the current password")
@@ -127,8 +131,6 @@ public class UpdateUserPassword {
                         .post("/profile/change-password")
                         .param("currentPassword", incorrectOldPassword)
                         .param("newPassword", "NewPassword10!")
-                        .param("retypePassword", "NewPassword10!"))
-                .andReturn();
+                        .param("retypePassword", "NewPassword10!"));
     }
-
 }

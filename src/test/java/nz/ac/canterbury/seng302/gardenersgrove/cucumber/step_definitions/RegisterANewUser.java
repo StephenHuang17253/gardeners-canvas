@@ -67,7 +67,6 @@ public class RegisterANewUser {
 
         AccountController accountController = new AccountController(userService, authenticationManager, emailService,
                 tokenService, gardenService, securityService);
-        // Allows us to bypass spring security
         mockMVC = MockMvcBuilders.standaloneSetup(accountController).build();
     }
 
@@ -155,7 +154,6 @@ public class RegisterANewUser {
                         .param("emailAddress", emailAddress)
                         .param("password", password)
                         .param("repeatPassword", repeatPassword));
-
     }
 
     @Then("A new user is added to database")
@@ -167,5 +165,4 @@ public class RegisterANewUser {
     public void no_account_is_created() {
         Assertions.assertNull(userService.getUserByEmailAndPassword(emailAddress, password));
     }
-
 }

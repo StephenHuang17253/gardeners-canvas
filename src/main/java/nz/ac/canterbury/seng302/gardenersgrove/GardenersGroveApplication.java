@@ -14,7 +14,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
  */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class GardenersGroveApplication {
-	
+
 	/**
 	 * Main entry point, runs the Spring application
 	 * 
