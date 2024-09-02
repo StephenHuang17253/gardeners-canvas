@@ -123,19 +123,6 @@ public class Garden {
     }
 
     /**
-     * Removes a grid item location from this garden such that it can be deleted.
-     * This is required as JPA
-     * <a href="https://stackoverflow.com/questions/22688402/delete-not-working-with-jparepository/52525033#52525033">
-     *  will not delete objects still linked in bidirectional relationships </a>
-     *  Should only be called by the pre delete method in gridItemLocation entity.
-     * @param gridItemLocation the grid item location to remove from this garden
-     */
-    protected void dismissGridLocation(GridItemLocation gridItemLocation)
-    {
-        this.itemLocations.remove(gridItemLocation);
-    }
-
-    /**
      * Creates a new Garden object without owner used for update Garden.
      *
      * @param gardenName     the name of the garden
@@ -167,13 +154,28 @@ public class Garden {
     }
 
     /**
-     * removes tha association between a garden and GridItemLocation before it is deleted.
-     * This avoids grid items trying to de register themselves from gardens when deleted, which causes a concurent
+     * Removes a grid item location from this garden such that it can be deleted.
+     * This is required as JPA
+     * <a href=
+     * "https://stackoverflow.com/questions/22688402/delete-not-working-with-jparepository/52525033#52525033">
+     * will not delete objects still linked in bidirectional relationships </a>
+     * Should only be called by the pre delete method in gridItemLocation entity.
+     * 
+     * @param gridItemLocation the grid item location to remove from this garden
+     */
+    protected void dismissGridLocation(GridItemLocation gridItemLocation) {
+        this.itemLocations.remove(gridItemLocation);
+    }
+
+    /**
+     * Removes a association between a garden and GridItemLocation before it is
+     * deleted.
+     * This avoids grid items trying to de-register themselves from gardens when
+     * deleted, which causes a concurent
      * modification exception
      */
     @PreRemove
-    public void removeGardenGridAssociations()
-    {
+    public void removeGardenGridAssociations() {
         itemLocations.forEach(location -> location.setGarden(null));
     }
 
@@ -256,8 +258,6 @@ public class Garden {
         return itemLocations;
     }
 
-
-
     public void setGardenName(String gardenName) {
         this.gardenName = gardenName;
     }
@@ -338,7 +338,6 @@ public class Garden {
         this.lastLocationUpdate = LocalDateTime.now();
     }
 
-
     /**
      * Retrieves a garden's location which is a concatenation of its address
      * components.
@@ -347,7 +346,6 @@ public class Garden {
      *         {postcode}, {country}
      */
     public String getGardenLocation() {
-        // Concatenate address components to form the complete location string
         String locationString = "";
         if (!gardenAddress.isBlank()) {
             locationString += gardenAddress + ", ";
