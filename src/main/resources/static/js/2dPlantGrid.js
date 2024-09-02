@@ -105,17 +105,22 @@ document.querySelectorAll('.plant-item').forEach(item => {
     const plantCount = parseInt(item.getAttribute('data-plant-count'));
     originalPlantCounts[plantName] = plantCount;
     item.addEventListener('click', function() {
-        if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = 'none';
-        }
-        this.style.border = '3px solid blue';
-        highlightedPaletteItem = this;
+        const currentCount = parseInt(this.getAttribute('data-plant-count'));
+        if (currentCount > 0) {
+            if (highlightedPaletteItem) {
+                highlightedPaletteItem.style.border = 'none';
+            }
+            this.style.border = '3px solid blue';
+            highlightedPaletteItem = this;
 
-        selectedPlantInfo = {
-            name: this.getAttribute('data-plant-name'),
-            image: this.getAttribute('data-plant-image'),
-            count: parseInt(this.getAttribute('data-plant-count'))
-        };
+            selectedPlantInfo = {
+                name: this.getAttribute('data-plant-name'),
+                image: this.getAttribute('data-plant-image'),
+                count: currentCount
+            };
+        } else {
+            console.log("no count?");
+        }
     });
 });
 /**
