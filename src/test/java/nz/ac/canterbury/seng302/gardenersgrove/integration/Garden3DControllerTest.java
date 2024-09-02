@@ -25,7 +25,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -111,7 +110,7 @@ class Garden3DControllerTest {
     @WithMockUser(username = "janeDoe@email.com")
     void Get3DGarden_UserNotAuthorisedAndGardenDoesNotExist_Return404() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/3D-garden/{gardenId}",MAX_LONG))
+                .perform(MockMvcRequestBuilders.get("/3D-garden/{gardenId}", MAX_LONG))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 

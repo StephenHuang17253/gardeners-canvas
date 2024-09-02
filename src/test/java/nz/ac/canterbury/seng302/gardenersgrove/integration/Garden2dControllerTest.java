@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden2DController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -12,13 +11,10 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -75,6 +70,7 @@ public class Garden2dControllerTest {
     Garden2dControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
+
     private static User user1;
     private static User user2;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
@@ -101,7 +97,7 @@ public class Garden2dControllerTest {
                 "172.5796159",
                 userService.getUserByEmail(user1.getEmailAddress())));
         gardenList.add(garden1);
-        for(int i = 0; i < COUNT_PER_PAGE+1; i++) {
+        for (int i = 0; i < COUNT_PER_PAGE + 1; i++) {
             plantList.add(plantService.addPlant(String.valueOf(i),
                     1,
                     "testDescription1",
@@ -115,7 +111,7 @@ public class Garden2dControllerTest {
     @Test
     void Get2DGarden_UserNotAuthorizedAndGardenDoseNotExist_Return403() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/2D-garden/"+MAX_LONG))
+                .perform(MockMvcRequestBuilders.get("/2D-garden/" + MAX_LONG))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
@@ -124,7 +120,7 @@ public class Garden2dControllerTest {
     void Get2DGarden_UserNotAuthorizedAndGardenExists_Return403() throws Exception {
         Long gardenId = gardenList.get(0).getGardenId();
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/2D-garden/"+gardenId))
+                .perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
@@ -132,7 +128,7 @@ public class Garden2dControllerTest {
     @WithMockUser(username = "janeDoe@email.com")
     void GetGardenDetailsPage_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
         mockMvc
-                .perform(MockMvcRequestBuilders.get("/2D-garden/"+MAX_LONG))
+                .perform(MockMvcRequestBuilders.get("/2D-garden/" + MAX_LONG))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -144,7 +140,7 @@ public class Garden2dControllerTest {
         List<Plant> expectedPlants = plantList.subList(0, COUNT_PER_PAGE);
         expectedPlants.sort(Comparator.comparing(Plant::getPlantName));
         MvcResult mvcResult = mockMvc
-                .perform(MockMvcRequestBuilders.get("/2D-garden/"+gardenId))
+                .perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -159,7 +155,6 @@ public class Garden2dControllerTest {
         Assertions.assertEquals(expectedPlants.size(), plants.size());
         Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
     }
-
 
 
 }
