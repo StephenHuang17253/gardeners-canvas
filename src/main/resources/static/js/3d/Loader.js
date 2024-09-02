@@ -1,11 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
-<<<<<<< Updated upstream
 
 const BASE_URL = window.location.origin;
-=======
->>>>>>> Stashed changes
 
 /**
  * Class to handle loading of textures and 3D models
@@ -18,28 +15,7 @@ class Loader {
      */
     constructor() {
         this.manager = new THREE.LoadingManager();
-<<<<<<< Updated upstream
-
-        this.manager.setURLModifier(url => {
-
-            const newBaseUrl = `${BASE_URL}/${getInstance()}`;
-
-            if (url.startsWith('blob:')) {
-                return url;
-            }
-
-            return `${newBaseUrl}${url}`;
-        });
-
-=======
-        this.manager.setURLModifier(
-            (url) => {
-                console.log(url);
-                console.log(`${window.location.origin}${getInstance()}${url}\n`)
-                return url;
-            }
-        );
->>>>>>> Stashed changes
+        this.manager.setURLModifier(url => url.startsWith('blob:') ? url : `${BASE_URL}/${getInstance()}${url}`);
         this.textureLoader = new THREE.TextureLoader(this.manager);
         this.gltfLoader = new GLTFLoader(this.manager);
         this.exrLoader = new EXRLoader(this.manager);
@@ -63,11 +39,7 @@ class Loader {
      * @param {String} path - path to the texture 
      * @returns {THREE.Texture} - The loaded texture
      */
-<<<<<<< Updated upstream
     loadTexture = (path) => this.textureLoader.load(`textures/${path}`);
-=======
-    loadTexture = (path) => this.textureLoader.load(`/textures/${path}`);
->>>>>>> Stashed changes
 
     /**
      * Load gltf 3d model, gives all parts the same name
@@ -77,11 +49,7 @@ class Loader {
      * @returns {Promise<Object>} - A promise that resolves to the loaded model scene.
      */
     loadModel = async (path, name) => {
-<<<<<<< Updated upstream
         const model = await this.gltfLoader.loadAsync(`models/${path}`);
-=======
-        const model = await this.gltfLoader.loadAsync(`/models/${path}`);
->>>>>>> Stashed changes
         model.scene.traverse((child) => {
             child.name = name;
         });
@@ -96,11 +64,7 @@ class Loader {
      */
     loadBackground = (path, onLoad) => {
         this.exrLoader.load(
-<<<<<<< Updated upstream
             `textures/${path}`,
-=======
-            `/textures/${path}`,
->>>>>>> Stashed changes
             texture => {
                 texture.mapping = THREE.EquirectangularReflectionMapping;
                 onLoad(texture);
