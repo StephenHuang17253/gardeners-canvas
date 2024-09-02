@@ -32,7 +32,7 @@ const idInput = document.getElementById("gardenId");
 
 const instance = getInstance();
 const response = await fetch(`/${instance}3D-garden-layout/${idInput.value}`);
-console.log(await response.json());
+const placedGardenObjects = await response.json();
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -88,6 +88,7 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.position.copy(position);
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
+    console.log("new model")
 };
 
 init();
@@ -126,13 +127,26 @@ creeperModel.traverse((child) => {
     }
 });
 
-addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
-addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
-addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
-addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
-addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
+
+const addObjectToScene = (plantOrDecoration) =>
+{
+    console.log(plantOrDecoration)
+    const xCoord3d = (plantOrDecoration.xCoordinate - ((GRID_SIZE - 1)/2)) * TILE_SIZE
+    const yCoord3d = (plantOrDecoration.yCoordinate - ((GRID_SIZE - 1)/2)) * TILE_SIZE
+
+    console.log(xCoord3d)
+    console.log(yCoord3d)
+    addModelToScene(potplantModel, new THREE.Vector3(xCoord3d,0,  yCoord3d), 5);
+}
+ placedGardenObjects.forEach((element) => addObjectToScene(element))
+
+// addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
+// addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
+// addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
+// addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
+// addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
 addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
-addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
+// addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
 
 /**
  * Renders the scene
