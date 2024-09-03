@@ -308,15 +308,11 @@ class GridItemLocationServiceIntegrationTest {
 
         Assertions.assertTrue(initialNumberOfGridItemLocations >= 2);
 
-        allGridItemLocations1.forEach(item -> System.out.println(item));
-
-
         gridItemLocationService.removeGridItemLocation(testLocation1);
 
 
         List<GridItemLocation> allGridItemLocations2 = gridItemLocationService.getAllGridItemLocations();
 
-        allGridItemLocations2.forEach(item -> System.out.println(item));
 
         Assertions.assertEquals(initialNumberOfGridItemLocations - 1, allGridItemLocations2.size());
 
