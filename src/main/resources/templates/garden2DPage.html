@@ -20,8 +20,9 @@
                              alt="Plant"
                              class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
                              style="max-width: 100px;">
-                        <a class="d-block break-word text-white mt-2" th:text="${plant.getPlantCount() > 0} ? ${plant.getPlantName()} + ' (x' + ${plant.getPlantCount()} + ')' : ${plant.getPlantName()}"></a>
-                        <a class="d-block break-word text-white mt-2" th:text="'Remaining: ' + ${plant.getPlantCount()}"></a>
+                        <a id="total" class="d-block break-word text-white mt-2" th:text="${plant.getPlantCount() > 0} ? ${plant.getPlantName()} + ' (x' + ${plant.getPlantCount()} + ')' : ${plant.getPlantName()}"></a>
+                        <p id="placed" class="d-block break-word mt-0 mb-0 text-white"> </p>
+                        <p id="remaining" class="d-block break-word mt-0 mb-0 text-white"> </p>
                     </div>
                 </div>
             </div>

@@ -198,9 +198,27 @@ if (clearAllButton) {
  */
 function updatePlantCountDisplay(plantItem, count) {
     const plantName = plantItem.getAttribute('data-plant-name');
+    const originalCount = originalPlantCounts[plantName];
     const countDisplay = plantItem.querySelector('a');
-    if (countDisplay) {
-        countDisplay.textContent = count > 0 ? `${plantName} (x${count})` : plantName;
+
+    // Select the <a> elements by their ids
+    const totalElement = plantItem.querySelector('#total');
+    const placedElement = plantItem.querySelector('#placed');
+    const remainingElement = plantItem.querySelector('#remaining');
+
+    // Update the total <a> element
+    if (totalElement) {
+        totalElement.textContent = `${plantName} (x${originalCount})`;
+    }
+
+    // Update the placed <a> element
+    if (placedElement) {
+        placedElement.textContent = `Placed: ${originalCount - count}`;
+    }
+
+    // Update the remaining <a> element
+    if (remainingElement) {
+        remainingElement.textContent = `Remaining: ${count}`;
     }
 }
 
