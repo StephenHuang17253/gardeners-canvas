@@ -311,9 +311,7 @@ class GridItemLocationServiceIntegrationTest {
         allGridItemLocations1.forEach(item -> System.out.println(item));
 
 
-
         gridItemLocationService.removeGridItemLocation(testLocation1);
-
 
 
         List<GridItemLocation> allGridItemLocations2 = gridItemLocationService.getAllGridItemLocations();
@@ -354,8 +352,8 @@ class GridItemLocationServiceIntegrationTest {
         Assertions.assertEquals(testLocation2.getItemType(), matchingGridItem.get().getItemType());
         Assertions.assertEquals(testLocation2.getGarden().getGardenId(), matchingGridItem.get().getGarden().getGardenId());
         Assertions.assertEquals(testLocation2.getId(), matchingGridItem.get().getId());
-        Assertions.assertEquals(testLocation2.getXCoordinates(), matchingGridItem.get().getXCoordinates());
-        Assertions.assertEquals(testLocation2.getYCoordinates(), matchingGridItem.get().getYCoordinates());
+        Assertions.assertEquals(testLocation2.getXCoordinate(), matchingGridItem.get().getXCoordinate());
+        Assertions.assertEquals(testLocation2.getYCoordinate(), matchingGridItem.get().getYCoordinate());
     }
 
     @Test
