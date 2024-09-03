@@ -12,33 +12,36 @@ public class GridItemLocation {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "item_type", nullable = false)
+    @Column(name = "item_type")
     private GridItemType itemType;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "garden_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "garden_id")
     private Garden garden;
 
-    @Column(name = "object_id", nullable = false)
+    @Column(name = "object_id")
     private Long objectId;
 
-    @Column(name = "x_coord", nullable = false)
+    @Column(name = "x_coord")
     private int xCoordinate;
 
-    @Column(name = "y_coord", nullable = false)
+    @Column(name = "y_coord")
     private int yCoordinate;
 
     /**
      * Zero Argument JPA constructor
      */
-    public GridItemLocation(){}
+    public GridItemLocation() {
+    }
 
     /**
      * Constructor for GridItemLocation object.
-     * (Used to store the location of a plant or decoration on the 2D grid of our 2D garden view)
-     * @param objectId id of the plant or decoration
-     * @param itemType enum, PLANT or DECORATION
-     * @param garden the garden the 2D view is for
+     * (Used to store the location of a plant or decoration on the 2D grid of our 2D
+     * garden view)
+     * 
+     * @param objectId    id of the plant or decoration
+     * @param itemType    enum, PLANT or DECORATION
+     * @param garden      the garden the 2D view is for
      * @param xCoordinate the x-coordinate on the grid
      * @param yCoordinate the y-coordinate on the grid
      */
@@ -48,6 +51,19 @@ public class GridItemLocation {
         this.garden = garden;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
+    }
+
+    /**
+     * removes this entity from the associated garden such that it can be deleted.
+     * <a href=
+     * "https://stackoverflow.com/questions/22688402/delete-not-working-with-jparepository/52525033#52525033">
+     * without this deleting Grid item locations is not possible</a>
+     */
+    @PreRemove
+    protected void removeSelfFromParent() {
+        if (this.garden != null) {
+            this.garden.dismissGridLocation(this);
+        }
     }
 
     public Long getId() {
@@ -74,7 +90,7 @@ public class GridItemLocation {
         this.garden = garden;
     }
 
-    public int getXCoordinates() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
@@ -82,7 +98,7 @@ public class GridItemLocation {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getYCoordinates() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 
@@ -90,8 +106,16 @@ public class GridItemLocation {
         this.yCoordinate = yCoordinate;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "GridItemLocation{" +
+                "id=" + id +
+                ", itemType=" + itemType +
+                ", garden=" + garden +
+                ", objectId=" + objectId +
+                ", xCoordinate=" + xCoordinate +
+                ", yCoordinate=" + yCoordinate +
+                '}';
+    }
 
 }

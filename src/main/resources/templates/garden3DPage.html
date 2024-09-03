@@ -22,6 +22,21 @@
         </div>
     </div>
 
+    <div class="d-flex flex-row flex-wrap justify-content-center mt-2 mb-4 gap-3">
+
+        <a th:if="${isOwner}" th:href="@{/my-gardens/__${garden.getGardenId()}__}">
+            <button type="button" class="btn bg-success text-white">Garden Details</button>
+        </a>
+
+        <a th:if="${!isOwner}" th:href="@{/public-gardens/__${garden.getGardenId()}__}">
+            <button type="button" class="btn bg-success text-white">Garden Details</button>
+        </a>
+
+        <a th:if="${isOwner}" th:href="@{/2D-garden/__${garden.getGardenId()}__}">
+            <button type="button" class="btn bg-success text-white">Edit in 2D</button>
+        </a>
+    </div>
+
     <div class="w-100 h-75 position-relative">
 
         <div class="dropdown position-absolute top-0 end-0 m-3">
@@ -43,29 +58,34 @@
 
         <div class="w-100 h-100" id="container"></div>
     </div>
-    
+
     <footer class="text-center mt-4">
         <ul class="list-unstyled">
             <li>
-                <a href="https://sketchfab.com/3d-models/garden-lattice-pack-wood-2b448f42a86f4bd28915c777c06abcb9" target="_blank">
+                <a href="https://sketchfab.com/3d-models/garden-lattice-pack-wood-2b448f42a86f4bd28915c777c06abcb9"
+                    target="_blank">
                     Garden Lattice Pack Wood by Antipode
                 </a>
                 - Downloaded from Sketchfab
             </li>
             <li>
-                <a href="https://sketchfab.com/3d-models/ivy-high-poly-f10e66e2e77a4dda9a7147cd89f2082b" target="_blank">
+                <a href="https://sketchfab.com/3d-models/ivy-high-poly-f10e66e2e77a4dda9a7147cd89f2082b"
+                    target="_blank">
                     Ivy (High Poly) by VROD
                 </a>
                 - Downloaded from Sketchfab
             </li>
             <li>
-                <a href="https://sketchfab.com/3d-models/green-creeper-plant-f1005205b134402db0a1c986b15c803d" target="_blank">
+                <a href="https://sketchfab.com/3d-models/green-creeper-plant-f1005205b134402db0a1c986b15c803d"
+                    target="_blank">
                     Green Creeper Plant by Tsukari
                 </a>
                 - Downloaded from Sketchfab
             </li>
         </ul>
     </footer>
+
+    <input id="gardenId" type="hidden" th:value="${garden.getGardenId()}">
 
 
     <script type="module" th:src="@{/js/3d/3dMain.js}"></script>

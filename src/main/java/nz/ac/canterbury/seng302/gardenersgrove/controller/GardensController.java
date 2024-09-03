@@ -58,7 +58,7 @@ public class GardensController {
     private static final int MAX_REQUESTS_PER_SECOND = 10;
 
 
-    private static final int COUNT_PER_PAGE = 10;
+    private static final int COUNT_PER_PAGE = 9;
 
     private volatile long lastRequestTime = Instant.now().getEpochSecond();
 

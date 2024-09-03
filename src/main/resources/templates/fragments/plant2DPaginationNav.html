@@ -1,0 +1,49 @@
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <a class="page-link bg-dark text-white"
+                th:href="@{/2D-garden/{gardenId}(page=1,gardenId=${gardenId})}">First</a>
+        </li>
+
+        <li class="page-item disabled" th:if="${currentPage > 3}">
+            <span class="page-link bg-dark text-white">...</span>
+        </li>
+
+        <li class="page-item" th:if="${currentPage - 2 > 0}">
+            <a class="page-link bg-dark text-white"
+                th:href="@{/2D-garden/{gardenId}(page=${currentPage - 2},gardenId=${gardenId})}"
+                th:text="${currentPage - 2}"></a>
+        </li>
+
+        <li class="page-item" th:if="${currentPage - 1 > 0}">
+            <a class="page-link bg-dark text-white"
+                th:href="@{/2D-garden/{gardenId}(page=${currentPage - 1},gardenId=${gardenId})}"
+                th:text="${currentPage - 1}"></a>
+        </li>
+
+        <li class="page-item active">
+            <span class="page-link bg-success text-white" th:text="${currentPage}"></span>
+        </li>
+
+        <li class="page-item" th:if="${currentPage + 1 <= lastPage}">
+            <a class="page-link bg-dark text-white"
+                th:href="@{/2D-garden/{gardenId}(page=${currentPage + 1},gardenId=${gardenId})}"
+                th:text="${currentPage + 1}"></a>
+        </li>
+
+        <li class="page-item" th:if="${currentPage + 2 <= lastPage}">
+            <a class="page-link bg-dark text-white"
+                th:href="@{/2D-garden/{gardenId}(page=${currentPage + 2},gardenId=${gardenId})}"
+                th:text="${currentPage + 2}"></a>
+        </li>
+
+        <li class="page-item disabled" th:if="${currentPage < lastPage - 2}">
+            <span class="page-link bg-dark text-white">...</span>
+        </li>
+
+        <li class="page-item">
+            <a class="page-link bg-dark text-white"
+                th:href="@{/2D-garden/{gardenId}(page=${lastPage},gardenId=${gardenId})}">Last</a>
+        </li>
+    </ul>
+</nav>

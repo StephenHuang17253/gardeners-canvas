@@ -26,9 +26,9 @@ public class RecentGardenModel {
      * Constructor for a RecentGardenModel
      *
      * @param garden the recent garden
-     * @param owner of the recent garden
+     * @param owner  of the recent garden
      */
-    public RecentGardenModel(Garden garden, User owner, boolean isOwner){
+    public RecentGardenModel(Garden garden, User owner, boolean isOwner) {
         this.gardenId = garden.getGardenId();
         this.gardenName = garden.getGardenName();
         this.gardenLocation = garden.getGardenCity() + ", " + garden.getGardenCountry();

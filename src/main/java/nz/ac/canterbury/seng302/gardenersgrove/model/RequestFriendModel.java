@@ -12,12 +12,14 @@ public class RequestFriendModel {
 
     /**
      * Constructor for a PendingFriendModel
+     * 
      * @param friendProfilePicture filename for the friend's profile picture.
-     * @param friendName first and last name of the friend.
-     * @param isSender whether they sent the request
-     * @param userId to have a reference to retrieve the user from the repo later
+     * @param friendName           first and last name of the friend.
+     * @param isSender             whether they sent the request
+     * @param userId               to have a reference to retrieve the user from the
+     *                             repo later
      */
-    public RequestFriendModel(String friendProfilePicture, String friendName, boolean isSender, long userId){
+    public RequestFriendModel(String friendProfilePicture, String friendName, boolean isSender, long userId) {
         this.friendProfilePicture = friendProfilePicture;
         this.friendName = friendName;
         this.isSender = isSender;
@@ -66,6 +68,5 @@ public class RequestFriendModel {
                 ", userId='" + userId + '\'' +
                 '}';
     }
-
 
 }

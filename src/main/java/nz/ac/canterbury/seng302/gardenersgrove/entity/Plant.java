@@ -40,7 +40,6 @@ public class Plant {
     @Column
     private String plantPictureFilename;
 
-
     /**
      * JPA required no-args constructor
      */
@@ -56,7 +55,8 @@ public class Plant {
      * @param plantDate        the date of planting
      * @param garden           the Garden object that the plant belongs to
      */
-    public Plant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Garden garden, PlantCategory plantCategory) {
+    public Plant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Garden garden,
+            PlantCategory plantCategory) {
         this.plantName = plantName;
         this.plantCount = plantCount;
         this.plantDescription = plantDescription;

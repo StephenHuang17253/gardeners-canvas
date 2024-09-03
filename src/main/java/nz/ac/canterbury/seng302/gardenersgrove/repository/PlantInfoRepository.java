@@ -15,12 +15,14 @@ public interface PlantInfoRepository extends CrudRepository<PlantInfo, Long> {
 
     /**
      * Finds a Plant Info object by id
+     * 
      * @param id of the Plant Info Entity
      */
     Optional<PlantInfo> findById(long id);
 
     /**
      * Find all Plant Info objects in repo
+     * 
      * @return list of Plant Info Entity objects
      */
     List<PlantInfo> findAll();

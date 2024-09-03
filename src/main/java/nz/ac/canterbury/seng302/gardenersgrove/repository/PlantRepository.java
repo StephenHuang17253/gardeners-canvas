@@ -11,19 +11,22 @@ import java.util.Optional;
 
 /**
  * Plant object repository accessor using Spring's @link{CrudRepository}.
- * These (basic) methods are provided for us without the need to write our own implementations
+ * These (basic) methods are provided for us without the need to write our own
+ * implementations
  */
 @Repository
 public interface PlantRepository extends CrudRepository<Plant, Long> {
 
     /**
      * Finds a Plant object by id
+     * 
      * @param id the plant's id
      */
     Optional<Plant> findById(long id);
 
     /**
      * Find all plant objects belonging to a particular plant category.
+     * 
      * @param plantCategory the plant category used in query
      * @return list of plant objects with that category
      */
@@ -31,7 +34,8 @@ public interface PlantRepository extends CrudRepository<Plant, Long> {
 
     /**
      * Find all plant objects belonging to a particular plant category and garden.
-     * @param garden the garden the plant belongs to
+     * 
+     * @param garden        the garden the plant belongs to
      * @param plantCategory the category the plant belongs to
      * @return list of plant objects belonging to that garden and category.
      */
@@ -39,6 +43,7 @@ public interface PlantRepository extends CrudRepository<Plant, Long> {
 
     /**
      * Find all Plant objects in repo
+     * 
      * @return list of plant objects
      */
     List<Plant> findAll();

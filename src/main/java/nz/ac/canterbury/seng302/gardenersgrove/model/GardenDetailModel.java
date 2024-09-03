@@ -1,9 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.model;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-
-import java.util.List;
 
 /**
  * Model class for storing garden data for garden detail pages
@@ -16,13 +13,12 @@ public class GardenDetailModel {
     private String gardenLocation;
     private Double gardenSize;
 
-
     /**
      * Constructor for a GardenDetailModel
      *
      * @param garden entity object to extract attributes from
      */
-    public GardenDetailModel(Garden garden){
+    public GardenDetailModel(Garden garden) {
         this.gardenId = garden.getGardenId();
         this.gardenIsPublic = garden.getIsPublic();
         this.gardenName = garden.getGardenName();
@@ -34,6 +30,7 @@ public class GardenDetailModel {
     public Long getGardenId() {
         return gardenId;
     }
+
     public String getGardenName() {
         return gardenName;
     }

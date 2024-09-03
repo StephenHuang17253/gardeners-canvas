@@ -5,37 +5,40 @@
 
 
 <body>
-<div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
-<div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100" th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
-<div class="container-md my-5 bg-white rounded pt-5 pb-5" style="width: 60%;">
-    <div class="d-flex justify-content-center align-items-center ratio ratio-1x1 mx-auto mt-5 mb-5" style="width: 15%">
-        <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-             alt="User's Profile" class="img-fluid rounded-circle border" style="width: 100%; height: 100%; object-fit: cover;">
-    </div>
-    <div class="mb-3 text-center">
-        <h3 th:text="${userName}">Username</h3>
-    </div>
-    <div class="mb-3 text-center">
-        <p>
-            <strong>
-                <span th:text="${gardensCount}"></span> Garden<span th:if="${gardensCount}>1">s</span>
-            </strong>
-        </p>
-    </div>
-
-    <div th:if="${gardensCount > 0}" class="container mt-4">
-        <div class="row mb-4">
-            <div class="col">
-                <h1 class="mb-3" th:text="${firstName} + '\'s Gardens'">User's Gardens</h1>
-                <div th:replace="~{fragments/paginationPageOverview.html}"
-                     th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
-                </div>
-
-            </div>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
+        th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+    <div class="container-md my-5 bg-white rounded pt-5 pb-5" style="width: 60%;">
+        <div class="d-flex justify-content-center align-items-center ratio ratio-1x1 mx-auto mt-5 mb-5"
+            style="width: 15%">
+            <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                alt="User's Profile" class="img-fluid rounded-circle border"
+                style="width: 100%; height: 100%; object-fit: cover;">
         </div>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-            <div class="col" th:each="garden : ${myGardens}">
-                <div th:replace="~{fragments/publicGardensCard.html ::
+        <div class="mb-3 text-center">
+            <h3 th:text="${userName}">Username</h3>
+        </div>
+        <div class="mb-3 text-center">
+            <p>
+                <strong>
+                    <span th:text="${gardensCount}"></span> Garden<span th:if="${gardensCount}>1">s</span>
+                </strong>
+            </p>
+        </div>
+
+        <div th:if="${gardensCount > 0}" class="container mt-4">
+            <div class="row mb-4">
+                <div class="col">
+                    <h1 class="mb-3" th:text="${firstName} + '\'s Gardens'">User's Gardens</h1>
+                    <div th:replace="~{fragments/paginationPageOverview.html}"
+                        th:with="totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}">
+                    </div>
+
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+                <div class="col" th:each="garden : ${myGardens}">
+                    <div th:replace="~{fragments/publicGardensCard.html ::
                         publicGardensCard(gardenId=${garden.gardenId},
                         gardenName=${garden.gardenName},
                         gardenLocation=${garden.gardenLocation},
@@ -46,18 +49,18 @@
                         plantImage2=${garden.plants.size() > 1 ? garden.plants[1].plantPictureFilename : null},
                         plantImage3=${garden.plants.size() > 2 ? garden.plants[2].plantPictureFilename : null},
                         numberOfPlants=${garden.plants?.size()})}">
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col">
-                <div th:replace="~{fragments/friendGardenPaginationNav.html}"
-                     th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, filter=${filter}, friendId=${friendId}">
+            <div class="row mt-4">
+                <div class="col">
+                    <div th:replace="~{fragments/friendGardenPaginationNav.html}"
+                        th:with="currentPage=${currentPage}, totalGardens=${totalGardens}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, filter=${filter}, friendId=${friendId}">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 
 </html>
