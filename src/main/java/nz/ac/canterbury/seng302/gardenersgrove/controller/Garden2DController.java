@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
@@ -21,9 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class Garden2DController {
@@ -93,15 +93,15 @@ public class Garden2DController {
     /**
      * Helper function to update the 2D co-ordinates of one item in a garden
      *
-     * @param gridItemType
-     * @param itemId
-     * @param xCoord
-     * @param yCoord
-     * @param garden
+     * @param gridItemType type of item (plant or decoration)
+     * @param itemId       id of item
+     * @param xCoord       x co-ordinate of item on 2D grid
+     * @param yCoord       y co-ordinate of item on 2D grid
+     * @param garden       garden that contains all the items
      */
     private void updateGardenGrid(GridItemType gridItemType, Long itemId, Integer xCoord, Integer yCoord, Garden garden) {
         Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(gridItemType, itemId, garden);
-        if (matchingGridItem == null) {
+        if (matchingGridItem.isEmpty()) {
             GridItemLocation newGridItemLocation = new GridItemLocation(itemId, gridItemType, garden, xCoord, yCoord);
             gridItemLocationService.addGridItemLocation(newGridItemLocation);
         } else {
@@ -112,17 +112,18 @@ public class Garden2DController {
         }
     }
 
-    //post method <-- save method
-    //save2DGarden
-    // parameters are objects (plants) <-- their ids
-    // object type
-    // and their location
-    // list of tuples with above three items
-    // garden Id
-
-    //loop through each item/id/thing and update GritItemLocation
-
-    //redirect back to "/2D-garden/{gardenId}"
+    /**
+     * Endpoint to save the locations of elements on a 2D garden grid.
+     * NOTE: CURRENTLY ASSUMES ALL ELEMENTS ARE PLANTS
+     *
+     * @param gardenId   id of the garden whose grid has to be saved
+     * @param idList     ids of all elements on the grid
+     * @param xCoordList x coordinates of all elements on the grid
+     * @param yCoordList y coordinates of all elements on the grid
+     * @param response   http response to use to return error
+     * @param model      model to use to return error
+     * @return redirect back to 2D garden grid
+     */
     @PostMapping("/2D-garden/{gardenId}/save")
     public String save2DGarden(@PathVariable Long gardenId, @RequestParam(value = "idList", required = false) String idList, @RequestParam(value = "xCoordList", required = false) String xCoordList, @RequestParam(value = "yCoordList", required = false) String yCoordList, HttpServletResponse response, Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
@@ -144,17 +145,32 @@ public class Garden2DController {
             return "403";
         }
 
-        logger.info((String) idList);
-
         if (idList == null || xCoordList == null || yCoordList == null) {
             return "redirect:/2D-garden/{gardenId}";
         }
 
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> idListAsList = new ArrayList<>();
+        List<Double> xCoordListAsList = new ArrayList<>();
+        List<Double> yCoordListAsList = new ArrayList<>();
+        try {
+            idListAsList = objectMapper.readValue(idList, new TypeReference<List<String>>() {
+            });
+            xCoordListAsList = objectMapper.readValue(xCoordList, new TypeReference<List<Double>>() {
+            });
+            yCoordListAsList = objectMapper.readValue(yCoordList, new TypeReference<List<Double>>() {
+            });
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
         //all items on grid are plants at the moment
-        //ToDo: garden2DLayout.forEach(item -> updateGardenGrid(item[0], item[1], item[2], item[3],garden));
+        for (int i = 0; i < idListAsList.size(); i++) {
+            updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
+        }
 
         return "redirect:/2D-garden/{gardenId}";
-
     }
 
 
