@@ -165,10 +165,20 @@ public class Garden2DController {
             logger.error(e.getMessage());
         }
 
-        //all items on grid are plants at the moment
-        for (int i = 0; i < idListAsList.size(); i++) {
-            updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
+        try {
+            for (int i = 0; i < idListAsList.size(); i++) {
+                //all items on grid are plants at the moment
+                updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("errorTitle", "400 Bad Request");
+            model.addAttribute("message",
+                    "Something went wrong. We could not save the changes");
+            return "error";
         }
+
 
         return "redirect:/2D-garden/{gardenId}";
     }
