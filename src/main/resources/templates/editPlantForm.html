@@ -69,7 +69,7 @@
                         </button>
                         <p th:if="${PCErrorText}" class="text-danger fs-6" th:text="${PCErrorText}"></p>
                         <p id="plantCategoryJSError" class="text-danger fs-6 " style="display: none"
-                           th:text="'Plant Category must be selected'"></p>
+                           th:text="'A plant category must be selected'"></p>
                         <div class="dropdown-menu">
                             <a class="dropdown-item overflow-text"
                                th:each="category : ${categories}" th:text="${category}" th:value="*{category}" onclick="onDropdownItemSelect(this)"></a>

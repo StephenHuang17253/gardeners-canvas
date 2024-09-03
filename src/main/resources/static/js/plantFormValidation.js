@@ -11,7 +11,9 @@ const plantCount = document.getElementById("plantCount");
 const plantCountJSError = document.getElementById("plantCountJSError");
 
 const plantCategory = document.getElementById("plantCategory");
+const plantCategoryButton = document.getElementById("plantCategoryButton");
 const plantCategoryJSError = document.getElementById("plantCategoryJSError");
+let plantCategorySelected = false;
 
 const variationSelector1 = 65039;
 const submitButton = document.querySelector('button[type="submit"]');
@@ -241,8 +243,7 @@ const handleCountUpdate = (event) => {
  * @returns {void}
  */
 const displayCategoryError = () => {
-    plantCategory.setCustomValidity(" ");
-    plantCategory.classList.add("border-danger");
+    plantCategoryButton.classList.add("border-danger");
     plantCategoryJSError.style.display = "block";
 }
 
@@ -270,6 +271,7 @@ const handleCategoryUpdate = (event) => {
         displayCategoryError();
     } else {
         clearCategoryError();
+        plantCategorySelected = true
     }
 
 }
@@ -282,16 +284,13 @@ const handleCategoryUpdate = (event) => {
  * @returns {void}
  */
 const handleFormSubmit = (event) => {
-    console.log(plantCategory.checkValidity())
-    console.log(plantName.checkValidity())
-
     handleDateUpdate({ target: plantDate });
     handleNameUpdate({ target: plantName }, plantNameJSError);
     handleDescriptionUpdate({target: plantDescription});
     handleCountUpdate({target: plantCount});
     handleCategoryUpdate({target: plantCategory});
     // Prevent form submission if there are any validation errors
-    if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity() || !plantCategory.checkValidity()) {
+    if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity() || !plantCategorySelected) {
         event.preventDefault();
     }
 }
