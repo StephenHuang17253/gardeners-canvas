@@ -1,16 +1,22 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import jakarta.servlet.http.HttpServletResponse;
+import net.minidev.json.JSONArray;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,15 +27,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,13 +65,14 @@ public class Garden2dControllerTest {
     @Autowired
     UserService userService;
 
+    @Autowired
+    private GridItemLocationRepository gridItemLocationRepository;
+
     private List<Garden> gardenList = new ArrayList<>();
     private List<Plant> plantList = new ArrayList<>();
 
     User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.now());
 
-//    @InjectMocks
-//    private static Garden2DController Garden2DController;
 
     private static final Long MAX_LONG = 10000L;
     private static final int COUNT_PER_PAGE = 6;
@@ -156,28 +167,128 @@ public class Garden2dControllerTest {
         Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
     }
 
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_emptyLists_returnRedirectAndDoNotChangePersistence() throws Exception {
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0).getGardenId();
+        List<String> idList = new ArrayList<>();
+        List<Double> xCoordList = new ArrayList<>();
+        List<Double> yCoordList = new ArrayList<>();
 
-    void save2DGarden_emptyLists_returnRedirectAndDoNotChangePersistence() {
-
-    }
-
-    void save2DGarden_oneItemInEachList_returnRedirectAndChangePersistence() {
-
-    }
-
-    void save2DGarden_twoItemsInEachList_returnRedirectAndChangePersistence() {
-
-    }
-
-    void save2DGarden_differentNumberOfItemsInEachList_return404() {
-
-    }
-
-    void save2DGarden_noGardenID_return404() {
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+        Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
     }
 
-    void save2DGarden_invalidGardenID_return404() {
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_oneItemInEachList_returnRedirectAndChangePersistence() throws Exception {
+        //preparing parameters
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0).getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+
+        //making call to endpoint
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(1, gridItemLocationRepository.findAll().size());
+        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository.findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant.getPlantId(), GridItemType.PLANT, gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Assertions.assertEquals(2.3, gridItemAddedToRepository.get().getXCoordinates());
+        Assertions.assertEquals(3.3, gridItemAddedToRepository.get().getYCoordinates());
+
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_twoItemsInEachList_returnRedirectAndChangePersistence() throws Exception {
+        //preparing parameters
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0).getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        Plant testPlant2 = gardenService.getGardenById(gardenId).get().getPlants().get(1);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        idList.add(testPlant2.getPlantId().toString());
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        xCoordList.add(4.5);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+        yCoordList.add(5.5);
+
+
+        //making call to endpoint
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+        //check persistence is updated
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(2, gridItemLocationRepository.findAll().size());
+        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository.findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant.getPlantId(), GridItemType.PLANT, gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Assertions.assertEquals(2.3, gridItemAddedToRepository.get().getXCoordinates());
+        Assertions.assertEquals(3.3, gridItemAddedToRepository.get().getYCoordinates());
+        Optional<GridItemLocation> gridItem2AddedToRepository = gridItemLocationRepository.findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant2.getPlantId(), GridItemType.PLANT, gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItem2AddedToRepository.isPresent());
+        Assertions.assertEquals(4.5, gridItem2AddedToRepository.get().getXCoordinates());
+        Assertions.assertEquals(5.5, gridItem2AddedToRepository.get().getYCoordinates());
+
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_differentNumberOfItemsInEachList_return400() throws Exception {
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0).getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        Plant testPlant2 = gardenService.getGardenById(gardenId).get().getPlants().get(1);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        idList.add(testPlant2.getPlantId().toString());
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        List<Double> yCoordList = new ArrayList<>();
+
+        //making call to endpoint
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
+        Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
+
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_invalidGardenID_return404() throws Exception {
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0).getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+
+        //making call to endpoint
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
+        Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
     }
 
