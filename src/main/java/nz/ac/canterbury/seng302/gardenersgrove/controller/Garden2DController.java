@@ -38,6 +38,8 @@ public class Garden2DController {
 
     private static final int COUNT_PER_PAGE = 6;
 
+    private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
+
     @Autowired
     public Garden2DController(GardenService gardenService, SecurityService securityService, GridItemLocationService gridItemLocationService) {
         this.gardenService = gardenService;
@@ -63,7 +65,7 @@ public class Garden2DController {
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message",
+            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
                     "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
         }
@@ -140,7 +142,7 @@ public class Garden2DController {
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message",
+            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
                     "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
         }
@@ -174,7 +176,7 @@ public class Garden2DController {
             logger.error(e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("errorTitle", "400 Bad Request");
-            model.addAttribute("message",
+            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
                     "Something went wrong. We could not save the changes");
             return "error";
         }
