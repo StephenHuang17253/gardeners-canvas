@@ -157,4 +157,29 @@ public class Garden2dControllerTest {
     }
 
 
+    void save2DGarden_emptyLists_returnRedirectAndDoNotChangePersistence() {
+
+    }
+
+    void save2DGarden_oneItemInEachList_returnRedirectAndChangePersistence() {
+
+    }
+
+    void save2DGarden_twoItemsInEachList_returnRedirectAndChangePersistence() {
+
+    }
+
+    void save2DGarden_differentNumberOfItemsInEachList_return404() {
+
+    }
+
+    void save2DGarden_noGardenID_return404() {
+
+    }
+
+    void save2DGarden_invalidGardenID_return404() {
+
+    }
+
+
 }
