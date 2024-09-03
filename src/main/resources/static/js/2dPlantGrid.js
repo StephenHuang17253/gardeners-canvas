@@ -115,7 +115,7 @@ document.querySelectorAll('.plant-item').forEach(item => {
             if (highlightedPaletteItem) {
                 highlightedPaletteItem.style.border = 'none';
             }
-            this.style.border = '3px solid red';
+            this.style.border = '3px solid blue';
             highlightedPaletteItem = this;
 
             selectedPlantInfo = {
