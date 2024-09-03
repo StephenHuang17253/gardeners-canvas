@@ -178,7 +178,7 @@ public class Garden2dControllerTest {
 
         MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
-                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
     }
@@ -200,7 +200,7 @@ public class Garden2dControllerTest {
         //making call to endpoint
         MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
-                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
         Assertions.assertEquals(1, gridItemLocationRepository.findAll().size());
@@ -233,7 +233,7 @@ public class Garden2dControllerTest {
         //making call to endpoint
         MvcResult mvcResult = mockMvc
                 .perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").param("idList", JSONArray.toJSONString(idList)).param("xCoordList", JSONArray.toJSONString(xCoordList)).param("yCoordList", JSONArray.toJSONString(yCoordList)))
-                .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         //check persistence is updated
         Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
