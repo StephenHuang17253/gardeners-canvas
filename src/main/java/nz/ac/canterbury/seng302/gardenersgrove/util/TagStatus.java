@@ -8,5 +8,4 @@ public enum TagStatus {
     APPROPRIATE,
     INAPPROPRIATE,
     PENDING
-
 }

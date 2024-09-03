@@ -60,14 +60,14 @@ class InputValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Hello", "Hello World", "àäèéëïĳöü", "áêéèëïíîôóúû", "êôúû", "ÆØÅæøå", "ÄÖäö",
+    @ValueSource(strings = { "Hello", "Hello World", "àäèéëïĳöü", "áêéèëïíîôóúû", "êôúû", "ÆØÅæøå", "ÄÖäö",
             "ÅÄÖåäö", "ÄÖÕÜäöõü", "ÄÖÜẞäöüß", "ÇÊÎŞÛçêîşû", "ĂÂÎȘȚăâîșț", "ÂÊÎÔÛŴŶÁÉÍÏâêîôûŵŷáéíï", "ĈĜĤĴŜŬĉĝĥĵŝŭ",
             "ÇĞİÖŞÜçğıöşü", "ÁÐÉÍÓÚÝÞÆÖáðéíóúýþæö", "ÁÐÍÓÚÝÆØáðíóúýæø", "ÁÉÍÓÖŐÚÜŰáéíóöőúüű", "ÀÇÉÈÍÓÒÚÜÏàçéèíóòúüï",
             "ÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸàâæçéèêëîïôœùûüÿ", "ÁÀÇÉÈÍÓÒÚËÜÏáàçéèíóòúëüï", "ÁÉÍÑÓÚÜáéíñóúü",
             "ÀÉÈÌÒÙàéèìòù", "ćęłńóśźż ", "ćśůź ", "ãéëòôù ", "ČŠŽ",
             "अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ऍ ऎ ए ऐ ", "ਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜ", "અ આ ઇ ઈ ઉ ઊ ઋ ઌ ઍ એ ઐ ", "ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ",
             "АБВГДЕЖЗИКЛМН", "ЙЩЬЮЯ", "ЁЫЭ", "ЄꙂꙀЗІЇꙈОуꙊѠ", "ΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ", "字文化圈", "いうえおの", "アイウ", "ㄈㄉㄊㄋㄌㄍㄎㄏ ",
-            "ㄪㄫㄬ", " Է Ը Թ Ժ ", " ჱ თ ი კ ლ მ ", "ⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎ"})
+            "ㄪㄫㄬ", " Է Ը Թ Ժ ", " ჱ თ ი კ ლ მ ", "ⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎ" })
     void InputValidator_compText_validString_return_OK(String input) {
         assertEquals(ValidationResult.OK, InputValidator.compulsoryAlphaPlusTextField(input));
     }
@@ -186,7 +186,6 @@ class InputValidatorTest {
     void InputValidator_optText_NonAlphaText4_return_NONALPHAPLUS() {
         assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField("Water & Buffalo"));
     }
-
 
     @Test
     void InputValidator_numCommSingle_blank_return_OK() {
@@ -309,19 +308,19 @@ class InputValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"1.00000000023", "1", "8000000.00", "1E-1", "1.1E4", "1,1E-1", "8E6", "1.4E-1", "0.01"})
+    @ValueSource(strings = { "1.00000000023", "1", "8000000.00", "1E-1", "1.1E4", "1,1E-1", "8E6", "1.4E-1", "0.01" })
     void InputValidator_validateGardenAreaInput_ValidArea_return_OK(String input) {
         assertEquals(ValidationResult.OK, InputValidator.validateGardenAreaInput(input));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"0.0000001", "0.009", "0"})
+    @ValueSource(strings = { "0.0000001", "0.009", "0" })
     void InputValidator_validateGardenAreaInput_SmallArea_return_AREA_TOO_SMALL(String input) {
         assertEquals(ValidationResult.AREA_TOO_SMALL, InputValidator.validateGardenAreaInput(input));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"8000000.001", "8000000.01", "340300000000000000000000000000000000000"})
+    @ValueSource(strings = { "8000000.001", "8000000.01", "340300000000000000000000000000000000000" })
     void InputValidator_validateGardenAreaInput_LargeArea_return_AREA_TOO_LARGE(String input) {
         assertEquals(ValidationResult.AREA_TOO_LARGE, InputValidator.validateGardenAreaInput(input));
     }
@@ -330,7 +329,7 @@ class InputValidatorTest {
      * Test for valid names
      */
     @ParameterizedTest
-    @ValueSource(strings = {"John Doe", "John-Doe", "John Doe's"})
+    @ValueSource(strings = { "John Doe", "John-Doe", "John Doe's" })
     void InputValidator_validateName_ValidName_return_OK(String name) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateName(name));
     }
@@ -341,7 +340,7 @@ class InputValidatorTest {
      * @param name
      */
     @ParameterizedTest
-    @ValueSource(strings = {"John1", "John>", "~John"})
+    @ValueSource(strings = { "John1", "John>", "~John" })
     void InputValidator_validateName_InvalidName_return_INVALID_USERNAME(String name) {
         Assertions.assertEquals(ValidationResult.INVALID_USERNAME, InputValidator.validateName(name));
     }
@@ -352,22 +351,25 @@ class InputValidatorTest {
      * @param email
      */
     @ParameterizedTest
-    @ValueSource(strings = {"test-test@example.com", "user_123@gmail.co.nz", "john.doe@hotmail.com",
-            "phlddzoxuomhdkclzinbsqhutjqhzodonrbgyxibpkutddaovmxifypmeksvhkts@mwbmmvndbnvfdskmrmmropbvhdgegssqcengjnfj" +
-                    "oavhccefauucivfpthrucoyhlxfgkcdurlffpoacnhhysprommslgxmusevvpxdgkkifsgpbpiljrcxjwejestmgvnsevszck" +
-                    "ujiglsrihnpblwmiculgtxodopsthkdzzpgjhznkcsarvzvubnyhutxhyyecsvjjykzxhdqlaxooxqnfbuewmajwlmvhklhzy" +
-                    "wxuhsxwtnshoxuw.com"})
+    @ValueSource(strings = { "test-test@example.com", "user_123@gmail.co.nz", "john.doe@hotmail.com",
+            "phlddzoxuomhdkclzinbsqhutjqhzodonrbgyxibpkutddaovmxifypmeksvhkts@mwbmmvndbnvfdskmrmmropbvhdgegssqcengjnfj"
+                    +
+                    "oavhccefauucivfpthrucoyhlxfgkcdurlffpoacnhhysprommslgxmusevvpxdgkkifsgpbpiljrcxjwejestmgvnsevszck"
+                    +
+                    "ujiglsrihnpblwmiculgtxodopsthkdzzpgjhznkcsarvzvubnyhutxhyyecsvjjykzxhdqlaxooxqnfbuewmajwlmvhklhzy"
+                    +
+                    "wxuhsxwtnshoxuw.com" })
     void InputValidator_validateUniqueEmail_ValidEmail_return_OK(String email) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateUniqueEmail(email));
     }
 
-    // Todo check if there is an email already in persistence <-- need to mock persistence for this.
+    // Todo check if there is an email already in persistence <-- need to mock
+    // persistence for this.
     // Todo add foreign scripts
 
-
     @ParameterizedTest
-    @ValueSource(strings = {" ", "user_123gmail.co.nz", "john.doe@h.", "test@test.c", "test@.com", "@test.com",
-            "abc-@mail.com", "abc..def@mail.com", ".abc@mail.com", "abc.def@mail#archive.com", "abc.def@mail..com"})
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.", "test@test.c", "test@.com", "@test.com",
+            "abc-@mail.com", "abc..def@mail.com", ".abc@mail.com", "abc.def@mail#archive.com", "abc.def@mail..com" })
     void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
     }
@@ -378,7 +380,7 @@ class InputValidatorTest {
      * @param password
      */
     @ParameterizedTest
-    @ValueSource(strings = {"aB0!bbba", "##aBB0hhhhhhhhhh", "Passw0rd!", "Pass word1!"})
+    @ValueSource(strings = { "aB0!bbba", "##aBB0hhhhhhhhhh", "Passw0rd!", "Pass word1!" })
     void InputValidator_validatePassword_ValidPassword_return_OK(String password) {
         String firstName = "John";
         String lastName = "";
@@ -399,8 +401,8 @@ class InputValidatorTest {
      * @param password
      */
     @ParameterizedTest
-    @CsvSource({"aaa", "aaaaaaaa", "000!0000", "password1!", "Password123", "Password!@#", "PASSWORD1!",
-            "1D!0", "D!1", "aA!0", "Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa"})
+    @CsvSource({ "aaa", "aaaaaaaa", "000!0000", "password1!", "Password123", "Password!@#", "PASSWORD1!",
+            "1D!0", "D!1", "aA!0", "Pa!0AAA", "John12345!", "Doe12345!", "Johndoe@gmail.com", "2024-01-01Aa" })
     void InputValidator_validatePassword_InvalidPassword_return_INVALID_PASSWORD(String password) {
         String firstName = "John";
         String lastName = "Doe";
@@ -416,7 +418,8 @@ class InputValidatorTest {
             otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(emailAddress);
-        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD, InputValidator.validatePassword(password, otherFields));
+        Assertions.assertEquals(ValidationResult.INVALID_PASSWORD,
+                InputValidator.validatePassword(password, otherFields));
     }
 
     /**
@@ -425,7 +428,7 @@ class InputValidatorTest {
      * @param dob string date
      */
     @ParameterizedTest
-    @ValueSource(strings = {"01/01/2000", "01/12/1999", "31/12/2000"})
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     void InputValidator_isValidDOB_ValidDate_return_OK(String dob) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDOB(dob));
     }
@@ -454,11 +457,11 @@ class InputValidatorTest {
      * @param dob string date
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "31/02/2003", "234/03/0000", "01/01/11111", "01/021/2000", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004"})
+    @ValueSource(strings = { "1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "31/02/2003", "234/03/0000",
+            "01/01/11111", "01/021/2000", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004" })
     void InputValidator_isValidDOB_invalidFormat_return_INVALID_DATE_FORMAT(String dob) {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDOB(dob));
     }
-
 
     /**
      * Test for valid DOB
@@ -466,7 +469,7 @@ class InputValidatorTest {
      * @param date
      */
     @ParameterizedTest
-    @ValueSource(strings = {"01/01/2000", "01/12/1999", "31/12/2000"})
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
     void InputValidator_isValidDate_ValidDate_return_OK(String date) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateDate(date));
     }
@@ -477,7 +480,8 @@ class InputValidatorTest {
      * @param date
      */
     @ParameterizedTest
-    @ValueSource(strings = {"1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "29/02/2001", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004", "\""})
+    @ValueSource(strings = { "1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "29/02/2001", "31/04/2002",
+            "02/13/2001", "04/00/2001", "00/12/2004", "\"" })
     void InputValidator_isValidDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
         Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validateDate(date));
     }
@@ -488,7 +492,7 @@ class InputValidatorTest {
      * @param streetAddress string input for a garden's street address
      */
     @ParameterizedTest
-    @ValueSource(strings = {"20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road", "1/14 Ilam Road"})
+    @ValueSource(strings = { "20 Kirkwood Avenue", "139 Greers Road", "116 Riccarton Road", "1/14 Ilam Road" })
     void InputValidator_isValidStreetAddress_validStreetAddress_return_OK(String streetAddress) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateAddressInput(streetAddress));
     }
@@ -499,17 +503,19 @@ class InputValidatorTest {
      * @param streetAddress string input for a garden's street address
      */
     @ParameterizedTest
-    @ValueSource(strings = {"Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"})
+    @ValueSource(strings = {
+            "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" })
     void InputValidator_isValidStreetAddress_invalidStreetAddress_return_LENGTH_OVER_LIMIT(String streetAddress) {
         Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.validateAddressInput(streetAddress));
     }
 
     /**
      * Test for invalid garden street address
+     * 
      * @param streetAddress - string input for a garden's street address
      */
     @ParameterizedTest
-    @ValueSource(strings = {"116 !@#$%^&*()_+-=[]{};:',.<>?| Road"})
+    @ValueSource(strings = { "116 !@#$%^&*()_+-=[]{};:',.<>?| Road" })
     void InputValidator_isValidStreetAddress_invalidStreetAddress_return_NON_ALPHA_PLUS(String streetAddress) {
         Assertions.assertEquals(ValidationResult.INVALID_STREET, InputValidator.validateAddressInput(streetAddress));
     }
@@ -520,7 +526,7 @@ class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = {"8041", "23020392", "SN6 8TL", "80-41"})
+    @ValueSource(strings = { "8041", "23020392", "SN6 8TL", "80-41" })
     void InputValidator_isValidPostcode_validPostcode_return_OK(String postcode) {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePostcodeInput(postcode));
     }
@@ -531,7 +537,7 @@ class InputValidatorTest {
      * @param postcode string input for a garden's postcode
      */
     @ParameterizedTest
-    @ValueSource(strings = {"THIS IS NOT A POSTC*DE", "8041!@#$", "\""})
+    @ValueSource(strings = { "THIS IS NOT A POSTC*DE", "8041!@#$", "\"" })
     void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
         Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode));
     }

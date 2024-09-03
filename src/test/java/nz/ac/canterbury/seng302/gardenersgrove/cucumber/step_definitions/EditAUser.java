@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatter;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class EditAUser {
@@ -61,9 +60,9 @@ public class EditAUser {
     @Autowired
     public HomePageLayoutRepository homePageLayoutRepository;
 
-
     @Autowired
     public FileService fileService;
+
     public UserService userService;
 
     String firstName = "John";
@@ -71,7 +70,6 @@ public class EditAUser {
     Boolean noLastName = false;
     String emailAddress = "JohnDoe22@email.com";
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
-
 
     @Before
     public void before_or_after_all(Scenario scenario) {
@@ -125,8 +123,7 @@ public class EditAUser {
                         .param("dateOfBirth", formattedDate)
                         .param("emailAddress", emailAddress)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(csrf())
-        );
+                        .with(csrf()));
     }
 
     @When("I enter valid values for first name {string}, last name {string}, email address {string}, and date of birth {string}")
@@ -172,6 +169,5 @@ public class EditAUser {
     public void i_click_the_check_box_marked_I_have_no_surname() {
         noLastName = true;
     }
-
 
 }

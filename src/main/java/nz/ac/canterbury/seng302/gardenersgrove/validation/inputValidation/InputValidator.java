@@ -254,7 +254,9 @@ public class InputValidator {
     }
 
     /**
-     * Checks input against a criteria: This function only allows numbers, letters, hyphens, commas, dots, slashes and spaces.
+     * Checks input against a criteria: This function only allows numbers, letters,
+     * hyphens, commas, dots, slashes and spaces.
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -266,7 +268,9 @@ public class InputValidator {
     }
 
     /**
-     * Checks input against a criteria: This function only allows numbers, letters, hyphens and spaces.
+     * Checks input against a criteria: This function only allows numbers, letters,
+     * hyphens and spaces.
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -435,9 +439,10 @@ public class InputValidator {
     /**
      * Validate a new garden tag
      * 25 characters or less and alpha numeric or _ - ' " and space
+     *
      * @param tag tag string to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *   otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateTag(String tag) {
         ValidationResult result = new InputValidator(tag)
@@ -453,8 +458,6 @@ public class InputValidator {
         }
         return result;
     }
-
-
 
     /**
      * Checks if a string represents a valid float that is also a whole number

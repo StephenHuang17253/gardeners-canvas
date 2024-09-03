@@ -42,6 +42,7 @@ public class GardenTagRelation {
 
     /**
      * Get a Garden-Tag relation's id
+     * 
      * @return the id
      */
     public Long getId() {
@@ -50,6 +51,7 @@ public class GardenTagRelation {
 
     /**
      * Get the garden in the Garden-Tag relation
+     * 
      * @return the garden
      */
     public Garden getGarden() {
@@ -58,6 +60,7 @@ public class GardenTagRelation {
 
     /**
      * Get the tag in the Garden-Tag relation
+     * 
      * @return the tag
      */
     public GardenTag getTag() {

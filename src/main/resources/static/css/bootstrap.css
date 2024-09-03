@@ -65,14 +65,14 @@
 .fadeOut {
     animation: fadeOutAnimation ease 1s;
     animation-fill-mode: forwards;
-  }
+}
 
-  @keyframes fadeOutAnimation {
+@keyframes fadeOutAnimation {
     0% {
-      opacity: 1;
+        opacity: 1;
     }
 
     100% {
-      opacity: 0;
+        opacity: 0;
     }
-  }
+}

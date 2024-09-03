@@ -78,6 +78,7 @@ public class BrowsePublicGardens {
     private MvcResult mvcResult;
 
     private String currentPageUrl;
+
     private int lastPage;
 
     @Given("I am browsing gardens")
@@ -105,7 +106,7 @@ public class BrowsePublicGardens {
     }
 
     @Given("I added {string} {string}, {int} is a user with email {string} and password {string}")
-    public void i_added_is_a_user_with_email_and_password(String firstName, String LastName, Integer age,
+    public void i_added_is_a_user_with_email_and_password(String firstName, String lastName, Integer age,
             String userEmail, String userPassword) {
         if (userService.getUserByEmail(userEmail) == null) {
             int birthYear = 2024 - age;
@@ -113,12 +114,11 @@ public class BrowsePublicGardens {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH);
             LocalDate dateOfBirth = LocalDate.parse(dob, formatter);
 
-            User user = new User(firstName, LastName, userEmail, dateOfBirth);
+            User user = new User(firstName, lastName, userEmail, dateOfBirth);
             user.setVerified(true);
             userService.addUser(user, userPassword);
             Assertions.assertNotNull(userService.getUserByEmail(userEmail));
         }
-
     }
 
     @When("I hit the search button with page {int}")
@@ -142,7 +142,6 @@ public class BrowsePublicGardens {
             Assertions.assertTrue(result.getGardenName().contains(input)
                     || result.getPlants().stream().anyMatch(plant -> plant.getPlantName().contains(input)));
         }
-
     }
 
     @Then("A message tells me {string}")
@@ -163,10 +162,10 @@ public class BrowsePublicGardens {
             garden = gardenService.addGarden(garden);
             for (int i = 0; i < plantNo; i++) {
                 String plantName = gardenName + " " + (i + 1);
-                plantService.addPlant(plantName, 2, gardenName, LocalDate.now(), garden.getGardenId(), PlantCategory.TREE);
+                plantService.addPlant(plantName, 2, gardenName, LocalDate.now(), garden.getGardenId(),
+                        PlantCategory.TREE);
             }
         }
-
     }
 
     @When("I click the \"first\" button")

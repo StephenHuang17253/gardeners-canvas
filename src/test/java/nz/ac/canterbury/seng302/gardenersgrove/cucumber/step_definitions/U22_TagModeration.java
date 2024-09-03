@@ -43,25 +43,19 @@ public class U22_TagModeration {
 
     @And("I have previously made a tag called {string}")
     public void iHavePreviouslyMadeATagCalled(String tagName) {
-
-        if(gardenTagService.getByName(tagName).isEmpty())
-        {
+        if (gardenTagService.getByName(tagName).isEmpty()) {
             gardenTagService.addGardenTag(new GardenTag(tagName));
         }
     }
 
-    // U22 AC5
     @Given("I as user {string} currently have {int} strikes")
     public void i_as_user_currently_have_x_strikes(String userEmail, int strikes) {
-        // This is just to check the number of strikes the user had
-        // So it can be compared with later
         User user = userService.getUserByEmail(userEmail);
         for (int i = 0; i < strikes; i++) {
             userService.strikeUser(user);
         }
         strikesBefore = user.getStrikes();
         Assertions.assertEquals(strikes, user.getStrikes());
-
     }
 
     @And("My Tag {string} is currently pending moderation")
@@ -70,12 +64,9 @@ public class U22_TagModeration {
         gardenTagService.updateGardenTagStatus(tagName, TagStatus.PENDING);
     }
 
-    // U22 AC5
     @Then("I {string} get a strike")
     public void i_get_a_strike(String userEmail) {
-        int strikes_now = userService.getUserByEmail(userEmail).getStrikes();
-        Assertions.assertEquals(strikesBefore + 1, strikes_now);
+        int strikesNow = userService.getUserByEmail(userEmail).getStrikes();
+        Assertions.assertEquals(strikesBefore + 1, strikesNow);
     }
-
-
 }

@@ -80,7 +80,7 @@ public class U10_Acceptance_Testing {
     public void before_or_after_all() {
         profanityService = Mockito.mock(ProfanityService.class);
 
-        Mockito.when(profanityService.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(false);
+        Mockito.when(profanityService.containsProfanity(Mockito.anyString(), Mockito.any())).thenReturn(false);
 
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);

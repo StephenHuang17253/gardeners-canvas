@@ -1,43 +1,36 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
 
 import jakarta.mail.MessagingException;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.security.authentication.AuthenticationManager;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SecurityServiceUnitTest {
+class SecurityServiceUnitTest {
+
     @Mock
     private UserService userService;
+
     @Mock
     private AuthenticationManager authenticationManager;
+
     @Mock
     private FriendshipService friendshipService;
+
     @Mock
     private UserInteractionService userInteractionService;
+
     @Mock
     private EmailService emailService;
 
     static SecurityService securityService;
 
-    private final static int NUM_STRIKES_FOR_WARN = 5;
+    private static final int NUM_STRIKES_FOR_WARN = 5;
 
-    private final static int NUM_STRIKES_FOR_BAN = 6;
+    private static final int NUM_STRIKES_FOR_BAN = 6;
 
     private User user;
 
@@ -49,12 +42,13 @@ public class SecurityServiceUnitTest {
         emailService = Mockito.mock(EmailService.class);
         user = Mockito.spy(new User("username", "password", "email@example.com", null));
         Mockito.when(userService.getUserById(userId)).thenReturn(user);
-        securityService = new SecurityService(userService,authenticationManager,friendshipService,userInteractionService,emailService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,
+                userInteractionService, emailService);
     }
 
     @Test
     void handelStrikeUser_UserNotInRepo_ThrowsIllegalArgumentException() {
-        User nonRepoUser = new User("","","",null);
+        User nonRepoUser = new User("", "", "", null);
         Assertions.assertThrows(IllegalArgumentException.class, () -> securityService.handleStrikeUser(nonRepoUser));
     }
 
@@ -68,7 +62,7 @@ public class SecurityServiceUnitTest {
             return null;
         }).when(userService).strikeUser(user);
         securityService.handleStrikeUser(user);
-        Assertions.assertEquals(1,user.getStrikes());
+        Assertions.assertEquals(1, user.getStrikes());
     }
 
     @Test
@@ -81,7 +75,7 @@ public class SecurityServiceUnitTest {
             return null;
         }).when(userService).strikeUser(user);
         securityService.handleStrikeUser(user);
-        Assertions.assertEquals(NUM_STRIKES_FOR_WARN,user.getStrikes());
+        Assertions.assertEquals(NUM_STRIKES_FOR_WARN, user.getStrikes());
     }
 
     @Test
@@ -94,7 +88,7 @@ public class SecurityServiceUnitTest {
             return null;
         }).when(userService).strikeUser(user);
         securityService.handleStrikeUser(user);
-        Assertions.assertEquals(NUM_STRIKES_FOR_BAN,user.getStrikes());
+        Assertions.assertEquals(NUM_STRIKES_FOR_BAN, user.getStrikes());
 
     }
 }

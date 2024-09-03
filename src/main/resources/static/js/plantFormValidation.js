@@ -4,7 +4,7 @@ const plantDateErrorJs = document.getElementById("plantDateJSError");
 const plantName = document.getElementById("plantName");
 const plantNameJSError = document.getElementById("plantNameJSError");
 
-const plantDescription =document.getElementById("plantDescription");
+const plantDescription = document.getElementById("plantDescription");
 const plantDescriptionJSError = document.getElementById("plantDescriptionJSError");
 
 const plantCount = document.getElementById("plantCount");
@@ -110,7 +110,7 @@ const clearNameError = (inputField, errorField) => {
  */
 const handleNameUpdate = (event, errorField) => {
     let nameValue = event.target.value;
-    const validNameRegex = /^[\p{L}\p{M}\p{N}\s,.''\-]*$/u;
+    const validNameRegex = /^[\p{L}\p{M}\p{N}\s,.'-]*$/u;
     if (nameValue.length > 64) {
         errorField.textContent = "Plant name cannot be greater than 64 characters in length";
         displayNameError(event.target, errorField);
@@ -286,8 +286,8 @@ const handleCategoryUpdate = (event) => {
 const handleFormSubmit = (event) => {
     handleDateUpdate({ target: plantDate });
     handleNameUpdate({ target: plantName }, plantNameJSError);
-    handleDescriptionUpdate({target: plantDescription});
-    handleCountUpdate({target: plantCount});
+    handleDescriptionUpdate({ target: plantDescription });
+    handleCountUpdate({ target: plantCount });
     handleCategoryUpdate({target: plantCategory});
     // Prevent form submission if there are any validation errors
     if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity() || !plantCategorySelected) {

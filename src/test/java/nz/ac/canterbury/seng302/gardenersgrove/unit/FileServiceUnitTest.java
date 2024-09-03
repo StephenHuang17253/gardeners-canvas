@@ -3,7 +3,6 @@ package nz.ac.canterbury.seng302.gardenersgrove.unit;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +16,7 @@ class FileServiceUnitTest {
     static void setup() {
         fileService = spy(new FileService());
     }
+
     @Test
     void testFileType_FileIsSVG_ReturnsSVG() {
         assertEquals("image/svg+xml", fileService.getImageFileType("example.svg"));

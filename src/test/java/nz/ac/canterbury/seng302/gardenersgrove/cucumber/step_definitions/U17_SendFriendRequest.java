@@ -303,7 +303,6 @@ public class U17_SendFriendRequest {
     @When("I accept the pending invite from {string}")
     public void i_accept_the_pending_invite_from(String email) throws Exception {
         User user = userService.getUserByEmail(email);
-
         mvcResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .post("/manage-friends")
@@ -331,7 +330,6 @@ public class U17_SendFriendRequest {
         FriendModel friendModel = result.get(result.size() - 1);
         Assertions.assertEquals(friendProfilePicture, friendModel.getFriendProfilePicture());
         Assertions.assertEquals(userName, friendModel.getFriendName());
-
     }
 
     @When("I decline the pending invite from {string}")

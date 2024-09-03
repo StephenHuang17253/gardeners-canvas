@@ -28,7 +28,6 @@ public class GardenTag {
     @Column(name = "tag_status")
     private TagStatus tagStatus = TagStatus.PENDING;
 
-
     /**
      * JPA required no-args constructor
      */
@@ -94,6 +93,5 @@ public class GardenTag {
                 ", TagName='" + tagName +
                 '}';
     }
-
 
 }

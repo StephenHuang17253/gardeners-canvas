@@ -68,6 +68,7 @@ public class PlantService {
 
     /**
      * Retrieves all plants belonging to a particular plant category
+     * 
      * @param plantCategory the plant category used in the query
      * @return a list of plants belonging to that category
      */
@@ -76,8 +77,10 @@ public class PlantService {
     }
 
     /**
-     * Retrieves all plant objects belonging to a particular plant category and garden.
-     * @param garden the garden the plant belongs to
+     * Retrieves all plant objects belonging to a particular plant category and
+     * garden.
+     * 
+     * @param garden        the garden the plant belongs to
      * @param plantCategory the category the plant belongs to
      * @return list of plant objects belonging to that garden and category.
      */
@@ -96,10 +99,12 @@ public class PlantService {
      * @param plantCategory    category the plant belongs to
      * @throws IllegalArgumentException if invalid garden ID
      */
-    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId, PlantCategory plantCategory) {
+    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId,
+            PlantCategory plantCategory) {
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isPresent()) {
-            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get(), plantCategory);
+            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get(),
+                    plantCategory);
             gardenService.addPlantToGarden(gardenId, plant);
             return plantRepository.save(plant);
         } else {
@@ -197,7 +202,6 @@ public class PlantService {
             logger.error(error.getMessage());
         }
     }
-
 
     /**
      * Returns all plants that the user interacted with

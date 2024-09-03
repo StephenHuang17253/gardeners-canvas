@@ -42,8 +42,10 @@ public class LoginUser {
     public static GardenService gardenService;
 
     public static UserService userService;
+
     @Autowired
     private EmailService emailService;
+
     @Autowired
     private TokenService tokenService;
 

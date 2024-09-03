@@ -18,7 +18,7 @@ import org.mockito.Mockito;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public class FriendshipServiceUnitTest {
+class FriendshipServiceUnitTest {
 
     @Mock
     FriendshipRepository friendshipRepository;
@@ -53,7 +53,6 @@ public class FriendshipServiceUnitTest {
         Mockito.when(userService.getUserById(2L)).thenReturn(testUser2);
 
         mockOptionalFriendship = Mockito.mock(Optional.class);
-
     }
 
     @Test
@@ -194,5 +193,4 @@ public class FriendshipServiceUnitTest {
         });
         Mockito.verify(friendshipRepository, Mockito.never()).deleteById(Mockito.anyLong());
     }
-
 }
