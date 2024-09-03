@@ -296,5 +296,21 @@ public class Garden2dControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(username = "janeDoe@email.com")
+    void save2DGarden_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0).getGardenId();
+        List<String> idList = new ArrayList<>();
+        List<Double> xCoordList = new ArrayList<>();
+        List<Double> yCoordList = new ArrayList<>();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
 
 }
