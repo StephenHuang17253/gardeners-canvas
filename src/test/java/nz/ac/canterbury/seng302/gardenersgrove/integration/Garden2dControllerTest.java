@@ -301,14 +301,14 @@ public class Garden2dControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "jane@email.com")
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void save2DGarden_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
         gridItemLocationRepository.deleteAll();
         List<String> idList = new ArrayList<>();
         List<Double> xCoordList = new ArrayList<>();
         List<Double> yCoordList = new ArrayList<>();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/save").with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/save").with(csrf())
                         .param("idList", JSONArray.toJSONString(idList))
                         .param("xCoordList", JSONArray.toJSONString(xCoordList))
                         .param("yCoordList", JSONArray.toJSONString(yCoordList)))
