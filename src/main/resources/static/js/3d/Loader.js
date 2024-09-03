@@ -15,18 +15,7 @@ class Loader {
      */
     constructor() {
         this.manager = new THREE.LoadingManager();
-
-        this.manager.setURLModifier(url => {
-
-            const newBaseUrl = `${BASE_URL}/${getInstance()}`;
-
-            if (url.startsWith('blob:')) {
-                return url;
-            }
-
-            return `${newBaseUrl}${url}`;
-        });
-
+        this.manager.setURLModifier(url => url.startsWith('blob:') ? url : `${BASE_URL}/${getInstance()}${url}`);
         this.textureLoader = new THREE.TextureLoader(this.manager);
         this.gltfLoader = new GLTFLoader(this.manager);
         this.exrLoader = new EXRLoader(this.manager);

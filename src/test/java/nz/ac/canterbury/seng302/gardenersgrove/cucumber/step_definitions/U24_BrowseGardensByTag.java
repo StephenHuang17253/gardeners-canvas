@@ -76,9 +76,7 @@ public class U24_BrowseGardensByTag {
 
     private static GardenTagService gardenTagService;
 
-
     private MvcResult mvcResult;
-
 
     private String currentPageUrl;
     private String searchValue;
@@ -87,7 +85,6 @@ public class U24_BrowseGardensByTag {
 
     @Before
     public void before_or_after_all() {
-
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
@@ -106,7 +103,7 @@ public class U24_BrowseGardensByTag {
     public void theUserHasAGardenCalledThatHasTheTag(String ownersEmail, String gardenName, String tag) {
         User user = userService.getUserByEmail(ownersEmail);
         Garden newGarden = new Garden(gardenName,
-                "", "", "", "", "", "", 0.0, true, "", "",user);
+                "", "", "", "", "", "", 0.0, true, "", "", user);
         targetGarden = gardenService.addGarden(newGarden);
         GardenTag testTagInit = new GardenTag(tag);
         testTagInit.setTagStatus(TagStatus.APPROPRIATE);
@@ -137,10 +134,10 @@ public class U24_BrowseGardensByTag {
     @When("I submit the search with tag")
     public void iSubmitTheSearchWithTag() throws Exception {
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get(currentPageUrl)
-                                .param("appliedTags", appliedTagName)
-                                .param("searchInput", ""))
+                MockMvcRequestBuilders
+                        .get(currentPageUrl)
+                        .param("appliedTags", appliedTagName)
+                        .param("searchInput", ""))
                 .andExpect(status().isOk())
                 .andReturn();
     }
@@ -148,16 +145,16 @@ public class U24_BrowseGardensByTag {
     @When("I submit the search with both search and tag")
     public void iSubmitTheSearchWithBothSearchAndTag() throws Exception {
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get(currentPageUrl)
-                                .param("appliedTags", appliedTagName)
-                                .param("searchInput", searchValue))
+                MockMvcRequestBuilders
+                        .get(currentPageUrl)
+                        .param("appliedTags", appliedTagName)
+                        .param("searchInput", searchValue))
                 .andExpect(status().isOk())
                 .andReturn();
     }
 
     @Then("The search results contain the garden called {string}")
-    public void theSearchResultsContainTheGardenCalled(String gardenName)  {
+    public void theSearchResultsContainTheGardenCalled(String gardenName) {
         Garden wantedGarden = gardenService.getMatchingGardens(gardenName).get(0);
         ModelAndView model = mvcResult.getModelAndView();
         Assertions.assertNotNull(model);

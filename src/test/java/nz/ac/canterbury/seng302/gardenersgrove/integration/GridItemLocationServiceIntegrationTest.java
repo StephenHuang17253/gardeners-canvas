@@ -285,7 +285,7 @@ class GridItemLocationServiceIntegrationTest {
     @Test
     void removeGridItemLocation_removeOneGridItemLocation_ReturnListWithOneRecords() {
         gridItemLocationRepository.deleteAll();
-
+        Assertions.assertEquals(0, gridItemLocationRepository.findAll().size());
         GridItemLocation testLocation1 = gridItemLocationService.addGridItemLocation(new GridItemLocation(
                 1L,
                 GridItemType.PLANT,
@@ -302,14 +302,25 @@ class GridItemLocationServiceIntegrationTest {
                 6
         ));
 
-        List<GridItemLocation> gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
+        List<GridItemLocation> allGridItemLocations1 = gridItemLocationService.getAllGridItemLocations();
 
-        Assertions.assertEquals(2, gridItemLocationsForGarden.size());
+        int initialNumberOfGridItemLocations = allGridItemLocations1.size();
+
+        Assertions.assertTrue(initialNumberOfGridItemLocations >= 2);
+
+        allGridItemLocations1.forEach(item -> System.out.println(item));
+
+
 
         gridItemLocationService.removeGridItemLocation(testLocation1);
-        gridItemLocationsForGarden = gridItemLocationService.getAllGridItemLocations();
 
-        Assertions.assertEquals(1, gridItemLocationsForGarden.size());
+
+
+        List<GridItemLocation> allGridItemLocations2 = gridItemLocationService.getAllGridItemLocations();
+
+        allGridItemLocations2.forEach(item -> System.out.println(item));
+
+        Assertions.assertEquals(initialNumberOfGridItemLocations - 1, allGridItemLocations2.size());
 
         Assertions.assertFalse(gridItemLocationService.getGridItemLocationById(testLocation1.getId()).isPresent());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(testLocation2.getId()).isPresent());

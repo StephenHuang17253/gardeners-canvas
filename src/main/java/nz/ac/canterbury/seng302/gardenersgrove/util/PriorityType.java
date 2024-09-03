@@ -1,13 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.util;
 
 public enum PriorityType {
-    NORMAL ("Normal Priority"),
-    LOW ("Low Priority");
+    NORMAL("Normal Priority"),
+    LOW("Low Priority");
 
     private String message;
 
-    PriorityType (String message)
-    {
+    PriorityType(String message) {
         this.message = message;
     }
 

@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * GridItemLocation Repository object repository accessor using Spring's @link{CrudRepository}.
+ * GridItemLocation Repository object repository accessor using
+ * Spring's @link{CrudRepository}.
  */
 @Repository
 public interface GridItemLocationRepository extends CrudRepository<GridItemLocation, Long> {

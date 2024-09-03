@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-// taken from ATDD workshop
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
@@ -28,14 +27,19 @@ import org.springframework.test.context.ContextConfiguration;
 @SpringBootTest
 @ActiveProfiles("cucumber")
 public class RunCucumberTest {
+
     @MockBean
     public FileService fileservice;
+
     @MockBean
     public WeatherService weatherService;
+
     @MockBean
     public ProfanityService profanityService;
+
     @MockBean
     public EmailService emailService;
+
     @MockBean
     public PlantInfoService plantInfoService;
 }

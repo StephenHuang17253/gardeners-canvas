@@ -19,7 +19,8 @@ import java.util.Optional;
 public class GridItemLocationService {
 
     /**
-     * Interface for generic CRUD operations on a repository for GridItemLocation types.
+     * Interface for generic CRUD operations on a repository for GridItemLocation
+     * types.
      */
     private final GridItemLocationRepository gridItemLocationRepository;
 
@@ -72,8 +73,9 @@ public class GridItemLocationService {
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
 
         List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
-                .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&
-                        gridItem.getYCoordinates() == gridItemLocation.getYCoordinates())).toList();
+                .filter(gridItem -> (gridItem.getXCoordinate() == gridItemLocation.getXCoordinate() &&
+                        gridItem.getYCoordinate() == gridItemLocation.getYCoordinate()))
+                .toList();
 
         if (overlappingLocation.isEmpty()) {
             return gridItemLocationRepository.save(gridItemLocation);
@@ -88,21 +90,24 @@ public class GridItemLocationService {
      * @param gridItemLocation the GridItemLocation to update
      * @return the GridItemLocation to update
      */
-    public GridItemLocation updateGridItemLocation(GridItemLocation gridItemLocation) throws IllegalArgumentException, EntityNotFoundException {
+    public GridItemLocation updateGridItemLocation(GridItemLocation gridItemLocation)
+            throws IllegalArgumentException, EntityNotFoundException {
 
         if (gridItemLocation.getId() == null) {
             throw new IllegalArgumentException("Grid item id cannot be null");
         }
 
-        Optional<GridItemLocation> optionalGridItemLocation = gridItemLocationRepository.findById((gridItemLocation.getId()));
+        Optional<GridItemLocation> optionalGridItemLocation = gridItemLocationRepository
+                .findById((gridItemLocation.getId()));
         if (optionalGridItemLocation.isEmpty()) {
             throw new EntityNotFoundException("Grid item not found");
         }
 
         List<GridItemLocation> gridItemLocationList = getGridItemLocationByGarden(gridItemLocation.getGarden());
         List<GridItemLocation> overlappingLocation = gridItemLocationList.parallelStream()
-                .filter(gridItem -> (gridItem.getXCoordinates() == gridItemLocation.getXCoordinates() &&
-                        gridItem.getYCoordinates() == gridItemLocation.getYCoordinates())).toList();
+                .filter(gridItem -> (gridItem.getXCoordinate() == gridItemLocation.getXCoordinate() &&
+                        gridItem.getYCoordinate() == gridItemLocation.getYCoordinate()))
+                .toList();
         if (overlappingLocation.isEmpty() || (overlappingLocation.size() == 1
                 && Objects.equals(overlappingLocation.get(0).getId(), gridItemLocation.getId()))) {
             return gridItemLocationRepository.save(gridItemLocation);

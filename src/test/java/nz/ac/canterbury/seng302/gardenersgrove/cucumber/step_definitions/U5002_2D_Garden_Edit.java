@@ -53,6 +53,7 @@ public class U5002_2D_Garden_Edit {
 
     @Autowired
     public UserRepository userRepository;
+
     @Autowired
     public SecurityService securityService;
     @Autowired
@@ -76,8 +77,8 @@ public class U5002_2D_Garden_Edit {
         user = userService.getUserByEmail(email);
         garden = user.getGardens().get(0);
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get("/2D-garden/{gardenId}", garden.getGardenId()))
+                MockMvcRequestBuilders
+                        .get("/2D-garden/{gardenId}", garden.getGardenId()))
                 .andExpect(status().isOk()).andReturn();
     }
 
@@ -87,10 +88,10 @@ public class U5002_2D_Garden_Edit {
         Assertions.assertNotNull(modelAndView);
         model = modelAndView.getModel();
 
-        //palette window page
+        // palette window page
         Assertions.assertTrue(model.containsKey("currentPage"));
 
-        //plants
+        // plants
         Assertions.assertTrue(model.containsKey("plants"));
     }
 }

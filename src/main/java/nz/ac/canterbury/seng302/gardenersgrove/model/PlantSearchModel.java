@@ -24,19 +24,21 @@ public class PlantSearchModel {
     /**
      *
      * Helper to capitalize words
+     * 
      * @param input the word to capitalize
      * @return capitalize word string
      */
 
     private String capitalizeWords(String input) {
         return Arrays.stream(input.split(" "))
-                .map(word -> word.isEmpty() ? word :
-                        Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase())
+                .map(word -> word.isEmpty() ? word
+                        : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase())
                 .collect(Collectors.joining(" "));
     }
 
     /**
      * Constructor for a PlantSearchModel
+     * 
      * @param plantList the JSON response from the API.
      */
     public PlantSearchModel(JsonNode plantList) {
@@ -49,6 +51,7 @@ public class PlantSearchModel {
 
     /**
      * Constructor for a PlantSearchModel for default plants
+     * 
      * @param plantInfo entity object
      */
     public PlantSearchModel(PlantInfo plantInfo) {

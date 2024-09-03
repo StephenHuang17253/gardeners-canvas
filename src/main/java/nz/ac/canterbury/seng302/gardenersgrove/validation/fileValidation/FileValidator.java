@@ -4,6 +4,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
+
 /**
  * Tests MultipartFiles on a variety of rules to check if values are valid
  * Returns a type ValidationResult Enum which informs about if a field passes
@@ -38,7 +39,8 @@ public class FileValidator {
     }
 
     /**
-     * Validates a file based on its size given in MB and file type as a FileType enum value
+     * Validates a file based on its size given in MB and file type as a FileType
+     * enum value
      * 
      * @param file     MultiPartFile to validate
      * @param maxSize  Maximum size allowed for file in MB
@@ -67,10 +69,11 @@ public class FileValidator {
         }
 
         String filename = file.getOriginalFilename();
-        
+
         String allFilenames = String.join("|", validFileTypes);
 
-        if (filename == null || !filename.matches("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$")) {
+        if (filename == null
+                || !filename.matches("^[^\\s]+\\.(" + allFilenames + "|" + allFilenames.toUpperCase() + ")$")) {
             this.validationResult = ValidationResult.INVALID_FILE_TYPE;
             this.passState = false;
         } else {
