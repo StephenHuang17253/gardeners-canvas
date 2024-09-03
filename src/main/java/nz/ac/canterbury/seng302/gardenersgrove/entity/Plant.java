@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
  */
 @Entity
 public class Plant {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long plantId;
@@ -146,5 +147,4 @@ public class Plant {
                 ", plant category='" + plantCategory + '\'' +
                 '}';
     }
-
 }

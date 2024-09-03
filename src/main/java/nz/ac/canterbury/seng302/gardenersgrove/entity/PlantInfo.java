@@ -7,35 +7,58 @@ import jakarta.persistence.Id;
 /**
  * Plant Info SpringBoot Entity object
  */
-
 @Entity
 public class PlantInfo {
+
     @Id
     private Long id;
+
     private String name;
+
     private String scientificName;
+
     private String imageURL;
+
     @Column(length = 1024)
     private String description;
+
     @Column(length = 500)
     private String detailJSONResponseString;
+
     private String watering;
+
     private String cycle;
+
     private String wateringPeriod;
+
     private String wateringGeneralBenchmarkValue;
+
     private String wateringGeneralBenchmarkUnit;
+
     private String sunlight;
+
     private String pruningMonth;
+
     private String pruningCountInterval;
+
     private String pruningCountAmount;
+
     private boolean flowers;
+
     private String floweringSeason;
+
     private boolean fruits;
+
     private boolean edibleFruit;
+
     private String fruitSeason;
+
     private boolean poisonousToHumans;
+
     private boolean poisonousToPets;
+
     private String maintenance;
+
     private boolean indoor;
 
     /**
@@ -45,7 +68,7 @@ public class PlantInfo {
     }
 
     /**
-     * Constriuctor for Plant Info entity object
+     * Constructor for Plant Info entity object
      * 
      * @param id                       of the plant that matches
      *                                 https://perenual.com database id of plants
