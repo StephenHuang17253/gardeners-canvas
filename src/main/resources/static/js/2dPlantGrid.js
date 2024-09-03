@@ -84,15 +84,17 @@ const handleAddPlant = (imageSrc, x, y) => {
 
 
         plant.on('click', function (e) {
-            if (selectedPlant) {
-                selectedPlant.stroke(null);
-                selectedPlant.strokeWidth(0);
+            if (!selectedPlantInfo) {
+                if (selectedPlant) {
+                    selectedPlant.stroke(null);
+                    selectedPlant.strokeWidth(0);
+                }
+                selectedPlant = plant;
+                plant.stroke('blue');
+                plant.strokeWidth(4);
+                layer.draw();
+                e.cancelBubble = true;
             }
-            selectedPlant = plant;
-            plant.stroke('blue');
-            plant.strokeWidth(4);
-            layer.draw();
-            e.cancelBubble = true;
         });
 
         layer.add(plant);
@@ -106,11 +108,14 @@ document.querySelectorAll('.plant-item').forEach(item => {
     originalPlantCounts[plantName] = plantCount;
     item.addEventListener('click', function() {
         const currentCount = parseInt(this.getAttribute('data-plant-count'));
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = 'none';
+        }
         if (currentCount > 0) {
             if (highlightedPaletteItem) {
                 highlightedPaletteItem.style.border = 'none';
             }
-            this.style.border = '3px solid blue';
+            this.style.border = '3px solid red';
             highlightedPaletteItem = this;
 
             selectedPlantInfo = {
@@ -141,25 +146,23 @@ stage.on('click', function (e) {
             if (highlightedPaletteItem) {
                 highlightedPaletteItem.setAttribute('data-plant-count', selectedPlantInfo.count);
                 updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
-            }
-
-            selectedPlantInfo = null;
-            if (highlightedPaletteItem) {
                 highlightedPaletteItem.style.border = 'none';
                 highlightedPaletteItem = null;
             }
+
+            selectedPlantInfo = null;
         }
     } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
         selectedPlant.position({x: x, y: y});
         selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
-        layer.draw();
+
 
         selectedPlant = null;
+        layer.draw();
     }
 });
 
