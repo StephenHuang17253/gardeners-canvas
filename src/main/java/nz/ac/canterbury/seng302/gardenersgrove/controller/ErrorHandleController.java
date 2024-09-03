@@ -21,7 +21,9 @@ public class ErrorHandleController implements ErrorController {
     Logger logger = LoggerFactory.getLogger(ErrorHandleController.class);
 
     /**
-     * This method is called when an error occurs in the application. It returns the relevant error page
+     * This method is called when an error occurs in the application. It returns the
+     * relevant error page
+     * 
      * @param request the request object
      * @return the error page to display
      */

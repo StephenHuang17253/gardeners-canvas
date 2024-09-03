@@ -33,7 +33,7 @@ public class Garden2DController {
     private static final int COUNT_PER_PAGE = 6;
 
     @Autowired
-    public Garden2DController(GardenService gardenService, SecurityService securityService){
+    public Garden2DController(GardenService gardenService, SecurityService securityService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
 
@@ -41,9 +41,9 @@ public class Garden2DController {
 
     @GetMapping("/2D-garden/{gardenId}")
     public String getGarden2DPage(@PathVariable Long gardenId,
-                                  @RequestParam(defaultValue = "1") int page,
-                                  HttpServletResponse response,
-                                  Model model){
+            @RequestParam(defaultValue = "1") int page,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /2D-garden/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -62,7 +62,7 @@ public class Garden2DController {
         }
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
-        handlePagniation(page,garden.getPlants().size(),garden.getPlants(),model);
+        handlePagniation(page, garden.getPlants().size(), garden.getPlants(), model);
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
         return "garden2DPage";
@@ -79,8 +79,8 @@ public class Garden2DController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants",plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount",plants.size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount", plants.size());
     }
 
 }
