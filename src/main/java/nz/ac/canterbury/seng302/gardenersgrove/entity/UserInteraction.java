@@ -8,7 +8,8 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 
 /**
- * Entity class of a UserInteraction, reflecting user data related to visiting pages
+ * Entity class of a UserInteraction, reflecting user data related to visiting
+ * pages
  */
 @Entity
 public class UserInteraction {
@@ -33,12 +34,12 @@ public class UserInteraction {
     /**
      * Creates a new UserInteraction object
      *
-     * @param user the user of whom the interaction pertains to
-     * @param itemId the id of the item
-     * @param itemType the item type of the interaction
+     * @param user            the user of whom the interaction pertains to
+     * @param itemId          the id of the item
+     * @param itemType        the item type of the interaction
      * @param interactionTime time of interaction
      */
-    public UserInteraction(User user, Long itemId, ItemType itemType, LocalDateTime interactionTime){
+    public UserInteraction(User user, Long itemId, ItemType itemType, LocalDateTime interactionTime) {
         this.user = user;
         this.itemId = itemId;
         this.itemType = itemType;
@@ -65,7 +66,7 @@ public class UserInteraction {
         return interactionTime;
     }
 
-    public void setInteractionTime(LocalDateTime interactionTime){
+    public void setInteractionTime(LocalDateTime interactionTime) {
         this.interactionTime = interactionTime;
     }
 

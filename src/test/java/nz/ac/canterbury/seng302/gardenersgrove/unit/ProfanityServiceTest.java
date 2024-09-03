@@ -11,127 +11,128 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Date;
 import java.util.List;
 
-
 class ProfanityServiceTest {
 
     private ProfanityService profanityService;
-    HttpClient httpClientMock;
 
-    GardenTagService gardenTagServiceMock;
+    private HttpClient httpClientMock;
+
+    private GardenTagService gardenTagServiceMock;
+
+    private ObjectMapper objectMapper;
+
+    private String profanitySentence = "Hello there John Doe";
+
+    private HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
 
     @BeforeEach
     void init() {
         httpClientMock = Mockito.mock(HttpClient.class);
         gardenTagServiceMock = Mockito.mock(GardenTagService.class);
-        profanityService = new ProfanityService(httpClientMock, gardenTagServiceMock);
-        ReflectionTestUtils.setField(profanityService, "endPoint", "https://gg-content-moderator.cognitiveservices.anImaginaryWebsite.com/");
+        objectMapper = new ObjectMapper();
+        profanityService = new ProfanityService(httpClientMock, gardenTagServiceMock, objectMapper);
+        ReflectionTestUtils.setField(profanityService, "endPoint",
+                "https://gg-content-moderator.cognitiveservices.anImaginaryWebsite.com/");
         ReflectionTestUtils.setField(profanityService, "moderatorKey", "NotARealKey123");
     }
 
     @Test
     void moderateContent_ProfanityMatchesApiCall_CorrectApiCallResponse() throws IOException, InterruptedException {
+        Mockito.when(mockHttpResponse.body()).thenReturn(
+                "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
+        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
+                .thenReturn(mockHttpResponse);
 
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
-        Mockito.when(mockHttpResponse.body()).thenReturn("{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
-        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
-        String profanity_sentence = "Hello there John Doe";
-        Assertions.assertEquals("{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}",
-                profanityService.moderateContent(profanity_sentence).toString());
-
+        Assertions.assertEquals(
+                "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}",
+                profanityService.moderateContent(profanitySentence).toString());
     }
 
     @Test
     void containsProfanity_NoProfanityFound_returnsFalse() throws IOException, InterruptedException {
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
-        Mockito.when(mockHttpResponse.body()).thenReturn("{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":null,\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
-        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
-        String profanity_sentence = "Hello there John Doe";
-        Assertions.assertFalse(profanityService.containsProfanity(profanity_sentence, PriorityType.NORMAL));
+        Mockito.when(mockHttpResponse.body()).thenReturn(
+                "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":null,\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
+        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
+                .thenReturn(mockHttpResponse);
+        Assertions.assertFalse(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
     }
 
     @Test
     void containsProfanity_profanityFound_returnsTrue() throws IOException, InterruptedException {
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
-        Mockito.when(mockHttpResponse.body()).thenReturn("{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
-        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
-        String profanity_sentence = "Hello there John Doe";
-        Assertions.assertTrue(profanityService.containsProfanity(profanity_sentence,PriorityType.NORMAL));
+        Mockito.when(mockHttpResponse.body()).thenReturn(
+                "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
+        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
+                .thenReturn(mockHttpResponse);
+        Assertions.assertTrue(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
     }
 
     @Test
     void containsProfanityCall_BackToBackCalls_CallsRateLimited() throws IOException, InterruptedException {
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
-        Mockito.when(mockHttpResponse.body()).thenReturn("{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
-        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
-        String profanity_sentence = "Hello there John Doe";
-        profanityService.moderateContent(profanity_sentence);
+        Mockito.when(mockHttpResponse.body()).thenReturn(
+                "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
+        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
+                .thenReturn(mockHttpResponse);
+        profanityService.moderateContent(profanitySentence);
         long preSecondCallTime = new Date().getTime();
-        profanityService.moderateContent(profanity_sentence);
+        profanityService.moderateContent(profanitySentence);
         long postSecondCallTime = new Date().getTime();
-
         Assertions.assertTrue((preSecondCallTime + 1100L) < postSecondCallTime);
     }
 
     @Test
     void containsProfanity_inappropriateTagStatusFoundInPersistence_returnsTrue() {
-        String profanity_sentence = "Hello there John Doe";
-        GardenTag matchingTag = new GardenTag(profanity_sentence);
+        GardenTag matchingTag = new GardenTag(profanitySentence);
         matchingTag.setTagStatus(TagStatus.INAPPROPRIATE);
-        Mockito.when(gardenTagServiceMock.getAllSimilar(profanity_sentence)).thenReturn(List.of(matchingTag));
-        Assertions.assertTrue(profanityService.containsProfanity(profanity_sentence,PriorityType.NORMAL));
+        Mockito.when(gardenTagServiceMock.getAllSimilar(profanitySentence)).thenReturn(List.of(matchingTag));
+        Assertions.assertTrue(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
     }
 
     @Test
     void containsProfanity_inappropriateTagStatusFoundInPersistence_doesNotCallAPI() {
-        String profanity_sentence = "Hello there John Doe";
-        GardenTag matchingTag = new GardenTag(profanity_sentence);
+        GardenTag matchingTag = new GardenTag(profanitySentence);
         matchingTag.setTagStatus(TagStatus.INAPPROPRIATE);
-        Mockito.when(gardenTagServiceMock.getAllSimilar(profanity_sentence)).thenReturn(List.of(matchingTag));
-        //checking
-        Assertions.assertTrue(profanityService.containsProfanity(profanity_sentence,PriorityType.NORMAL));
+        Mockito.when(gardenTagServiceMock.getAllSimilar(profanitySentence)).thenReturn(List.of(matchingTag));
+        Assertions.assertTrue(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
         Mockito.verifyNoInteractions(httpClientMock);
     }
 
     @Test
     void containsProfanity_appropriateTagStatusFoundInPersistence_returnsFalse() {
-        String profanity_sentence = "Hello there John Doe";
-        GardenTag matchingTag = new GardenTag(profanity_sentence);
+        GardenTag matchingTag = new GardenTag(profanitySentence);
         matchingTag.setTagStatus(TagStatus.APPROPRIATE);
-        Mockito.when(gardenTagServiceMock.getAllSimilar(profanity_sentence)).thenReturn(List.of(matchingTag));
-        Assertions.assertFalse(profanityService.containsProfanity(profanity_sentence,PriorityType.NORMAL));
+        Mockito.when(gardenTagServiceMock.getAllSimilar(profanitySentence)).thenReturn(List.of(matchingTag));
+        Assertions.assertFalse(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
     }
 
     @Test
     void containsProfanity_appropriateTagStatusFoundInPersistence_doesNotCallAPI() {
-        String profanity_sentence = "Hello there John Doe";
-        GardenTag matchingTag = new GardenTag(profanity_sentence);
+        GardenTag matchingTag = new GardenTag(profanitySentence);
         matchingTag.setTagStatus(TagStatus.APPROPRIATE);
-        Mockito.when(gardenTagServiceMock.getAllSimilar(profanity_sentence)).thenReturn(List.of(matchingTag));
-        //checking
-        Assertions.assertFalse(profanityService.containsProfanity(profanity_sentence,PriorityType.NORMAL));
+        Mockito.when(gardenTagServiceMock.getAllSimilar(profanitySentence)).thenReturn(List.of(matchingTag));
+        Assertions.assertFalse(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
         Mockito.verifyNoInteractions(httpClientMock);
     }
 
-
     @Test
     void containsProfanity_pendingTagStatusFoundInPersistence_callsAPI() throws IOException, InterruptedException {
-        String profanity_sentence = "Hello there John Doe";
-        GardenTag matchingTag = new GardenTag(profanity_sentence);
+        GardenTag matchingTag = new GardenTag(profanitySentence);
         matchingTag.setTagStatus(TagStatus.PENDING);
-        Mockito.when(gardenTagServiceMock.getAllSimilar(profanity_sentence)).thenReturn(List.of(matchingTag));
-        //mock an API response
-        HttpResponse<String> mockHttpResponse = Mockito.mock(HttpResponse.class);
-        Mockito.when(mockHttpResponse.body()).thenReturn("{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
-        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString()))).thenReturn(mockHttpResponse);
-        //checking
-        Assertions.assertTrue(profanityService.containsProfanity(profanity_sentence,PriorityType.NORMAL));
-        Mockito.verify(httpClientMock, Mockito.times(1)).send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString()));
+        Mockito.when(gardenTagServiceMock.getAllSimilar(profanitySentence)).thenReturn(List.of(matchingTag));
+        Mockito.when(mockHttpResponse.body()).thenReturn(
+                "{\"OriginalText\":\"No bad input\",\"NormalizedText\":\" bad input\",\"Misrepresentation\":null,\"Language\":\"eng\",\"Terms\":[{\"Index\":7,\"OriginalIndex\":12,\"ListId\":0,\"Term\":\"BadWord\"}],\"Status\":{\"Code\":3000,\"Description\":\"OK\",\"Exception\":null},\"TrackingId\":\"e7b5c1ba-48cf-4b58-b3f1-41dce34ae0c5\"}");
+        Mockito.when(httpClientMock.send(Mockito.any(), Mockito.eq(HttpResponse.BodyHandlers.ofString())))
+                .thenReturn(mockHttpResponse);
+        Assertions.assertTrue(profanityService.containsProfanity(profanitySentence, PriorityType.NORMAL));
+        Mockito.verify(httpClientMock, Mockito.times(1)).send(Mockito.any(),
+                Mockito.eq(HttpResponse.BodyHandlers.ofString()));
         Mockito.verifyNoMoreInteractions(httpClientMock);
     }
 }

@@ -156,9 +156,8 @@ public class WeatherMonitoring {
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService,objectMapper,gardenTagService, profanityService, userService);
+                weatherService, objectMapper, gardenTagService, profanityService, userService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
-
     }
 
     @Given("I as user {string} is on my garden details page")

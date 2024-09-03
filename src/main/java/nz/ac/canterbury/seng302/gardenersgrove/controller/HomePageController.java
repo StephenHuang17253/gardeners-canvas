@@ -2,23 +2,13 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.model.FriendModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentPlantModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserInteractionService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
+import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.slf4j.Logger;
@@ -58,6 +48,8 @@ public class HomePageController {
     private final UserInteractionService userInteractionService;
     private final WeatherService weatherService;
 
+    private final GridItemLocationService gridItemLocationService;
+
     private static final int PAGE_SIZE = 5;
 
     /**
@@ -70,7 +62,8 @@ public class HomePageController {
     public HomePageController(UserService userService, AuthenticationManager authenticationManager,
                               GardenService gardenService, PlantService plantService,
                               FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
-                              UserInteractionService userInteractionService) {
+                              UserInteractionService userInteractionService,
+                              GridItemLocationService gridItemLocationService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -78,6 +71,7 @@ public class HomePageController {
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
         this.weatherService = weatherService;
+        this.gridItemLocationService = gridItemLocationService;
     }
 
     /**
@@ -133,8 +127,15 @@ public class HomePageController {
             sampleGarden = gardenService.addGarden(sampleGarden);
 
             for (int k = 0; k < 12; k++) {
-                plantService.addPlant("Test Plant #" + k, 2,
+                Plant newPlant = plantService.addPlant("Test Plant #" + k, 2,
                         "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.TREE);
+                GridItemLocation newLocation = new GridItemLocation(
+                        newPlant.getPlantId(),
+                        GridItemType.PLANT,
+                        sampleGarden,
+                        k % 5,
+                        k / 5);
+                gridItemLocationService.addGridItemLocation(newLocation);
             }
         }
 

@@ -9,13 +9,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * GridItemLocation Repository object repository accessor using Spring's @link{CrudRepository}.
+ * GridItemLocation Repository object repository accessor using
+ * Spring's @link{CrudRepository}.
  */
 @Repository
 public interface GridItemLocationRepository extends CrudRepository<GridItemLocation, Long> {
 
     /**
      * Finds a GridItemLocation object by id
+     * 
      * @param id the GridItemLocation's id
      * @return none or a GridItemLocation object
      */
@@ -31,9 +33,9 @@ public interface GridItemLocationRepository extends CrudRepository<GridItemLocat
 
     /**
      * Find all GardenItemLocation objects in repo
+     * 
      * @return list of GridItemLocation objects
      */
     List<GridItemLocation> findAll();
-
 
 }
