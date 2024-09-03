@@ -114,6 +114,7 @@ document.querySelectorAll('.plant-item').forEach(item => {
             highlightedPaletteItem = this;
 
             selectedPlantInfo = {
+
                 name: this.getAttribute('data-plant-name'),
                 image: this.getAttribute('data-plant-image'),
                 count: currentCount
