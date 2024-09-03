@@ -17,6 +17,7 @@ public class GlobalModelAttributeAdvice {
 
     /**
      * Add loggedIn attribute to all controllers
+     * 
      * @param model hashmap of variables that are injected into the view
      */
     @ModelAttribute
@@ -24,6 +25,5 @@ public class GlobalModelAttributeAdvice {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean loggedIn = authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
         model.addAttribute("loggedIn", loggedIn);
-
     }
 }

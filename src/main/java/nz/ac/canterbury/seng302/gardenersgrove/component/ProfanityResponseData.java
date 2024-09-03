@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.ArrayList;
+
 /**
- * This entity class is for representing and processing the response given by the profanity service
+ * This entity class is for representing and processing the response given by
+ * the profanity service
  */
 public class ProfanityResponseData {
     private JsonNode originalText;
@@ -22,7 +24,7 @@ public class ProfanityResponseData {
     private boolean callLimitExceeded;
 
     @JsonCreator
-    public ProfanityResponseData(JsonNode jsonProfanityData){
+    public ProfanityResponseData(JsonNode jsonProfanityData) {
         detectError(jsonProfanityData);
         if (!callLimitExceeded) {
             originalText = jsonProfanityData.get("OriginalText");
@@ -37,6 +39,7 @@ public class ProfanityResponseData {
             setHasProfanity();
         }
     }
+
     public String getOriginalText() {
         return originalText.asText();
     }
@@ -69,7 +72,9 @@ public class ProfanityResponseData {
         return hasProfanity;
     }
 
-    public boolean callLimitExceeded() {return callLimitExceeded;}
+    public boolean callLimitExceeded() {
+        return callLimitExceeded;
+    }
 
     /**
      * Sets the list of found terms from the JSON data.
@@ -82,6 +87,7 @@ public class ProfanityResponseData {
             }
         }
     }
+
     /**
      * Sets status variables from the JSON data.
      */

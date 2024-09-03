@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,22 +40,11 @@ public class PublicGardensController {
 
     @Autowired
     public PublicGardensController(GardenService gardenService, SecurityService securityService,
-                                   FriendshipService friendshipService, GardenTagService gardenTagService) {
+            FriendshipService friendshipService, GardenTagService gardenTagService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.gardenTagService = gardenTagService;
-    }
-
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     * 
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -70,7 +58,7 @@ public class PublicGardensController {
         return "redirect:/public-gardens/search/1";
     }
 
-    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
+    private void handlePagniation(int page, int listLength, List<Plant> plants, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -79,10 +67,9 @@ public class PublicGardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants",plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount",plants.size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount", plants.size());
     }
-
 
     /**
      * returns a page with the 10 most recent public gardens based on search and on
@@ -197,22 +184,18 @@ public class PublicGardensController {
 
         boolean isOwner = (Objects.equals(currentUser.getId(), gardenOwner.getId()));
 
-        if (!garden.getIsPublic() ) {
+        if (!garden.getIsPublic()) {
             FriendshipStatus userOwnerRelationship;
-            if(Objects.equals(gardenOwner.getId(), currentUser.getId()))
-            {
+            if (Objects.equals(gardenOwner.getId(), currentUser.getId())) {
                 userOwnerRelationship = FriendshipStatus.ACCEPTED;
-            }
-            else
-            {
-                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+            } else {
+                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner, currentUser);
             }
 
-
-            if (userOwnerRelationship != FriendshipStatus.ACCEPTED)
-            {
+            if (userOwnerRelationship != FriendshipStatus.ACCEPTED) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+                model.addAttribute("message",
+                        "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
                 return "403";
             }
 
@@ -220,7 +203,7 @@ public class PublicGardensController {
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
-        handlePagniation(page,garden.getPlants().size(),garden.getPlants(),model);
+        handlePagniation(page, garden.getPlants().size(), garden.getPlants(), model);
 
         model.addAttribute("isOwner", isOwner);
         model.addAttribute("garden", new GardenDetailModel(garden));

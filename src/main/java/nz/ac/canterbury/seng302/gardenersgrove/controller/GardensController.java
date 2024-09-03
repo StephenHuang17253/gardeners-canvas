@@ -92,7 +92,6 @@ public class GardensController {
             Model model) {
         logger.info("GET /my-gardens");
 
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
 

@@ -51,7 +51,6 @@ public class SecurityConfiguration {
                 .getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(authProvider);
         return authenticationManagerBuilder.build();
-
     }
 
     /**
@@ -69,19 +68,16 @@ public class SecurityConfiguration {
                 .headers(headers -> headers.frameOptions(Customizer.withDefaults()).disable())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2/**")))
                 .authorizeHttpRequests(request ->
-                // Allow "/", "/register", and "/login" to anyone (permitAll)
 
                 request.requestMatchers("/", "/register", "/login", "/home", "/static/**", "/css/**", "/js/**",
-                        "/Images/**","/images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**", "/reset-password",
-                                "/lost-password", "/reset-password/**","/webjars/**")
+                        "/Images/**", "/images/**", "/img/**", "/error", "/access-denied", "favicon.ico", "/verify/**",
+                        "/reset-password",
+                        "/lost-password", "/reset-password/**", "/webjars/**")
                         .permitAll()
-                        // Any other request requires authentication
                         .anyRequest()
                         .authenticated())
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login").invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID"));
-
         return http.build();
-
     }
 }
