@@ -72,7 +72,6 @@ public class Garden2DController {
         handlePagniation(page, garden.getPlants().size(), garden.getPlants(), model);
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
-        model.addAttribute("plants", garden.getPlants());
         return "garden2DPage";
     }
 
