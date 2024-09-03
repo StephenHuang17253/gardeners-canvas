@@ -196,7 +196,12 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, PlantCategory.valueOf(plantCategory.toUpperCase()));
+        PlantCategory plantCategoryValue = null;
+        if (plantCategory != null) {
+            plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+        }
+
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, plantCategoryValue);
 
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
@@ -356,7 +361,10 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        PlantCategory plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+        PlantCategory plantCategoryValue = null;
+        if (plantCategory != null) {
+            plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+        }
 
         plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate, plantCategoryValue);
         if (!plantPicture.isEmpty()) {
