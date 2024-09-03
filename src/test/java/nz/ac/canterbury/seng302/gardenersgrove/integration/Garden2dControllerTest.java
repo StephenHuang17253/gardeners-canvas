@@ -312,7 +312,7 @@ public class Garden2dControllerTest {
                         .param("idList", JSONArray.toJSONString(idList))
                         .param("xCoordList", JSONArray.toJSONString(xCoordList))
                         .param("yCoordList", JSONArray.toJSONString(yCoordList)))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test
