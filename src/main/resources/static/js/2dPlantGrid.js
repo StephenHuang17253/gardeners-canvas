@@ -83,7 +83,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
             });
         });
 
-        plant.on('click', function (e) {
+        plant.on('click', function (event) {
             if (!selectedPlantInfo) {
                 if (selectedPlant) {
                     selectedPlant.stroke(null);
@@ -93,7 +93,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
                 plant.stroke('blue');
                 plant.strokeWidth(4);
                 layer.draw();
-                e.cancelBubble = true;
+                event.cancelBubble = true;
             }
         });
 
@@ -134,8 +134,8 @@ document.querySelectorAll('.plant-item').forEach(item => {
 /**
  * Handles the clicking of any plant on the stage
  */
-stage.on('click', function (e) {
-    if (selectedPlantInfo && (e.target === stage || e.target.name() === 'grid-cell')) {
+stage.on('click', function (event) {
+    if (selectedPlantInfo && (event.target === stage || event.target.name() === 'grid-cell')) {
         if (selectedPlantInfo.count > 0) {
 
             const mousePos = stage.getPointerPosition();
@@ -154,7 +154,7 @@ stage.on('click', function (e) {
 
             selectedPlantInfo = null;
         }
-    } else if (selectedPlant && (e.target === stage || e.target.name() === 'grid-cell')) {
+    } else if (selectedPlant && (event.target === stage || event.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
@@ -168,7 +168,6 @@ stage.on('click', function (e) {
         // Deselect the plant
         selectedPlant = null;
 
-        // document.querySelectorAll('.plant-item')
     }
 });
 
