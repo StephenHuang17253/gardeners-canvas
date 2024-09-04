@@ -121,10 +121,12 @@ document.querySelectorAll('.plant-item').forEach(item => {
             this.style.border = '3px solid blue';
             highlightedPaletteItem = this;
 
+            const instance = getInstance()
+
             selectedPlantInfo = {
 
                 name: this.getAttribute('data-plant-name'),
-                image: this.getAttribute('data-plant-image'),
+                image: `/${instance}` + this.getAttribute('data-plant-image'),
                 id: this.getAttribute('data-plant-id'),
                 count: currentCount
             };
