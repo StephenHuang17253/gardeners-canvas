@@ -102,6 +102,9 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
     };
 }
 
+/**
+ * Event listener for clicking on palette items
+ */
 document.querySelectorAll('.plant-item').forEach(item => {
     const plantName = item.getAttribute('data-plant-name');
     const plantCount = parseInt(item.getAttribute('data-plant-count'));
@@ -125,8 +128,6 @@ document.querySelectorAll('.plant-item').forEach(item => {
                 id: this.getAttribute('data-plant-id'),
                 count: currentCount
             };
-        } else {
-            console.log("no count?");
         }
     });
 });
@@ -182,6 +183,9 @@ function resetPlantCount(plantItem) {
     updatePlantCountDisplay(plantItem, originalCount);
 }
 
+/**
+ * Clear items from the grid and deselect items
+ */
 const clearAllButton = document.querySelector('.btn.bg-warning');
 if (clearAllButton) {
     clearAllButton.addEventListener('click', function () {
