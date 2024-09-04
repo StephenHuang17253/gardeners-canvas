@@ -142,7 +142,7 @@ stage.on('click', function (e) {
             let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
             let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
             plantCount = plantCount - 1
-            handleAddPlant(selectedPlantInfo.image, x, y)
+            handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
             selectedPlantInfo.count -= 1
 
             if (highlightedPaletteItem) {
