@@ -45,13 +45,6 @@
                          th:data-grid-y="${gridItemLocation.getYCoordinate()}"
                          th:data-grid-objectid="${gridItemLocation.getObjectId()}"
                          th:data-grid-image="${plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename()}">
-
-                        <!-- Iterate through plants to find the matching one -->
-                        <div th:each="plant : ${plants}">
-                            <!-- If plantId matches gridItemLocation's objectId -->
-                            <input type="hidden" id="gridPlantImage" th:if="${plant.getPlantId()} == ${gridItemLocation.getObjectId()}"
-                                 th:value="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
-                        </div>
                     </div>
                 </div>
 
