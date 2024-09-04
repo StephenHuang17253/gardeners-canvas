@@ -159,16 +159,13 @@ if (clearAllButton) {
  * @param fileExtension extension of downloaded file
  */
 function handleExport(fileExtension) {
-    console.log(fileExtension);
-    let dataURL = stage.toDataURL({pixelRatio: 3});
+    let dataURL = stage.toDataURL({mimeType: 'image/'+ (fileExtension === "jpg" ? "jpeg" : fileExtension), pixelRatio: 3});
     let link = document.createElement('a');
-    link.download = document.getElementById("title-2D-Grid").innerText + fileExtension;
-    console.log(link.download);
+    link.download = document.getElementById("title-2D-Grid").innerText + "." + fileExtension;
     link.href = dataURL;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    delete link;
 }
 
 /**
@@ -217,9 +214,9 @@ window.addEventListener('resize', () => {
     stage.draw();
 });
 
-jpgDownloadButton.addEventListener('click', () => handleExport('.jpg'));
-pngDownloadButton.addEventListener('click', () => handleExport('.png'));
-jpegDownloadButton.addEventListener('click', () => handleExport('.jpeg'));
+jpgDownloadButton.addEventListener('click', () => handleExport('jpg'));
+pngDownloadButton.addEventListener('click', () => handleExport('png'));
+jpegDownloadButton.addEventListener('click', () => handleExport('jpeg'));
 
 
 
