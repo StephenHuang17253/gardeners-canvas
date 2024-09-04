@@ -48,6 +48,16 @@ public class PlantService {
     }
 
     /**
+     * Retrieves a plant from the plant service by the id of the plant
+     * @param id id of the plant
+     * @return an optional containing the plant if it exists.
+     */
+    public Optional<Plant> getById(Long id)
+    {
+        return plantRepository.findById(id);
+    }
+
+    /**
      * Retrieves all plants from persistence
      *
      * @return a list of all plant objects saved in persistence
