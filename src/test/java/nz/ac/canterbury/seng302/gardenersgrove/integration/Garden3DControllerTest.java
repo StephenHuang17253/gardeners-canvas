@@ -15,6 +15,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -106,7 +107,7 @@ class Garden3DControllerTest {
                 user1));
         gardenList.add(garden1);
 
-        Plant plant = plantService.addPlant("test plant", 1, "hello", null, garden1.getGardenId(), null);
+        Plant plant = plantService.addPlant("test plant", 1, "hello", null, garden1.getGardenId(), PlantCategory.POT_PLANT);
         GridItemLocation newLocation = new GridItemLocation(
                 plant.getPlantId(),
                 GridItemType.PLANT,
