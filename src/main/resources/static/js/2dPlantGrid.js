@@ -151,6 +151,18 @@ if (clearAllButton) {
     });
 }
 
+
+// function from https://stackoverflow.com/a/15832662/512042
+function downloadURI(uri, name) {
+    var link = document.createElement('a');
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    delete link;
+}
+
 /**
  * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
  */
@@ -159,6 +171,9 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
     let idList = [];
     let xCoordList = [];
     let yCoordList = [];
+
+    var dataURL = stage.toDataURL({pixelRatio: 3});
+    downloadURI(dataURL, 'stage.jpg');
 
     // Assuming 'layer.find('Image')' is correctly defined elsewhere
     layer.find('Image').forEach(node => {
@@ -183,6 +198,7 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
     } else {
         console.error('One or more hidden inputs not found');
     }
+
 });
 
 window.addEventListener('resize', () => {
