@@ -24,15 +24,18 @@
                     <button type="button" class="btn bg-warning text-white mb-2">Clear All</button>
                 </div>
                 <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
-                    <div class="w-100 plant-item" th:data-plant-name="${plant.getPlantName()}"
+                    <div class="w-100 plant-item"
+                         th:data-plant-name="${plant.getPlantName()}"
+                         th:data-plant-count="${plant.getPlantCount()}"
                          th:data-plant-id="${plant.getPlantId()}"
                          th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
                         <img th:src="@{${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}}"
                              alt="Plant"
                              class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
                              style="max-width: 100px;">
-                        <a class="d-block break-word text-white mt-2"
-                           th:text="${plant.getPlantCount() > 0} ? ${plant.getPlantName()} + ' (x' + ${plant.getPlantCount()} + ')' : ${plant.getPlantName()}"></a>
+                        <a id="total" class="d-block break-word text-white mt-2" th:text="${plant.getPlantCount() > 0} ? ${plant.getPlantName()} + ' (x' + ${plant.getPlantCount()} + ')' : ${plant.getPlantName()}"></a>
+                        <p id="placed" class="d-block break-word mt-0 mb-0 text-white"> </p>
+                        <p id="remaining" class="d-block break-word mt-0 mb-0 text-white"> </p>
                     </div>
                 </div>
             </div>
