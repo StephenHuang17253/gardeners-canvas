@@ -50,13 +50,13 @@ let selectedPlant = null;
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y) => {
+const handleAddPlant = (imageSrc, x, y, plantId) => {
     plantPosition -= 10;
     let currentPlantName = plantName + plantPosition.toString();
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
-    plantImage.onload = function() {
+    plantImage.onload = function () {
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -64,6 +64,7 @@ const handleAddPlant = (imageSrc, x, y) => {
             width: GRID_SIZE,
             height: GRID_SIZE,
             name: plantName,
+            id: plantId.toString(),
             draggable: true,
         });
 
@@ -77,7 +78,6 @@ const handleAddPlant = (imageSrc, x, y) => {
                 y: y,
             });
         });
-
 
         plant.on('click', function (e) {
             if (selectedPlant) {
@@ -97,7 +97,7 @@ const handleAddPlant = (imageSrc, x, y) => {
 }
 
 document.querySelectorAll('.plant-item').forEach(item => {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function () {
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = 'none';
         }
@@ -106,7 +106,8 @@ document.querySelectorAll('.plant-item').forEach(item => {
 
         selectedPlantInfo = {
             name: this.getAttribute('data-plant-name'),
-            image: this.getAttribute('data-plant-image')
+            image: this.getAttribute('data-plant-image'),
+            id: this.getAttribute('data-plant-id')
         };
     });
 });
@@ -119,7 +120,7 @@ stage.on('click', function (e) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-        handleAddPlant(selectedPlantInfo.image, x, y)
+        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
         selectedPlantInfo = null;
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = 'none';
@@ -144,11 +145,45 @@ stage.on('click', function (e) {
 
 const clearAllButton = document.querySelector('.btn.bg-warning');
 if (clearAllButton) {
-    clearAllButton.addEventListener('click', function() {
+    clearAllButton.addEventListener('click', function () {
         layer.find('Image').forEach(node => node.destroy());
         layer.draw();
     });
 }
+
+/**
+ * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
+ */
+document.getElementById('saveGardenForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    let idList = [];
+    let xCoordList = [];
+    let yCoordList = [];
+
+    // Assuming 'layer.find('Image')' is correctly defined elsewhere
+    layer.find('Image').forEach(node => {
+        idList.push(node.id());
+        xCoordList.push(node.x());
+        yCoordList.push(node.y());
+    });
+
+    // Ensure these elements exist
+    let idListInput = document.getElementById("idList");
+    let xCoordListInput = document.getElementById("xCoordList");
+    let yCoordListInput = document.getElementById("yCoordList");
+
+
+    if (idListInput && xCoordListInput && yCoordListInput) {
+        idListInput.value = JSON.stringify(idList);
+        xCoordListInput.value = JSON.stringify(xCoordList);
+        yCoordListInput.value = JSON.stringify(yCoordList);
+        // Manually submit the form
+        event.target.submit();
+
+    } else {
+        console.error('One or more hidden inputs not found');
+    }
+});
 
 window.addEventListener('resize', () => {
     const newWidth = container.clientWidth;
