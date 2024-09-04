@@ -22,8 +22,8 @@ public class WeatherModel {
      * WeatherModel Constructor for JSON construction
      */
     public WeatherModel(String weatherIcon, String date, String description,
-                        String minTemp, String maxTemp, String currentTemp,
-                        String precipitation, Integer humidity, String error, String day) {
+            String minTemp, String maxTemp, String currentTemp,
+            String precipitation, Integer humidity, String error, String day) {
         this.weatherIcon = weatherIcon;
         this.date = date;
         this.description = description;
@@ -52,14 +52,13 @@ public class WeatherModel {
         this.day = dailyWeather.getDay();
     }
 
-
-
     public String getWeatherIcon() {
         return weatherIcon;
     }
 
     /**
      * Returns this date in format
+     * 
      * @return formatted date in dd/MM
      */
     public String getDate() {
@@ -68,32 +67,31 @@ public class WeatherModel {
 
     /**
      * Returns this day
+     * 
      * @return day in three letters such as SUN, MON, etc.
      */
     public String getDay() {
         return this.day;
     }
+
     public String getDescription() {
         return (description == null) ? null : description;
     }
+
     public String getMinTemp() {
         return minTemp;
     }
-
-
 
     public String getMaxTemp() {
         return this.maxTemp;
     }
 
-
     public String getTemp() {
         return currentTemp;
     }
 
-
     public String getPrecipitation() {
-        return (precipitation == null) ? null : precipitation.toString();
+        return (precipitation == null) ? null : precipitation;
     }
 
     public String getHumidity() {

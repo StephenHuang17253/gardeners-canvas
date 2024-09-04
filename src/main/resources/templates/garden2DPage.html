@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:replace="~{fragments/header.html}"><title>Garden</title></head>
+
+<head th:replace="~{fragments/header.html}">
+    <title>Garden</title>
+</head>
+
 <body style="height: 100vh">
-<div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 
 <div class="d-flex h-100">
-    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark align-items-center" style="width: 20vw; max-height: 90vh; overflow-y: auto;">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark align-items-center"
+         style="width: 20vw; max-height: 90vh; overflow-y: auto;">
         <span class="fs-4">Palette Window</span>
         <hr>
+
         <div class="container">
+
             <div class="row mb-4">
                 <div class="d-flex flex-row justify-content-center">
-                    <button type="button" class="btn bg-success text-white mb-2">Save Garden</button>
+                    <button type="submit" id="saveGarden" class="btn bg-success text-white mb-2" form="saveGardenForm">
+                        Save Garden
+                    </button>
                     <button type="button" class="btn bg-warning text-white mb-2">Clear All</button>
                 </div>
-                <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
-                    <div class="w-100 plant-item" th:data-plant-name="${plant.getPlantName()}" th:data-plant-count="${plant.getPlantCount()}" th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
+                    <div class="w-100 plant-item" th:data-plant-name="${plant.getPlantName()}"
+                         th:data-plant-count="${plant.getPlantCount()}"
+                         th:data-plant-id="${plant.getPlantId()}"
+                         th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
                         <img th:src="@{${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}}"
                              alt="Plant"
                              class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
@@ -24,27 +35,33 @@
                         <p id="placed" class="d-block break-word mt-0 mb-0 text-white"> </p>
                         <p id="remaining" class="d-block break-word mt-0 mb-0 text-white"> </p>
                     </div>
-                </div>
+                </>
             </div>
         </div>
+        <form th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm" method="post">
+            <input type="hidden" id="idList" name="idList" th:value="''"/>
+            <input type="hidden" id="xCoordList" name="xCoordList" th:value="''"/>
+            <input type="hidden" id="yCoordList" name="yCoordList" th:value="''"/>
+        </form>
 
-        <div class="mt-auto">
-            <div th:replace="~{fragments/plant2DPaginationNav.html}"
-                 th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
+            <div class="mt-auto">
+                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
                               startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                </div>
+                <hr>
+                <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn bg-success text-white">Return to
+                    Garden Details</a>
             </div>
-            <hr>
-            <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn bg-success text-white">Return to Garden Details</a>
+        </div>
+        <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+            <div class="bg-white p-2 text-center">
+                <h1 class="break-word" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
+            </div>
+            <div id="container" class="flex-grow-1 overflow-auto"></div>
         </div>
     </div>
-    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
-        <div class="bg-white p-2 text-center">
-            <h1 class="break-word" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
-        </div>
-        <div id="container" class="flex-grow-1 overflow-auto"></div>
-    </div>
-</div>
 
-<script th:src="@{/js/2dPlantGrid.js}"></script>
+    <script th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
+
 </html>

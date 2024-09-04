@@ -6,7 +6,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 /**
- * Entity class of a Friendship, reflecting a many-to-many relationship between users
+ * Entity class of a Friendship, reflecting a many-to-many relationship between
+ * users
  */
 @Entity
 @Table(name = "friendship_table")
@@ -36,8 +37,8 @@ public class Friendship {
      * Creates a new Friendship object
      * NOTE the ordering
      *
-     * @param user1 IMPORTANT the user that sent the request
-     * @param user2 IMPORTANT the user that received the request
+     * @param user1  IMPORTANT the user that sent the request
+     * @param user2  IMPORTANT the user that received the request
      * @param status enum status of the two users relationship
      */
     public Friendship(User user1, User user2, FriendshipStatus status) {
@@ -62,9 +63,13 @@ public class Friendship {
         return user1;
     }
 
-    public void setUser1(User user) { this.user1 = user;}
+    public void setUser1(User user) {
+        this.user1 = user;
+    }
 
-    public void setUser2(User user) { this.user2 = user;}
+    public void setUser2(User user) {
+        this.user2 = user;
+    }
 
     public User getUser2() {
         return user2;

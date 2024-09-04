@@ -28,6 +28,8 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const link = document.createElement('a');
 const gardenName = 'My Favourite Garden';
 
+const gardenId = document.getElementById("gardenId").value;
+
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
  */
@@ -82,6 +84,7 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.position.copy(position);
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
+    console.log("new model")
 };
 
 init();
@@ -120,13 +123,22 @@ creeperModel.traverse((child) => {
     }
 });
 
-addModelToScene(fernModel, new THREE.Vector3(0, 0, 20), 1);
-addModelToScene(creeperModel, new THREE.Vector3(0, 0, -20), 0.5);
-addModelToScene(treeModel, new THREE.Vector3(10, 0, 0), 5);
-addModelToScene(flowerModel, new THREE.Vector3(-10, 0, 0), 10);
-addModelToScene(shrubModel, new THREE.Vector3(-20, 0, 0), 10);
-addModelToScene(potplantModel, new THREE.Vector3(20, 0, 0), 5);
-addModelToScene(climberModel, new THREE.Vector3(0, 0, 0), 5);
+/**
+ * Adds a plant or decoration object to the scene.
+ * 
+ * @param {Object} plantOrDecoration - The plant or decoration object to be added.
+ * @returns {Promise<void>} - A promise that resolves when the object is added to the scene.
+ */
+const addObjectToScene = async (plantOrDecoration) => {
+    const x = (plantOrDecoration.xCoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
+    const z = (plantOrDecoration.yCoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
+    const position = new THREE.Vector3(x, 0, z);
+    addModelToScene(await loader.loadModel('fern.glb', 'fern'), position, 1);
+};
+
+const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
+const placedGardenObjects = await response.json();
+await placedGardenObjects.forEach((element) => addObjectToScene(element));
 
 /**
  * Renders the scene

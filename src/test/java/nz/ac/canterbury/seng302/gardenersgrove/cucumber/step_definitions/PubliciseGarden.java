@@ -97,7 +97,6 @@ public class PubliciseGarden {
 
     @Before
     public void before_or_after_all() {
-
         profanityService = Mockito.mock(ProfanityService.class);
         weatherService = Mockito.mock(WeatherService.class);
 
@@ -112,10 +111,8 @@ public class PubliciseGarden {
 
         mockMVCMyGarden = MockMvcBuilders.standaloneSetup(myGardensController).build();
         mockMVCGardenForm = MockMvcBuilders.standaloneSetup(gardenFormController).build();
-
     }
 
-    // AC1
     @Given("User {string} is on my garden details page for {string}")
     public void userIsOnMyGardenDetailsPageFor(String userEmail, String garden) {
         user = userService.getUserByEmail(userEmail);
@@ -123,7 +120,6 @@ public class PubliciseGarden {
         Assertions.assertEquals(garden, userGarden.getGardenName());
     }
 
-    // AC1
     @When("I mark a checkbox labelled \"Make my garden public\"")
     public void iMarkACheckboxLabelledMakeMyGardenPublic() throws Exception {
         String myGardenUrl = String.format("/my-gardens/%d/public", userGarden.getGardenId());
@@ -133,23 +129,19 @@ public class PubliciseGarden {
                         .param("makeGardenPublic", String.valueOf(true))
                         .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
-
     }
 
-    // AC1
     @Then("My garden will be visible in search results")
     public void myGardenWillBeVisibleInSearchResults() {
         Optional<Garden> testGarden = gardenService.getGardenById(userGarden.getGardenId());
         Assertions.assertTrue(testGarden.get().getIsPublic());
     }
 
-    // AC2, AC4
     @When("I add an optional description")
     public void iAddAnOptionalDescription() {
         description = "is a vegetable patch";
     }
 
-    // AC3,AC5
     @When("I remove the description of the garden")
     public void iRemoveTheDescriptionOfTheGarden() {
         description = "";
@@ -191,7 +183,6 @@ public class PubliciseGarden {
                         .param("latitude", "-43.5214643")
                         .param("longitude", "172.5796159"))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
-
     }
 
     @Then("the new description is persisted")
@@ -199,7 +190,6 @@ public class PubliciseGarden {
         newGarden = gardenService.getAllUsersGardens(user.getId())
                 .get(gardenService.getAllUsersGardens(user.getId()).size() - 1);
         Assertions.assertEquals(description, newGarden.getGardenDescription());
-
     }
 
     @Then("the new description is deleted")

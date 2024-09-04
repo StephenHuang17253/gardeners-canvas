@@ -5,7 +5,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 
 /**
- * Model class for storing plant data for showing recently added plants on the home page
+ * Model class for storing plant data for showing recently added plants on the
+ * home page
  */
 public class RecentPlantModel {
     private final Long plantId;

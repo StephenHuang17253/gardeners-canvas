@@ -45,8 +45,11 @@ public class addUserProfilePicture {
     public TokenRepository tokenRepository;
 
     public EmailService emailService;
+
     public FileService fileService;
+
     public UserService userService;
+
     @Autowired
     public SecurityService securityService;
 
@@ -75,8 +78,7 @@ public class addUserProfilePicture {
 
         Mockito.when(userService.getUserByEmail(Mockito.any())).thenReturn(mockUser);
 
-
-        ProfileController profileController = new ProfileController(authenticationManager,userService,
+        ProfileController profileController = new ProfileController(authenticationManager, userService,
                 fileService, emailService, securityService);
 
         // Allows us to bypass spring security
@@ -85,37 +87,41 @@ public class addUserProfilePicture {
                 .build();
     }
 
-
     @Given("I choose a valid profile picture")
     public void i_choose_a_valid_profile_picture() {
         mockImage = new MockMultipartFile("profilePictureInput", "test.jpg",
                 "image/jpg", "Not Actually a picture".getBytes());
     }
 
-    @WithMockUser(username="johndoe.test@email.com")
+    @WithMockUser(username = "johndoe.test@email.com")
     @When("I submit my profile picture")
     public void i_submit_my_profile_picture() throws Exception {
         mockMVC.perform(
                 MockMvcRequestBuilders
                         .multipart("/profile").file(mockImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(csrf())
-        );
+                        .with(csrf()));
     }
+
     @Then("My profile picture is updated")
     public void my_profile_picture_is_updated() {
-        Mockito.verify(userService, Mockito.atLeastOnce()).updateProfilePictureFilename(Mockito.anyString(),Mockito.anyLong());
+        Mockito.verify(userService, Mockito.atLeastOnce()).updateProfilePictureFilename(Mockito.anyString(),
+                Mockito.anyLong());
     }
+
     @Given("I choose a non png nor jpg nor svg profile picture")
     public void i_choose_a_non_png_jpg_svg_profile_picture() {
         mockImage = new MockMultipartFile("profilePictureInput", "test.tif",
                 "image/tif", "Not Actually a picture".getBytes());
 
     }
+
     @Then("My profile picture is not updated")
     public void my_profile_picture_is_not_updated() {
-        Mockito.verify(userService, Mockito.never()).updateProfilePictureFilename(Mockito.anyString(),Mockito.anyLong());
+        Mockito.verify(userService, Mockito.never()).updateProfilePictureFilename(Mockito.anyString(),
+                Mockito.anyLong());
     }
+
     @Given("I choose a profile picture larger than 10MB")
     public void i_choose_a_profile_picture_larger_than_10mb() {
         byte[] bytes = new byte[1024 * 1024 * 10];

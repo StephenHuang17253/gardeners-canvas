@@ -58,19 +58,19 @@ const updateTagAutocompleteDropdown = (tagSuggestions) => {
     clearTagAutocompleteDropdown();
 
     tagAutocompleteDropdown.style.width = `${tagField.offsetWidth}px`
-     tagSuggestions.forEach(tag => {
-         const listElement = document.createElement("li");
-         listElement.classList.add("list-group-item", "py-2");
-         const div = document.createElement("div");
-         div.textContent = getDisplayString(tag);
-         div.classList.add("cursor-pointer", "darken-on-hover", "rounded", "p-2");
-         div.style.overflowWrap = "break-word";
-         div.style.textAlign = "left"
-         div.addEventListener("click", () => handleTagSuggestionClicked(tag));
-         listElement.appendChild(div);
-         tagAutocompleteDropdown.appendChild(listElement);
+    tagSuggestions.forEach(tag => {
+        const listElement = document.createElement("li");
+        listElement.classList.add("list-group-item", "py-2");
+        const div = document.createElement("div");
+        div.textContent = getDisplayString(tag);
+        div.classList.add("cursor-pointer", "darken-on-hover", "rounded", "p-2");
+        div.style.overflowWrap = "break-word";
+        div.style.textAlign = "left"
+        div.addEventListener("click", () => handleTagSuggestionClicked(tag));
+        listElement.appendChild(div);
+        tagAutocompleteDropdown.appendChild(listElement);
 
-     });
+    });
 }
 
 /**
@@ -125,7 +125,7 @@ const handleTagClick = (event) => {
  */
 const fetchTagData = async (query) => {
     const instance = getInstance();
-    const response =  await fetch(`/${instance}tag/suggestions?query=${query}`)
+    const response = await fetch(`/${instance}tag/suggestions?query=${query}`)
     return await response.json();
 }
 

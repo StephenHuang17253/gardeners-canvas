@@ -31,13 +31,16 @@ import org.slf4j.LoggerFactory;
  */
 @Service
 public class ProfanityService {
+
+    Logger logger = LoggerFactory.getLogger(ProfanityService.class);
+
     @Value("${azure.moderator.token}")
     private String moderatorKey;
+
     @Value("${azure.service.endpoint}")
     private String endPoint;
-    Logger logger = LoggerFactory.getLogger(ProfanityService.class);
+
     private final HttpClient httpClient;
-    ObjectMapper objectMapper = new ObjectMapper();
 
     private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
     private static final long RATE_LIMIT_DELAY_MS = 1500;
@@ -46,19 +49,19 @@ public class ProfanityService {
 
     Random random = new Random();
 
-    /**
-     * Service to handle tag database checks.
-     */
     private final GardenTagService gardenTagService;
+
+    private final ObjectMapper objectMapper;
 
     /**
      * General constructor for profanity service, creates new http client.
      * always use this constructor when running real api calls
      */
     @Autowired
-    public ProfanityService(GardenTagService gardenTagService) {
+    public ProfanityService(GardenTagService gardenTagService, ObjectMapper objectMapper) {
         httpClient = HttpClient.newHttpClient();
         this.gardenTagService = gardenTagService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -70,9 +73,11 @@ public class ProfanityService {
      *                             testing the Profanity service
      * @param gardenTagServiceMock mocked garden service for unit testing.
      */
-    public ProfanityService(HttpClient httpClientMock, GardenTagService gardenTagServiceMock) {
+    public ProfanityService(HttpClient httpClientMock, GardenTagService gardenTagServiceMock,
+            ObjectMapper objectMapper) {
         httpClient = httpClientMock;
         this.gardenTagService = gardenTagServiceMock;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -95,7 +100,6 @@ public class ProfanityService {
             return null;
         }
         return moderateContentApiCall(content);
-
     }
 
     /**
@@ -130,7 +134,6 @@ public class ProfanityService {
             Thread.currentThread().interrupt();
             return null;
         }
-
     }
 
     private ProfanityResponseData moderateContentApiCall(String content) {
@@ -210,7 +213,6 @@ public class ProfanityService {
         if (inputString.matches(emptyRegex)) {
             return false;
         }
-
         // Checking if the input is a tag stored in database with allocated status.
         List<TagStatus> previousOccurrenceOfTag = gardenTagService.getAllSimilar(inputString).stream()
                 .map(GardenTag::getTagStatus).toList();
@@ -242,6 +244,5 @@ public class ProfanityService {
             }
         }
         Thread.sleep(timeToWait);
-
     }
 }

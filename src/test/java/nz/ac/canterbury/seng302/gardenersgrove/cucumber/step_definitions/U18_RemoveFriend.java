@@ -67,7 +67,6 @@ public class U18_RemoveFriend {
 
     private MvcResult mvcResult;
 
-    // Setup
     @Before
     public void before_or_after_all() {
 
@@ -77,12 +76,10 @@ public class U18_RemoveFriend {
 
         ManageFriendsController manageFriendsController = new ManageFriendsController(friendshipService,
                 securityService, userService, userInteractionService);
-        // Allows us to bypass spring security
         mockMVC = MockMvcBuilders.standaloneSetup(manageFriendsController).build();
 
     }
 
-    // AC1
     @When("I cancel my friend request to {string}")
     public void i_cancel_my_friend_request_to(String receiverEmail) throws Exception {
         User user = userService.getUserByEmail(receiverEmail);
@@ -95,7 +92,6 @@ public class U18_RemoveFriend {
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
 
-    // AC1
     @When("There is user {string} who is logged in with {string}")
     public void there_is_user_who_is_logged_in(String userEmail, String userPassword) throws Exception {
         mockMVC.perform(
@@ -105,7 +101,6 @@ public class U18_RemoveFriend {
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/home"));
     }
 
-    // AC1
     @Then("I cannot see or accept the friend request from {string}")
     public void they_cannot_see_or_accept_my_friend_request(String senderEmail) throws Exception {
         User user = userService.getUserByEmail(senderEmail);
@@ -116,13 +111,13 @@ public class U18_RemoveFriend {
                 .andExpect(status().isOk()).andReturn();
         ModelAndView model = mvcResult.getModelAndView();
         Assertions.assertNotNull(model);
-        List<RequestFriendModel> result = (List<RequestFriendModel>) model.getModelMap().getAttribute("pendingFriends");
+        List<RequestFriendModel> result = (List<RequestFriendModel>) model.getModelMap()
+                .getAttribute("pendingFriends");
         Assertions.assertNotNull(result);
         RequestFriendModel requestFriendModel = result.get(result.size() - 1);
         Assertions.assertNotEquals(userName, requestFriendModel.getFriendName());
     }
 
-    // AC2
     @When("I hit the 'Remove Friend' button for user {string}")
     public void i_hit_remove_friend_button_for_user(String email) throws Exception {
 
@@ -136,7 +131,6 @@ public class U18_RemoveFriend {
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
 
-    // AC2
     @Then("That friend {string} is removed from my friends list")
     public void that_friend_is_removed_from_my_friends_list(String email) throws Exception {
 
@@ -153,5 +147,4 @@ public class U18_RemoveFriend {
         FriendModel friendModel = result.get(result.size() - 1);
         Assertions.assertNotEquals(userName, friendModel.getFriendName());
     }
-
 }
