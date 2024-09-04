@@ -3,7 +3,9 @@ const stageHeight = window.innerHeight * 0.9;
 const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
 const GRID_COLUMNS = 7;
 const GRID_ROWS = 7;
-
+const jpgDownloadButton = document.getElementById("download-jpg")
+const pngDownloadButton = document.getElementById("download-png")
+const jpegDownloadButton = document.getElementById("download-jpeg")
 
 // Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
@@ -151,12 +153,18 @@ if (clearAllButton) {
     });
 }
 
-
-// function from https://stackoverflow.com/a/15832662/512042
-function downloadURI(uri, name) {
-    var link = document.createElement('a');
-    link.download = name;
-    link.href = uri;
+/**
+ * Downloads image of 2D garden grid
+ * Based on function from https://stackoverflow.com/a/15832662/512042
+ * @param fileExtension extension of downloaded file
+ */
+function handleExport(fileExtension) {
+    console.log(fileExtension);
+    let dataURL = stage.toDataURL({pixelRatio: 3});
+    let link = document.createElement('a');
+    link.download = document.getElementById("title-2D-Grid").innerText + fileExtension;
+    console.log(link.download);
+    link.href = dataURL;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -171,9 +179,6 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
     let idList = [];
     let xCoordList = [];
     let yCoordList = [];
-
-    var dataURL = stage.toDataURL({pixelRatio: 3});
-    downloadURI(dataURL, 'stage.jpg');
 
     // Assuming 'layer.find('Image')' is correctly defined elsewhere
     layer.find('Image').forEach(node => {
@@ -201,6 +206,9 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
 
 });
 
+
+
+
 window.addEventListener('resize', () => {
     const newWidth = container.clientWidth;
     const newHeight = container.clientHeight;
@@ -208,6 +216,10 @@ window.addEventListener('resize', () => {
     stage.height(newHeight);
     stage.draw();
 });
+
+jpgDownloadButton.addEventListener('click', () => handleExport('.jpg'));
+pngDownloadButton.addEventListener('click', () => handleExport('.png'));
+jpegDownloadButton.addEventListener('click', () => handleExport('.jpeg'));
 
 
 
