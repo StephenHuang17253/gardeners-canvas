@@ -128,13 +128,13 @@ public class HomePageController {
 
             for (int k = 0; k < 12; k++) {
                 Plant newPlant = plantService.addPlant("Test Plant #" + k, 2,
-                        "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.TREE);
+                        "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.CLIMBER);
                 GridItemLocation newLocation = new GridItemLocation(
                         newPlant.getPlantId(),
                         GridItemType.PLANT,
                         sampleGarden,
-                        k % 5,
-                        k / 5);
+                        k % 7,
+                        k / 7);
                 gridItemLocationService.addGridItemLocation(newLocation);
             }
         }
@@ -183,7 +183,7 @@ public class HomePageController {
 
                 for (int k = 0; k < 1; k++) {
                     plantService.addPlant("Test Plant " + k, 2,
-                            "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.TREE);
+                            "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.CLIMBER);
                 }
 
             }

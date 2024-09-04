@@ -3,15 +3,15 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
+import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +37,16 @@ public class Garden3DController {
     private final SecurityService securityService;
     private final FriendshipService friendshipService;
 
+    private final PlantService plantService;
+
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
-            FriendshipService friendshipService, GridItemLocationService gridItemLocationService) {
+                              FriendshipService friendshipService, GridItemLocationService gridItemLocationService, PlantService plantService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
+        this.plantService = plantService;
     }
 
     @GetMapping("/3D-garden/{gardenId}")
@@ -113,10 +116,22 @@ public class Garden3DController {
 
         List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        displayableItems = plantLocations.stream()
-                .map(plantLocation -> new DisplayableItem(plantLocation.getXCoordinate(),
-                        plantLocation.getYCoordinate(), "testName", "testModel"))
-                .toList();
+        for (GridItemLocation plantLocation: plantLocations)
+        {
+            if(plantLocation.getItemType() == GridItemType.PLANT)
+            {
+                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getId());
+                if (optionalPlant.isPresent())
+                {
+                    Plant currentPlant = optionalPlant.get();
+                    displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
+                            plantLocation.getYCoordinate(),
+                            currentPlant.getPlantName(),
+                            currentPlant.getPlantCategory().getModelName(),
+                            currentPlant.getPlantCategory().getScaleFactor()));
+                }
+            }
+        }
 
         return displayableItems;
     }
