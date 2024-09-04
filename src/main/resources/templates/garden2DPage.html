@@ -38,6 +38,24 @@
                         <p id="remaining" class="d-block break-word mt-0 mb-0 text-white"> </p>
                     </div>
                 </div>
+
+                <div th:each="gridItemLocation : ${gridItemLocations}">
+                    <div class="grid-item-location"
+                         th:data-grid-x="${gridItemLocation.getXCoordinate()}"
+                         th:data-grid-y="${gridItemLocation.getYCoordinate()}"
+                         th:data-grid-objectid="${gridItemLocation.getObjectId()}"
+                         th:data-grid-image="${plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename()}">
+
+                        <!-- Iterate through plants to find the matching one -->
+                        <div th:each="plant : ${plants}">
+                            <!-- If plantId matches gridItemLocation's objectId -->
+                            <input type="hidden" id="gridPlantImage" th:if="${plant.getPlantId()} == ${gridItemLocation.getObjectId()}"
+                                 th:value="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
         <form th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm" method="post">
@@ -63,7 +81,7 @@
     </div>
 
     <script th:src="@{/js/2dPlantGrid.js}"></script>
-    <script th:src="@{/js/getInstance.js}"></script>
+
 </body>
 
 </html>

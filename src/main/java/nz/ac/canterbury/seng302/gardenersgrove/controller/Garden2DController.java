@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 public class Garden2DController {
@@ -72,8 +74,14 @@ public class Garden2DController {
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
         handlePagniation(page, garden.getPlants().size(), garden.getPlants(), model);
+
+        Map<Long, Plant> plantsById = garden.getPlants().stream()
+                .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
+
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
+        model.addAttribute("gridItemLocations", gridItemLocationService.getGridItemLocationByGarden(garden));
+        model.addAttribute("plantsById", plantsById);
         return "garden2DPage";
     }
 

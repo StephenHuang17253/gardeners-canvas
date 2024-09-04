@@ -51,6 +51,37 @@ let selectedPlantInfo = null;
 let highlightedPaletteItem = null;
 let selectedPlant = null;
 
+document.querySelectorAll('.grid-item-location').forEach(item => {
+    const x_coord = parseInt(item.getAttribute('data-grid-x'));
+    const y_coord = parseInt(item.getAttribute('data-grid-y'));
+    const plantId = item.getAttribute('data-grid-objectid');
+    console.log(plantId)
+
+    console.log(item.getAttribute('data-grid-image'))
+
+    const plantImage = new Image();
+
+    plantImage.src = item.getAttribute('data-grid-image');
+    plantImage.onload = function () {
+        const plant = new Konva.Image({
+            x: x_coord,
+            y: y_coord,
+            image: plantImage,
+            width: GRID_SIZE,
+            height: GRID_SIZE,
+            name: plantName,
+            id: plantId.toString(),
+            draggable: true,
+        });
+
+        console.log(plant)
+
+        layer.add(plant);
+        layer.draw();
+    }
+
+});
+
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
@@ -106,9 +137,20 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
  * Event listener for clicking on palette items
  */
 document.querySelectorAll('.plant-item').forEach(item => {
+    const instance = getInstance();
+    let plantImage;
+
+    if (instance === "test/" || instance === "prod/") {
+        plantImage = `/${instance}` + item.getAttribute('data-plant-image')
+    } else {
+        plantImage = item.getAttribute('data-plant-image')
+    }
+
     const plantName = item.getAttribute('data-plant-name');
     const plantCount = parseInt(item.getAttribute('data-plant-count'));
+
     originalPlantCounts[plantName] = plantCount;
+
     item.addEventListener('click', function() {
         const currentCount = parseInt(this.getAttribute('data-plant-count'));
         if (highlightedPaletteItem) {
@@ -121,12 +163,11 @@ document.querySelectorAll('.plant-item').forEach(item => {
             this.style.border = '3px solid blue';
             highlightedPaletteItem = this;
 
-            const instance = getInstance()
+            const instance = getInstance();
 
             selectedPlantInfo = {
-
                 name: this.getAttribute('data-plant-name'),
-                image: `/${instance}` + this.getAttribute('data-plant-image'),
+                image: plantImage,
                 id: this.getAttribute('data-plant-id'),
                 count: currentCount
             };
