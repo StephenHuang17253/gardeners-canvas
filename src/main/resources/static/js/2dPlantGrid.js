@@ -3,7 +3,9 @@ const stageHeight = window.innerHeight * 0.9;
 const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
 const GRID_COLUMNS = 7;
 const GRID_ROWS = 7;
-
+const jpgDownloadButton = document.getElementById("download-jpg")
+const pngDownloadButton = document.getElementById("download-png")
+const jpegDownloadButton = document.getElementById("download-jpeg")
 
 // Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
@@ -237,6 +239,21 @@ function updatePlantCountDisplay(plantItem, count) {
 }
 
 /**
+ * Downloads image of 2D garden grid
+ * Based on function from https://stackoverflow.com/a/15832662/512042
+ * @param fileExtension extension of downloaded file
+ */
+function handleExport(fileExtension) {
+    let dataURL = stage.toDataURL({mimeType: 'image/'+ (fileExtension === "jpg" ? "jpeg" : fileExtension), pixelRatio: 3});
+    let link = document.createElement('a');
+    link.download = document.getElementById("title-2D-Grid").innerText + "." + fileExtension;
+    link.href = dataURL;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+/**
  * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
  */
 document.getElementById('saveGardenForm').addEventListener('submit', function (event) {
@@ -268,7 +285,11 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
     } else {
         console.error('One or more hidden inputs not found');
     }
+
 });
+
+
+
 
 window.addEventListener('resize', () => {
     const newWidth = container.clientWidth;
@@ -277,6 +298,10 @@ window.addEventListener('resize', () => {
     stage.height(newHeight);
     stage.draw();
 });
+
+jpgDownloadButton.addEventListener('click', () => handleExport('jpg'));
+pngDownloadButton.addEventListener('click', () => handleExport('png'));
+jpegDownloadButton.addEventListener('click', () => handleExport('jpeg'));
 
 
 

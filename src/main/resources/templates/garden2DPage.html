@@ -8,6 +8,7 @@
 <body style="height: 100vh">
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 
+
 <div class="d-flex h-100">
     <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark align-items-center"
          style="width: 20vw; max-height: 90vh; overflow-y: auto;">
@@ -54,13 +55,32 @@
                 <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn btn-secondary text-white d-block mx-auto">Cancel</a>
             </div>
         </div>
-        <div class="d-flex flex-column flex-grow-1 overflow-hidden">
-            <div class="bg-white p-2 text-center">
-                <h1 class="break-word" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
-            </div>
-            <div id="container" class="flex-grow-1 overflow-auto"></div>
+
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+        <div class="bg-white p-2 text-center">
+            <h1 class="break-word" id="title-2D-Grid" th:text="'2D View for ' + ${garden.getGardenName()}">Garden
+                Name</h1>
+        </div>
+        <div id="container" class="flex-grow-1 overflow-auto"></div>
+        <div class="dropdown position-absolute end-0 m-3">
+            <button class="btn btn-success dropdown-toggle" id="export-dropdown" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                Export Layout
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button class="dropdown-item" id="download-jpeg">JPEG</button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="download-jpg">JPG</button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="download-png">PNG</button>
+                </li>
+            </ul>
         </div>
     </div>
+</div>
 
     <script th:src="@{/js/2dPlantGrid.js}"></script>
     <script th:src="@{/js/getInstance.js}"></script>
