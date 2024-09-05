@@ -30,6 +30,13 @@ const stage = new Konva.Stage({
 const layer = new Konva.Layer();
 stage.add(layer);
 
+function convertToKonvaCoordinates(gridItemX, gridItemY) {
+    const konvaX = gridItemX * GRID_SIZE + offsetX;
+    const konvaY = gridItemY * GRID_SIZE + offsetY;
+    return { x: konvaX, y: konvaY };
+}
+
+
 // Create grid
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
@@ -63,9 +70,10 @@ document.querySelectorAll('.grid-item-location').forEach(item => {
 
     plantImage.src = item.getAttribute('data-grid-image');
     plantImage.onload = function () {
+        const konvaPos = convertToKonvaCoordinates(x_coord, y_coord);
         const plant = new Konva.Image({
-            x: x_coord,
-            y: y_coord,
+            x: konvaPos.x,
+            y: konvaPos.y,
             image: plantImage,
             width: GRID_SIZE,
             height: GRID_SIZE,
@@ -92,6 +100,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
     plantImage.src = imageSrc;
 
     plantImage.onload = function () {
+        // const konvaPos = gridToKonvaCoordinates(x, y);
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -289,8 +298,11 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
     // Assuming 'layer.find('Image')' is correctly defined elsewhere
     layer.find('Image').forEach(node => {
         idList.push(node.id());
-        xCoordList.push(node.x());
-        yCoordList.push(node.y());
+        // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
+        const x_coord = Math.round((node.x() - offsetX) / GRID_SIZE);
+        const y_coord = Math.round((node.y() - offsetY) / GRID_SIZE);
+        xCoordList.push(x_coord);
+        yCoordList.push(y_coord);
     });
 
     // Ensure these elements exist
