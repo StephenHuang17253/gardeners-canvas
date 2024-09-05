@@ -7,9 +7,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden2DController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -54,15 +56,19 @@ public class U5002_2D_Garden_Edit {
 
     @Autowired
     public SecurityService securityService;
-
+    @Autowired
+    public GridItemLocationService gridItemLocationService;
+    @Autowired
+    public GridItemLocationRepository gridItemLocationRepository;
     private Map<String, Object> model;
 
     @Before
     public void before_or_after_all() {
         gardenService = new GardenService(gardenRepository, userService);
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
+        gridItemLocationService = new GridItemLocationService(gridItemLocationRepository);
 
-        Garden2DController garden2DController = new Garden2DController(gardenService, securityService);
+        Garden2DController garden2DController = new Garden2DController(gardenService, securityService, gridItemLocationService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
 

@@ -89,7 +89,7 @@ public class PublicGardensController {
 
         List<String> paramList = new ArrayList<>();
 
-        if (!searchInput.equals("")) {
+        if (!searchInput.isEmpty()) {
             paramList.add("searchInput=" + searchInput);
         }
 

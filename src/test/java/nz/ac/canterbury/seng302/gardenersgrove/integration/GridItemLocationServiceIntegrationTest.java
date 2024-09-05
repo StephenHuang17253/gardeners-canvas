@@ -18,6 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -95,7 +96,7 @@ class GridItemLocationServiceIntegrationTest {
         );
         testGridItemLocation.setId(1L);
 
-        Assertions.assertThrows(EntityNotFoundException.class,() -> {
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {
             gridItemLocationService.updateGridItemLocation(testGridItemLocation);
         });
     }
@@ -110,7 +111,7 @@ class GridItemLocationServiceIntegrationTest {
                 0,
                 6
         );
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gridItemLocationService.updateGridItemLocation(testGridItemLocation);
         });
     }
@@ -149,7 +150,7 @@ class GridItemLocationServiceIntegrationTest {
                 6
         );
         gridItemLocationService.addGridItemLocation(testGridItemLocation1);
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gridItemLocationService.addGridItemLocation(testGridItemLocation2);
         });
     }
@@ -173,8 +174,8 @@ class GridItemLocationServiceIntegrationTest {
                 6
         );
 
-        GridItemLocation savedGrid1 =  gridItemLocationService.addGridItemLocation(testGridItemLocation1);
-        GridItemLocation savedGrid2 =  gridItemLocationService.addGridItemLocation(testGridItemLocation2);
+        GridItemLocation savedGrid1 = gridItemLocationService.addGridItemLocation(testGridItemLocation1);
+        GridItemLocation savedGrid2 = gridItemLocationService.addGridItemLocation(testGridItemLocation2);
 
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(savedGrid1.getId()).isPresent());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(savedGrid2.getId()).isPresent());
@@ -307,27 +308,113 @@ class GridItemLocationServiceIntegrationTest {
 
         Assertions.assertTrue(initialNumberOfGridItemLocations >= 2);
 
-        allGridItemLocations1.forEach(item -> System.out.println(item));
-
-        System.out.println(initialNumberOfGridItemLocations);
-
-
-
-        System.out.println(testLocation1);
-
         gridItemLocationService.removeGridItemLocation(testLocation1);
-
 
 
         List<GridItemLocation> allGridItemLocations2 = gridItemLocationService.getAllGridItemLocations();
 
-        allGridItemLocations2.forEach(item -> System.out.println(item));
-
-        System.out.println(allGridItemLocations2.size());
 
         Assertions.assertEquals(initialNumberOfGridItemLocations - 1, allGridItemLocations2.size());
 
         Assertions.assertFalse(gridItemLocationService.getGridItemLocationById(testLocation1.getId()).isPresent());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationById(testLocation2.getId()).isPresent());
+
+
     }
+
+
+    @Test
+    void getMatchingGridItem_validParams_returnsCorrectMatch() {
+        gridItemLocationRepository.deleteAll();
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                7
+        ));
+
+        GridItemLocation testLocation2 = gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D2,
+                1,
+                6
+        ));
+
+        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(GridItemType.PLANT, 1L, garden2D2);
+        Assertions.assertTrue(matchingGridItem.isPresent());
+        Assertions.assertEquals(testLocation2.getItemType(), matchingGridItem.get().getItemType());
+        Assertions.assertEquals(testLocation2.getGarden().getGardenId(), matchingGridItem.get().getGarden().getGardenId());
+        Assertions.assertEquals(testLocation2.getId(), matchingGridItem.get().getId());
+        Assertions.assertEquals(testLocation2.getXCoordinate(), matchingGridItem.get().getXCoordinate());
+        Assertions.assertEquals(testLocation2.getYCoordinate(), matchingGridItem.get().getYCoordinate());
+    }
+
+    @Test
+    void getMatchingGridItem_invalidGridItemType_returnsEmpty() {
+        gridItemLocationRepository.deleteAll();
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                7
+        ));
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D2,
+                1,
+                6
+        ));
+
+        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(GridItemType.DECORATION, 1L, garden2D);
+        Assertions.assertTrue(matchingGridItem.isEmpty());
+    }
+
+    @Test
+    void getMatchingGridItem_invalidItemID_returnsEmpty() {
+        gridItemLocationRepository.deleteAll();
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                7
+        ));
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D2,
+                1,
+                6
+        ));
+
+        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(GridItemType.PLANT, 2L, garden2D2);
+        Assertions.assertTrue(matchingGridItem.isEmpty());
+    }
+
+    @Test
+    void getMatchingGridItem_invalidGarden_returnsEmpty() {
+        gridItemLocationRepository.deleteAll();
+
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(
+                1L,
+                GridItemType.PLANT,
+                garden2D,
+                2,
+                7
+        ));
+
+        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(GridItemType.PLANT, 1L, garden2D2);
+        Assertions.assertTrue(matchingGridItem.isEmpty());
+    }
+
+
 }

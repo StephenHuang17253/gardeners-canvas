@@ -117,7 +117,7 @@ public class Plant {
 
     public PlantCategory getPlantCategory() {
         if (this.plantCategory == null) {
-            this.plantCategory = PlantCategory.POT_PLANT;
+            this.plantCategory = PlantCategory.HERB;
         }
         return this.plantCategory;
     }
