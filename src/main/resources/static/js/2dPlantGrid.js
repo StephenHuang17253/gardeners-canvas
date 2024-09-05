@@ -247,7 +247,6 @@ function updatePlantCountDisplay(plantItem, count) {
 
 /**
  * Downloads image of 2D garden grid
- * Based on function from https://stackoverflow.com/a/15832662/512042
  * @param fileExtension extension of downloaded file
  */
 const handleExport = async (fileExtension) => {
