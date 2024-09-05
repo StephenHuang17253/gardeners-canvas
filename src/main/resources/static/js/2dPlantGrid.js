@@ -58,6 +58,9 @@ let selectedPlantInfo = null;
 let highlightedPaletteItem = null;
 let selectedPlant = null;
 
+/**
+ * Loads the persisted plants from a saved layout onto the grid.
+ */
 document.querySelectorAll('.grid-item-location').forEach(item => {
     const x_coord = parseInt(item.getAttribute('data-grid-x'));
     const y_coord = parseInt(item.getAttribute('data-grid-y'));
@@ -108,9 +111,35 @@ document.querySelectorAll('.grid-item-location').forEach(item => {
 
         layer.add(plant);
         layer.draw();
+
+        updateCountersOnLoad(plantId);
     }
 
 });
+
+/**
+ * Updates a plant's placed & remaining counters when the saved layout loads.
+ * @param plantId id of the plant whose counters are being updated
+ */
+function updateCountersOnLoad(plantId) {
+    const plantItem = document.querySelector(`.plant-item[data-plant-id="${plantId}"]`)
+
+    if (plantItem) {
+        const count = parseInt(plantItem.getAttribute('data-plant-count'))
+        const placedCount = originalPlantCounts[plantItem.getAttribute('data-plant-name')] - count;
+
+        const placedElement = plantItem.querySelector('#placed');
+        const remainingElement = plantItem.querySelector('#remaining');
+
+        if (placedElement && remainingElement) {
+            placedElement.textContent = `Placed: ${placedCount + 1}`;
+            remainingElement.textContent = `Remaining: ${count - 1}`;
+        }
+
+        plantItem.setAttribute('data-plant-count', count - 1);
+    }
+
+}
 
 /**
  * Handles the adding of a plant to the stage produced by konva
