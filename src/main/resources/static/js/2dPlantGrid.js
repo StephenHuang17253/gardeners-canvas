@@ -82,7 +82,29 @@ document.querySelectorAll('.grid-item-location').forEach(item => {
             draggable: true,
         });
 
-        console.log(plant)
+        plant.on('dragmove', function () {
+            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+
+            plant.position({
+                x: x,
+                y: y,
+            });
+        });
+
+        plant.on('click', function (event) {
+            if (!selectedPlantInfo) {
+                if (selectedPlant) {
+                    selectedPlant.stroke(null);
+                    selectedPlant.strokeWidth(0);
+                }
+                selectedPlant = plant;
+                plant.stroke('blue');
+                plant.strokeWidth(4);
+                layer.draw();
+                event.cancelBubble = true;
+            }
+        });
 
         layer.add(plant);
         layer.draw();
