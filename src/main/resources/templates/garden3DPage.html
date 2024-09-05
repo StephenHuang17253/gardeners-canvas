@@ -32,20 +32,20 @@
         <div class="dropdown position-absolute top-0 end-0 m-3">
             <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown"
                 aria-expanded="false">
-            Export Layout
-        </button>
-        <ul class="dropdown-menu">
-            <li>
-                <button class="dropdown-item" id="download-gltf">GLTF</button>
-            </li>
-            <li>
-                <button class="dropdown-item" id="download-jpg">JPEG</button>
-            </li>
-            <li>
-                <button class="dropdown-item" id="download-obj">OBJ</button>
-            </li>
-        </ul>
-    </div>
+                Export Layout
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button class="dropdown-item" id="download-gltf">GLTF</button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="download-jpg">JPEG</button>
+                </li>
+                <li>
+                    <button class="dropdown-item" id="download-obj">OBJ</button>
+                </li>
+            </ul>
+        </div>
 
         <div id="loading-div"
             class="position-absolute w-100 h-100 bg-success d-flex align-items-center justify-content-center">
@@ -82,7 +82,7 @@
     </footer>
 
     <input id="gardenId" type="hidden" th:value="${garden.getGardenId()}">
-
+    <input id="gardenName" type="text" th:value="${garden.getGardenName()}">
 
     <script type="module" th:src="@{/js/3d/3dMain.js}"></script>
 </body>
