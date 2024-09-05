@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
@@ -82,13 +83,17 @@ public class Garden2DController {
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
 
-        plants.sort(Comparator.comparing(Plant::getPlantName));
+        List<Plant2DModel> plantModels = plants.stream()
+                .sorted(Comparator.comparing(Plant::getPlantName))
+                .map(Plant2DModel::new)
+                .toList();
+
 
         model.addAttribute("currentPage", page);
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("plants", plantModels.subList(startIndex, endIndex));
         model.addAttribute("plantCount", plants.size());
     }
 

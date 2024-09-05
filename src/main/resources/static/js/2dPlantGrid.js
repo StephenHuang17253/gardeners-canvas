@@ -3,6 +3,7 @@ const stageHeight = window.innerHeight * 0.9;
 const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
 const GRID_COLUMNS = 7;
 const GRID_ROWS = 7;
+const TREE_SIZE = 50;
 
 
 // Calculate the total grid width and height
@@ -38,7 +39,7 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             y: j * GRID_SIZE + offsetY,
             width: GRID_SIZE,
             height: GRID_SIZE,
-            fill: 'green',
+            fill: '#76ad4c',
             stroke: 'black',
             strokeWidth: 1,
             name: 'grid-cell',
@@ -54,19 +55,23 @@ let selectedPlant = null;
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y, plantId) => {
+const handleAddPlant = (imageSrc, x, y, plantId, plantCategory) => {
     plantPosition -= 10;
     let currentPlantName = plantName + plantPosition.toString();
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
     plantImage.onload = function () {
+        let size = GRID_SIZE;
+        if(plantCategory === 'Tree'){
+            size += TREE_SIZE;
+        }
         const plant = new Konva.Image({
             x: x,
             y: y,
             image: plantImage,
-            width: GRID_SIZE,
-            height: GRID_SIZE,
+            width: size,
+            height: size,
             name: plantName,
             id: plantId.toString(),
             draggable: true,
@@ -96,7 +101,6 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
                 event.cancelBubble = true;
             }
         });
-
         layer.add(plant);
         layer.draw();
     };
@@ -121,18 +125,20 @@ document.querySelectorAll('.plant-item').forEach(item => {
             this.style.border = '3px solid blue';
             highlightedPaletteItem = this;
 
-            const instance = getInstance()
+            const inst = getInstance();
 
             selectedPlantInfo = {
 
                 name: this.getAttribute('data-plant-name'),
-                image: `/${instance}` + this.getAttribute('data-plant-image'),
+                image: `/${inst}` + this.getAttribute('data-category-image'),
                 id: this.getAttribute('data-plant-id'),
-                count: currentCount
+                count: currentCount,
+                category: this.getAttribute('data-plant-category')
             };
         }
     });
 });
+
 
 /**
  * Handles the clicking of any plant on the stage
@@ -142,10 +148,14 @@ stage.on('click', function (event) {
         if (selectedPlantInfo.count > 0) {
 
             const mousePos = stage.getPointerPosition();
-            let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+            let offset = 0;
+            if(selectedPlantInfo.category === 'Tree'){
+                offset += TREE_SIZE/2;
+            }
+            let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX-offset;
+            let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY-offset;
             plantCount = plantCount - 1
-            handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
+            handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id, selectedPlantInfo.category)
             selectedPlantInfo.count -= 1
 
             if (highlightedPaletteItem) {
@@ -153,14 +163,21 @@ stage.on('click', function (event) {
                 updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
                 highlightedPaletteItem.style.border = 'none';
                 highlightedPaletteItem = null;
+
             }
 
             selectedPlantInfo = null;
         }
     } else if (selectedPlant && (event.target === stage || event.target.name() === 'grid-cell')) {
         const mousePos = stage.getPointerPosition();
-        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+        let offset = 0;
+        const plantImageObject = selectedPlant.image();
+        let plantImagePath = new URL(plantImageObject.src).pathname;
+        if(plantImagePath === "/" + getInstance() + 'images/2d-plant-types/tree.png'){
+            offset += TREE_SIZE/2;
+        }
+        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX-offset;
+        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY-offset;
 
         selectedPlant.position({x: x, y: y});
         selectedPlant.stroke(null);
