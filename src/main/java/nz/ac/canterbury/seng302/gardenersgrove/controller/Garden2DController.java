@@ -19,8 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -135,7 +135,12 @@ public class Garden2DController {
      * @return redirect back to 2D garden grid
      */
     @PostMapping("/2D-garden/{gardenId}/save")
-    public String save2DGarden(@PathVariable Long gardenId, @RequestParam(value = "idList", required = false) String idList, @RequestParam(value = "xCoordList", required = false) String xCoordList, @RequestParam(value = "yCoordList", required = false) String yCoordList, HttpServletResponse response, Model model) {
+    public String save2DGarden(@PathVariable Long gardenId,
+                               @RequestParam(value = "idList", required = false) String idList,
+                               @RequestParam(value = "xCoordList", required = false) String xCoordList,
+                               @RequestParam(value = "yCoordList", required = false) String yCoordList,
+                               HttpServletResponse response,
+                               Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -193,5 +198,49 @@ public class Garden2DController {
         return "redirect:/2D-garden/{gardenId}";
     }
 
+    /**
+     * Endpoint for clearing all elements from the 2D garden grid.
+     * NOTE: Currently all gridItems are plants, decorations feature hasn't been added.
+     *
+     * @param gardenId   id of the garden whose grid has to be saved
+     * @param response   http response to use to return error
+     * @param model      model to use to return error
+     * @return redirect back to 2D garden grid
+     */
+    @PostMapping("/2D-garden/{gardenId}/clear")
+    public String clear2DGarden(@PathVariable Long gardenId,
+                               HttpServletResponse response,
+                               Model model) {
+        logger.info("POST /2D-garden/{}/clear", gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Garden garden = optionalGarden.get();
+        model.addAttribute("gardenId", garden.getGardenId());
+
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
+                    "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+            return "403";
+        }
+
+        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
+
+        for (GridItemLocation gridItem : gridItems) {
+            try {
+                gridItemLocationService.removeGridItemLocation(gridItem);
+            } catch (Exception exception) {
+                logger.error("Error removing grid item with id {}: {}", gridItem.getId(), exception.getMessage());
+            }
+        }
+
+        return "redirect:/2D-garden/{gardenId}";
+    }
 
 }
