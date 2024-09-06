@@ -1,9 +1,13 @@
+import { Downloader } from "./Downloader.js";
+
 const stageWidth = window.innerWidth * 0.8;
 const stageHeight = window.innerHeight * 0.9;
 const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
 const GRID_COLUMNS = 7;
 const GRID_ROWS = 7;
-
+const jpgDownloadButton = document.getElementById("download-jpg");
+const pngDownloadButton = document.getElementById("download-png");
+const jpegDownloadButton = document.getElementById("download-jpeg");
 
 // Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
@@ -19,13 +23,18 @@ let plantCount = 0;
 
 const originalPlantCounts = {};
 
-const saveGardenButton = document.querySelector('.btn.bg-success');
-
 const stage = new Konva.Stage({
     width: stageWidth,
     height: stageHeight,
-    container: 'container'
+    container: "container"
 });
+
+const gardenName = document.getElementById("gardenName").value;
+
+// link used to download files
+const link = document.createElement("a");
+
+const downloader = new Downloader(link);
 
 const layer = new Konva.Layer();
 stage.add(layer);
@@ -45,10 +54,10 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             y: j * GRID_SIZE + offsetY,
             width: GRID_SIZE,
             height: GRID_SIZE,
-            fill: 'green',
-            stroke: 'black',
+            fill: "green",
+            stroke: "black",
             strokeWidth: 1,
-            name: 'grid-cell',
+            name: "grid-cell",
         });
         layer.add(rect);
     }
@@ -151,7 +160,6 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
     plantImage.src = imageSrc;
 
     plantImage.onload = function () {
-        // const konvaPos = gridToKonvaCoordinates(x, y);
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -164,7 +172,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
         });
 
 
-        plant.on('dragmove', function () {
+        plant.on("dragmove", function () {
             let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
             let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
@@ -174,14 +182,14 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
             });
         });
 
-        plant.on('click', function (event) {
+        plant.on("click", function (event) {
             if (!selectedPlantInfo) {
                 if (selectedPlant) {
                     selectedPlant.stroke(null);
                     selectedPlant.strokeWidth(0);
                 }
                 selectedPlant = plant;
-                plant.stroke('blue');
+                plant.stroke("blue");
                 plant.strokeWidth(4);
                 layer.draw();
                 event.cancelBubble = true;
@@ -196,39 +204,39 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
 /**
  * Event listener for clicking on palette items
  */
-document.querySelectorAll('.plant-item').forEach(item => {
+document.querySelectorAll(".plant-item").forEach(item => {
     const instance = getInstance();
     let plantImage;
 
     if (instance === "test/" || instance === "prod/") {
-        plantImage = `/${instance}` + item.getAttribute('data-plant-image')
+        plantImage = `/${instance}` + item.getAttribute("data-plant-image")
     } else {
-        plantImage = item.getAttribute('data-plant-image')
+        plantImage = item.getAttribute("data-plant-image")
     }
 
-    const plantName = item.getAttribute('data-plant-name');
-    const plantCount = parseInt(item.getAttribute('data-plant-count'));
+    const plantName = item.getAttribute("data-plant-name");
+    const plantCount = parseInt(item.getAttribute("data-plant-count"));
 
     originalPlantCounts[plantName] = plantCount;
 
-    item.addEventListener('click', function() {
+    item.addEventListener("click", function() {
         const currentCount = parseInt(this.getAttribute('data-plant-count'));
         if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = 'none';
+            highlightedPaletteItem.style.border = "none";
         }
         if (currentCount > 0) {
             if (highlightedPaletteItem) {
-                highlightedPaletteItem.style.border = 'none';
+                highlightedPaletteItem.style.border = "none";
             }
-            this.style.border = '3px solid blue';
+            this.style.border = "3px solid blue";
             highlightedPaletteItem = this;
 
             const instance = getInstance();
 
             selectedPlantInfo = {
-                name: this.getAttribute('data-plant-name'),
+                name: this.getAttribute("data-plant-name"),
                 image: plantImage,
-                id: this.getAttribute('data-plant-id'),
+                id: this.getAttribute("data-plant-id"),
                 count: currentCount
             };
         }
@@ -238,8 +246,8 @@ document.querySelectorAll('.plant-item').forEach(item => {
 /**
  * Handles the clicking of any plant on the stage
  */
-stage.on('click', function (event) {
-    if (selectedPlantInfo && (event.target === stage || event.target.name() === 'grid-cell')) {
+stage.on("click", function (event) {
+    if (selectedPlantInfo && (event.target === stage || event.target.name() === "grid-cell")) {
         if (selectedPlantInfo.count > 0) {
 
             const mousePos = stage.getPointerPosition();
@@ -250,20 +258,20 @@ stage.on('click', function (event) {
             selectedPlantInfo.count -= 1
 
             if (highlightedPaletteItem) {
-                highlightedPaletteItem.setAttribute('data-plant-count', selectedPlantInfo.count);
+                highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
                 updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
-                highlightedPaletteItem.style.border = 'none';
+                highlightedPaletteItem.style.border = "none";
                 highlightedPaletteItem = null;
             }
 
             selectedPlantInfo = null;
         }
-    } else if (selectedPlant && (event.target === stage || event.target.name() === 'grid-cell')) {
+    } else if (selectedPlant && (event.target === stage || event.target.name() === "grid-cell")) {
         const mousePos = stage.getPointerPosition();
         let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
         let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
-        selectedPlant.position({x: x, y: y});
+        selectedPlant.position({ x: x, y: y });
         selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
 
@@ -280,27 +288,27 @@ stage.on('click', function (event) {
  * @param {HTMLElement} plantItem - The plant item element
  */
 function resetPlantCount(plantItem) {
-    const plantName = plantItem.getAttribute('data-plant-name');
+    const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
-    plantItem.setAttribute('data-plant-count', originalCount);
+    plantItem.setAttribute("data-plant-count", originalCount);
     updatePlantCountDisplay(plantItem, originalCount);
 }
 
 /**
  * Clear items from the grid and deselect items
  */
-const clearAllButton = document.querySelector('.btn.bg-warning');
+const clearAllButton = document.querySelector(".btn.bg-warning");
 if (clearAllButton) {
-    clearAllButton.addEventListener('click', function () {
-        layer.find('Image').forEach(node => node.destroy());
+    clearAllButton.addEventListener("click", function () {
+        layer.find("Image").forEach(node => node.destroy());
         layer.draw();
 
-        document.querySelectorAll('.plant-item').forEach(item => {
+        document.querySelectorAll(".plant-item").forEach(item => {
             resetPlantCount(item);
         });
         selectedPlantInfo = null;
         if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = 'none';
+            highlightedPaletteItem.style.border = "none";
             highlightedPaletteItem = null;
         }
     });
@@ -312,14 +320,14 @@ if (clearAllButton) {
  * @param {number} count - The new count
  */
 function updatePlantCountDisplay(plantItem, count) {
-    const plantName = plantItem.getAttribute('data-plant-name');
+    const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
-    const countDisplay = plantItem.querySelector('a');
+    const countDisplay = plantItem.querySelector("a");
 
     // Select the <a> elements by their ids
-    const totalElement = plantItem.querySelector('#total');
-    const placedElement = plantItem.querySelector('#placed');
-    const remainingElement = plantItem.querySelector('#remaining');
+    const totalElement = plantItem.querySelector("#total");
+    const placedElement = plantItem.querySelector("#placed");
+    const remainingElement = plantItem.querySelector("#remaining");
 
     // Update the total <a> element
     if (totalElement) {
@@ -338,16 +346,31 @@ function updatePlantCountDisplay(plantItem, count) {
 }
 
 /**
+ * Downloads image of 2D garden grid
+ * @param fileExtension extension of downloaded file
+ */
+const handleExport = async (fileExtension) => {
+    const dataURL = stage.toDataURL(
+        {
+            mimeType: "image/" + (fileExtension === "jpg" ? "jpeg" : fileExtension),
+            pixelRatio: 3
+        }
+    );
+    const blob = await fetch(dataURL).then(res => res.blob());
+    downloader.saveFile(blob, `${gardenName}.${fileExtension}`);
+}
+
+/**
  * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
  */
-document.getElementById('saveGardenForm').addEventListener('submit', function (event) {
+document.getElementById("saveGardenForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent the default form submission
     let idList = [];
     let xCoordList = [];
     let yCoordList = [];
 
-    // Assuming 'layer.find('Image')' is correctly defined elsewhere
-    layer.find('Image').forEach(node => {
+    // Assuming "layer.find("Image")" is correctly defined elsewhere
+    layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
         const x_coord = Math.round((node.x() - offsetX) / GRID_SIZE);
@@ -370,17 +393,25 @@ document.getElementById('saveGardenForm').addEventListener('submit', function (e
         event.target.submit();
 
     } else {
-        console.error('One or more hidden inputs not found');
+        console.error("One or more hidden inputs not found");
     }
+
 });
 
-window.addEventListener('resize', () => {
+
+
+
+window.addEventListener("resize", () => {
     const newWidth = container.clientWidth;
     const newHeight = container.clientHeight;
     stage.width(newWidth);
     stage.height(newHeight);
     stage.draw();
 });
+
+jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
+pngDownloadButton.addEventListener("click", () => handleExport("png"));
+jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 
 
 

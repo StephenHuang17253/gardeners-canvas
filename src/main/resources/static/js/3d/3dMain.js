@@ -4,8 +4,9 @@ import { OrbitControls } from './OrbitControls.js';
 import { Loader } from './Loader.js';
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from './Exporter.js';
+import { Downloader } from '../Downloader.js';
 
-let scene, camera, renderer, controls, loader, exporter, light;
+let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
 const container = document.getElementById('container');
 
@@ -26,9 +27,9 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 // link used to download files
 const link = document.createElement('a');
-const gardenName = 'My Favourite Garden';
 
 const gardenId = document.getElementById("gardenId").value;
+const gardenName = document.getElementById("gardenName").value;
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -63,7 +64,9 @@ const init = () => {
     controls.minRadius = MIN_CAMERA_DIST;
     controls.maxRadius = MAX_CAMERA_DIST;
 
-    exporter = new Exporter(link, gardenName);
+    downloader = new Downloader(link);
+
+    exporter = new Exporter(gardenName, downloader);
 };
 
 /**
@@ -117,8 +120,7 @@ const addObjectToScene = async (plantOrDecoration) => {
 
     const loadedModel = await loader.loadModel(plantOrDecoration.modelName, plantOrDecoration.modelName)
 
-    if (plantOrDecoration.modelName === "creeper.glb")
-    {
+    if (plantOrDecoration.modelName === "creeper.glb") {
         loadedModel.traverse((child) => {
             if (child.isMesh) {
                 child.material = createHueSaturationMaterial(
