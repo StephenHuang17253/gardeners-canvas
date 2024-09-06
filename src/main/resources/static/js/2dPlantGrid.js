@@ -295,7 +295,7 @@ function resetPlantCount(plantItem) {
 /**
  * Clear items from the grid and deselect items
  */
-const clearAllButton = document.querySelector(".btn.bg-warning");
+const clearAllButton = document.getElementById("confirmClearAll");
 if (clearAllButton) {
     clearAllButton.addEventListener("click", function () {
         layer.find("Image").forEach(node => node.destroy());
