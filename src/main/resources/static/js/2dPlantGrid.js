@@ -205,11 +205,11 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
  * Event listener for clicking on palette items
  */
 document.querySelectorAll(".plant-item").forEach(item => {
-    const instance = getInstance();
+    const inst = getInstance();
     let plantImage;
 
-    if (instance === "test/" || instance === "prod/") {
-        plantImage = `/${instance}` + item.getAttribute("data-plant-image")
+    if (inst === "test/" || inst === "prod/") {
+        plantImage = `/${inst}` + item.getAttribute("data-plant-image")
     } else {
         plantImage = item.getAttribute("data-plant-image")
     }
@@ -230,8 +230,6 @@ document.querySelectorAll(".plant-item").forEach(item => {
             }
             this.style.border = "3px solid blue";
             highlightedPaletteItem = this;
-
-            const instance = getInstance();
 
             selectedPlantInfo = {
                 name: this.getAttribute("data-plant-name"),
