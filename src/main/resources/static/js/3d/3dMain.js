@@ -4,8 +4,9 @@ import { OrbitControls } from './OrbitControls.js';
 import { Loader } from './Loader.js';
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from './Exporter.js';
+import { Downloader } from '../Downloader.js';
 
-let scene, camera, renderer, controls, loader, exporter, light;
+let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
 const container = document.getElementById('container');
 
@@ -26,9 +27,9 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 // link used to download files
 const link = document.createElement('a');
-const gardenName = 'My Favourite Garden';
 
 const gardenId = document.getElementById("gardenId").value;
+const gardenName = document.getElementById("gardenName").value;
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -63,7 +64,9 @@ const init = () => {
     controls.minRadius = MIN_CAMERA_DIST;
     controls.maxRadius = MAX_CAMERA_DIST;
 
-    exporter = new Exporter(link, gardenName);
+    downloader = new Downloader(link);
+
+    exporter = new Exporter(gardenName, downloader);
 };
 
 /**
@@ -104,25 +107,6 @@ const grassTexture = loader.loadTexture('grass-tileable.jpg');
 const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 scene.add(grid);
 
-const fernModel = await loader.loadModel('fern.glb', 'fern');
-const creeperModel = await loader.loadModel('creeper.glb', 'creeper');
-const treeModel = await loader.loadModel('tree.glb', 'tree');
-const flowerModel = await loader.loadModel('flower.glb', 'flower');
-const shrubModel = await loader.loadModel('shrub.glb', 'shrub');
-const potplantModel = await loader.loadModel('potplant.glb', 'potplant');
-const climberModel = await loader.loadModel('climber.glb', 'climber');
-
-creeperModel.traverse((child) => {
-    if (child.isMesh) {
-        child.material = createHueSaturationMaterial(
-            child.material.map,
-            0.2,
-            1.56,
-            2
-        );
-    }
-});
-
 /**
  * Adds a plant or decoration object to the scene.
  * 
@@ -133,12 +117,33 @@ const addObjectToScene = async (plantOrDecoration) => {
     const x = (plantOrDecoration.xCoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
     const z = (plantOrDecoration.yCoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
     const position = new THREE.Vector3(x, 0, z);
-    addModelToScene(await loader.loadModel('fern.glb', 'fern'), position, 1);
+
+    const loadedModel = await loader.loadModel(plantOrDecoration.modelName, plantOrDecoration.modelName)
+
+    if (plantOrDecoration.modelName === "creeper.glb") {
+        loadedModel.traverse((child) => {
+            if (child.isMesh) {
+                child.material = createHueSaturationMaterial(
+                    child.material.map,
+                    0.2,
+                    1.56,
+                    2
+                );
+            }
+        });
+    }
+
+
+    addModelToScene(
+        loadedModel,
+        position,
+        plantOrDecoration.modelScale);
+    console.log(plantOrDecoration)
 };
 
 const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
-await placedGardenObjects.forEach((element) => addObjectToScene(element));
+placedGardenObjects.forEach((element) => addObjectToScene(element));
 
 /**
  * Renders the scene

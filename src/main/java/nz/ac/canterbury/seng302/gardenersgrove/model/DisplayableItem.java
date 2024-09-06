@@ -12,6 +12,8 @@ public class DisplayableItem {
 
     private String name;
 
+    private float modelScale;
+
     private String modelName;
 
     /**
@@ -21,12 +23,14 @@ public class DisplayableItem {
      * @param yCoordinate y location of object
      * @param name        name of represented object e.g plant name
      * @param modelName   name of model used to display in 3d, e.g tree.obj
+     * @param modelScale  a value to scale the displayed model by
      */
-    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String modelName) {
+    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String modelName, float modelScale) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.name = name;
         this.modelName = modelName;
+        this.modelScale = modelScale;
     }
 
     public int getxCoordinate() {
@@ -59,5 +63,13 @@ public class DisplayableItem {
 
     public void setModelName(String modelName) {
         this.modelName = modelName;
+    }
+
+    public float getModelScale() {
+        return modelScale;
+    }
+
+    public void setModelScale(float modelScale) {
+        this.modelScale = modelScale;
     }
 }

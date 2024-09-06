@@ -51,7 +51,7 @@ public class PublicGardensController {
 
     /**
      * Adds the loggedIn attribute to the model for all requests
-     * 
+     *
      * @param model
      */
     @ModelAttribute
@@ -70,7 +70,7 @@ public class PublicGardensController {
         return "redirect:/public-gardens/search/1";
     }
 
-    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
+    private void handlePagniation(int page, int listLength, List<Plant> plants, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -79,8 +79,8 @@ public class PublicGardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants",plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount",plants.size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount", plants.size());
     }
 
 
@@ -102,7 +102,7 @@ public class PublicGardensController {
 
         List<String> paramList = new ArrayList<>();
 
-        if (!searchInput.equals("")) {
+        if (!searchInput.isEmpty()) {
             paramList.add("searchInput=" + searchInput);
         }
 
@@ -178,9 +178,9 @@ public class PublicGardensController {
      */
     @GetMapping("public-gardens/{gardenId}")
     public String viewPublicGarden(@PathVariable Long gardenId,
-            @RequestParam(defaultValue = "1") int page,
-            HttpServletResponse response,
-            Model model) {
+                                   @RequestParam(defaultValue = "1") int page,
+                                   HttpServletResponse response,
+                                   Model model) {
         logger.info("GET public-gardens/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -197,20 +197,16 @@ public class PublicGardensController {
 
         boolean isOwner = (Objects.equals(currentUser.getId(), gardenOwner.getId()));
 
-        if (!garden.getIsPublic() ) {
+        if (!garden.getIsPublic()) {
             FriendshipStatus userOwnerRelationship;
-            if(Objects.equals(gardenOwner.getId(), currentUser.getId()))
-            {
+            if (Objects.equals(gardenOwner.getId(), currentUser.getId())) {
                 userOwnerRelationship = FriendshipStatus.ACCEPTED;
-            }
-            else
-            {
-                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner,currentUser);
+            } else {
+                userOwnerRelationship = friendshipService.checkFriendshipStatus(gardenOwner, currentUser);
             }
 
 
-            if (userOwnerRelationship != FriendshipStatus.ACCEPTED)
-            {
+            if (userOwnerRelationship != FriendshipStatus.ACCEPTED) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 model.addAttribute("message", "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
                 return "403";
@@ -220,7 +216,7 @@ public class PublicGardensController {
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
-        handlePagniation(page,garden.getPlants().size(),garden.getPlants(),model);
+        handlePagniation(page, garden.getPlants().size(), garden.getPlants(), model);
 
         model.addAttribute("isOwner", isOwner);
         model.addAttribute("garden", new GardenDetailModel(garden));
