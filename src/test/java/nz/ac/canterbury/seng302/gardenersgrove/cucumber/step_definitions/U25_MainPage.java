@@ -18,8 +18,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -87,9 +85,6 @@ public class U25_MainPage {
     @Autowired
     public UserInteractionService userInteractionService;
 
-    @Autowired
-    GridItemLocationService gridItemLocationService;
-
     public MockMvc mockMVC;
 
     private MvcResult mvcResult;
@@ -154,8 +149,8 @@ public class U25_MainPage {
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
         HomePageController homePageController = new HomePageController(userService, authenticationManager,
-                gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService,
-                gridItemLocationService);
+                gardenService, plantService, friendshipService, securityService, weatherService,
+                userInteractionService);
 
         mockMVC = MockMvcBuilders
                 .standaloneSetup(homePageController)

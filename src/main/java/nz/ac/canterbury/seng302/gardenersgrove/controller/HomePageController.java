@@ -8,9 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.model.RecentGardenModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.RecentPlantModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
-import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
-import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +18,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -48,8 +42,6 @@ public class HomePageController {
     private final UserInteractionService userInteractionService;
     private final WeatherService weatherService;
 
-    private final GridItemLocationService gridItemLocationService;
-
     private static final int PAGE_SIZE = 5;
 
     /**
@@ -60,10 +52,9 @@ public class HomePageController {
      */
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager,
-                              GardenService gardenService, PlantService plantService,
-                              FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
-                              UserInteractionService userInteractionService,
-                              GridItemLocationService gridItemLocationService) {
+            GardenService gardenService, PlantService plantService,
+            FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
+            UserInteractionService userInteractionService) {
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -71,17 +62,6 @@ public class HomePageController {
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
         this.weatherService = weatherService;
-        this.gridItemLocationService = gridItemLocationService;
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     *
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -96,113 +76,6 @@ public class HomePageController {
     }
 
     /**
-     * Adds a default user and gardens to the database for testing purposes
-     */
-    public void addDefaultContent() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
-        LocalDate date = LocalDate.parse("01/01/2001", formatter);
-
-        // Add a default user to speed up manual testing.
-        User johnDoe = new User("John",
-                "Doe",
-                "gardenersgrovetest@gmail.com",
-                date);
-        userService.addUser(johnDoe, "Password1!");
-        userService.verifyUser(johnDoe);
-
-        for (int i = 1; i < 12; i++) {
-            Garden sampleGarden = new Garden(
-                    "John's Garden " + i,
-                    "Some Description here",
-                    "114 Ilam Road",
-                    "Ilam",
-                    "Christchurch",
-                    "8041",
-                    "New Zealand",
-                    15.0,
-                    true,
-                    "-43.5214643",
-                    "172.5796159",
-                    johnDoe);
-            sampleGarden = gardenService.addGarden(sampleGarden);
-
-            for (int k = 0; k < 12; k++) {
-                Plant newPlant = plantService.addPlant("Test Plant #" + k, 2,
-                        "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.CLIMBER);
-                GridItemLocation newLocation = new GridItemLocation(
-                        newPlant.getPlantId(),
-                        GridItemType.PLANT,
-                        sampleGarden,
-                        k % 7,
-                        k / 7);
-                gridItemLocationService.addGridItemLocation(newLocation);
-            }
-        }
-
-        Garden sampleGarden2 = new Garden(
-                "John's Private garden ",
-                "Some Description here",
-                "114 Ilam Road",
-                "Ilam",
-                "Christchurch",
-                "8041",
-                "New Zealand",
-                15.0,
-                false,
-                "-43.5214643",
-                "172.5796159",
-                johnDoe);
-
-        gardenService.addGarden(sampleGarden2);
-
-        if (!userService.emailInUse("janedoe@email.com")) {
-
-            // Add a default user to speed up manual testing.
-            User janeDoe = new User("Jane",
-                    "Doe",
-                    "janedoe@email.com",
-                    date);
-            userService.addUser(janeDoe, "Password1!");
-            userService.verifyUser(janeDoe);
-
-            for (int i = 0; i < 1; i++) {
-                Garden sampleGarden = new Garden(
-                        "Jane's Garden " + i,
-                        "Some Description here",
-                        "114 Ilam Road",
-                        "Ilam",
-                        "Christchurch",
-                        "8041",
-                        "New Zealand",
-                        15.0,
-                        true,
-                        "-43.5214643",
-                        "172.5796159",
-                        janeDoe);
-                sampleGarden = gardenService.addGarden(sampleGarden);
-
-                for (int k = 0; k < 1; k++) {
-                    plantService.addPlant("Test Plant " + k, 2,
-                            "test", LocalDate.now(), sampleGarden.getGardenId(), PlantCategory.CLIMBER);
-                }
-
-            }
-            Friendship friendship = friendshipService.addFriendship(janeDoe, johnDoe);
-            friendshipService.updateFriendShipStatus(friendship.getId(), FriendshipStatus.ACCEPTED);
-        }
-
-        if (!userService.emailInUse("badguy@email.com")) {
-            User badGuy = new User("Bad",
-                    "Guy",
-                    "badguy@email.com",
-                    date);
-            userService.addUser(badGuy, "Badguy1!");
-            userService.verifyUser(badGuy);
-            userService.banUser(badGuy, 1);
-        }
-    }
-
-    /**
      * This function is called when a GET request is made to /home
      *
      * @param model
@@ -212,11 +85,6 @@ public class HomePageController {
     public String home(Model model) {
 
         logger.info("GET /home");
-
-        // Add a test user with test gardens and test plants
-        if (!userService.emailInUse("gardenersgrovetest@gmail.com")) {
-            addDefaultContent();
-        }
 
         User user = securityService.getCurrentUser();
 
@@ -377,7 +245,7 @@ public class HomePageController {
      *                watering
      */
     private List<Garden> getGardensForWatering(List<Garden> gardens) {
-        if(gardens.isEmpty()){
+        if (gardens.isEmpty()) {
             return gardens;
         }
 
@@ -389,7 +257,7 @@ public class HomePageController {
             Garden garden = gardens.get(i);
             boolean needsWater = gardenNeedsWatering(garden, weatherDataList.get(i));
 
-            if(!Objects.equals(needsWater, garden.getNeedsWatering())) {
+            if (!Objects.equals(needsWater, garden.getNeedsWatering())) {
                 garden.setNeedsWatering(needsWater);
                 gardenService.changeGardenNeedsWatering(garden.getGardenId(), needsWater);
             }
@@ -424,8 +292,8 @@ public class HomePageController {
 
         return garden.getNeedsWatering()
                 || beforeYesterdayWeather.getDescription().equals("Sunny") &&
-                yesterdayWeather.getDescription().equals("Sunny") &&
-                currentWeather.getDescription().equals("Sunny");
+                        yesterdayWeather.getDescription().equals("Sunny") &&
+                        currentWeather.getDescription().equals("Sunny");
 
     }
 

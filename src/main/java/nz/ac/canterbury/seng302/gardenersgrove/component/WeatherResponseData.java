@@ -23,11 +23,12 @@ public class WeatherResponseData {
     private JsonNode jsonDates;
     private List<DailyWeather> retrievedWeatherData;
 
-
     /**
      * Constructor for the weather reponse data class
      * Takes a response from the weather api as an input
-     * @param jsonWeatherData the response data from a class to the weather api as a json file
+     * 
+     * @param jsonWeatherData the response data from a class to the weather api as a
+     *                        json file
      */
     public WeatherResponseData(JsonNode jsonWeatherData) {
         current = jsonWeatherData.get("current");
@@ -54,17 +55,20 @@ public class WeatherResponseData {
     }
 
     /**
-     * This method separates the API response for daily weather into specific JsonNodes
+     * This method separates the API response for daily weather into specific
+     * JsonNodes
      */
     void setDailyWeather() {
-        jsonTempMax =  daily.get("temperature_2m_max");
+        jsonTempMax = daily.get("temperature_2m_max");
         jsonTempMin = daily.get("temperature_2m_min");
         jsonDailyWeatherCodes = daily.get("weather_code");
         jsonDailyPrecipitationSum = daily.get("precipitation_sum");
         jsonDates = daily.get("time");
     }
+
     /**
-     * This method collects all API responses and adds them to a list of weather object
+     * This method collects all API responses and adds them to a list of weather
+     * object
      */
     void convertToWeatherObjects() {
         List<DailyWeather> weatherObjects = new ArrayList<>();
@@ -74,9 +78,9 @@ public class WeatherResponseData {
         this.retrievedWeatherData = weatherObjects;
     }
 
-
     /**
      * This helper method creates a day with all weather details entered
+     * 
      * @param i - the index of json weather details
      * @return the day with all weather details set
      */
@@ -94,8 +98,11 @@ public class WeatherResponseData {
     }
 
     /**
-     * This helper methods identifies the weather description and icon based on weather code
-     * @param weatherCode integer that is part of WMO Weather interpretation codes (WW)
+     * This helper methods identifies the weather description and icon based on
+     * weather code
+     * 
+     * @param weatherCode integer that is part of WMO Weather interpretation codes
+     *                    (WW)
      * @return list of weather description and the name of icon file
      */
     public List<String> getWeatherDescriptionAndIcon(int weatherCode) {
@@ -104,7 +111,7 @@ public class WeatherResponseData {
         if (SUNNY_WEATHER_CODES.contains(weatherCode)) {
             weatherDescription = "Sunny";
             iconFileName = "sunny.png";
-        }  else if (OVERCAST_WEATHER_CODES.contains(weatherCode)) {
+        } else if (OVERCAST_WEATHER_CODES.contains(weatherCode)) {
             weatherDescription = "Overcast";
             iconFileName = "overcast.png";
         } else {
@@ -113,6 +120,5 @@ public class WeatherResponseData {
         }
         return List.of(weatherDescription, iconFileName);
     }
-
 
 }

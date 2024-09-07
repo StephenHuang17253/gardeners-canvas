@@ -17,11 +17,16 @@ import java.util.List;
 @Component
 public class PlantInfoDataInitializer implements CommandLineRunner {
 
-    @Autowired
     private PlantInfoRepository plantInfoRepository;
+
+    @Autowired
+    public PlantInfoDataInitializer(PlantInfoRepository plantInfoRepository) {
+        this.plantInfoRepository = plantInfoRepository;
+    }
 
     /**
      * Add Default plants to repo
+     * 
      * @param args incoming main method arguments
      * @throws Exception
      */
@@ -52,8 +57,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            false
-                            ),
+                            false),
                     new PlantInfo(7409L,
                             "Potato",
                             "Solanum Tuberosum",
@@ -77,8 +81,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            true
-                    ),
+                            true),
                     new PlantInfo(2320L,
                             "Carrot",
                             "Daucus Carota Var. Sativus",
@@ -102,8 +105,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    ),
+                            false),
                     new PlantInfo(5833L,
                             "Parsley",
                             "Petroselinum Crispum",
@@ -127,8 +129,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    ),
+                            false),
                     new PlantInfo(5842L,
                             "Bean",
                             "Phaseolus Vulgaris",
@@ -152,9 +153,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            false
-                    )
-                    ,
+                            false),
                     new PlantInfo(1888L,
                             "Lemon",
                             "Citrus Limon",
@@ -178,8 +177,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    ),
+                            false),
                     new PlantInfo(3013L,
                             "Strawberry",
                             "Fragaria 'Allstar'",
@@ -203,8 +201,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "High",
-                            false
-                    ),
+                            false),
                     new PlantInfo(5194L,
                             "Apple Mint",
                             "Mentha Suaveolens",
@@ -228,8 +225,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            true
-                    ),
+                            true),
                     new PlantInfo(6345L,
                             "Dwarf Plum",
                             "Prunus Domestica 'Johnson' STARKING DELICIOUS",
@@ -253,8 +249,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "High",
-                            false
-                    ),
+                            false),
                     new PlantInfo(5025L,
                             "Tomato",
                             "Lycopersicon Esculentum 'Rapunzel'",
@@ -278,8 +273,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            false
-                    ),
+                            false),
                     new PlantInfo(1848L,
                             "Spider Plant",
                             "Chlorophytum 'Fire Flash'",
@@ -303,8 +297,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            true
-                    ),
+                            true),
                     new PlantInfo(5257L,
                             "Swiss Cheese Plant",
                             "Monstera Deliciosa",
@@ -328,8 +321,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            true
-                    ),
+                            true),
                     new PlantInfo(1115L,
                             "Lady Fern",
                             "Athyrium Filix-Femina",
@@ -353,8 +345,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    ),
+                            false),
                     new PlantInfo(8551L,
                             "Golden Barrel Cactus",
                             "Echinocactus Grusonii",
@@ -378,8 +369,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    ),
+                            false),
                     new PlantInfo(5808L,
                             "Baby Rubber Plant",
                             "Peperomia Obtusifolia",
@@ -403,8 +393,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            true
-                    ),
+                            true),
                     new PlantInfo(7684L,
                             "French Marigold",
                             "Tagetes Patula",
@@ -428,8 +417,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    ),
+                            false),
                     new PlantInfo(4014L,
                             "Bigleaf Hydrangea",
                             "Hydrangea Macrophylla",
@@ -453,8 +441,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            false
-                    ),
+                            false),
                     new PlantInfo(3088L,
                             "Gardenia",
                             "Gardenia Jasminoides 'Bab1183' SUMMER SNOW",
@@ -478,8 +465,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "High",
-                            false
-                    ),
+                            false),
                     new PlantInfo(6803L,
                             "Shrub Rose",
                             "Rosa 'BAIing' GRANDMA'S BLESSING",
@@ -503,8 +489,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Moderate",
-                            false
-                    ),
+                            false),
                     new PlantInfo(2044L,
                             "Cabbage Tree",
                             "Cordyline Australis 'Salsa'",
@@ -528,9 +513,7 @@ public class PlantInfoDataInitializer implements CommandLineRunner {
                             false,
                             false,
                             "Low",
-                            false
-                    )
-            );
+                            false));
             plantInfoRepository.saveAll(defaultPlants);
         }
     }

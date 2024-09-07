@@ -105,7 +105,7 @@ public class ResetUserPassword {
                 emailService,
                 tokenService, gardenService, securityService);
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService,
-                emailService, securityService);
+                emailService);
         mockMVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController)
                 .build();
         tokenService.addToken(token);
