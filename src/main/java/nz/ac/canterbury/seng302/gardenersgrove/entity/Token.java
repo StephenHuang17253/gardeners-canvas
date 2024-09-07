@@ -13,6 +13,7 @@ import java.util.Random;
  */
 @Entity
 public class Token {
+
     @Transient
     private static final int TOKEN_LENGTH = 6;
 

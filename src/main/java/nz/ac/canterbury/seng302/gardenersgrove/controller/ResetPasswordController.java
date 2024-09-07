@@ -1,11 +1,9 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
-
 import jakarta.mail.MessagingException;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.TokenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,32 +32,20 @@ import java.util.Objects;
 public class ResetPasswordController {
 
     private static final Logger logger = LoggerFactory.getLogger(ResetPasswordController.class);
-    
+
     private final UserService userService;
+
     private final EmailService emailService;
+
     private final TokenService tokenService;
-    private final SecurityService securityService;
 
     @Autowired
-    public ResetPasswordController(UserService userService, TokenService tokenService, EmailService emailService, SecurityService securityService) {
+    public ResetPasswordController(UserService userService, TokenService tokenService, EmailService emailService) {
         this.userService = userService;
         this.emailService = emailService;
         this.tokenService = tokenService;
-        this.securityService = securityService;
     }
 
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     * 
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
-    }
-
-  
     /**
      * Get form for entering email if user has forgotten their password
      *
@@ -68,7 +53,7 @@ public class ResetPasswordController {
      */
     @GetMapping("/lost-password")
     public String lostPassword(@RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-                               Model model) {
+            Model model) {
         logger.info("GET /lost-password");
         model.addAttribute("emailAddress", emailAddress);
         return "lostPasswordPage";
@@ -76,7 +61,8 @@ public class ResetPasswordController {
 
     /**
      * Post form for entering email if user has forgotten their password
-     * Checks if input values are valid and then sends reset password link to email entered
+     * Checks if input values are valid and then sends reset password link to email
+     * entered
      *
      * @param emailAddress input email to send reset password link to
      * @param model        to collect field values and error messages
@@ -84,9 +70,9 @@ public class ResetPasswordController {
      */
     @PostMapping("/lost-password")
     public String emailChecker(@RequestParam("emailAddress") String emailAddress,
-                               Model model) {
-
+            Model model) {
         logger.info("POST /lost-password");
+
         boolean isRegistered = userService.emailInUse(emailAddress);
         ValidationResult emailValidation = InputValidator.validateEmail(emailAddress);
         model.addAttribute("emailAddress", emailAddress);
@@ -110,7 +96,6 @@ public class ResetPasswordController {
         return "lostPasswordPage";
     }
 
-
     /**
      * Get form for entering in new passwords (for resetting passwords)
      * Checks token in url is valid
@@ -121,7 +106,7 @@ public class ResetPasswordController {
      */
     @GetMapping("/reset-password/{token}")
     public String resetPassword(@PathVariable("token") String resetToken,
-                                RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
         logger.info("GET /reset-password");
 
         Token token = tokenService.getTokenByTokenString(resetToken);
@@ -151,10 +136,10 @@ public class ResetPasswordController {
      */
     @PostMapping("/reset-password/{token}")
     public String passwordChecker(@PathVariable("token") String resetToken,
-                                  @RequestParam("password") String password,
-                                  @RequestParam("retypePassword") String retypePassword,
-                                  Model model,
-                                  RedirectAttributes redirectAttributes) {
+            @RequestParam("password") String password,
+            @RequestParam("retypePassword") String retypePassword,
+            Model model,
+            RedirectAttributes redirectAttributes) {
         logger.info("POST /reset-password");
 
         Token token = tokenService.getTokenByTokenString(resetToken);

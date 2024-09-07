@@ -144,7 +144,6 @@ public class Garden2DController {
         logger.info("POST /2D-garden/{}/save", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
@@ -164,7 +163,6 @@ public class Garden2DController {
             return "redirect:/2D-garden/{gardenId}";
         }
 
-
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> idListAsList = new ArrayList<>();
         List<Double> xCoordListAsList = new ArrayList<>();
@@ -182,7 +180,7 @@ public class Garden2DController {
 
         try {
             for (int i = 0; i < idListAsList.size(); i++) {
-                //all items on grid are plants at the moment
+                // all items on grid are plants at the moment
                 updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
             }
         } catch (Exception e) {
@@ -193,7 +191,6 @@ public class Garden2DController {
                     "Something went wrong. We could not save the changes");
             return "error";
         }
-
 
         return "redirect:/2D-garden/{gardenId}";
     }

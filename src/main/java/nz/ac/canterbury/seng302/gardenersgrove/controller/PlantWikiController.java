@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-
 /**
  * Controller for plant info endpoints
  */
@@ -40,21 +39,22 @@ public class PlantWikiController {
         this.plantInfoService = plantInfoService;
     }
 
-
     /**
      * Helper to handle adding api call results to model
      * and catching any potential exceptions that may occur
+     * 
      * @param search term entered by user
-     * @param model hashmap of endpoints attributes
+     * @param model  hashmap of endpoints attributes
      */
-    private void addAPIResultsToModel(String search, Long plantId, Model model){
+    private void addAPIResultsToModel(String search, Long plantId, Model model) {
         try {
-            if(Objects.nonNull(search)){
+            if (Objects.nonNull(search)) {
 
                 JsonNode plantList = plantInfoService.getPlantListJson(search, false);
 
                 if (plantList.has("X-RateLimit-Remaining") && plantList.get("X-RateLimit-Remaining").asInt() <= 0) {
-                    throw new HttpStatusCodeException(HttpStatus.TOO_MANY_REQUESTS, "Surpassed API Rate Limit") {};
+                    throw new HttpStatusCodeException(HttpStatus.TOO_MANY_REQUESTS, "Surpassed API Rate Limit") {
+                    };
                 }
 
                 List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
@@ -76,8 +76,9 @@ public class PlantWikiController {
 
         } catch (UnavailableException e) {
             logger.error("UnavailableException occurred: {}", e.getMessage());
-            model.addAttribute("searchError", "Plant Wiki searching is a limited resource, which doesn't grow on trees. " +
-                    "Please try again");
+            model.addAttribute("searchError",
+                    "Plant Wiki searching is a limited resource, which doesn't grow on trees. " +
+                            "Please try again");
 
         } catch (HttpStatusCodeException e) {
             if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
@@ -86,7 +87,8 @@ public class PlantWikiController {
                         "Please try again tomorrow. In the meantime you may wish to check out our default plants");
             } else {
                 logger.error("HTTP error occurred: {}", e.getMessage());
-                model.addAttribute("searchError", "An error occurred while retrieving plant data. Please try again later.");
+                model.addAttribute("searchError",
+                        "An error occurred while retrieving plant data. Please try again later.");
             }
         } catch (IOException e) {
             logger.error("IOException occurred while fetching plant data: {}", e.getMessage());
@@ -105,9 +107,10 @@ public class PlantWikiController {
 
     /**
      * Helper to add the default plant info objects to model
+     * 
      * @param model hashmap of endpoint attributes
      */
-    private void addDefaultPlantsToModel(Model model){
+    private void addDefaultPlantsToModel(Model model) {
         List<PlantSearchModel> plants = plantInfoService.getAllDefaultPlants().stream()
                 .map(PlantSearchModel::new)
                 .collect(Collectors.toList());
@@ -115,16 +118,17 @@ public class PlantWikiController {
     }
 
     /**
-     * This method creates the get mapping for the plant wiki page where users can search for plant information.
+     * This method creates the get mapping for the plant wiki page where users can
+     * search for plant information.
+     * 
      * @param search the query string
-     * @param model the model
+     * @param model  the model
      * @return template for the plant wiki page
      */
     @GetMapping("/plant-wiki")
     @CrossOrigin
-    public String viewPlantWiki(@RequestParam(name = "search", required = false)
-                                String search,
-                                Model model) {
+    public String viewPlantWiki(@RequestParam(name = "search", required = false) String search,
+            Model model) {
         logger.info("GET /plant-wiki with search term: {}", search);
 
         if (search != null && !search.isEmpty()) {
@@ -139,19 +143,21 @@ public class PlantWikiController {
     }
 
     /**
-     * This method creates the get mapping for the plant details page which displays information for a certain plant.
-     * @param plantId               id of the plant
-     * @param model                 the model
-     * @return                      template for the plant details pge
+     * This method creates the get mapping for the plant details page which displays
+     * information for a certain plant.
+     * 
+     * @param plantId id of the plant
+     * @param model   the model
+     * @return template for the plant details pge
      */
     @GetMapping("/plant-wiki/{plantId}/details")
     public String viewPlantDetails(@PathVariable Long plantId,
-                                   Model model) {
+            Model model) {
         logger.info("GET /plant-wiki/{}/details", plantId);
 
         Optional<PlantInfo> plant = plantInfoService.getPlantById(plantId);
 
-        if(plant.isPresent()){
+        if (plant.isPresent()) {
             PlantInfoModel plantInfo = new PlantInfoModel(plant.get());
 
             model.addAttribute("plant", plantInfo);
