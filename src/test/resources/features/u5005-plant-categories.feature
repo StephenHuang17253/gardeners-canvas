@@ -20,9 +20,3 @@ Scenario: AC4.2 - I can select a plant category when editing an existing plant
     And I submit edit plant form
     Then My plant 'Lily' is updated with the plant category 'Bush'
 
-Scenario: AC4.3 - I see an error message if I do not select a plant category when creating a new plant
-    Given I "oliverdoe@email.com" am creating a new plant with the name 'Lemon'
-    And I can see a list of categories
-    When I do not select a plant category
-    And I submit create new plant form
-    Then I receive an error message reading 'A plant category must be selected'

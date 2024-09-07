@@ -128,7 +128,7 @@ public class PlantFormController {
                                      @RequestParam(name = "plantCount", required = false) String plantCount,
                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+                                     @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
                                      @RequestParam(name = "plantCategory") String plantCategory,
                                      @PathVariable("gardenId") Long gardenId,
                                      HttpServletResponse response,
