@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * This is a basic spring boot controller for the home page,
@@ -191,7 +190,7 @@ public class HomePageController {
         return plantList.stream()
                 .map(plant -> new RecentPlantModel(plant, plant.getGarden(), plant.getGarden().getOwner(),
                         securityService.isOwner(plant.getGarden().getOwner().getId())))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -251,7 +250,14 @@ public class HomePageController {
 
         List<Garden> gardensNeedWatering = new ArrayList<>();
 
-        List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
+        List<WeatherResponseData> weatherDataList;
+
+        weatherDataList = weatherService.getWeatherForGardens(gardens);
+
+        if (weatherDataList == null) {
+            logger.error("Error getting weather data for gardens");
+            return gardensNeedWatering;
+        }
 
         for (int i = 0; i < gardens.size(); i++) {
             Garden garden = gardens.get(i);

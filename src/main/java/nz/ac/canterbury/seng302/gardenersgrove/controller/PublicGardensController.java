@@ -139,7 +139,7 @@ public class PublicGardensController {
                     .sorted(Comparator.comparing(Garden::getCreationDate).reversed())
                     .skip((long) (pageNumber - 1) * COUNT_PER_PAGE)
                     .limit(COUNT_PER_PAGE)
-                    .collect(Collectors.toList());
+                    .toList();
 
             startIndex = (pageNumber - 1) * COUNT_PER_PAGE + 1;
             endIndex = Math.min(startIndex + COUNT_PER_PAGE, totalGardens);
