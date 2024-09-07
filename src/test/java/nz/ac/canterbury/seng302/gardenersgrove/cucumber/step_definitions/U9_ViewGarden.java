@@ -107,7 +107,7 @@ public class U9_ViewGarden {
         weatherService = Mockito.mock(WeatherService.class);
 
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService, objectMapper, gardenTagService, profanityService, userService);
+                weatherService, objectMapper, gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
         String mockResponse = "{\n" +

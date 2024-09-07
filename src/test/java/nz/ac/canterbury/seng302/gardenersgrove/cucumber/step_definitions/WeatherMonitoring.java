@@ -156,7 +156,7 @@ public class WeatherMonitoring {
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService, objectMapper, gardenTagService, profanityService, userService);
+                weatherService, objectMapper, gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
     }
 

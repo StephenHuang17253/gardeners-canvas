@@ -12,24 +12,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * 2 * Custom Authentication Provider class, to allow for handling
+ * Custom Authentication Provider class, to allow for handling
  * authentication in any way we see fit.
- * 3 * In this case using our existing {@link User}
- * 4
+ * In this case using our existing {@link User}
  */
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
     Logger logger = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
     /**
-     *
      * Autowired user service for custom authentication using our own user objects
      */
-    @Autowired
     private UserService userService;
 
-    public CustomAuthenticationProvider() {
+    @Autowired
+    public CustomAuthenticationProvider(UserService userService) {
         super();
+        this.userService = userService;
     }
 
     /**
@@ -58,7 +57,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     }
 
     /**
-     * Supports the UsernamePasswordAuthenticationToken
+     * Check if the authentication object is of type
+     * {@link UsernamePasswordAuthenticationToken}
      */
     @Override
     public boolean supports(Class<?> authentication) {
