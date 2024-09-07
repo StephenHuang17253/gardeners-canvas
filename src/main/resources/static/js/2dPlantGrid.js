@@ -205,6 +205,8 @@ stage.on("click", event => {
         // Deselect the plant
         selectedPlant = null;
     }
+
+    highlightedPaletteItem = null;
 });
 
 /**
@@ -323,6 +325,12 @@ window.addEventListener("resize", () => {
     stage.width(newWidth);
     stage.height(newHeight);
     stage.draw();
+});
+
+window.addEventListener("click", event => {
+    console.log(event.target);
+    console.log(highlightedPaletteItem);
+    // if (event.target !==)
 });
 
 jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
