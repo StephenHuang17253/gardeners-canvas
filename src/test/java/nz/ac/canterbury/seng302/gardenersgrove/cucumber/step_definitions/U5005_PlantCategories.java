@@ -172,7 +172,7 @@ public class U5005_PlantCategories {
     }
 //    AC4.2
     @Then("My plant {string} is updated with the plant category {string}")
-    public void my_plant_is_updated_with_the_plant_category(String plantName, String plantCategory) throws UnsupportedEncodingException {
+    public void my_plant_is_updated_with_the_plant_category(String plantName, String plantCategory) {
         Assertions.assertEquals(302, mvcResult.getResponse().getStatus());
         Plant updatedPlant = plantService.getPlants().get(0);
         Assertions.assertEquals(plantName, updatedPlant.getPlantName());
