@@ -52,15 +52,9 @@ public class HomePageController {
      */
     @Autowired
     public HomePageController(UserService userService, AuthenticationManager authenticationManager,
-<<<<<<< Updated upstream
             GardenService gardenService, PlantService plantService,
             FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
             UserInteractionService userInteractionService) {
-=======
-                              GardenService gardenService, PlantService plantService,
-                              FriendshipService friendshipService, SecurityService securityService, WeatherService weatherService,
-                              UserInteractionService userInteractionService) {
->>>>>>> Stashed changes
         this.userService = userService;
         this.gardenService = gardenService;
         this.plantService = plantService;
@@ -68,19 +62,6 @@ public class HomePageController {
         this.securityService = securityService;
         this.userInteractionService = userInteractionService;
         this.weatherService = weatherService;
-<<<<<<< Updated upstream
-=======
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     *
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
->>>>>>> Stashed changes
     }
 
     /**
