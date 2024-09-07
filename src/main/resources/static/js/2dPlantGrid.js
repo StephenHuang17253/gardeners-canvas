@@ -136,7 +136,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
 
         layer.add(plant);
     };
-}
+};
 
 /**
  * Event listener for clicking on palette items
@@ -170,7 +170,7 @@ document.querySelectorAll('[name="plant-item"]').forEach(item => {
             count: currentCount
         };
     });
-});
+})
 
 /**
  * Handles the clicking of any plant on the stage
@@ -184,7 +184,7 @@ stage.on("click", event => {
     const y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
     if (selectedPlantInfo) {
-        if (selectedPlantInfo.count < 1) return;
+        if (selectedPlantInfo.count < 1 || !validLocation(x, y)) return;
 
         plantCount = plantCount - 1
         handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
@@ -225,7 +225,7 @@ const resetPlantCount = (plantItem) => {
     const originalCount = originalPlantCounts[plantName];
     plantItem.setAttribute("data-plant-count", originalCount);
     updatePlantCountDisplay(plantItem, originalCount);
-}
+};
 
 /**
  * Clear items from the grid and deselect items
@@ -277,7 +277,7 @@ const updatePlantCountDisplay = (plantItem, count) => {
     if (remainingElement) {
         remainingElement.textContent = `Remaining: ${count}`;
     }
-}
+};
 
 /**
  * Downloads image of 2D garden grid
@@ -314,7 +314,6 @@ document.getElementById("saveGardenForm").addEventListener("submit", event => {
     const idListInput = document.getElementById("idList");
     const xCoordListInput = document.getElementById("xCoordList");
     const yCoordListInput = document.getElementById("yCoordList");
-
 
     if (idListInput && xCoordListInput && yCoordListInput) {
         idListInput.value = JSON.stringify(idList);
