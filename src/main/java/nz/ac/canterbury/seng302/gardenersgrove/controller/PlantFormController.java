@@ -186,8 +186,6 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId,
-                PlantCategory.TREE);
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
