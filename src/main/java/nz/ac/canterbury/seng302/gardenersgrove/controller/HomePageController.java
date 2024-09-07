@@ -250,9 +250,7 @@ public class HomePageController {
 
         List<Garden> gardensNeedWatering = new ArrayList<>();
 
-        List<WeatherResponseData> weatherDataList;
-
-        weatherDataList = weatherService.getWeatherForGardens(gardens);
+        List<WeatherResponseData> weatherDataList = weatherService.getWeatherForGardens(gardens);
 
         if (weatherDataList == null) {
             logger.error("Error getting weather data for gardens");
