@@ -9,6 +9,8 @@ const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
 const jpegDownloadButton = document.getElementById("download-jpeg");
 
+const instance = getInstance();
+
 // Calculate the total grid width and height
 const gridWidth = GRID_COLUMNS * GRID_SIZE;
 const gridHeight = GRID_ROWS * GRID_SIZE;
@@ -61,6 +63,16 @@ let highlightedPaletteItem = null;
 let selectedPlant = null;
 
 /**
+ * Checks if the location is valid on the grid
+ * @param {Number} x - x-coordinate of the plant
+ * @param {Number} y - y-coordinate of the plant
+ * @returns {Boolean} - True if the location is valid, false otherwise
+ */
+const validLocation = (x, y) => {
+    return x >= offsetX && x < offsetX + gridWidth && y >= offsetY && y < offsetY + gridHeight;
+};
+
+/**
  * Handles the adding of a plant to the stage produced by konva
  */
 const handleAddPlant = (imageSrc, x, y, plantId) => {
@@ -69,7 +81,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
-    plantImage.onload = function () {
+    plantImage.onload = () => {
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -82,104 +94,128 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
         });
 
 
-        plant.on("dragmove", function () {
+        plant.on("dragmove", () => {
             let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
             let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
+            // Ensure the plant is within the grid
+            if (x < offsetX) x = offsetX;
+            if (y < offsetY) y = offsetY;
+            if (x >= offsetX + gridWidth) x = offsetX + gridWidth - GRID_SIZE;
+            if (y >= offsetY + gridHeight) y = offsetY + gridHeight - GRID_SIZE;
+
             plant.position({
                 x: x,
-                y: y,
+                y: y
             });
+
+            // Highlight the plant when dragging
+            plant.stroke("blue");
+            plant.strokeWidth(4);
+
         });
 
-        plant.on("click", function (event) {
-            if (!selectedPlantInfo) {
-                if (selectedPlant) {
-                    selectedPlant.stroke(null);
-                    selectedPlant.strokeWidth(0);
-                }
-                selectedPlant = plant;
-                plant.stroke("blue");
-                plant.strokeWidth(4);
-                layer.draw();
-                event.cancelBubble = true;
+        plant.on("dragend", () => {
+            // Unhighlight the plant when dragging ends
+            plant.stroke(null);
+            plant.strokeWidth(0);
+        });
+
+        plant.on("click", event => {
+            if (selectedPlantInfo) return;
+
+            if (selectedPlant) {
+                selectedPlant.stroke(null);
+                selectedPlant.strokeWidth(0);
             }
+
+            selectedPlant = plant;
+            plant.stroke("blue");
+            plant.strokeWidth(4);
+
+            event.cancelBubble = true;
+
         });
 
         layer.add(plant);
-        layer.draw();
     };
 }
 
 /**
  * Event listener for clicking on palette items
  */
-document.querySelectorAll(".plant-item").forEach(item => {
+document.querySelectorAll('[name="plant-item"]').forEach(item => {
     const plantName = item.getAttribute("data-plant-name");
     const plantCount = parseInt(item.getAttribute("data-plant-count"));
     originalPlantCounts[plantName] = plantCount;
-    item.addEventListener("click", function () {
-        const currentCount = parseInt(this.getAttribute("data-plant-count"));
+
+    item.addEventListener("click", () => {
+
+        const currentCount = parseInt(item.getAttribute("data-plant-count"));
+
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = "none";
         }
-        if (currentCount > 0) {
-            if (highlightedPaletteItem) {
-                highlightedPaletteItem.style.border = "none";
-            }
-            this.style.border = "3px solid blue";
-            highlightedPaletteItem = this;
 
-            const instance = getInstance()
+        if (currentCount < 1) return;
 
-            selectedPlantInfo = {
-
-                name: this.getAttribute("data-plant-name"),
-                image: `/${instance}` + this.getAttribute("data-plant-image"),
-                id: this.getAttribute("data-plant-id"),
-                count: currentCount
-            };
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = "none";
         }
+
+        item.style.border = "3px solid blue";
+        highlightedPaletteItem = item;
+
+        selectedPlantInfo = {
+            name: item.getAttribute("data-plant-name"),
+            image: `/${instance}` + item.getAttribute("data-plant-image"),
+            id: item.getAttribute("data-plant-id"),
+            count: currentCount
+        };
     });
 });
 
 /**
  * Handles the clicking of any plant on the stage
  */
-stage.on("click", function (event) {
-    if (selectedPlantInfo && (event.target === stage || event.target.name() === "grid-cell")) {
-        if (selectedPlantInfo.count > 0) {
+stage.on("click", event => {
 
-            const mousePos = stage.getPointerPosition();
-            let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-            plantCount = plantCount - 1
-            handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
-            selectedPlantInfo.count -= 1
+    if (!(event.target === stage || event.target.name() === "grid-cell")) return;
 
-            if (highlightedPaletteItem) {
-                highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
-                updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
-                highlightedPaletteItem.style.border = "none";
-                highlightedPaletteItem = null;
-            }
+    const mousePos = stage.getPointerPosition();
+    const x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
+    const y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
-            selectedPlantInfo = null;
+    if (selectedPlantInfo) {
+        if (selectedPlantInfo.count < 1) return;
+
+        plantCount = plantCount - 1
+        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
+        selectedPlantInfo.count -= 1
+
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
+            updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
+            highlightedPaletteItem.style.border = "none";
+            highlightedPaletteItem = null;
         }
-    } else if (selectedPlant && (event.target === stage || event.target.name() === "grid-cell")) {
-        const mousePos = stage.getPointerPosition();
-        let x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-        let y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
 
-        selectedPlant.position({ x: x, y: y });
+        selectedPlantInfo = null;
+
+    } else if (selectedPlant) {
+
+        if (validLocation(x, y)) {
+            selectedPlant.position({
+                x: x,
+                y: y
+            });
+        }
+
         selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
 
-        layer.draw();
-
         // Deselect the plant
         selectedPlant = null;
-
     }
 });
 
@@ -187,7 +223,7 @@ stage.on("click", function (event) {
  * Resets the plant count to its original value
  * @param {HTMLElement} plantItem - The plant item element
  */
-function resetPlantCount(plantItem) {
+const resetPlantCount = (plantItem) => {
     const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
     plantItem.setAttribute("data-plant-count", originalCount);
@@ -198,14 +234,16 @@ function resetPlantCount(plantItem) {
  * Clear items from the grid and deselect items
  */
 const clearAllButton = document.querySelector(".btn.bg-warning");
-if (clearAllButton) {
-    clearAllButton.addEventListener("click", function () {
-        layer.find("Image").forEach(node => node.destroy());
-        layer.draw();
 
-        document.querySelectorAll(".plant-item").forEach(item => {
+// TODO: remove this if check
+if (clearAllButton) {
+    clearAllButton.addEventListener("click", () => {
+        layer.find("Image").forEach(node => node.destroy());
+
+        document.querySelectorAll('[name="plant-item"]').forEach(item => {
             resetPlantCount(item);
         });
+
         selectedPlantInfo = null;
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = "none";
@@ -219,7 +257,7 @@ if (clearAllButton) {
  * @param {HTMLElement} plantItem - The plant item element
  * @param {number} count - The new count
  */
-function updatePlantCountDisplay(plantItem, count) {
+const updatePlantCountDisplay = (plantItem, count) => {
     const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
     const countDisplay = plantItem.querySelector("a");
@@ -258,12 +296,12 @@ const handleExport = async (fileExtension) => {
     );
     const blob = await fetch(dataURL).then(res => res.blob());
     downloader.saveFile(blob, `${gardenName}.${fileExtension}`);
-}
+};
 
 /**
  * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
  */
-document.getElementById("saveGardenForm").addEventListener("submit", function (event) {
+document.getElementById("saveGardenForm").addEventListener("submit", event => {
     event.preventDefault(); // Prevent the default form submission
     let idList = [];
     let xCoordList = [];
@@ -277,9 +315,9 @@ document.getElementById("saveGardenForm").addEventListener("submit", function (e
     });
 
     // Ensure these elements exist
-    let idListInput = document.getElementById("idList");
-    let xCoordListInput = document.getElementById("xCoordList");
-    let yCoordListInput = document.getElementById("yCoordList");
+    const idListInput = document.getElementById("idList");
+    const xCoordListInput = document.getElementById("xCoordList");
+    const yCoordListInput = document.getElementById("yCoordList");
 
 
     if (idListInput && xCoordListInput && yCoordListInput) {
@@ -288,15 +326,11 @@ document.getElementById("saveGardenForm").addEventListener("submit", function (e
         yCoordListInput.value = JSON.stringify(yCoordList);
         // Manually submit the form
         event.target.submit();
-
     } else {
         console.error("One or more hidden inputs not found");
     }
 
 });
-
-
-
 
 window.addEventListener("resize", () => {
     const newWidth = container.clientWidth;

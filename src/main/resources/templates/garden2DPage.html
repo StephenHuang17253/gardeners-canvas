@@ -26,9 +26,9 @@
                         <button type="button" class="btn bg-warning text-white mb-2">Clear All</button>
                     </div>
                     <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
-                        <div class="w-100 plant-item" th:data-plant-name="${plant.getPlantName()}"
+                        <div class="w-100" name="plant-item" th:data-plant-name="${plant.getPlantName()}"
                             th:data-plant-count="${plant.getPlantCount()}" th:data-plant-id="${plant.getPlantId()}"
-                            th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
+                            th:data-plant-image="${plant.getPlantPictureFilename() == null ? 'images/default_plant.png' : 'files/users/' + plant.getPlantPictureFilename()}">
                             <img th:src="@{${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}}"
                                 alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
                                 style="max-width: 100px;">
@@ -57,8 +57,8 @@
                 <div class="d-flex flex-row flex-wrap justify-content-center mt-2 mb-1 gap-1">
                 </div>
 
-                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}"
-                   class="btn btn-success d-block mx-auto">View in 3D</a>
+                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}" class="btn btn-success d-block mx-auto">View in
+                    3D</a>
             </div>
         </div>
         <div class="d-flex flex-column flex-grow-1 overflow-hidden">
@@ -86,7 +86,7 @@
             </div>
         </div>
     </div>
-    <input id="gardenName" type="text" th:value="${garden.getGardenName()}">
+    <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}">
     <script type="module" th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
 
