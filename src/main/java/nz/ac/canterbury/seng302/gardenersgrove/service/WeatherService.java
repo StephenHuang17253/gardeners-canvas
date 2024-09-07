@@ -55,10 +55,10 @@ public class WeatherService {
         if (latitude.isEmpty() || longitude.isBlank()) {
             return null;
         }
-        Double latitdueDouble = Double.parseDouble(latitude);
+        Double latitudeDouble = Double.parseDouble(latitude);
         Double longtitudeDouble = Double.parseDouble(longitude);
 
-        return String.format("%.2f,%.2f", latitdueDouble, longtitudeDouble);
+        return String.format("%.2f,%.2f", latitudeDouble, longtitudeDouble);
     }
 
     /**
@@ -128,12 +128,12 @@ public class WeatherService {
                     CacheableWeatherResponseData oldCachedData = linkedWeatherResults.poll();
                     cachedWeatherResults.remove(oldCachedData.getLocationIdentifier());
                     clearedRecords += 1;
-                    logger.info("removed {}", oldCachedData);
+                    logger.info("Removed {}", oldCachedData);
                 } catch (NullPointerException nullPointerException) {
                     logger.info("Old cache record failed to finish clearing, cache may be empty");
                 }
             }
-            logger.info("cleaned {} old weather data cache values", clearedRecords);
+            logger.info("Cleaned {} old weather data cache values", clearedRecords);
             logger.info("Hash table size {}", cachedWeatherResults.size());
             long oldestRecord = new Date().getTime() - linkedWeatherResults.peek().getCreationTime();
             logger.info("Oldest living records age should be in {} milliseconds",
