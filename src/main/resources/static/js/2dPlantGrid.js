@@ -1,8 +1,8 @@
 import { Downloader } from "./Downloader.js";
 
-const stageWidth = window.innerWidth * 0.8;
-const stageHeight = window.innerHeight * 0.9;
-const GRID_SIZE = Math.min(stageWidth, stageHeight) / 8;
+const STAGE_WIDTH = window.innerWidth * 0.8;
+const STAGE_HEIGHT = window.innerHeight * 0.9;
+const GRID_SIZE = Math.min(STAGE_WIDTH, STAGE_HEIGHT) / 8;
 const GRID_COLUMNS = 7;
 const GRID_ROWS = 7;
 const jpgDownloadButton = document.getElementById("download-jpg");
@@ -12,22 +12,20 @@ const jpegDownloadButton = document.getElementById("download-jpeg");
 const instance = getInstance();
 
 // Calculate the total grid width and height
-const gridWidth = GRID_COLUMNS * GRID_SIZE;
-const gridHeight = GRID_ROWS * GRID_SIZE;
+const GRID_WIDTH = GRID_COLUMNS * GRID_SIZE;
+const GRID_HEIGHT = GRID_ROWS * GRID_SIZE;
 
-const offsetX = (stageWidth - gridWidth) / 2;
-const offsetY = (stageHeight - gridHeight) / 2;
+const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
+const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
 let plantPosition = 100;
 const plantName = "plant";
 
-let plantCount = 0;
-
 const originalPlantCounts = {};
 
 const stage = new Konva.Stage({
-    width: stageWidth,
-    height: stageHeight,
+    width: STAGE_WIDTH,
+    height: STAGE_HEIGHT,
     container: "container"
 });
 
@@ -45,8 +43,8 @@ stage.add(layer);
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
         const rect = new Konva.Rect({
-            x: i * GRID_SIZE + offsetX,
-            y: j * GRID_SIZE + offsetY,
+            x: i * GRID_SIZE + OFFSET_X,
+            y: j * GRID_SIZE + OFFSET_Y,
             width: GRID_SIZE,
             height: GRID_SIZE,
             fill: "green",
@@ -69,7 +67,7 @@ let selectedPlant = null;
  * @returns {Boolean} - True if the location is valid, false otherwise
  */
 const validLocation = (x, y) => {
-    return x >= offsetX && x < offsetX + gridWidth && y >= offsetY && y < offsetY + gridHeight;
+    return x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
 };
 
 /**
@@ -95,14 +93,14 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
 
 
         plant.on("dragmove", () => {
-            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+            let x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE) * GRID_SIZE + OFFSET_X;
+            let y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE) * GRID_SIZE + OFFSET_Y;
 
             // Ensure the plant is within the grid
-            if (x < offsetX) x = offsetX;
-            if (y < offsetY) y = offsetY;
-            if (x >= offsetX + gridWidth) x = offsetX + gridWidth - GRID_SIZE;
-            if (y >= offsetY + gridHeight) y = offsetY + gridHeight - GRID_SIZE;
+            if (x < OFFSET_X) x = OFFSET_X;
+            if (y < OFFSET_Y) y = OFFSET_Y;
+            if (x >= OFFSET_X + GRID_WIDTH) x = OFFSET_X + GRID_WIDTH - GRID_SIZE;
+            if (y >= OFFSET_Y + GRID_HEIGHT) y = OFFSET_Y + GRID_HEIGHT - GRID_SIZE;
 
             plant.position({
                 x: x,
@@ -112,7 +110,6 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
             // Highlight the plant when dragging
             plant.stroke("blue");
             plant.strokeWidth(4);
-
         });
 
         plant.on("dragend", () => {
@@ -143,8 +140,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
  */
 document.querySelectorAll('[name="plant-item"]').forEach(item => {
     const plantName = item.getAttribute("data-plant-name");
-    const plantCount = parseInt(item.getAttribute("data-plant-count"));
-    originalPlantCounts[plantName] = plantCount;
+    originalPlantCounts[plantName] = parseInt(item.getAttribute("data-plant-count"));
 
     item.addEventListener("click", () => {
 
@@ -155,10 +151,6 @@ document.querySelectorAll('[name="plant-item"]').forEach(item => {
         }
 
         if (currentCount < 1) return;
-
-        if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = "none";
-        }
 
         item.style.border = "3px solid blue";
         highlightedPaletteItem = item;
@@ -180,13 +172,12 @@ stage.on("click", event => {
     if (!(event.target === stage || event.target.name() === "grid-cell")) return;
 
     const mousePos = stage.getPointerPosition();
-    const x = Math.floor((mousePos.x - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-    const y = Math.floor((mousePos.y - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+    const x = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE) * GRID_SIZE + OFFSET_X;
+    const y = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE) * GRID_SIZE + OFFSET_Y;
 
     if (selectedPlantInfo) {
         if (selectedPlantInfo.count < 1 || !validLocation(x, y)) return;
 
-        plantCount = plantCount - 1
         handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
         selectedPlantInfo.count -= 1
 
