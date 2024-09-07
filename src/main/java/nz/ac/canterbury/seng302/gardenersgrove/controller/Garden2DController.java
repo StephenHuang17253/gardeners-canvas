@@ -41,7 +41,8 @@ public class Garden2DController {
     private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
 
     @Autowired
-    public Garden2DController(GardenService gardenService, SecurityService securityService, GridItemLocationService gridItemLocationService) {
+    public Garden2DController(GardenService gardenService, SecurityService securityService,
+            GridItemLocationService gridItemLocationService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.gridItemLocationService = gridItemLocationService;
@@ -50,9 +51,9 @@ public class Garden2DController {
 
     @GetMapping("/2D-garden/{gardenId}")
     public String getGarden2DPage(@PathVariable Long gardenId,
-                                  @RequestParam(defaultValue = "1") int page,
-                                  HttpServletResponse response,
-                                  Model model) {
+            @RequestParam(defaultValue = "1") int page,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /2D-garden/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -101,8 +102,10 @@ public class Garden2DController {
      * @param yCoord       y co-ordinate of item on 2D grid
      * @param garden       garden that contains all the items
      */
-    private void updateGardenGrid(GridItemType gridItemType, Long itemId, Integer xCoord, Integer yCoord, Garden garden) {
-        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(gridItemType, itemId, garden);
+    private void updateGardenGrid(GridItemType gridItemType, Long itemId, Integer xCoord, Integer yCoord,
+            Garden garden) {
+        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(gridItemType, itemId,
+                garden);
         if (matchingGridItem.isEmpty()) {
             GridItemLocation newGridItemLocation = new GridItemLocation(itemId, gridItemType, garden, xCoord, yCoord);
             gridItemLocationService.addGridItemLocation(newGridItemLocation);
@@ -127,10 +130,13 @@ public class Garden2DController {
      * @return redirect back to 2D garden grid
      */
     @PostMapping("/2D-garden/{gardenId}/save")
-    public String save2DGarden(@PathVariable Long gardenId, @RequestParam(value = "idList", required = false) String idList, @RequestParam(value = "xCoordList", required = false) String xCoordList, @RequestParam(value = "yCoordList", required = false) String yCoordList, HttpServletResponse response, Model model) {
+    public String save2DGarden(@PathVariable Long gardenId,
+            @RequestParam(value = "idList", required = false) String idList,
+            @RequestParam(value = "xCoordList", required = false) String xCoordList,
+            @RequestParam(value = "yCoordList", required = false) String yCoordList, HttpServletResponse response,
+            Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-
 
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -151,7 +157,6 @@ public class Garden2DController {
             return "redirect:/2D-garden/{gardenId}";
         }
 
-
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> idListAsList = new ArrayList<>();
         List<Double> xCoordListAsList = new ArrayList<>();
@@ -169,8 +174,9 @@ public class Garden2DController {
 
         try {
             for (int i = 0; i < idListAsList.size(); i++) {
-                //all items on grid are plants at the moment
-                updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
+                // all items on grid are plants at the moment
+                updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)),
+                        xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -181,9 +187,7 @@ public class Garden2DController {
             return "error";
         }
 
-
         return "redirect:/2D-garden/{gardenId}";
     }
-
 
 }

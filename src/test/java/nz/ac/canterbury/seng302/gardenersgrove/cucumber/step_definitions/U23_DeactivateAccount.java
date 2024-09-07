@@ -107,7 +107,7 @@ public class U23_DeactivateAccount {
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
         GardensController gardensController = new GardensController(gardenService, securityService,
-                plantService, weatherService, objectMapper, gardenTagService, profanityService, userService);
+                plantService, weatherService, objectMapper, gardenTagService, profanityService);
 
         AccountController loginPageController = new AccountController(userService, authenticationManager,
                 emailService,

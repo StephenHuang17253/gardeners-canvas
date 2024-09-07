@@ -24,7 +24,6 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +52,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.validation.inputValidation.InputV
 public class ProfileController {
 
     Logger logger = LoggerFactory.getLogger(ProfileController.class);
-    
+
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final FileService fileService;
@@ -64,9 +63,9 @@ public class ProfileController {
      * Constructor for the ProfileController with {@link Autowired} to connect
      * this controller with services
      *
-     * @param userService service to access repository
+     * @param userService           service to access repository
      * @param authenticationManager manager for user's authentication details
-     * @param fileService service to manage files
+     * @param fileService           service to manage files
      */
     @Autowired
     public ProfileController(AuthenticationManager authenticationManager,
@@ -78,17 +77,7 @@ public class ProfileController {
         this.userService = userService;
         this.fileService = fileService;
         this.emailService = emailService;
-        this.securityService = securityService; 
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     * 
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
+        this.securityService = securityService;
     }
 
     /**
@@ -140,9 +129,9 @@ public class ProfileController {
      * between the login and registration pages possibly should be moved to a
      * different class? As not correct to be here
      *
-     * @param email email of the user
+     * @param email    email of the user
      * @param password password of the user
-     * @param session http session to set the cookies with the context key
+     * @param session  http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
         User user = userService.getUserByEmail(email);
@@ -163,7 +152,7 @@ public class ProfileController {
     /**
      * Update the user's profile picture
      *
-     * @param user user to update
+     * @param user           user to update
      * @param profilePicture new profile picture
      */
     public void updateProfilePicture(User user, MultipartFile profilePicture) {
@@ -220,7 +209,7 @@ public class ProfileController {
      * authenticated user and updates their profile picture
      *
      * @param profilePicture user's profile picture
-     * @param model contains all field data
+     * @param model          contains all field data
      * @return redirect to profile page
      */
     @PostMapping("/profile")
@@ -257,7 +246,7 @@ public class ProfileController {
     @GetMapping("/profile/edit")
     public String editProfile(Model model) {
         logger.info("GET /profile/edit");
-        
+
         User user = securityService.getCurrentUser();
 
         model.addAttribute("firstName", user.getFirstName());
@@ -278,14 +267,14 @@ public class ProfileController {
      * Redirects POST url '/profile/edit' to the edit form if invalid input or
      * to user's profile page '/profile' if edit completed
      *
-     * @param firstName - user's first name
-     * @param lastName - user's last name
-     * @param noLastName - checkbox for whether user has a last name
-     * @param dateOfBirth - user's date of birth (optional)
-     * @param emailAddress - user's email address
+     * @param firstName      - user's first name
+     * @param lastName       - user's last name
+     * @param noLastName     - checkbox for whether user has a last name
+     * @param dateOfBirth    - user's date of birth (optional)
+     * @param emailAddress   - user's email address
      * @param profilePicture - user's profile picture
-     * @param model - (map-like) representation of user's input (above
-     * parameters)
+     * @param model          - (map-like) representation of user's input (above
+     *                       parameters)
      * @return redirect to edit form or to profile page
      */
     @PostMapping("/profile/edit")
@@ -298,7 +287,7 @@ public class ProfileController {
             @RequestParam(name = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
-        
+
         User user = securityService.getCurrentUser();
 
         // Create a map of validation results for each input
@@ -388,8 +377,7 @@ public class ProfileController {
     public String changePassword(Model model,
             @RequestParam(name = "currentPassword", required = false) String currentPassword,
             @RequestParam(name = "newPassword", required = false) String newPassword,
-            @RequestParam(name = "retypePassword", required = false) String retypePassword
-    ) {
+            @RequestParam(name = "retypePassword", required = false) String retypePassword) {
         logger.info("GET /profile/change-password");
 
         model.addAttribute("currentPassword", currentPassword);
@@ -404,10 +392,10 @@ public class ProfileController {
      * input or to user's profile page '/profile' if edit completed
      *
      * @param currentPassword - user's current password
-     * @param newPassword - new password user would like to change to
-     * @param retypePassword - retyped password to see if matches new password
-     * @param model - (map-like) representation of user's input (above
-     * parameters)
+     * @param newPassword     - new password user would like to change to
+     * @param retypePassword  - retyped password to see if matches new password
+     * @param model           - (map-like) representation of user's input (above
+     *                        parameters)
      * @return redirect to changePassword form or to profile page
      */
     @PostMapping("/profile/change-password")
@@ -448,7 +436,8 @@ public class ProfileController {
             otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(currentUser.getEmailAddress());
-        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, otherFields);;
+        ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, otherFields);
+        ;
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);

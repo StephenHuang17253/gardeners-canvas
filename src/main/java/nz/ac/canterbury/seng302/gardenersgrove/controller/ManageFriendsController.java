@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -52,9 +51,9 @@ public class ManageFriendsController {
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
-     * @param securityService   service to access security methods
-     * @param friendshipService service to access plant repository
-     * @param userService       service to manage users
+     * @param securityService        service to access security methods
+     * @param friendshipService      service to access plant repository
+     * @param userService            service to manage users
      * @param userInteractionService service to manage user interactions
      */
     @Autowired
@@ -144,16 +143,6 @@ public class ManageFriendsController {
         }
 
         return requestFriendModels;
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     * 
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**

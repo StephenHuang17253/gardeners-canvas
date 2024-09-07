@@ -105,7 +105,7 @@ public class PubliciseGarden {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService, objectMapper, gardenTagService, profanityService, userService);
+                weatherService, objectMapper, gardenTagService, profanityService);
         GardenFormController gardenFormController = new GardenFormController(gardenService, locationService,
                 securityService);
 

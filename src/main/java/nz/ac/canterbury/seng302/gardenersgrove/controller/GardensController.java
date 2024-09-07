@@ -3,9 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
@@ -32,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -52,15 +49,9 @@ public class GardensController {
     private final WeatherService weatherService;
     private final GardenTagService gardenTagService;
     private final ProfanityService profanityService;
-    private final UserService userService;
     private final ObjectMapper objectMapper;
 
-    private static final int MAX_REQUESTS_PER_SECOND = 10;
-
-
     private static final int COUNT_PER_PAGE = 9;
-
-    private volatile long lastRequestTime = Instant.now().getEpochSecond();
 
     /**
      * Constructor for the GardensController with {@link Autowired} to connect
@@ -77,7 +68,7 @@ public class GardensController {
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
             WeatherService weatherService, ObjectMapper objectMapper, GardenTagService gardenTagService,
-            ProfanityService profanityService, UserService userService) {
+            ProfanityService profanityService) {
         this.gardenService = gardenService;
         this.plantService = plantService;
         this.securityService = securityService;
@@ -85,7 +76,6 @@ public class GardensController {
         this.gardenTagService = gardenTagService;
         this.objectMapper = objectMapper;
         this.profanityService = profanityService;
-        this.userService = userService;
     }
 
     /**
@@ -102,7 +92,6 @@ public class GardensController {
             Model model) {
         logger.info("GET /my-gardens");
 
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
         User user = securityService.getCurrentUser();
         List<Garden> gardens = gardenService.getAllUsersGardens(user.getId());
 
@@ -153,8 +142,6 @@ public class GardensController {
         } catch (NullPointerException error) {
             noWeather = new DailyWeather("no_weather_available_icon.png", null, null);
             noWeather.setError("Location not found, please update your location to see the weather");
-        } catch (UnavailableException e) {
-            noWeather = new DailyWeather("not_found.png", null, null);
         }
 
         if (noWeather != null) {
@@ -185,7 +172,7 @@ public class GardensController {
         }
     }
 
-    private void handlePagniation(int page, int listLength,List<Plant> plants, Model model) {
+    private void handlePagniation(int page, int listLength, List<Plant> plants, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -194,8 +181,8 @@ public class GardensController {
         model.addAttribute("lastPage", totalPages);
         model.addAttribute("startIndex", startIndex + 1);
         model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants",plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount",plants.size());
+        model.addAttribute("plants", plants.subList(startIndex, endIndex));
+        model.addAttribute("plantCount", plants.size());
     }
 
     /**
@@ -264,7 +251,7 @@ public class GardensController {
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-        handlePagniation(page, plants.size(),garden.getPlants(), model);
+        handlePagniation(page, plants.size(), garden.getPlants(), model);
 
         try {
             if (weatherListJson != null) {
@@ -436,7 +423,7 @@ public class GardensController {
         User user = garden.getOwner();
         List<Plant> plants = garden.getPlants();
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
-        handlePagniation(page, plants.size(),garden.getPlants(), model);
+        handlePagniation(page, plants.size(), garden.getPlants(), model);
 
         model.addAttribute("openModal", "true");
         model.addAttribute("tagText", tag);
@@ -483,7 +470,7 @@ public class GardensController {
             RedirectAttributes redirectAttributes,
             HttpServletResponse response,
             HttpServletRequest request,
-            Model model) throws ServletException, InterruptedException {
+            Model model) throws ServletException {
         logger.info("POST /my-gardens/{}/tag", gardenId);
 
         tag = tag.trim();
@@ -697,8 +684,7 @@ public class GardensController {
         return "gardensPage";
     }
 
-    WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) throws UnavailableException {
-
+    private WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) {
         return weatherService.getWeather(gardenLatitude, gardenLongitude);
     }
 
@@ -715,7 +701,7 @@ public class GardensController {
         return gardenTagService.getAllSimilar(query);
     }
 
-    private void asynchronousTagProfanityCheck(String tagName, User user) throws InterruptedException {
+    private void asynchronousTagProfanityCheck(String tagName, User user) {
         Thread asyncThread = new Thread((() -> {
             boolean tagContainsProfanity = profanityService.containsProfanity(tagName, PriorityType.LOW);
             if (!tagContainsProfanity) {
