@@ -121,7 +121,7 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
             plant.strokeWidth(0);
         });
 
-        plant.on("click", event => {
+        plant.on("click", () => {
             if (selectedPlantInfo) return;
 
             if (selectedPlant) {
@@ -132,9 +132,6 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
             selectedPlant = plant;
             plant.stroke("blue");
             plant.strokeWidth(4);
-
-            event.cancelBubble = true;
-
         });
 
         layer.add(plant);
@@ -260,7 +257,6 @@ if (clearAllButton) {
 const updatePlantCountDisplay = (plantItem, count) => {
     const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
-    const countDisplay = plantItem.querySelector("a");
 
     // Select the <a> elements by their ids
     const totalElement = plantItem.querySelector("#total");
@@ -329,7 +325,6 @@ document.getElementById("saveGardenForm").addEventListener("submit", event => {
     } else {
         console.error("One or more hidden inputs not found");
     }
-
 });
 
 window.addEventListener("resize", () => {
