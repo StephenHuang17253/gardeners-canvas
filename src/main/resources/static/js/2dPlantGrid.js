@@ -153,6 +153,7 @@ document.querySelectorAll('[name="plant-item"]').forEach(item => {
         if (currentCount < 1) return;
 
         item.style.border = "3px solid blue";
+
         highlightedPaletteItem = item;
 
         selectedPlantInfo = {
@@ -175,19 +176,17 @@ stage.on("click", event => {
     const x = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE) * GRID_SIZE + OFFSET_X;
     const y = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE) * GRID_SIZE + OFFSET_Y;
 
-    if (selectedPlantInfo) {
+    if (highlightedPaletteItem) {
         if (selectedPlantInfo.count < 1 || !validLocation(x, y)) return;
 
         handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
         selectedPlantInfo.count -= 1
 
-        if (highlightedPaletteItem) {
-            highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
-            updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
-            highlightedPaletteItem.style.border = "none";
-            highlightedPaletteItem = null;
-        }
+        highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
+        updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
 
+        highlightedPaletteItem.style.border = "none";
+        highlightedPaletteItem = null;
         selectedPlantInfo = null;
 
     } else if (selectedPlant) {
@@ -327,10 +326,12 @@ window.addEventListener("resize", () => {
     stage.draw();
 });
 
+// Deselect plant in palette when clicking outside of it
 window.addEventListener("click", event => {
-    console.log(event.target);
-    console.log(highlightedPaletteItem);
-    // if (event.target !==)
+    if (highlightedPaletteItem && !highlightedPaletteItem.contains(event.target)) {
+        highlightedPaletteItem.style.border = "none";
+        highlightedPaletteItem = null;
+    }
 });
 
 jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
