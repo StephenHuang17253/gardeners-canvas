@@ -75,9 +75,15 @@ document.querySelectorAll('.grid-item-location').forEach(item => {
     const y_coord = parseInt(item.getAttribute('data-grid-y'));
     const plantId = item.getAttribute('data-grid-objectid');
 
+    const inst = getInstance();
     const plantImage = new Image();
 
-    plantImage.src = item.getAttribute('data-grid-image');
+    if (inst === "test/" || inst === "prod/") {
+        plantImage.src = `/${inst}` + item.getAttribute("data-grid-image")
+    } else {
+        plantImage.src = item.getAttribute("data-grid-image")
+    }
+
     plantImage.onload = function () {
         const konvaPos = convertToKonvaCoordinates(x_coord, y_coord);
         const plant = new Konva.Image({
