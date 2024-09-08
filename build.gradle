@@ -51,7 +51,7 @@ sonar {
 		property "sonar.host.url", "https://sonarqube.csse.canterbury.ac.nz"
 		property "sonar.login", "$System.env.SONARQUBE_TOKEN"
 		property "sonar.coverage.jacoco.xmlReportPath", "${buildDir}/jacoco/test-report.xml"
-		property "sonar.java.jdkHome", "/usr/lib/jvm/jdk17.0.11/"
+		property "sonar.java.source", sourceCompatibility
 		// For pipelines run for a branch build only
 		if (System.env.CI_MERGE_REQUEST_IID == null || System.env.CI_MERGE_REQUEST_IID.trim().isEmpty()) {
 			property "sonar.branch.name", "$System.env.CI_COMMIT_REF_NAME"
