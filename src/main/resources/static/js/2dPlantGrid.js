@@ -146,9 +146,7 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
 
         layer.add(plant);
 
-        if (onload) {
-            onload();
-        }
+        if (onload) onload();
     };
 };
 
