@@ -176,24 +176,23 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
  * @param plantId id of the plant whose counters are being updated
  */
 const updateCountersOnLoad = (plantId) => {
-    const plantItem = document.querySelector(`[name="plant-item"][data-plant-id="${plantId}"]`)
+    const plantItem = document.querySelector(`[name="plant-item"][data-plant-id="${plantId}"]`);
 
-    if (plantItem) {
-        const count = parseInt(plantItem.getAttribute("data-plant-count"))
-        const placedCount = originalPlantCounts[plantItem.getAttribute("data-plant-name")] - count;
+    if (!plantItem) return;
 
-        const placedElement = plantItem.querySelector("#placed");
-        const remainingElement = plantItem.querySelector("#remaining");
+    const count = parseInt(plantItem.getAttribute("data-plant-count"));
+    const placedCount = originalPlantCounts[plantItem.getAttribute("data-plant-name")] - count;
 
-        if (placedElement && remainingElement) {
-            placedElement.textContent = `Placed: ${placedCount + 1}`;
-            remainingElement.textContent = `Remaining: ${count - 1}`;
-        }
+    const placedElement = plantItem.querySelector("#placed");
+    const remainingElement = plantItem.querySelector("#remaining");
 
-        plantItem.setAttribute("data-plant-count", count - 1);
+    if (placedElement && remainingElement) {
+        placedElement.textContent = `Placed: ${placedCount + 1}`;
+        remainingElement.textContent = `Remaining: ${count - 1}`;
     }
 
-}
+    plantItem.setAttribute("data-plant-count", count - 1);
+};
 
 /**
  * Event listener for clicking on palette items
@@ -201,12 +200,10 @@ const updateCountersOnLoad = (plantId) => {
 document.querySelectorAll("[name='plant-item']").forEach(item => {
 
     const inst = getInstance();
-    let plantImage;
+    let plantImage = item.getAttribute("data-plant-image")
 
     if (inst === "test/" || inst === "prod/") {
-        plantImage = `/${inst}` + item.getAttribute("data-plant-image")
-    } else {
-        plantImage = item.getAttribute("data-plant-image")
+        plantImage = `/${inst}` + plantImage
     }
 
     const plantName = item.getAttribute("data-plant-name");
@@ -247,8 +244,9 @@ stage.on("click", event => {
     if (!(event.target === stage || event.target.name() === "grid-cell")) return;
 
     const mousePos = stage.getPointerPosition();
-    const x = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE) * GRID_SIZE + OFFSET_X;
-    const y = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE) * GRID_SIZE + OFFSET_Y;
+    const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
+    const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
+    const { x, y } = convertToKonvaCoordinates(i, j);
 
     if (highlightedPaletteItem) {
         if (selectedPlantInfo.count < 1 || !validLocation(x, y)) return;
@@ -363,9 +361,9 @@ const handleExport = async (fileExtension) => {
  */
 document.getElementById("saveGardenForm").addEventListener("submit", event => {
     event.preventDefault(); // Prevent the default form submission
-    let idList = [];
-    let xCoordList = [];
-    let yCoordList = [];
+    const idList = [];
+    const xCoordList = [];
+    const yCoordList = [];
 
     // Assuming "layer.find("Image")" is correctly defined elsewhere
     layer.find("Image").forEach(node => {
