@@ -256,7 +256,7 @@ public class InputValidator {
     /**
      * Checks input against a criteria: This function only allows numbers, letters,
      * hyphens, commas, dots, slashes and spaces.
-     * 
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -270,7 +270,7 @@ public class InputValidator {
     /**
      * Checks input against a criteria: This function only allows numbers, letters,
      * hyphens and spaces.
-     * 
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -430,10 +430,16 @@ public class InputValidator {
         return result;
     }
 
+    public static ValidationResult validatePlantCategory(String plantCategory) {
+        return new InputValidator(plantCategory)
+                .lengthHelper(200)
+                .getResult();
+    }
+
     /**
      * Validate a new garden tag
      * 25 characters or less and alpha numeric or _ - ' " and space
-     * 
+     *
      * @param tag tag string to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
      *         otherwise and this.getErrorMessage() returning the error message
