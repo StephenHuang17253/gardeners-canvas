@@ -10,6 +10,11 @@ const plantDescriptionJSError = document.getElementById("plantDescriptionJSError
 const plantCount = document.getElementById("plantCount");
 const plantCountJSError = document.getElementById("plantCountJSError");
 
+const plantCategory = document.getElementById("plantCategory");
+const plantCategoryButton = document.getElementById("plantCategoryButton");
+const plantCategoryJSError = document.getElementById("plantCategoryJSError");
+let plantCategorySelected = false;
+
 const variationSelector1 = 65039;
 const submitButton = document.querySelector('button[type="submit"]');
 
@@ -65,9 +70,6 @@ const handleDateUpdate = (event) => {
     } else {
         validAge = true;
     }
-
-
-
     if (!validAge) {
         displayDateError();
     } else {
@@ -234,6 +236,48 @@ const handleCountUpdate = (event) => {
 
 
 /**
+ * Handles the case where the user's input for the category is invalid.
+ * Sets the border of the input to red, and makes the error message visible.
+ * @param {HTMLElement} inputField - The input field element (plantCategory).
+ * @param {HTMLElement} errorField - The error message element (plantCategoryJSError).
+ * @returns {void}
+ */
+const displayCategoryError = () => {
+    plantCategoryButton.classList.add("border-danger");
+    plantCategoryJSError.style.display = "block";
+}
+
+/**
+ * Clears the error message and removes the red border from the input field.
+ * @param {HTMLElement} inputField - The input field element.
+ * @param {HTMLElement} errorField - The error message element.
+ * @returns {void}
+ */
+const clearCategoryError = () => {
+    plantCategory.setCustomValidity("");
+    plantCategory.classList.remove("border-danger");
+    plantCategoryJSError.style.display = "none";
+}
+
+/**
+ * Handles updates to the input field for category.
+ * @param {{target: HTMLElement}} event - The input event.
+ * @param {HTMLElement} errorField - The error message element.
+ * @returns {void}
+ */
+const handleCategoryUpdate = (event) => {
+    let categoryValue = event.target.value;
+    if (categoryValue.length === 0) {
+        displayCategoryError();
+    } else {
+        clearCategoryError();
+        plantCategorySelected = true
+    }
+
+}
+
+
+/**
  * Validates the form on the client-side when the user presses the Submit button.
  * If there is an invalid input, prevent the submission of the form.
  * @param {Event} event - The input event.
@@ -244,8 +288,9 @@ const handleFormSubmit = (event) => {
     handleNameUpdate({ target: plantName }, plantNameJSError);
     handleDescriptionUpdate({ target: plantDescription });
     handleCountUpdate({ target: plantCount });
+    handleCategoryUpdate({target: plantCategory});
     // Prevent form submission if there are any validation errors
-    if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity()) {
+    if (!plantDate.checkValidity() || !plantName.checkValidity() || !plantDescription.checkValidity() || !plantCount.checkValidity() || !plantCategorySelected) {
         event.preventDefault();
     }
 }

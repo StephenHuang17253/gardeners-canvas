@@ -74,6 +74,14 @@ public class GridItemLocation {
         this.id = id;
     }
 
+    public Long getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(Long objectId) {
+        this.objectId = objectId;
+    }
+
     public GridItemType getItemType() {
         return itemType;
     }
