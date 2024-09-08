@@ -4,6 +4,8 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
@@ -27,6 +29,10 @@ class GardenServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private GridItemLocationRepository gridItemLocationRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
     private UserService userService;
 
     private List<Garden> gardenList = new ArrayList<>();
@@ -36,6 +42,8 @@ class GardenServiceIntegrationTest {
     @BeforeEach
     void ClearRepository_AddUsersAndGardens() {
         gardenList = new ArrayList<>();
+        tokenRepository.deleteAll();
+        gridItemLocationRepository.deleteAll();
         userRepository.deleteAll();
         User user1 = new User("John", "Doe", "johnDoe@email.com", date);
         User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);

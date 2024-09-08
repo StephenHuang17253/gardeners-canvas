@@ -378,7 +378,6 @@ public class GardensController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "404";
         }
-        logger.info(weatherListJson);
 
         Garden garden = optionalGarden.get();
 
