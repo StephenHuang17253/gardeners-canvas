@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -373,4 +374,95 @@ class Garden2dControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
+    void clear2DGarden_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void clear2DGarden_invalidGardenID_return404() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
+        Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
+
+    }
+
+    @Test
+    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
+    void clear2DGarden_UserNotOwnerGardenExists_return403Forbidden() throws Exception {
+
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Garden garden = gardenService.getGardenById(gardenId).get();
+        Plant testPlant = garden.getPlants().get(0);
+
+        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
+                garden, 9, 8);
+        gridItemLocationService.addGridItemLocation(newGridItemLocation);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void clear2DGarden_GardenHasItem_clearItem() throws Exception {
+
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Garden garden = gardenService.getGardenById(gardenId).get();
+        Plant testPlant = garden.getPlants().get(0);
+
+        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
+                garden, 9, 8);
+        gridItemLocationService.addGridItemLocation(newGridItemLocation);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void clear2DGarden_GardenHasNoItems_return302() throws Exception {
+
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Garden garden = gardenService.getGardenById(gardenId).get();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void clear2DGarden_GardenHasMultipleItems_clearAllItems() throws Exception {
+
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Garden garden = gardenService.getGardenById(gardenId).get();
+        Plant testPlant = garden.getPlants().get(0);
+
+        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
+                garden, 1, 1);
+        GridItemLocation newGridItemLocation2 = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
+                garden, 5, 5);
+        gridItemLocationService.addGridItemLocation(newGridItemLocation);
+        gridItemLocationService.addGridItemLocation(newGridItemLocation2);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
+
+    }
 }
