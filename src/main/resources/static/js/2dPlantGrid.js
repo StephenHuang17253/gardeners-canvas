@@ -339,4 +339,38 @@ pngDownloadButton.addEventListener("click", () => handleExport("png"));
 jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 
 
+const deleteButton = document.getElementById("deletePlant");
+
+// Add an event listener for the Delete button
+deleteButton.addEventListener("click", function () {
+    if (selectedPlant) {
+        // Find the plant item in the palette
+        const plantName = selectedPlantInfo ? selectedPlantInfo.name : null;
+        const plantItem = plantName
+            ? Array.from(document.querySelectorAll('[name="plant-item"]')).find(
+                item => item.getAttribute("data-plant-name") === plantName
+            )
+            : null;
+
+        console.log(plantItem)
+
+        if (plantItem) {
+            console.log("running count code")
+            const currentCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
+            plantItem.setAttribute("data-plant-count", currentCount);
+            updatePlantCountDisplay(plantItem, currentCount);
+            console.log(currentCount)
+        }
+
+        // Remove the selected plant from the grid
+        selectedPlant.destroy();
+        selectedPlant = null;
+        selectedPlantInfo = null;
+        if (highlightedPaletteItem) {
+            highlightedPaletteItem.style.border = "none";
+            highlightedPaletteItem = null;
+        }
+    }
+});
+
 
