@@ -17,9 +17,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class ProfanityService {
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
     String emptyRegex = "^\\s*$";
 
-    Random random = new Random();
+    SecureRandom random = new SecureRandom();
 
     private final GardenTagService gardenTagService;
 

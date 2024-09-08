@@ -1005,7 +1005,7 @@ public class InputValidator {
 
         String filteredValue = testedValue.replaceAll("\\s+", "");
 
-        if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
+        if (!filteredValue.equals("") && !filteredValue.matches("[A-Za-z]+")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
