@@ -1,4 +1,3 @@
-import { on } from "events";
 import { Downloader } from "./Downloader.js";
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
@@ -85,11 +84,10 @@ const validLocation = (x, y) => {
     return x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
 };
 
-
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y, plantId, onload=undefined) => {
+const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
@@ -107,8 +105,9 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload=undefined) => {
 
 
         plant.on("dragmove", () => {
-            let x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE) * GRID_SIZE + OFFSET_X;
-            let y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE) * GRID_SIZE + OFFSET_Y;
+            const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
+            const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
+            let { x, y } = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -156,88 +155,42 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload=undefined) => {
 /**
  * Loads the persisted plants from a saved layout onto the grid.
  */
-document.querySelectorAll('.grid-item-location').forEach(item => {
-    const x_coord = parseInt(item.getAttribute('data-grid-x'));
-    const y_coord = parseInt(item.getAttribute('data-grid-y'));
-    const plantId = item.getAttribute('data-grid-objectid');
+document.querySelectorAll(".grid-item-location").forEach(item => {
+    const x_coord = parseInt(item.getAttribute("data-grid-x"));
+    const y_coord = parseInt(item.getAttribute("data-grid-y"));
+    const plantId = item.getAttribute("data-grid-objectid");
 
+    let plantSrc = item.getAttribute("data-grid-image");
     const inst = getInstance();
-    // const plantImage = new Image();
-
     if (inst === "test/" || inst === "prod/") {
-        plantImage.src = `/${inst}` + item.getAttribute("data-grid-image")
-    } else {
-        plantImage.src = item.getAttribute("data-grid-image")
+        plantSrc = `/${inst}` + plantSrc;
     }
+    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
-    handleAddPlant(plantImage.src, x_coord, y_coord, plantId, onload=() => updateCountersOnLoad(plantId));
-
-    // plantImage.onload = () => {
-    //     const konvaPos = convertToKonvaCoordinates(x_coord, y_coord);
-    //     const plant = new Konva.Image({
-    //         x: konvaPos.x,
-    //         y: konvaPos.y,
-    //         image: plantImage,
-    //         width: GRID_SIZE,
-    //         height: GRID_SIZE,
-    //         name: plantName,
-    //         id: plantId.toString(),
-    //         draggable: true,
-    //     });
-
-    //     plant.on('dragmove', () => {
-    //         const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
-    //         const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
-    //         const konvaPos = convertToKonvaCoordinates(i, j);
-
-    //         plant.position({
-    //             x: konvaPos.x,
-    //             y: konvaPos.y,
-    //         });
-    //     });
-
-    //     plant.on('click', event => {
-    //         if (!selectedPlantInfo) {
-    //             if (selectedPlant) {
-    //                 selectedPlant.stroke(null);
-    //                 selectedPlant.strokeWidth(0);
-    //             }
-    //             selectedPlant = plant;
-    //             plant.stroke('blue');
-    //             plant.strokeWidth(4);
-    //             layer.draw();
-    //             event.cancelBubble = true;
-    //         }
-    //     });
-
-    //     layer.add(plant);
-    //     layer.draw();
-
-    //     updateCountersOnLoad(plantId);
-    // }
-
+    const onloadCallback = () => updateCountersOnLoad(plantId);
+    handleAddPlant(plantSrc, x, y, plantId, onloadCallback);
 });
 
 /**
- * Updates a plant's placed & remaining counters when the saved layout loads.
+ * Updates a plant"s placed & remaining counters when the saved layout loads.
  * @param plantId id of the plant whose counters are being updated
  */
 const updateCountersOnLoad = (plantId) => {
-    const plantItem = document.querySelector(`.plant-item[data-plant-id="${plantId}"]`)
+    const plantItem = document.querySelector(`[name="plant-item"][data-plant-id="${plantId}"]`)
 
     if (plantItem) {
-        const count = parseInt(plantItem.getAttribute('data-plant-count'))
-        const placedCount = originalPlantCounts[plantItem.getAttribute('data-plant-name')] - count;
+        const count = parseInt(plantItem.getAttribute("data-plant-count"))
+        const placedCount = originalPlantCounts[plantItem.getAttribute("data-plant-name")] - count;
 
-        const placedElement = plantItem.querySelector('#placed');
-        const remainingElement = plantItem.querySelector('#remaining');
+        const placedElement = plantItem.querySelector("#placed");
+        const remainingElement = plantItem.querySelector("#remaining");
 
         if (placedElement && remainingElement) {
             placedElement.textContent = `Placed: ${placedCount + 1}`;
             remainingElement.textContent = `Remaining: ${count - 1}`;
         }
 
-        plantItem.setAttribute('data-plant-count', count - 1);
+        plantItem.setAttribute("data-plant-count", count - 1);
     }
 
 }
@@ -245,7 +198,7 @@ const updateCountersOnLoad = (plantId) => {
 /**
  * Event listener for clicking on palette items
  */
-document.querySelectorAll('[name="plant-item"]').forEach(item => {
+document.querySelectorAll("[name='plant-item']").forEach(item => {
 
     const inst = getInstance();
     let plantImage;
@@ -348,7 +301,7 @@ if (clearAllButton) {
     clearAllButton.addEventListener("click", () => {
         layer.find("Image").forEach(node => node.destroy());
 
-        document.querySelectorAll('[name="plant-item"]').forEach(item => {
+        document.querySelectorAll("[name='plant-item']").forEach(item => {
             resetPlantCount(item);
         });
 
