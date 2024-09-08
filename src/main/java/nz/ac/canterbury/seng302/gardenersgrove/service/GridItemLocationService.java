@@ -122,7 +122,7 @@ public class GridItemLocationService {
      * @param gridItemLocation the gridItemLocation to remove
      */
     public void removeGridItemLocation(GridItemLocation gridItemLocation) {
-        gridItemLocationRepository.delete(gridItemLocation);
+        gridItemLocationRepository.deleteById(gridItemLocation.getId());
     }
 
     /**

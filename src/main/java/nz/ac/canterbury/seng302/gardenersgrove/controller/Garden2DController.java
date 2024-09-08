@@ -227,6 +227,8 @@ public class Garden2DController {
             return "403";
         }
 
+        logger.info("Clearing grid of garden with id: {}", gardenId);
+
         List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
 
         for (GridItemLocation gridItem : gridItems) {
