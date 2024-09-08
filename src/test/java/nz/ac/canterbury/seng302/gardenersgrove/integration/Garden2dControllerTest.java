@@ -375,7 +375,7 @@ class Garden2dControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
     void clear2DGarden_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/clear").with(csrf()))
@@ -393,6 +393,24 @@ class Garden2dControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
+    void clear2DGarden_UserNotOwnerGardenExists_return403Forbidden() throws Exception {
+
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Garden garden = gardenService.getGardenById(gardenId).get();
+        Plant testPlant = garden.getPlants().get(0);
+
+        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
+                garden, 9, 8);
+        gridItemLocationService.addGridItemLocation(newGridItemLocation);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+    }
+
+    @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void clear2DGarden_GardenHasItem_clearItem() throws Exception {
 
@@ -402,7 +420,6 @@ class Garden2dControllerTest {
         Garden garden = gardenService.getGardenById(gardenId).get();
         Plant testPlant = garden.getPlants().get(0);
 
-        // adding initial grid item locations to repository
         GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
                 garden, 9, 8);
         gridItemLocationService.addGridItemLocation(newGridItemLocation);
@@ -436,7 +453,6 @@ class Garden2dControllerTest {
         Garden garden = gardenService.getGardenById(gardenId).get();
         Plant testPlant = garden.getPlants().get(0);
 
-        // adding initial grid item locations to repository
         GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
                 garden, 1, 1);
         GridItemLocation newGridItemLocation2 = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
