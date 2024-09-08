@@ -242,7 +242,7 @@ class PlantServiceTest {
 
         // When
         plantService.addPlant("John's Plant", 3, "Plant owned by John", dateOfPlanting, 1L, PlantCategory.TREE);
-        Plant resultPlant = plantService.updatePlant(1L, "Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting);
+        Plant resultPlant = plantService.updatePlant(1L, "Jane's Plant", 4, "Plant owned by Jane", newDateOfPlanting, PlantCategory.HERB);
 
         // Then
         Assertions.assertEquals("Jane's Plant", resultPlant.getPlantName());
@@ -250,6 +250,7 @@ class PlantServiceTest {
         Assertions.assertEquals("Plant owned by Jane", resultPlant.getPlantDescription());
         Assertions.assertEquals(newDateOfPlanting, resultPlant.getPlantDate());
         Assertions.assertEquals(garden, resultPlant.getGarden());
+        Assertions.assertEquals(PlantCategory.HERB, resultPlant.getPlantCategory());
     }
 
 

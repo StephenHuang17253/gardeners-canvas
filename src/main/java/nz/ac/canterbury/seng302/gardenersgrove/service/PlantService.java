@@ -13,9 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service class for Plant objects.
@@ -139,6 +137,7 @@ public class PlantService {
             oldPlant.setPlantCount(newPlant.getPlantCount());
             oldPlant.setPlantDescription(newPlant.getPlantDescription());
             oldPlant.setPlantDate(newPlant.getPlantDate());
+            oldPlant.setPlantCategory(newPlant.getPlantCategory());
             return plantRepository.save(oldPlant);
         } else {
             throw new IllegalArgumentException("Invalid plant IDD");
@@ -154,7 +153,7 @@ public class PlantService {
      * @param newDesc  new plant description
      * @param newDate  new plant date
      */
-    public Plant updatePlant(Long id, String newName, int newCount, String newDesc, LocalDate newDate) {
+    public Plant updatePlant(Long id, String newName, int newCount, String newDesc, LocalDate newDate, PlantCategory newPlantCategory) {
         Optional<Plant> targetPlant = findById(id);
         if (targetPlant.isPresent()) {
             Plant oldPlant = targetPlant.get();
@@ -163,6 +162,7 @@ public class PlantService {
             oldPlant.setPlantCount(newCount);
             oldPlant.setPlantDescription(newDesc);
             oldPlant.setPlantDate(newDate);
+            oldPlant.setPlantCategory(newPlantCategory);
             return plantRepository.save(oldPlant);
         } else {
             throw new IllegalArgumentException("Invalid plant ID");
@@ -271,5 +271,9 @@ public class PlantService {
             garden.getPlants().remove(plantToDelete);
             plantRepository.deleteById(plantId);
         }
+    }
+
+    public List<PlantCategory> getPlantCategories() {
+        return Arrays.asList(PlantCategory.values());
     }
 }

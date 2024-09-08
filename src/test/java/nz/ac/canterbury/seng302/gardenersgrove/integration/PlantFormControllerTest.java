@@ -173,6 +173,7 @@ class PlantFormControllerTest {
                 .file(mockFile) // Attach the file to the request
                 .param("plantName", expectedPlant.getPlantName())
                 .param("plantCount", String.valueOf(expectedPlant.getPlantCount()))
+                .param("plantCategory", expectedPlant.getPlantCategory().toString())
                 .param("plantDescription", expectedPlant.getPlantDescription())
                 .param("plantDate", expectedPlant.getPlantDate().toString()));
 
@@ -183,6 +184,7 @@ class PlantFormControllerTest {
         Assertions.assertEquals(expectedPlant.getPlantName(), actualPlant.getPlantName());
         Assertions.assertEquals(expectedPlant.getPlantDescription(), actualPlant.getPlantDescription());
         Assertions.assertEquals(expectedPlant.getPlantCount(), actualPlant.getPlantCount());
+        Assertions.assertEquals(expectedPlant.getPlantCategory(), actualPlant.getPlantCategory());
 
     }
 
@@ -194,6 +196,7 @@ class PlantFormControllerTest {
 
         String newPlantName = "test";
         String newPlantDescription = "standardPlant";
+        String newPlantCategory = PlantCategory.HERB.toString();
         int newPlantCount = 1;
         LocalDate newPlantDate = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -211,7 +214,9 @@ class PlantFormControllerTest {
                 .param("plantName", newPlantName)
                 .param("plantCount", String.valueOf(newPlantCount))
                 .param("plantDescription", newPlantDescription)
+                .param("plantCategory", newPlantCategory)
                 .param("plantDate", newPlantDate.toString()));
+
 
         Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
         Assertions.assertTrue(optionalPlant.isPresent());
@@ -221,6 +226,7 @@ class PlantFormControllerTest {
         Assertions.assertEquals(newPlantDescription, actualPlant.getPlantDescription());
         Assertions.assertEquals(newPlantCount, actualPlant.getPlantCount());
         Assertions.assertEquals(newPlantDate, actualPlant.getPlantDate());
+        Assertions.assertEquals(newPlantCategory, actualPlant.getPlantCategory().toString());
     }
 
     @Test
@@ -567,6 +573,7 @@ class PlantFormControllerTest {
         String plantDescription = "standardPlant";
         int plantCount = 1;
         String plantName = "test";
+        String plantCategory = PlantCategory.TREE.toString();
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // Form field name
                 "default_plant.png", // Filename
@@ -580,7 +587,8 @@ class PlantFormControllerTest {
                 .param("plantName", plantName)
                 .param("plantCount", String.valueOf(plantCount))
                 .param("plantDescription", plantDescription)
-                .param("plantDate", String.valueOf(formattedDate)));
+                .param("plantDate", String.valueOf(formattedDate))
+                .param("plantCategory", plantCategory));
 
         Optional<Plant> optionalPlant = plantService.findById(expectedPlant.getPlantId());
         Assertions.assertTrue(optionalPlant.isPresent());
@@ -599,6 +607,7 @@ class PlantFormControllerTest {
         Plant expectedPlant = plantList.get(1);
 
         String plantDescription = "standardPlant";
+        String plantCategory = PlantCategory.TREE.toString();
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -614,7 +623,8 @@ class PlantFormControllerTest {
                         .param("plantName", plantName)
                         .param("plantCount", String.valueOf(plantCount))
                         .param("plantDescription", plantDescription)
-                        .param("plantDate", date.toString()))
+                        .param("plantDate", date.toString())
+                        .param("plantCategory", plantCategory))
                 .andExpect(MockMvcResultMatchers
                         .redirectedUrl("/my-gardens/" + testGarden.getGardenId()));
 
@@ -640,6 +650,7 @@ class PlantFormControllerTest {
     void plantFormController_editDescriptionVariantsPass(String plantDescription) throws Exception {
         Plant expectedPlant = plantList.get(1);
         String plantName = "standardPlant";
+        String plantCategory = PlantCategory.TREE.toString();
         int plantCount = 1;
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -655,7 +666,8 @@ class PlantFormControllerTest {
                         .param("plantName", plantName)
                         .param("plantCount", String.valueOf(plantCount))
                         .param("plantDescription", plantDescription)
-                        .param("plantDate", date.toString()))
+                        .param("plantDate", date.toString())
+                        .param("plantCategory", plantCategory))
                 .andExpect(MockMvcResultMatchers
                         .redirectedUrl("/my-gardens/" + testGarden.getGardenId()));
 
@@ -678,6 +690,7 @@ class PlantFormControllerTest {
 
         String plantName = "test name";
         String plantDescription = "standardPlant";
+        String plantCategory = PlantCategory.TREE.toString();
         LocalDate date = LocalDate.of(2024, 3, 28);
         MockMultipartFile mockFile = new MockMultipartFile(
                 "plantPictureInput", // Form field name
@@ -692,7 +705,8 @@ class PlantFormControllerTest {
                         .param("plantName", plantName)
                         .param("plantCount", String.valueOf(plantCount))
                         .param("plantDescription", plantDescription)
-                        .param("plantDate", date.toString()))
+                        .param("plantDate", date.toString())
+                        .param("plantCategory",plantCategory))
                 .andExpect(MockMvcResultMatchers
                         .redirectedUrl("/my-gardens/" + testGarden.getGardenId()));
 
