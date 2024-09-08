@@ -1006,7 +1006,6 @@ public class InputValidator {
         String filteredValue = testedValue.replaceAll("\\s+", "");
 
         if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
-            System.out.println("Invalid description from regex");
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
