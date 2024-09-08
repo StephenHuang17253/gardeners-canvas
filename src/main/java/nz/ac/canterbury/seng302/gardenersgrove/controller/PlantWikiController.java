@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -30,8 +29,11 @@ import java.util.stream.StreamSupport;
  */
 @Controller
 public class PlantWikiController {
+
     Logger logger = LoggerFactory.getLogger(PlantWikiController.class);
+
     private final PlantInfoService plantInfoService;
+
     private static final int PLANT_SPECIES_LIMIT = 3000;
 
     @Autowired
@@ -60,7 +62,7 @@ public class PlantWikiController {
                 List<PlantSearchModel> plants = StreamSupport.stream(plantList.get("data").spliterator(), false)
                         .map(PlantSearchModel::new)
                         .filter(plant -> plant.getId() <= PLANT_SPECIES_LIMIT)
-                        .collect(Collectors.toList());
+                        .toList();
 
                 model.addAttribute("plants", plants);
 
@@ -90,6 +92,7 @@ public class PlantWikiController {
                 model.addAttribute("searchError",
                         "An error occurred while retrieving plant data. Please try again later.");
             }
+
         } catch (IOException e) {
             logger.error("IOException occurred while fetching plant data: {}", e.getMessage());
             model.addAttribute("searchError", "There was an error retrieving plant data. Please try again later.");
@@ -113,7 +116,7 @@ public class PlantWikiController {
     private void addDefaultPlantsToModel(Model model) {
         List<PlantSearchModel> plants = plantInfoService.getAllDefaultPlants().stream()
                 .map(PlantSearchModel::new)
-                .collect(Collectors.toList());
+                .toList();
         model.addAttribute("plants", plants);
     }
 
@@ -129,7 +132,7 @@ public class PlantWikiController {
     @CrossOrigin
     public String viewPlantWiki(@RequestParam(name = "search", required = false) String search,
             Model model) {
-        logger.info("GET /plant-wiki with search term: {}", search);
+        logger.info("GET /plant-wiki");
 
         if (search != null && !search.isEmpty()) {
             model.addAttribute("searchTerm", search);
