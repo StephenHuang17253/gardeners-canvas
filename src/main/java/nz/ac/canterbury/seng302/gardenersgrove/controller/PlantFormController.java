@@ -47,6 +47,11 @@ public class PlantFormController {
     private final FileService fileService;
     private final SecurityService securityService;
 
+    private static final String PLANT_CATEGORY_ATTRIBUTE = "plantCategory";
+    private static final String PLANT_DATE_ATTRIBUTE = "plantDate";
+    private static final String PLANT_CATEGORIES_ATTRIBUTE = "categories";
+
+
     @Autowired
     public PlantFormController(PlantService plantService, GardenService gardenService, FileService fileService,
             SecurityService securityService) {
@@ -86,11 +91,11 @@ public class PlantFormController {
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
-        model.addAttribute("plantCategory", plantCategory);
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantCategory);
         model.addAttribute("plantDescription", plantDescription);
-        model.addAttribute("plantDate", plantDate);
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
-        model.addAttribute("categories", plantService.getPlantCategories());
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
@@ -166,10 +171,10 @@ public class PlantFormController {
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
-        model.addAttribute("plantCategory", plantCategory);
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantCategory);
         model.addAttribute("plantDescription", plantDescription);
-        model.addAttribute("plantDate", plantDate);
-        model.addAttribute("categories", plantService.getPlantCategories());
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
@@ -252,11 +257,11 @@ public class PlantFormController {
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
-        model.addAttribute("plantCategory", plantToUpdate.get().getPlantCategory());
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantToUpdate.get().getPlantCategory());
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
-        model.addAttribute("plantDate", plantDate);
-        model.addAttribute("categories", plantService.getPlantCategories());
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
         return "editPlantForm"; // Return the view for creating a new plant
     }
 
@@ -334,9 +339,9 @@ public class PlantFormController {
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
-        model.addAttribute("plantDate", plantDate);
-        model.addAttribute("plantCategory", plantCategory);
-        model.addAttribute("categories", plantService.getPlantCategories());
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantCategory);
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
                 || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
@@ -575,7 +580,8 @@ public class PlantFormController {
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
-        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantToUpdate.get().getPlantDate());
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantToUpdate.get().getPlantCategory());
 
         return "importPlantForm";
     }

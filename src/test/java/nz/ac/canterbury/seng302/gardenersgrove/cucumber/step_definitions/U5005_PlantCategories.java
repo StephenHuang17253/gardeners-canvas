@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.Map;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -178,7 +177,4 @@ public class U5005_PlantCategories {
         Assertions.assertEquals(plantName, updatedPlant.getPlantName());
         Assertions.assertEquals(plantCategory, updatedPlant.getPlantCategory().toString());
     }
-
-
-
 }
