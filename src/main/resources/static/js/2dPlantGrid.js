@@ -74,9 +74,6 @@ document.querySelectorAll('.grid-item-location').forEach(item => {
     const x_coord = parseInt(item.getAttribute('data-grid-x'));
     const y_coord = parseInt(item.getAttribute('data-grid-y'));
     const plantId = item.getAttribute('data-grid-objectid');
-    console.log(plantId)
-
-    console.log(item.getAttribute('data-grid-image'))
 
     const plantImage = new Image();
 
