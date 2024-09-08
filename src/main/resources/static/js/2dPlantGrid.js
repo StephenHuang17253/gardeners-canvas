@@ -222,7 +222,7 @@ document.querySelectorAll(".plant-item").forEach(item => {
 
     originalPlantCounts[plantName] = plantCount;
 
-    item.addEventListener("click", function() {
+    item.addEventListener("click", function () {
         const currentCount = parseInt(this.getAttribute('data-plant-count'));
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = "none";
@@ -354,8 +354,8 @@ function updatePlantCountDisplay(plantItem, count) {
  */
 const dataURLtoBlob = (dataURL) => {
     // Split the data URL to extract the MIME type and base64 data
-    const [mime, base64] = dataURL.split(',');
-    const mimeType = mime.split(':')[1].split(';')[0];
+    const [mime, base64] = dataURL.split(",");
+    const mimeType = mime.split(":")[1].split(";")[0];
 
     // Decode the base64 string
     const byteString = atob(base64);
