@@ -1,3 +1,4 @@
+import { on } from "events";
 import { Downloader } from "./Downloader.js";
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
@@ -18,7 +19,6 @@ const GRID_HEIGHT = GRID_ROWS * GRID_SIZE;
 const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
-let plantPosition = 100;
 const plantName = "plant";
 
 const originalPlantCounts = {};
@@ -39,9 +39,16 @@ const downloader = new Downloader(link);
 const layer = new Konva.Layer();
 stage.add(layer);
 
-function convertToKonvaCoordinates(gridItemX, gridItemY) {
-    const konvaX = gridItemX * GRID_SIZE + offsetX;
-    const konvaY = gridItemY * GRID_SIZE + offsetY;
+/**
+ * Converts grid item coordinates to Konva coordinates
+ * 
+ * @param {Number} gridItemX - x-coordinate of the grid item
+ * @param {Number} gridItemY - y-coordinate of the grid item
+ * @returns {Object} - Object containing the x and y coordinates in Konva
+ */
+const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
+    const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
+    const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
     return { x: konvaX, y: konvaY };
 }
 
@@ -49,9 +56,10 @@ function convertToKonvaCoordinates(gridItemX, gridItemY) {
 // Create grid
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
+        const konvaPos = convertToKonvaCoordinates(i, j);
         const rect = new Konva.Rect({
-            x: i * GRID_SIZE + OFFSET_X,
-            y: j * GRID_SIZE + OFFSET_Y,
+            x: konvaPos.x,
+            y: konvaPos.y,
             width: GRID_SIZE,
             height: GRID_SIZE,
             fill: "green",
@@ -77,98 +85,11 @@ const validLocation = (x, y) => {
     return x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
 };
 
-/**
- * Loads the persisted plants from a saved layout onto the grid.
- */
-document.querySelectorAll('.grid-item-location').forEach(item => {
-    const x_coord = parseInt(item.getAttribute('data-grid-x'));
-    const y_coord = parseInt(item.getAttribute('data-grid-y'));
-    const plantId = item.getAttribute('data-grid-objectid');
-
-    const inst = getInstance();
-    const plantImage = new Image();
-
-    if (inst === "test/" || inst === "prod/") {
-        plantImage.src = `/${inst}` + item.getAttribute("data-grid-image")
-    } else {
-        plantImage.src = item.getAttribute("data-grid-image")
-    }
-
-    plantImage.onload = function () {
-        const konvaPos = convertToKonvaCoordinates(x_coord, y_coord);
-        const plant = new Konva.Image({
-            x: konvaPos.x,
-            y: konvaPos.y,
-            image: plantImage,
-            width: GRID_SIZE,
-            height: GRID_SIZE,
-            name: plantName,
-            id: plantId.toString(),
-            draggable: true,
-        });
-
-        plant.on('dragmove', function () {
-            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
-
-            plant.position({
-                x: x,
-                y: y,
-            });
-        });
-
-        plant.on('click', function (event) {
-            if (!selectedPlantInfo) {
-                if (selectedPlant) {
-                    selectedPlant.stroke(null);
-                    selectedPlant.strokeWidth(0);
-                }
-                selectedPlant = plant;
-                plant.stroke('blue');
-                plant.strokeWidth(4);
-                layer.draw();
-                event.cancelBubble = true;
-            }
-        });
-
-        layer.add(plant);
-        layer.draw();
-
-        updateCountersOnLoad(plantId);
-    }
-
-});
-
-/**
- * Updates a plant's placed & remaining counters when the saved layout loads.
- * @param plantId id of the plant whose counters are being updated
- */
-function updateCountersOnLoad(plantId) {
-    const plantItem = document.querySelector(`.plant-item[data-plant-id="${plantId}"]`)
-
-    if (plantItem) {
-        const count = parseInt(plantItem.getAttribute('data-plant-count'))
-        const placedCount = originalPlantCounts[plantItem.getAttribute('data-plant-name')] - count;
-
-        const placedElement = plantItem.querySelector('#placed');
-        const remainingElement = plantItem.querySelector('#remaining');
-
-        if (placedElement && remainingElement) {
-            placedElement.textContent = `Placed: ${placedCount + 1}`;
-            remainingElement.textContent = `Remaining: ${count - 1}`;
-        }
-
-        plantItem.setAttribute('data-plant-count', count - 1);
-    }
-
-}
 
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y, plantId) => {
-    plantPosition -= 10;
-    let currentPlantName = plantName + plantPosition.toString();
+const handleAddPlant = (imageSrc, x, y, plantId, onload=undefined) => {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
@@ -225,8 +146,101 @@ const handleAddPlant = (imageSrc, x, y, plantId) => {
         });
 
         layer.add(plant);
+
+        if (onload) {
+            onload();
+        }
     };
 };
+
+/**
+ * Loads the persisted plants from a saved layout onto the grid.
+ */
+document.querySelectorAll('.grid-item-location').forEach(item => {
+    const x_coord = parseInt(item.getAttribute('data-grid-x'));
+    const y_coord = parseInt(item.getAttribute('data-grid-y'));
+    const plantId = item.getAttribute('data-grid-objectid');
+
+    const inst = getInstance();
+    // const plantImage = new Image();
+
+    if (inst === "test/" || inst === "prod/") {
+        plantImage.src = `/${inst}` + item.getAttribute("data-grid-image")
+    } else {
+        plantImage.src = item.getAttribute("data-grid-image")
+    }
+
+    handleAddPlant(plantImage.src, x_coord, y_coord, plantId, onload=() => updateCountersOnLoad(plantId));
+
+    // plantImage.onload = () => {
+    //     const konvaPos = convertToKonvaCoordinates(x_coord, y_coord);
+    //     const plant = new Konva.Image({
+    //         x: konvaPos.x,
+    //         y: konvaPos.y,
+    //         image: plantImage,
+    //         width: GRID_SIZE,
+    //         height: GRID_SIZE,
+    //         name: plantName,
+    //         id: plantId.toString(),
+    //         draggable: true,
+    //     });
+
+    //     plant.on('dragmove', () => {
+    //         const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
+    //         const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
+    //         const konvaPos = convertToKonvaCoordinates(i, j);
+
+    //         plant.position({
+    //             x: konvaPos.x,
+    //             y: konvaPos.y,
+    //         });
+    //     });
+
+    //     plant.on('click', event => {
+    //         if (!selectedPlantInfo) {
+    //             if (selectedPlant) {
+    //                 selectedPlant.stroke(null);
+    //                 selectedPlant.strokeWidth(0);
+    //             }
+    //             selectedPlant = plant;
+    //             plant.stroke('blue');
+    //             plant.strokeWidth(4);
+    //             layer.draw();
+    //             event.cancelBubble = true;
+    //         }
+    //     });
+
+    //     layer.add(plant);
+    //     layer.draw();
+
+    //     updateCountersOnLoad(plantId);
+    // }
+
+});
+
+/**
+ * Updates a plant's placed & remaining counters when the saved layout loads.
+ * @param plantId id of the plant whose counters are being updated
+ */
+const updateCountersOnLoad = (plantId) => {
+    const plantItem = document.querySelector(`.plant-item[data-plant-id="${plantId}"]`)
+
+    if (plantItem) {
+        const count = parseInt(plantItem.getAttribute('data-plant-count'))
+        const placedCount = originalPlantCounts[plantItem.getAttribute('data-plant-name')] - count;
+
+        const placedElement = plantItem.querySelector('#placed');
+        const remainingElement = plantItem.querySelector('#remaining');
+
+        if (placedElement && remainingElement) {
+            placedElement.textContent = `Placed: ${placedCount + 1}`;
+            remainingElement.textContent = `Remaining: ${count - 1}`;
+        }
+
+        plantItem.setAttribute('data-plant-count', count - 1);
+    }
+
+}
 
 /**
  * Event listener for clicking on palette items
@@ -404,8 +418,8 @@ document.getElementById("saveGardenForm").addEventListener("submit", event => {
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const x_coord = Math.round((node.x() - offsetX) / GRID_SIZE);
-        const y_coord = Math.round((node.y() - offsetY) / GRID_SIZE);
+        const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
+        const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
         xCoordList.push(x_coord);
         yCoordList.push(y_coord);
     });
