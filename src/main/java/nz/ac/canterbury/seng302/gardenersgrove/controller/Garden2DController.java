@@ -15,12 +15,10 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -245,25 +243,26 @@ public class Garden2DController {
     /**
      * This endpoint handles deleting a single item from the grid.
      * @param gardenId id of the garden the grid belongs to
-     * @param gridItemToDelete id of the item we're deleting from the grid
+     * @param gridItemId id of the item we're deleting from the grid
      * @param response http response to use to return error
      * @param model model to use to return error
      * @return redirect back to the 2d garden page
      */
-    @PostMapping("/2D-garden/{gardenId}/delete")
-    public String deleteGridItem(@PathVariable Long gardenId,
-                                 @RequestParam(value = "gridItemToDelete") Long gridItemToDelete,
+    @DeleteMapping("/2D-garden/{gardenId}/delete/{gridItemId}")
+    @ResponseBody
+    public ResponseEntity<String> deleteGridItem(@PathVariable Long gardenId,
+                                 @RequestParam Long gridItemId,
                                  HttpServletResponse response,
                                  Model model) {
 
 
-    logger.info("POST /2D-garden/{}/delete", gardenId);
+    logger.info("DELETE /2D-garden/{}/delete", gardenId);
     Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
 
     if (optionalGarden.isEmpty()) {
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        return "404";
+//        return "404";
     }
 
     Garden garden = optionalGarden.get();
@@ -273,12 +272,12 @@ public class Garden2DController {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
                 "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
-        return "403";
+//        return "403";
     }
 
-    logger.info("Deleting item with id {} from grid of garden with id: {}", gridItemToDelete, gardenId);
+    logger.info("Deleting item with id {} from grid of garden with id: {}", gridItemId, gardenId);
 
-    Optional<GridItemLocation> gridItem = gridItemLocationService.getGridItemLocationById(gridItemToDelete);
+    Optional<GridItemLocation> gridItem = gridItemLocationService.getGridItemLocationById(gridItemId);
 
     if (gridItem.isPresent()) {
         try {
@@ -288,7 +287,7 @@ public class Garden2DController {
         }
     }
 
-    return "redirect:/2D-garden/{gardenId}";
+        return ResponseEntity.ok().build();
     }
 
 

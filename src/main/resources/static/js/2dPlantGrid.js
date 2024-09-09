@@ -440,15 +440,24 @@ jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 /**
  * Event-listener to handle deleting data. Is on the deleteGridItemForm to update hidden variables before submission.
  */
-document.getElementById("deleteGridItemForm").addEventListener("submit", event => {
-    event.preventDefault(); // Prevent the default form submission
+document.getElementById("deletePlant").addEventListener("click", async event => {
+    // event.preventDefault(); // Prevent the default form submission
 
     if (selectedPlant) {
         const plantId = selectedPlant.attrs.id;
-        const gridItemToDelete = document.getElementById("gridItemToDelete");
-        gridItemToDelete.value = plantId;
-        console.log(gridItemToDelete.value)
-        event.target.submit();
+        // const gridItemToDelete = document.getElementById("gridItemId");
+        // gridItemToDelete.value = plantId;
+        // console.log(gridItemToDelete.value)
+        const gardenId = document.getElementById("gardenId")
+        console.log(gardenId.value)
+        console.log(`/${instance}2D-garden/${gardenId.value}/delete/${plantId}`)
+        const response = await fetch(`/${instance}2D-garden/${gardenId.value}/delete/${plantId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        // event.target.submit();
     } else {
         console.error("Hidden input not found")
     }

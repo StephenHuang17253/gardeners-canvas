@@ -80,12 +80,13 @@
 
             <div class="mt-auto">
 
-                <form id="deleteGridItemForm" th:action="@{/2D-garden/__${garden.getGardenId()}__/delete}" method="post">
-                    <input id="gridItemToDelete"  name="gridItemToDelete" type="hidden" th:value="''">
-                    <button type="submit" id="deletePlant" class="btn bg-danger text-white mb-2" >Delete Selected Plant</button>
-                </form>
+<!--                <form id="deleteGridItemForm" th:action="@{/2D-garden/__${garden.getGardenId()}__/delete}" method="get">-->
+<!--                    <input id="gridItemId"  name="gridItemId" type="hidden" th:value="''">-->
+<!--                    <button type="submit" id="deletePlant" class="btn bg-danger text-white mb-2" >Delete Selected Plant</button>-->
+<!--                </form>-->
 
-
+                <input id="gardenId"  name="gardenId" type="hidden" th:value="${garden.getGardenId()}">
+                <button type="button" id="deletePlant" class="btn bg-danger text-white mb-2" >Delete Selected Plant</button>
 
                 <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
                               startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
