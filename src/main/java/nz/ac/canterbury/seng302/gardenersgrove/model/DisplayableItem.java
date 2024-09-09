@@ -16,6 +16,8 @@ public class DisplayableItem {
 
     private String modelName;
 
+    private Long objectId;
+
     /**
      * create a new Displayable object
      * 
@@ -25,27 +27,28 @@ public class DisplayableItem {
      * @param modelName   name of model used to display in 3d, e.g tree.obj
      * @param modelScale  a value to scale the displayed model by
      */
-    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String modelName, float modelScale) {
+    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String modelName, float modelScale, long objectId) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.name = name;
         this.modelName = modelName;
         this.modelScale = modelScale;
+        this.objectId = objectId;
     }
 
-    public int getxCoordinate() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
-    public void setxCoordinate(int xCoordinate) {
+    public void setXCoordinate(int xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getyCoordinate() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 
-    public void setyCoordinate(int yCoordinate) {
+    public void setYCoordinate(int yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
 
@@ -72,4 +75,9 @@ public class DisplayableItem {
     public void setModelScale(float modelScale) {
         this.modelScale = modelScale;
     }
+
+    public Long getObjectId() {return objectId;}
+
+    public void setObjectId(long objectId) {this.objectId = objectId;}
+
 }

@@ -18,7 +18,7 @@ const GRID_HEIGHT = GRID_ROWS * GRID_SIZE;
 const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
-let plantName = "plant";
+// const plantName = "plant";
 
 const originalPlantCounts = {};
 
@@ -89,7 +89,7 @@ const validLocation = (x, y) => {
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
+const handleAddPlant = (imageSrc, x, y, plantId, plantName, onload = undefined) => {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
@@ -185,20 +185,20 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
     const x_coord = parseInt(item.getAttribute("data-grid-x"));
     const y_coord = parseInt(item.getAttribute("data-grid-y"));
     const plantId = item.getAttribute("data-grid-objectid");
+    const plantName = item.getAttribute("data-grid-name");
 
     let plantSrc = item.getAttribute("data-grid-image");
-    const inst = getInstance();
-    if (inst === "test/" || inst === "prod/") {
-        plantSrc = `/${inst}` + plantSrc;
+    if (instance === "test/" || instance === "prod/") {
+        plantSrc = `/${instance}` + plantSrc;
     }
     const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
-    handleAddPlant(plantSrc, x, y, plantId, onloadCallback);
+    handleAddPlant(plantSrc, x, y, plantId,plantName, onloadCallback);
 });
 
 /**
- * Updates a plant"s placed & remaining counters when the saved layout loads.
+ * Updates a plant's placed & remaining counters when the saved layout loads.
  * @param plantId id of the plant whose counters are being updated
  */
 const updateCountersOnLoad = (plantId) => {
@@ -232,7 +232,7 @@ document.querySelectorAll("[name='plant-item']").forEach(item => {
         plantImage = `/${inst}` + plantImage
     }
 
-    plantName = item.getAttribute("data-plant-name");
+    const plantName = item.getAttribute("data-plant-name");
     originalPlantCounts[plantName] = parseInt(item.getAttribute("data-plant-count"));
 
     item.addEventListener("click", () => {
@@ -311,7 +311,7 @@ stage.on("click", event => {
  * @param {HTMLElement} plantItem - The plant item element
  */
 const resetPlantCount = (plantItem) => {
-    plantName = plantItem.getAttribute("data-plant-name");
+    const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
     plantItem.setAttribute("data-plant-count", originalCount);
     updatePlantCountDisplay(plantItem, originalCount);
@@ -343,7 +343,7 @@ if (clearAllButton) {
  * @param {number} count - The new count
  */
 const updatePlantCountDisplay = (plantItem, count) => {
-    plantName = plantItem.getAttribute("data-plant-name");
+    const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
 
     // Select the <a> elements by their ids

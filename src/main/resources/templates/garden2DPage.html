@@ -61,11 +61,12 @@
                         </div>
                     </div>
 
-                    <div th:each="gridItemLocation : ${gridItemLocations}">
-                        <div class="grid-item-location" th:data-grid-x="${gridItemLocation.getXCoordinate()}"
-                            th:data-grid-y="${gridItemLocation.getYCoordinate()}"
-                            th:data-grid-objectid="${gridItemLocation.getObjectId()}"
-                            th:data-grid-image="${plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename()}">
+                    <div th:each="displayableItem : ${displayableItemsList}">
+                        <div class="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                             th:data-grid-y="${displayableItem.getYCoordinate()}"
+                             th:data-grid-name="${displayableItem.getName()}"
+                            th:data-grid-objectid="${displayableItem.getObjectId()}"
+                            th:data-grid-image="${plantsById[displayableItem.getObjectId()].getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plantsById[gridItemLocation.getObjectId()].getPlantPictureFilename()}">
                         </div>
                     </div>
 

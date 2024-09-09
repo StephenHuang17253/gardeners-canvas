@@ -125,7 +125,8 @@ public class Garden3DController {
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().getModelName(),
-                            currentPlant.getPlantCategory().getScaleFactor()));
+                            currentPlant.getPlantCategory().getScaleFactor(),
+                            plantLocation.getObjectId()));
                 }
             }
         }

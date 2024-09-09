@@ -6,9 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
@@ -36,6 +38,8 @@ public class Garden2DController {
 
     private final SecurityService securityService;
 
+    private final PlantService plantService;
+
     private final GridItemLocationService gridItemLocationService;
 
     private static final int COUNT_PER_PAGE = 6;
@@ -43,10 +47,11 @@ public class Garden2DController {
     private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
 
     @Autowired
-    public Garden2DController(GardenService gardenService, SecurityService securityService, GridItemLocationService gridItemLocationService) {
+    public Garden2DController(GardenService gardenService, SecurityService securityService, GridItemLocationService gridItemLocationService, PlantService plantService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.gridItemLocationService = gridItemLocationService;
+        this.plantService = plantService;
 
     }
 
@@ -78,9 +83,28 @@ public class Garden2DController {
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
 
+        List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
+
+        List<DisplayableItem> displayableItems = new ArrayList<>();
+
+        for (GridItemLocation plantLocation : plantLocations) {
+            if (plantLocation.getItemType() == GridItemType.PLANT) {
+                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getId());
+                if (optionalPlant.isPresent()) {
+                    Plant currentPlant = optionalPlant.get();
+                    displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
+                            plantLocation.getYCoordinate(),
+                            currentPlant.getPlantName(),
+                            currentPlant.getPlantCategory().getModelName(),
+                            currentPlant.getPlantCategory().getScaleFactor(),
+                            plantLocation.getObjectId()));
+                }
+            }
+        }
+
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
-        model.addAttribute("gridItemLocations", gridItemLocationService.getGridItemLocationByGarden(garden));
+        model.addAttribute("displayableItemsList", displayableItems);
         model.addAttribute("plantsById", plantsById);
         return "garden2DPage";
     }
