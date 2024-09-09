@@ -53,25 +53,20 @@ public class GridItemLocation {
         this.yCoordinate = yCoordinate;
     }
 
-    /**
-     * removes this entity from the associated garden such that it can be deleted.
-     * <a href=
-     * "https://stackoverflow.com/questions/22688402/delete-not-working-with-jparepository/52525033#52525033">
-     * without this deleting Grid item locations is not possible</a>
-     */
-    @PreRemove
-    protected void removeSelfFromParent() {
-        if (this.garden != null) {
-            this.garden.dismissGridLocation(this);
-        }
-    }
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(Long objectId) {
+        this.objectId = objectId;
     }
 
     public GridItemType getItemType() {

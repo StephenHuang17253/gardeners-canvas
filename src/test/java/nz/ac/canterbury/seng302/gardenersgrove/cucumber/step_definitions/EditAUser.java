@@ -6,10 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -63,6 +60,9 @@ public class EditAUser {
     @Autowired
     public FileService fileService;
 
+    @Autowired
+    public GridItemLocationRepository gridItemLocationRepository;
+
     public UserService userService;
 
     String firstName = "John";
@@ -79,6 +79,7 @@ public class EditAUser {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         tokenRepository.deleteAll();
         friendshipRepository.deleteAll();
+        gridItemLocationRepository.deleteAll();
         userRepository.deleteAll();
         userService.addUser(new User(firstName,
                 lastName,

@@ -2,6 +2,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,10 +80,6 @@ public class Garden {
     @CreatedDate
     private LocalDateTime lastLocationUpdate;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "garden_id")
-    private List<GridItemLocation> itemLocations = new ArrayList<>();
-
     /**
      * JPA required no-args constructor
      */
@@ -155,30 +152,12 @@ public class Garden {
     }
 
     /**
-     * Removes a grid item location from this garden such that it can be deleted.
-     * This is required as JPA
-     * <a href=
-     * "https://stackoverflow.com/questions/22688402/delete-not-working-with-jparepository/52525033#52525033">
-     * will not delete objects still linked in bidirectional relationships </a>
-     * Should only be called by the pre delete method in gridItemLocation entity.
-     * 
-     * @param gridItemLocation the grid item location to remove from this garden
-     */
-    protected void dismissGridLocation(GridItemLocation gridItemLocation) {
-        this.itemLocations.remove(gridItemLocation);
-    }
-
-    /**
      * Removes a association between a garden and GridItemLocation before it is
      * deleted.
      * This avoids grid items trying to de-register themselves from gardens when
      * deleted, which causes a concurent
      * modification exception
      */
-    @PreRemove
-    public void removeGardenGridAssociations() {
-        itemLocations.forEach(location -> location.setGarden(null));
-    }
 
     public Long getGardenId() {
         return gardenId;
@@ -253,10 +232,6 @@ public class Garden {
 
     public LocalDateTime getLastWaterCheck() {
         return lastWaterCheck;
-    }
-
-    public List<GridItemLocation> getItemLocations() {
-        return itemLocations;
     }
 
     public void setGardenName(String gardenName) {

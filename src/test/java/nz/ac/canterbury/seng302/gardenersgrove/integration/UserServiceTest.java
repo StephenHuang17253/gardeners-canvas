@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,15 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * SpringBootTest being used to attempt to run integration tests between the
@@ -32,6 +31,10 @@ class UserServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
+    private GridItemLocationRepository gridItemLocationRepository;
 
     @Autowired
     private UserService userService;
@@ -53,6 +56,8 @@ class UserServiceTest {
 
     @BeforeEach
     void clearRepository_AddUser_LoginUser() {
+        tokenRepository.deleteAll();
+        gridItemLocationRepository.deleteAll();
         userRepository.deleteAll();
         User user = new User(fName1, lName1, email1, date1);
         userService.addUser(user, password1);
