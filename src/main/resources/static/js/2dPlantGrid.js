@@ -251,9 +251,8 @@ stage.on("click", event => {
 
         handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
         selectedPlantInfo.count -= 1
-
         highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
-        updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
+        updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count, true);
 
         highlightedPaletteItem.style.border = "none";
         highlightedPaletteItem = null;
@@ -313,6 +312,7 @@ if (clearAllButton) {
  * Updates the displayed plant count in the HTML
  * @param {HTMLElement} plantItem - The plant item element
  * @param {number} count - The new count
+ * @param adding - whether we are adding a plant or deleting one
  */
 const updatePlantCountDisplay = (plantItem, count) => {
     const plantName = plantItem.getAttribute("data-plant-name");
@@ -442,32 +442,11 @@ const deleteButton = document.getElementById("deletePlant");
 // Add an event listener for the Delete button
 deleteButton.addEventListener("click", function () {
     if (selectedPlant) {
-        // Find the plant item in the palette
-        const plantName = selectedPlantInfo ? selectedPlantInfo.name : null;
-        const plantItem = plantName
-            ? Array.from(document.querySelectorAll('[name="plant-item"]')).find(
-                item => item.getAttribute("data-plant-name") === plantName
-            )
-            : null;
 
-        console.log(plantItem)
-
-        if (plantItem) {
-            console.log("running count code")
-            const currentCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
-            plantItem.setAttribute("data-plant-count", currentCount);
-            updatePlantCountDisplay(plantItem, currentCount);
-            console.log(currentCount)
-        }
-
-        // Remove the selected plant from the grid
-        selectedPlant.destroy();
-        selectedPlant = null;
-        selectedPlantInfo = null;
-        if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = "none";
-            highlightedPaletteItem = null;
-        }
+        console.log(selectedPlant.attrs.id)
+        const plantId = selectedPlant.attrs.id
+        const gridItemToDelete = document.getElementById("gridItemToDelete")
+        gridItemToDelete.value = plantId;
     }
 });
 
