@@ -118,7 +118,7 @@ public class Garden3DController {
 
         for (GridItemLocation plantLocation : plantLocations) {
             if (plantLocation.getItemType() == GridItemType.PLANT) {
-                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getId());
+                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getObjectId());
                 if (optionalPlant.isPresent()) {
                     Plant currentPlant = optionalPlant.get();
                     displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
@@ -127,6 +127,12 @@ public class Garden3DController {
                             currentPlant.getPlantCategory().getModelName(),
                             currentPlant.getPlantCategory().getScaleFactor()));
                 }
+                else {
+                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}",plantLocation.getId());
+                }
+            }
+            else {
+                logger.warn("Not yet implemented adding decoration to grid {}",plantLocation.getId());
             }
         }
 
