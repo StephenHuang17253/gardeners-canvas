@@ -465,4 +465,19 @@ class Garden2dControllerTest {
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
 
     }
+
+    void save2DGarden_twoCopiesOfSamePlantAtDifferentLocations_returnRedirectAndChangePersistence() {
+
+    }
+
+    void save2DGarden_updatePreexistingWithDuplicates_returnRedirectAndChangePersistence() {
+
+    }
+
+
+    void save2DGarden_preexistingAndEmptyInputs_returnRedirectAndDoNotChangePersistence() {
+
+    }
+
+
 }
