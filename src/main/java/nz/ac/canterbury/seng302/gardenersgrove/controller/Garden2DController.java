@@ -242,4 +242,54 @@ public class Garden2DController {
         return "redirect:/2D-garden/{gardenId}";
     }
 
+    /**
+     * This endpoint handles deleting a single item from the grid.
+     * @param gardenId id of the garden the grid belongs to
+     * @param gridItemToDelete id of the item we're deleting from the grid
+     * @param response http response to use to return error
+     * @param model model to use to return error
+     * @return redirect back to the 2d garden page
+     */
+    @PostMapping("/2D-garden/{gardenId}/delete")
+    public String deleteGridItem(@PathVariable Long gardenId,
+                                 @RequestParam(value = "gridItemToDelete") Long gridItemToDelete,
+                                 HttpServletResponse response,
+                                 Model model) {
+
+
+    logger.info("POST /2D-garden/{}/delete", gardenId);
+    Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+
+    if (optionalGarden.isEmpty()) {
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return "404";
+    }
+
+    Garden garden = optionalGarden.get();
+    model.addAttribute("gardenId", garden.getGardenId());
+
+    if (!securityService.isOwner(garden.getOwner().getId())) {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
+                "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+        return "403";
+    }
+
+    logger.info("Deleting item with id {} from grid of garden with id: {}", gridItemToDelete, gardenId);
+
+    Optional<GridItemLocation> gridItem = gridItemLocationService.getGridItemLocationById(gridItemToDelete);
+
+    if (gridItem.isPresent()) {
+        try {
+            gridItemLocationService.removeGridItemLocation(gridItem.get());
+        } catch (Exception exception) {
+            logger.error("Error removing grid item with id {}: {}", gridItem.get().getId(), exception.getMessage());
+        }
+    }
+
+    return "redirect:/2D-garden/{gardenId}";
+    }
+
+
 }
