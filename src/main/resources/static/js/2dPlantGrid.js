@@ -18,7 +18,7 @@ const GRID_HEIGHT = GRID_ROWS * GRID_SIZE;
 const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
-const plantName = "plant";
+let plantName = "plant";
 
 const originalPlantCounts = {};
 
@@ -36,7 +36,9 @@ const link = document.createElement("a");
 const downloader = new Downloader(link);
 
 const layer = new Konva.Layer();
+const tooltipLayer = new Konva.Layer();
 stage.add(layer);
+stage.add(tooltipLayer);
 
 /**
  * Converts grid item coordinates to Konva coordinates
@@ -92,6 +94,16 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
     plantImage.src = imageSrc;
 
     plantImage.onload = () => {
+        const tooltip = new Konva.Text({
+            text: '',
+            fontFamily: 'Calibri',
+            fontSize: 12,
+            padding: 5,
+            textFill: 'white',
+            fill: 'black',
+            alpha: 0.75,
+            visible: false,
+        });
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -144,9 +156,25 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
             plant.strokeWidth(4);
         });
 
+        plant.on('mousemove', ()  => {
+            const mousePos = stage.getPointerPosition();
+            tooltip.position({
+                x: mousePos.x + 5,
+                y: mousePos.y + 5,
+            });
+            tooltip.text(plant.name());
+            tooltip.show()
+        });
+
+        plant.on('mouseout', () => {
+            tooltip.hide();
+        })
+
         layer.add(plant);
 
         if (onload) onload();
+
+        tooltipLayer.add(tooltip)
     };
 };
 
@@ -204,7 +232,7 @@ document.querySelectorAll("[name='plant-item']").forEach(item => {
         plantImage = `/${inst}` + plantImage
     }
 
-    const plantName = item.getAttribute("data-plant-name");
+    plantName = item.getAttribute("data-plant-name");
     originalPlantCounts[plantName] = parseInt(item.getAttribute("data-plant-count"));
 
     item.addEventListener("click", () => {
@@ -249,7 +277,7 @@ stage.on("click", event => {
     if (highlightedPaletteItem) {
         if (selectedPlantInfo.count < 1 || !validLocation(x, y)) return;
 
-        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
+        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id, selectedPlantInfo.name)
         selectedPlantInfo.count -= 1
 
         highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
@@ -283,7 +311,7 @@ stage.on("click", event => {
  * @param {HTMLElement} plantItem - The plant item element
  */
 const resetPlantCount = (plantItem) => {
-    const plantName = plantItem.getAttribute("data-plant-name");
+    plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
     plantItem.setAttribute("data-plant-count", originalCount);
     updatePlantCountDisplay(plantItem, originalCount);
@@ -315,7 +343,7 @@ if (clearAllButton) {
  * @param {number} count - The new count
  */
 const updatePlantCountDisplay = (plantItem, count) => {
-    const plantName = plantItem.getAttribute("data-plant-name");
+    plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
 
     // Select the <a> elements by their ids
