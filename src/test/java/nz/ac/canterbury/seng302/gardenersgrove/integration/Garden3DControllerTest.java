@@ -79,7 +79,7 @@ class Garden3DControllerTest {
     private final int itemXCoord = 5;
     private final int itemYCoord = 5;
     private final String itemName = "test plant";
-    private final String itemModelName = "potplant.glb";
+    private final String itemModelName = "potplant_HD.glb";
 
     private final String johnEmail = "johnDoe@Garden3dControllerTest.com";
     private final String janeEmail = "janeDoe@Garden3dControllerTest.com";
