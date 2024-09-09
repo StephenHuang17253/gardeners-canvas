@@ -41,6 +41,7 @@ public interface GridItemLocationRepository extends CrudRepository<GridItemLocat
 
     /**
      * Finds GridItemLocation matching given details
+     * Note: This function is only being used in testing at the moment
      *
      * @param objectId unique id of plant or decoration entity in persistence
      * @param itemType plant or decoration
