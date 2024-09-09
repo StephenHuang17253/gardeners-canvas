@@ -94,16 +94,35 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
     plantImage.src = imageSrc;
 
     plantImage.onload = () => {
-        const tooltip = new Konva.Text({
-            text: '',
-            fontFamily: 'Calibri',
-            fontSize: 12,
-            padding: 5,
-            textFill: 'white',
-            fill: 'black',
-            alpha: 0.75,
+        const tooltip = new Konva.Label({
+            x: 0,
+            y: 0,
+            opacity: 0.75,
             visible: false,
+        })
+        const tooltiptag = new Konva.Tag({
+            fill:'black',
+            pointerDirection:'up',
+            pointerWidth: 10,
+            pointerHeight: 10,
+            lineJoin: 'round',
+            shadowColor: 'black',
+            shadowBlur: 10,
+            shadowOffsetX: 10,
+            shadowOffsetY: 10,
+            shadowOpacity: 0.5,
         });
+        const tooltiptext =
+            new Konva.Text({
+                text:'' ,
+                fontFamily: 'Calibri',
+                fontSize: 18,
+                padding: 5,
+                fill: 'white',
+            }
+        );
+        tooltip.add(tooltiptag)
+        tooltip.add(tooltiptext)
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -117,6 +136,7 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
 
 
         plant.on("dragmove", () => {
+            tooltip.hide();
             const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
             const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
             let { x, y } = convertToKonvaCoordinates(i, j);
@@ -139,11 +159,13 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
 
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
+            tooltip.hide();
             plant.stroke(null);
             plant.strokeWidth(0);
         });
 
         plant.on("click", () => {
+            tooltip.hide();
             if (selectedPlantInfo) return;
 
             if (selectedPlant) {
@@ -159,12 +181,12 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
         plant.on('mousemove', ()  => {
             const mousePos = stage.getPointerPosition();
             tooltip.position({
-                x: mousePos.x + 5,
-                y: mousePos.y + 5,
+                x: mousePos.x + 10,
+                y: mousePos.y + 10,
             });
-            console.log(category)
-            tooltip.text(plantName + "\n" + category);
+            tooltiptext.text(plantName + "\n" + category);
             tooltip.show()
+            tooltip.set
         });
 
         plant.on('mouseout', () => {
