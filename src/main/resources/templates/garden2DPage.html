@@ -126,6 +126,8 @@
             </div>
         </div>
     </div>
+    <div id="error-message" class="alert alert-warning py-2 px-3 m-2 position-fixed bottom-0 end-0 d-none font-bold"
+        role="alert"></div>
     <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}">
     <script type="module" th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
