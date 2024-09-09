@@ -12,9 +12,7 @@ public class DisplayableItem {
 
     private String name;
 
-    private float modelScale;
-
-    private String modelName;
+    private String category;
 
     private Long objectId;
 
@@ -24,15 +22,13 @@ public class DisplayableItem {
      * @param xCoordinate x location of object
      * @param yCoordinate y location of object
      * @param name        name of represented object e.g plant name
-     * @param modelName   name of model used to display in 3d, e.g tree.obj
-     * @param modelScale  a value to scale the displayed model by
+     * @param category    category of item
      */
-    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String modelName, float modelScale, long objectId) {
+    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.name = name;
-        this.modelName = modelName;
-        this.modelScale = modelScale;
+        this.category = category;
         this.objectId = objectId;
     }
 
@@ -60,20 +56,12 @@ public class DisplayableItem {
         this.name = name;
     }
 
-    public String getModelName() {
-        return modelName;
+    public String getCategory() {
+        return category;
     }
 
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
-    public float getModelScale() {
-        return modelScale;
-    }
-
-    public void setModelScale(float modelScale) {
-        this.modelScale = modelScale;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Long getObjectId() {return objectId;}

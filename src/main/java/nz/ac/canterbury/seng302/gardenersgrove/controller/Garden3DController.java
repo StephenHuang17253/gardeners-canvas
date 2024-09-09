@@ -85,14 +85,12 @@ public class Garden3DController {
      *
      * @param gardenId of the garden to get layout for
      * @param response object to be returned to caller
-     * @param model
      * @return a list of displayable items
      */
     @ResponseBody
     @GetMapping("/3D-garden-layout/{gardenId}")
     public List<DisplayableItem> get3DGardenLayout(@PathVariable Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+            HttpServletResponse response) {
         logger.info("GET /3D-garden-layout/{}", gardenId);
 
         List<DisplayableItem> displayableItems = new ArrayList<>();
@@ -124,8 +122,7 @@ public class Garden3DController {
                     displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
-                            currentPlant.getPlantCategory().getModelName(),
-                            currentPlant.getPlantCategory().getScaleFactor(),
+                            currentPlant.getPlantCategory().toString(),
                             plantLocation.getObjectId()));
                 }
             }

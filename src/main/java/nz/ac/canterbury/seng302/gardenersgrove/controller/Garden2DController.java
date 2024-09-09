@@ -95,8 +95,7 @@ public class Garden2DController {
                     displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
-                            currentPlant.getPlantCategory().getModelName(),
-                            currentPlant.getPlantCategory().getScaleFactor(),
+                            currentPlant.getPlantCategory().toString(),
                             plantLocation.getObjectId()));
                 }
             }

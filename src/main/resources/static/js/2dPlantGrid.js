@@ -89,7 +89,7 @@ const validLocation = (x, y) => {
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y, plantId, plantName, onload = undefined) => {
+const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = undefined) => {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
@@ -162,7 +162,8 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, onload = undefined) 
                 x: mousePos.x + 5,
                 y: mousePos.y + 5,
             });
-            tooltip.text(plant.name());
+            console.log(category)
+            tooltip.text(plantName + "\n" + category);
             tooltip.show()
         });
 
@@ -186,6 +187,7 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
     const y_coord = parseInt(item.getAttribute("data-grid-y"));
     const plantId = item.getAttribute("data-grid-objectid");
     const plantName = item.getAttribute("data-grid-name");
+    const category = item.getAttribute("data-grid-category");
 
     let plantSrc = item.getAttribute("data-grid-image");
     if (instance === "test/" || instance === "prod/") {
@@ -194,7 +196,7 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
     const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
-    handleAddPlant(plantSrc, x, y, plantId,plantName, onloadCallback);
+    handleAddPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
 });
 
 /**
@@ -238,6 +240,7 @@ document.querySelectorAll("[name='plant-item']").forEach(item => {
     item.addEventListener("click", () => {
 
         const currentCount = parseInt(item.getAttribute("data-plant-count"));
+        const category = item.getAttribute("data-plant-category")
 
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = "none";
@@ -257,7 +260,8 @@ document.querySelectorAll("[name='plant-item']").forEach(item => {
             name: item.getAttribute("data-plant-name"),
             image: plantImage,
             id: item.getAttribute("data-plant-id"),
-            count: currentCount
+            count: currentCount,
+            category: category
         };
     });
 })
@@ -277,7 +281,7 @@ stage.on("click", event => {
     if (highlightedPaletteItem) {
         if (selectedPlantInfo.count < 1 || !validLocation(x, y)) return;
 
-        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id, selectedPlantInfo.name)
+        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id, selectedPlantInfo.name, selectedPlantInfo.category)
         selectedPlantInfo.count -= 1
 
         highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
