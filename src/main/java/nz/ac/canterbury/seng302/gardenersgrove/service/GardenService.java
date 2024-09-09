@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for Garden objects.
@@ -216,16 +215,28 @@ public class GardenService {
         return gardenRepository.findByGardenNameOrPlantNameContainingIgnoreCase(searchValue);
     }
 
+    /**
+     * Retrieves all public gardens from persistence
+     * 
+     * @return a list of all public garden objects saved in persistence
+     */
     public List<Garden> getAllPublicGardens() {
         return gardenRepository.findAllPublicGardens();
     }
 
+    /**
+     * Retrieves all gardens from persistence that have been interacted with by the
+     * user
+     * 
+     * @param userInteractions the user interactions
+     * @return a list of all garden objects saved in persistence
+     */
     public List<Garden> getGardensByInteraction(List<UserInteraction> userInteractions) {
         return userInteractions.stream()
                 .map(userInteraction -> getGardenById(userInteraction.getItemId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

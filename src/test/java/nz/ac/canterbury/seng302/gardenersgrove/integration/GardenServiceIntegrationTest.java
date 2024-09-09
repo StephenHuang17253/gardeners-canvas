@@ -276,11 +276,11 @@ class GardenServiceIntegrationTest {
         Garden resultGarden = userService.getUserById(1L).getGardens().get(0);
         Assertions.assertEquals(1, resultGarden.getPlants().size());
         Plant resultPlant = resultGarden.getPlants().get(0);
-        Assertions.assertEquals(resultPlant.getPlantName(), "John's Plant");
-        Assertions.assertEquals(resultPlant.getPlantCount(), 3);
-        Assertions.assertEquals(resultPlant.getPlantDescription(), "Plant owned by John");
-        Assertions.assertEquals(resultPlant.getPlantDate(), dateOfPlanting);
-        Assertions.assertEquals(resultPlant.getGarden().getGardenId(), garden.getGardenId());
+        Assertions.assertEquals("John's Plant", resultPlant.getPlantName());
+        Assertions.assertEquals(3, resultPlant.getPlantCount());
+        Assertions.assertEquals("Plant owned by John", resultPlant.getPlantDescription());
+        Assertions.assertEquals(dateOfPlanting, resultPlant.getPlantDate());
+        Assertions.assertEquals(garden.getGardenId(), resultPlant.getGarden().getGardenId());
     }
 
     @Test

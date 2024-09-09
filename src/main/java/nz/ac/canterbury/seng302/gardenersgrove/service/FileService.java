@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -135,17 +136,14 @@ public class FileService {
      * @throws IOException if the files cannot read from the file system
      */
     public String[] getAllFiles() throws IOException {
-        String[] allFiles = new String[0];
-        try {
-            allFiles = Files.walk(getRootLocation(), 1)
+        try (Stream<Path> paths = Files.walk(getRootLocation(), 1)) {
+            return paths
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .toArray(String[]::new);
-
         } catch (IOException error) {
             throw new IOException("Could not list the files");
         }
-        return allFiles;
     }
 
     /**

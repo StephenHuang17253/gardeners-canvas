@@ -133,7 +133,7 @@ public class GardensController {
         List<WeatherModel> weatherList = new ArrayList<>();
         DailyWeather noWeather = null;
         try {
-            WeatherResponseData gardenWeather = showGardenWeather(garden.getGardenLatitude(),
+            WeatherResponseData gardenWeather = weatherService.getWeather(garden.getGardenLatitude(),
                     garden.getGardenLongitude());
 
             weatherList.addAll(gardenWeather.getRetrievedWeatherData().stream()
@@ -488,8 +488,10 @@ public class GardensController {
         if (tagResult.valid()) {
             GardenTag gardenTag = new GardenTag(tag);
 
-            if (gardenTagService.getByName(tag).isPresent()) {
-                gardenTag = gardenTagService.getByName(tag).get();
+            Optional<GardenTag> gardenTagOptional = gardenTagService.getByName(tag);
+
+            if (gardenTagOptional.isPresent()) {
+                gardenTag = gardenTagOptional.get();
 
             } else {
                 gardenTagService.addGardenTag(gardenTag);
@@ -681,10 +683,6 @@ public class GardensController {
         model.addAttribute("profilePicture", friend.getProfilePictureFilename());
 
         return "gardensPage";
-    }
-
-    private WeatherResponseData showGardenWeather(String gardenLatitude, String gardenLongitude) {
-        return weatherService.getWeather(gardenLatitude, gardenLongitude);
     }
 
     /**

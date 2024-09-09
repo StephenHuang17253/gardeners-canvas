@@ -437,7 +437,6 @@ public class ProfileController {
         }
         otherFields.add(currentUser.getEmailAddress());
         ValidationResult passwordValidation = InputValidator.validatePassword(newPassword, otherFields);
-        ;
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);

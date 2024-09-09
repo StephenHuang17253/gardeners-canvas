@@ -2,9 +2,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
 
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Random;
 
 /**
  * Entity class reflecting a token used for registration/verification
@@ -21,7 +21,7 @@ public class Token {
     private static final int TOKEN_LIFETIME = 10;
 
     @Transient
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

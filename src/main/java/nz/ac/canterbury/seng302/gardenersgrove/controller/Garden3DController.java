@@ -11,7 +11,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
-import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,8 @@ public class Garden3DController {
 
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
-                              FriendshipService friendshipService, GridItemLocationService gridItemLocationService, PlantService plantService) {
+            FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
+            PlantService plantService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
@@ -116,13 +116,10 @@ public class Garden3DController {
 
         List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        for (GridItemLocation plantLocation: plantLocations)
-        {
-            if(plantLocation.getItemType() == GridItemType.PLANT)
-            {
+        for (GridItemLocation plantLocation : plantLocations) {
+            if (plantLocation.getItemType() == GridItemType.PLANT) {
                 Optional<Plant> optionalPlant = plantService.getById(plantLocation.getId());
-                if (optionalPlant.isPresent())
-                {
+                if (optionalPlant.isPresent()) {
                     Plant currentPlant = optionalPlant.get();
                     displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
                             plantLocation.getYCoordinate(),
