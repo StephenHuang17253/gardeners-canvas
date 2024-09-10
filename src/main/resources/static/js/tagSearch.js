@@ -3,7 +3,10 @@ const addTagButton = document.getElementById("addTagButton");
 const appliedTagsList = document.getElementById("appliedTagsList");
 const appliedTagsInputs = document.getElementById("appliedTagsInputs");
 const searchTagErrorText = document.getElementById("searchTagErrorText");
-const maxTextLength = 50;
+const MAX_TEXT_LENGTH = 50;
+const validTagRegex = /^[a-zA-Z0-9\s\-_']+$/;
+
+const instance = getInstance();
 
 /**
  * handles when the user enters a tag, 
@@ -19,12 +22,19 @@ const handleButtonClick = async () => {
         return;
     }
 
+    const validTag = validTagRegex.test(value);
+
+    if (!validTag) {
+        tagInput.classList.add("border-danger");
+        searchTagErrorText.textContent = `No tag matching "${limitTagLength(value)}"`;
+        return;
+    }
+
     const tagExists = await checkTagExists(value);
 
     if (!tagExists) {
         tagInput.classList.add("border-danger");
-        searchTagErrorText.textContent = `No tag matching "${value}"`;
-        cutOffText(searchTagErrorText, maxTextLength);
+        searchTagErrorText.textContent = `No tag matching "${limitTagLength(value)}"`;
         return;
     }
 
@@ -97,7 +107,6 @@ const handleKeyPress = (event) => {
  * @returns {Promise<any>} - A promise that resolves with the fetched data
  */
 const checkTagExists = async (tagName) => {
-    const instance = getInstance();
     const response = await fetch(`/${instance}tag/exists?tagName=${tagName}`);
     return await response.json();
 };
@@ -110,15 +119,14 @@ const hideTagSection = () => {
 };
 
 /**
- * Cuts off text if it exceeds the max length
+ * Cuts off text if it exceeds the max length (50)
  * @param {HTMLElement} element - The element containing the text
- * @param {number} maxLength - The maximum length of the text
  */
-const cutOffText = (element, maxLength) => {
-    const text = element.textContent;
-    if (text.length > maxLength) {
-        element.textContent = text.substring(0, maxLength - 3) + "...\"";
+const limitTagLength = (tagName) => {
+    if (tagName.length > MAX_TEXT_LENGTH) {
+        return tagName.substring(0, MAX_TEXT_LENGTH - 3) + "...";
     }
+    return tagName;
 };
 
 hideTagSection()

@@ -14,6 +14,7 @@ const deletePlantButton = document.getElementById("deletePlant");
 const saveGardenForm = document.getElementById("saveGardenForm");
 
 const INVALID_LOCATION = "Please place on the grid";
+const NO_PLANT_SELECTED = "Please select a plant to delete";
 const ERROR_MESSAGE_DURATION = 3000;
 
 const instance = getInstance();
@@ -457,7 +458,10 @@ const handleExport = async (fileExtension) => {
  * Handles the deletion of a plant from the grid
  */
 const handleDeletePlant = () => {
-    if (!selectedPlant) return;
+    if (!selectedPlant) {
+        showErrorMessage(NO_PLANT_SELECTED);
+        return;
+    }
 
     const gridX = selectedPlant.attrs.x;
     const gridY = selectedPlant.attrs.y;
@@ -467,7 +471,7 @@ const handleDeletePlant = () => {
     const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
     const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
 
-    fetch(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`)
+    fetch(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`);
 
     let plantItem = null;
     document.querySelectorAll('[name="plant-item"]').forEach(item => {
@@ -511,7 +515,7 @@ const handleWindowClicked = (event) => {
 
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
 
-    // If the person is no clicking on a palette item, display an error message
+    // If the person is no clicking on a palette item, display an error message as invalid location to place a plant
     if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
 
     // If the person is clicking on a palette item, deselect the highlighted palette item
@@ -523,15 +527,16 @@ const handleWindowClicked = (event) => {
 }
 
 /**
- * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
+ * Handles the saving of the garden layout
+ * 
+ * @param {Event} event 
  */
-saveGardenForm.addEventListener("submit", event => {
-    event.preventDefault(); // Prevent the default form submission
+const handleSaveGardenClicked = (event) => {
+    event.preventDefault();
     const idList = [];
     const xCoordList = [];
     const yCoordList = [];
 
-    // Assuming "layer.find("Image")" is correctly defined elsewhere
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
@@ -541,29 +546,29 @@ saveGardenForm.addEventListener("submit", event => {
         yCoordList.push(y_coord);
     });
 
-    // Ensure these elements exist
     const idListInput = document.getElementById("idList");
     const xCoordListInput = document.getElementById("xCoordList");
     const yCoordListInput = document.getElementById("yCoordList");
 
-    if (idListInput && xCoordListInput && yCoordListInput) {
-        idListInput.value = JSON.stringify(idList);
-        xCoordListInput.value = JSON.stringify(xCoordList);
-        yCoordListInput.value = JSON.stringify(yCoordList);
-        // Manually submit the form
-        event.target.submit();
-    } else {
-        console.error("One or more hidden inputs not found");
-    }
-});
+    // Check if the hidden inputs exist
+    if (!(idListInput && xCoordListInput && yCoordListInput)) return;
+
+    idListInput.value = JSON.stringify(idList);
+    xCoordListInput.value = JSON.stringify(xCoordList);
+    yCoordListInput.value = JSON.stringify(yCoordList);
+    event.target.submit();
+}
+
+
+// Event Listeners
 
 window.addEventListener("resize", handleWindowResize);
 window.addEventListener("click", handleWindowClicked);
-
 jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
 pngDownloadButton.addEventListener("click", () => handleExport("png"));
 jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 clearAllButton.addEventListener("click", handleClearAllButtonClicked);
 deletePlantButton.addEventListener("click", handleDeletePlant);
+saveGardenForm.addEventListener("submit", handleSaveGardenClicked);
 
 
