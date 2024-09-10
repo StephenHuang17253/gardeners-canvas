@@ -578,6 +578,16 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalTextField(input));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "ÙýµFB¬",
+            "Seng ! "
+    })
+    void InputValidator_optText_NonAlphaTexttWNumber_return_NONALPHAPLUS(String input) {
+        assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField(input,100));
+    }
+
+
 
 
 }
