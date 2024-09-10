@@ -270,7 +270,7 @@ stage.on("click", event => {
         handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
         selectedPlantInfo.count -= 1
         highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
-        updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count, true);
+        updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
 
         highlightedPaletteItem.style.border = "none";
         highlightedPaletteItem = null;
@@ -480,10 +480,25 @@ document.getElementById("deletePlant").addEventListener("click", event => {
                 method: 'GET'
             })
 
+        let plantItem = null;
+        document.querySelectorAll('[name="plant-item"]').forEach(item => {
+            if (item.getAttribute("data-plant-id") === selectedPlant.attrs.id) {
+                plantItem = item;
+            }
+        });
+
+        let count = parseInt(plantItem.getAttribute("data-plant-count"));
+        count += 1
+        plantItem.setAttribute("data-plant-count", count)
+
+        updatePlantCountDisplay(plantItem, count)
+
         selectedPlant.destroy()
         selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
         selectedPlant = null;
+
+
 
     }
 });
