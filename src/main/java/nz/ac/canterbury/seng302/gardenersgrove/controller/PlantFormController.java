@@ -193,6 +193,7 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
+            plantCategory = plantCategory.replace(' ', '_');
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
         }
 
@@ -356,6 +357,7 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
+            plantCategory = plantCategory.replace(' ', '_');
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
         }
 
