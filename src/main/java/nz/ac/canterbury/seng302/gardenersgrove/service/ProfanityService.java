@@ -45,15 +45,15 @@ public class ProfanityService {
     private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
     private static final long RATE_LIMIT_DELAY_MS = 1500;
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
-    String emptyRegex = "^\\s*$";
+    private static final String EMPTY_REGEX = "^\\s*$";
 
-    SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
+
+    private static final int MAX_RETRIES = 4;
 
     private final GardenTagService gardenTagService;
 
     private final ObjectMapper objectMapper;
-
-    private static final int MAX_RETRIES = 4;
 
     /**
      * General constructor for profanity service, creates new http client.
@@ -209,7 +209,7 @@ public class ProfanityService {
     }
 
     private Boolean containPriorityPrecheck(String inputString) {
-        if (inputString.matches(emptyRegex)) {
+        if (inputString.matches(EMPTY_REGEX)) {
             return false;
         }
         // Checking if the input is a tag stored in database with allocated status.
