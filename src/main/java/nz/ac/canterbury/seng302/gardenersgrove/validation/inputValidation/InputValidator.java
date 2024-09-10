@@ -430,12 +430,6 @@ public class InputValidator {
         return result;
     }
 
-    public static ValidationResult validatePlantCategory(String plantCategory) {
-        return new InputValidator(plantCategory)
-                .lengthHelper(200)
-                .getResult();
-    }
-
     /**
      * Validate a new garden tag
      * 25 characters or less and alpha numeric or _ - ' " and space
@@ -765,6 +759,7 @@ public class InputValidator {
             return this;
         }
 
+
         long yearsDifference = ChronoUnit.YEARS.between(
                 inputtedDate,
                 LocalDate.now());
@@ -1059,7 +1054,7 @@ public class InputValidator {
                 this.passState = false;
                 return this;
             }
-        } catch (Exception e) {
+        } catch (Exception err) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
@@ -1089,7 +1084,7 @@ public class InputValidator {
                 this.passState = false;
                 return this;
             }
-        } catch (Exception e) {
+        } catch (Exception err) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
