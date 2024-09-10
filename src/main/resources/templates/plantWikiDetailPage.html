@@ -6,7 +6,9 @@
 <body>
     <div th:replace="~{fragments/navBar.html :: navBar('plantWiki')}" th:with="loggedIn=${loggedIn}"></div>
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
-        th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
+        th:style="|background-image: url('@{/images/landingPlant.JPG}');|">
+    </div>
+    <p th:if="${searchError} != ''" class="text-danger fs-6" th:text="${searchError}"></p>
     <div th:if="${plant}" class="container mt-5 bg-white border rounded pt-4">
         <div class="row mx-2">
             <div class="col mb-4">
