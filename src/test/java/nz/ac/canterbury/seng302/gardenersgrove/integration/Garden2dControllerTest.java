@@ -469,7 +469,7 @@ class Garden2dControllerTest {
     @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
     void deleteGridItem_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/delete").with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + 99L + "/delete").with(csrf())
                         .param("x_coord_delete", String.valueOf(1))
                         .param("y_coord_delete", String.valueOf(1)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
@@ -479,7 +479,7 @@ class Garden2dControllerTest {
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void deleteGridItem_invalidGardenID_return404() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/delete").with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + 9L + "/delete").with(csrf())
                         .param("x_coord_delete", String.valueOf(1))
                         .param("y_coord_delete", String.valueOf(1)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
@@ -500,7 +500,7 @@ class Garden2dControllerTest {
                 garden, 1, 1);
         gridItemLocationService.addGridItemLocation(newGridItemLocation);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/delete").with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
                         .param("x_coord_delete", String.valueOf(1))
                         .param("y_coord_delete", String.valueOf(1)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
@@ -520,10 +520,10 @@ class Garden2dControllerTest {
                 garden, 1, 1);
         gridItemLocationService.addGridItemLocation(newGridItemLocation);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/delete").with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
                         .param("x_coord_delete", String.valueOf(1))
                         .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+                .andExpect(MockMvcResultMatchers.status().isOk());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
     }
 
@@ -536,10 +536,10 @@ class Garden2dControllerTest {
                 .getGardenId();
         Garden garden = gardenService.getGardenById(gardenId).get();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/delete").with(csrf())
+        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
                         .param("x_coord_delete", String.valueOf(1))
                         .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+                .andExpect(MockMvcResultMatchers.status().isOk());
         Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
     }
 

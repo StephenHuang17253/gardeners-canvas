@@ -280,15 +280,15 @@ public class Garden2DController {
 
     logger.info("Removing item at {}, {} on grid of garden with id: {}", xCoord, yCoord, gardenId);
 
-        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
+    List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        for (GridItemLocation gridItem : gridItems) {
-            if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord) {
-                gridItemLocationService.removeGridItemLocation(gridItem);
-            }
+    for (GridItemLocation gridItem : gridItems) {
+        if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord) {
+            gridItemLocationService.removeGridItemLocation(gridItem);
         }
-
-        return "200";
+    }
+    response.setStatus(HttpServletResponse.SC_OK);
+    return "200";
     }
 
 
