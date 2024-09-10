@@ -184,7 +184,6 @@ class Garden3DControllerTest {
         assertEquals(item.get("xcoordinate").asInt(), itemXCoord);
         assertEquals(item.get("ycoordinate").asInt(), itemYCoord);
         assertEquals(item.get("name").asText(), itemName);
-//        assertEquals(item.get("modelName").asText(), itemModelName);
     }
 
 }
