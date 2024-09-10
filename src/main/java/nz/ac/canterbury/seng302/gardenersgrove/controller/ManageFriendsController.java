@@ -1,10 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,7 +183,7 @@ public class ManageFriendsController {
         User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
         User currentUser = securityService.getCurrentUser();
         if (searchResults.length < 1) {
-            return null;
+            return Collections.emptyList();
         }
         for (User foundUser : searchResults) {
             // ensure that a search result is not the current user
@@ -306,8 +303,7 @@ public class ManageFriendsController {
     public String managePendingRequest(@RequestParam(name = "friendAccepted") boolean friendAccepted,
             @RequestParam(name = "pendingFriendId") Long pendingFriendId,
             @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         logger.info("POST /manage-friends");
 
         User currentUser = securityService.getCurrentUser();
@@ -341,8 +337,7 @@ public class ManageFriendsController {
     @PostMapping("/manage-friends/remove")
     public String cancelSentRequest(@RequestParam(name = "friendId") Long friendId,
             @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         logger.info("POST /manage-friends/remove");
 
         User currentUser = securityService.getCurrentUser();

@@ -137,11 +137,9 @@ public class ProfanityService {
     }
 
     private ProfanityResponseData moderateContentApiCall(String content) {
-        boolean wasProfanityChecked = false;
         int retryCounter = 0;
-        while (!wasProfanityChecked && retryCounter < 4) {
+        while (retryCounter < 4) {
             try {
-
                 String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
                 logger.info("Sent profanity API request: {}", new Date().getTime());
                 HttpRequest request = HttpRequest.newBuilder()
@@ -166,7 +164,6 @@ public class ProfanityService {
                     logger.warn("Could not get profanity response due to ratelimit, retrying {}", retryCounter);
                     waitForRateLimit();
                 } else {
-                    wasProfanityChecked = true;
                     return profanityResponse;
                 }
 
