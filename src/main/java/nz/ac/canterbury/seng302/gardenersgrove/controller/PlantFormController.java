@@ -193,7 +193,11 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
-            plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+            if (plantCategory.equals("Pot Plant")) {
+                plantCategoryValue = PlantCategory.POT_PLANT;
+            } else {
+                plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+            }
         }
 
         Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, plantCategoryValue);
@@ -356,7 +360,11 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
-            plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+            if (plantCategory.equals("Pot Plant")) {
+                plantCategoryValue = PlantCategory.POT_PLANT;
+            } else {
+                plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+            }
         }
 
         plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate, plantCategoryValue);
