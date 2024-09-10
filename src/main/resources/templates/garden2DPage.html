@@ -60,7 +60,7 @@
                     </div>
 
                     <div th:each="displayableItem : ${displayableItemsList}">
-                        <div class="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                        <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
                             th:data-grid-y="${displayableItem.getYCoordinate()}"
                             th:data-grid-name="${displayableItem.getName()}"
                             th:data-grid-category="${displayableItem.getCategory()}"

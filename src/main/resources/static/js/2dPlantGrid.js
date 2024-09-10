@@ -8,7 +8,7 @@ const deletePlantButton = document.getElementById("deletePlant");
 const saveGardenForm = document.getElementById("saveGardenForm");
 const confirmClearAllButton = document.getElementById("confirmClearAll");
 const plantItems = document.querySelectorAll("[name='plant-item']");
-const gridItemLocations = document.querySelectorAll(".grid-item-location");
+const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
 const idListInput = document.getElementById("idList");
 const xCoordListInput = document.getElementById("xCoordList");
 const yCoordListInput = document.getElementById("yCoordList");
