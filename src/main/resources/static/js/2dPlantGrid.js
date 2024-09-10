@@ -63,8 +63,11 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantCategory) => {
 
     plantImage.onload = function () {
         let size = GRID_SIZE;
+        let offset = 0;
+
         if(plantCategory === 'Tree'){
             size += TREE_SIZE;
+            offset += TREE_SIZE / 2;
         }
         const plant = new Konva.Image({
             x: x,
@@ -79,8 +82,8 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantCategory) => {
 
 
         plant.on('dragmove', function () {
-            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX;
-            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY;
+            let x = Math.round((plant.x() - offsetX) / GRID_SIZE) * GRID_SIZE + offsetX - offset;
+            let y = Math.round((plant.y() - offsetY) / GRID_SIZE) * GRID_SIZE + offsetY - offset;
 
             plant.position({
                 x: x,
