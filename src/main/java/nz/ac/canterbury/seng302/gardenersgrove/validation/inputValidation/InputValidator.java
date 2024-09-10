@@ -296,7 +296,7 @@ public class InputValidator {
     }
 
     /**
-     * Checks if the given decsription is valid 512 char or less and contains at
+     * Checks if the given description is valid 512 char or less and contains at
      * least one letter if not empty will return invalid description message in
      * either case
      *

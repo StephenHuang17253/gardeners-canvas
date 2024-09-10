@@ -541,4 +541,43 @@ class InputValidatorTest {
     void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
         Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode));
     }
+
+
+    @Test
+    void InputValidator_optionalTextField_LENGTH_OVER_LIMIT()
+    {
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalTextField(
+                "xYc1I1YLqb5DtZdJfARp1hq2Aw3SLoAJkeLBE5Qj0jFn91dmXIOc3MoIMDBk7KPasrmX4t0jBdQqSsaUhRvUCokk5MbCI62au32t" +
+                        "wQ53MGhH7uIITaIZEHU5EmQ5kDM77wEWrdUq5YbGEYmlQqdRLJ6xqbAPDheEp7DNyLYuvwhUveSNi7VIUdxUlTiOU2hw" +
+                        "pNpF4FibW"
+        ));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "hello",
+            "hello with space",
+            "hello with numbers 123",
+            "special charackters !@#$%^&*()",
+            "xYc1I1YLqb5DtZdJfARp1hq2Aw3SLoAJkeLBE5Qj0jFn91dmXIOc3MoIMDBk7KPasrmX4t0jBdQqSsaUhRvUCokk5MbCI62au32t" +
+                    "wQ53MGhH7uIITaIZEHU5EmQ5kDM77wEWrdUq5YbGEYmlQqdRLJ6xqbAPDheEp7DNyLYuvwhUveSNi7VIUdxUlTiOU2hw" +
+                    "pNpF4Fib",
+            "123",
+            "",
+            "::",
+            "❤\uFE0F",
+            "\uD83E\uDEC0",
+            "àäèéëïĳöü",
+            "áêéèëïíîôóúû",
+            "êôúû",
+            "ÆØÅæøå",
+            "ÄÖäö",
+    })
+    void InputValidator_optionalTextField_return_ok(String input)
+    {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalTextField(input));
+    }
+
+
+
 }
