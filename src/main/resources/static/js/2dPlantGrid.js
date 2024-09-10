@@ -1,4 +1,4 @@
-import { Downloader } from "./Downloader.js";
+import {Downloader} from "./Downloader.js";
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
@@ -11,6 +11,7 @@ const jpegDownloadButton = document.getElementById("download-jpeg");
 const errorElement = document.getElementById("error-message");
 
 const INVALID_LOCATION = "Please place on the grid";
+const OCCUPIED_DESTINATION = "Space is already occupied";
 const ERROR_MESSAGE_DURATION = 3000;
 
 const instance = getInstance();
@@ -23,6 +24,8 @@ const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
 const originalPlantCounts = {};
+
+let prevSelectPlantPosition;
 
 const stage = new Konva.Stage({
     width: STAGE_WIDTH,
@@ -44,7 +47,7 @@ stage.add(tooltipLayer);
 
 /**
  * Converts grid item coordinates to Konva coordinates
- * 
+ *
  * @param {Number} gridItemX - x-coordinate of the grid item
  * @param {Number} gridItemY - y-coordinate of the grid item
  * @returns {Object} - Object containing the x and y coordinates in Konva
@@ -52,7 +55,7 @@ stage.add(tooltipLayer);
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 }
 
 // Create grid
@@ -85,13 +88,35 @@ let selectedPlant = null;
  * @returns {Boolean} - True if the location is valid, false otherwise
  */
 const validLocation = (x, y) => {
-    const shape = layer.getIntersection({x,y});
-    console.log(shape)
-    if (shape != null) {
-        return false;
-    }
     return x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
 };
+
+/**
+ * Checks if destination on grid is empty
+ * @param {Number} x - x-coordinate of the plant on grid
+ * @param {Number} y - y-coordinate of the plant on grid
+ * @param plantId - id of plant being moved
+ * @returns {Boolean} - True if the destination is empty, false otherwise
+ */
+const emptyDestination = (x, y, plantId) => {
+    let nodes = layer.find("Image").values();
+    for (let node of nodes) {
+        const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
+        const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
+        if (x_coord === x && y_coord === y) {
+            if (node.id() !== plantId) {
+                return false;
+            }
+
+        }
+    }
+
+    //     //Todo: create function for doing the below two lines
+    //     const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
+    //     const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
+    return true
+}
+
 
 /**
  * Handles the adding of a plant to the stage produced by konva
@@ -121,12 +146,12 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
         });
         const tooltiptext =
             new Konva.Text({
-                text: '',
-                fontFamily: 'Calibri',
-                fontSize: 18,
-                padding: 5,
-                fill: 'white',
-            }
+                    text: '',
+                    fontFamily: 'Calibri',
+                    fontSize: 18,
+                    padding: 5,
+                    fill: 'white',
+                }
             );
         tooltip.add(tooltiptag)
         tooltip.add(tooltiptext)
@@ -141,11 +166,15 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
             draggable: true,
         });
 
+        plant.on("dragstart", () => {
+            prevSelectPlantPosition = {x: plant.x(), y: plant.y()};
+        })
+
         plant.on("dragmove", () => {
             tooltip.hide();
             const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
             const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
-            let { x, y } = convertToKonvaCoordinates(i, j);
+            let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -166,6 +195,12 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
+            const x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
+            const y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
+            if (!emptyDestination(x, y, plant.id())) {
+                showErrorMessage(OCCUPIED_DESTINATION);
+                plant.position(prevSelectPlantPosition);
+            }
             plant.stroke(null);
             plant.strokeWidth(0);
         });
@@ -220,7 +255,8 @@ const showErrorMessage = (message) => {
     errorElement.classList.remove("d-none");
     setTimeout(() => {
         errorElement.classList.add("d-none");
-    }, ERROR_MESSAGE_DURATION);validLocation
+    }, ERROR_MESSAGE_DURATION);
+    validLocation
 };
 
 /**
@@ -237,7 +273,7 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
     if (instance === "test/" || instance === "prod/") {
         plantSrc = `/${instance}` + plantSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
     handleAddPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
@@ -316,7 +352,7 @@ stage.on("click", event => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (highlightedPaletteItem) {
 
@@ -443,7 +479,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], { type: mimeType });
+    return new Blob([uint8Array], {type: mimeType});
 }
 
 /**
