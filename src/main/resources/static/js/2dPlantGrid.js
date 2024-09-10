@@ -22,8 +22,6 @@ const GRID_HEIGHT = GRID_ROWS * GRID_SIZE;
 const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
-const plantName = "plant";
-
 const originalPlantCounts = {};
 
 const stage = new Konva.Stage({
