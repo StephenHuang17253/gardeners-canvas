@@ -17,10 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -249,7 +246,8 @@ public class Garden2DController {
      * @param model model to use to return error
      * @return redirect back to the 2d garden page
      */
-    @PostMapping("/2D-garden/{gardenId}/delete")
+    @GetMapping("/2D-garden/{gardenId}/delete")
+    @ResponseBody
     public String deleteGridItem(@PathVariable Long gardenId,
                                  @RequestParam(value = "x_coord_delete") int xCoord,
                                  @RequestParam(value = "y_coord_delete") int yCoord,
@@ -281,15 +279,12 @@ public class Garden2DController {
         List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
 
         for (GridItemLocation gridItem : gridItems) {
-            if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord)
-                try {
-                    gridItemLocationService.removeGridItemLocation(gridItem);
-                } catch (Exception exception) {
-                    logger.error("Error removing grid item with id {}: {}", gridItem.getId(), exception.getMessage());
-                }
+            if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord) {
+                gridItemLocationService.removeGridItemLocation(gridItem);
+            }
         }
 
-    return "redirect:/2D-garden/{gardenId}";
+        return "200";
     }
 
 

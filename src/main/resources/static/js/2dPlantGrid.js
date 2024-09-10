@@ -440,21 +440,36 @@ jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 /**
  * Event-listener to handle deleting data. Is on the deleteGridItemForm to update hidden variables before submission.
  */
-document.getElementById("deleteGridItemForm").addEventListener("submit", event => {
+document.getElementById("deletePlant").addEventListener("click", event => {
     console.log("Delete button clicked")
-    event.preventDefault(); // Prevent the default form submission
+    // event.preventDefault(); // Prevent the default form submission
 
     if (selectedPlant) {
         const gridX = selectedPlant.attrs.x;
         const gridY = selectedPlant.attrs.y;
 
-        const x_coord_delete = document.getElementById("x_coord_delete")
-        const y_coord_delete = document.getElementById("y_coord_delete")
+        // const x_coord_delete = document.getElementById("x_coord_delete")
+        // const y_coord_delete = document.getElementById("y_coord_delete")
+        // x_coord_delete.value = Math.round((gridX - OFFSET_X) / GRID_SIZE);
+        // y_coord_delete.value = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
 
-        x_coord_delete.value = Math.round((gridX - OFFSET_X) / GRID_SIZE);
-        y_coord_delete.value = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
+        const gardenId = document.getElementById("gardenId")
 
-        event.target.submit();
+        const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
+        const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
+
+        console.log(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`)
+
+        fetch(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`,
+            {
+                method: 'GET'
+            })
+
+        selectedPlant.destroy()
+        selectedPlant.stroke(null);
+        selectedPlant.strokeWidth(0);
+        selectedPlant = null;
+        // event.target.submit();
     } else {
         console.error("Hidden input not found")
     }
