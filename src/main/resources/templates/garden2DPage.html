@@ -80,12 +80,6 @@
 
             <div class="mt-auto">
 
-<!--                <form id="deleteGridItemForm" th:action="@{/2D-garden/__${garden.getGardenId()}__/delete}" method="post">-->
-<!--                    <input id="x_coord_delete"  name="x_coord_delete" type="hidden" th:value="''">-->
-<!--                    <input id="y_coord_delete"  name="y_coord_delete" type="hidden" th:value="''">-->
-<!--                    <button type="submit" id="deletePlant" class="btn bg-danger text-white mb-2" >Delete Selected Plant</button>-->
-<!--                </form>-->
-
                 <input type="hidden" id="gardenId" name="gardenId" th:value="${garden.getGardenId()}" />
                 <button type="button" id="deletePlant" class="btn bg-danger text-white mb-2" >Delete Selected Plant</button>
 

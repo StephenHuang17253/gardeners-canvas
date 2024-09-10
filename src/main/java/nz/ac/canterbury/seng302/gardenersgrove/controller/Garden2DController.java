@@ -242,6 +242,8 @@ public class Garden2DController {
     /**
      * This endpoint handles deleting a single item from the grid.
      * @param gardenId id of the garden the grid belongs to
+     * @param xCoord the x coordinate of the grid item
+     * @param yCoord the y coordinate of the grid item
      * @param response http response to use to return error
      * @param model model to use to return error
      * @return redirect back to the 2d garden page
