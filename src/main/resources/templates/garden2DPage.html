@@ -79,6 +79,10 @@
             </form>
 
             <div class="mt-auto">
+
+                <input type="hidden" id="gardenId" name="gardenId" th:value="${garden.getGardenId()}" />
+                <button type="button" id="deletePlant" class="btn bg-danger text-white mb-2" >Remove Selected Plant</button>
+
                 <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
                               startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
                 </div>

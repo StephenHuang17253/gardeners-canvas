@@ -385,6 +385,7 @@ if (clearAllButton) {
  * Updates the displayed plant count in the HTML
  * @param {HTMLElement} plantItem - The plant item element
  * @param {number} count - The new count
+ * @param adding - whether we are adding a plant or deleting one
  */
 const updatePlantCountDisplay = (plantItem, count) => {
     const plantName = plantItem.getAttribute("data-plant-name");
@@ -510,3 +511,47 @@ window.addEventListener("click", event => {
 jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
 pngDownloadButton.addEventListener("click", () => handleExport("png"));
 jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
+
+
+/**
+ * Event-listener to handle deleting data.
+ */
+document.getElementById("deletePlant").addEventListener("click", event => {
+    console.log("Delete button clicked")
+
+    if (selectedPlant) {
+        const gridX = selectedPlant.attrs.x;
+        const gridY = selectedPlant.attrs.y;
+
+        const gardenId = document.getElementById("gardenId")
+
+        const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
+        const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
+
+        fetch(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`,
+            {
+                method: 'GET'
+            })
+
+        let plantItem = null;
+        document.querySelectorAll('[name="plant-item"]').forEach(item => {
+            if (item.getAttribute("data-plant-id") === selectedPlant.attrs.id) {
+                plantItem = item;
+            }
+        });
+
+        let count = parseInt(plantItem.getAttribute("data-plant-count"));
+        count += 1
+        plantItem.setAttribute("data-plant-count", count)
+
+        updatePlantCountDisplay(plantItem, count)
+
+        selectedPlant.destroy()
+        selectedPlant.stroke(null);
+        selectedPlant.strokeWidth(0);
+        selectedPlant = null;
+
+    }
+});
+
+
