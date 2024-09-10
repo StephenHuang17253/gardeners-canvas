@@ -45,15 +45,19 @@
                     </div>
 
                     <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
-                        <div class="w-100 d-none" name="plant-item" th:data-plant-name="${plant.getPlantName()}"
-                            th:data-plant-category="${plant.getPlantCategory()}"
-                            th:data-plant-count="${plant.getPlantCount()}" th:data-plant-id="${plant.getPlantId()}"
-                            th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
-                            <img th:src="@{${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}}"
+                        <div class="w-100 d-none" name="plant-item" th:data-plant-name="${plant.getName()}"
+                            th:data-plant-category="${plant.getCategory()}"
+                            th:data-plant-count="${plant.getCount()}" th:data-plant-id="${plant.getId()}"
+                            th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
+                            th:data-category-image="${plant.getCategoryImage()}"
+
+                        >
+                            <p id="category" th:text="${plant.getCategory()}"></p>
+                            <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
                                 alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
                                 style="max-width: 100px;" draggable="false">
                             <a id="total" class="d-block break-word text-white mt-2"
-                                th:text="${plant.getPlantCount() > 0} ? ${plant.getPlantName()} + ' (x' + ${plant.getPlantCount()} + ')' : ${plant.getPlantName()}"></a>
+                                th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()()}"></a>
                             <p id="placed" class="d-block break-word mt-0 mb-0 text-white"> </p>
                             <p id="remaining" class="d-block break-word mt-0 mb-0 text-white"> </p>
                         </div>
