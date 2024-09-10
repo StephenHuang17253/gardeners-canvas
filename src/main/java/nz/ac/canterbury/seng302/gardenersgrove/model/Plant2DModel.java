@@ -13,7 +13,7 @@ public class Plant2DModel {
     private final String img;
     private final String category;
     private final String categoryImage;
-    private String ROOT_PATH = "/images/2d-plant-categorys/";
+    private String ROOT_PATH = "/images/2d-plant-categories/";
 
     /**
      * Constructor for model data struct for 2d gardens page

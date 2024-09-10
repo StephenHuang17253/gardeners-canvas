@@ -101,7 +101,8 @@ public class Garden2DController {
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId()));
+                            plantLocation.getObjectId(),
+                            currentPlant.getPlantCategory().getCategoryImage()));
                 }
             }
         }
