@@ -45,9 +45,11 @@ public class ProfanityService {
     private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
     private static final long RATE_LIMIT_DELAY_MS = 1500;
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
-    String emptyRegex = "^\\s*$";
+    private static final String EMPTY_REGEX = "^\\s*$";
 
-    SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
+
+    private static final int MAX_RETRIES = 4;
 
     private final GardenTagService gardenTagService;
 
@@ -137,11 +139,9 @@ public class ProfanityService {
     }
 
     private ProfanityResponseData moderateContentApiCall(String content) {
-        boolean wasProfanityChecked = false;
         int retryCounter = 0;
-        while (!wasProfanityChecked && retryCounter < 4) {
+        while (retryCounter < MAX_RETRIES) {
             try {
-
                 String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
                 logger.info("Sent profanity API request: {}", new Date().getTime());
                 HttpRequest request = HttpRequest.newBuilder()
@@ -166,7 +166,6 @@ public class ProfanityService {
                     logger.warn("Could not get profanity response due to ratelimit, retrying {}", retryCounter);
                     waitForRateLimit();
                 } else {
-                    wasProfanityChecked = true;
                     return profanityResponse;
                 }
 
@@ -177,7 +176,7 @@ public class ProfanityService {
                 Thread.currentThread().interrupt();
                 logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s",
                         errorException.getMessage()));
-                return null; /// RETURN ERROR, FIX LATER
+                return null;
             }
         }
 
@@ -210,7 +209,7 @@ public class ProfanityService {
     }
 
     private Boolean containPriorityPrecheck(String inputString) {
-        if (inputString.matches(emptyRegex)) {
+        if (inputString.matches(EMPTY_REGEX)) {
             return false;
         }
         // Checking if the input is a tag stored in database with allocated status.
