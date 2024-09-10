@@ -1,4 +1,4 @@
-const MIN_TAG_INPUT_LENGTH = 3;
+const MIN_TAG_INPUT_LENGTH = 1;
 const form = document.getElementById("tagForm");
 const tagField = document.getElementById("tagInput")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
