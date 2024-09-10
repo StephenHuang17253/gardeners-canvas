@@ -6,6 +6,17 @@ import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from './Exporter.js';
 import { Downloader } from '../Downloader.js';
 
+const modelMap = {
+    "Tree": ["tree.glb", 5],
+    "Shrub": ["shrub.glb", 10],
+    "Bush": ["shrub.glb", 20],
+    "Herb": ["fern.glb", 1],
+    "Creeper": ["creeper.glb", 0.5],
+    "Climber": ["climber.glb", 5],
+    "Flower": ["flower.glb", 10],
+    "Pot Plant": ["potplant.glb", 5]
+};
+
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
 const container = document.getElementById('container');
@@ -87,7 +98,6 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.position.copy(position);
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
-    console.log("new model")
 };
 
 init();
@@ -114,13 +124,18 @@ scene.add(grid);
  * @returns {Promise<void>} - A promise that resolves when the object is added to the scene.
  */
 const addObjectToScene = async (plantOrDecoration) => {
-    const x = (plantOrDecoration.xCoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
-    const z = (plantOrDecoration.yCoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
+    const x = (plantOrDecoration.xcoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
+    const z = (plantOrDecoration.ycoordinate - ((GRID_SIZE - 1) / 2)) * TILE_SIZE;
     const position = new THREE.Vector3(x, 0, z);
 
-    const loadedModel = await loader.loadModel(plantOrDecoration.modelName, plantOrDecoration.modelName)
+    const category = plantOrDecoration.category;
 
-    if (plantOrDecoration.modelName === "creeper.glb") {
+    const loadedModel = await loader.loadModel(modelMap[category][0], category);
+
+    console.log(category, modelMap[category]);
+    console.log(loadedModel);
+
+    if (category === "Creeper") {
         loadedModel.traverse((child) => {
             if (child.isMesh) {
                 child.material = createHueSaturationMaterial(
@@ -133,12 +148,10 @@ const addObjectToScene = async (plantOrDecoration) => {
         });
     }
 
-
     addModelToScene(
         loadedModel,
         position,
-        plantOrDecoration.modelScale);
-    console.log(plantOrDecoration)
+        modelMap[category][1]);
 };
 
 const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);

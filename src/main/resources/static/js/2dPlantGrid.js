@@ -22,8 +22,6 @@ const GRID_HEIGHT = GRID_ROWS * GRID_SIZE;
 const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
-const plantName = "plant";
-
 const originalPlantCounts = {};
 
 const stage = new Konva.Stage({
@@ -40,7 +38,9 @@ const link = document.createElement("a");
 const downloader = new Downloader(link);
 
 const layer = new Konva.Layer();
+const tooltipLayer = new Konva.Layer();
 stage.add(layer);
+stage.add(tooltipLayer);
 
 /**
  * Converts grid item coordinates to Konva coordinates
@@ -54,7 +54,6 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
     return { x: konvaX, y: konvaY };
 }
-
 
 // Create grid
 for (let i = 0; i < GRID_COLUMNS; i++) {
@@ -91,11 +90,40 @@ const validLocation = (x, y) => {
 /**
  * Handles the adding of a plant to the stage produced by konva
  */
-const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
+const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = undefined) => {
     const plantImage = new Image();
     plantImage.src = imageSrc;
 
     plantImage.onload = () => {
+        const tooltip = new Konva.Label({
+            x: 0,
+            y: 0,
+            opacity: 0.75,
+            visible: false,
+        })
+        const tooltiptag = new Konva.Tag({
+            fill: 'black',
+            pointerDirection: 'up',
+            pointerWidth: 10,
+            pointerHeight: 10,
+            lineJoin: 'round',
+            shadowColor: 'black',
+            shadowBlur: 10,
+            shadowOffsetX: 10,
+            shadowOffsetY: 10,
+            shadowOpacity: 0.5,
+        });
+        const tooltiptext =
+            new Konva.Text({
+                text: '',
+                fontFamily: 'Calibri',
+                fontSize: 18,
+                padding: 5,
+                fill: 'white',
+            }
+            );
+        tooltip.add(tooltiptag)
+        tooltip.add(tooltiptext)
         const plant = new Konva.Image({
             x: x,
             y: y,
@@ -108,6 +136,7 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
         });
 
         plant.on("dragmove", () => {
+            tooltip.hide();
             const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
             const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
             let { x, y } = convertToKonvaCoordinates(i, j);
@@ -130,11 +159,13 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
 
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
+            tooltip.hide();
             plant.stroke(null);
             plant.strokeWidth(0);
         });
 
         plant.on("click", () => {
+            tooltip.hide();
             if (highlightedPaletteItem) {
                 highlightedPaletteItem.style.border = "none";
                 highlightedPaletteItem = null;
@@ -151,9 +182,26 @@ const handleAddPlant = (imageSrc, x, y, plantId, onload = undefined) => {
             plant.strokeWidth(4);
         });
 
+        plant.on('mousemove', () => {
+            const mousePos = stage.getPointerPosition();
+            tooltip.position({
+                x: mousePos.x + 10,
+                y: mousePos.y + 10,
+            });
+            tooltiptext.text(plantName + "\n" + category);
+            tooltip.show()
+            tooltip.set
+        });
+
+        plant.on('mouseout', () => {
+            tooltip.hide();
+        })
+
         layer.add(plant);
 
         if (onload) onload();
+
+        tooltipLayer.add(tooltip)
     };
 };
 
@@ -176,6 +224,8 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
     const x_coord = parseInt(item.getAttribute("data-grid-x"));
     const y_coord = parseInt(item.getAttribute("data-grid-y"));
     const plantId = item.getAttribute("data-grid-objectid");
+    const plantName = item.getAttribute("data-grid-name");
+    const category = item.getAttribute("data-grid-category");
 
     let plantSrc = item.getAttribute("data-grid-image");
     if (instance === "test/" || instance === "prod/") {
@@ -184,11 +234,11 @@ document.querySelectorAll(".grid-item-location").forEach(item => {
     const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
-    handleAddPlant(plantSrc, x, y, plantId, onloadCallback);
+    handleAddPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
 });
 
 /**
- * Updates a plant"s placed & remaining counters when the saved layout loads.
+ * Updates a plant's placed & remaining counters when the saved layout loads.
  * @param plantId id of the plant whose counters are being updated
  */
 const updateCountersOnLoad = (plantId) => {
@@ -221,6 +271,7 @@ document.querySelectorAll("[name='plant-item']").forEach(item => {
     item.addEventListener("click", () => {
 
         const currentCount = parseInt(item.getAttribute("data-plant-count"));
+        const category = item.getAttribute("data-plant-category")
 
         if (highlightedPaletteItem) {
             highlightedPaletteItem.style.border = "none";
@@ -243,7 +294,8 @@ document.querySelectorAll("[name='plant-item']").forEach(item => {
             name: item.getAttribute("data-plant-name"),
             image: plantImage,
             id: item.getAttribute("data-plant-id"),
-            count: currentCount
+            count: currentCount,
+            category: category
         };
     });
 })
@@ -267,7 +319,7 @@ stage.on("click", event => {
             return;
         }
 
-        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id)
+        handleAddPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id, selectedPlantInfo.name, selectedPlantInfo.category)
         selectedPlantInfo.count -= 1
 
         highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
@@ -458,6 +510,3 @@ window.addEventListener("click", event => {
 jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
 pngDownloadButton.addEventListener("click", () => handleExport("png"));
 jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
-
-
-
