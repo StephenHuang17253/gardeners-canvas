@@ -245,14 +245,14 @@ public class Garden2DController {
     /**
      * This endpoint handles deleting a single item from the grid.
      * @param gardenId id of the garden the grid belongs to
-     * @param gridItemToDelete id of the item we're deleting from the grid
      * @param response http response to use to return error
      * @param model model to use to return error
      * @return redirect back to the 2d garden page
      */
     @PostMapping("/2D-garden/{gardenId}/delete")
     public String deleteGridItem(@PathVariable Long gardenId,
-                                 @RequestParam(value = "gridItemToDelete") Long gridItemToDelete,
+                                 @RequestParam(value = "x_coord_delete") int xCoord,
+                                 @RequestParam(value = "y_coord_delete") int yCoord,
                                  HttpServletResponse response,
                                  Model model) {
 
@@ -276,17 +276,18 @@ public class Garden2DController {
         return "403";
     }
 
-    logger.info("Deleting item with id {} from grid of garden with id: {}", gridItemToDelete, gardenId);
+    logger.info("Removing item at {}, {} on grid of garden with id: {}", xCoord, yCoord, gardenId);
 
-    Optional<GridItemLocation> gridItem = gridItemLocationService.getGridItemLocationById(gridItemToDelete);
+        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-    if (gridItem.isPresent()) {
-        try {
-            gridItemLocationService.removeGridItemLocation(gridItem.get());
-        } catch (Exception exception) {
-            logger.error("Error removing grid item with id {}: {}", gridItem.get().getId(), exception.getMessage());
+        for (GridItemLocation gridItem : gridItems) {
+            if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord)
+                try {
+                    gridItemLocationService.removeGridItemLocation(gridItem);
+                } catch (Exception exception) {
+                    logger.error("Error removing grid item with id {}: {}", gridItem.getId(), exception.getMessage());
+                }
         }
-    }
 
     return "redirect:/2D-garden/{gardenId}";
     }

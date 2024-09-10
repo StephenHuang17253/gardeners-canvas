@@ -441,13 +441,19 @@ jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
  * Event-listener to handle deleting data. Is on the deleteGridItemForm to update hidden variables before submission.
  */
 document.getElementById("deleteGridItemForm").addEventListener("submit", event => {
+    console.log("Delete button clicked")
     event.preventDefault(); // Prevent the default form submission
 
     if (selectedPlant) {
-        const plantId = selectedPlant.attrs.id;
-        const gridItemToDelete = document.getElementById("gridItemToDelete");
-        gridItemToDelete.value = plantId;
-        console.log(gridItemToDelete.value)
+        const gridX = selectedPlant.attrs.x;
+        const gridY = selectedPlant.attrs.y;
+
+        const x_coord_delete = document.getElementById("x_coord_delete")
+        const y_coord_delete = document.getElementById("y_coord_delete")
+
+        x_coord_delete.value = Math.round((gridX - OFFSET_X) / GRID_SIZE);
+        y_coord_delete.value = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
+
         event.target.submit();
     } else {
         console.error("Hidden input not found")
