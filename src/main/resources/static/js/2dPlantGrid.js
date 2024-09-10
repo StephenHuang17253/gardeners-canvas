@@ -502,7 +502,7 @@ const handleExport = async (fileExtension) => {
         }
     );
     const blob = dataURLtoBlob(dataURL);
-    downloader.saveFile(blob, `${gardenName}.${fileExtension}`);
+    downloader.saveWithLink(blob, `${gardenName}.${fileExtension}`);
 };
 
 /**
