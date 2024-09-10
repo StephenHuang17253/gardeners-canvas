@@ -133,15 +133,24 @@ public class Garden2DController {
      * @param garden       garden that contains all the items
      */
     private void updateGardenGrid(GridItemType gridItemType, Long itemId, Integer xCoord, Integer yCoord, Garden garden) {
-        Optional<GridItemLocation> matchingGridItem = gridItemLocationService.getMatchingGridItem(gridItemType, itemId, garden);
-        if (matchingGridItem.isEmpty()) {
-            GridItemLocation newGridItemLocation = new GridItemLocation(itemId, gridItemType, garden, xCoord, yCoord);
-            gridItemLocationService.addGridItemLocation(newGridItemLocation);
-        } else {
-            GridItemLocation updatedGridItem = matchingGridItem.get();
-            updatedGridItem.setXCoordinates(xCoord);
-            updatedGridItem.setYCoordinates(yCoord);
-            gridItemLocationService.updateGridItemLocation(updatedGridItem);
+        GridItemLocation newGridItemLocation = new GridItemLocation(itemId, gridItemType, garden, xCoord, yCoord);
+        gridItemLocationService.addGridItemLocation(newGridItemLocation);
+    }
+
+    /**
+     * Helper function to delete grid items of given garden.
+     *
+     * @param garden garden whose grid items have to be deleted
+     */
+    private void deleteOldGridLocationItems(Garden garden) {
+        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
+
+        for (GridItemLocation gridItem : gridItems) {
+            try {
+                gridItemLocationService.removeGridItemLocation(gridItem);
+            } catch (Exception exception) {
+                logger.error("Error removing grid item with id {}: {}", gridItem.getId(), exception.getMessage());
+            }
         }
     }
 
@@ -186,28 +195,23 @@ public class Garden2DController {
             return "redirect:/2D-garden/{gardenId}";
         }
 
+        //converting json input to arrays
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> idListAsList = new ArrayList<>();
         List<Double> xCoordListAsList = new ArrayList<>();
         List<Double> yCoordListAsList = new ArrayList<>();
         try {
-            idListAsList = objectMapper.readValue(idList, new TypeReference<List<String>>() {
+            idListAsList = objectMapper.readValue(idList, new TypeReference<>() {
             });
-            xCoordListAsList = objectMapper.readValue(xCoordList, new TypeReference<List<Double>>() {
+            xCoordListAsList = objectMapper.readValue(xCoordList, new TypeReference<>() {
             });
-            yCoordListAsList = objectMapper.readValue(yCoordList, new TypeReference<List<Double>>() {
+            yCoordListAsList = objectMapper.readValue(yCoordList, new TypeReference<>() {
             });
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
 
-        try {
-            for (int i = 0; i < idListAsList.size(); i++) {
-                // all items on grid are plants at the moment
-                updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        if (idListAsList.size() != xCoordListAsList.size() || idListAsList.size() != yCoordListAsList.size()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("errorTitle", "400 Bad Request");
             model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
@@ -215,6 +219,12 @@ public class Garden2DController {
             return "error";
         }
 
+        //updating the repository
+        deleteOldGridLocationItems(garden);
+        for (int i = 0; i < idListAsList.size(); i++) {
+            // all items on grid are plants at the moment
+            updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
+        }
         return "redirect:/2D-garden/{gardenId}";
     }
 
@@ -222,15 +232,15 @@ public class Garden2DController {
      * Endpoint for clearing all elements from the 2D garden grid.
      * NOTE: Currently all gridItems are plants, decorations feature hasn't been added.
      *
-     * @param gardenId   id of the garden whose grid has to be saved
-     * @param response   http response to use to return error
-     * @param model      model to use to return error
+     * @param gardenId id of the garden whose grid has to be saved
+     * @param response http response to use to return error
+     * @param model    model to use to return error
      * @return redirect back to 2D garden grid
      */
     @PostMapping("/2D-garden/{gardenId}/clear")
     public String clear2DGarden(@PathVariable Long gardenId,
-                               HttpServletResponse response,
-                               Model model) {
+                                HttpServletResponse response,
+                                Model model) {
         logger.info("POST /2D-garden/{}/clear", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -252,15 +262,7 @@ public class Garden2DController {
 
         logger.info("Clearing grid of garden with id: {}", gardenId);
 
-        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
-
-        for (GridItemLocation gridItem : gridItems) {
-            try {
-                gridItemLocationService.removeGridItemLocation(gridItem);
-            } catch (Exception exception) {
-                logger.error("Error removing grid item with id {}: {}", gridItem.getId(), exception.getMessage());
-            }
-        }
+        deleteOldGridLocationItems(garden);
 
         return "redirect:/2D-garden/{gardenId}";
     }

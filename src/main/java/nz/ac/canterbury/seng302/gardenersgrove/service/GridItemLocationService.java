@@ -129,6 +129,7 @@ public class GridItemLocationService {
      * Checks if item with given details already exists in repository
      * Returns match if item exists, null otherwise
      * Note that it is possible for a plant and a decoration to have the same id
+     * Note: this method seems to be only being used in tests
      *
      * @param gridItemType plant or decoration
      * @param itemId       unique id of plant or of decoration
