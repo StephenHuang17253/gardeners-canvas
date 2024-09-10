@@ -47,7 +47,8 @@ public class Garden2DController {
     private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
 
     @Autowired
-    public Garden2DController(GardenService gardenService, SecurityService securityService, GridItemLocationService gridItemLocationService, PlantService plantService) {
+    public Garden2DController(GardenService gardenService, SecurityService securityService,
+            GridItemLocationService gridItemLocationService, PlantService plantService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.gridItemLocationService = gridItemLocationService;
@@ -57,9 +58,9 @@ public class Garden2DController {
 
     @GetMapping("/2D-garden/{gardenId}")
     public String getGarden2DPage(@PathVariable Long gardenId,
-                                  @RequestParam(defaultValue = "1") int page,
-                                  HttpServletResponse response,
-                                  Model model) {
+            @RequestParam(defaultValue = "1") int page,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /2D-garden/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -78,7 +79,7 @@ public class Garden2DController {
         }
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
-        handlePagniation(page, garden.getPlants().size(), garden.getPlants(), model);
+        handlePagination(page, garden.getPlants().size(), garden.getPlants(), model);
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
@@ -89,7 +90,7 @@ public class Garden2DController {
 
         for (GridItemLocation plantLocation : plantLocations) {
             if (plantLocation.getItemType() == GridItemType.PLANT) {
-                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getId());
+                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getObjectId());
                 if (optionalPlant.isPresent()) {
                     Plant currentPlant = optionalPlant.get();
                     displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
@@ -108,7 +109,7 @@ public class Garden2DController {
         return "garden2DPage";
     }
 
-    private void handlePagniation(int page, int listLength, List<Plant> plants, Model model) {
+    private void handlePagination(int page, int listLength, List<Plant> plants, Model model) {
         int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
@@ -132,7 +133,8 @@ public class Garden2DController {
      * @param yCoord       y co-ordinate of item on 2D grid
      * @param garden       garden that contains all the items
      */
-    private void updateGardenGrid(GridItemType gridItemType, Long itemId, Integer xCoord, Integer yCoord, Garden garden) {
+    private void updateGardenGrid(GridItemType gridItemType, Long itemId, Integer xCoord, Integer yCoord,
+            Garden garden) {
         GridItemLocation newGridItemLocation = new GridItemLocation(itemId, gridItemType, garden, xCoord, yCoord);
         gridItemLocationService.addGridItemLocation(newGridItemLocation);
     }
@@ -168,11 +170,11 @@ public class Garden2DController {
      */
     @PostMapping("/2D-garden/{gardenId}/save")
     public String save2DGarden(@PathVariable Long gardenId,
-                               @RequestParam(value = "idList", required = false) String idList,
-                               @RequestParam(value = "xCoordList", required = false) String xCoordList,
-                               @RequestParam(value = "yCoordList", required = false) String yCoordList,
-                               HttpServletResponse response,
-                               Model model) {
+            @RequestParam(value = "idList", required = false) String idList,
+            @RequestParam(value = "xCoordList", required = false) String xCoordList,
+            @RequestParam(value = "yCoordList", required = false) String yCoordList,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
@@ -195,11 +197,12 @@ public class Garden2DController {
             return "redirect:/2D-garden/{gardenId}";
         }
 
-        //converting json input to arrays
+        // converting json input to arrays
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> idListAsList = new ArrayList<>();
         List<Double> xCoordListAsList = new ArrayList<>();
         List<Double> yCoordListAsList = new ArrayList<>();
+
         try {
             idListAsList = objectMapper.readValue(idList, new TypeReference<>() {
             });
@@ -219,18 +222,20 @@ public class Garden2DController {
             return "error";
         }
 
-        //updating the repository
+        // updating the repository
         deleteOldGridLocationItems(garden);
         for (int i = 0; i < idListAsList.size(); i++) {
             // all items on grid are plants at the moment
-            updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)), xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
+            updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)),
+                    xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
         }
         return "redirect:/2D-garden/{gardenId}";
     }
 
     /**
      * Endpoint for clearing all elements from the 2D garden grid.
-     * NOTE: Currently all gridItems are plants, decorations feature hasn't been added.
+     * NOTE: Currently all gridItems are plants, decorations feature hasn't been
+     * added.
      *
      * @param gardenId id of the garden whose grid has to be saved
      * @param response http response to use to return error
@@ -239,11 +244,10 @@ public class Garden2DController {
      */
     @PostMapping("/2D-garden/{gardenId}/clear")
     public String clear2DGarden(@PathVariable Long gardenId,
-                                HttpServletResponse response,
-                                Model model) {
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /2D-garden/{}/clear", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-
 
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);

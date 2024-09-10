@@ -64,8 +64,23 @@ public class DisplayableItem {
         this.category = category;
     }
 
-    public Long getObjectId() {return objectId;}
+    public Long getObjectId() {
+        return objectId;
+    }
 
-    public void setObjectId(long objectId) {this.objectId = objectId;}
+    public void setObjectId(long objectId) {
+        this.objectId = objectId;
+    }
+
+    @Override
+    public String toString() {
+        return "DisplayableItem{" +
+                "xCoordinate=" + xCoordinate +
+                ", yCoordinate=" + yCoordinate +
+                ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
+                ", objectId=" + objectId +
+                '}';
+    }
 
 }

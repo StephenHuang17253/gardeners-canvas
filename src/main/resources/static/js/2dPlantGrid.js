@@ -102,8 +102,8 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
             visible: false,
         })
         const tooltiptag = new Konva.Tag({
-            fill:'black',
-            pointerDirection:'up',
+            fill: 'black',
+            pointerDirection: 'up',
             pointerWidth: 10,
             pointerHeight: 10,
             lineJoin: 'round',
@@ -115,13 +115,13 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
         });
         const tooltiptext =
             new Konva.Text({
-                text:'' ,
+                text: '',
                 fontFamily: 'Calibri',
                 fontSize: 18,
                 padding: 5,
                 fill: 'white',
             }
-        );
+            );
         tooltip.add(tooltiptag)
         tooltip.add(tooltiptext)
         const plant = new Konva.Image({
@@ -182,7 +182,7 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
             plant.strokeWidth(4);
         });
 
-        plant.on('mousemove', ()  => {
+        plant.on('mousemove', () => {
             const mousePos = stage.getPointerPosition();
             tooltip.position({
                 x: mousePos.x + 10,
@@ -510,6 +510,3 @@ window.addEventListener("click", event => {
 jpgDownloadButton.addEventListener("click", () => handleExport("jpg"));
 pngDownloadButton.addEventListener("click", () => handleExport("png"));
 jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
-
-
-
