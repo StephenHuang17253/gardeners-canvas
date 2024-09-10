@@ -7,13 +7,13 @@ package nz.ac.canterbury.seng302.gardenersgrove.util;
  */
 public enum PlantCategory {
     TREE("Tree","tree.png","tree.glb", 5),
-    SHRUB("Shrub","","shrub.glb", 5),
+    SHRUB("Shrub","shrub.png","shrub.glb", 5),
     BUSH("Bush","fern.png","fern.glb", 10),
-    HERB("Herb","","fern.glb", 1),
-    CREEPER("Creeper","","creeper.glb", .5f),
-    CLIMBER("Climber","","climber.glb", 5),
-    FLOWER("Flower","","flower.glb", 10),
-    POT_PLANT("Potplant","","potplant.glb", 5);
+    HERB("Herb","shrub.png","shrub.glb", 5),
+    CREEPER("Creeper","creeper.png","creeper.glb", .5f),
+    CLIMBER("Climber","climber.png","climber.glb", 5),
+    FLOWER("Flower","flower.png","flower.glb", 10),
+    POT_PLANT("Potplant","potplant.png","potplant.glb", 5);
 
     private String name;
     private String imageName;
