@@ -11,6 +11,7 @@ const jpegDownloadButton = document.getElementById("download-jpeg");
 const errorElement = document.getElementById("error-message");
 
 const INVALID_LOCATION = "Please place on the grid";
+const NO_PLANT_SELECTED = "Please select a plant to delete";
 const ERROR_MESSAGE_DURATION = 3000;
 
 const instance = getInstance();
@@ -457,12 +458,11 @@ const handleExport = async (fileExtension) => {
  * Event-listener to handle saving data. Is on the saveGardenFrom to update hidden variables before submission.
  */
 document.getElementById("saveGardenForm").addEventListener("submit", event => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
     const idList = [];
     const xCoordList = [];
     const yCoordList = [];
 
-    // Assuming "layer.find("Image")" is correctly defined elsewhere
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
@@ -472,20 +472,17 @@ document.getElementById("saveGardenForm").addEventListener("submit", event => {
         yCoordList.push(y_coord);
     });
 
-    // Ensure these elements exist
     const idListInput = document.getElementById("idList");
     const xCoordListInput = document.getElementById("xCoordList");
     const yCoordListInput = document.getElementById("yCoordList");
 
-    if (idListInput && xCoordListInput && yCoordListInput) {
-        idListInput.value = JSON.stringify(idList);
-        xCoordListInput.value = JSON.stringify(xCoordList);
-        yCoordListInput.value = JSON.stringify(yCoordList);
-        // Manually submit the form
-        event.target.submit();
-    } else {
-        console.error("One or more hidden inputs not found");
-    }
+    // Check if the hidden inputs exist
+    if (!(idListInput && xCoordListInput && yCoordListInput)) return;
+
+    idListInput.value = JSON.stringify(idList);
+    xCoordListInput.value = JSON.stringify(xCoordList);
+    yCoordListInput.value = JSON.stringify(yCoordList);
+    event.target.submit();
 });
 
 window.addEventListener("resize", () => {
@@ -516,42 +513,39 @@ jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 /**
  * Event-listener to handle deleting data.
  */
-document.getElementById("deletePlant").addEventListener("click", event => {
-    console.log("Delete button clicked")
+document.getElementById("deletePlant").addEventListener("click", () => {
 
-    if (selectedPlant) {
-        const gridX = selectedPlant.attrs.x;
-        const gridY = selectedPlant.attrs.y;
-
-        const gardenId = document.getElementById("gardenId")
-
-        const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
-        const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
-
-        fetch(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`,
-            {
-                method: 'GET'
-            })
-
-        let plantItem = null;
-        document.querySelectorAll('[name="plant-item"]').forEach(item => {
-            if (item.getAttribute("data-plant-id") === selectedPlant.attrs.id) {
-                plantItem = item;
-            }
-        });
-
-        let count = parseInt(plantItem.getAttribute("data-plant-count"));
-        count += 1
-        plantItem.setAttribute("data-plant-count", count)
-
-        updatePlantCountDisplay(plantItem, count)
-
-        selectedPlant.destroy()
-        selectedPlant.stroke(null);
-        selectedPlant.strokeWidth(0);
-        selectedPlant = null;
-
+    if (!selectedPlant) {
+        showErrorMessage(NO_PLANT_SELECTED);
+        return;
     }
+
+    const gridX = selectedPlant.attrs.x;
+    const gridY = selectedPlant.attrs.y;
+
+    const gardenId = document.getElementById("gardenId");
+
+    const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
+    const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
+
+    fetch(`/${instance}2D-garden/${gardenId.value}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`);
+
+    let plantItem = null;
+    document.querySelectorAll('[name="plant-item"]').forEach(item => {
+        if (item.getAttribute("data-plant-id") === selectedPlant.attrs.id) {
+            plantItem = item;
+        }
+    });
+
+    const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
+    plantItem.setAttribute("data-plant-count", updatedCount);
+
+    updatePlantCountDisplay(plantItem, updatedCount);
+
+    selectedPlant.destroy();
+    selectedPlant.stroke(null);
+    selectedPlant.strokeWidth(0);
+    selectedPlant = null;
 });
 
 

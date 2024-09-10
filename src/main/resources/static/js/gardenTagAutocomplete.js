@@ -2,6 +2,7 @@ const MIN_TAG_INPUT_LENGTH = 3;
 const form = document.getElementById("tagForm");
 const tagField = document.getElementById("tagInput")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
+const tagRegex = /^[a-zA-Z0-9\s\-_']+$/;
 
 /**
  * Gets the name of a tag
@@ -76,16 +77,22 @@ const updateTagAutocompleteDropdown = (tagSuggestions) => {
 /**
  * Handles updates to the input field such as char input and the field being selected,
  *      fetching suggestions and updating the UI accordingly
- * @type {(function(*): Promise<void>)|*}
+ * @param event - The input event
  */
-const handleTagUpdate = (async (event) => {
+const handleTagUpdate = async (event) => {
+    const value = event.target.value.trim();
 
-    if (event.target.value === "") {
+    if (value === "") {
         hideTagAutocompleteDropdown();
         return;
     }
 
-    if (event.target.value.length < MIN_TAG_INPUT_LENGTH) {
+    if (value.length < MIN_TAG_INPUT_LENGTH) {
+        hideTagAutocompleteDropdown();
+        return;
+    }
+
+    if (!tagRegex.test(value)) {
         hideTagAutocompleteDropdown();
         return;
     }
@@ -99,7 +106,7 @@ const handleTagUpdate = (async (event) => {
 
     updateTagAutocompleteDropdown(tagSuggestions);
     showTagAutocompleteDropdown();
-})
+}
 
 /**
  * Handles deselecting an input focus, hiding dropdowns
