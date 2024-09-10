@@ -53,6 +53,8 @@ public class ProfanityService {
 
     private final ObjectMapper objectMapper;
 
+    private static final int MAX_RETRIES = 4;
+
     /**
      * General constructor for profanity service, creates new http client.
      * always use this constructor when running real api calls
@@ -138,7 +140,7 @@ public class ProfanityService {
 
     private ProfanityResponseData moderateContentApiCall(String content) {
         int retryCounter = 0;
-        while (retryCounter < 4) {
+        while (retryCounter < MAX_RETRIES) {
             try {
                 String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
                 logger.info("Sent profanity API request: {}", new Date().getTime());
@@ -174,7 +176,7 @@ public class ProfanityService {
                 Thread.currentThread().interrupt();
                 logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s",
                         errorException.getMessage()));
-                return null; /// RETURN ERROR, FIX LATER
+                return null;
             }
         }
 
