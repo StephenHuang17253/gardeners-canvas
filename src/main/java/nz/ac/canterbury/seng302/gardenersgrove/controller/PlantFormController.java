@@ -193,6 +193,10 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
+            if (plantCategory.equalsIgnoreCase("POT PLANT"))
+            {
+                plantCategory = "POT_PLANT";
+            }
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
         }
 
@@ -356,6 +360,10 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
+            if (plantCategory.equalsIgnoreCase("POT PLANT"))
+            {
+                plantCategory = "POT_PLANT";
+            }
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
         }
 
