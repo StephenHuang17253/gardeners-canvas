@@ -68,6 +68,7 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             stroke: "black",
             strokeWidth: 1,
             name: "grid-cell",
+            listening: false,
         });
         layer.add(rect);
     }
@@ -84,6 +85,11 @@ let selectedPlant = null;
  * @returns {Boolean} - True if the location is valid, false otherwise
  */
 const validLocation = (x, y) => {
+    const shape = layer.getIntersection({x,y});
+    console.log(shape)
+    if (shape != null) {
+        return false;
+    }
     return x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
 };
 
@@ -214,7 +220,7 @@ const showErrorMessage = (message) => {
     errorElement.classList.remove("d-none");
     setTimeout(() => {
         errorElement.classList.add("d-none");
-    }, ERROR_MESSAGE_DURATION);
+    }, ERROR_MESSAGE_DURATION);validLocation
 };
 
 /**
@@ -315,6 +321,7 @@ stage.on("click", event => {
     if (highlightedPaletteItem) {
 
         if (!validLocation(x, y)) {
+            console.log("ERRORRRRR")
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -337,6 +344,7 @@ stage.on("click", event => {
                 y: y
             });
         } else {
+            console.log("DIF ERROR")
             showErrorMessage(INVALID_LOCATION);
         }
 
