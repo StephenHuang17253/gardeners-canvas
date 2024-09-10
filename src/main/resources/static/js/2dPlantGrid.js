@@ -3,15 +3,26 @@ import { Downloader } from "./Downloader.js";
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
 const jpegDownloadButton = document.getElementById("download-jpeg");
+
 const errorElement = document.getElementById("error-message");
+const confirmClearAllButton = document.getElementById("confirmClearAll");
 const deletePlantButton = document.getElementById("deletePlant");
 const saveGardenForm = document.getElementById("saveGardenForm");
-const confirmClearAllButton = document.getElementById("confirmClearAll");
-const plantItems = document.querySelectorAll("[name='plant-item']");
-const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
+
 const idListInput = document.getElementById("idList");
 const xCoordListInput = document.getElementById("xCoordList");
 const yCoordListInput = document.getElementById("yCoordList");
+
+const plantItems = document.querySelectorAll("[name='plant-item']");
+const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
+
+const pagination = document.getElementById("pagination");
+const firstPage = document.getElementById("firstPage");
+const previousPage = document.getElementById("previousPage");
+const currentPage = document.getElementById("currentPage");
+const nextPage = document.getElementById("nextPage");
+const lastPage = document.getElementById("lastPage");
+
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
@@ -33,6 +44,9 @@ const instance = getInstance();
 
 const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
+const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
+
+let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer, tooltipLayer;
 
 
 
@@ -190,18 +204,11 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
 
         plant.on("click", () => {
             tooltip.hide();
-            if (highlightedPaletteItem) {
-                highlightedPaletteItem.style.border = "none";
-                highlightedPaletteItem = null;
-                selectedPlantInfo = null;
-            }
+            deselectPaletteItem();
 
-            if (selectedPlant) {
-                selectedPlant.stroke(null);
-                selectedPlant.strokeWidth(0);
-            }
+            deselectGridItem();
 
-            selectedPlant = plant;
+            selectedGridItem = plant;
             plant.stroke("blue");
             plant.strokeWidth(4);
         });
@@ -309,28 +316,66 @@ const resetPlantCount = (plantItem) => {
     updatePlantCountDisplay(plantItem, originalCount);
 };
 
+/**
+ * Show plant items on the page based on the start and end indices
+ * 
+ * @param {number} start - The start index
+ * @param {number} end - The end index
+ */
+const showPlantItems = (start, end) => {
+    plantItems.forEach((item, i) => {
+        if (i >= start && i < end) {
+            item.classList.remove("d-none");
+        } else {
+            item.classList.add("d-none");
+        }
+    });
+};
+
+/**
+ * Deselects the highlighted palette item
+ */
+const deselectPaletteItem = () => {
+    if (selectedPaletteItem) {
+        selectedPaletteItem.style.border = "none";
+        selectedPaletteItem = null;
+        selectedPaletteItemInfo = null;
+    }
+};
+
+/**
+ * Deselects the highlighted grid item
+ */
+const deselectGridItem = () => {
+    if (selectedGridItem) {
+        selectedGridItem.stroke(null);
+        selectedGridItem.strokeWidth(0);
+        selectedGridItem = null;
+    }
+};
+
 
 
 // Initialisation
 
 const link = document.createElement("a");
 
-const downloader = new Downloader(link);
+downloader = new Downloader(link);
 
-const originalPlantCounts = {};
+originalPlantCounts = {};
 
-let selectedPlantInfo = null;
-let highlightedPaletteItem = null;
-let selectedPlant = null;
+selectedPaletteItemInfo = null;
+selectedPaletteItem = null;
+selectedGridItem = null;
 
-const stage = new Konva.Stage({
+stage = new Konva.Stage({
     width: STAGE_WIDTH,
     height: STAGE_HEIGHT,
     container: "container"
 });
 
-const layer = new Konva.Layer();
-const tooltipLayer = new Konva.Layer();
+layer = new Konva.Layer();
+tooltipLayer = new Konva.Layer();
 stage.add(layer);
 stage.add(tooltipLayer);
 
@@ -375,7 +420,11 @@ gridItemLocations.forEach(item => {
 /**
  * Initialise plant counts and event listeners for clicking on plant items
  */
-plantItems.forEach(item => {
+plantItems.forEach((item, i) => {
+
+    if (i < COUNT_PER_PAGE) {
+        item.classList.remove("d-none");
+    }
 
     const plantName = item.getAttribute("data-plant-name");
     originalPlantCounts[plantName] = parseInt(item.getAttribute("data-plant-count"));
@@ -388,16 +437,13 @@ plantItems.forEach(item => {
         const currentCount = parseInt(item.getAttribute("data-plant-count"));
         const category = item.getAttribute("data-plant-category");
 
-        if (highlightedPaletteItem) {
-            highlightedPaletteItem.style.border = "none";
-            highlightedPaletteItem = null;
-        }
+        deselectPaletteItem();
 
         if (currentCount < 1) return;
 
         item.style.border = "3px solid blue";
 
-        highlightedPaletteItem = item;
+        selectedPaletteItem = item;
 
         let plantImage = item.getAttribute("data-plant-image")
 
@@ -405,7 +451,7 @@ plantItems.forEach(item => {
             plantImage = `/${instance}` + plantImage;
         }
 
-        selectedPlantInfo = {
+        selectedPaletteItemInfo = {
             name: item.getAttribute("data-plant-name"),
             image: plantImage,
             id: item.getAttribute("data-plant-id"),
@@ -416,8 +462,6 @@ plantItems.forEach(item => {
 
     item.addEventListener("click", handlePlantItemClick);
 });
-
-
 
 // Event Handlers
 
@@ -435,27 +479,23 @@ const handleStageClick = (event) => {
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
     const { x, y } = convertToKonvaCoordinates(i, j);
 
-    if (highlightedPaletteItem) {
+    if (selectedPaletteItem) {
 
         if (!validLocation(x, y)) {
             showErrorMessage(INVALID_LOCATION);
             return;
         }
 
-        createPlant(selectedPlantInfo.image, x, y, selectedPlantInfo.id, selectedPlantInfo.name, selectedPlantInfo.category)
-        selectedPlantInfo.count -= 1
+        createPlant(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
+        selectedPaletteItemInfo.count -= 1
 
-        highlightedPaletteItem.setAttribute("data-plant-count", selectedPlantInfo.count);
-        updatePlantCountDisplay(highlightedPaletteItem, selectedPlantInfo.count);
+        selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
+        updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
 
-        highlightedPaletteItem.style.border = "none";
-        highlightedPaletteItem = null;
-        selectedPlantInfo = null;
-
-    } else if (selectedPlant) {
+    } else if (selectedGridItem) {
 
         if (validLocation(x, y)) {
-            selectedPlant.position({
+            selectedGridItem.position({
                 x: x,
                 y: y
             });
@@ -463,12 +503,10 @@ const handleStageClick = (event) => {
             showErrorMessage(INVALID_LOCATION);
         }
 
-        selectedPlant.stroke(null);
-        selectedPlant.strokeWidth(0);
-        selectedPlant = null;
+        deselectGridItem();
     }
 
-    highlightedPaletteItem = null;
+    deselectPaletteItem();
 };
 
 
@@ -482,11 +520,7 @@ const handleClearAllButtonClick = () => {
         resetPlantCount(item);
     });
 
-    selectedPlantInfo = null;
-    if (highlightedPaletteItem) {
-        highlightedPaletteItem.style.border = "none";
-        highlightedPaletteItem = null;
-    }
+    deselectPaletteItem();
 };
 
 /**
@@ -509,13 +543,13 @@ const handleExport = async (fileExtension) => {
  * Handles the deletion of a plant from the garden
  */
 const handleDeleteButtonClick = () => {
-    if (!selectedPlant) {
+    if (!selectedGridItem) {
         showErrorMessage(NO_PLANT_SELECTED);
         return;
     }
 
-    const gridX = selectedPlant.attrs.x;
-    const gridY = selectedPlant.attrs.y;
+    const gridX = selectedGridItem.attrs.x;
+    const gridY = selectedGridItem.attrs.y;
 
     const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
     const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
@@ -524,7 +558,7 @@ const handleDeleteButtonClick = () => {
 
     let plantItem = null;
     plantItems.forEach(item => {
-        if (item.getAttribute("data-plant-id") === selectedPlant.attrs.id) {
+        if (item.getAttribute("data-plant-id") === selectedGridItem.attrs.id) {
             plantItem = item;
         }
     });
@@ -534,10 +568,8 @@ const handleDeleteButtonClick = () => {
 
     updatePlantCountDisplay(plantItem, updatedCount);
 
-    selectedPlant.destroy()
-    selectedPlant.stroke(null);
-    selectedPlant.strokeWidth(0);
-    selectedPlant = null;
+    selectedGridItem.destroy();
+    selectedGridItem = null;
 };
 
 /**
@@ -584,14 +616,63 @@ const handleWindowResize = () => {
  * @param {Event} event - The event object
  */
 const handleWindowClick = (event) => {
-    const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
-    if (highlightedPaletteItem && !isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
 
-    if (highlightedPaletteItem && !highlightedPaletteItem.contains(event.target)) {
-        highlightedPaletteItem.style.border = "none";
-        highlightedPaletteItem = null;
-        selectedPlantInfo = null;
+    if (!selectedPaletteItem) return;
+
+    if (pagination.contains(event.target)) {
+        deselectPaletteItem();
+        return;
     }
+
+    const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
+    if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
+
+    if (!selectedPaletteItem.contains(event.target)) {
+        deselectPaletteItem();
+    }
+};
+
+/**
+ * Handle clicking the first page button
+ */
+const handleFirstPageClick = () => {
+    showPlantItems(0, COUNT_PER_PAGE);
+    currentPage.textContent = 1;
+};
+
+/**
+ * Handle clicking the previous page button
+ */
+const handlePreviousPageClick = () => {
+    const currentPageNumber = parseInt(currentPage.textContent);
+    if (currentPageNumber === 1) return;
+    const start = (currentPageNumber - 2) * COUNT_PER_PAGE;
+    const end = (currentPageNumber - 1) * COUNT_PER_PAGE;
+    showPlantItems(start, end);
+    currentPage.textContent = currentPageNumber - 1;
+};
+
+/**
+ * Handle clicking the next page button
+ */
+const handleNextPageClick = () => {
+    const currentPageNumber = parseInt(currentPage.textContent);
+    if (plantItems.length <= currentPageNumber * COUNT_PER_PAGE) return;
+    const start = currentPageNumber * COUNT_PER_PAGE;
+    const end = (currentPageNumber + 1) * COUNT_PER_PAGE;
+    showPlantItems(start, end);
+    currentPage.textContent = currentPageNumber + 1;
+};
+
+/**
+ * Handle clicking the last page button
+ */
+const handleLastPageClick = () => {
+    const start = Math.floor(plantItems.length / COUNT_PER_PAGE) * COUNT_PER_PAGE;
+    const end = plantItems.length;
+    if (start === end) return;
+    showPlantItems(start, end);
+    currentPage.textContent = Math.ceil(end / COUNT_PER_PAGE);
 };
 
 
@@ -610,3 +691,8 @@ jpegDownloadButton.addEventListener("click", () => handleExport("jpeg"));
 confirmClearAllButton.addEventListener("click", handleClearAllButtonClick);
 deletePlantButton.addEventListener("click", handleDeleteButtonClick);
 saveGardenForm.addEventListener("submit", handleGardenFormSubmit);
+
+firstPage.addEventListener("click", handleFirstPageClick);
+previousPage.addEventListener("click", handlePreviousPageClick);
+nextPage.addEventListener("click", handleNextPageClick);
+lastPage.addEventListener("click", handleLastPageClick);
