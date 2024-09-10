@@ -53,7 +53,7 @@ class Exporter {
                     blob = new Blob([output], { type: MIME_TYPES.TEXT_PLAIN });
                     extension = FILE_EXTENSIONS.GLTF;
                 }
-                this.downloader.saveFile(blob, `${this.gardenName}.${extension}`);
+                this.downloader.saveWithLink(blob, `${this.gardenName}.${extension}`);
             }
         );
     };
@@ -66,7 +66,7 @@ class Exporter {
     downloadOBJ = (scene) => {
         const objData = this.objExporter.parse(scene);
         const blob = new Blob([objData], { type: MIME_TYPES.TEXT_PLAIN });
-        this.downloader.saveFile(blob, `${this.gardenName}.${FILE_EXTENSIONS.OBJ}`);
+        this.downloader.saveWithLink(blob, `${this.gardenName}.${FILE_EXTENSIONS.OBJ}`);
     };
 
     /**
@@ -76,7 +76,7 @@ class Exporter {
      */
     downloadJPG = (renderer) => {
         renderer.domElement.toBlob(blob => {
-            this.downloader.saveFile(blob, `${this.gardenName}.${FILE_EXTENSIONS.JPG}`);
+            this.downloader.saveWithLink(blob, `${this.gardenName}.${FILE_EXTENSIONS.JPG}`);
         }, MIME_TYPES.IMAGE_JPG, 1);
     };
 
