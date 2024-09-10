@@ -296,7 +296,7 @@ public class InputValidator {
     }
 
     /**
-     * Checks if the given decsription is valid 512 char or less and contains at
+     * Checks if the given description is valid 512 char or less and contains at
      * least one letter if not empty will return invalid description message in
      * either case
      *
@@ -428,12 +428,6 @@ public class InputValidator {
             result = ValidationResult.INVALID_PLANT_COUNT;
         }
         return result;
-    }
-
-    public static ValidationResult validatePlantCategory(String plantCategory) {
-        return new InputValidator(plantCategory)
-                .lengthHelper(200)
-                .getResult();
     }
 
     /**
@@ -758,6 +752,7 @@ public class InputValidator {
         LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
 
         LocalDate oneYearFromNow = LocalDate.now().plusYears(1);
+        LocalDate fourHundredYearsAgo = LocalDate.now().minusYears(400);
 
         if (inputtedDate.isAfter(oneYearFromNow)) {
             this.validationResult = ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE;
@@ -765,11 +760,7 @@ public class InputValidator {
             return this;
         }
 
-        long yearsDifference = ChronoUnit.YEARS.between(
-                inputtedDate,
-                LocalDate.now());
-
-        if (yearsDifference > 400 || testedValue == null) {
+        if (inputtedDate.isBefore(fourHundredYearsAgo)) {
             this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
@@ -1005,7 +996,7 @@ public class InputValidator {
 
         String filteredValue = testedValue.replaceAll("\\s+", "");
 
-        if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
+        if (!filteredValue.equals("") && !filteredValue.matches(".*\\p{L}.*")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
@@ -1059,7 +1050,7 @@ public class InputValidator {
                 this.passState = false;
                 return this;
             }
-        } catch (Exception e) {
+        } catch (Exception err) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
@@ -1089,7 +1080,7 @@ public class InputValidator {
                 this.passState = false;
                 return this;
             }
-        } catch (Exception e) {
+        } catch (Exception err) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
