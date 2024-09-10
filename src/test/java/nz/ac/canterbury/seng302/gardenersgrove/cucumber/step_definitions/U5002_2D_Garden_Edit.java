@@ -72,9 +72,10 @@ public class U5002_2D_Garden_Edit {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gridItemLocationService = new GridItemLocationService(gridItemLocationRepository);
         fileService = new FileService();
-        plantService = new PlantService(plantRepository, gardenService,fileService );
+        plantService = new PlantService(plantRepository, gardenService, fileService);
 
-        Garden2DController garden2DController = new Garden2DController(gardenService, securityService, gridItemLocationService, plantService);
+        Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
+                gridItemLocationService, plantService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
 
@@ -95,7 +96,7 @@ public class U5002_2D_Garden_Edit {
         model = modelAndView.getModel();
 
         // palette window page
-        Assertions.assertTrue(model.containsKey("currentPage"));
+        Assertions.assertTrue(model.containsKey("displayableItemsList"));
 
         // plants
         Assertions.assertTrue(model.containsKey("plants"));
