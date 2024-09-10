@@ -752,6 +752,7 @@ public class InputValidator {
         LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
 
         LocalDate oneYearFromNow = LocalDate.now().plusYears(1);
+        LocalDate fourHundredYearsAgo = LocalDate.now().minusYears(400);
 
         if (inputtedDate.isAfter(oneYearFromNow)) {
             this.validationResult = ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE;
@@ -759,12 +760,7 @@ public class InputValidator {
             return this;
         }
 
-
-        long yearsDifference = ChronoUnit.YEARS.between(
-                inputtedDate,
-                LocalDate.now());
-
-        if (yearsDifference > 400 || testedValue == null) {
+        if (inputtedDate.isBefore(fourHundredYearsAgo)) {
             this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
