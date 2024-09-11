@@ -251,9 +251,22 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         });
 
         plant.on("click", () => {
+            if(selectedPaletteItem){
+                showErrorMessage(OCCUPIED_DESTINATION);
+                tooltip.hide();
+                deselectPaletteItem();
+                deselectGridItem();
+                return;
+            }
+            if(selectedGridItem){
+                showErrorMessage(OCCUPIED_DESTINATION);
+                tooltip.hide();
+                deselectPaletteItem();
+                deselectGridItem();
+                return;
+            }
             tooltip.hide();
             deselectPaletteItem();
-
             deselectGridItem();
 
             selectedGridItem = plant;
@@ -678,6 +691,9 @@ const handleWindowClick = (event) => {
         deselectPaletteItem();
         return;
     }
+    console.log("machine gun");
+
+    // check is spot clicked it plant
 
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
     if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
