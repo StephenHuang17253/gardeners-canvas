@@ -157,7 +157,7 @@ public class ManageFriendsController {
             activeTab = (String) inputFlashMap.get("activeTab");
         }
         if (inputFlashMap != null) {
-            model.addAttribute("errorMessage", inputFlashMap.get("errorMessage"));
+            model.addAttribute(Constants.ERROR_MESSAGE_ATTRIBUTE, inputFlashMap.get(Constants.ERROR_MESSAGE_ATTRIBUTE));
             model.addAttribute("goodMessage", false);
         }
 
@@ -348,7 +348,7 @@ public class ManageFriendsController {
 
         if (friendship != null) {
             if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "This user has already declined this request");
+                redirectAttributes.addFlashAttribute(Constants.ERROR_MESSAGE_ATTRIBUTE, "This user has already declined this request");
             }
             friendshipService.deleteFriendship(friendship.getId());
             userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);

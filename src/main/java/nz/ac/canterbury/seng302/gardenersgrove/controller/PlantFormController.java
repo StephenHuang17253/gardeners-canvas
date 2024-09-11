@@ -66,9 +66,9 @@ public class PlantFormController {
      */
     @GetMapping("/my-gardens/{gardenId}/create-new-plant")
     public String newPlantForm(@PathVariable Long gardenId,
-            @RequestParam(name = "plantName", required = false) String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = Constants.PLANT_NAME_ATTRIBUTE, required = false) String plantName,
+            @RequestParam(name = Constants.PLANT_COUNT_ATTRIBUTE, required = false) String plantCount,
+            @RequestParam(name = Constants.PLANT_DESCRIPTION_ATTRIBUTE, required = false) String plantDescription,
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
             @RequestParam(name = "plantCategory", required = false) String plantCategory,
             HttpServletResponse response,
@@ -97,7 +97,7 @@ public class PlantFormController {
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
-        model.addAttribute("plantPicture", plantPictureString);
+        model.addAttribute(Constants.PLANT_PICTURE_ATTRIBUTE, plantPictureString);
 
         return "createNewPlantForm"; // Return the view for creating a new plant
     }
@@ -117,13 +117,13 @@ public class PlantFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}/create-new-plant")
-    public String submitNewPlantForm(@RequestParam(name = "plantName") String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+    public String submitNewPlantForm(@RequestParam(name = Constants.PLANT_NAME_ATTRIBUTE) String plantName,
+            @RequestParam(name = Constants.PLANT_COUNT_ATTRIBUTE, required = false) String plantCount,
+            @RequestParam(name = Constants.PLANT_DESCRIPTION_ATTRIBUTE, required = false) String plantDescription,
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
             @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
             @RequestParam(name = "plantCategory") String plantCategory,
-            @PathVariable("gardenId") Long gardenId,
+            @PathVariable(Constants.GARDEN_ID_ATTRIBUTE) Long gardenId,
             HttpServletResponse response,
             Model model) {
         logger.info("POST /create-new-plant");
@@ -167,16 +167,16 @@ public class PlantFormController {
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
                 plantDateResult, plantCategoryResult);
 
-        model.addAttribute("plantName", plantName);
-        model.addAttribute("plantCount", plantCount);
+        model.addAttribute(Constants.PLANT_NAME_ATTRIBUTE, plantName);
+        model.addAttribute(Constants.PLANT_COUNT_ATTRIBUTE, plantCount);
         model.addAttribute(Constants.PLANT_CATEGORY_ATTRIBUTE, plantCategory);
-        model.addAttribute("plantDescription", plantDescription);
+        model.addAttribute(Constants.PLANT_DESCRIPTION_ATTRIBUTE, plantDescription);
         model.addAttribute(Constants.PLANT_DATE_ATTRIBUTE, plantDate);
         model.addAttribute(Constants.PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
-        model.addAttribute("plantPicture", plantPictureString);
+        model.addAttribute(Constants.PLANT_PICTURE_ATTRIBUTE, plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
                 || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
@@ -213,7 +213,7 @@ public class PlantFormController {
      * @return thymeleaf createNewPlantForm
      */
     @GetMapping("/my-gardens/{gardenId}/{plantId}/edit")
-    public String editPlantForm(@PathVariable("gardenId") Long gardenId,
+    public String editPlantForm(@PathVariable(Constants.GARDEN_ID_ATTRIBUTE) Long gardenId,
             @PathVariable("plantId") Long plantId,
             HttpServletResponse response,
             Model model) {
@@ -251,14 +251,14 @@ public class PlantFormController {
             plantDate = null;
         }
 
-        model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
-        model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
+        model.addAttribute(Constants.GARDEN_ID_ATTRIBUTE, gardenId); // Pass gardenId to the form
+        model.addAttribute(Constants.GARDEN_NAME_ATTRIBUTE, garden.getGardenName()); // Pass gardenName to the form
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
-        model.addAttribute("plantPicture", plantPicture);
-        model.addAttribute("plantName", plantToUpdate.get().getPlantName());
+        model.addAttribute(Constants.PLANT_PICTURE_ATTRIBUTE, plantPicture);
+        model.addAttribute(Constants.PLANT_NAME_ATTRIBUTE, plantToUpdate.get().getPlantName());
         model.addAttribute(Constants.PLANT_CATEGORY_ATTRIBUTE, plantToUpdate.get().getPlantCategory());
-        model.addAttribute("plantCount", plantCount);
-        model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
+        model.addAttribute(Constants.PLANT_COUNT_ATTRIBUTE, plantCount);
+        model.addAttribute(Constants.PLANT_DESCRIPTION_ATTRIBUTE, plantToUpdate.get().getPlantDescription());
         model.addAttribute(Constants.PLANT_DATE_ATTRIBUTE, plantDate);
         model.addAttribute(Constants.PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
         return "editPlantForm"; // Return the view for creating a new plant
@@ -279,13 +279,13 @@ public class PlantFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}/{plantId}/edit")
-    public String submiteditPlantForm(@RequestParam(name = "plantName") String plantName,
-            @RequestParam(name = "plantCount", required = false) String plantCount,
-            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+    public String submiteditPlantForm(@RequestParam(name = Constants.PLANT_NAME_ATTRIBUTE) String plantName,
+            @RequestParam(name = Constants.PLANT_COUNT_ATTRIBUTE, required = false) String plantCount,
+            @RequestParam(name = Constants.PLANT_DESCRIPTION_ATTRIBUTE, required = false) String plantDescription,
             @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
             @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
             @RequestParam(name = "plantCategory") String plantCategory,
-            @PathVariable("gardenId") Long gardenId,
+            @PathVariable(Constants.GARDEN_ID_ATTRIBUTE) Long gardenId,
             @PathVariable("plantId") Long plantId,
             HttpServletResponse response,
             Model model) {
@@ -334,10 +334,10 @@ public class PlantFormController {
                 plantDateResult, plantCategoryResult);
 
         String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
-        model.addAttribute("plantPicture", plantPictureString);
-        model.addAttribute("plantName", plantName);
-        model.addAttribute("plantCount", plantCount);
-        model.addAttribute("plantDescription", plantDescription);
+        model.addAttribute(Constants.PLANT_PICTURE_ATTRIBUTE, plantPictureString);
+        model.addAttribute(Constants.PLANT_NAME_ATTRIBUTE, plantName);
+        model.addAttribute(Constants.PLANT_COUNT_ATTRIBUTE, plantCount);
+        model.addAttribute(Constants.PLANT_DESCRIPTION_ATTRIBUTE, plantDescription);
         model.addAttribute(Constants.PLANT_DATE_ATTRIBUTE, plantDate);
         model.addAttribute(Constants.PLANT_CATEGORY_ATTRIBUTE, plantCategory);
         model.addAttribute(Constants.PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
@@ -474,7 +474,7 @@ public class PlantFormController {
      * @return confirmation of import form
      */
     @PostMapping("/import-plant")
-    public String importPlant(@RequestParam("gardenId") Long gardenId,
+    public String importPlant(@RequestParam(Constants.GARDEN_ID_ATTRIBUTE) Long gardenId,
             @RequestParam("plantId") Long plantId,
             RedirectAttributes redirectAttributes,
             HttpServletResponse response) {
@@ -497,7 +497,7 @@ public class PlantFormController {
         securityService.addUserInteraction(newPlant.getPlantId(), ItemType.PLANT, LocalDateTime.now());
 
         redirectAttributes.addAttribute("plantId", newPlant.getPlantId());
-        redirectAttributes.addAttribute("gardenId", gardenId);
+        redirectAttributes.addAttribute(Constants.GARDEN_ID_ATTRIBUTE, gardenId);
         redirectAttributes.addAttribute("gardenIdOfOriginalPlant", toCopyPlant.getGarden().getGardenId());
 
         return "redirect:/import-plant/confirm";
@@ -532,7 +532,7 @@ public class PlantFormController {
             return "500";
         }
 
-        redirectAttributes.addAttribute("gardenId", gardenIdOfOriginalPlant);
+        redirectAttributes.addAttribute(Constants.GARDEN_ID_ATTRIBUTE, gardenIdOfOriginalPlant);
 
         return "redirect:/public-gardens/{gardenId}";
     }
@@ -549,7 +549,7 @@ public class PlantFormController {
      * @return confirmation form
      */
     @GetMapping("/import-plant/confirm")
-    public String importPlantConfirmationForm(@RequestParam("gardenId") Long gardenId,
+    public String importPlantConfirmationForm(@RequestParam(Constants.GARDEN_ID_ATTRIBUTE) Long gardenId,
             @RequestParam("plantId") Long plantId,
             @RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
             HttpServletResponse response,
@@ -573,13 +573,13 @@ public class PlantFormController {
         }
 
         model.addAttribute("gardenIdOfOriginalPlant", gardenIdOfOriginalPlant); // Pass gardenId to the form
-        model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
+        model.addAttribute(Constants.GARDEN_NAME_ATTRIBUTE, garden.getGardenName()); // Pass gardenName to the form
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantId", plantId);
-        model.addAttribute("plantPicture", plantPicture);
-        model.addAttribute("plantName", plantToUpdate.get().getPlantName());
-        model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
-        model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
+        model.addAttribute(Constants.PLANT_PICTURE_ATTRIBUTE, plantPicture);
+        model.addAttribute(Constants.PLANT_NAME_ATTRIBUTE, plantToUpdate.get().getPlantName());
+        model.addAttribute(Constants.PLANT_COUNT_ATTRIBUTE, plantToUpdate.get().getPlantCount());
+        model.addAttribute(Constants.PLANT_DESCRIPTION_ATTRIBUTE, plantToUpdate.get().getPlantDescription());
         model.addAttribute(Constants.PLANT_DATE_ATTRIBUTE, plantToUpdate.get().getPlantDate());
         model.addAttribute(Constants.PLANT_CATEGORY_ATTRIBUTE, plantToUpdate.get().getPlantCategory());
 
