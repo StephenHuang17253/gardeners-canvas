@@ -167,7 +167,7 @@ const updateCountersOnLoad = (plantId) => {
     const plantItem = document.querySelector(`[name="plant-item"][data-plant-id="${plantId}"]`);
 
     const count = parseInt(plantItem.getAttribute("data-plant-count"));
-    const placedCount = originalPlantCounts[plantItem.getAttribute("data-plant-name")] - count;
+    const placedCount = originalPlantCounts[plantId] - count;
 
     const placedElement = plantItem.querySelector("#placed");
     const remainingElement = plantItem.querySelector("#remaining");
@@ -251,14 +251,14 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         });
 
         plant.on("click", () => {
-            if(selectedPaletteItem){
+            if (selectedPaletteItem) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 tooltip.hide();
                 deselectPaletteItem();
                 deselectGridItem();
                 return;
             }
-            if(selectedGridItem){
+            if (selectedGridItem) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 tooltip.hide();
                 deselectPaletteItem();
@@ -341,12 +341,14 @@ const dataURLtoBlob = (dataURL) => {
  * @param {number} count - The new count
  */
 const updatePlantCountDisplay = (plantItem, count) => {
-    const plantName = plantItem.getAttribute("data-plant-name");
-    const originalCount = originalPlantCounts[plantName];
+    const plantId = plantItem.getAttribute("data-plant-id");
+    const originalCount = originalPlantCounts[plantId];
 
     const totalElement = plantItem.querySelector("#total");
     const placedElement = plantItem.querySelector("#placed");
     const remainingElement = plantItem.querySelector("#remaining");
+
+    const plantName = plantItem.getAttribute("data-plant-name");
 
     if (totalElement) {
         totalElement.textContent = `${plantName} (x${originalCount})`;
@@ -367,8 +369,8 @@ const updatePlantCountDisplay = (plantItem, count) => {
  * @param {HTMLElement} plantItem - The plant item element
  */
 const resetPlantCount = (plantItem) => {
-    const plantName = plantItem.getAttribute("data-plant-name");
-    const originalCount = originalPlantCounts[plantName];
+    const plantId = plantItem.getAttribute("data-plant-id");
+    const originalCount = originalPlantCounts[plantId];
     plantItem.setAttribute("data-plant-count", originalCount);
     updatePlantCountDisplay(plantItem, originalCount);
 };
@@ -418,6 +420,7 @@ const link = document.createElement("a");
 
 downloader = new Downloader(link);
 
+// maps plant id to the original count
 originalPlantCounts = {};
 
 selectedPaletteItemInfo = null;
@@ -484,8 +487,8 @@ plantItems.forEach((item, i) => {
         item.classList.remove("d-none");
     }
 
-    const plantName = item.getAttribute("data-plant-name");
-    originalPlantCounts[plantName] = parseInt(item.getAttribute("data-plant-count"));
+    const plantId = item.getAttribute("data-plant-id");
+    originalPlantCounts[plantId] = parseInt(item.getAttribute("data-plant-count"));
 
     /**
      * Handles the clicking of a plant item in the palette
@@ -498,7 +501,7 @@ plantItems.forEach((item, i) => {
         deselectPaletteItem();
         deselectGridItem();
 
-        if (nodes.length >= GRID_COLUMNS*GRID_ROWS) {
+        if (nodes.length >= GRID_COLUMNS * GRID_ROWS) {
             showErrorMessage(FULL_GRID);
             return;
         }
