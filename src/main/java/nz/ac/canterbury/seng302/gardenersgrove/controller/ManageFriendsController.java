@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,7 +171,7 @@ public class ManageFriendsController {
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("activeTab", activeTab);
 
-        return "manageFriendsPage";
+        return Constants.MANAGE_FRIENDS_PAGE_ATTRIBUTE;
     }
 
     /**
@@ -256,7 +257,7 @@ public class ManageFriendsController {
         model.addAttribute("isPotentialFriend", true);
         model.addAttribute("userSearch", searchInput);
         model.addAttribute("activeTab", "search");
-        return "manageFriendsPage";
+        return Constants.MANAGE_FRIENDS_PAGE_ATTRIBUTE;
     }
 
     /**
@@ -278,7 +279,7 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("searchErrorText", exception.getMessage());
-            return "manageFriendsPage";
+            return Constants.MANAGE_FRIENDS_PAGE_ATTRIBUTE;
         }
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
