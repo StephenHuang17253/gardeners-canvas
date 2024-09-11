@@ -50,7 +50,9 @@
                         class="d-flex flex-row flex-wrap justify-content-center align-items-center gap-2 mb-3">
                         <h7>Applied tags:</h7>
                         <div class="p-1" th:each="tag : ${appliedTags}">
-                            <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success', isRemovable=true) }"></div>
+                            <div
+                                th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success', isRemovable=true) }">
+                            </div>
                         </div>
                     </div>
 
@@ -98,7 +100,6 @@
 
     <script th:src="@{/js/tagSearch.js}"></script>
     <script th:src="@{/js/gardenTagAutocomplete.js}"></script>
-    <script th:src="@{/js/getInstance.js}"></script>
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
 </body>
 

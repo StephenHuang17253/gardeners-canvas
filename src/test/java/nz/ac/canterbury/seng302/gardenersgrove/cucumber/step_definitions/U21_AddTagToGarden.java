@@ -89,13 +89,15 @@ public class U21_AddTagToGarden {
     private MvcResult mvcResultPublicGardens;
 
     private MvcResult mvcResultGardens;
+
     private MvcResult tagResult;
 
     private Garden garden;
 
+    String tagSuggestions = "/tag/suggestions";
+
     @Before
     public void before_or_after_all() {
-
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
@@ -108,10 +110,9 @@ public class U21_AddTagToGarden {
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
         GardensController gardensController = new GardensController(gardenService, securityService,
-                plantService, weatherService, objectMapper, gardenTagService, profanityService, userService);
+                plantService, weatherService, objectMapper, gardenTagService, profanityService);
 
         mockMVCGardens = MockMvcBuilders.standaloneSetup(gardensController).build();
-
     }
 
     @Given("I as user {string} have a garden")
@@ -158,7 +159,6 @@ public class U21_AddTagToGarden {
 
     @When("I try to add an invalid tag {string} to my garden")
     public void i_try_to_add_a_tag_to_the_garden(String tag) throws Exception {
-
         mvcResultGardens = mockMVCGardens.perform(
                 MockMvcRequestBuilders
                         .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
@@ -166,83 +166,67 @@ public class U21_AddTagToGarden {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    // AC5
     @When("I enter a valid tag {string}")
     public void i_enter_a_valid_tag(String tag) throws Exception {
         mvcResultGardens = mockMVCGardens.perform(
                 MockMvcRequestBuilders
                         .post("/my-gardens/{gardenId}/tag", garden.getGardenId())
-                        .param("tag", tag)
-        ).andReturn();
+                        .param("tag", tag))
+                .andReturn();
     }
 
-    @When ("I previously added a tag {string}")
+    @When("I previously added a tag {string}")
     public void i_previously_added_a_tag(String tag) throws Exception {
         gardenTagService.addGardenTag(new GardenTag(tag));
     }
 
-    // AC3
     @And("I begin typing the tag {string}")
     public void i_begin_typing_a_tag(String query) throws Exception {
         gardenTagService.addGardenTag(new GardenTag("Garden"));
         gardenTagService.addGardenTag(new GardenTag("Vegetable Garden"));
         gardenTagService.addGardenTag(new GardenTag("Rose Garden"));
 
-        gardenTagService.updateGardenTagStatus("Garden",TagStatus.APPROPRIATE);
-        gardenTagService.updateGardenTagStatus("Vegetable Garden",TagStatus.APPROPRIATE);
-        gardenTagService.updateGardenTagStatus("Rose Garden",TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Garden", TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Vegetable Garden", TagStatus.APPROPRIATE);
+        gardenTagService.updateGardenTagStatus("Rose Garden", TagStatus.APPROPRIATE);
 
-
-        String fetchUrl = "/tag/suggestions";
         tagResult = mockMVCGardens.perform(
                 MockMvcRequestBuilders
-                        .get(fetchUrl)
-                        .param("query", query)
-
-        ).andReturn();
+                        .get(tagSuggestions)
+                        .param("query", query))
+                .andReturn();
     }
 
     @Then("The following error message is displayed {string}")
     public void the_following_error_message_is_displayed(String errorMessage) {
-
         String tagErrorText = mvcResultGardens.getModelAndView().getModelMap().getAttribute("tagErrorText")
                 .toString();
-
         Assertions.assertEquals(errorMessage, tagErrorText);
-
     }
 
     @Then("The tag is not added to the garden")
     public void the_tag_is_not_added_to_the_garden() {
-
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
-
         Assertions.assertTrue(gardenTags.isEmpty());
-
     }
 
-    // AC3
     @Then("I see autocomplete options for existing tags")
     public void i_see_autocomplete_options_for_existing_tags()
             throws JsonProcessingException, UnsupportedEncodingException {
-        assert tagResult != null;
+        Assertions.assertNotNull(tagResult);
         String tagListResponse = tagResult.getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(tagListResponse);
-
         Assertions.assertEquals("Garden", jsonNode.get(0).get("tagName").asText());
         Assertions.assertEquals("Vegetable Garden", jsonNode.get(1).get("tagName").asText());
         Assertions.assertEquals("Rose Garden", jsonNode.get(2).get("tagName").asText());
-
         gardenTagRepository.deleteAll();
     }
-//    AC5
+
     @Then("The tag is {string} added to my garden")
     public void the_tag_is_added_to_my_garden(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
-
         gardenTagService.updateGardenTagStatus(tagName, TagStatus.APPROPRIATE);
-
         String tag = String.valueOf(gardenTags.get(0).getTag().getTagName());
         Assertions.assertEquals(tagName, tag);
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
@@ -252,24 +236,20 @@ public class U21_AddTagToGarden {
     public void theTagIsAddedToMyGardenAsPending(String tagName) {
         List<GardenTagRelation> gardenTags = gardenTagService.getGardenTagRelationByGarden(garden);
         Assertions.assertNotNull(gardenTags);
-
         GardenTag tag = gardenTags.get(0).getTag();
         Assertions.assertEquals(tagName, tag.getTagName());
         Assertions.assertSame(TagStatus.PENDING, tag.getTagStatus());
         Assertions.assertEquals(garden.getGardenName(), gardenTags.get(0).getGarden().getGardenName());
     }
 
-    // AC5
     @And("The tag {string} shows up in future autocomplete suggestions")
     public void the_tag_shows_up_in_future_autocomplete_suggestions(String tagName) throws Exception {
         String query = tagName;
-        String fetchUrl = "/tag/suggestions";
         tagResult = mockMVCGardens.perform(
                 MockMvcRequestBuilders
-                        .get(fetchUrl)
-                        .param("query", query)
-
-        ).andReturn();
+                        .get(tagSuggestions)
+                        .param("query", query))
+                .andReturn();
 
         String tagListResponse = tagResult.getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(tagListResponse);
@@ -280,19 +260,15 @@ public class U21_AddTagToGarden {
         gardenTagRepository.deleteAll();
     }
 
-    // AC6, AC7
     @And("The tag {string} is not shown in future autocomplete suggestions")
     public void the_tag_is_not_shown_in_future_autocomplete_suggestions(String query) throws Exception {
-        String fetchUrl = "/tag/suggestions";
         tagResult = mockMVCGardens.perform(
                 MockMvcRequestBuilders
-                        .get(fetchUrl)
-                        .param("query", query)
-
-        ).andReturn();
+                        .get(tagSuggestions)
+                        .param("query", query))
+                .andReturn();
 
         String tagListResponse = tagResult.getResponse().getContentAsString();
         Assertions.assertEquals("[]", tagListResponse);
     }
-
 }

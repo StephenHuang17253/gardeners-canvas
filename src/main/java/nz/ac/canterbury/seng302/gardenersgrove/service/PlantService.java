@@ -4,6 +4,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.PlantRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service class for Plant objects.
@@ -49,6 +48,16 @@ public class PlantService {
     }
 
     /**
+     * Retrieves a plant from the plant service by the id of the plant
+     * @param id id of the plant
+     * @return an optional containing the plant if it exists.
+     */
+    public Optional<Plant> getById(Long id)
+    {
+        return plantRepository.findById(id);
+    }
+
+    /**
      * Retrieves all plants from persistence
      *
      * @return a list of all plant objects saved in persistence
@@ -68,6 +77,28 @@ public class PlantService {
     }
 
     /**
+     * Retrieves all plants belonging to a particular plant category
+     * 
+     * @param plantCategory the plant category used in the query
+     * @return a list of plants belonging to that category
+     */
+    public List<Plant> getPlantsByCategory(PlantCategory plantCategory) {
+        return plantRepository.findPlantsByPlantCategoryIs(plantCategory);
+    }
+
+    /**
+     * Retrieves all plant objects belonging to a particular plant category and
+     * garden.
+     * 
+     * @param garden        the garden the plant belongs to
+     * @param plantCategory the category the plant belongs to
+     * @return list of plant objects belonging to that garden and category.
+     */
+    public List<Plant> getPlantsByGardenAndCategory(Garden garden, PlantCategory plantCategory) {
+        return plantRepository.findPlantsByGardenIsAndPlantCategoryIs(garden, plantCategory);
+    }
+
+    /**
      * Adds a new plant
      *
      * @param plantName        plant's name
@@ -75,12 +106,15 @@ public class PlantService {
      * @param plantDescription plant's description
      * @param plantDate        date of planting
      * @param gardenId         id of garden the plant belongs to
+     * @param plantCategory    category the plant belongs to
      * @throws IllegalArgumentException if invalid garden ID
      */
-    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId) {
+    public Plant addPlant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Long gardenId,
+            PlantCategory plantCategory) {
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isPresent()) {
-            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get());
+            Plant plant = new Plant(plantName, plantCount, plantDescription, plantDate, optionalGarden.get(),
+                    plantCategory);
             gardenService.addPlantToGarden(gardenId, plant);
             return plantRepository.save(plant);
         } else {
@@ -103,6 +137,7 @@ public class PlantService {
             oldPlant.setPlantCount(newPlant.getPlantCount());
             oldPlant.setPlantDescription(newPlant.getPlantDescription());
             oldPlant.setPlantDate(newPlant.getPlantDate());
+            oldPlant.setPlantCategory(newPlant.getPlantCategory());
             return plantRepository.save(oldPlant);
         } else {
             throw new IllegalArgumentException("Invalid plant IDD");
@@ -118,7 +153,7 @@ public class PlantService {
      * @param newDesc  new plant description
      * @param newDate  new plant date
      */
-    public Plant updatePlant(Long id, String newName, int newCount, String newDesc, LocalDate newDate) {
+    public Plant updatePlant(Long id, String newName, int newCount, String newDesc, LocalDate newDate, PlantCategory newPlantCategory) {
         Optional<Plant> targetPlant = findById(id);
         if (targetPlant.isPresent()) {
             Plant oldPlant = targetPlant.get();
@@ -127,6 +162,7 @@ public class PlantService {
             oldPlant.setPlantCount(newCount);
             oldPlant.setPlantDescription(newDesc);
             oldPlant.setPlantDate(newDate);
+            oldPlant.setPlantCategory(newPlantCategory);
             return plantRepository.save(oldPlant);
         } else {
             throw new IllegalArgumentException("Invalid plant ID");
@@ -176,7 +212,6 @@ public class PlantService {
             logger.error(error.getMessage());
         }
     }
-
 
     /**
      * Returns all plants that the user interacted with
@@ -236,5 +271,9 @@ public class PlantService {
             garden.getPlants().remove(plantToDelete);
             plantRepository.deleteById(plantId);
         }
+    }
+
+    public List<PlantCategory> getPlantCategories() {
+        return Arrays.asList(PlantCategory.values());
     }
 }

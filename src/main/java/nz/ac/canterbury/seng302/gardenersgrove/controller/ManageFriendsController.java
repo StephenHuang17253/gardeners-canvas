@@ -1,10 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -52,9 +48,9 @@ public class ManageFriendsController {
      * Constructor for the ManageFriendsController with {@link Autowired} to
      * connect this controller with other services
      *
-     * @param securityService   service to access security methods
-     * @param friendshipService service to access plant repository
-     * @param userService       service to manage users
+     * @param securityService        service to access security methods
+     * @param friendshipService      service to access plant repository
+     * @param userService            service to manage users
      * @param userInteractionService service to manage user interactions
      */
     @Autowired
@@ -147,30 +143,21 @@ public class ManageFriendsController {
     }
 
     /**
-     * Adds the loggedIn attribute to the model for all requests
-     * 
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
-    }
-
-    /**
      * Maps the manageFriendsPage html file to /manage-friends url
      *
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends")
-    public String myFriends(Model model, HttpServletRequest request) {
+    public String myFriends(@RequestParam(defaultValue = "friends") String activeTab, Model model, HttpServletRequest request) {
         logger.info("GET /manage-friends");
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        String activeTab;
         if (inputFlashMap != null && inputFlashMap.containsKey("activeTab")) {
             activeTab = (String) inputFlashMap.get("activeTab");
-        } else {
-            activeTab = "friends";
+        }
+        if (inputFlashMap != null) {
+            model.addAttribute("errorMessage", inputFlashMap.get("errorMessage"));
+            model.addAttribute("goodMessage", false);
         }
 
         List<FriendModel> acceptedFriendModels = createFriendModel();
@@ -197,7 +184,7 @@ public class ManageFriendsController {
         User[] searchResults = userService.getMatchingUsers(searchInput, validEmail);
         User currentUser = securityService.getCurrentUser();
         if (searchResults.length < 1) {
-            return null;
+            return Collections.emptyList();
         }
         for (User foundUser : searchResults) {
             // ensure that a search result is not the current user
@@ -317,8 +304,7 @@ public class ManageFriendsController {
     public String managePendingRequest(@RequestParam(name = "friendAccepted") boolean friendAccepted,
             @RequestParam(name = "pendingFriendId") Long pendingFriendId,
             @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         logger.info("POST /manage-friends");
 
         User currentUser = securityService.getCurrentUser();
@@ -352,8 +338,7 @@ public class ManageFriendsController {
     @PostMapping("/manage-friends/remove")
     public String cancelSentRequest(@RequestParam(name = "friendId") Long friendId,
             @RequestParam("activeTab") String activeTab,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
         logger.info("POST /manage-friends/remove");
 
         User currentUser = securityService.getCurrentUser();
@@ -361,11 +346,13 @@ public class ManageFriendsController {
         Friendship friendship = friendshipService.findFriendship(currentUser, friend);
 
         if (friendship != null) {
+            if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "This user has already declined this request");
+            }
             friendshipService.deleteFriendship(friendship.getId());
             userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);
             userInteractionService.removeUserInteraction(friendId, currentUser.getId(), ItemType.USER);
         }
-
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
         return "redirect:/manage-friends";

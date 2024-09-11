@@ -18,8 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
-public class GardenServiceUnitTest {
+class GardenServiceUnitTest {
 
     @Mock
     GardenRepository gardenRepository;
@@ -37,11 +36,12 @@ public class GardenServiceUnitTest {
 
     @BeforeEach
     void setup() {
-         gardenRepository = Mockito.mock(GardenRepository.class);
-         userService = Mockito.mock(UserService.class);
-         gardenService = new GardenService(gardenRepository, userService);
+        gardenRepository = Mockito.mock(GardenRepository.class);
+        userService = Mockito.mock(UserService.class);
+        gardenService = new GardenService(gardenRepository, userService);
 
-        User testUser1 = Mockito.spy(new User("John", "Doe", "jhonDoe@ManageFriendsControllerIntegrationTest.com", LocalDate.of(2003,5,2)));
+        User testUser1 = Mockito.spy(new User("John", "Doe", "jhonDoe@ManageFriendsControllerIntegrationTest.com",
+                LocalDate.of(2003, 5, 2)));
 
         Mockito.when(testUser1.getId()).thenReturn(1L);
         Mockito.when(userService.getUserById(1L)).thenReturn(testUser1);
@@ -80,7 +80,9 @@ public class GardenServiceUnitTest {
     @Test
     void testUpdateGardenLocationCoordinates_InvalidId() {
         Mockito.when(gardenRepository.findById(2L)).thenReturn(Optional.empty());
-        Exception error = assertThrows(IllegalArgumentException.class,() -> {gardenService.updateGardenCoordinates(2L, "1.1", "1.1");});
+        Exception error = assertThrows(IllegalArgumentException.class, () -> {
+            gardenService.updateGardenCoordinates(2L, "1.1", "1.1");
+        });
         assertEquals("Invalid garden ID", error.getMessage());
         assertEquals("", garden.getGardenLongitude());
         assertEquals("", garden.getGardenLatitude());

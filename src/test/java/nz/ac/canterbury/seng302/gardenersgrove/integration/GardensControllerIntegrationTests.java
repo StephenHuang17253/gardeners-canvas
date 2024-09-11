@@ -11,6 +11,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.WeatherModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -152,8 +153,8 @@ class GardensControllerIntegrationTests {
                 "172.5796159",
                 userService.getUserByEmail(user1.getEmailAddress())));
 
-        plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
-        plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId());
+        plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId(), PlantCategory.TREE);
+        plantService.addPlant("Java Tree", 1, "Grows Java Plums", date, garden2.getGardenId(), PlantCategory.TREE);
         gardenList.add(gardenService.getGardenById(garden1.getGardenId()).get());
         gardenList.add(gardenService.getGardenById(garden2.getGardenId()).get());
         gardenList.add(gardenService.getGardenById(garden3.getGardenId()).get());

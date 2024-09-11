@@ -2,8 +2,8 @@
     th:fragment="plantBox(plantId, plantName, plantCount, plantDescription, plantDate, plantPicture, isOwner, page, weatherListJson)">
     <div class="card h-100 bg-success text-white garden-card">
         <div class="card-body pt-1">
-            <div class="modal fade text-black" id="importPlantModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
+            <div class="modal fade text-black" th:id="'importPlantModal'+${plantId}" tabindex="-1"
+                aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -12,10 +12,9 @@
                         </div>
 
                         <form th:action="@{/import-plant}" method="post">
-
                             <input type="hidden" th:value="${plantId}" th:name="plantId">
 
-                            <div class="modal-body">
+                            <div class="modal-body" th:if="${!#lists.isEmpty(session.userGardens)}">
                                 <select class="form-select col-xxl-3" aria-label="Select garden" th:name="gardenId">
                                     <option class="text-truncate" th:each="garden : ${session.userGardens}"
                                         th:with="gardenName=${garden.getGardenName}"
@@ -24,9 +23,20 @@
                                     </option>
                                 </select>
                             </div>
+                            <div class="modal-body" th:if="${#lists.isEmpty(session.userGardens)}">
+                                <p id="missingGardenErrorText" class="mb-0 text-danger fs-6"
+                                    th:text="${'You do not have any gardens. You cannot import a plant. Please cancel or create a new garden first'}">
+                                </p>
+                            </div>
+
 
                             <div class="modal-footer justify-content-center">
-                                <button type="submit" class="btn btn-success">Add to garden</button>
+                                <button type="submit" th:if="${!#lists.isEmpty(session.userGardens)}"
+                                    class="btn btn-success">Add to garden
+                                </button>
+                                <a th:if="${#lists.isEmpty(session.userGardens)}" th:href="@{/create-new-garden}">
+                                    <button type="button" class="btn btn-success">Create Garden</button>
+                                </a>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </form>
@@ -35,7 +45,7 @@
                 </div>
             </div>
             <div class="text-end">
-                <a th:if="${isOwner}" th:href="@{__${gardenId}__/__${plantId}__/edit}" aria-label="Plant edit link">
+                <a th:if="${isOwner}" th:href="@{/my-gardens/__${gardenId}__/__${plantId}__/edit}" aria-label="Plant edit link">
                     <svg width="20" height="20" focusable="false" aria-hidden="true" viewBox="0 0 24 24" fill="#ffffff"
                         tabindex="-1" title="Edit">
                         <path
@@ -79,14 +89,14 @@
                 </div>
                 <div class="col-2">
                     <button th:if="${!isOwner}" type="button" class="btn p-0 rounded-3" data-bs-toggle="modal"
-                        data-bs-target="#importPlantModal">
+                        th:attr="data-bs-target='#importPlantModal'+${plantId}">
                         <img th:src="@{/images/smallImportPlant.png}" class="w-100 h-100 image-fluid rounded-3"
                             alt="Import plant to one of your gardens">
                     </button>
                 </div>
             </div>
             <h4 class="card-title mt-1"
-                th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}"></h4>
+                th:text="${plantCount > 0} ? ${plantName} + ' (x' + ${plantCount} + ')' : ${plantName}">Plant Info</h4>
             <div class="row">
                 <p th:if="${plantDate == null}" class="plant-date"> Planted on: not specified </p>
                 <p th:if="${plantDate != null}" th:text="${plantDate}" class="plant-date"> Name </p>

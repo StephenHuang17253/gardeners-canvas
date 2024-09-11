@@ -7,10 +7,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import jakarta.servlet.UnavailableException;
-import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.PublicGardensController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Friendship;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -20,11 +17,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,14 +36,9 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 
-import java.io.File;
-import java.time.LocalDate;
 import java.util.*;
 
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -153,24 +141,26 @@ public class U25_MainPage {
             "  }\n" +
             "}\n";
 
-    private Garden targetGarden;
-
-    Logger logger = LoggerFactory.getLogger(U25_MainPage.class);
-    // Setup
     @Before
-    public void before_or_after_all() {
-
+    public void before_or_after_all() throws JsonProcessingException {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
 
-        HomePageController homePageController = new HomePageController(userService, authenticationManager, gardenService, plantService, friendshipService, securityService, weatherService, userInteractionService);
+        HomePageController homePageController = new HomePageController(userService, authenticationManager,
+                gardenService, plantService, friendshipService, securityService, weatherService,
+                userInteractionService);
 
-        // Allows us to bypass spring security
         mockMVC = MockMvcBuilders
                 .standaloneSetup(homePageController)
                 .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode weatherNode = objectMapper.readTree(drySampleWeather);
+        WeatherResponseData weather = new WeatherResponseData(weatherNode);
+
+        Mockito.when(weatherService.getWeatherForGardens(Mockito.anyList())).thenReturn(List.of(weather));
     }
 
     @Given("I am a user with email {string} and no recently added friends")
@@ -200,9 +190,9 @@ public class U25_MainPage {
 
     @Then("I see that my friends with emails {string} and {string} are listed in order")
     public void i_see_that_my_friends_with_emails_and_are_listed_in_order(String email1, String email2) {
-        ModelAndView model = mvcResult.getModelAndView();
-        Assertions.assertNotNull(model);
-        List<FriendModel> friendList = (List<FriendModel>) model.getModelMap().getAttribute("recentFriends");
+        ModelAndView mvcModel = mvcResult.getModelAndView();
+        Assertions.assertNotNull(mvcModel);
+        List<FriendModel> friendList = (List<FriendModel>) mvcModel.getModelMap().getAttribute("recentFriends");
         User user1 = userService.getUserByEmail(email1);
         User user2 = userService.getUserByEmail(email2);
         assertNotNull(friendList);
@@ -214,20 +204,19 @@ public class U25_MainPage {
 
     @Then("There are no recently accessed friends")
     public void there_are_no_recently_accessed_friends() {
-        ModelAndView model = mvcResult.getModelAndView();
-        Assertions.assertNotNull(model);
-        List<FriendModel> friendList = (List<FriendModel>) model.getModelMap().getAttribute("recentFriends");
+        ModelAndView mvcModel = mvcResult.getModelAndView();
+        Assertions.assertNotNull(mvcModel);
+        List<FriendModel> friendList = (List<FriendModel>) mvcModel.getModelMap().getAttribute("recentFriends");
         assertNotNull(friendList);
         assertTrue(friendList.isEmpty());
     }
-
 
     @And("I am on the home page")
     public void iAmOnTheHomePage() throws Exception {
 
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get("/home"))
+                MockMvcRequestBuilders
+                        .get("/home"))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -251,15 +240,16 @@ public class U25_MainPage {
     }
 
     @Then("I can see that {string} need watering in the watering notifications for {string}")
-    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) throws Exception {
+    public void iCanSeeTheNamesAndGardensOfPlantsThatNeedWatering(String gardenName, String email) {
         User user = userService.getUserByEmail(email);
-        List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap().getAttribute("gardensNeedWatering");
+        List<Garden> gardensNeedWatering = (List<Garden>) mvcResult.getModelAndView().getModelMap()
+                .getAttribute("gardensNeedWatering");
         assertNotNull(gardensNeedWatering, "The list of gardens that need water should not be null");
         assertEquals(gardensNeedWatering.get(0).toString(), user.getGardens().get(0).toString());
     }
 
     @Then("I can see a button and message that says {string}")
-    public void iCanSeeAButtonAndMessageThatSays(String message) throws Exception {
+    public void iCanSeeAButtonAndMessageThatSays(String message) {
         assertEquals(message, model.get("notificationMessage"));
     }
 

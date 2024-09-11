@@ -6,10 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.FriendshipRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +29,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,9 +57,12 @@ public class EditAUser {
     @Autowired
     public HomePageLayoutRepository homePageLayoutRepository;
 
-
     @Autowired
     public FileService fileService;
+
+    @Autowired
+    public GridItemLocationRepository gridItemLocationRepository;
+
     public UserService userService;
 
     String firstName = "John";
@@ -71,7 +70,6 @@ public class EditAUser {
     Boolean noLastName = false;
     String emailAddress = "JohnDoe22@email.com";
     LocalDate dateOfBirth = LocalDate.of(2001, 2, 2);
-
 
     @Before
     public void before_or_after_all(Scenario scenario) {
@@ -81,6 +79,7 @@ public class EditAUser {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         tokenRepository.deleteAll();
         friendshipRepository.deleteAll();
+        gridItemLocationRepository.deleteAll();
         userRepository.deleteAll();
         userService.addUser(new User(firstName,
                 lastName,
@@ -125,8 +124,7 @@ public class EditAUser {
                         .param("dateOfBirth", formattedDate)
                         .param("emailAddress", emailAddress)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(csrf())
-        );
+                        .with(csrf()));
     }
 
     @When("I enter valid values for first name {string}, last name {string}, email address {string}, and date of birth {string}")
@@ -172,6 +170,5 @@ public class EditAUser {
     public void i_click_the_check_box_marked_I_have_no_surname() {
         noLastName = true;
     }
-
 
 }

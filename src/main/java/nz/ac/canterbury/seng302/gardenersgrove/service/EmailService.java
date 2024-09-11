@@ -21,7 +21,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-
 /**
  * This class is a service class for sending emails defined by the
  * {@link Service} annotation.
@@ -50,7 +49,8 @@ public class EmailService {
 
     /**
      * Autowired default constructor for Email Service
-     * @param mailSender mail sender bean
+     * 
+     * @param mailSender     mail sender bean
      * @param templateEngine mail sender bean
      */
     @Autowired
@@ -60,15 +60,20 @@ public class EmailService {
     }
 
     /**
-     * <h4 style="color:red;"> CONSTRUCTOR FOR TEST USE ONLY </h4>
+     * <h4 style="color:red;">CONSTRUCTOR FOR TEST USE ONLY</h4>
      * Overloaded constructor for email service,
-     * Overwrites application properties usually defined at runtime in order to make testing this service easier
-     * @param mailSender mail sender bean
-     * @param templateEngine mail sender bean
-     * @param overwrittenBaseUrl overwritten url basis (where emails are sent to)
-     * @param overwrittenSenderEmail overwritten sending email address (where emails are sent froim)
+     * Overwrites application properties usually defined at runtime in order to make
+     * testing this service easier
+     * 
+     * @param mailSender             mail sender bean
+     * @param templateEngine         mail sender bean
+     * @param overwrittenBaseUrl     overwritten url basis (where emails are sent
+     *                               to)
+     * @param overwrittenSenderEmail overwritten sending email address (where emails
+     *                               are sent froim)
      */
-    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine, String overwrittenSenderEmail, String overwrittenBaseUrl) {
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine, String overwrittenSenderEmail,
+            String overwrittenBaseUrl) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
         this.baseURL = overwrittenBaseUrl;
@@ -87,7 +92,7 @@ public class EmailService {
      *
      * @param toEmail the email recipient
      * @param subject the email subject
-     * @param body the email body
+     * @param body    the email body
      * @throws MailException if the email cannot be sent
      */
     public void sendPlaintextEmail(String toEmail, String subject, String body) throws MailException {
@@ -98,13 +103,10 @@ public class EmailService {
         message.setText(body);
 
         Thread asynchronousEmailthread = new Thread(() -> {
-            try
-            {
+            try {
                 mailSender.send(message);
                 logger.info("Email Sent");
-            }
-            catch (MailException error)
-            {
+            } catch (MailException error) {
                 logger.error("Email could not be sent");
             }
         });
@@ -117,8 +119,8 @@ public class EmailService {
      * (the send email function takes 5 seconds to run)
      *
      * @param recipientEmail email of person to receive message
-     * @param subject subject of email
-     * @param template html template to fill for email
+     * @param subject        subject of email
+     * @param template       html template to fill for email
      * @throws MessagingException if cannot send email
      */
     public void sendHTMLEmail(String recipientEmail, String subject, String template, Context context)
@@ -133,13 +135,10 @@ public class EmailService {
         helper.setText(htmlContent, true);
 
         Thread asynchronousEmailthread = new Thread(() -> {
-            try
-            {
+            try {
                 mailSender.send(message);
                 logger.info("Email Sent");
-            }
-            catch (MailException error)
-            {
+            } catch (MailException error) {
                 logger.error("Email could not be sent");
             }
         });
@@ -189,7 +188,8 @@ public class EmailService {
                 .buildAndExpand(tokenString)
                 .toUriString();
         String urlText = "RESET PASSWORD";
-        String mainBody = String.format("Click the link below to reset your password. %n This link expires in %s minutes.", lifetime);
+        String mainBody = String
+                .format("Click the link below to reset your password. %n This link expires in %s minutes.", lifetime);
 
         Context context = new Context();
         context.setVariable(USERNAME_FIELD, username);
@@ -201,14 +201,13 @@ public class EmailService {
         sendHTMLEmail(toEmail, subject, template, context);
     }
 
-
     /**
      * Sends a confirmation of reset password
      *
      * @param currentUser user to send confirmation of password reset to
      */
     public void sendPasswordResetConfirmationEmail(User currentUser) throws MessagingException {
-        logger.info("Sending confirmation email to {}",currentUser.getEmailAddress());
+        logger.info("Sending confirmation email to {}", currentUser.getEmailAddress());
         String subject = "Your Password Has Been Updated";
         String template = "generalEmail";
 
@@ -233,8 +232,8 @@ public class EmailService {
         String template = "generalEmail";
         String mainBody = """
                 Due to your Gardener's Grove account recently submitting a tag that breaches our language standard,
-                 \nyour account has received its fifth consecutive strike.
-                \nThis is your final warning, if you add another inappropriate tag your account will be banned for 7 days.""";
+                your account has received its fifth consecutive strike.
+                This is your final warning, if you add another inappropriate tag your account will be banned for 7 days.""";
 
         String username = user.getFirstName() + " " + user.getLastName();
 
@@ -247,7 +246,8 @@ public class EmailService {
     }
 
     /**
-     * Sends a ban email to the user that informs them they have been banned for 7 days
+     * Sends a ban email to the user that informs them they have been banned for 7
+     * days
      *
      * @param user to send the email
      */

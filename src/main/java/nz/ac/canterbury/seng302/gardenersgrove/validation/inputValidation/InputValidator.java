@@ -254,7 +254,9 @@ public class InputValidator {
     }
 
     /**
-     * Checks input against a criteria: This function only allows numbers, letters, hyphens, commas, dots, slashes and spaces.
+     * Checks input against a criteria: This function only allows numbers, letters,
+     * hyphens, commas, dots, slashes and spaces.
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -266,7 +268,9 @@ public class InputValidator {
     }
 
     /**
-     * Checks input against a criteria: This function only allows numbers, letters, hyphens and spaces.
+     * Checks input against a criteria: This function only allows numbers, letters,
+     * hyphens and spaces.
+     *
      * @param text - text to validate
      * @return ValidationResult enum state (Enum explains pass/fail, and why)
      */
@@ -292,7 +296,7 @@ public class InputValidator {
     }
 
     /**
-     * Checks if the given decsription is valid 512 char or less and contains at
+     * Checks if the given description is valid 512 char or less and contains at
      * least one letter if not empty will return invalid description message in
      * either case
      *
@@ -302,7 +306,7 @@ public class InputValidator {
     public static ValidationResult validateDescription(String text) {
         ValidationResult result = new InputValidator(text)
                 .lengthHelperWithEmojis(512)
-                .NotOnlyNumOrSpecChar()
+                .notOnlyNumOrSpecChar()
                 .getResult();
 
         if (!result.valid()) {
@@ -426,13 +430,13 @@ public class InputValidator {
         return result;
     }
 
-
     /**
      * Validate a new garden tag
      * 25 characters or less and alpha numeric or _ - ' " and space
+     *
      * @param tag tag string to validate
      * @return ValidationResult with this.isValid() returning true if valid, false
-     *   otherwise and this.getErrorMessage() returning the error message
+     *         otherwise and this.getErrorMessage() returning the error message
      */
     public static ValidationResult validateTag(String tag) {
         ValidationResult result = new InputValidator(tag)
@@ -448,8 +452,6 @@ public class InputValidator {
         }
         return result;
     }
-
-
 
     /**
      * Checks if a string represents a valid float that is also a whole number
@@ -515,7 +517,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^\\p{L}[\\p{L} \\-'’]*$")) {
+        if (!testedValue.matches("^[\\p{L}\\p{M}][\\p{L}\\p{M} \\-'’]*$")) {
             this.validationResult = ValidationResult.INVALID_USERNAME;
             this.passState = false;
             return this;
@@ -542,7 +544,7 @@ public class InputValidator {
             return this;
         }
 
-        String emailRegex = "^[\\p{L}\\p{M}\\p{N}]{1,}(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]{1,}\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$";
+        String emailRegex = "^[\\p{L}\\p{M}\\p{N}]+(?:[._-][\\p{L}\\p{M}\\p{N}]+)*@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}(?:\\.[a-zA-Z]{2,})?$";
 
         if (!testedValue.matches(emailRegex)) {
 
@@ -598,7 +600,7 @@ public class InputValidator {
             return this;
         }
 
-        if (!testedValue.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9\\s]).+$")) {
+        if (!testedValue.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9\\s]).+$")) {
             this.validationResult = ValidationResult.INVALID_PASSWORD;
             this.passState = false;
             return this;
@@ -622,9 +624,9 @@ public class InputValidator {
         }
 
         for (String field : fields) {
-            String lower_case_field = field.toLowerCase();
-            String lower_case_tested_value = testedValue.toLowerCase();
-            if (lower_case_tested_value.contains(lower_case_field) && !field.equals("")) {
+            String lowerCaseField = field.toLowerCase();
+            String lowerCaseTestedValue = testedValue.toLowerCase();
+            if (lowerCaseTestedValue.contains(lowerCaseField) && !field.equals("")) {
                 this.validationResult = ValidationResult.INVALID_PASSWORD;
                 this.passState = false;
                 return this;
@@ -697,7 +699,7 @@ public class InputValidator {
         }
 
         for (String s : dateList) {
-            if (!s.matches("[0-9]+")) {
+            if (!s.matches("\\d+")) {
                 this.validationResult = ValidationResult.INVALID_DATE_FORMAT;
                 this.passState = false;
                 return this;
@@ -750,6 +752,7 @@ public class InputValidator {
         LocalDate inputtedDate = LocalDate.parse(testedValue, formatter);
 
         LocalDate oneYearFromNow = LocalDate.now().plusYears(1);
+        LocalDate fourHundredYearsAgo = LocalDate.now().minusYears(400);
 
         if (inputtedDate.isAfter(oneYearFromNow)) {
             this.validationResult = ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE;
@@ -757,11 +760,7 @@ public class InputValidator {
             return this;
         }
 
-        long yearsDifference = ChronoUnit.YEARS.between(
-                inputtedDate,
-                LocalDate.now());
-
-        if (yearsDifference > 400 || testedValue == null) {
+        if (inputtedDate.isBefore(fourHundredYearsAgo)) {
             this.validationResult = ValidationResult.PLANT_AGE_ABOVE_400;
             this.passState = false;
             return this;
@@ -990,14 +989,14 @@ public class InputValidator {
         return this;
     }
 
-    private InputValidator NotOnlyNumOrSpecChar() {
+    private InputValidator notOnlyNumOrSpecChar() {
         if (!this.passState) {
             return this;
         }
 
         String filteredValue = testedValue.replaceAll("\\s+", "");
 
-        if (!filteredValue.equals("") && !filteredValue.matches(".*[a-zA-Z].*")) {
+        if (!filteredValue.equals("") && !filteredValue.matches(".*\\p{L}.*")) {
             this.validationResult = ValidationResult.INVALID_DESCRIPTION;
             this.passState = false;
             return this;
@@ -1051,7 +1050,7 @@ public class InputValidator {
                 this.passState = false;
                 return this;
             }
-        } catch (Exception e) {
+        } catch (Exception err) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;
@@ -1081,7 +1080,7 @@ public class InputValidator {
                 this.passState = false;
                 return this;
             }
-        } catch (Exception e) {
+        } catch (Exception err) {
             this.validationResult = ValidationResult.INVALID;
             this.passState = false;
             return this;

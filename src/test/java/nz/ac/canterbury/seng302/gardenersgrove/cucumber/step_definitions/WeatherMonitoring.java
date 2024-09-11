@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,9 +157,8 @@ public class WeatherMonitoring {
         weatherService = mock(WeatherService.class);
         gardenTagService = new GardenTagService(gardenTagRepository, gardenTagRelationRepository);
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService,objectMapper,gardenTagService, profanityService, userService);
+                weatherService, objectMapper, gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
-
     }
 
     @Given("I as user {string} is on my garden details page")

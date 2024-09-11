@@ -1,8 +1,14 @@
-const MIN_TAG_INPUT_LENGTH = 3;
-
+const MIN_TAG_INPUT_LENGTH = 1;
+const form = document.getElementById("tagForm");
 const tagField = document.getElementById("tagInput")
 const tagAutocompleteDropdown = document.getElementById("tagAutocompleteSuggestions")
+const tagRegex = /^[a-zA-Z0-9\s\-_']+$/;
 
+/**
+ * Gets the name of a tag
+ * @param data the tag
+ * @returns {string} the tag name
+ */
 const getDisplayString = (data) => {
     return data.tagName;
 }
@@ -13,7 +19,11 @@ const getDisplayString = (data) => {
  */
 const fillTagField = (data) => {
     tagField.value = getDisplayString(data)
-    document.getElementById("addTagButton").click();
+    if (form) {
+        form.submit();
+    } else {
+        document.getElementById("addTagButton").click();
+    }
 }
 
 /**
@@ -49,34 +59,40 @@ const updateTagAutocompleteDropdown = (tagSuggestions) => {
     clearTagAutocompleteDropdown();
 
     tagAutocompleteDropdown.style.width = `${tagField.offsetWidth}px`
-     tagSuggestions.forEach(tag => {
-         const listElement = document.createElement("li");
-         listElement.classList.add("list-group-item", "py-2");
-         const div = document.createElement("div");
-         div.textContent = getDisplayString(tag);
-         div.classList.add("cursor-pointer", "darken-on-hover", "rounded", "p-2");
-         div.style.overflowWrap = "break-word";
-         div.style.textAlign = "left"
-         div.addEventListener("click", () => handleTagSuggestionClicked(tag));
-         listElement.appendChild(div);
-         tagAutocompleteDropdown.appendChild(listElement);
+    tagSuggestions.forEach(tag => {
+        const listElement = document.createElement("li");
+        listElement.classList.add("list-group-item", "py-2");
+        const div = document.createElement("div");
+        div.textContent = getDisplayString(tag);
+        div.classList.add("cursor-pointer", "darken-on-hover", "rounded", "p-2");
+        div.style.overflowWrap = "break-word";
+        div.style.textAlign = "left"
+        div.addEventListener("click", () => handleTagSuggestionClicked(tag));
+        listElement.appendChild(div);
+        tagAutocompleteDropdown.appendChild(listElement);
 
-     });
+    });
 }
 
 /**
  * Handles updates to the input field such as char input and the field being selected,
  *      fetching suggestions and updating the UI accordingly
- * @type {(function(*): Promise<void>)|*}
+ * @param event - The input event
  */
-const handleTagUpdate = (async (event) => {
+const handleTagUpdate = async (event) => {
+    const value = event.target.value.trim();
 
-    if (event.target.value === "") {
+    if (value === "") {
         hideTagAutocompleteDropdown();
         return;
     }
 
-    if (event.target.value.length < MIN_TAG_INPUT_LENGTH) {
+    if (value.length < MIN_TAG_INPUT_LENGTH) {
+        hideTagAutocompleteDropdown();
+        return;
+    }
+
+    if (!tagRegex.test(value)) {
         hideTagAutocompleteDropdown();
         return;
     }
@@ -90,7 +106,7 @@ const handleTagUpdate = (async (event) => {
 
     updateTagAutocompleteDropdown(tagSuggestions);
     showTagAutocompleteDropdown();
-})
+}
 
 /**
  * Handles deselecting an input focus, hiding dropdowns
@@ -116,7 +132,7 @@ const handleTagClick = (event) => {
  */
 const fetchTagData = async (query) => {
     const instance = getInstance();
-    const response =  await fetch(`/${instance}tag/suggestions?query=${query}`)
+    const response = await fetch(`/${instance}tag/suggestions?query=${query}`)
     return await response.json();
 }
 

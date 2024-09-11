@@ -142,7 +142,6 @@ public class U15_GardenLocation {
         gardenCountry = garden.getGardenCountry();
     }
 
-    // AC1
     @Given("I specify a valid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
     public void i_specify_a_valid_address(String street, String suburb, String city, String postcode, String country,
             String latitude, String longitude) {
@@ -158,7 +157,6 @@ public class U15_GardenLocation {
         gardenLatitude = latitude;
     }
 
-    // AC3
     @Given("I specify an invalid address with {string}, {string}, {string}, {string}, {string}, {string}, and {string}")
     public void i_specify_an_invalid_address(String street, String suburb, String city, String postcode, String country,
             String latitude, String longitude) {
@@ -174,7 +172,6 @@ public class U15_GardenLocation {
         gardenLatitude = longitude;
     }
 
-    // AC1, AC3, AC5
     @When("I submit the create garden form")
     public void i_submit_the_create_garden_form() throws Exception {
         String gardenUrl = "/create-new-garden";
@@ -194,7 +191,6 @@ public class U15_GardenLocation {
                 .andReturn();
     }
 
-    // AC1, AC3.1, AC4
     @Then("The garden is created successfully with that location")
     public void the_garden_is_created_successfully_with_that_location() {
         String redirectUrl = createGardenResult.getResponse().getRedirectedUrl();
@@ -220,7 +216,6 @@ public class U15_GardenLocation {
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), createdGarden.getGardenSize());
     }
 
-    // AC2
     @When("I submit the edit garden form")
     public void i_submit_the_edit_plant_form() throws Exception {
         String gardenUrl = String.format("/my-gardens/%d/edit", expectedGarden.getGardenId());
@@ -236,11 +231,9 @@ public class U15_GardenLocation {
                         .param("postcode", gardenPostcode)
                         .param("gardenSize", gardenSize) // must be present, but is overridden immediately in controller
                         .param("longitude", gardenLongitude)
-                        .param("latitude", gardenLatitude))
-                .andReturn();
+                        .param("latitude", gardenLatitude));
     }
 
-    // AC2
     @Then("The garden details are successfully updated")
     public void the_garden_details_are_successfully_updated() {
         Optional<Garden> optionalUpdatedGarden = gardenService.getGardenById(expectedGarden.getGardenId());
@@ -259,40 +252,31 @@ public class U15_GardenLocation {
         Assertions.assertEquals(gardenLatitude, updatedGarden.getGardenLatitude());
         Assertions.assertEquals(gardenLongitude, updatedGarden.getGardenLongitude());
         Assertions.assertEquals(Double.parseDouble(gardenSize.replace(",", ".")), updatedGarden.getGardenSize());
-
     }
 
-    // AC3.2, AC5
     @Then("The garden is not created")
     public void the_garden_is_not_created() {
         Assertions.assertNull(expectedNewGarden);
     }
 
-    // AC5
     @Then("An error message tells me 'City and Country are required'")
     public void city_and_country_error_message() {
         ModelAndView modelAndView = createGardenResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
         String model = modelAndView.getModel().toString();
-
         Assertions.assertTrue(model.contains("City and Country are required"));
-
     }
 
-    // AC6
     @When("I start typing {string}")
     public void i_start_typing(String query) throws Exception {
         String fetchUrl = "/api/location/suggestions";
         locationResult = mockMVC.perform(
                 MockMvcRequestBuilders
                         .get(fetchUrl)
-                        .param("query", query)
-
-        ).andReturn();
-
+                        .param("query", query))
+                .andReturn();
     }
 
-    // AC6, AC7
     @Then("LocationService is invoked to make an API request")
     public void location_service_is_invoked() throws UnsupportedEncodingException {
         String responseBody = locationResult.getResponse().getContentAsString();
@@ -300,11 +284,9 @@ public class U15_GardenLocation {
         Assertions.assertTrue(responseBody.contains(expectedLocation));
     }
 
-    // AC7
     @Then("The matching fields are filled out")
     public void the_matching_fields_are_filled_out() {
-        // not that meaningful of a test, but it's meant to emulate how the autocomplete
-        // script fills the fields.
+        // Emulates how the autocomplete script fills the fields.
         gardenStreet = "Mock Street";
         gardenSuburb = "Mock Suburb";
         gardenCity = "Mock City";
@@ -316,7 +298,5 @@ public class U15_GardenLocation {
         Assertions.assertEquals("Mock City", gardenCity);
         Assertions.assertEquals("MOCK", gardenPostcode);
         Assertions.assertEquals("The United States of Mockland", gardenCountry);
-
     }
-
 }

@@ -12,6 +12,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserInteractionService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -63,10 +64,13 @@ class UserInteractionServiceIntergrationTest {
     @BeforeAll
     void before_or_after_all() {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
-        userInteractionService = new UserInteractionService(userInteractionRepository, userService, gardenService,
+        userInteractionService = new UserInteractionService(userInteractionRepository, userService,
+                gardenService,
                 plantService);
-        user1 = new User("John", "Doe", "jhonDoe@UserInteractionServiceIntergrationTest.com", LocalDate.of(2003, 5, 2));
-        user2 = new User("Jane", "Doe", "janeDoe@UserInteractionServiceIntergrationTest.com", LocalDate.of(2003, 5, 2));
+        user1 = new User("John", "Doe", "jhonDoe@UserInteractionServiceIntergrationTest.com",
+                LocalDate.of(2003, 5, 2));
+        user2 = new User("Jane", "Doe", "janeDoe@UserInteractionServiceIntergrationTest.com",
+                LocalDate.of(2003, 5, 2));
         user3 = new User("Sheldon", "Cooper", "sheldonCooper@UserInteractionServiceIntergrationTest.com",
                 LocalDate.of(2003, 5, 2));
         userService.addUser(user1, "1es1P@ssword");
@@ -120,7 +124,8 @@ class UserInteractionServiceIntergrationTest {
                 3,
                 "Plant owned by John",
                 LocalDate.of(2003, 5, 2),
-                1L);
+                1L,
+                PlantCategory.TREE);
         plantList.add(plant1);
     }
 
@@ -152,7 +157,8 @@ class UserInteractionServiceIntergrationTest {
 
         Assertions.assertEquals(expectedUserInteraction.getUserInteractionId(),
                 actualUserInteraction.getUserInteractionId());
-        Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+        Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                actualUserInteraction.getUser().getId());
         Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
         Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
         Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),
@@ -191,9 +197,11 @@ class UserInteractionServiceIntergrationTest {
             UserInteraction actualUserInteraction = actualUserInteractions.get(i);
             Assertions.assertEquals(expectedUserInteraction.getUserInteractionId(),
                     actualUserInteraction.getUserInteractionId());
-            Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+            Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                    actualUserInteraction.getUser().getId());
             Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
-            Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
+            Assertions.assertEquals(expectedUserInteraction.getItemType(),
+                    actualUserInteraction.getItemType());
             Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),
                     actualUserInteraction.getInteractionTime());
         }
@@ -218,9 +226,11 @@ class UserInteractionServiceIntergrationTest {
             UserInteraction actualUserInteraction = actualUserInteractions.get(i);
             Assertions.assertEquals(expectedUserInteraction.getUserInteractionId(),
                     actualUserInteraction.getUserInteractionId());
-            Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+            Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                    actualUserInteraction.getUser().getId());
             Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
-            Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
+            Assertions.assertEquals(expectedUserInteraction.getItemType(),
+                    actualUserInteraction.getItemType());
             Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),
                     actualUserInteraction.getInteractionTime());
         }
@@ -245,9 +255,11 @@ class UserInteractionServiceIntergrationTest {
             UserInteraction actualUserInteraction = actualUserInteractions.get(i);
             Assertions.assertEquals(expectedUserInteraction.getUserInteractionId(),
                     actualUserInteraction.getUserInteractionId());
-            Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+            Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                    actualUserInteraction.getUser().getId());
             Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
-            Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
+            Assertions.assertEquals(expectedUserInteraction.getItemType(),
+                    actualUserInteraction.getItemType());
             Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),
                     actualUserInteraction.getInteractionTime());
         }
@@ -272,9 +284,11 @@ class UserInteractionServiceIntergrationTest {
             UserInteraction actualUserInteraction = actualUserInteractions.get(i);
             Assertions.assertEquals(expectedUserInteraction.getUserInteractionId(),
                     actualUserInteraction.getUserInteractionId());
-            Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+            Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                    actualUserInteraction.getUser().getId());
             Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
-            Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
+            Assertions.assertEquals(expectedUserInteraction.getItemType(),
+                    actualUserInteraction.getItemType());
             Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),
                     actualUserInteraction.getInteractionTime());
         }
@@ -291,8 +305,9 @@ class UserInteractionServiceIntergrationTest {
     @Test
     void addUserInteraction_UserInPersistenceAndItemNotInPersistence_ThrowsIllegalArgumentException() {
         LocalDateTime interactionTime = LocalDateTime.of(2023, 7, 15, 10, 0);
+        long userId = user1.getId();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            userInteractionService.addUserInteraction(user1.getId(), MAX_LONG, ItemType.GARDEN, interactionTime);
+            userInteractionService.addUserInteraction(userId, MAX_LONG, ItemType.GARDEN, interactionTime);
         });
     }
 
@@ -303,10 +318,12 @@ class UserInteractionServiceIntergrationTest {
         UserInteraction expectedUserInteraction = new UserInteraction(user1, gardenId, ItemType.GARDEN,
                 interactionTime);
 
-        UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user1.getId(), gardenId,
+        UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user1.getId(),
+                gardenId,
                 ItemType.GARDEN, interactionTime);
 
-        Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+        Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                actualUserInteraction.getUser().getId());
         Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
         Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
         Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),
@@ -320,10 +337,12 @@ class UserInteractionServiceIntergrationTest {
         UserInteraction expectedUserInteraction = new UserInteraction(user3, gardenId, ItemType.GARDEN,
                 interactionTime);
 
-        UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user3.getId(), gardenId,
+        UserInteraction actualUserInteraction = userInteractionService.addUserInteraction(user3.getId(),
+                gardenId,
                 ItemType.GARDEN, interactionTime);
 
-        Assertions.assertEquals(expectedUserInteraction.getUser().getId(), actualUserInteraction.getUser().getId());
+        Assertions.assertEquals(expectedUserInteraction.getUser().getId(),
+                actualUserInteraction.getUser().getId());
         Assertions.assertEquals(expectedUserInteraction.getItemId(), actualUserInteraction.getItemId());
         Assertions.assertEquals(expectedUserInteraction.getItemType(), actualUserInteraction.getItemType());
         Assertions.assertEquals(expectedUserInteraction.getInteractionTime(),

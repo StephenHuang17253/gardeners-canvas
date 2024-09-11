@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Service class for User, defined by the {@link Service} annotation.
@@ -27,12 +26,13 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    /** passwordEncoder to use for encoding passwords before storage */
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final HomePageLayoutRepository homePageLayoutRepository;
-
     Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserRepository userRepository;
+
+    private final HomePageLayoutRepository homePageLayoutRepository;
 
     /**
      * tells Spring to inject a PasswordEncoder bean when creating an instance of
@@ -66,13 +66,13 @@ public class UserService {
      * @param user        object to persist
      * @param rawPassword string to encode and add to user
      */
-    public void addUser(User user, String rawPassword) {
+    public User addUser(User user, String rawPassword) {
         HomePageLayout newLayout = new HomePageLayout();
         homePageLayoutRepository.save(newLayout);
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         user.setHomePageLayout(newLayout);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     /**
@@ -273,7 +273,7 @@ public class UserService {
                 .map(UserInteraction::getItemId)
                 .map(this::getUserById)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

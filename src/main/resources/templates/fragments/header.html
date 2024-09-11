@@ -1,13 +1,27 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en"></html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+</html>
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="img-src 'self' https://perenual.com/" />
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
-    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
     <title>Gardener's Grove</title>
     <link rel="icon" th:href="@{/images/gardeners_grove_fern_logo.svg}" type="image/svg+xml">
-    <th:block th:if="${includeWeatherStyles}">
-        <link th:href="@{/css/weatherTimes.css}" rel="stylesheet">
-    </th:block>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+
+    <link th:if="${includeWeatherStyles}" rel="stylesheet" th:href="@{/css/weatherTimes.css}">
+
+    <script th:src="@{/webjars/konva/9.3.14/konva.min.js}"></script>
+
+    <script th:if="${include3js}" type="importmap" th:inline="javascript">
+        {
+            "imports": {
+                "three": "[(@{/webjars/three/0.167.1/build/three.module.js})]",
+                "three/addons/": "[(@{/webjars/three/0.167.1/examples/jsm/})]"
+            }
+        }
+    </script>
 </head>

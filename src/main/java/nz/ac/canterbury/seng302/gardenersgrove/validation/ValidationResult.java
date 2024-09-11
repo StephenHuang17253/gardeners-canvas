@@ -14,8 +14,10 @@ public enum ValidationResult {
     INVALID_POSTCODE("must only contain numbers, letters, hyphens, and spaces"),
     INVALID_USERNAME("cannot be empty and must only include letters, spaces, hyphens or apostrophes"),
     INVALID_EMAIL("Email must be in the form 'jane@doe.nz'"),
-    EMAIL_TO_LONG("Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 225 characters"),
-    INVALID_PASSWORD("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
+    EMAIL_TO_LONG(
+            "Email is too long, should be 320 characters or less. The local part should be max 64 characters and domain should be max 255 characters"),
+    INVALID_PASSWORD(
+            "Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."),
     AGE_BELOW_13("You must be 13 years or older to create an account"),
     AGE_ABOVE_120("The maximum age allowed is 120 years"),
     PLANT_AGE_ABOVE_400("Plant date cannot be more than 400 years ago."),
@@ -31,7 +33,8 @@ public enum ValidationResult {
     AREA_TOO_SMALL("must be a positive number. \n\r Must be greater than or equal to 0.01"),
     DESCRIPTION_CONTAINS_PROFANITY("The description does not match the language standards of the app"),
     INVALID_DESCRIPTION("Description must be 512 characters or less and contain some letters"),
-    INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000");
+    INVALID_PLANT_COUNT("Plant count must be a positive whole number between 1 and 1,000,000"),
+    INVALID_CATEGORY("A plant category must be selected");
 
     private String message;
 
@@ -50,7 +53,8 @@ public enum ValidationResult {
 
     /**
      * returns a basic description of why the input failed
-     * IMPORTANT: this is not sufficient as user feedback, more info is needed if this output is shown on UI
+     * IMPORTANT: this is not sufficient as user feedback, more info is needed if
+     * this output is shown on UI
      *
      * @return fail or ok Message
      */

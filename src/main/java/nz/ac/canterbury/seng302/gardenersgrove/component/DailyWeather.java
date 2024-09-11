@@ -7,7 +7,8 @@ import java.util.Locale;
 
 /**
  * Object storing key details about a day's weather
- * Contains date, weather description, weather icon name, temperatures, precipitation, and any errors that may appear.
+ * Contains date, weather description, weather icon name, temperatures,
+ * precipitation, and any errors that may appear.
  */
 public class DailyWeather {
     String urlToWeatherIcon;
@@ -22,9 +23,11 @@ public class DailyWeather {
 
     /**
      * Constructor for class containing weather details of a day
+     * 
      * @param urlToWeatherIcon string name of icon file
-     * @param date LocalDate of this day
-     * @param description string description of current weather such as Sunny or Rainy
+     * @param date             LocalDate of this day
+     * @param description      string description of current weather such as Sunny
+     *                         or Rainy
      */
     public DailyWeather(String urlToWeatherIcon, LocalDate date, String description) {
         this.urlToWeatherIcon = urlToWeatherIcon;
@@ -32,13 +35,13 @@ public class DailyWeather {
         this.description = description;
     }
 
-
     public String getWeatherIcon() {
         return urlToWeatherIcon;
     }
 
     /**
      * Returns this date in format
+     * 
      * @return formatted date in dd/MM
      */
     public String getDate() {
@@ -51,14 +54,17 @@ public class DailyWeather {
 
     /**
      * Returns this day
+     * 
      * @return day in three letters such as SUN, MON, etc.
      */
     public String getDay() {
         return (date == null) ? null : date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.getDefault());
     }
+
     public String getDescription() {
         return (description == null) ? null : description;
     }
+
     public String getMinTemp() {
         return (minTemp == null) ? null : String.valueOf(Math.round(minTemp));
     }

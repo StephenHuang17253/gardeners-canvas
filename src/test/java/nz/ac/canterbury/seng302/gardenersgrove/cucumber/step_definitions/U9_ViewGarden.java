@@ -34,7 +34,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-
 @SpringBootTest
 public class U9_ViewGarden {
     public static MockMvc mockMVC;
@@ -100,16 +99,18 @@ public class U9_ViewGarden {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
-        securityService = new SecurityService(userService, authenticationManager, friendshipService, userInteractionService, emailService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,
+                userInteractionService, emailService);
 
-        securityService = new SecurityService(userService, authenticationManager, friendshipService,userInteractionService, emailService);
+        securityService = new SecurityService(userService, authenticationManager, friendshipService,
+                userInteractionService, emailService);
         weatherService = Mockito.mock(WeatherService.class);
 
         GardensController myGardensController = new GardensController(gardenService, securityService, plantService,
-                weatherService,objectMapper,gardenTagService, profanityService, userService);
+                weatherService, objectMapper, gardenTagService, profanityService);
         mockMVC = MockMvcBuilders.standaloneSetup(myGardensController).build();
 
-        String mockResponse ="{\n" +
+        String mockResponse = "{\n" +
                 "  \"latitude\": -43.5,\n" +
                 "  \"longitude\": 172.625,\n" +
                 "  \"generationtime_ms\": 0.07200241088867188,\n" +
@@ -175,7 +176,6 @@ public class U9_ViewGarden {
 
     }
 
-
     @When("I try to visit user {string}'s garden, {string}")
     public void iTryToVisitGarden(String userEmail, String gardenName) throws Exception {
         User user = userService.getUserByEmail(userEmail);
@@ -194,7 +194,7 @@ public class U9_ViewGarden {
     }
 
     @And("The garden's name {string} and location {string}, {string} are visible")
-    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry){
+    public void theNameLocationAndOptionallySizeAreVisible(String gardenName, String gardenCity, String gardenCountry) {
         ModelAndView model = mvcResult.getModelAndView();
         Assertions.assertNotNull(model);
         ModelMap modelMap = model.getModelMap();

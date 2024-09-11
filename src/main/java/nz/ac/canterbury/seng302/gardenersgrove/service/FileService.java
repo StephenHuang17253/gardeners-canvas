@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -106,7 +107,8 @@ public class FileService {
         try {
             Path destinationFile = getRootLocation().resolve(Paths.get(newFile)).normalize().toAbsolutePath();
             Path toCopy = getRootLocation().resolve(Paths.get(originalFile)).normalize().toAbsolutePath();
-            Files.copy(toCopy, destinationFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+            Files.copy(toCopy, destinationFile, StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException error) {
             logger.error(error.toString());
             throw new IOException("Could not store the file");
@@ -134,17 +136,14 @@ public class FileService {
      * @throws IOException if the files cannot read from the file system
      */
     public String[] getAllFiles() throws IOException {
-        String[] allFiles = new String[0];
-        try {
-            allFiles = Files.walk(getRootLocation(), 1)
+        try (Stream<Path> paths = Files.walk(getRootLocation(), 1)) {
+            return paths
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .toArray(String[]::new);
-
         } catch (IOException error) {
             throw new IOException("Could not list the files");
         }
-        return allFiles;
     }
 
     /**
@@ -163,4 +162,24 @@ public class FileService {
         }
     }
 
+    /**
+     * Takes String of an image filename and returns what extension type is in
+     * header format.
+     * 
+     * @param filename Name of File
+     * @return String of image type in the format image/*extentiontype*. Used for
+     *         content type headers.
+     */
+    public String getImageFileType(String filename) {
+        if (filename.endsWith(".svg") || filename.endsWith(".SVG")) {
+            return "image/svg+xml";
+        } else if (filename.endsWith(".png") || filename.endsWith(".PNG")) {
+            return "image/png";
+        } else if (filename.endsWith(".jpg") || filename.endsWith(".JPG") || filename.endsWith(".jpeg")
+                || filename.endsWith(".JPEG")) {
+            return "image/jpeg";
+        } else {
+            return "unknown";
+        }
+    }
 }

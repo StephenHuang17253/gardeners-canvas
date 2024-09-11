@@ -10,27 +10,33 @@
         th:style="|background-image: url('@{/images/landingPlant.JPG}');|"></div>
     <div class="container-md my-5 bg-white rounded pt-3 pb-5" style="width: 60%;">
         <div class="container text-center">
-            <div th:if="${isOwner}" class="text-end">
-                <form th:action="@{/my-gardens/__${garden.getGardenId()}__/public}" method="post"
-                    th:object="${weatherList}">
-                    <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic"
-                        th:checked="${garden.isGardenIsPublic()}" onChange="this.form.submit()">Make my garden public
-                    <input id="page" th:name="page" th:value="${currentPage}" type="hidden" />
-                    <input type="hidden" id="weatherListJson" name="weatherListJson" th:value="${weatherListJson}" />
-                </form>
+            <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-between">
+                <div class="text-start">
+                    <form th:action="@{/my-gardens/__${garden.getGardenId()}__/public}" method="post"
+                        th:object="${weatherList}">
+                        <input type="checkbox" id="makeGardenPublic" name="makeGardenPublic"
+                            th:checked="${garden.isGardenIsPublic()}" onChange="this.form.submit()">
+                        Make my garden public
+                        <input id="page" th:name="page" th:value="${currentPage}" type="hidden" />
+                        <input type="hidden" id="weatherListJson" name="weatherListJson"
+                            th:value="${weatherListJson}" />
+                    </form>
+                </div>
+                <div class="text-end">
+                    <a th:href="@{__${garden.getGardenId()}__/edit}">
+                        <button type="button" class="btn bg-success text-white">Edit Garden</button>
+                    </a>
+                </div>
             </div>
             <div>
                 <h1 class="break-word" th:text="${garden.getGardenName()}">Garden Name</h1>
 
                 <div class="d-flex flex-row flex-wrap justify-content-center gap-2">
                     <div class="p-1" th:each="tag : ${tagsList}">
-                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success',isRemovable=false)}"></div>
+                        <div
+                            th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-success',isRemovable=false)}">
+                        </div>
                     </div>
-
-                    <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
-                        <div th:replace="~{fragments/tagBox.html :: tagBox(tagName=${tag}, badgeColour='text-bg-secondary',isRemovable=false)}"></div>
-                    </div>
-                </div>
 
                     <div th:if="${isOwner}" class="p-1" th:each="tag : ${pendingTags}">
                         <div
@@ -39,129 +45,144 @@
                     </div>
                 </div>
 
-                <p class="break-word" th:text="${garden.getGardenDescription()}"></p>
-                <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
-                    <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
-                        alt="User's Profile Picture"
-                        class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
-                </div>
-                <h5 th:if="${isOwner}">Owner: You</h5>
-                <h5 class="break-word" th:if="${!isOwner}" th:text="'Owner: ' + ${userName}">Owner's Name</h5>
-                <div>
-                    <p class="break-word">
-                        <strong>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg" stroke="#000000" transform="translate(0, -2)">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path
-                                        d="M11.9638 6.96986C11.9638 6.96986 8.88872 7.27638 7.27853 5.93455C5.66835 4.59273 6.03618 2.03015 6.03618 2.03015C6.03618 2.03015 9.11128 1.72362 10.7215 3.06545C12.3317 4.40727 11.9638 6.96986 11.9638 6.96986Z"
-                                        stroke="#000000" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path
-                                        d="M12.0362 6.96986C12.0362 6.96986 15.1113 7.27638 16.7215 5.93455C18.3317 4.59273 17.9638 2.03015 17.9638 2.03015C17.9638 2.03015 14.8887 1.72362 13.2785 3.06545C11.6683 4.40727 12.0362 6.96986 12.0362 6.96986Z"
-                                        stroke="#000000" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path
-                                        d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z"
-                                        stroke="#000000" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"></path>
-                                    <path d="M5 14H19L17 22H7L5 14Z" stroke="#000000" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                </g>
-                            </svg>
-                            <span th:text="${plantCount}"></span>
-                        </strong>
-                    </p>
-                    <p class="break-word">
-                        <strong>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-geo-alt" viewBox="0 0 16 16">
+            </div>
+
+            <p class="break-word" th:text="${garden.getGardenDescription()}"></p>
+            <div class="ratio ratio-1x1 mt-3 mb-3 mx-auto" style="width: 10%">
+                <img th:src="@{${profilePicture == null ? '/images/default_profile_picture.png' : '/files/users/' + profilePicture}}"
+                    alt="User's Profile" class="img-fluid rounded-circle border w-100 h-100 object-fit-cover">
+            </div>
+            <h5 th:if="${isOwner}">Owner: You</h5>
+            <h5 class="break-word" th:if="${!isOwner}" th:text="'Owner: ' + ${userName}">Owner's Name</h5>
+            <div>
+                <p class="break-word">
+                    <strong>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            stroke="#000000" transform="translate(0, -2)">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
                                 <path
-                                    d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
-                                <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                            </svg>
-                            <span th:text="${garden.getGardenLocation()}"></span>
-                        </strong>
-                    </p>
-                    <p class="break-word">
-                        <strong>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-arrows" viewBox="0 0 16 16">
+                                    d="M11.9638 6.96986C11.9638 6.96986 8.88872 7.27638 7.27853 5.93455C5.66835 4.59273 6.03618 2.03015 6.03618 2.03015C6.03618 2.03015 9.11128 1.72362 10.7215 3.06545C12.3317 4.40727 11.9638 6.96986 11.9638 6.96986Z"
+                                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                </path>
                                 <path
-                                    d="M1.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L2.707 7.5h10.586l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L13.293 8.5H2.707l1.147 1.146a.5.5 0 0 1-.708.708z" />
-                            </svg>
-                            <span th:if="${#strings.equals(garden.getGardenSize(), 0.0)}"> not specified</span>
-                            <span th:if="${not #strings.equals(garden.getGardenSize(), 0.0)}"
-                                th:utext="${garden.getGardenSize()} + ' m&sup2;'"></span>
-                        </strong>
-                    </p>
-                </div>
-                <input id="openModal" th:if="${openModal}" type="hidden">
-                <div class="modal fade text-black" id="tagModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5">Enter a tag to apply to your garden</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post"
-                                autocomplete="off">
-                                <div class="modal-body">
-                                    <div class="input-group rounded mb-2">
-                                        <input id="tagInput" th:name="tag" type="search"
-                                            class="form-control rounded-start"
-                                            th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
-                                            th:value="${tagText}" placeholder="e.g. vegetable garden"
-                                            aria-label="Search" aria-describedby="search-addon" autofocus />
-                                        <button type="submit" class="btn btn-success">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                                                <path fill-rule="evenodd"
-                                                    d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div class="position-relative">
-                                        <ul id="tagAutocompleteSuggestions" class="list-group position-absolute"></ul>
-                                    </div>
-                                    <p id="tagErrorText" th:if="${tagErrorText}" class="mb-0 text-danger fs-6"
-                                        th:text="${tagErrorText}"></p>
-                                    <p id="tagMessageText" th:if="${tagMessageText}" class="mb-0 text-primary fs-6"
-                                        th:text="${tagMessageText}"></p>
+                                    d="M12.0362 6.96986C12.0362 6.96986 15.1113 7.27638 16.7215 5.93455C18.3317 4.59273 17.9638 2.03015 17.9638 2.03015C17.9638 2.03015 14.8887 1.72362 13.2785 3.06545C11.6683 4.40727 12.0362 6.96986 12.0362 6.96986Z"
+                                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                </path>
+                                <path
+                                    d="M4 11C4 10.4477 4.44772 10 5 10H19C19.5523 10 20 10.4477 20 11V13C20 13.5523 19.5523 14 19 14H5C4.44772 14 4 13.5523 4 13V11Z"
+                                    stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                </path>
+                                <path d="M5 14H19L17 22H7L5 14Z" stroke="#000000" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+                        </svg>
+                        <span th:text="${plantCount}"></span>
+                    </strong>
+                </p>
+                <p class="break-word">
+                    <strong>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-geo-alt" viewBox="0 0 16 16">
+                            <path
+                                d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
+                            <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                        </svg>
+                        <span th:text="${garden.getGardenLocation()}"></span>
+                    </strong>
+                </p>
+                <p class="break-word">
+                    <strong>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-arrows" viewBox="0 0 16 16">
+                            <path
+                                d="M1.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L2.707 7.5h10.586l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L13.293 8.5H2.707l1.147 1.146a.5.5 0 0 1-.708.708z" />
+                        </svg>
+                        <span th:if="${#strings.equals(garden.getGardenSize(), 0.0)}"> not specified</span>
+                        <span th:if="${not #strings.equals(garden.getGardenSize(), 0.0)}"
+                            th:utext="${garden.getGardenSize()} + ' m&sup2;'"></span>
+                    </strong>
+                </p>
+            </div>
+            <div class="d-flex flex-row flex-wrap justify-content-center gap-3 mb-3">
+                <ul id="myTab" class="nav nav-underline">
+                    <li class="nav-item">
+                        <a id="details-tab" class="nav-link link-success active"
+                           th:if="${isOwner}"
+                            th:href="@{/my-gardens/__${garden.getGardenId()}__}">Garden details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="2d-tab" class="nav-link link-success"
+                           th:if="${isOwner}"
+                           th:href="@{/2D-garden/__${garden.getGardenId()}__}">View in 2D</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="3d-tab" class="nav-link link-success"
+                           th:if="${isOwner}"
+                            th:href="@{/3D-garden/__${garden.getGardenId()}__}">View in 3D</a>
+                    </li>
+                </ul>
+            </div>
+            <input id="openModal" th:if="${openModal}" type="hidden">
+            <div class="modal fade text-black" id="tagModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5">Enter a tag to apply to your garden</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="tagForm" th:action="@{/my-gardens/__${gardenId}__/tag}" method="post"
+                            autocomplete="off">
+                            <div class="modal-body">
+                                <div class="input-group rounded mb-2">
+                                    <input id="tagInput" th:name="tag" type="search" class="form-control rounded-start"
+                                        th:classappend="${tagErrorText == null ? '' : 'border-danger'}"
+                                        th:value="${tagText}" placeholder="e.g. vegetable garden" aria-label="Search"
+                                        aria-describedby="search-addon" autofocus />
+                                    <button type="submit" class="btn btn-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+                                        </svg>
+                                    </button>
                                 </div>
-                            </form>
-                            <div class="modal-footer justify-content-center">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <div class="position-relative">
+                                    <ul id="tagAutocompleteSuggestions" class="list-group position-absolute"></ul>
+                                </div>
+                                <p id="tagErrorText" th:if="${tagErrorText}" class="mb-0 text-danger fs-6"
+                                    th:text="${tagErrorText}"></p>
+                                <p id="tagMessageText" th:if="${tagMessageText}" class="mb-0 text-primary fs-6"
+                                    th:text="${tagMessageText}"></p>
                             </div>
+                        </form>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         </div>
                     </div>
                 </div>
+            </div>
 
 
-                <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                    <button id="openTagModalButton" type="button" class="btn bg-success text-white"
-                        data-bs-toggle="modal" data-bs-target="#tagModal">Add Tags</button>
+            <div th:if="${isOwner}" class="d-flex flex-row flex-wrap justify-content-center gap-3">
+                <button id="openTagModalButton" type="button" class="btn bg-success text-white" data-bs-toggle="modal"
+                    data-bs-target="#tagModal">Add Tags</button>
 
                     <a th:href="@{__${garden.getGardenId()}__/create-new-plant}">
                         <button type="button" class="btn bg-success text-white">Create Plant</button>
                     </a>
-                    <a th:href="@{__${garden.getGardenId()}__/edit}">
-                        <button type="button" class="btn bg-success text-white">Edit Garden</button>
-                    </a>
                 </div>
 
+        </div>
+        <div th:if="${isOwner}" class="mt-3 rounded" th:classappend="${gradientClass}">
+            <div class="p-2 text-white">
+                <h4 th:text="${currentTime}">Current Time</h4>
             </div>
-            <div th:if="${isOwner}" class="mt-3 rounded" th:classappend="${gradientClass}">
-                <div class="p-2 text-white">
-                    <h4 th:text="${currentTime}">Current Time</h4>
-                </div>
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
-                    <div class="w-25" th:each="prediction, iterStat : ${weatherList}">
-                        <div th:replace="~{fragments/weatherBox.html :: weatherBox(
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 p-3 text-left">
+                <div class="w-25" th:each="prediction, iterStat : ${weatherList}">
+                    <div th:replace="~{fragments/weatherBox.html :: weatherBox(
                             weatherIcon=${prediction.getWeatherIcon()},
                             date=${prediction.getDate()},
                             day=${prediction.getDay()},
@@ -172,32 +193,33 @@
                             weatherError=${prediction.getWeatherError()},
                             today=${iterStat.index == 2}
                         )}">
-                        </div>
                     </div>
                 </div>
-                <div class="attribution">
-                    <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
-                </div>
             </div>
-            <div class="watering position-relative w-100 h-40" th:if="${message}" id="messageBox">
-                <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}"></div>
-                <span class="close position-absolute top-0 end-0 cursor-pointer" onclick="closeMessageBox()">×</span>
+            <div class="attribution">
+                <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
             </div>
         </div>
-        <div th:if="${plantCount > 0}" class="container mt-4 bg-white rounded">
-            <div class="row mb-4">
-                <div class="col">
-                    <h1 class="mb-3">Plants</h1>
-                    <p class="text-muted">
-                        Showing results <span th:text="${startIndex}"></span> to <span th:text="${endIndex}"></span> of
-                        <span th:text="${plantCount}"></span>
-                    </p>
-                </div>
+        <div class="watering position-relative w-100 h-40" th:if="${message}" id="messageBox">
+            <div th:replace="~{fragments/infoBox.html :: infoBox(message=${message}, goodMessage=${goodMessage})}">
             </div>
-            <input type="hidden" id="gardenId" th:value="${garden.getGardenId()}" />
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-                <div class="col" th:each="plant : ${plants}">
-                    <div th:replace="~{fragments/plantBox.html :: plantBox(
+            <span class="close position-absolute top-0 end-0 cursor-pointer" onclick="closeMessageBox()">×</span>
+        </div>
+    </div>
+    <div th:if="${plantCount > 0}" class="container mt-4 bg-white rounded">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="mb-3">Plants</h1>
+                <p class="text-muted">
+                    Showing results <span th:text="${startIndex}"></span> to <span th:text="${endIndex}"></span> of
+                    <span th:text="${plantCount}"></span>
+                </p>
+            </div>
+        </div>
+        <input type="hidden" id="gardenId" th:value="${garden.getGardenId()}" />
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+            <div class="col" th:each="plant : ${plants}">
+                <div th:replace="~{fragments/plantBox.html :: plantBox(
                     plantId=${plant.getPlantId()},
                     plantName=${plant.getPlantName()},
                     plantCount=${plant.getPlantCount()},
@@ -207,25 +229,25 @@
                     isOwner=${isOwner},
                     page=${currentPage},
                     weatherListJson=${weatherListJson})}">
-                    </div>
-                </div>
-            </div>
-            <div th:if="${isOwner}" class="row mt-4">
-                <div class="col">
-                    <div th:replace="~{fragments/plantPaginationNav.html}"
-                        th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
-                          startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, weatherListJson=${weatherListJson}">
-                    </div>
-                </div>
-            </div>
-            <div th:if="${!isOwner}" class="row mt-4">
-                <div class="col">
-                    <div th:replace="~{fragments/publicPlantPaginationNav.html}"
-                        th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
-                    </div>
                 </div>
             </div>
         </div>
+        <div th:if="${isOwner}" class="row mt-4">
+            <div class="col">
+                <div th:replace="~{fragments/plantPaginationNav.html}"
+                    th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
+                          startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}, weatherListJson=${weatherListJson}">
+                </div>
+            </div>
+        </div>
+        <div th:if="${!isOwner}" class="row mt-4">
+            <div class="col">
+                <div th:replace="~{fragments/publicPlantPaginationNav.html}"
+                    th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage}, startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script th:src="@{/js/tagModalOpener.js}"></script>
@@ -233,7 +255,6 @@
     <script th:src="@{/js/inputCharacterLimit.js}"></script>
     <script th:src="@{/js/imagePicker.js}"></script>
     <script th:src="@{/js/gardenTagAutocomplete.js}"></script>
-    <script th:src="@{/js/getInstance.js}"></script>
 </body>
 
 </html>

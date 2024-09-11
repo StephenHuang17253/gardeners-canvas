@@ -15,7 +15,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 /**
- * Service class for obtaining location autocomplete suggestions using the LocationIQ API.
+ * Service class for obtaining location autocomplete suggestions using the
+ * LocationIQ API.
  */
 @Service
 public class LocationService {
@@ -27,43 +28,56 @@ public class LocationService {
 
     /**
      * Retrieves location suggestions based on provided query string.
+     * 
      * @param query The string for which autocomplete suggestions are requested.
      * @return A JSON string containing location suggestions
-     * @throws IOException If an error occurs while making request
+     * @throws IOException          If an error occurs while making request
      * @throws InterruptedException If request is interrupted
      */
     public String getLocationSuggestions(String query) throws IOException, InterruptedException {
-;
+
+        logger.info("Location API request");
+
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery + "&tag=place:house"
+                .uri(URI.create("https://api.locationiq.com/v1/autocomplete?q=" + encodedQuery
+                        + "&tag=place:house"
                         + ",building:*"
-                        + "&normalizecity=1" + "&key=" + locationIqAccessToken
-
-                ))
+                        + "&normalizecity=1" + "&key=" + locationIqAccessToken))
                 .header("accept", "application/json")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        logger.info("Location API request, query = '" + query + "'");
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request,
+                HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
 
+    /**
+     * Retrieves the latitude and longitude of a location based on the provided
+     * query
+     * 
+     * @param query The string for which latitude and longitude are requested
+     * @return A JSON node containing the latitude and longitude of the location
+     * @throws IOException          If an error occurs while making the request
+     * @throws InterruptedException If the request is interrupted
+     */
     public JsonNode getLatitudeLongitude(String query) throws IOException, InterruptedException {
+
+        logger.info("Location API forward geocoding request");
+
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://us1.locationiq.com/v1/search?key=" + locationIqAccessToken + "&q=" + encodedQuery + "&format=json"
-
-                ))
+                .uri(URI.create("https://us1.locationiq.com/v1/search?key=" + locationIqAccessToken
+                        + "&q=" + encodedQuery + "&format=json"))
                 .header("accept", "application/json")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        logger.info("Location API forward geocoding request, query = '" + query + "'");
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request,
+                HttpResponse.BodyHandlers.ofString());
 
         ObjectMapper objectMapper = new ObjectMapper();
 

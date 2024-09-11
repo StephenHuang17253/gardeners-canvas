@@ -8,10 +8,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.HomePageLayout;
 import java.util.Optional;
 
 @Repository
-public interface HomePageLayoutRepository extends CrudRepository<HomePageLayout, Long>{
-    
+public interface HomePageLayoutRepository extends CrudRepository<HomePageLayout, Long> {
+
     /**
      * Finds a HomePageLayout object by id
+     * 
      * @param id the layouts's id
      */
     Optional<HomePageLayout> findById(long id);

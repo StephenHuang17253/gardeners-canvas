@@ -5,13 +5,11 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.HomePageController;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.PlantWikiController;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantInfoModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.PlantSearchModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,7 +17,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +43,7 @@ public class U26_PlantInfo {
 
     List<PlantSearchModel> plants;
 
-    PlantInfoModel plant;
+    PlantInfoModel plantInfo;
 
     String searchTerm;
 
@@ -63,14 +60,16 @@ public class U26_PlantInfo {
     public void i_am_on_the_plant_wiki_page() throws Exception {
         mvcResult = mockMVC.perform(get("/plant-wiki")).andExpect(status().isOk()).andReturn();
     }
+
     @When("I enter the search term {string}")
     public void i_enter_the_search_term(String searchTerm) throws Exception {
         this.searchTerm = searchTerm;
         ObjectMapper mapper = new ObjectMapper();
-        when(plantInfoService.getPlantListJson(anyString(),anyBoolean())).thenReturn(mapper.readTree(mockAppleSearchTermAPIPlantListResponse));
-        mvcResult = mockMVC.perform(get("/plant-wiki?search="+searchTerm)).andExpect(status().isOk()).andReturn();
-
+        when(plantInfoService.getPlantListJson(anyString(), anyBoolean()))
+                .thenReturn(mapper.readTree(mockAppleSearchTermAPIPlantListResponse));
+        mvcResult = mockMVC.perform(get("/plant-wiki?search=" + searchTerm)).andExpect(status().isOk()).andReturn();
     }
+
     @Then("I see a list of plant cards")
     public void i_see_a_list_of_plant_cards() {
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -79,18 +78,20 @@ public class U26_PlantInfo {
         plants = (List<PlantSearchModel>) model.get("plants");
         Assertions.assertEquals(30, plants.size());
     }
+
     @Then("They display names that contain my search term")
     public void they_display_names_that_contain_my_search_term() {
-        for (PlantSearchModel plant : plants){
+        for (PlantSearchModel plant : plants) {
             boolean containsSearchTerm = plant.getCommonName().toLowerCase().contains(searchTerm)
                     || plant.getScientificName().toLowerCase().contains(searchTerm)
                     || plant.getOtherNames().toLowerCase().contains(searchTerm);
             Assertions.assertTrue(containsSearchTerm);
         }
     }
+
     @Then("The plant card has an image")
     public void the_plant_card_has_an_image() {
-        for (PlantSearchModel plant : plants){
+        for (PlantSearchModel plant : plants) {
             Assertions.assertNotNull(plant.getImage());
         }
     }
@@ -99,8 +100,9 @@ public class U26_PlantInfo {
     public void there_is_a_list_of_plant_results_for_the_search_term(String searchTerm) throws Exception {
         this.searchTerm = searchTerm;
         ObjectMapper mapper = new ObjectMapper();
-        when(plantInfoService.getPlantListJson(anyString(),anyBoolean())).thenReturn(mapper.readTree(mockAppleSearchTermAPIPlantListResponse));
-        mvcResult = mockMVC.perform(get("/plant-wiki?search="+searchTerm)).andExpect(status().isOk()).andReturn();
+        when(plantInfoService.getPlantListJson(anyString(), anyBoolean()))
+                .thenReturn(mapper.readTree(mockAppleSearchTermAPIPlantListResponse));
+        mvcResult = mockMVC.perform(get("/plant-wiki?search=" + searchTerm)).andExpect(status().isOk()).andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
@@ -113,7 +115,8 @@ public class U26_PlantInfo {
     @When("I click on the {string} plant card")
     public void i_click_on_the_plant_card(String plantName) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        when(plantInfoService.getPlantDetailsJson(anyString(),anyBoolean())).thenReturn(mapper.readTree(mockGrannySmithAppleAPIPlantDetailReponse));
+        when(plantInfoService.getPlantDetailsJson(anyString(), anyBoolean()))
+                .thenReturn(mapper.readTree(mockGrannySmithAppleAPIPlantDetailReponse));
         mvcResult = mockMVC.perform(get("/plant-wiki/365/details")).andExpect(status().isOk()).andReturn();
     }
 
@@ -121,14 +124,13 @@ public class U26_PlantInfo {
     public void i_see_the_plant_details_page_for(String plantName) {
         ModelAndView modelAndView = mvcResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
-        plant = (PlantInfoModel) modelAndView.getModel().get("plant");
+        plantInfo = (PlantInfoModel) modelAndView.getModel().get("plant");
 
-        Assertions.assertEquals(plantName, plant.getCommonName());
-        Assertions.assertNotNull(plant.getScientificName());
-        Assertions.assertNotNull(plant.getDescription());
-        Assertions.assertNotNull(plant.getDefaultImage());
+        Assertions.assertEquals(plantName, plantInfo.getCommonName());
+        Assertions.assertNotNull(plantInfo.getScientificName());
+        Assertions.assertNotNull(plantInfo.getDescription());
+        Assertions.assertNotNull(plantInfo.getDefaultImage());
 
     }
-
 
 }

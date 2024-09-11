@@ -46,20 +46,27 @@ public class ResetUserPassword {
 
     @Autowired
     public AuthenticationManager authenticationManager;
+
     @Autowired
     public PasswordEncoder passwordEncoder;
+
     @Autowired
     public UserRepository userRepository;
+
     @Autowired
     public HomePageLayoutRepository homePageLayoutRepository;
+
     @Autowired
     public FileService fileService;
+
     @Autowired
     public GardenService gardenService;
+
     @Autowired
     private TokenService tokenService;
 
     public static MockMvc mockMVC;
+
     @Autowired
     public UserService userService;
 
@@ -98,7 +105,7 @@ public class ResetUserPassword {
                 emailService,
                 tokenService, gardenService, securityService);
         ResetPasswordController resetPasswordController = new ResetPasswordController(userService, tokenService,
-                emailService, securityService);
+                emailService);
         mockMVC = MockMvcBuilders.standaloneSetup(accountController, resetPasswordController, profileController)
                 .build();
         tokenService.addToken(token);
@@ -123,7 +130,6 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url))
                 .andExpect(status().isOk()).andReturn();
-
     }
 
     @When("I hit the “Forgot your password?” link")
@@ -133,7 +139,6 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url))
                 .andExpect(status().isOk()).andReturn();
-
     }
 
     @Then("I see a form asking me for my email address")
@@ -147,7 +152,6 @@ public class ResetUserPassword {
         Assertions.assertNotNull(model);
         ModelMap modelMap = model.getModelMap();
         assertNotNull("emailAddress attribute exists", modelMap.get("emailAddress"));
-
     }
 
     @Given("I am on the lost password form")
@@ -157,7 +161,6 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url))
                 .andExpect(status().isOk()).andReturn();
-
     }
 
     @When("I enter an empty or malformed email address {string}")
@@ -201,13 +204,11 @@ public class ResetUserPassword {
         Object messageObject = modelMap.get("message");
         String givenMessage = messageObject.toString();
         Assertions.assertEquals(message, givenMessage, "Message match");
-
     }
 
     @When("I enter an email {string} that is known to the system")
     public void i_enter_an_email_that_is_known_to_the_system(String email) {
         userEmail = email;
-
     }
 
     @And("an email is sent with a link containing a unique reset token")
@@ -216,7 +217,6 @@ public class ResetUserPassword {
         Assertions.assertNotNull(model);
         ModelMap modelMap = model.getModelMap();
         assertNotNull("emailSent attribute exists", modelMap.get("emailSent"));
-
     }
 
     @Given("I go to the received email in the email {string}")
@@ -247,7 +247,6 @@ public class ResetUserPassword {
 
     @Then("I am taken to the reset password form")
     public void i_am_taken_to_the_reset_password_form() throws Exception {
-
         // Verifies the page the resetLink takes you to is the reset password form
         resetPasswordResult = mockMVC.perform(MockMvcRequestBuilders.get(resetLink))
                 .andExpect(status().isOk())
@@ -270,7 +269,6 @@ public class ResetUserPassword {
                 MockMvcRequestBuilders
                         .get(url))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-
     }
 
     @When("I enter two different passwords {string}, {string}")
@@ -282,7 +280,6 @@ public class ResetUserPassword {
                         .param("password", newPassword)
                         .param("retypePassword", retypePassword))
                 .andReturn();
-
     }
 
     @When("I enter a weak password {string}")
@@ -294,13 +291,11 @@ public class ResetUserPassword {
                         .param("password", weakPassword)
                         .param("retypePassword", weakPassword))
                 .andReturn();
-
     }
 
     @Then("My password does not get updated")
     public void my_password_does_not_get_updated() {
         Assertions.assertEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
-
     }
 
     @When("I enter {string} in both new and retype fields and hit the save button")
@@ -312,13 +307,11 @@ public class ResetUserPassword {
                         .param("password", password)
                         .param("retypePassword", password))
                 .andReturn();
-
     }
 
     @Then("my password is updated")
     public void my_password_is_updated() {
         Assertions.assertNotEquals(origHash, userService.getUserByEmail(userEmail).getEncodedPassword());
-
     }
 
     @And("I am redirected to the login page")
@@ -326,6 +319,5 @@ public class ResetUserPassword {
         String url = "/login";
         String redirectedUrl = resetPasswordResult.getResponse().getRedirectedUrl();
         Assertions.assertEquals(String.format(url), redirectedUrl);
-
     }
 }

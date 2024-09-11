@@ -4,9 +4,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.TokenRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +29,10 @@ class GardenServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private GridItemLocationRepository gridItemLocationRepository;
+    @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
     private UserService userService;
 
     private List<Garden> gardenList = new ArrayList<>();
@@ -35,6 +42,8 @@ class GardenServiceIntegrationTest {
     @BeforeEach
     void ClearRepository_AddUsersAndGardens() {
         gardenList = new ArrayList<>();
+        tokenRepository.deleteAll();
+        gridItemLocationRepository.deleteAll();
         userRepository.deleteAll();
         User user1 = new User("John", "Doe", "johnDoe@email.com", date);
         User user2 = new User("Jane", "Doe", "janeDoe@email.com", date);
@@ -258,7 +267,7 @@ class GardenServiceIntegrationTest {
         // Given
         Garden garden = userService.getUserById(1L).getGardens().get(0);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
 
         // When
         gardenService.addPlantToGarden(1L, plant);
@@ -267,11 +276,11 @@ class GardenServiceIntegrationTest {
         Garden resultGarden = userService.getUserById(1L).getGardens().get(0);
         Assertions.assertEquals(1, resultGarden.getPlants().size());
         Plant resultPlant = resultGarden.getPlants().get(0);
-        Assertions.assertEquals(resultPlant.getPlantName(), "John's Plant");
-        Assertions.assertEquals(resultPlant.getPlantCount(), 3);
-        Assertions.assertEquals(resultPlant.getPlantDescription(), "Plant owned by John");
-        Assertions.assertEquals(resultPlant.getPlantDate(), dateOfPlanting);
-        Assertions.assertEquals(resultPlant.getGarden().getGardenId(), garden.getGardenId());
+        Assertions.assertEquals("John's Plant", resultPlant.getPlantName());
+        Assertions.assertEquals(3, resultPlant.getPlantCount());
+        Assertions.assertEquals("Plant owned by John", resultPlant.getPlantDescription());
+        Assertions.assertEquals(dateOfPlanting, resultPlant.getPlantDate());
+        Assertions.assertEquals(garden.getGardenId(), resultPlant.getGarden().getGardenId());
     }
 
     @Test
@@ -291,7 +300,7 @@ class GardenServiceIntegrationTest {
                 "172.5796159",
                 user);
         LocalDate dateOfPlanting = LocalDate.of(2024, 3, 14);
-        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden);
+        Plant plant = new Plant("John's Plant", 3, "Plant owned by John", dateOfPlanting, garden, PlantCategory.TREE);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gardenService.addPlantToGarden(4L, plant);

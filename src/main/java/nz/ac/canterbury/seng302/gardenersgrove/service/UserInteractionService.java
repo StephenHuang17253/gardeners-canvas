@@ -4,6 +4,9 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserInteractionRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,8 @@ import java.util.Optional;
 
 @Service
 public class UserInteractionService {
+
+    Logger logger = LoggerFactory.getLogger(UserInteractionService.class);
 
     private final UserInteractionRepository userInteractionRepository;
 
@@ -26,14 +31,15 @@ public class UserInteractionService {
 
     /**
      * UserInteractionService constructor
+     * 
      * @param userInteractionRepository the repository for UserInteractions
-     * @param userService the service for the user repository
+     * @param userService               the service for the user repository
      */
     @Autowired
     public UserInteractionService(UserInteractionRepository userInteractionRepository,
-                                  UserService userService,
-                                  GardenService gardenService,
-                                  PlantService plantService) {
+            UserService userService,
+            GardenService gardenService,
+            PlantService plantService) {
         this.userInteractionRepository = userInteractionRepository;
         this.userService = userService;
         this.gardenService = gardenService;
@@ -42,15 +48,17 @@ public class UserInteractionService {
 
     /**
      * Retrieves a UserInteraction by ID
+     * 
      * @param id the UserInteraction's ID
      * @return the UserInteraction or Optional.empty() if none found
      */
-    public Optional<UserInteraction> getUserInteractionById(long id){
+    public Optional<UserInteraction> getUserInteractionById(long id) {
         return userInteractionRepository.findById(id);
     }
 
     /**
      * Retrieves all a users UserInteractions from persistence
+     * 
      * @param id the user's ID
      * @return a list of UserInteraction objects
      */
@@ -64,10 +72,12 @@ public class UserInteractionService {
 
     /**
      * Retrieves all a users UserInteractions from persistence of the given itemType
+     * 
      * @param id the user's ID
      * @return a list of UserInteraction objects
      */
-    public List<UserInteraction> getAllUsersUserInteractionsByItemType(long id, ItemType itemType) throws IllegalArgumentException {
+    public List<UserInteraction> getAllUsersUserInteractionsByItemType(long id, ItemType itemType)
+            throws IllegalArgumentException {
         if (userService.getUserById(id) == null) {
             throw new IllegalArgumentException("Invalid user ID: " + id);
         }
@@ -77,11 +87,12 @@ public class UserInteractionService {
 
     /**
      * Helper method to check item exits in the repo
-     * @param itemId id of the item
+     * 
+     * @param itemId   id of the item
      * @param itemType type of the item
      * @return if valid or not
      */
-    private boolean isValidItem(Long itemId, ItemType itemType){
+    private boolean isValidItem(Long itemId, ItemType itemType) {
         return switch (itemType) {
             case GARDEN -> gardenService.getGardenById(itemId).isPresent();
             case PLANT -> plantService.findById(itemId).isPresent();
@@ -91,13 +102,15 @@ public class UserInteractionService {
 
     /**
      * Add a UserInteraction for a given user
-     * @param userId id of the user that the interaction belongs to
-     * @param itemId the id of item the user interacted with
-     * @param itemType the type of item the user interacted with
+     * 
+     * @param userId          id of the user that the interaction belongs to
+     * @param itemId          the id of item the user interacted with
+     * @param itemType        the type of item the user interacted with
      * @param interactionTime the time of the user interaction
      * @return the UserInteraction
      */
-    public UserInteraction addUserInteraction(Long userId, Long itemId, ItemType itemType, LocalDateTime interactionTime){
+    public UserInteraction addUserInteraction(Long userId, Long itemId, ItemType itemType,
+            LocalDateTime interactionTime) {
         User user = userService.getUserById(userId);
         if (user == null) {
             throw new IllegalArgumentException("Invalid user ID: " + userId);
@@ -111,7 +124,8 @@ public class UserInteractionService {
             throw new IllegalArgumentException("Interaction Time: " + interactionTime + " cannot be in the future");
         }
 
-        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository.findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
+        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository
+                .findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
         if (existingInteractionOpt.isPresent()) {
             UserInteraction existingInteraction = existingInteractionOpt.get();
             existingInteraction.setInteractionTime(interactionTime);
@@ -122,8 +136,8 @@ public class UserInteractionService {
 
         List<UserInteraction> userInteractions = getAllUsersUserInteractionsByItemType(userId, itemType);
 
-        if(userInteractions.size() == MAX_INTERACTION_COUNT_PER_TYPE){
-            userInteractionRepository.delete(userInteractions.get(userInteractions.size()-1));
+        if (userInteractions.size() == MAX_INTERACTION_COUNT_PER_TYPE) {
+            userInteractionRepository.delete(userInteractions.get(userInteractions.size() - 1));
         }
 
         return userInteractionRepository.save(userInteraction);
@@ -132,8 +146,9 @@ public class UserInteractionService {
     /**
      * Remove a user interaction by its user, item id and item type,
      * If the interaction does not exist, nothing will happen.
-     * @param userId the user who triggered the interaction
-     * @param itemId the item interacted with
+     * 
+     * @param userId   the user who triggered the interaction
+     * @param itemId   the item interacted with
      * @param itemType the item's type
      */
     public void removeUserInteraction(Long userId, Long itemId, ItemType itemType) {
@@ -146,12 +161,12 @@ public class UserInteractionService {
             throw new IllegalArgumentException("Invalid item ID: " + itemId + " for item type: " + itemType);
         }
 
-        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository.findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
+        Optional<UserInteraction> existingInteractionOpt = userInteractionRepository
+                .findByUserIdAndItemIdAndItemType(userId, itemId, itemType);
         if (existingInteractionOpt.isPresent()) {
             UserInteraction userInteraction = existingInteractionOpt.get();
             userInteractionRepository.delete(userInteraction);
         }
-
     }
 
 }

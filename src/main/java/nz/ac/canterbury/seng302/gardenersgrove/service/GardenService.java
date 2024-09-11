@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.service;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTag;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.UserInteraction;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenRepository;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for Garden objects.
@@ -20,6 +18,8 @@ import java.util.stream.Collectors;
 public class GardenService {
 
     private UserService userService;
+
+    private String invalidGardenId = "Invalid garden ID";
 
     /**
      * Interface for generic CRUD operations on a repository for Garden types.
@@ -113,7 +113,7 @@ public class GardenService {
             return gardenRepository.save(targetGarden);
 
         } else {
-            throw new IllegalArgumentException("Invalid garden ID");
+            throw new IllegalArgumentException(invalidGardenId);
         }
     }
 
@@ -134,28 +134,30 @@ public class GardenService {
             return gardenRepository.save(targetGarden);
 
         } else {
-            throw new IllegalArgumentException("Invalid garden ID");
+            throw new IllegalArgumentException(invalidGardenId);
         }
     }
 
     /**
      * Updates the watering need status of the garden
-     * @param gardenId the garden's id
-     * @param NeedsWatering the boolean attribute used to determine if a garden needs watering
+     * 
+     * @param gardenId      the garden's id
+     * @param needsWatering the boolean attribute used to determine if a garden
+     *                      needs watering
      * @return the updated garden as saved in the repository
      */
-    public Garden changeGardenNeedsWatering(Long gardenId, boolean NeedsWatering) {
+    public Garden changeGardenNeedsWatering(Long gardenId, boolean needsWatering) {
         Optional<Garden> optionalGarden = getGardenById(gardenId);
 
         if (optionalGarden.isPresent()) {
             Garden targetGarden = optionalGarden.get();
 
-            targetGarden.setNeedsWatering(NeedsWatering);
+            targetGarden.setNeedsWatering(needsWatering);
 
             return gardenRepository.save(targetGarden);
 
         } else {
-            throw new IllegalArgumentException("Invalid garden ID");
+            throw new IllegalArgumentException(invalidGardenId);
         }
     }
 
@@ -178,7 +180,7 @@ public class GardenService {
             return gardenRepository.save(targetGarden);
 
         } else {
-            throw new IllegalArgumentException("Invalid garden ID");
+            throw new IllegalArgumentException(invalidGardenId);
         }
     }
 
@@ -197,7 +199,7 @@ public class GardenService {
             garden.getPlants().add(plant);
             gardenRepository.save(garden);
         } else {
-            throw new IllegalArgumentException("Invalid garden ID");
+            throw new IllegalArgumentException(invalidGardenId);
         }
     }
 
@@ -213,16 +215,28 @@ public class GardenService {
         return gardenRepository.findByGardenNameOrPlantNameContainingIgnoreCase(searchValue);
     }
 
+    /**
+     * Retrieves all public gardens from persistence
+     * 
+     * @return a list of all public garden objects saved in persistence
+     */
     public List<Garden> getAllPublicGardens() {
         return gardenRepository.findAllPublicGardens();
     }
 
+    /**
+     * Retrieves all gardens from persistence that have been interacted with by the
+     * user
+     * 
+     * @param userInteractions the user interactions
+     * @return a list of all garden objects saved in persistence
+     */
     public List<Garden> getGardensByInteraction(List<UserInteraction> userInteractions) {
         return userInteractions.stream()
                 .map(userInteraction -> getGardenById(userInteraction.getItemId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

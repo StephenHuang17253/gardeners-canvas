@@ -17,9 +17,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -31,34 +31,39 @@ import org.slf4j.LoggerFactory;
  */
 @Service
 public class ProfanityService {
+
+    Logger logger = LoggerFactory.getLogger(ProfanityService.class);
+
     @Value("${azure.moderator.token}")
     private String moderatorKey;
+
     @Value("${azure.service.endpoint}")
     private String endPoint;
-    Logger logger = LoggerFactory.getLogger(ProfanityService.class);
+
     private final HttpClient httpClient;
-    ObjectMapper objectMapper = new ObjectMapper();
 
     private final AtomicLong nextFreeCallTimestamp = new AtomicLong(new Date().getTime());
     private static final long RATE_LIMIT_DELAY_MS = 1500;
     private static final long RATE_LIMIT_DELAY_BUFFER = 5;
-    String emptyRegex = "^\\s*$";
+    private static final String EMPTY_REGEX = "^\\s*$";
 
-    Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
 
-    /**
-     * Service to handle tag database checks.
-     */
+    private static final int MAX_RETRIES = 4;
+
     private final GardenTagService gardenTagService;
+
+    private final ObjectMapper objectMapper;
 
     /**
      * General constructor for profanity service, creates new http client.
      * always use this constructor when running real api calls
      */
     @Autowired
-    public ProfanityService(GardenTagService gardenTagService) {
+    public ProfanityService(GardenTagService gardenTagService, ObjectMapper objectMapper) {
         httpClient = HttpClient.newHttpClient();
         this.gardenTagService = gardenTagService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -70,9 +75,11 @@ public class ProfanityService {
      *                             testing the Profanity service
      * @param gardenTagServiceMock mocked garden service for unit testing.
      */
-    public ProfanityService(HttpClient httpClientMock, GardenTagService gardenTagServiceMock) {
+    public ProfanityService(HttpClient httpClientMock, GardenTagService gardenTagServiceMock,
+            ObjectMapper objectMapper) {
         httpClient = httpClientMock;
         this.gardenTagService = gardenTagServiceMock;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -95,7 +102,6 @@ public class ProfanityService {
             return null;
         }
         return moderateContentApiCall(content);
-
     }
 
     /**
@@ -130,15 +136,12 @@ public class ProfanityService {
             Thread.currentThread().interrupt();
             return null;
         }
-
     }
 
     private ProfanityResponseData moderateContentApiCall(String content) {
-        boolean wasProfanityChecked = false;
         int retryCounter = 0;
-        while (!wasProfanityChecked && retryCounter < 4) {
+        while (retryCounter < MAX_RETRIES) {
             try {
-
                 String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
                 logger.info("Sent profanity API request: {}", new Date().getTime());
                 HttpRequest request = HttpRequest.newBuilder()
@@ -163,7 +166,6 @@ public class ProfanityService {
                     logger.warn("Could not get profanity response due to ratelimit, retrying {}", retryCounter);
                     waitForRateLimit();
                 } else {
-                    wasProfanityChecked = true;
                     return profanityResponse;
                 }
 
@@ -174,7 +176,7 @@ public class ProfanityService {
                 Thread.currentThread().interrupt();
                 logger.error(String.format("Automatic Moderation Failure, Moderate Manually %s",
                         errorException.getMessage()));
-                return null; /// RETURN ERROR, FIX LATER
+                return null;
             }
         }
 
@@ -207,10 +209,9 @@ public class ProfanityService {
     }
 
     private Boolean containPriorityPrecheck(String inputString) {
-        if (inputString.matches(emptyRegex)) {
+        if (inputString.matches(EMPTY_REGEX)) {
             return false;
         }
-
         // Checking if the input is a tag stored in database with allocated status.
         List<TagStatus> previousOccurrenceOfTag = gardenTagService.getAllSimilar(inputString).stream()
                 .map(GardenTag::getTagStatus).toList();
@@ -242,6 +243,5 @@ public class ProfanityService {
             }
         }
         Thread.sleep(timeToWait);
-
     }
 }

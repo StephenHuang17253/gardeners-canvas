@@ -1,9 +1,12 @@
-const tagInput = document.getElementById('tagInput');
-const addTagButton = document.getElementById('addTagButton');
-const appliedTagsList = document.getElementById('appliedTagsList');
-const appliedTagsInputs = document.getElementById('appliedTagsInputs');
-const searchTagErrorText = document.getElementById('searchTagErrorText')
-const maxTextLength = 50;
+const tagInput = document.getElementById("tagInput");
+const addTagButton = document.getElementById("addTagButton");
+const appliedTagsList = document.getElementById("appliedTagsList");
+const appliedTagsInputs = document.getElementById("appliedTagsInputs");
+const searchTagErrorText = document.getElementById("searchTagErrorText");
+const MAX_TEXT_LENGTH = 50;
+const validTagRegex = /^[a-zA-Z0-9\s\-_']+$/;
+
+const instance = getInstance();
 
 /**
  * handles when the user enters a tag, 
@@ -14,63 +17,73 @@ const handleButtonClick = async () => {
     const value = tagInput.value.trim();
 
     if (value === "") {
-        tagInput.classList.add('border-danger');
+        tagInput.classList.add("border-danger");
         searchTagErrorText.textContent = "Please enter a valid tag";
+        return;
+    }
+
+    const validTag = validTagRegex.test(value);
+
+    if (!validTag) {
+        tagInput.classList.add("border-danger");
+        searchTagErrorText.textContent = `No tag matching "${limitTagLength(value)}"`;
         return;
     }
 
     const tagExists = await checkTagExists(value);
 
     if (!tagExists) {
-        tagInput.classList.add('border-danger');
-        searchTagErrorText.textContent = `No tag matching "${value}"`;
-        cutOffText(searchTagErrorText, maxTextLength);
+        tagInput.classList.add("border-danger");
+        searchTagErrorText.textContent = `No tag matching "${limitTagLength(value)}"`;
         return;
     }
-    const tagAlreadyApplied = Array.from(appliedTagsInputs.querySelectorAll('input[name="appliedTags"]'))
-        .some(input => input.value === value)
+
+    const tagAlreadyApplied = Array.from(appliedTagsInputs.querySelectorAll("input[name='appliedTags']"))
+        .some(input => input.value === value);
+
     if (tagAlreadyApplied) {
         searchTagErrorText.textContent = `"${value}" is already applied`;
         return;
     }
 
-    appliedTagsList.classList.remove('d-none');
-    searchTagErrorText.textContent = '';
-    tagInput.classList.remove('border-danger');
+    appliedTagsList.classList.remove("d-none");
+    searchTagErrorText.textContent = "";
+    tagInput.classList.remove("border-danger");
 
-    const div1 = document.createElement('div');
-    div1.classList.add('p-1');
-    const div2 = document.createElement('div');
-    const span1 = document.createElement('span');
-    span1.classList.add('badge', 'rounded-pill', 'text-bg-success', 'p-2', 'cursor-pointer');
+    const div1 = document.createElement("div");
+    div1.classList.add("p-1");
+    const div2 = document.createElement("div");
+    const span1 = document.createElement("span");
+    span1.classList.add("badge", "rounded-pill", "text-bg-success", "p-2", "cursor-pointer");
     span1.textContent = value;
-    span1.setAttribute('data-tag-name', value);
+    span1.setAttribute("data-tag-name", value);
     span1.onclick = () => removeTag(span1);
-    span1.onmouseover = () => span1.classList.replace('text-bg-success', 'text-bg-danger');
-    span1.onmouseout = () => span1.classList.replace('text-bg-danger', 'text-bg-success');
+    span1.onmouseover = () => span1.classList.replace("text-bg-success", "text-bg-danger");
+    span1.onmouseout = () => span1.classList.replace("text-bg-danger", "text-bg-success");
 
     div2.appendChild(span1);
     div1.appendChild(div2);
     appliedTagsList.appendChild(div1);
 
-    const input = document.createElement('input');
+    const input = document.createElement("input");
     input.value = value;
-    input.name = 'appliedTags';
-    input.type = 'hidden';
+    input.name = "appliedTags";
+    input.type = "hidden";
     appliedTagsInputs.appendChild(input);
 
-    tagInput.value = ''
+    tagInput.value = "";
 };
+
 /**
  *  Finds and removes tag input element
  *  and removes it from appliedTagsInputs array
  *  @param element of tag to remove
  **/
 const removeTag = (element) => {
-    const tagName = element.getAttribute('data-tag-name');
-    element.closest('.p-1').remove();
+    const tagName = element.getAttribute("data-tag-name");
+    element.closest(".p-1").remove();
     const inputToRemove = Array.from(appliedTagsInputs.children).find(input => input.value === tagName);
-    if (inputToRemove) {inputToRemove.remove();}
+    if (inputToRemove) inputToRemove.remove();
     hideTagSection();
 };
 
@@ -80,13 +93,13 @@ const removeTag = (element) => {
  * @param {Event} event - The keydown event.
  */
 const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
         event.preventDefault();
         handleButtonClick();
     } else {
-        searchTagErrorText.textContent = '';
+        searchTagErrorText.textContent = "";
     }
-}
+};
 
 /**
  * Fetches tag data
@@ -94,35 +107,30 @@ const handleKeyPress = (event) => {
  * @returns {Promise<any>} - A promise that resolves with the fetched data
  */
 const checkTagExists = async (tagName) => {
-    const instance = getInstance();
     const response = await fetch(`/${instance}tag/exists?tagName=${tagName}`);
     return await response.json();
-}
-
+};
 
 /**
  * Hides the applied tag section
  */
 const hideTagSection = () => {
-    if (appliedTagsList.childElementCount === 1) {
-        appliedTagsList.classList.add('d-none');
-    }
-}
-hideTagSection()
+    if (appliedTagsList.childElementCount === 1) appliedTagsList.classList.add("d-none");
+};
 
 /**
- * Cuts off text if it exceeds the max length
+ * Cuts off text if it exceeds the max length (50)
  * @param {HTMLElement} element - The element containing the text
- * @param {number} maxLength - The maximum length of the text
  */
-const cutOffText = (element, maxLength) => {
-    let text = element.textContent;
-    if (text.length > maxLength) {
-        element.textContent = text.substring(0, maxLength - 3) + "...\"";
+const limitTagLength = (tagName) => {
+    if (tagName.length > MAX_TEXT_LENGTH) {
+        return tagName.substring(0, MAX_TEXT_LENGTH - 3) + "...";
     }
-}
+    return tagName;
+};
 
+hideTagSection()
 
-window.addEventListener('load', hideTagSection);
-tagInput.addEventListener('keypress', handleKeyPress);
-addTagButton.addEventListener('click', handleButtonClick);
+window.addEventListener("load", hideTagSection);
+tagInput.addEventListener("keypress", handleKeyPress);
+addTagButton.addEventListener("click", handleButtonClick);

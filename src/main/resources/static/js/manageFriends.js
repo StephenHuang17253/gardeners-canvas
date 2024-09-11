@@ -14,12 +14,12 @@ const manageRequest = (button, accepted) => {
 
 
 const showModal = (id) => {
-    const modal = document.getElementById("confirm-remove-form-"+id);
+    const modal = document.getElementById("confirm-remove-form-" + id);
     modal.classList.remove("d-none");
 }
 
 
 const closeModal = (id) => {
-    const modal = document.getElementById("confirm-remove-form-"+id);
+    const modal = document.getElementById("confirm-remove-form-" + id);
     modal.classList.add("d-none");
 }

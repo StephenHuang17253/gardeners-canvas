@@ -22,8 +22,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -88,6 +86,7 @@ public class U23_DeactivateAccount {
     public static GardenTagService gardenTagService;
 
     private MvcResult mvcResultGardens;
+
     private MvcResult mvcResultAccount;
 
     private Garden garden;
@@ -96,7 +95,6 @@ public class U23_DeactivateAccount {
 
     @Before
     public void before_or_after_all() {
-
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gardenService = new GardenService(gardenRepository, userService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
@@ -109,7 +107,7 @@ public class U23_DeactivateAccount {
         mockMVCPublicGardens = MockMvcBuilders.standaloneSetup(publicGardensController).build();
 
         GardensController gardensController = new GardensController(gardenService, securityService,
-                plantService, weatherService, objectMapper, gardenTagService, profanityService, userService);
+                plantService, weatherService, objectMapper, gardenTagService, profanityService);
 
         AccountController loginPageController = new AccountController(userService, authenticationManager,
                 emailService,
@@ -132,7 +130,7 @@ public class U23_DeactivateAccount {
     }
 
     @Then("I am logged out")
-    public void iAmLoggedOut() throws Exception {
+    public void iAmLoggedOut() {
         Assertions.assertEquals("/login", mvcResultGardens.getFlashMap().getTargetRequestPath());
     }
 
@@ -163,9 +161,6 @@ public class U23_DeactivateAccount {
     @Then("I receive an error message {string}")
     public void iReceiveErrorMessage(String errorMessage) {
         Assertions.assertEquals(errorMessage, mvcResultAccount.getModelAndView().getModel().get("message"));
-        System.out.println("Current time:" + LocalDateTime.now());
-        System.out.println("Yesterday" + LocalDateTime.now().minusDays(1));
-
     }
 
     @When("It is the eighth day of my account {string} being blocked")
@@ -182,8 +177,6 @@ public class U23_DeactivateAccount {
                         .param("emailAddress", email)
                         .param("password", password))
                 .andExpect(redirectedUrl("/home"));
-
         Assertions.assertFalse(user.isBanned());
     }
-
 }

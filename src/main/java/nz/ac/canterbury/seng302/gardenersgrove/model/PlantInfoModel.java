@@ -3,9 +3,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.PlantInfo;
 
-
 /**
- * Model class for storing plant data from API call, used for the Plant Details page.
+ * Model class for storing plant data from API call, used for the Plant Details
+ * page.
  */
 public class PlantInfoModel {
 
@@ -13,7 +13,6 @@ public class PlantInfoModel {
     private String scientificName;
     private String watering;
     private String cycle;
-    private String wateringPeriod;
     private String wateringGeneralBenchmarkValue;
     private String wateringGeneralBenchmarkUnit;
     private String sunlight;
@@ -35,6 +34,7 @@ public class PlantInfoModel {
 
     /**
      * Constructor for a PlantInfoModel
+     * 
      * @param plantDetails the JSON response from the API.
      */
     public PlantInfoModel(JsonNode plantDetails) {
@@ -44,7 +44,6 @@ public class PlantInfoModel {
         this.defaultImage = getImageURL(plantDetails);
         this.watering = nullChecker("watering", plantDetails);
         this.cycle = nullChecker("cycle", plantDetails);
-        this.wateringPeriod = nullChecker("wateringPeriod", plantDetails);
         this.wateringGeneralBenchmarkValue = nullChecker("value", plantDetails.get("watering_general_benchmark"));
         this.wateringGeneralBenchmarkUnit = nullChecker("unit", plantDetails.get("watering_general_benchmark"));
         this.sunlight = extractStringNames(plantDetails.get("sunlight").get(0));
@@ -61,8 +60,10 @@ public class PlantInfoModel {
         this.maintenance = nullChecker("maintenance", plantDetails);
         this.indoor = plantDetails.get("indoor").asBoolean();
     }
+
     /**
      * Constructor for a PlantSearchModel for default plants
+     * 
      * @param plantInfo entity object
      */
     public PlantInfoModel(PlantInfo plantInfo) {
@@ -72,7 +73,6 @@ public class PlantInfoModel {
         this.description = plantInfo.getDescription();
         this.watering = plantInfo.getWatering();
         this.cycle = plantInfo.getCycle();
-        this.wateringPeriod = plantInfo.getWateringPeriod();
         this.wateringGeneralBenchmarkValue = plantInfo.getWateringGeneralBenchmarkValue();
         this.wateringGeneralBenchmarkUnit = plantInfo.getWateringGeneralBenchmarkUnit();
         this.sunlight = plantInfo.getSunlight();
@@ -91,10 +91,10 @@ public class PlantInfoModel {
 
     }
 
-
     /**
      * Checks if the attribute value returned from plantDetails is null
-     * @param attribute - value to get from plantDetails
+     * 
+     * @param attribute    - value to get from plantDetails
      * @param plantDetails - JSON response from Perenual API
      * @return "" if attribute value is null, or the value as string
      */
@@ -112,6 +112,7 @@ public class PlantInfoModel {
     /**
      * Goes through images for a plant from the plantDetails
      * Finds whichever is not null
+     * 
      * @param plantDetails - the JSON response from Perenual API
      * @return the imageURL or empty string is unavailable
      */
@@ -130,40 +131,91 @@ public class PlantInfoModel {
     public String getCommonName() {
         return commonName;
     }
+
     public String getDescription() {
         return description;
     }
+
     public String getDefaultImage() {
         return defaultImage;
     }
+
     public String getScientificName() {
         return scientificName;
     }
+
     public String getWatering() {
         return watering;
     }
 
-    public String getCycle() {return cycle;}
-    public String getWateringGeneralBenchmarkValue() {return wateringGeneralBenchmarkValue;}
-    public String getWateringGeneralBenchmarkUnit() {return wateringGeneralBenchmarkUnit;}
-    public String getSunlight() {return sunlight;}
-    public String getPruningMonth() {return pruningMonth;}
-    public String getPruningCountAmount() {return pruningCountAmount;}
-    public String getPruningCountInterval() {return pruningCountInterval;}
-    public boolean getFlowers() {return flowers;}
-    public String getFloweringSeason() {return floweringSeason;}
-    public boolean getFruits() {return fruits;}
-    public boolean getEdibleFruit() {return edibleFruit;}
-    public String getFruitSeason() {return fruitSeason;}
-    public boolean getPoisonousToHumans() {return poisonousToHumans;}
-    public boolean getPoisonousToPets() {return poisonousToPets;}
-    public String getMaintenance() {return maintenance;}
-    public boolean getIndoor() {return indoor;}
+    public String getCycle() {
+        return cycle;
+    }
 
+    public String getWateringGeneralBenchmarkValue() {
+        return wateringGeneralBenchmarkValue;
+    }
+
+    public String getWateringGeneralBenchmarkUnit() {
+        return wateringGeneralBenchmarkUnit;
+    }
+
+    public String getSunlight() {
+        return sunlight;
+    }
+
+    public String getPruningMonth() {
+        return pruningMonth;
+    }
+
+    public String getPruningCountAmount() {
+        return pruningCountAmount;
+    }
+
+    public String getPruningCountInterval() {
+        return pruningCountInterval;
+    }
+
+    public boolean getFlowers() {
+        return flowers;
+    }
+
+    public String getFloweringSeason() {
+        return floweringSeason;
+    }
+
+    public boolean getFruits() {
+        return fruits;
+    }
+
+    public boolean getEdibleFruit() {
+        return edibleFruit;
+    }
+
+    public String getFruitSeason() {
+        return fruitSeason;
+    }
+
+    public boolean getPoisonousToHumans() {
+        return poisonousToHumans;
+    }
+
+    public boolean getPoisonousToPets() {
+        return poisonousToPets;
+    }
+
+    public String getMaintenance() {
+        return maintenance;
+    }
+
+    public boolean getIndoor() {
+        return indoor;
+    }
 
     /**
      * Takes a List<String> from the JSON data
      * Converts to String with commas separating strings
+     * 
      * @param stringList the JsonNode data
      * @return String of all the values with commas
      */

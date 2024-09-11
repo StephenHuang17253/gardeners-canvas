@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +13,7 @@ import java.time.format.DateTimeFormatter;
  */
 @Entity
 public class Plant {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long plantId;
@@ -32,9 +34,12 @@ public class Plant {
     @JoinColumn(name = "garden_id")
     private Garden garden;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PlantCategory plantCategory;
+
     @Column
     private String plantPictureFilename;
-
 
     /**
      * JPA required no-args constructor
@@ -51,12 +56,14 @@ public class Plant {
      * @param plantDate        the date of planting
      * @param garden           the Garden object that the plant belongs to
      */
-    public Plant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Garden garden) {
+    public Plant(String plantName, int plantCount, String plantDescription, LocalDate plantDate, Garden garden,
+            PlantCategory plantCategory) {
         this.plantName = plantName;
         this.plantCount = plantCount;
         this.plantDescription = plantDescription;
         this.plantDate = plantDate;
         this.garden = garden;
+        this.plantCategory = plantCategory;
     }
 
     public Long getPlantId() {
@@ -108,6 +115,17 @@ public class Plant {
         return garden;
     }
 
+    public PlantCategory getPlantCategory() {
+        if (this.plantCategory == null) {
+            this.plantCategory = PlantCategory.HERB;
+        }
+        return this.plantCategory;
+    }
+
+    public void setPlantCategory(PlantCategory plantCategory) {
+        this.plantCategory = plantCategory;
+    }
+
     public String getPlantPictureFilename() {
         return this.plantPictureFilename;
     }
@@ -126,7 +144,7 @@ public class Plant {
                 ", plant date='" + plantDate + '\'' +
                 ", plant picture filename='" + plantPictureFilename + '\'' +
                 ", garden id='" + garden.getGardenId() + '\'' +
+                ", plant category='" + plantCategory + '\'' +
                 '}';
     }
-
 }

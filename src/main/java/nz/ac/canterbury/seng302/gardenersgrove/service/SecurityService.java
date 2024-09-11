@@ -22,6 +22,7 @@ import java.util.Objects;
 @Service("securityService")
 public class SecurityService {
 
+    Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
     private final UserService userService;
 
@@ -33,8 +34,6 @@ public class SecurityService {
 
     private final EmailService emailService;
 
-    Logger logger = LoggerFactory.getLogger(SecurityService.class);
-
     private static final int NUM_STRIKES_FOR_WARN = 5;
 
     private static final int NUM_STRIKES_FOR_BAN = 6;
@@ -44,17 +43,18 @@ public class SecurityService {
      * connect this
      * controller with other services
      *
-     * @param userService to use for checking persistence to validate email and password
-     * @param authenticationManager to login user after registration
+     * @param userService            to use for checking persistence to validate
+     *                               email and password
+     * @param authenticationManager  to login user after registration
      * @param userInteractionService autowire user interaction service
-     * @param emailService autowire email service
+     * @param emailService           autowire email service
      */
     @Autowired
     public SecurityService(UserService userService,
-                           AuthenticationManager authenticationManager,
-                           FriendshipService friendshipService,
-                           UserInteractionService userInteractionService,
-                           EmailService emailService){
+            AuthenticationManager authenticationManager,
+            FriendshipService friendshipService,
+            UserInteractionService userInteractionService,
+            EmailService emailService) {
 
         this.userService = userService;
         this.authenticationManager = authenticationManager;
@@ -67,21 +67,23 @@ public class SecurityService {
     /**
      * Checks if the owner id matches the current logged, in user
      *
-     * @param ownerId user id of the user entity associated with a given garden entity
-     * @return boolean of if the current logged, in user matches the owner id of a garden
+     * @param ownerId user id of the user entity associated with a given garden
+     *                entity
+     * @return boolean of if the current logged, in user matches the owner id of a
+     *         garden
      */
-    public boolean isOwner(Long ownerId){
-        logger.info("Security check");
+    public boolean isOwner(Long ownerId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByEmail(authentication.getName());
         return Objects.equals(user.getId(), ownerId);
     }
+
     /**
      * Checks if the current user is logged in or not
      *
      * @return true or false
      */
-    public Boolean isLoggedIn(){
+    public Boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null && !Objects.equals(authentication.getName(), "anonymousUser");
     }
@@ -91,23 +93,25 @@ public class SecurityService {
      *
      * @return user entity of logged, in user
      */
-    public User getCurrentUser(){
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.getUserByEmail(authentication.getName());
     }
+
     /**
      * Helper to add a user interaction to repo
      *
-     * @param itemId id of item
-     * @param itemType the enum value of the item
+     * @param itemId          id of item
+     * @param itemType        the enum value of the item
      * @param interactionTime LocalDateTime of interaction
      */
-    public void addUserInteraction(Long itemId, ItemType itemType, LocalDateTime interactionTime){
+    public void addUserInteraction(Long itemId, ItemType itemType, LocalDateTime interactionTime) {
         userInteractionService.addUserInteraction(getCurrentUser().getId(), itemId, itemType, interactionTime);
     }
 
     /**
      * Helper to check if a user is friends with the current user.
+     * 
      * @param userId - id of the user being checked.
      * @return the user if they're a friend.
      */
@@ -116,15 +120,19 @@ public class SecurityService {
         User targetUser = userService.getUserById(userId);
         FriendshipStatus status = friendshipService.checkFriendshipStatus(currentUser, targetUser);
 
-
         if (status.equals(expectedStatus)) {
             return targetUser;
         } else {
             return null;
         }
-
     }
 
+    /**
+     * Change the friendship status between the current user and the target user.
+     * 
+     * @param userId           - id of the target user.
+     * @param friendshipStatus - the new status of the friendship.
+     */
     public void changeFriendship(Long userId, FriendshipStatus friendshipStatus) {
         User currentUser = getCurrentUser();
         User targetUser = userService.getUserById(userId);
@@ -133,7 +141,6 @@ public class SecurityService {
         if (friendship != null) {
             friendshipService.updateFriendShipStatus(friendship.getId(), friendshipStatus);
         }
-
     }
 
     /**
@@ -141,9 +148,9 @@ public class SecurityService {
      * This method is shared functionality between the login and registration pages
      * possibly should be moved to a different class? As not correct to be here
      *
-     * @param email of user who is registering
+     * @param email    of user who is registering
      * @param password of user who is registering
-     * @param session http session to set the cookies with the context key
+     * @param session  http session to set the cookies with the context key
      */
     public void setSecurityContext(String email, String password, HttpSession session) {
         User user = userService.getUserByEmailAndPassword(email, password);
@@ -162,7 +169,9 @@ public class SecurityService {
     }
 
     /**
-     * Wrapper Method to encompass all the logic that may be required when striking a user
+     * Wrapper Method to encompass all the logic that may be required when striking
+     * a user
+     * 
      * @param user that is receiving the strike
      * @return users total strikes
      */
@@ -176,7 +185,7 @@ public class SecurityService {
         try {
             if (user.getStrikes() == NUM_STRIKES_FOR_WARN) {
                 emailService.sendTagBanWarningEmail(user);
-            } else if(user.getStrikes() == NUM_STRIKES_FOR_BAN) {
+            } else if (user.getStrikes() == NUM_STRIKES_FOR_BAN) {
                 emailService.sendTagBanEmail(user);
                 userService.banUser(user, 7);
             }
@@ -186,5 +195,4 @@ public class SecurityService {
 
         return user.getStrikes();
     }
-
 }

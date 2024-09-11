@@ -1,0 +1,26 @@
+<nav aria-label="Page navigation" id="pagination">
+    <input id="countPerPage" type="hidden" th:value="${countPerPage}">
+    <ul class="pagination justify-content-center my-0">
+        <li class="page-item">
+            <button id="firstPage" class="page-link bg-dark text-white">
+                << </button>
+        </li>
+
+        <li class="page-item">
+            <button id="previousPage" class="page-link bg-dark text-white">
+                < </button>
+        </li>
+
+        <li class="page-item active">
+            <span id="currentPage" class="page-link bg-success text-white">1</span>
+        </li>
+
+        <li class="page-item">
+            <button id="nextPage" class="page-link bg-dark text-white">></button>
+        </li>
+
+        <li class="page-item">
+            <button id="lastPage" class="page-link bg-dark text-white">>></button>
+        </li>
+    </ul>
+</nav>

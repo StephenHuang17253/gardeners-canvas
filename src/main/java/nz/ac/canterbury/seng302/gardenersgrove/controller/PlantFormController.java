@@ -8,6 +8,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.ValidationResult;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileType;
 import nz.ac.canterbury.seng302.gardenersgrove.validation.fileValidation.FileValidator;
@@ -46,23 +47,18 @@ public class PlantFormController {
     private final FileService fileService;
     private final SecurityService securityService;
 
+    private static final String PLANT_CATEGORY_ATTRIBUTE = "plantCategory";
+    private static final String PLANT_DATE_ATTRIBUTE = "plantDate";
+    private static final String PLANT_CATEGORIES_ATTRIBUTE = "categories";
+
+
     @Autowired
     public PlantFormController(PlantService plantService, GardenService gardenService, FileService fileService,
-                               SecurityService securityService) {
+            SecurityService securityService) {
         this.plantService = plantService;
         this.gardenService = gardenService;
         this.fileService = fileService;
         this.securityService = securityService;
-    }
-
-    /**
-     * Adds the loggedIn attribute to the model for all requests
-     *
-     * @param model
-     */
-    @ModelAttribute
-    public void addLoggedInAttribute(Model model) {
-        model.addAttribute("loggedIn", securityService.isLoggedIn());
     }
 
     /**
@@ -72,12 +68,13 @@ public class PlantFormController {
      */
     @GetMapping("/my-gardens/{gardenId}/create-new-plant")
     public String newPlantForm(@PathVariable Long gardenId,
-                               @RequestParam(name = "plantName", required = false) String plantName,
-                               @RequestParam(name = "plantCount", required = false) String plantCount,
-                               @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                               @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                               HttpServletResponse response,
-                               Model model) {
+            @RequestParam(name = "plantName", required = false) String plantName,
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantCategory", required = false) String plantCategory,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /create-new-plant");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -94,9 +91,11 @@ public class PlantFormController {
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantCategory);
         model.addAttribute("plantDescription", plantDescription);
-        model.addAttribute("plantDate", plantDate);
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
         model.addAttribute("myGardens", gardenService.getGardens());
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
@@ -121,13 +120,14 @@ public class PlantFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/create-new-plant")
     public String submitNewPlantForm(@RequestParam(name = "plantName") String plantName,
-                                     @RequestParam(name = "plantCount", required = false) String plantCount,
-                                     @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                                     @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                     @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
-                                     @PathVariable("gardenId") Long gardenId,
-                                     HttpServletResponse response,
-                                     Model model) {
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantPictureInput") MultipartFile plantPicture,
+            @RequestParam(name = "plantCategory") String plantCategory,
+            @PathVariable("gardenId") Long gardenId,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /create-new-plant");
 
         // logic to handle checking if fields are vaild
@@ -136,6 +136,7 @@ public class PlantFormController {
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
+        ValidationResult plantCategoryResult = InputValidator.compulsoryTextField(plantCategory);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -155,25 +156,32 @@ public class PlantFormController {
             plantDateResult = InputValidator.validatePlantDate(dateString);
         }
 
+        if (plantCategory == null || plantCategory.isEmpty()) {
+            plantCategoryResult = ValidationResult.INVALID_CATEGORY;
+        }
+
         // Plant image is optional
         if (plantPicture.isEmpty()) {
             plantPictureResult = ValidationResult.OK;
         }
 
+
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
-                plantDateResult);
+                plantDateResult, plantCategoryResult);
 
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantCategory);
         model.addAttribute("plantDescription", plantDescription);
-        model.addAttribute("plantDate", plantDate);
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         // Sets default plant image
         String plantPictureString = getPlantPictureString("");
         model.addAttribute("plantPicture", plantPictureString);
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
+                || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
             return "createNewPlantForm";
         }
 
@@ -183,7 +191,14 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId);
+        PlantCategory plantCategoryValue = null;
+        if (plantCategory != null) {
+            plantCategory = plantCategory.replace(' ', '_');
+            plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+        }
+
+        Plant newPlant = plantService.addPlant(plantName, plantCountValue, plantDescription, plantDate, gardenId, plantCategoryValue);
+
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(newPlant, plantPicture);
         }
@@ -201,9 +216,9 @@ public class PlantFormController {
      */
     @GetMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String editPlantForm(@PathVariable("gardenId") Long gardenId,
-                                @PathVariable("plantId") Long plantId,
-                                HttpServletResponse response,
-                                Model model) {
+            @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -222,14 +237,32 @@ public class PlantFormController {
             return "404";
         }
 
+        String plantCount = String.valueOf(plantToUpdate.get().getPlantCount());
+
+        if (Objects.equals(plantCount, "0")) {
+            plantCount = "";
+        }
+
+        LocalDate plantDateLocal = plantToUpdate.get().getPlantDate();
+
+        String plantDate = "";
+
+        if (plantDateLocal != null) {
+            plantDate = plantDateLocal.toString();
+        } else {
+            plantDate = null;
+        }
+
         model.addAttribute("gardenId", gardenId); // Pass gardenId to the form
         model.addAttribute("gardenName", garden.getGardenName()); // Pass gardenName to the form
         String plantPicture = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPicture);
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
-        model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantToUpdate.get().getPlantCategory());
+        model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
-        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
         return "editPlantForm"; // Return the view for creating a new plant
     }
 
@@ -249,14 +282,15 @@ public class PlantFormController {
      */
     @PostMapping("/my-gardens/{gardenId}/{plantId}/edit")
     public String submiteditPlantForm(@RequestParam(name = "plantName") String plantName,
-                                      @RequestParam(name = "plantCount", required = false) String plantCount,
-                                      @RequestParam(name = "plantDescription", required = false) String plantDescription,
-                                      @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
-                                      @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
-                                      @PathVariable("gardenId") Long gardenId,
-                                      @PathVariable("plantId") Long plantId,
-                                      HttpServletResponse response,
-                                      Model model) {
+            @RequestParam(name = "plantCount", required = false) String plantCount,
+            @RequestParam(name = "plantDescription", required = false) String plantDescription,
+            @RequestParam(name = "plantDate", required = false) LocalDate plantDate,
+            @RequestParam(name = "plantPictureInput", required = false) MultipartFile plantPicture,
+            @RequestParam(name = "plantCategory") String plantCategory,
+            @PathVariable("gardenId") Long gardenId,
+            @PathVariable("plantId") Long plantId,
+            HttpServletResponse response,
+            Model model) {
         logger.info("POST /my-gardens/{gardenId}/{plantId}/edit");
 
         Optional<Plant> plantToUpdate = plantService.findById(plantId);
@@ -275,13 +309,14 @@ public class PlantFormController {
             return "403";
         }
 
-
         // logic to handle checking if fields are vaild
         ValidationResult plantPictureResult = FileValidator.validateImage(plantPicture, 10, FileType.IMAGES);
         ValidationResult plantNameResult = InputValidator.compulsoryAlphaPlusTextField(plantName, 64);
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
+        ValidationResult plantCategoryResult = InputValidator.compulsoryTextField(plantCategory);
+
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
         } else {
@@ -293,18 +328,24 @@ public class PlantFormController {
             plantPictureResult = ValidationResult.OK;
         }
 
+        if (plantCategory == null || plantCategory.isEmpty()) {
+            plantCategoryResult = ValidationResult.INVALID_CATEGORY;
+        }
+
         plantFormErrorText(model, plantPictureResult, plantNameResult, plantCountResult, plantDescriptionResult,
-                plantDateResult);
+                plantDateResult, plantCategoryResult);
 
         String plantPictureString = plantToUpdate.get().getPlantPictureFilename();
         model.addAttribute("plantPicture", plantPictureString);
         model.addAttribute("plantName", plantName);
         model.addAttribute("plantCount", plantCount);
         model.addAttribute("plantDescription", plantDescription);
-        model.addAttribute("plantDate", plantDate);
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantDate);
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantCategory);
+        model.addAttribute(PLANT_CATEGORIES_ATTRIBUTE, plantService.getPlantCategories());
 
         if (!plantPictureResult.valid() || !plantNameResult.valid() || !plantCountResult.valid()
-                || !plantDescriptionResult.valid() || !plantDateResult.valid()) {
+                || !plantDescriptionResult.valid() || !plantDateResult.valid() || !plantCategoryResult.valid()) {
             return "editPlantForm";
         }
 
@@ -314,7 +355,13 @@ public class PlantFormController {
             plantCountValue = (int) (Double.parseDouble(plantCount.replace(",", ".")));
         }
 
-        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate);
+        PlantCategory plantCategoryValue = null;
+        if (plantCategory != null) {
+            plantCategory = plantCategory.replace(' ', '_');
+            plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
+        }
+
+        plantService.updatePlant(plantId, plantName, plantCountValue, plantDescription, plantDate, plantCategoryValue);
         if (!plantPicture.isEmpty()) {
             plantService.updatePlantPicture(plantToUpdate.get(), plantPicture);
         }
@@ -335,8 +382,8 @@ public class PlantFormController {
      *                               appropriate error)
      */
     private void plantFormErrorText(Model model, ValidationResult plantPictureResult, ValidationResult plantNameResult,
-                                    ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
-                                    ValidationResult plantDateResult) {
+            ValidationResult plantCountResult, ValidationResult plantDescriptionResult,
+            ValidationResult plantDateResult, ValidationResult plantCategoryResult) {
 
         if (!plantPictureResult.valid()) {
             model.addAttribute("plantPictureError", plantPictureResult);
@@ -367,6 +414,10 @@ public class PlantFormController {
 
         if (!plantDateResult.valid()) {
             model.addAttribute("PAErrorText", plantDateResult);
+        }
+
+        if (!plantCategoryResult.valid()) {
+            model.addAttribute("PCAErrorText", plantCategoryResult);
         }
 
     }
@@ -404,9 +455,10 @@ public class PlantFormController {
         logger.info("GET /files/plants/{}", filename);
         try {
             Resource file = fileService.loadFile(filename);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                    .body(file);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename\"" + file.getFilename() + "\"");
+            headers.add(HttpHeaders.CONTENT_TYPE, fileService.getImageFileType(filename));
+            return ResponseEntity.ok().headers(headers).body(file);
         } catch (MalformedURLException error) {
             logger.error(error.getMessage());
         }
@@ -425,8 +477,9 @@ public class PlantFormController {
      */
     @PostMapping("/import-plant")
     public String importPlant(@RequestParam("gardenId") Long gardenId,
-                              @RequestParam("plantId") Long plantId, RedirectAttributes redirectAttributes,
-                              HttpServletResponse response) {
+            @RequestParam("plantId") Long plantId,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response) {
         logger.info("POST /import-plant");
         Optional<Plant> optionalPlant = plantService.findById(plantId);
 
@@ -437,13 +490,13 @@ public class PlantFormController {
 
         Plant toCopyPlant = optionalPlant.get();
 
-        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(), toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId);
+        Plant newPlant = plantService.addPlant(toCopyPlant.getPlantName(), toCopyPlant.getPlantCount(),
+                toCopyPlant.getPlantDescription(), toCopyPlant.getPlantDate(), gardenId, PlantCategory.TREE);
         if (toCopyPlant.getPlantPictureFilename() != null) {
             plantService.updatePlantPicture(newPlant, toCopyPlant.getPlantPictureFilename());
         }
         securityService.addUserInteraction(plantId, ItemType.PLANT, LocalDateTime.now());
         securityService.addUserInteraction(newPlant.getPlantId(), ItemType.PLANT, LocalDateTime.now());
-
 
         redirectAttributes.addAttribute("plantId", newPlant.getPlantId());
         redirectAttributes.addAttribute("gardenId", gardenId);
@@ -452,20 +505,20 @@ public class PlantFormController {
         return "redirect:/import-plant/confirm";
     }
 
-
     /**
      * Cancels copying of plant and deletes copy from database
      *
-     * @param gardenIdOfOriginalPlant garden that was being copied from (used to return to previous garden page)
+     * @param gardenIdOfOriginalPlant garden that was being copied from (used to
+     *                                return to previous garden page)
      * @param plantId                 id of plant to be deleted
      * @param response                error page
      * @return redirect to another page
      */
     @PostMapping("/import-plant/cancel")
     public String cancelImportPlant(@RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
-                                    @RequestParam("plantId") Long plantId,
-                                    RedirectAttributes redirectAttributes,
-                                    HttpServletResponse response) {
+            @RequestParam("plantId") Long plantId,
+            RedirectAttributes redirectAttributes,
+            HttpServletResponse response) {
         logger.info("POST /import-plant/cancel");
         Optional<Plant> optionalPlant = plantService.findById(plantId);
 
@@ -489,7 +542,8 @@ public class PlantFormController {
     /**
      * Confirmation form to copy plant
      *
-     * @param gardenId                id of the owner's garden the plant is being copied to
+     * @param gardenId                id of the owner's garden the plant is being
+     *                                copied to
      * @param plantId                 id of the new copy of the plant
      * @param gardenIdOfOriginalPlant garden that was being copied from
      * @param response                response for error
@@ -498,10 +552,10 @@ public class PlantFormController {
      */
     @GetMapping("/import-plant/confirm")
     public String importPlantConfirmationForm(@RequestParam("gardenId") Long gardenId,
-                                              @RequestParam("plantId") Long plantId,
-                                              @RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
-                                              HttpServletResponse response,
-                                              Model model) {
+            @RequestParam("plantId") Long plantId,
+            @RequestParam("gardenIdOfOriginalPlant") Long gardenIdOfOriginalPlant,
+            HttpServletResponse response,
+            Model model) {
         logger.info("GET /import-plant/confirm");
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -528,10 +582,10 @@ public class PlantFormController {
         model.addAttribute("plantName", plantToUpdate.get().getPlantName());
         model.addAttribute("plantCount", plantToUpdate.get().getPlantCount());
         model.addAttribute("plantDescription", plantToUpdate.get().getPlantDescription());
-        model.addAttribute("plantDate", plantToUpdate.get().getPlantDate());
+        model.addAttribute(PLANT_DATE_ATTRIBUTE, plantToUpdate.get().getPlantDate());
+        model.addAttribute(PLANT_CATEGORY_ATTRIBUTE, plantToUpdate.get().getPlantCategory());
 
         return "importPlantForm";
     }
-
 
 }

@@ -11,10 +11,10 @@ public class ValidateCucumber {
     WebApplicationContext webApplicationContext;
 
     @Autowired
-    ValidateCucumber(WebApplicationContext webApplicationContext)
-    {
+    ValidateCucumber(WebApplicationContext webApplicationContext) {
         this.webApplicationContext = webApplicationContext;
     }
+
     @When("Spring Application context is loaded")
     public void an_empty_cucumber_test_is_run() {
         Assertions.assertNotNull(this.webApplicationContext);

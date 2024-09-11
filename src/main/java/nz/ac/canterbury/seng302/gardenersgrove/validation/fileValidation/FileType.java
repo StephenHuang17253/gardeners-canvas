@@ -12,6 +12,7 @@ public enum FileType {
 
     /**
      * Constructor for FileType
+     * 
      * @param extensions
      */
     FileType(String[] extensions) {
@@ -20,6 +21,7 @@ public enum FileType {
 
     /**
      * Returns the extensions of the file type
+     * 
      * @return extensions
      */
     public String[] getExtensions() {
