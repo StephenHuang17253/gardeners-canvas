@@ -39,6 +39,7 @@ const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 const INVALID_LOCATION = "Please place on the grid";
 const NO_PLANT_SELECTED = "Please select a plant to delete";
 const OCCUPIED_DESTINATION = "Space is already occupied";
+const FULL_GRID = "No more space left on the garden"
 const ERROR_MESSAGE_DURATION = 3000;
 
 const instance = getInstance();
@@ -481,17 +482,23 @@ plantItems.forEach((item, i) => {
      * Handles the clicking of a plant item in the palette
      */
     const handlePlantItemClick = () => {
-
+        let nodes = layer.find("Image");
         const currentCount = parseInt(item.getAttribute("data-plant-count"));
         const category = item.getAttribute("data-plant-category");
 
         deselectPaletteItem();
+
+        if (nodes.length >= GRID_COLUMNS*GRID_ROWS) {
+            showErrorMessage(FULL_GRID);
+            return;
+        }
 
         if (currentCount < 1) return;
 
         item.style.border = "3px solid blue";
 
         selectedPaletteItem = item;
+
 
         let plantImage = item.getAttribute("data-category-image")
 
