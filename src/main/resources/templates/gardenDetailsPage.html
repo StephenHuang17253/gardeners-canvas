@@ -81,7 +81,7 @@
                         <span th:text="${plantCount}"></span>
                     </strong>
                 </p>
-                <p class="break-word">
+                <p class="break-word"  th:if="${isOwner}">
                     <strong>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-geo-alt" viewBox="0 0 16 16">
