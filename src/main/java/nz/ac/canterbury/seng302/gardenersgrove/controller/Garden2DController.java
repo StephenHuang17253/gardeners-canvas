@@ -76,7 +76,11 @@ public class Garden2DController {
         }
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
-        handlePagination(page, garden.getPlants().size(), garden.getPlants(), model);
+
+        List<Plant> plants = garden.getPlants();
+        plants.sort(Comparator.comparing(Plant::getPlantName));
+        model.addAttribute("plants", plants);
+        model.addAttribute("countPerPage", COUNT_PER_PAGE);
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
@@ -104,21 +108,6 @@ public class Garden2DController {
         model.addAttribute("displayableItemsList", displayableItems);
         model.addAttribute("plantsById", plantsById);
         return "garden2DPage";
-    }
-
-    private void handlePagination(int page, int listLength, List<Plant> plants, Model model) {
-        int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
-        int startIndex = (page - 1) * COUNT_PER_PAGE;
-        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
-
-        plants.sort(Comparator.comparing(Plant::getPlantName));
-
-        model.addAttribute("currentPage", page);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants", plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount", plants.size());
     }
 
     /**
@@ -270,53 +259,51 @@ public class Garden2DController {
 
     /**
      * This endpoint handles deleting a single item from the grid.
+     * 
      * @param gardenId id of the garden the grid belongs to
-     * @param xCoord the x coordinate of the grid item
-     * @param yCoord the y coordinate of the grid item
+     * @param xCoord   the x coordinate of the grid item
+     * @param yCoord   the y coordinate of the grid item
      * @param response http response to use to return error
-     * @param model model to use to return error
+     * @param model    model to use to return error
      * @return redirect back to the 2d garden page
      */
     @GetMapping("/2D-garden/{gardenId}/delete")
     @ResponseBody
     public String deleteGridItem(@PathVariable Long gardenId,
-                                 @RequestParam(value = "x_coord_delete") int xCoord,
-                                 @RequestParam(value = "y_coord_delete") int yCoord,
-                                 HttpServletResponse response,
-                                 Model model) {
+            @RequestParam(value = "x_coord_delete") int xCoord,
+            @RequestParam(value = "y_coord_delete") int yCoord,
+            HttpServletResponse response,
+            Model model) {
 
+        logger.info("POST /2D-garden/{}/delete", gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
-    logger.info("POST /2D-garden/{}/delete", gardenId);
-    Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-
-
-    if (optionalGarden.isEmpty()) {
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        return "404";
-    }
-
-    Garden garden = optionalGarden.get();
-    model.addAttribute("gardenId", garden.getGardenId());
-
-    if (!securityService.isOwner(garden.getOwner().getId())) {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
-                "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
-        return "403";
-    }
-
-    logger.info("Removing item at {}, {} on grid of garden with id: {}", xCoord, yCoord, gardenId);
-
-    List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
-
-    for (GridItemLocation gridItem : gridItems) {
-        if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord) {
-            gridItemLocationService.removeGridItemLocation(gridItem);
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
         }
-    }
-    response.setStatus(HttpServletResponse.SC_OK);
-    return "200";
-    }
 
+        Garden garden = optionalGarden.get();
+        model.addAttribute("gardenId", garden.getGardenId());
+
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
+                    "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+            return "403";
+        }
+
+        logger.info("Removing item at {}, {} on grid of garden with id: {}", xCoord, yCoord, gardenId);
+
+        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
+
+        for (GridItemLocation gridItem : gridItems) {
+            if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord) {
+                gridItemLocationService.removeGridItemLocation(gridItem);
+            }
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
+        return "200";
+    }
 
 }
