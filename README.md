@@ -28,11 +28,14 @@ This project includes:
 - managing friends (adding friends, pending, accepted, and declined invites)
 - publicise gardens* 
 - browsing public gardens
+- aranging your gardens layout on a 2D grid 
+- viewing your garden in 3D
 
 For more information, check the user manual in the wiki.
 _*Thoose features require environment variables._
 
 #### User accounts
+_*Note that user accounts are only available on the local versio if you downlad the data.sql file from our wiki and place it in the projects resources folder before opening the project._
 
 | Account Type | Email | Password | Gmail Password | Use: |
 |--------------|-------|----------|----------------|------|
