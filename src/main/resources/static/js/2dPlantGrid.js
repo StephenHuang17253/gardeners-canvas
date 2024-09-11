@@ -39,6 +39,7 @@ const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 const INVALID_LOCATION = "Please place on the grid";
 const NO_PLANT_SELECTED = "Please select a plant to delete";
 const OCCUPIED_DESTINATION = "Space is already occupied";
+const FULL_GRID = "No more space left on the garden"
 const ERROR_MESSAGE_DURATION = 3000;
 
 const instance = getInstance();
@@ -67,6 +68,18 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 };
 
 /**
+ * Converts Konva coordinates to grid item coordinates
+ * @param konvaCoordX - Konva x-coordinate of grid item
+ * @param konvaCoordY - Konva y-coordinate of grid item
+ * @returns {{i: number, j: number}} - Object containing x and y coordinates on the grid
+ */
+const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
+    const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
+    const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
+    return {i: gridItemX, j: gridItemY};
+}
+
+/**
  * Checks if the location is valid on the grid
  * @param {number} x - x-coordinate of the plant
  * @param {number} y - y-coordinate of the plant
@@ -85,9 +98,8 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
-        const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
-        if (x_coord === x && y_coord === y) {
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        if (i === x && j === y) {
             if (node.id() !== plantId) {
                 return false;
             } else if (node.attrs.uniqueGridId !== gridLocationUniqueId) {
@@ -205,8 +217,7 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
 
         plant.on("dragmove", () => {
             tooltip.hide();
-            const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
-            const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
+            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
             let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
@@ -228,10 +239,10 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
-            const x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
-            const y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
+            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
+
             //ensure destination is empty
-            if (!emptyDestination(x, y, plant.id(), plant.attrs.uniqueGridId)) {
+            if (!emptyDestination(i, j, plant.id(), plant.attrs.uniqueGridId)) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 plant.position(prevSelectPlantPosition);
             }
@@ -471,17 +482,23 @@ plantItems.forEach((item, i) => {
      * Handles the clicking of a plant item in the palette
      */
     const handlePlantItemClick = () => {
-
+        let nodes = layer.find("Image");
         const currentCount = parseInt(item.getAttribute("data-plant-count"));
         const category = item.getAttribute("data-plant-category");
 
         deselectPaletteItem();
+
+        if (nodes.length >= GRID_COLUMNS*GRID_ROWS) {
+            showErrorMessage(FULL_GRID);
+            return;
+        }
 
         if (currentCount < 1) return;
 
         item.style.border = "3px solid blue";
 
         selectedPaletteItem = item;
+
 
         let plantImage = item.getAttribute("data-category-image")
 
@@ -590,10 +607,9 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
-    const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
-    fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`)
+    fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${i}&y_coord_delete=${j}`)
 
     let plantItem = null;
     plantItems.forEach(item => {
@@ -627,10 +643,9 @@ const handleGardenFormSubmit = (event) => {
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
-        const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
-        xCoordList.push(x_coord);
-        yCoordList.push(y_coord);
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        xCoordList.push(i);
+        yCoordList.push(j);
     });
 
     idListInput.value = JSON.stringify(idList);
