@@ -8,66 +8,69 @@
     <div id="homeImage" class="d-flex align-items-center justify-content-center position-fixed w-100 h-100"
         th:style="|background-image: url('@{/images/landingPlant.JPG}');|">
     </div>
-    <p th:if="${searchError} != ''" class="text-danger fs-6" th:text="${searchError}"></p>
     <div th:if="${plant}" class="container mt-5 bg-white border rounded pt-4">
-        <div class="row mx-2">
-            <div class="col mb-4">
-                <h1 th:text="${plant.commonName}">Plant Name</h1>
-                <h5 th:text="${plant.scientificName}" class="fw-light fst-italic text-success">Scientific Name</h5>
+        <p th:if="${searchError} != ''" class="text-danger fs-6" th:text="${searchError}"></p>
+        <div th:if="${plant}">
+            <div class="row mx-2">
+                <div class="col mb-4">
+                    <h1 th:text="${plant.commonName}">Plant Name</h1>
+                    <h5 th:text="${plant.scientificName}" class="fw-light fst-italic text-success">Scientific Name</h5>
+                </div>
             </div>
-        </div>
-        <div class="row mb-4 g-0">
-            <div class="col-md-7">
-                <div class="w-75 mb-4 mx-auto">
-                    <div class="ratio ratio-1x1">
-                        <img th:src="@{${plant.defaultImage == '' ? '/images/default_plant.png' : plant.defaultImage}}"
-                            alt="Plant" class="image-fluid rounded w-100 h-100 object-fit-cover">
+            <div class="row mb-4 g-0">
+                <div class="col-md-7">
+                    <div class="w-75 mb-4 mx-auto">
+                        <div class="ratio ratio-1x1">
+                            <img th:src="@{${plant.defaultImage == '' ? '/images/default_plant.png' : plant.defaultImage}}"
+                                 alt="Plant" class="image-fluid rounded w-100 h-100 object-fit-cover">
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="https://perenual.com/" target="_blank">Plant Info data by Perenual API</a>
+                        </div>
                     </div>
-                    <div class="text-center mt-2">
-                        <a href="https://perenual.com/" target="_blank">Plant Info data by Perenual API</a>
+                </div>
+                <div class="col-md-4">
+                    <div th:if="${plant.poisonousToHumans || plant.poisonousToPets}" class="alert alert-danger"
+                         role="alert">
+                        Warning: Plant poisonous to pets and/or humans
+                    </div>
+                    <h3 class="text-center">Care Information</h3>
+                    <div class="p-3 border rounded bg-green, mx-auto">
+                        <p th:if="${plant.indoor}" th:text="'Indoor Plant'"></p>
+                        <p th:if="${!plant.indoor}" th:text="'Outdoor Plant'"></p>
+                        <p th:if="${plant.cycle != ''}" th:text="'Cycle : ' + ${plant.cycle}"></p>
+                        <p th:if="${plant.maintenance != ''}" th:text="'Maintenance : ' + ${plant.maintenance}"></p>
+                        <hr
+                                th:if="${plant.watering != '' || plant.wateringGeneralBenchmarkUnit != '' || plant.wateringGeneralBenchmarkValue != ''}">
+                        <p th:if="${plant.sunlight != ''}" th:text="'Light Requirements : ' + ${plant.sunlight}"></p>
+                        <p th:if="${plant.wateringGeneralBenchmarkValue != '' && plant.wateringGeneralBenchmarkUnit != ''}"
+                           th:text="'Water plant every '+ ${plant.wateringGeneralBenchmarkValue} + ' ' + ${plant.wateringGeneralBenchmarkUnit}">
+                        </p>
+                        <hr
+                                th:if="${plant.pruningCountInterval != '' || plant.pruningCountInterval != '' || plant.pruningMonth != ''}">
+                        <p th:if="${plant.pruningCountAmount !='' && plant.pruningCountInterval != ''}"
+                           th:text="'Pruning : ' + ${plant.pruningCountAmount} + ' x ' + ${plant.pruningCountInterval}">
+                        </p>
+                        <p th:if="${plant.pruningMonth != ''}" th:text="'Pruning months : ' + ${plant.pruningMonth}"></p>
+                        <hr>
+                        <p th:if="${plant.flowers && plant.floweringSeason != ''}"
+                           th:text="'Flowers in ' + ${plant.floweringSeason}"></p>
+                        <p th:if="${plant.flowers && plant.floweringSeason == ''}" th:text="'Produces flowers'"></p>
+                        <p th:if="${!plant.flowers}" th:text="'Non-flowering Plant'"></p>
+                        <p th:if="${!plant.fruits}" th:text="'Non-bearing Plant'"></p>
+                        <p th:if="${plant.fruits && plant.edibleFruit && plant.fruitSeason != ''}"
+                           th:text="'Produces edible fruit in ' + ${plant.fruitSeason}"></p>
+                        <p th:if="${plant.fruits && !plant.edibleFruit && plant.fruitSeason != ''}"
+                           th:text="'Produces inedible fruit in ' + ${plant.fruitSeason}">
+                        <p th:if="${plant.fruits && plant.edibleFruit && plant.fruitSeason == ''}"
+                           th:text="'Produces edible fruit'">
+                        <p th:if="${plant.fruits && !plant.edibleFruit && plant.fruitSeason == ''}"
+                           th:text="'Produces inedible fruit'">
                     </div>
                 </div>
+                <p class="text-justify px-5 " th:text="${plant.description}"></p>
             </div>
-            <div class="col-md-4">
-                <div th:if="${plant.poisonousToHumans || plant.poisonousToPets}" class="alert alert-danger"
-                    role="alert">
-                    Warning: Plant poisonous to pets and/or humans
-                </div>
-                <h3 class="text-center">Care Information</h3>
-                <div class="p-3 border rounded bg-green, mx-auto">
-                    <p th:if="${plant.indoor}" th:text="'Indoor Plant'"></p>
-                    <p th:if="${!plant.indoor}" th:text="'Outdoor Plant'"></p>
-                    <p th:if="${plant.cycle != ''}" th:text="'Cycle : ' + ${plant.cycle}"></p>
-                    <p th:if="${plant.maintenance != ''}" th:text="'Maintenance : ' + ${plant.maintenance}"></p>
-                    <hr
-                        th:if="${plant.watering != '' || plant.wateringGeneralBenchmarkUnit != '' || plant.wateringGeneralBenchmarkValue != ''}">
-                    <p th:if="${plant.sunlight != ''}" th:text="'Light Requirements : ' + ${plant.sunlight}"></p>
-                    <p th:if="${plant.wateringGeneralBenchmarkValue != '' && plant.wateringGeneralBenchmarkUnit != ''}"
-                        th:text="'Water plant every '+ ${plant.wateringGeneralBenchmarkValue} + ' ' + ${plant.wateringGeneralBenchmarkUnit}">
-                    </p>
-                    <hr
-                        th:if="${plant.pruningCountInterval != '' || plant.pruningCountInterval != '' || plant.pruningMonth != ''}">
-                    <p th:if="${plant.pruningCountAmount !='' && plant.pruningCountInterval != ''}"
-                        th:text="'Pruning : ' + ${plant.pruningCountAmount} + ' x ' + ${plant.pruningCountInterval}">
-                    </p>
-                    <p th:if="${plant.pruningMonth != ''}" th:text="'Pruning months : ' + ${plant.pruningMonth}"></p>
-                    <hr>
-                    <p th:if="${plant.flowers && plant.floweringSeason != ''}"
-                        th:text="'Flowers in ' + ${plant.floweringSeason}"></p>
-                    <p th:if="${plant.flowers && plant.floweringSeason == ''}" th:text="'Produces flowers'"></p>
-                    <p th:if="${!plant.flowers}" th:text="'Non-flowering Plant'"></p>
-                    <p th:if="${!plant.fruits}" th:text="'Non-bearing Plant'"></p>
-                    <p th:if="${plant.fruits && plant.edibleFruit && plant.fruitSeason != ''}"
-                        th:text="'Produces edible fruit in ' + ${plant.fruitSeason}"></p>
-                    <p th:if="${plant.fruits && !plant.edibleFruit && plant.fruitSeason != ''}"
-                        th:text="'Produces inedible fruit in ' + ${plant.fruitSeason}">
-                    <p th:if="${plant.fruits && plant.edibleFruit && plant.fruitSeason == ''}"
-                        th:text="'Produces edible fruit'">
-                    <p th:if="${plant.fruits && !plant.edibleFruit && plant.fruitSeason == ''}"
-                        th:text="'Produces inedible fruit'">
-                </div>
-            </div>
-            <p class="text-justify px-5 " th:text="${plant.description}"></p>
+
         </div>
     </div>
 </body>

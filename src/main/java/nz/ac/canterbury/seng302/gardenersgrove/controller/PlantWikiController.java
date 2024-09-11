@@ -71,6 +71,12 @@ public class PlantWikiController {
 
             } else {
                 JsonNode plantDetails = plantInfoService.getPlantDetailsJson(String.valueOf(plantId), false);
+
+                if (plantDetails.has("X-RateLimit-Remaining") && plantDetails.get("X-RateLimit-Remaining").asInt() <= 0) {
+                    throw new HttpStatusCodeException(HttpStatus.TOO_MANY_REQUESTS, "Surpassed API Rate Limit") {
+                    };
+                }
+
                 PlantInfoModel plantInfo = new PlantInfoModel(plantDetails);
                 model.addAttribute("plant", plantInfo);
             }

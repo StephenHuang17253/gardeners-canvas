@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
-                        <div class="w-100" name="plant-item" th:data-plant-name="${plant.getPlantName()}"
+                        <div class="w-100 d-none" name="plant-item" th:data-plant-name="${plant.getPlantName()}"
                             th:data-plant-category="${plant.getPlantCategory()}"
                             th:data-plant-count="${plant.getPlantCount()}" th:data-plant-id="${plant.getPlantId()}"
                             th:data-plant-image="${plant.getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plant.getPlantPictureFilename()}">
@@ -60,7 +60,7 @@
                     </div>
 
                     <div th:each="displayableItem : ${displayableItemsList}">
-                        <div class="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                        <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
                             th:data-grid-y="${displayableItem.getYCoordinate()}"
                             th:data-grid-name="${displayableItem.getName()}"
                             th:data-grid-category="${displayableItem.getCategory()}"
@@ -68,7 +68,6 @@
                             th:data-grid-image="${plantsById[displayableItem.getObjectId()].getPlantPictureFilename() == null ? '/images/default_plant.png' : '/files/users/' + plantsById[displayableItem.getObjectId()].getPlantPictureFilename()}">
                         </div>
                     </div>
-
 
                 </div>
             </div>
@@ -79,12 +78,10 @@
             </form>
 
             <div class="mt-auto">
+                <button type="button" id="deletePlant" class="btn bg-danger text-white mb-2">Remove Selected
+                    Plant</button>
 
-                <input type="hidden" id="gardenId" name="gardenId" th:value="${garden.getGardenId()}" />
-                <button type="button" id="deletePlant" class="btn bg-danger text-white mb-2" >Remove Selected Plant</button>
-
-                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="gardenId=${garden.getGardenId()}, currentPage=${currentPage},
-                              startIndex=${startIndex}, endIndex=${endIndex}, lastPage=${lastPage}">
+                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
                 </div>
                 <hr>
                 <a th:href="@{/my-gardens/__${garden.getGardenId()}__}"
@@ -124,7 +121,8 @@
     </div>
     <div id="error-message" class="alert alert-warning py-2 px-3 m-2 position-fixed bottom-0 end-0 d-none font-bold"
         role="alert"></div>
-    <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}">
+    <input id="gardenId" type="hidden" th:value="${garden.getGardenId()}" />
+    <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}" />
     <script type="module" th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
 
