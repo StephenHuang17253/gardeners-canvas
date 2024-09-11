@@ -157,7 +157,7 @@ const handleDescriptionUpdate = (event) => {
     const descriptionValue = event.target.value;
     const filteredValue = descriptionValue.replaceAll(/\s+/g, "");
 
-    const containsLetterRegex = ".*\\p{L}.*";
+    const containsLetterRegex = /.*\p{L}.*/u;
 
     const characterCount = Array.from(descriptionValue).filter(char => !(char.match(/\s/) || char.charCodeAt(0) === variationSelector1)).length;
 
