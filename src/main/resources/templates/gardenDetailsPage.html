@@ -109,14 +109,17 @@
                 <ul id="myTab" class="nav nav-underline">
                     <li class="nav-item">
                         <a id="details-tab" class="nav-link link-success active"
+                           th:if="${isOwner}"
                             th:href="@{/my-gardens/__${garden.getGardenId()}__}">Garden details</a>
                     </li>
                     <li class="nav-item">
                         <a id="2d-tab" class="nav-link link-success"
+                           th:if="${isOwner}"
                            th:href="@{/2D-garden/__${garden.getGardenId()}__}">View in 2D</a>
                     </li>
                     <li class="nav-item">
                         <a id="3d-tab" class="nav-link link-success"
+                           th:if="${isOwner}"
                             th:href="@{/3D-garden/__${garden.getGardenId()}__}">View in 3D</a>
                     </li>
                 </ul>
