@@ -347,13 +347,12 @@ public class ManageFriendsController {
 
         if (friendship != null) {
             if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "This request has already been declined");
+                redirectAttributes.addFlashAttribute("errorMessage", "This user has already declined this request");
             }
             friendshipService.deleteFriendship(friendship.getId());
             userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);
             userInteractionService.removeUserInteraction(friendId, currentUser.getId(), ItemType.USER);
         }
-
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
 
         return "redirect:/manage-friends";

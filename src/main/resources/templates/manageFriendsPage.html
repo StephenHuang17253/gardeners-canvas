@@ -121,6 +121,11 @@
                         </div>
                     </div>
                 </div>
+                <div
+                        th:replace="~{fragments/infoBox.html :: infoBox(message=${errorMessage}, goodMessage=${goodMessage})}">
+
+                </div>
+
             </div>
             <div id="declined-tab-pane" class="tab-pane fade"
                 th:classappend="${activeTab == 'declined' ? 'show active' : ''}" role="tabpanel">
