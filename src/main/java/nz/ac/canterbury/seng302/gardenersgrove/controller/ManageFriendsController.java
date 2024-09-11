@@ -148,15 +148,16 @@ public class ManageFriendsController {
      * @return thymeleaf manageFriendsPage
      */
     @GetMapping("/manage-friends")
-    public String myFriends(Model model, HttpServletRequest request) {
+    public String myFriends(@RequestParam(defaultValue = "friends") String activeTab, Model model, HttpServletRequest request) {
         logger.info("GET /manage-friends");
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
-        String activeTab;
         if (inputFlashMap != null && inputFlashMap.containsKey("activeTab")) {
             activeTab = (String) inputFlashMap.get("activeTab");
-        } else {
-            activeTab = "friends";
+        }
+        if (inputFlashMap != null) {
+            model.addAttribute("errorMessage", inputFlashMap.get("errorMessage"));
+            model.addAttribute("goodMessage", false);
         }
 
         List<FriendModel> acceptedFriendModels = createFriendModel();
@@ -345,6 +346,9 @@ public class ManageFriendsController {
         Friendship friendship = friendshipService.findFriendship(currentUser, friend);
 
         if (friendship != null) {
+            if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "This request has already been declined");
+            }
             friendshipService.deleteFriendship(friendship.getId());
             userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);
             userInteractionService.removeUserInteraction(friendId, currentUser.getId(), ItemType.USER);
