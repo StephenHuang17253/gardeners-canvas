@@ -6,18 +6,18 @@ package nz.ac.canterbury.seng302.gardenersgrove.model;
  * stored in what locations
  */
 public class DisplayableItem {
-    private int xCoordinate;
+    private final int xCoordinate;
 
-    private int yCoordinate;
+    private final int yCoordinate;
 
-    private String name;
+    private final String name;
 
-    private String category;
+    private final String category;
 
-    private Long objectId;
+    private final Long objectId;
 
-    private String categoryImage;
-    private String ROOT_PATH = "/images/2d-plant-categories/";
+    private final String categoryImage;
+    private static final String ROOT_PATH = "/images/2d-plant-categories/";
 
     /**
      * create a new Displayable object
@@ -40,32 +40,16 @@ public class DisplayableItem {
         return xCoordinate;
     }
 
-    public void setXCoordinate(int xCoordinate) {
-        this.xCoordinate = xCoordinate;
-    }
-
     public int getYCoordinate() {
         return yCoordinate;
-    }
-
-    public void setYCoordinate(int yCoordinate) {
-        this.yCoordinate = yCoordinate;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getCategory() {
         return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public Long getObjectId() {
@@ -76,9 +60,6 @@ public class DisplayableItem {
         return categoryImage;
     }
 
-    public void setObjectId(long objectId) {
-        this.objectId = objectId;
-    }
 
     @Override
     public String toString() {
