@@ -1,4 +1,4 @@
-import { Downloader } from "./Downloader.js";
+import {Downloader} from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -38,6 +38,7 @@ const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
 const INVALID_LOCATION = "Please place on the grid";
 const NO_PLANT_SELECTED = "Please select a plant to delete";
+const OCCUPIED_DESTINATION = "Space is already occupied";
 const ERROR_MESSAGE_DURATION = 3000;
 
 const instance = getInstance();
@@ -46,15 +47,15 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
-let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer, tooltipLayer;
-
-
+let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
+    tooltipLayer, prevSelectPlantPosition;
+let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 
 // Helpers
 
 /**
  * Converts grid item coordinates to Konva coordinates
- * 
+ *
  * @param {number} gridItemX - x-coordinate of the grid item
  * @param {number} gridItemY - y-coordinate of the grid item
  * @returns {Object} - Object containing the x and y coordinates in Konva
@@ -62,7 +63,7 @@ let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downl
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 };
 
 /**
@@ -72,6 +73,30 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
  * @returns {boolean} - True if the location is valid, false otherwise
  */
 const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
+
+/**
+ * Checks if destination on grid is empty
+ * @param {Number} x - x-coordinate of the plant on grid
+ * @param {Number} y - y-coordinate of the plant on grid
+ * @param plantId - id of plant being moved
+ * @param gridLocationUniqueId
+ * @returns {Boolean} - True if the destination is empty, false otherwise
+ */
+const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
+    let nodes = layer.find("Image").values();
+    for (let node of nodes) {
+        const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
+        const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
+        if (x_coord === x && y_coord === y) {
+            if (node.id() !== plantId) {
+                return false;
+            } else if (node.attrs.uniqueGridId !== gridLocationUniqueId) {
+                return false;
+            }
+        }
+    }
+    return true
+}
 
 /**
  * Creates a tooltip object for displaying plant names and categories
@@ -112,7 +137,7 @@ const createToolTip = () => {
 
     /**
      * Sets the text of the tooltip
-     * @param {String} text 
+     * @param {String} text
      */
     const setTooltipText = (text) => {
         tooltipText.text(text);
@@ -123,7 +148,7 @@ const createToolTip = () => {
 
 /**
  * Updates a plant's placed & remaining counters when the saved layout loads.
- * 
+ *
  * @param {number} plantId id of the plant whose counters are being updated
  */
 const updateCountersOnLoad = (plantId) => {
@@ -145,7 +170,7 @@ const updateCountersOnLoad = (plantId) => {
 
 /**
  * Creates a new plant and adds it to the stage produced by konva
- * 
+ *
  * @param {string} imageSrc - The image source of the plant
  * @param {number} x - The x-coordinate of the plant
  * @param {number} y - The y-coordinate of the plant
@@ -171,13 +196,18 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
             name: plantName,
             id: plantId.toString(),
             draggable: true,
+            uniqueGridId: uniqueGridItemIDNo.pop(),
         });
+
+        plant.on("dragstart", () => {
+            prevSelectPlantPosition = {x: plant.x(), y: plant.y()};
+        })
 
         plant.on("dragmove", () => {
             tooltip.hide();
             const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
             const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
-            let { x, y } = convertToKonvaCoordinates(i, j);
+            let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -198,6 +228,13 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
+            const x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
+            const y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
+            //ensure destination is empty
+            if (!emptyDestination(x, y, plant.id(), plant.attrs.uniqueGridId)) {
+                showErrorMessage(OCCUPIED_DESTINATION);
+                plant.position(prevSelectPlantPosition);
+            }
             plant.stroke(null);
             plant.strokeWidth(0);
         });
@@ -235,7 +272,7 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
 
 /**
  * Displays an error message for a short period of time
- * 
+ *
  * @param {string} message - The error message to display
  */
 const showErrorMessage = (message) => {
@@ -249,7 +286,7 @@ const showErrorMessage = (message) => {
 /**
  * Takes the data URL generated by Konva of the stage and converts it to a Blob
  * Function adapted from https://stackoverflow.com/questions/12168909/blob-from-dataurl
- * 
+ *
  * @param {String} dataURL - The data URL of the stage
  * @returns {Blob} - The Blob object
  */
@@ -270,12 +307,12 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], { type: mimeType });
+    return new Blob([uint8Array], {type: mimeType});
 };
 
 /**
  * Updates the displayed plant count in the HTML
- * 
+ *
  * @param {HTMLElement} plantItem - The plant item element
  * @param {number} count - The new count
  */
@@ -306,7 +343,7 @@ const updatePlantCountDisplay = (plantItem, count) => {
 
 /**
  * Resets the plant count to its original value
- * 
+ *
  * @param {HTMLElement} plantItem - The plant item element
  */
 const resetPlantCount = (plantItem) => {
@@ -318,7 +355,7 @@ const resetPlantCount = (plantItem) => {
 
 /**
  * Show plant items on the page based on the start and end indices
- * 
+ *
  * @param {number} start - The start index
  * @param {number} end - The end index
  */
@@ -355,7 +392,6 @@ const deselectGridItem = () => {
 };
 
 
-
 // Initialisation
 
 const link = document.createElement("a");
@@ -379,6 +415,7 @@ tooltipLayer = new Konva.Layer();
 stage.add(layer);
 stage.add(tooltipLayer);
 
+// Create grid
 for (let i = 0; i < GRID_COLUMNS; i++) {
     for (let j = 0; j < GRID_ROWS; j++) {
         const konvaPos = convertToKonvaCoordinates(i, j);
@@ -391,6 +428,7 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             stroke: "black",
             strokeWidth: 1,
             name: "grid-cell",
+            listening: false,
         });
         layer.add(rect);
     }
@@ -411,7 +449,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         plantSrc = `/${instance}` + plantSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
     createPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
@@ -467,8 +505,8 @@ plantItems.forEach((item, i) => {
 
 /**
  * Handles the clicking of the stage
- * 
- * @param {Event} event 
+ *
+ * @param {Event} event
  */
 const handleStageClick = (event) => {
 
@@ -477,7 +515,7 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
 
@@ -519,13 +557,14 @@ const handleClearAllButtonClick = () => {
     plantItems.forEach(item => {
         resetPlantCount(item);
     });
+    uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 
     deselectPaletteItem();
 };
 
 /**
  * Downloads image of 2D garden grid
- * 
+ *
  * @param {String} fileExtension - extension of downloaded file
  */
 const handleExport = async (fileExtension) => {
@@ -565,6 +604,7 @@ const handleDeleteButtonClick = () => {
 
     const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
     plantItem.setAttribute("data-plant-count", updatedCount);
+    uniqueGridItemIDNo.push(selectedGridItem.attrs.uniqueGridId);
 
     updatePlantCountDisplay(plantItem, updatedCount);
 
@@ -574,7 +614,7 @@ const handleDeleteButtonClick = () => {
 
 /**
  * Handles the saving of the garden layout
- * 
+ *
  * @param {Event} event - The event object
  */
 const handleGardenFormSubmit = (event) => {
@@ -612,7 +652,7 @@ const handleWindowResize = () => {
 
 /**
  * Handle clicking outside of the palette
- * 
+ *
  * @param {Event} event - The event object
  */
 const handleWindowClick = (event) => {
@@ -674,7 +714,6 @@ const handleLastPageClick = () => {
     showPlantItems(start, end);
     currentPage.textContent = Math.ceil(end / COUNT_PER_PAGE);
 };
-
 
 
 // Event listeners
