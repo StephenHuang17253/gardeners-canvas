@@ -123,7 +123,8 @@ public class Garden3DController {
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId()));
+                            plantLocation.getObjectId(),
+                            currentPlant.getPlantCategory().getCategoryImage()));
                 }
                 else {
                     logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}",plantLocation.getId());

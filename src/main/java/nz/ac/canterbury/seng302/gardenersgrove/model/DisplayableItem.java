@@ -16,6 +16,9 @@ public class DisplayableItem {
 
     private Long objectId;
 
+    private String categoryImage;
+    private String ROOT_PATH = "/images/2d-plant-categories/";
+
     /**
      * create a new Displayable object
      * 
@@ -24,12 +27,13 @@ public class DisplayableItem {
      * @param name        name of represented object e.g plant name
      * @param category    category of item
      */
-    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId) {
+    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId, String categoryImage) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.name = name;
         this.category = category;
         this.objectId = objectId;
+        this.categoryImage = ROOT_PATH + categoryImage;
     }
 
     public int getXCoordinate() {
@@ -66,6 +70,10 @@ public class DisplayableItem {
 
     public Long getObjectId() {
         return objectId;
+    }
+
+    public String getCategoryImage() {
+        return categoryImage;
     }
 
     public void setObjectId(long objectId) {
