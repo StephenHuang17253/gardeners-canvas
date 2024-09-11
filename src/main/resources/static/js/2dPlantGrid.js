@@ -1,4 +1,4 @@
-import {Downloader} from "./Downloader.js";
+import { Downloader } from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -64,7 +64,7 @@ let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return {x: konvaX, y: konvaY};
+    return { x: konvaX, y: konvaY };
 };
 
 /**
@@ -76,7 +76,7 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return {i: gridItemX, j: gridItemY};
+    return { i: gridItemX, j: gridItemY };
 }
 
 /**
@@ -98,7 +98,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        const { i, j } = convertToGridCoordinates(node.x(), node.y());
         if (i === x && j === y) {
             if (node.id() !== plantId) {
                 return false;
@@ -212,13 +212,13 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         });
 
         plant.on("dragstart", () => {
-            prevSelectPlantPosition = {x: plant.x(), y: plant.y()};
+            prevSelectPlantPosition = { x: plant.x(), y: plant.y() };
         })
 
         plant.on("dragmove", () => {
             tooltip.hide();
-            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
-            let {x, y} = convertToKonvaCoordinates(i, j);
+            const { i, j } = convertToGridCoordinates(plant.x(), plant.y());
+            let { x, y } = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -239,7 +239,7 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
-            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
+            const { i, j } = convertToGridCoordinates(plant.x(), plant.y());
 
             //ensure destination is empty
             if (!emptyDestination(i, j, plant.id(), plant.attrs.uniqueGridId)) {
@@ -331,7 +331,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], {type: mimeType});
+    return new Blob([uint8Array], { type: mimeType });
 };
 
 /**
@@ -344,22 +344,18 @@ const updatePlantCountDisplay = (plantItem, count) => {
     const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
 
-    // Select the <a> elements by their ids
     const totalElement = plantItem.querySelector("#total");
     const placedElement = plantItem.querySelector("#placed");
     const remainingElement = plantItem.querySelector("#remaining");
 
-    // Update the total <a> element
     if (totalElement) {
         totalElement.textContent = `${plantName} (x${originalCount})`;
     }
 
-    // Update the placed <a> element
     if (placedElement) {
         placedElement.textContent = `Placed: ${originalCount - count}`;
     }
 
-    // Update the remaining <a> element
     if (remainingElement) {
         remainingElement.textContent = `Remaining: ${count}`;
     }
@@ -473,7 +469,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         plantSrc = `/${instance}` + plantSrc;
     }
-    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
+    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
     createPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
@@ -500,6 +496,7 @@ plantItems.forEach((item, i) => {
         const category = item.getAttribute("data-plant-category");
 
         deselectPaletteItem();
+        deselectGridItem();
 
         if (nodes.length >= GRID_COLUMNS*GRID_ROWS) {
             showErrorMessage(FULL_GRID);
@@ -545,7 +542,7 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const {x, y} = convertToKonvaCoordinates(i, j);
+    const { x, y } = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
 
@@ -620,7 +617,7 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const {i, j} = convertToGridCoordinates(gridX, gridY);
+    const { i, j } = convertToGridCoordinates(gridX, gridY);
 
     fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${i}&y_coord_delete=${j}`)
 
@@ -656,7 +653,7 @@ const handleGardenFormSubmit = (event) => {
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        const { i, j } = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
     });
