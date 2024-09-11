@@ -6,22 +6,23 @@
 <body style="height: 100vh">
     <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 
-    <div class="d-flex h-100">
-        <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark align-items-center"
-            style="width: 20vw; max-height: 90vh; overflow-y: auto;">
-            <span class="fs-4">Palette Window</span>
-            <hr>
+    <div class="d-flex">
+        <div class="bg-dark d-flex flex-column flex-shrink-0 p-3 text-white align-items-center h-100"
+            style="width: 20vw;">
+            <h1 class="fs-4 mb-3">Palette Window</h1>
 
             <div class="container">
 
-                <div class="row mb-4">
-                    <div class="d-flex flex-row justify-content-center">
-                        <button type="submit" id="saveGarden" class="btn bg-success text-white mb-2"
-                            form="saveGardenForm">
+                <div class="row">
+                    <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                        <button id=" saveGarden" type="submit" class="btn btn-success" form="saveGardenForm">
                             Save Garden
                         </button>
-                        <button id="openClearModalButton" type="button" class="btn bg-warning text-white mb-2"
-                            data-bs-toggle="modal" data-bs-target="#confirmClearModal">Clear All</button>
+
+                        <button id="openClearModalButton" type="button" class="btn btn-warning text-light"
+                            data-bs-toggle="modal" data-bs-target="#confirmClearModal">
+                            Clear All
+                        </button>
                     </div>
 
                     <div class="modal fade text-black" id="confirmClearModal" tabindex="-1" aria-hidden="true">
@@ -44,21 +45,22 @@
                         </div>
                     </div>
 
-                    <div class="col-6 g-2 p-3 text-left" th:each="plant : ${plants}">
-                        <div class="w-100 d-none" name="plant-item" th:data-plant-name="${plant.getName()}"
-                            th:data-plant-category="${plant.getCategory()}" th:data-plant-count="${plant.getCount()}"
-                            th:data-plant-id="${plant.getId()}"
-                            th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
-                            th:data-category-image="${plant.getCategoryImage()}">
-                            <p id="category" th:text="${plant.getCategory()}"></p>
+                    <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
+                        th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
+                        th:data-plant-category="${plant.getCategory()}" th:data-plant-count="${plant.getCount()}"
+                        th:data-plant-id="${plant.getId()}"
+                        th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
+                        th:data-category-image="${plant.getCategoryImage()}">
+                        <div class="ratio ratio-1x1">
                             <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
-                                alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover"
-                                style="max-width: 100px;" draggable="false">
-                            <a id="total" class="d-block break-word text-white mt-2"
-                                th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}"></a>
-                            <p id="placed" class="d-block break-word mt-0 mb-0 text-white"> </p>
-                            <p id="remaining" class="d-block break-word mt-0 mb-0 text-white"> </p>
+                                alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                         </div>
+                        <p id="total" class="break-word mt-2 mb-0 text-decoration-underline"
+                            th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}">
+                        </p>
+                        <p id="category" class="mb-0" th:text="${plant.getCategory()}"></p>
+                        <p id="placed" class="break-word my-0 "></p>
+                        <p id="remaining" class="break-word my-0"></p>
                     </div>
 
                     <div th:each="displayableItem : ${displayableItemsList}">
@@ -73,29 +75,34 @@
 
                 </div>
             </div>
-            <form th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm" method="post">
+
+            <form class="d-none" th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm"
+                method="post">
                 <input type="hidden" id="idList" name="idList" th:value="''" />
                 <input type="hidden" id="xCoordList" name="xCoordList" th:value="''" />
                 <input type="hidden" id="yCoordList" name="yCoordList" th:value="''" />
             </form>
 
-            <div class="mt-auto">
-                <button type="button" id="deletePlant" class="btn bg-danger text-white mb-2">Remove Selected
-                    Plant</button>
-
+            <div class="d-flex flex-column gap-2 align-items-center">
                 <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
                 </div>
-                <hr>
-                <a th:href="@{/my-gardens/__${garden.getGardenId()}__}"
-                    class="btn btn-secondary text-white d-block mx-auto">Cancel</a>
 
-                <div class="d-flex flex-row flex-wrap justify-content-center mt-2 mb-1 gap-1">
+                <button type="button" id="deletePlant" class="btn btn-danger">
+                    Remove Selected Plant
+                </button>
+
+                <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                    <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn btn-secondary d-block">
+                        Cancel
+                    </a>
+
+                    <a th:href="@{/3D-garden/__${garden.getGardenId()}__}" class="btn btn-success d-block">
+                        View in 3D
+                    </a>
                 </div>
-
-                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}" class="btn btn-success d-block mx-auto">View in
-                    3D</a>
             </div>
         </div>
+
         <div class="d-flex flex-column flex-grow-1 overflow-hidden">
             <div class="bg-white p-2 text-center">
                 <h1 class="break-word" id="title-2D-Grid" th:text="'2D View for ' + ${garden.getGardenName()}">Garden

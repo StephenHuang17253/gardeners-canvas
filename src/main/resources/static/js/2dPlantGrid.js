@@ -1,4 +1,4 @@
-import {Downloader} from "./Downloader.js";
+import { Downloader } from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -63,7 +63,7 @@ let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return {x: konvaX, y: konvaY};
+    return { x: konvaX, y: konvaY };
 };
 
 /**
@@ -200,14 +200,14 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         });
 
         plant.on("dragstart", () => {
-            prevSelectPlantPosition = {x: plant.x(), y: plant.y()};
+            prevSelectPlantPosition = { x: plant.x(), y: plant.y() };
         })
 
         plant.on("dragmove", () => {
             tooltip.hide();
             const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
             const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
-            let {x, y} = convertToKonvaCoordinates(i, j);
+            let { x, y } = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -307,7 +307,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], {type: mimeType});
+    return new Blob([uint8Array], { type: mimeType });
 };
 
 /**
@@ -320,22 +320,18 @@ const updatePlantCountDisplay = (plantItem, count) => {
     const plantName = plantItem.getAttribute("data-plant-name");
     const originalCount = originalPlantCounts[plantName];
 
-    // Select the <a> elements by their ids
     const totalElement = plantItem.querySelector("#total");
     const placedElement = plantItem.querySelector("#placed");
     const remainingElement = plantItem.querySelector("#remaining");
 
-    // Update the total <a> element
     if (totalElement) {
         totalElement.textContent = `${plantName} (x${originalCount})`;
     }
 
-    // Update the placed <a> element
     if (placedElement) {
         placedElement.textContent = `Placed: ${originalCount - count}`;
     }
 
-    // Update the remaining <a> element
     if (remainingElement) {
         remainingElement.textContent = `Remaining: ${count}`;
     }
@@ -449,7 +445,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         plantSrc = `/${instance}` + plantSrc;
     }
-    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
+    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
     createPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
@@ -476,6 +472,7 @@ plantItems.forEach((item, i) => {
         const category = item.getAttribute("data-plant-category");
 
         deselectPaletteItem();
+        deselectGridItem();
 
         if (currentCount < 1) return;
 
@@ -515,7 +512,7 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const {x, y} = convertToKonvaCoordinates(i, j);
+    const { x, y } = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
 
