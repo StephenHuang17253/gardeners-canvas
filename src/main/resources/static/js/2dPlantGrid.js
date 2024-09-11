@@ -24,6 +24,7 @@ const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
 const originalPlantCounts = {};
+let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 
 let prevSelectPlantPosition;
 
@@ -96,9 +97,10 @@ const validLocation = (x, y) => {
  * @param {Number} x - x-coordinate of the plant on grid
  * @param {Number} y - y-coordinate of the plant on grid
  * @param plantId - id of plant being moved
+ * @param gridLocationUniqueId
  * @returns {Boolean} - True if the destination is empty, false otherwise
  */
-const emptyDestination = (x, y, plantId) => {
+const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
         const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
@@ -106,14 +108,11 @@ const emptyDestination = (x, y, plantId) => {
         if (x_coord === x && y_coord === y) {
             if (node.id() !== plantId) {
                 return false;
+            } else if (node.attrs.uniqueGridId !== gridLocationUniqueId) {
+                return false;
             }
-
         }
     }
-
-    //     //Todo: create function for doing the below two lines
-    //     const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
-    //     const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
     return true
 }
 
@@ -164,6 +163,8 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
             name: plantName,
             id: plantId.toString(),
             draggable: true,
+            uniqueGridId: uniqueGridItemIDNo.pop(),
+
         });
 
         plant.on("dragstart", () => {
@@ -197,7 +198,7 @@ const handleAddPlant = (imageSrc, x, y, plantId, plantName, category, onload = u
             tooltip.hide();
             const x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
             const y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
-            if (!emptyDestination(x, y, plant.id())) {
+            if (!emptyDestination(x, y, plant.id(), plant.attrs.uniqueGridId)) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 plant.position(prevSelectPlantPosition);
             }
@@ -357,7 +358,6 @@ stage.on("click", event => {
     if (highlightedPaletteItem) {
 
         if (!validLocation(x, y)) {
-            console.log("ERRORRRRR")
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -380,7 +380,6 @@ stage.on("click", event => {
                 y: y
             });
         } else {
-            console.log("DIF ERROR")
             showErrorMessage(INVALID_LOCATION);
         }
 
@@ -412,7 +411,7 @@ const clearAllButton = document.getElementById("confirmClearAll");
 if (clearAllButton) {
     clearAllButton.addEventListener("click", () => {
         layer.find("Image").forEach(node => node.destroy());
-
+        uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
         document.querySelectorAll("[name='plant-item']").forEach(item => {
             resetPlantCount(item);
         });
@@ -585,12 +584,12 @@ document.getElementById("deletePlant").addEventListener("click", event => {
         });
 
         let count = parseInt(plantItem.getAttribute("data-plant-count"));
-        count += 1
-        plantItem.setAttribute("data-plant-count", count)
+        count += 1;
+        plantItem.setAttribute("data-plant-count", count);
+        uniqueGridItemIDNo.push(selectedPlant.attrs.uniqueGridId);
 
-        updatePlantCountDisplay(plantItem, count)
-
-        selectedPlant.destroy()
+        updatePlantCountDisplay(plantItem, count);
+        selectedPlant.destroy();
         selectedPlant.stroke(null);
         selectedPlant.strokeWidth(0);
         selectedPlant = null;
