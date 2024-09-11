@@ -66,10 +66,16 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     return {x: konvaX, y: konvaY};
 };
 
+/**
+ * Converts Konva coordinates to grid item coordinates
+ * @param konvaCoordX - Konva x-coordinate of grid item
+ * @param konvaCoordY - Konva y-coordinate of grid item
+ * @returns {{i: number, j: number}} - Object containing x and y coordinates on the grid
+ */
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return {x: gridItemX, y: gridItemY};
+    return {i: gridItemX, j: gridItemY};
 }
 
 /**
@@ -91,10 +97,8 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const {x_coord, y_coord} = convertToGridCoordinates(node.x(), node.y());
-        // const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
-        // const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
-        if (x_coord === x && y_coord === y) {
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        if (i === x && j === y) {
             if (node.id() !== plantId) {
                 return false;
             } else if (node.attrs.uniqueGridId !== gridLocationUniqueId) {
@@ -213,9 +217,6 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         plant.on("dragmove", () => {
             tooltip.hide();
             const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
-            //
-            // const i = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
-            // const j = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
             let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
@@ -237,12 +238,10 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
-            const {x, y} = convertToGridCoordinates(plant.x(), plant.y());
+            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
 
-            // const x = Math.round((plant.x() - OFFSET_X) / GRID_SIZE);
-            // const y = Math.round((plant.y() - OFFSET_Y) / GRID_SIZE);
             //ensure destination is empty
-            if (!emptyDestination(x, y, plant.id(), plant.attrs.uniqueGridId)) {
+            if (!emptyDestination(i, j, plant.id(), plant.attrs.uniqueGridId)) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 plant.position(prevSelectPlantPosition);
             }
@@ -601,13 +600,9 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const {x_coord, y_coord} = convertToGridCoordinates(gridX, gridY);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
-
-    // const x_coord = Math.round((gridX - OFFSET_X) / GRID_SIZE);
-    // const y_coord = Math.round((gridY - OFFSET_Y) / GRID_SIZE);
-
-    fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${x_coord}&y_coord_delete=${y_coord}`)
+    fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${i}&y_coord_delete=${j}`)
 
     let plantItem = null;
     plantItems.forEach(item => {
@@ -641,12 +636,9 @@ const handleGardenFormSubmit = (event) => {
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const {x_coord, y_coord} = convertToGridCoordinates(node.x(), node.y());
-
-        // const x_coord = Math.round((node.x() - OFFSET_X) / GRID_SIZE);
-        // const y_coord = Math.round((node.y() - OFFSET_Y) / GRID_SIZE);
-        xCoordList.push(x_coord);
-        yCoordList.push(y_coord);
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        xCoordList.push(i);
+        yCoordList.push(j);
     });
 
     idListInput.value = JSON.stringify(idList);
