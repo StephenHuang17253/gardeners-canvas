@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
+import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
@@ -77,8 +78,10 @@ public class Garden2DController {
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
 
-        List<Plant> plants = garden.getPlants();
-        plants.sort(Comparator.comparing(Plant::getPlantName));
+        List<Plant2DModel> plants = garden.getPlants().stream()
+                .sorted(Comparator.comparing(Plant::getPlantName))
+                .map(Plant2DModel::new)
+                .toList();
         model.addAttribute("plants", plants);
         model.addAttribute("countPerPage", COUNT_PER_PAGE);
 
@@ -98,7 +101,8 @@ public class Garden2DController {
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId()));
+                            plantLocation.getObjectId(),
+                            currentPlant.getPlantCategory().getCategoryImage()));
                 }
             }
         }

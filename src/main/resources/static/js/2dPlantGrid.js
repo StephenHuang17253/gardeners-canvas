@@ -424,7 +424,7 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             y: konvaPos.y,
             width: GRID_SIZE,
             height: GRID_SIZE,
-            fill: "green",
+            fill: '#76ad4c',
             stroke: "black",
             strokeWidth: 1,
             name: "grid-cell",
@@ -483,7 +483,7 @@ plantItems.forEach((item, i) => {
 
         selectedPaletteItem = item;
 
-        let plantImage = item.getAttribute("data-plant-image")
+        let plantImage = item.getAttribute("data-category-image")
 
         if (instance === "test/" || instance === "prod/") {
             plantImage = `/${instance}` + plantImage;
