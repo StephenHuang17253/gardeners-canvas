@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
+import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
@@ -19,10 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -79,7 +77,13 @@ public class Garden2DController {
         }
 
         securityService.addUserInteraction(gardenId, ItemType.GARDEN, LocalDateTime.now());
-        handlePagination(page, garden.getPlants().size(), garden.getPlants(), model);
+
+        List<Plant2DModel> plants = garden.getPlants().stream()
+                .sorted(Comparator.comparing(Plant::getPlantName))
+                .map(Plant2DModel::new)
+                .toList();
+        model.addAttribute("plants", plants);
+        model.addAttribute("countPerPage", COUNT_PER_PAGE);
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
@@ -97,7 +101,8 @@ public class Garden2DController {
                             plantLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId()));
+                            plantLocation.getObjectId(),
+                            currentPlant.getPlantCategory().getCategoryImage()));
                 }
             }
         }
@@ -107,21 +112,6 @@ public class Garden2DController {
         model.addAttribute("displayableItemsList", displayableItems);
         model.addAttribute("plantsById", plantsById);
         return "garden2DPage";
-    }
-
-    private void handlePagination(int page, int listLength, List<Plant> plants, Model model) {
-        int totalPages = (int) Math.ceil((double) listLength / COUNT_PER_PAGE);
-        int startIndex = (page - 1) * COUNT_PER_PAGE;
-        int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
-
-        plants.sort(Comparator.comparing(Plant::getPlantName));
-
-        model.addAttribute("currentPage", page);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
-        model.addAttribute("plants", plants.subList(startIndex, endIndex));
-        model.addAttribute("plantCount", plants.size());
     }
 
     /**
@@ -269,6 +259,55 @@ public class Garden2DController {
         deleteOldGridLocationItems(garden);
 
         return "redirect:/2D-garden/{gardenId}";
+    }
+
+    /**
+     * This endpoint handles deleting a single item from the grid.
+     * 
+     * @param gardenId id of the garden the grid belongs to
+     * @param xCoord   the x coordinate of the grid item
+     * @param yCoord   the y coordinate of the grid item
+     * @param response http response to use to return error
+     * @param model    model to use to return error
+     * @return redirect back to the 2d garden page
+     */
+    @GetMapping("/2D-garden/{gardenId}/delete")
+    @ResponseBody
+    public String deleteGridItem(@PathVariable Long gardenId,
+            @RequestParam(value = "x_coord_delete") int xCoord,
+            @RequestParam(value = "y_coord_delete") int yCoord,
+            HttpServletResponse response,
+            Model model) {
+
+        logger.info("POST /2D-garden/{}/delete", gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "404";
+        }
+
+        Garden garden = optionalGarden.get();
+        model.addAttribute("gardenId", garden.getGardenId());
+
+        if (!securityService.isOwner(garden.getOwner().getId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
+                    "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
+            return "403";
+        }
+
+        logger.info("Removing item at {}, {} on grid of garden with id: {}", xCoord, yCoord, gardenId);
+
+        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
+
+        for (GridItemLocation gridItem : gridItems) {
+            if (gridItem.getXCoordinate() == xCoord && gridItem.getYCoordinate() == yCoord) {
+                gridItemLocationService.removeGridItemLocation(gridItem);
+            }
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
+        return "200";
     }
 
 }

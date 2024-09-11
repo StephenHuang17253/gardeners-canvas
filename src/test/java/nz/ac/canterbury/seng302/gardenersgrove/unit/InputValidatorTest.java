@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,6 +43,7 @@ class InputValidatorTest {
 
     @BeforeEach
     void resetInterface() {
+        Mockito.when(profanityServiceMock.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(false);
         Mockito.when(userServiceMock.emailInUse(Mockito.any())).thenReturn(false);
     }
 
@@ -363,15 +365,31 @@ class InputValidatorTest {
         Assertions.assertEquals(ValidationResult.OK, InputValidator.validateUniqueEmail(email));
     }
 
-    // Todo check if there is an email already in persistence <-- need to mock
-    // persistence for this.
-    // Todo add foreign scripts
-
     @ParameterizedTest
     @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.", "test@test.c", "test@.com", "@test.com",
             "abc-@mail.com", "abc..def@mail.com", ".abc@mail.com", "abc.def@mail#archive.com", "abc.def@mail..com" })
     void InputValidator_validateUniqueEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
         Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateUniqueEmail(email));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "test-test@example.com", "user_123@gmail.co.nz", "john.doe@hotmail.com",
+            "phlddzoxuomhdkclzinbsqhutjqhzodonrbgyxibpkutddaovmxifypmeksvhkts@mwbmmvndbnvfdskmrmmropbvhdgegssqcengjnfj"
+                    +
+                    "oavhccefauucivfpthrucoyhlxfgkcdurlffpoacnhhysprommslgxmusevvpxdgkkifsgpbpiljrcxjwejestmgvnsevszck"
+                    +
+                    "ujiglsrihnpblwmiculgtxodopsthkdzzpgjhznkcsarvzvubnyhutxhyyecsvjjykzxhdqlaxooxqnfbuewmajwlmvhklhzy"
+                    +
+                    "wxuhsxwtnshoxuw.com" })
+    void InputValidator_validateEmail_ValidEmail_return_OK(String email) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validateEmail(email));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { " ", "user_123gmail.co.nz", "john.doe@h.", "test@test.c", "test@.com", "@test.com",
+            "abc-@mail.com", "abc..def@mail.com", ".abc@mail.com", "abc.def@mail#archive.com", "abc.def@mail..com" })
+    void InputValidator_validateEmail_InvalidEmail_return_INVALID_EMAIL(String email) {
+        Assertions.assertEquals(ValidationResult.INVALID_EMAIL, InputValidator.validateEmail(email));
     }
 
     /**
@@ -541,4 +559,254 @@ class InputValidatorTest {
     void InputValidator_isValidPostcode_invalidPostcode_return_INVALID_POSTCODE(String postcode) {
         Assertions.assertEquals(ValidationResult.INVALID_POSTCODE, InputValidator.validatePostcodeInput(postcode));
     }
+
+
+    @Test
+    void InputValidator_optionalTextField_LENGTH_OVER_LIMIT()
+    {
+        Assertions.assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalTextField(
+                "xYc1I1YLqb5DtZdJfARp1hq2Aw3SLoAJkeLBE5Qj0jFn91dmXIOc3MoIMDBk7KPasrmX4t0jBdQqSsaUhRvUCokk5MbCI62au32t" +
+                        "wQ53MGhH7uIITaIZEHU5EmQ5kDM77wEWrdUq5YbGEYmlQqdRLJ6xqbAPDheEp7DNyLYuvwhUveSNi7VIUdxUlTiOU2hw" +
+                        "pNpF4FibW"
+        ));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "hello",
+            "hello with space",
+            "hello with numbers 123",
+            "special charackters !@#$%^&*()",
+            "xYc1I1YLqb5DtZdJfARp1hq2Aw3SLoAJkeLBE5Qj0jFn91dmXIOc3MoIMDBk7KPasrmX4t0jBdQqSsaUhRvUCokk5MbCI62au32t" +
+                    "wQ53MGhH7uIITaIZEHU5EmQ5kDM77wEWrdUq5YbGEYmlQqdRLJ6xqbAPDheEp7DNyLYuvwhUveSNi7VIUdxUlTiOU2hw" +
+                    "pNpF4Fib",
+            "123",
+            "",
+            "::",
+            "❤\uFE0F",
+            "\uD83E\uDEC0",
+            "àäèéëïĳöü",
+            "áêéèëïíîôóúû",
+            "êôúû",
+            "ÆØÅæøå",
+            "ÄÖäö",
+    })
+    void InputValidator_optionalTextField_return_ok(String input)
+    {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.optionalTextField(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Hello",
+            "Hello World",
+            "Hello123",
+            "Hello World123",
+            "",
+            "Hello123",
+            "Hello World123",
+            ".",
+            "Hello World.",
+            "Hello-World"
+    })
+    void InputValidator_optText_okText_return_OK(String input) {
+        assertEquals(ValidationResult.OK, InputValidator.optionalAlphaPlusTextField(input,100));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "!",
+            "Hello World!",
+            "ÙýµFB¬",
+            "Seng ! ",
+            "Henson & Hedges",
+            "Water & Buffalo"
+    })
+    void InputValidator_optText_NonAlphaTexttWNumber_return_NONALPHAPLUS(String input) {
+        assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.optionalAlphaPlusTextField(input,100));
+    }
+
+    @Test
+    void InputValidator_optText_OverTextLimit_return_LengthOverLimit() {
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.optionalAlphaPlusTextField("Hi",1));
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Hello",
+            "Hello World",
+            "àäèéëïĳöü",
+            "áêéèëïíîôóúû",
+            "êôúû",
+            "ÆØÅæøå",
+            "ÄÖäö",
+            "ÅÄÖåäö",
+            "ÄÖÕÜäöõü",
+            "ÄÖÜẞäöüß",
+            "ÇÊÎŞÛçêîşû",
+            "ĂÂÎȘȚăâîșț",
+            "ÂÊÎÔÛŴŶÁÉÍÏâêîôûŵŷáéíï",
+            "ĈĜĤĴŜŬĉĝĥĵŝŭ",
+            "ÇĞİÖŞÜçğıöşü",
+            "ÁÐÉÍÓÚÝÞÆÖáðéíóúýþæö",
+            "ÁÐÍÓÚÝÆØáðíóúýæø",
+            "ÁÉÍÓÖŐÚÜŰáéíóöőúüű",
+            "ÀÇÉÈÍÓÒÚÜÏàçéèíóòúüï",
+            "ÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸàâæçéèêëîïôœùûüÿ",
+            "ÁÀÇÉÈÍÓÒÚËÜÏáàçéèíóòúëüï",
+            "ÁÉÍÑÓÚÜáéíñóúü",
+            "ÀÉÈÌÒÙàéèìòù",
+            "ćęłńóśźż ",
+            "ćśůź ",
+            "ãéëòôù ",
+            "ČŠŽ",
+            "अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ऍ ऎ ए ऐ ",
+            "ਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜ",
+            "અ આ ઇ ઈ ઉ ઊ ઋ ઌ ઍ એ ઐ ",
+            "ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ",
+            "АБВГДЕЖЗИКЛМН",
+            "ЙЩЬЮЯ",
+            "ЁЫЭ",
+            "ЄꙂꙀЗІЇꙈОуꙊѠ",
+            "ΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ",
+            "字文化圈",
+            "いうえおの",
+            "アイウ",
+            "ㄈㄉㄊㄋㄌㄍㄎㄏ ",
+            "ㄪㄫㄬ",
+            " Է Ը Թ Ժ ",
+            " ჱ თ ი კ ლ მ ",
+            "ⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎ",
+            "hello",
+            "hello with space",
+            "hello with numbers 123",
+            "special charackters !@#$%^&*()",
+            "xYc1I1YLqb5DtZdJfARp1hq2Aw3SLoAJkeLBE5Qj0jFn91dmXIOc3MoIMDBk7KPasrmX4t0jBdQqSsaUhRvUCokk5MbCI62au32t" +
+                    "wQ53MGhH7uIITaIZEHU5EmQ5kDM77wEWrdUq5YbGEYmlQqdRLJ6xqbAPDheEp7DNyLYuvwhUveSNi7VIUdxUlTiOU2hw" +
+                    "pNpF4Fib",
+            "àäèéëïĳöü",
+            "áêéèëïíîôóúû",
+            "êôúû",
+            "ÆØÅæøå",
+            "ÄÖäö",
+    })
+    void InputValidator_validDescription_valid_return_OK(String input) {
+        assertEquals(ValidationResult.OK, InputValidator.validateDescription(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "123",
+            "::",
+            "11",
+            "11!!",
+            "'",
+            "❤\uFE0F",
+            "\uD83E\uDEC0",
+    })
+    void InputValidator_validDescription_invalid_return_INVALID_DESCRIPTION(String input) {
+        assertEquals(ValidationResult.INVALID_DESCRIPTION, InputValidator.validateDescription(input));
+    }
+
+    @Test
+    void InputValidator_ProfanityDescription_valid_return_ProfanityFound() {
+        Mockito.when(profanityServiceMock.containsProfanity(Mockito.anyString(),Mockito.any())).thenReturn(true);
+        assertEquals(ValidationResult.DESCRIPTION_CONTAINS_PROFANITY, InputValidator.validateDescription("badWords"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "1",
+            "1000000",
+            "01",
+            "1.0",
+            "1,0",
+            "1000000.0"
+
+    })
+    void InputValidator_validPlantCount_valid_return_OK(String input) {
+        assertEquals(ValidationResult.OK, InputValidator.validatePlantCount(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "1.1",
+            "1000001.0",
+            "500.5",
+            "0.9",
+            "0",
+            "-500",
+            "text",
+            "500text"
+    })
+    void InputValidator_validPlantCount_invalid_return_INVALID_PLANTCOUNT(String input) {
+        assertEquals(ValidationResult.INVALID_PLANT_COUNT, InputValidator.validatePlantCount(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Hello",
+            "Hello_",
+            "1223",
+            "Hel-lo",
+            "Hell'o",
+            "Hell\"oo",
+            "abcdefghijklmnopqrstuvwxy",
+    })
+    void InputValidator_validateTag_valid_return_OK(String input) {
+        assertEquals(ValidationResult.OK, InputValidator.validateTag(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "\uD83D\uDC80\uD83D\uDC80",
+            "@#$%^",
+            "12*",
+            "{{{",
+            "]]]]"
+    })
+    void InputValidator_validateTag_invalid_return_NONAPHAPLUS(String input) {
+        assertEquals(ValidationResult.NON_ALPHA_PLUS, InputValidator.validateTag(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "abcdefghijklmnopqrstuvwx\uD83D\uDC80\uD83D\uDC80",
+            "abcdefghijklmnopqrstuvwxyz"
+    })
+    void InputValidator_validateTag_invalid_return_OVERLENGTHLIMIT(String input) {
+        assertEquals(ValidationResult.LENGTH_OVER_LIMIT, InputValidator.validateTag(input));
+    }
+
+
+
+    @ParameterizedTest
+    @ValueSource(strings = { "1960/3/2", "Steve", "12122013", "12:12:2014", "12-12-2014", "31/02/2003", "234/03/0000",
+            "01/01/11111", "01/021/2000", "31/04/2002", "02/13/2001", "04/00/2001", "00/12/2004" })
+    void InputValidator_validatePlantDate_invalidFormat_return_INVALID_DATE_FORMAT(String date) {
+        Assertions.assertEquals(ValidationResult.INVALID_DATE_FORMAT, InputValidator.validatePlantDate(date));
+    }
+
+    @Test
+    void InputValidator_validatePlantDate_tooFarInFuture_return_PLANTAGEINFUTURE() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        String newDate = LocalDate.now().plusDays(1).plusYears(1).format(formatter);
+        Assertions.assertEquals(ValidationResult.PLANT_DATE_MORE_THAN_ONE_YEAR_IN_FUTURE, InputValidator.validatePlantDate(newDate));
+    }
+
+    @Test
+    void InputValidator_validatePlantDate_tooOld_return_PLANTAGETOOOLD() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
+        String newDate = LocalDate.now().minusDays(1).minusYears(400).format(formatter);
+        Assertions.assertEquals(ValidationResult.PLANT_AGE_ABOVE_400, InputValidator.validatePlantDate(newDate));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "01/01/2000", "01/12/1999", "31/12/2000" })
+    void InputValidator_validatePlantDate_ValidDate_return_OK(String date) {
+        Assertions.assertEquals(ValidationResult.OK, InputValidator.validatePlantDate(date));
+    }
+
+
 }

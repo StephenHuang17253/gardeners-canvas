@@ -22,7 +22,7 @@ class Downloader {
      * Save the blob to a file using a link element
      * 
      * @param {Blob} blob - blob to save
-     * @param {String} filename - name of the file to save the blob to
+     * @param {string} filename - name of the file to save the blob to
      */
     saveWithLink = (blob, filename) => {
         const blobURL = URL.createObjectURL(blob);
@@ -40,7 +40,7 @@ class Downloader {
      * Save the blob to a file using the File System Access API
      * 
      * @param {Blob} blob - blob to save
-     * @param {String} filename - name of the file to save the blob to 
+     * @param {string} filename - name of the file to save the blob to 
      */
     saveWithFilePicker = async (blob, filename) => {
         const handle = await showSaveFilePicker({
@@ -57,7 +57,7 @@ class Downloader {
      * Save the blob to a file using a file picker if it is supported, otherwise use a link element
      * 
      * @param {Blob} blob 
-     * @param {String} filename
+     * @param {string} filename
      */
     saveFile = async (blob, filename) => {
         // Checks that the browser supports the File System Access API.

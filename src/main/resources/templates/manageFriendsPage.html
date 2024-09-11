@@ -16,27 +16,28 @@
 
             <ul id="myTab" class="nav nav-underline">
                 <li class="nav-item">
-                    <button id="friends-tab" tabindex="0" class="nav-link link-success"
-                        th:classappend="${activeTab == 'friends' ? 'active' : ''}" data-bs-toggle="tab"
-                        data-bs-target="#friends-tab-pane" type="button" role="tab">Friends</button>
+                    <a id="friends-tab" tabindex="0" class="nav-link link-success"
+                       th:href="@{/manage-friends(activeTab='friends')}"
+                       th:classappend="${activeTab == 'friends' ? 'active' : ''}">Friends</a>
                 </li>
                 <li class="nav-item">
-                    <button id="search-tab" tabindex="0" class="nav-link link-success"
-                        th:classappend="${activeTab == 'search' ? 'active' : ''}" data-bs-toggle="tab"
-                        data-bs-target="#search-tab-pane" type="button" role="tab">Add
-                        Friend</button>
+                    <a id="search-tab" tabindex="0" class="nav-link link-success"
+                       th:href="@{/manage-friends(activeTab='search')}"
+                       th:classappend="${activeTab == 'search' ? 'active' : ''}">Add
+                        Friend</a>
                 </li>
                 <li class="nav-item">
-                    <button id="pending-tab" tabindex="0" class="nav-link link-success"
-                        th:classappend="${activeTab == 'pending' ? 'active' : ''}" data-bs-toggle="tab"
-                        data-bs-target="#pending-tab-pane" type="button" role="tab">Pending</button>
+                    <a id="pending-tab" tabindex="0" class="nav-link link-success"
+                       th:href="@{/manage-friends(activeTab='pending')}"
+                       th:classappend="${activeTab == 'pending' ? 'active' : ''}">Pending</a>
                 </li>
                 <li class="nav-item">
-                    <button id="declined-tab" tabindex="0" class="nav-link link-success"
-                        th:classappend="${activeTab == 'declined' ? 'active' : ''}" data-bs-toggle="tab"
-                        data-bs-target="#declined-tab-pane" type="button" role="tab">Declined</button>
+                    <a id="declined-tab" tabindex="0" class="nav-link link-success"
+                       th:href="@{/manage-friends(activeTab='declined')}"
+                       th:classappend="${activeTab == 'declined' ? 'active' : ''}">Declined</a>
                 </li>
             </ul>
+
 
         </div>
 
@@ -120,6 +121,11 @@
                         </div>
                     </div>
                 </div>
+                <div
+                        th:replace="~{fragments/infoBox.html :: infoBox(message=${errorMessage}, goodMessage=${goodMessage})}">
+
+                </div>
+
             </div>
             <div id="declined-tab-pane" class="tab-pane fade"
                 th:classappend="${activeTab == 'declined' ? 'show active' : ''}" role="tabpanel">

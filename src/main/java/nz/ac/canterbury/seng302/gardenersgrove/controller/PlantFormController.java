@@ -134,7 +134,7 @@ public class PlantFormController {
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
-        ValidationResult plantCategoryResult = InputValidator.validatePlantCategory(plantCategory);
+        ValidationResult plantCategoryResult = InputValidator.compulsoryTextField(plantCategory);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
         if (optionalGarden.isEmpty()) {
@@ -191,6 +191,7 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
+            plantCategory = plantCategory.replace(' ', '_');
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
         }
 
@@ -312,7 +313,7 @@ public class PlantFormController {
         ValidationResult plantDescriptionResult = InputValidator.validateDescription(plantDescription);
         ValidationResult plantCountResult = InputValidator.validatePlantCount(plantCount);
         ValidationResult plantDateResult;
-        ValidationResult plantCategoryResult = InputValidator.validatePlantCategory(plantCategory);
+        ValidationResult plantCategoryResult = InputValidator.compulsoryTextField(plantCategory);
 
         if (plantDate == null) {
             plantDateResult = ValidationResult.OK;
@@ -354,6 +355,7 @@ public class PlantFormController {
 
         PlantCategory plantCategoryValue = null;
         if (plantCategory != null) {
+            plantCategory = plantCategory.replace(' ', '_');
             plantCategoryValue = PlantCategory.valueOf(plantCategory.toUpperCase());
         }
 

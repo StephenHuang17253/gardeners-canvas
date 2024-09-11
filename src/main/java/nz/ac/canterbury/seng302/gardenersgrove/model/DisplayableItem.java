@@ -6,15 +6,18 @@ package nz.ac.canterbury.seng302.gardenersgrove.model;
  * stored in what locations
  */
 public class DisplayableItem {
-    private int xCoordinate;
+    private final int xCoordinate;
 
-    private int yCoordinate;
+    private final int yCoordinate;
 
-    private String name;
+    private final String name;
 
-    private String category;
+    private final String category;
 
-    private Long objectId;
+    private final Long objectId;
+
+    private final String categoryImage;
+    private static final String ROOT_PATH = "/images/2d-plant-categories/";
 
     /**
      * create a new Displayable object
@@ -24,53 +27,39 @@ public class DisplayableItem {
      * @param name        name of represented object e.g plant name
      * @param category    category of item
      */
-    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId) {
+    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId, String categoryImage) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.name = name;
         this.category = category;
         this.objectId = objectId;
+        this.categoryImage = ROOT_PATH + categoryImage;
     }
 
     public int getXCoordinate() {
         return xCoordinate;
     }
 
-    public void setXCoordinate(int xCoordinate) {
-        this.xCoordinate = xCoordinate;
-    }
-
     public int getYCoordinate() {
         return yCoordinate;
-    }
-
-    public void setYCoordinate(int yCoordinate) {
-        this.yCoordinate = yCoordinate;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getCategory() {
         return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public Long getObjectId() {
         return objectId;
     }
 
-    public void setObjectId(long objectId) {
-        this.objectId = objectId;
+    public String getCategoryImage() {
+        return categoryImage;
     }
+
 
     @Override
     public String toString() {
