@@ -5,6 +5,8 @@ import { Loader } from './Loader.js';
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from './Exporter.js';
 import { Downloader } from '../Downloader.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -58,6 +60,8 @@ const init = () => {
             preserveDrawingBuffer: true,
         }
     );
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.5;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
@@ -104,13 +108,66 @@ init();
 
 addLight();
 
-loader.loadBackground(
-    'skybox.exr',
-    texture => {
-        scene.background = texture;
-        scene.environment = texture;
+// loader.loadBackground(
+//     'skybox.exr',
+//     texture => {
+//         scene.background = texture;
+//         scene.environment = texture;
+//     }
+// );
+
+let updateSun;
+
+const skyBox = () => {
+    const sun = new THREE.Vector3();
+    const sky = new Sky();
+    sky.scale.setScalar( 10000 );
+    scene.add( sky );
+
+    const skyUniforms = sky.material.uniforms;
+
+    skyUniforms[ 'turbidity' ].value = 10;
+    skyUniforms[ 'rayleigh' ].value = 2;
+    skyUniforms[ 'mieCoefficient' ].value = 0.005;
+    skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+    let parameters = {
+        elevation: 2,
+        azimuth: 180
+    };
+
+    const pmremGenerator = new THREE.PMREMGenerator( renderer );
+    const sceneEnv = new THREE.Scene();
+
+    let renderTarget;
+
+    updateSun = function() {
+
+        const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+        const theta = THREE.MathUtils.degToRad( parameters.azimuth );
+
+        sun.setFromSphericalCoords( 1, phi, theta );
+
+        sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+
+        if ( renderTarget !== undefined ) renderTarget.dispose();
+
+        sceneEnv.add( sky );
+        renderTarget = pmremGenerator.fromScene( sceneEnv );
+        scene.add( sky );
+
+        scene.environment = renderTarget.texture;
     }
-);
+    updateSun();
+    const gui = new GUI();
+
+    const folderSky = gui.addFolder( 'Sky' );
+    folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+    folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
+    folderSky.open();
+};
+skyBox();
+
 
 const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
