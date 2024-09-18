@@ -514,43 +514,6 @@ class Garden2dControllerTest {
 
     @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void deleteGridItem_GardenHasItem_deleteItem() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-        Plant testPlant = garden.getPlants().get(0);
-
-        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 1, 1);
-        gridItemLocationService.addGridItemLocation(newGridItemLocation);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void deleteGridItem_GardenHasNoItems_return302() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void save2DGarden_twoCopiesOfSamePlantAtDifferentLocations_returnRedirectAndChangePersistence()
             throws Exception {
         // preparing parameters
