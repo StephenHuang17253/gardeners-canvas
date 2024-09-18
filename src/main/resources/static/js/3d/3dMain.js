@@ -18,8 +18,10 @@ const modelMap = {
 };
 
 const decoMap = {
-    "Rock": ["deco/rock.glb", 1],
-    "Pond": ["deco/pond.glb", 2]
+    "Rock": ["deco/rock.glb", 2],
+    "Pond": ["deco/pond.glb", 2],
+    "Gnome": ["deco/gnome.glb", 8],
+    "Fountain": ["deco/fountain.glb", 2],
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
@@ -163,17 +165,26 @@ const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
 
-const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
-const pondModel = await loader.loadModel(decoMap['Pond'][0], 'Pond');
-const position = new THREE.Vector3(10, 0, 0);
-addModelToScene(
-    rockModel,
-    position,
-    decoMap['Rock'][1]);
-addModelToScene(
-    pondModel,
-    new THREE.Vector3(0, 0, 0),
-    decoMap['Pond'][1]);
+// const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
+// const pondModel = await loader.loadModel(decoMap['Pond'][0], 'Pond');
+// const gnomeModel = await loader.loadModel(decoMap['Gnome'][0], 'Gnome');
+// const fountainModel = await loader.loadModel(decoMap['Fountain'][0], 'Fountain');
+// addModelToScene(
+//     rockModel,
+//     new THREE.Vector3(10, 0, 0),
+//     decoMap['Rock'][1]);
+// addModelToScene(
+//     pondModel,
+//     new THREE.Vector3(0, 0, 0),
+//     decoMap['Pond'][1]);
+// addModelToScene(
+//     gnomeModel,
+//     new THREE.Vector3(-10, 0, 0),
+//     decoMap['Gnome'][1]);
+// addModelToScene(
+//     fountainModel,
+//     new THREE.Vector3(0, 0, 10),
+//     decoMap['Fountain'][1]);
 
 /**
  * Renders the scene
