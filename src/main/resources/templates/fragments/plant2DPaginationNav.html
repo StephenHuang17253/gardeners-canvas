@@ -2,25 +2,27 @@
     <input id="countPerPage" type="hidden" th:value="${countPerPage}">
     <ul class="pagination justify-content-center my-0">
         <li class="page-item">
-            <button id="firstPage" class="page-link bg-dark text-white">
-                << </button>
+            <button id="firstPage" class="page-link bg-dark text-white no-exit">
+                <<
+            </button>
         </li>
 
         <li class="page-item">
-            <button id="previousPage" class="page-link bg-dark text-white">
-                < </button>
+            <button id="previousPage" class="page-link bg-dark text-white no-exit">
+                <
+            </button>
         </li>
 
         <li class="page-item active">
-            <span id="currentPage" class="page-link bg-success text-white">1</span>
+            <span id="currentPage" class="page-link bg-success text-white no-exit">1</span>
         </li>
 
         <li class="page-item">
-            <button id="nextPage" class="page-link bg-dark text-white">></button>
+            <button id="nextPage" class="page-link bg-dark text-white no-exit">></button>
         </li>
 
         <li class="page-item">
-            <button id="lastPage" class="page-link bg-dark text-white">>></button>
+            <button id="lastPage" class="page-link bg-dark text-white no-exit">>></button>
         </li>
     </ul>
 </nav>

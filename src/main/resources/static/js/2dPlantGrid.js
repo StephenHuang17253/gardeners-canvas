@@ -22,7 +22,9 @@ const previousPage = document.getElementById("previousPage");
 const currentPage = document.getElementById("currentPage");
 const nextPage = document.getElementById("nextPage");
 const lastPage = document.getElementById("lastPage");
-
+//new code lines X2
+const confirmUnsavedExit = document.getElementById("confirmExit");
+const confirmStayOnPage = document.getElementById('confirmStayOnPage');
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
@@ -48,10 +50,12 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
+//new code variable targetUrl
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
-    tooltipLayer, prevSelectPlantPosition;
+    tooltipLayer, prevSelectPlantPosition, targetUrl;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
-
+//new code lines X1
+let isExitConfirmationModalOpen = false;
 // Helpers
 
 /**
@@ -746,11 +750,61 @@ const handleLastPageClick = () => {
     currentPage.textContent = Math.ceil(end / COUNT_PER_PAGE);
 };
 
+//new code function
+/**
+ * Handles exiting the page in any form
+ * Shows modal if there are unsaved changes
+ */
+const handlePageExit = (event) => {
+    if (!isExitConfirmationModalOpen) {
+        event.preventDefault();
+    }
+}
+
+//new code function
+/**
+ * Exit page with unsaved changes
+ */
+const handleUnsavedExit = () => {
+    isExitConfirmationModalOpen = false;
+    document.getElementById('exitModal').style.display = 'none';
+    window.removeEventListener('beforeunload', null);
+    window.location.href = targetUrl;
+}
+
+//new code function
+/**
+ * Handle stay on page. Closes confirm page change modal
+ */
+const handleStayOnPage = () => {
+    isExitConfirmationModalOpen = false;
+    document.getElementById('exitModal').style.display = 'none';
+}
+
+//new code function
+/**
+ * Handles clicks on the page. Opens exit confirm modal if needed
+ * Does not handle click on the grid
+ * Todo modularize this. also only show modal if there are unsaved changes
+ */
+const handleDocumentClick = (event) => {
+    if (event.target.tagName === 'A' && !event.target.classList.contains('no-exit')) {
+        event.preventDefault();
+        isExitConfirmationModalOpen = true;
+        document.getElementById('confirmExitModal').style.display = 'block';
+        targetUrl = event.target.href;
+    }
+}
+
 
 // Event listeners
 
 window.addEventListener("click", handleWindowClick);
 window.addEventListener("resize", handleWindowResize);
+// new code lines X2
+// before unload event found at https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+window.addEventListener("beforeunload", handlePageExit);
+document.addEventListener("click", handleDocumentClick);
 
 stage.on("click", handleStageClick);
 
@@ -766,3 +820,7 @@ firstPage.addEventListener("click", handleFirstPageClick);
 previousPage.addEventListener("click", handlePreviousPageClick);
 nextPage.addEventListener("click", handleNextPageClick);
 lastPage.addEventListener("click", handleLastPageClick);
+
+//new code lines X2
+confirmUnsavedExit.addEventListener("click", handleUnsavedExit);
+confirmStayOnPage.addEventListener("click", handleStayOnPage);
