@@ -221,44 +221,4 @@ public class Garden2DController {
         }
         return "redirect:/2D-garden/{gardenId}";
     }
-
-    /**
-     * Endpoint for clearing all elements from the 2D garden grid.
-     * NOTE: Currently all gridItems are plants, decorations feature hasn't been
-     * added.
-     *
-     * @param gardenId id of the garden whose grid has to be saved
-     * @param response http response to use to return error
-     * @param model    model to use to return error
-     * @return redirect back to 2D garden grid
-     */
-    @PostMapping("/2D-garden/{gardenId}/clear")
-    public String clear2DGarden(@PathVariable Long gardenId,
-            HttpServletResponse response,
-            Model model) {
-        logger.info("POST /2D-garden/{}/clear", gardenId);
-        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
-
-        if (optionalGarden.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "404";
-        }
-
-        Garden garden = optionalGarden.get();
-        model.addAttribute("gardenId", garden.getGardenId());
-
-        if (!securityService.isOwner(garden.getOwner().getId())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
-                    "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
-            return "403";
-        }
-
-        logger.info("Clearing grid of garden with id: {}", gardenId);
-
-        deleteOldGridLocationItems(garden);
-
-        return "redirect:/2D-garden/{gardenId}";
-    }
-
 }
