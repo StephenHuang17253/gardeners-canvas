@@ -17,6 +17,10 @@ const modelMap = {
     "Pot Plant": ["potplant.glb", 5]
 };
 
+const decoMap = {
+    "Rock": ["deco/rock.glb", 1]
+};
+
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
 const container = document.getElementById('container');
@@ -157,6 +161,13 @@ const addObjectToScene = async (plantOrDecoration) => {
 const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
+
+const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
+const position = new THREE.Vector3(0, 0, 0);
+addModelToScene(
+    rockModel,
+    position,
+    decoMap['Rock'][1]);
 
 /**
  * Renders the scene
