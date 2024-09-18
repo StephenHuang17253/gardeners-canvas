@@ -18,7 +18,8 @@ const modelMap = {
 };
 
 const decoMap = {
-    "Rock": ["deco/rock.glb", 1]
+    "Rock": ["deco/rock.glb", 1],
+    "Pond": ["deco/pond.glb", 2]
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
@@ -163,11 +164,16 @@ const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
 
 const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
-const position = new THREE.Vector3(0, 0, 0);
+const pondModel = await loader.loadModel(decoMap['Pond'][0], 'Pond');
+const position = new THREE.Vector3(10, 0, 0);
 addModelToScene(
     rockModel,
     position,
     decoMap['Rock'][1]);
+addModelToScene(
+    pondModel,
+    new THREE.Vector3(0, 0, 0),
+    decoMap['Pond'][1]);
 
 /**
  * Renders the scene
