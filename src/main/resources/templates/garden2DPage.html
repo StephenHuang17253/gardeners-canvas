@@ -92,18 +92,16 @@
                     <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn btn-secondary d-block">
                         Cancel
                     </a>
-
-                    <a th:href="@{/3D-garden/__${garden.getGardenId()}__}" class="btn btn-success d-block">
-                        View in 3D
-                    </a>
                 </div>
             </div>
         </div>
 
         <div class="d-flex flex-column flex-grow-1 overflow-hidden">
-            <div class="bg-white p-2 text-center">
-                <h1 class="break-word" id="title-2D-Grid" th:text="'2D View for ' + ${garden.getGardenName()}">Garden
-                    Name</h1>
+            <div class="bg-white p-2 position-relative">
+                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}" class="btn btn-success position-absolute top-0 start-0 m-2">
+                    View in 3D
+                </a>
+                <h1 class="break-word mb-0 text-center" id="title-2D-Grid" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
             </div>
             <div id="container" class="flex-grow-1 overflow-auto"></div>
             <div class="dropdown position-absolute end-0 m-3">
