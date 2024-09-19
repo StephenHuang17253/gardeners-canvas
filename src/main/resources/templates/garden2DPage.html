@@ -32,15 +32,12 @@
                                     <h1 class="modal-title fs-5">Are you sure you want to clear all?</h1>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
-                                <form id="clearAllForm" th:action="@{/2D-garden/__${garden.getGardenId()}__/clear}"
-                                    method="post" autocomplete="off">
                                     <div class="modal-footer justify-content-center">
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Cancel</button>
                                         <button id="confirmClearAll" type="submit" class="btn btn-warning"
                                             data-bs-dismiss="modal">Yes</button>
                                     </div>
-                                </form>
                             </div>
                         </div>
                     </div>
