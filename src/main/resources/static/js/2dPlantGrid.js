@@ -752,18 +752,32 @@ const hasUnsavedChanges = () => {
     const originalGrid = Array.from(gridItemLocations).map(value => ({
         x: value.getAttribute("data-grid-x"),
         y: value.getAttribute("data-grid-y"),
-        objectId: value.getAttribute("data-grid-objectid").toString(),
+        id: value.getAttribute("data-grid-objectid").toString(),
         name: value.getAttribute("data-grid-name"),
         category: value.getAttribute("data-grid-category")
     }));
 
-    const currentGrid = layer.find("Image").map(node => ({
-        x: node.x(),
-        y: node.y(),
-        id: node.id(),
-        name: node.name(),
-        category: node.attrs.itemCategory,
-    }));
+
+    const currentGrid = layer.find("Image").map(node => {
+        const {i: x, j: y} = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
+        return {
+            x: x.toString(),
+            y: y.toString(),
+            id: node.id(),  // This is fine, as `id` is a method
+            name: node.name(),
+            category: node.attrs.itemCategory
+        };
+    });
+
+    currentGrid.sort((a, b) => {
+        return a.id.localeCompare(b.id) ||
+            a.name.localeCompare(b.name)
+    });
+
+    originalGrid.sort((a, b) => {
+        return a.id.localeCompare(b.id) ||
+            a.name.localeCompare(b.name)
+    });
 
     // Compare the two arrays
     if (originalGrid.length !== currentGrid.length) {
@@ -775,7 +789,7 @@ const hasUnsavedChanges = () => {
         return (
             original.x !== current.x ||
             original.y !== current.y ||
-            original.objectId !== current.id ||
+            original.id !== current.id ||
             original.name !== current.name ||
             original.category !== current.category
         );
@@ -789,9 +803,7 @@ const hasUnsavedChanges = () => {
  * Shows modal if there are unsaved changes
  */
 const handlePageExit = (event) => {
-    const hasUnsaved = hasUnsavedChanges();
-    console.log(hasUnsaved)
-    if (hasUnsaved) {
+    if (hasUnsavedChanges()) {
         event.preventDefault();
         event.returnValue = 'You have unsaved changes!';
     }
