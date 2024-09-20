@@ -208,6 +208,7 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
             name: plantName,
             id: plantId.toString(),
             draggable: true,
+            itemCategory: category,
             uniqueGridId: uniqueGridItemIDNo.pop(),
         });
 
@@ -748,7 +749,39 @@ const handleLastPageClick = () => {
 // Function to check if there are unsaved changes
 //Todo implement this
 const hasUnsavedChanges = () => {
-    return true;
+    const originalGrid = Array.from(gridItemLocations).map(value => ({
+        x: value.getAttribute("data-grid-x"),
+        y: value.getAttribute("data-grid-y"),
+        objectId: value.getAttribute("data-grid-objectid").toString(),
+        name: value.getAttribute("data-grid-name"),
+        category: value.getAttribute("data-grid-category")
+    }));
+
+    const currentGrid = layer.find("Image").map(node => ({
+        x: node.x(),
+        y: node.y(),
+        id: node.id(),
+        name: node.name(),
+        category: node.attrs.itemCategory,
+    }));
+
+    // Compare the two arrays
+    if (originalGrid.length !== currentGrid.length) {
+        return true;
+    }
+
+    return originalGrid.some((original, index) => {
+        const current = currentGrid[index];
+        return (
+            original.x !== current.x ||
+            original.y !== current.y ||
+            original.objectId !== current.id ||
+            original.name !== current.name ||
+            original.category !== current.category
+        );
+    });
+
+
 }
 
 /**
@@ -756,7 +789,9 @@ const hasUnsavedChanges = () => {
  * Shows modal if there are unsaved changes
  */
 const handlePageExit = (event) => {
-    if (hasUnsavedChanges()) {
+    const hasUnsaved = hasUnsavedChanges();
+    console.log(hasUnsaved)
+    if (hasUnsaved) {
         event.preventDefault();
         event.returnValue = 'You have unsaved changes!';
     }
