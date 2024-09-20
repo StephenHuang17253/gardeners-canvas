@@ -747,8 +747,10 @@ const handleLastPageClick = () => {
 };
 
 
-// Function to check if there are unsaved changes
-//Todo implement this
+/**
+ * checks if 2D grid has been modified and has unsaved changes
+ * @returns {boolean} are there changes on the grid (true if there are, false if not)
+ */
 const hasUnsavedChanges = () => {
     const originalGrid = Array.from(gridItemLocations).map(value => ({
         x: value.getAttribute("data-grid-x"),
