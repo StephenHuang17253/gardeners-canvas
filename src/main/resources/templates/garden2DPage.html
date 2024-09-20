@@ -47,24 +47,6 @@
                     </div>
                 </div>
 
-                <div class="modal fade text-black" id="confirmExitModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5">You have unsaved changes. Are you sure you want to
-                                    exit?</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" id="confirmStayOnPage"
-                                        data-dismiss="modal">Stay on Page
-                                </button>
-                                <a href="#" id="confirmExit" class="btn btn-primary">Leave Page</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
                      th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
                      th:data-plant-category="${plant.getCategory()}" th:data-plant-count="${plant.getCount()}"

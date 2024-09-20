@@ -1,4 +1,4 @@
-import { Downloader } from "./Downloader.js";
+import {Downloader} from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -22,9 +22,6 @@ const previousPage = document.getElementById("previousPage");
 const currentPage = document.getElementById("currentPage");
 const nextPage = document.getElementById("nextPage");
 const lastPage = document.getElementById("lastPage");
-//new code lines X2
-const confirmUnsavedExit = document.getElementById("confirmExit");
-const confirmStayOnPage = document.getElementById('confirmStayOnPage');
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
@@ -50,12 +47,11 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
-//new code variable targetUrl
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
-    tooltipLayer, prevSelectPlantPosition, targetUrl;
+    tooltipLayer, prevSelectPlantPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
-//new code lines X1
-let isExitConfirmationModalOpen = false;
+
+
 // Helpers
 
 /**
@@ -68,7 +64,7 @@ let isExitConfirmationModalOpen = false;
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 };
 
 /**
@@ -80,7 +76,7 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return { i: gridItemX, j: gridItemY };
+    return {i: gridItemX, j: gridItemY};
 }
 
 /**
@@ -102,7 +98,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if (i === x && j === y) {
             if (node.id() !== plantId) {
                 return false;
@@ -216,13 +212,13 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         });
 
         plant.on("dragstart", () => {
-            prevSelectPlantPosition = { x: plant.x(), y: plant.y() };
+            prevSelectPlantPosition = {x: plant.x(), y: plant.y()};
         })
 
         plant.on("dragmove", () => {
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plant.x(), plant.y());
-            let { x, y } = convertToKonvaCoordinates(i, j);
+            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
+            let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -243,7 +239,7 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
         plant.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plant.x(), plant.y());
+            const {i, j} = convertToGridCoordinates(plant.x(), plant.y());
 
             //ensure destination is empty
             if (!emptyDestination(i, j, plant.id(), plant.attrs.uniqueGridId)) {
@@ -335,7 +331,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], { type: mimeType });
+    return new Blob([uint8Array], {type: mimeType});
 };
 
 /**
@@ -476,7 +472,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         plantSrc = `/${instance}` + plantSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(plantId);
     createPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
@@ -549,7 +545,7 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
 
@@ -624,7 +620,7 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const { i, j } = convertToGridCoordinates(gridX, gridY);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
     fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${i}&y_coord_delete=${j}`)
 
@@ -660,7 +656,7 @@ const handleGardenFormSubmit = (event) => {
     layer.find("Image").forEach(node => {
         idList.push(node.id());
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
     });
@@ -695,8 +691,6 @@ const handleWindowClick = (event) => {
         deselectPaletteItem();
         return;
     }
-    console.log("machine gun");
-
     // check is spot clicked it plant
 
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
@@ -750,49 +744,21 @@ const handleLastPageClick = () => {
     currentPage.textContent = Math.ceil(end / COUNT_PER_PAGE);
 };
 
-//new code function
+
+// Function to check if there are unsaved changes
+//Todo implement this
+const hasUnsavedChanges = () => {
+    return true;
+}
+
 /**
  * Handles exiting the page in any form
  * Shows modal if there are unsaved changes
  */
 const handlePageExit = (event) => {
-    if (!isExitConfirmationModalOpen) {
+    if (hasUnsavedChanges()) {
         event.preventDefault();
-    }
-}
-
-//new code function
-/**
- * Exit page with unsaved changes
- */
-const handleUnsavedExit = () => {
-    isExitConfirmationModalOpen = false;
-    document.getElementById('exitModal').style.display = 'none';
-    window.removeEventListener('beforeunload', null);
-    window.location.href = targetUrl;
-}
-
-//new code function
-/**
- * Handle stay on page. Closes confirm page change modal
- */
-const handleStayOnPage = () => {
-    isExitConfirmationModalOpen = false;
-    document.getElementById('exitModal').style.display = 'none';
-}
-
-//new code function
-/**
- * Handles clicks on the page. Opens exit confirm modal if needed
- * Does not handle click on the grid
- * Todo modularize this. also only show modal if there are unsaved changes
- */
-const handleDocumentClick = (event) => {
-    if (event.target.tagName === 'A' && !event.target.classList.contains('no-exit')) {
-        event.preventDefault();
-        isExitConfirmationModalOpen = true;
-        document.getElementById('confirmExitModal').style.display = 'block';
-        targetUrl = event.target.href;
+        event.returnValue = 'You have unsaved changes!';
     }
 }
 
@@ -801,10 +767,8 @@ const handleDocumentClick = (event) => {
 
 window.addEventListener("click", handleWindowClick);
 window.addEventListener("resize", handleWindowResize);
-// new code lines X2
 // before unload event found at https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
 window.addEventListener("beforeunload", handlePageExit);
-document.addEventListener("click", handleDocumentClick);
 
 stage.on("click", handleStageClick);
 
@@ -820,7 +784,3 @@ firstPage.addEventListener("click", handleFirstPageClick);
 previousPage.addEventListener("click", handlePreviousPageClick);
 nextPage.addEventListener("click", handleNextPageClick);
 lastPage.addEventListener("click", handleLastPageClick);
-
-//new code lines X2
-confirmUnsavedExit.addEventListener("click", handleUnsavedExit);
-confirmStayOnPage.addEventListener("click", handleStayOnPage);
