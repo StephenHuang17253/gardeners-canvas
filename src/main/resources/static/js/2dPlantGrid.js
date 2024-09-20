@@ -50,7 +50,7 @@ const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
     tooltipLayer, prevSelectPlantPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
-
+let preventUnload = false;
 
 // Helpers
 
@@ -649,6 +649,7 @@ const handleDeleteButtonClick = () => {
  */
 const handleGardenFormSubmit = (event) => {
     event.preventDefault();
+    preventUnload = true;
 
     const idList = [];
     const xCoordList = [];
@@ -769,14 +770,21 @@ const hasUnsavedChanges = () => {
         };
     });
 
+    //ensure lists are sorted
     currentGrid.sort((a, b) => {
         return a.id.localeCompare(b.id) ||
-            a.name.localeCompare(b.name)
+            a.name.localeCompare(b.name) ||
+            a.category.localeCompare(b.category) ||
+            a.x.localeCompare(b.x) ||
+            a.y.localeCompare(b.y)
     });
 
     originalGrid.sort((a, b) => {
         return a.id.localeCompare(b.id) ||
-            a.name.localeCompare(b.name)
+            a.name.localeCompare(b.name) ||
+            a.category.localeCompare(b.category) ||
+            a.x.localeCompare(b.x) ||
+            a.y.localeCompare(b.y)
     });
 
     // Compare the two arrays
@@ -794,8 +802,6 @@ const hasUnsavedChanges = () => {
             original.category !== current.category
         );
     });
-
-
 }
 
 /**
@@ -803,9 +809,10 @@ const hasUnsavedChanges = () => {
  * Shows modal if there are unsaved changes
  */
 const handlePageExit = (event) => {
-    if (hasUnsavedChanges()) {
+    if (hasUnsavedChanges() && !preventUnload) {
         event.preventDefault();
         event.returnValue = 'You have unsaved changes!';
+        return 'You have unsaved changes!';
     }
 }
 
