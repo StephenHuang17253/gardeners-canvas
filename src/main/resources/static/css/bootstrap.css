@@ -67,6 +67,7 @@
     animation-fill-mode: forwards;
 }
 
+
 @keyframes fadeOutAnimation {
     0% {
         opacity: 1;
