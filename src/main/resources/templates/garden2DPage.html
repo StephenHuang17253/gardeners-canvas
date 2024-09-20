@@ -46,46 +46,52 @@
                     <div class="container-fluid mt-3">
                         <ul class="nav nav-tabs nav-fill d-flex justify-content-center">
                             <li class="nav-item nav-underline ">
-                                <a class="nav-link text-white fs-5 " role="tab" data-bs-toggle="tab" href="#plantTabContent" id="plant-tab">Plants</a>
+                                <a class="nav-link text-white fs-5 active" role="tab" data-bs-toggle="tab" href="#plantTabContent" id="plant-tab"
+                                style="background-color:transparent">Plants</a>
                             </li>
                             <li class="nav-item nav-underline">
-                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab" href="#textureTabContent" id="textures-tab">Textures</a>
+                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab" href="#textureTabContent" id="textures-tab"
+                                   style="background-color:transparent">Textures</a>
                             </li>
                         </ul>
 
                     </div>
+                    <div class="tab-content">
+                        <div id="plantTabContent" class="tab-pane active">
+                            <div class="row">
+                                <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
+                                    th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
+                                    th:data-plant-category="${plant.getCategory()}" th:data-plant-count="${plant.getCount()}"
+                                    th:data-plant-id="${plant.getId()}"
+                                    th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
+                                    th:data-category-image="${plant.getCategoryImage()}">
+                                    <div class="ratio ratio-1x1">
+                                        <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
+                                            alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
+                                    </div>
+                                    <p id="total" class="break-word mt-2 mb-0 text-decoration-underline"
+                                        th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}">
+                                    </p>
+                                    <p id="category" class="mb-0" th:text="${plant.getCategory()}"></p>
+                                    <p id="placed" class="break-word my-0 "></p>
+                                    <p id="remaining" class="break-word my-0"></p>
+                                </div>
+                            </div>
 
-                    <div id="plantTabContent" role="tabpanel" class="col-6 p-3 text-left d-none text-white tab-content" draggable="false" name="plant-item"
-                        th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
-                        th:data-plant-category="${plant.getCategory()}" th:data-plant-count="${plant.getCount()}"
-                        th:data-plant-id="${plant.getId()}"
-                        th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
-                        th:data-category-image="${plant.getCategoryImage()}">
-                        <div class="ratio ratio-1x1">
-                            <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
-                                alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
-                        </div>
-                        <p id="total" class="break-word mt-2 mb-0 text-decoration-underline"
-                            th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}">
-                        </p>
-                        <p id="category" class="mb-0" th:text="${plant.getCategory()}"></p>
-                        <p id="placed" class="break-word my-0 "></p>
-                        <p id="remaining" class="break-word my-0"></p>
+                            <div th:each="displayableItem : ${displayableItemsList}">
+                                <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                                    th:data-grid-y="${displayableItem.getYCoordinate()}"
+                                    th:data-grid-name="${displayableItem.getName()}"
+                                    th:data-grid-category="${displayableItem.getCategory()}"
+                                    th:data-grid-objectid="${displayableItem.getObjectId()}"
+                                    th:data-grid-image="${displayableItem.getCategoryImage()}">
+                                </div>
+                            </div>
                     </div>
 
-
-                    <div th:each="displayableItem : ${displayableItemsList}">
-                        <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
-                            th:data-grid-y="${displayableItem.getYCoordinate()}"
-                            th:data-grid-name="${displayableItem.getName()}"
-                            th:data-grid-category="${displayableItem.getCategory()}"
-                            th:data-grid-objectid="${displayableItem.getObjectId()}"
-                            th:data-grid-image="${displayableItem.getCategoryImage()}">
-                        </div>
-                    </div>
-
-                    <div id="textureTabContent" class="tab-content">
+                    <div id="textureTabContent" class="tab-pane">
                         Icons for Textures will go here
+                    </div>
                     </div>
 
 

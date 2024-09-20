@@ -67,9 +67,6 @@
     animation-fill-mode: forwards;
 }
 
-.active {
-    background-color: transparent;
-}
 
 @keyframes fadeOutAnimation {
     0% {
