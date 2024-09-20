@@ -623,8 +623,6 @@ const handleDeleteButtonClick = () => {
 
     const {i, j} = convertToGridCoordinates(gridX, gridY);
 
-    fetch(`/${instance}2D-garden/${gardenId}/delete?x_coord_delete=${i}&y_coord_delete=${j}`)
-
     let plantItem = null;
     plantItems.forEach(item => {
         if (item.getAttribute("data-plant-id") === selectedGridItem.attrs.id) {
