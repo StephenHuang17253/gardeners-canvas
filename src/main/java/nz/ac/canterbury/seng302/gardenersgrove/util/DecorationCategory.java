@@ -5,11 +5,14 @@ package nz.ac.canterbury.seng302.gardenersgrove.util;
  * This is used to determine which 3D model is used for a decoration in the 3D Garden View.
  */
 public enum DecorationCategory {
-    ROCK("Rock", "rock.png"),
-    TABLE("Table", "table.png"),
-    POND("Pond", "pond.png"),
-    GNOME("Gnome", "gnome.png"),
-    FOUNTAIN("Fountain", "fountain.png");
+
+    // TODO: Person who adds decoration images will replace 'tree.png' with suitable image.
+
+    ROCK("Rock", "tree.png"),
+    TABLE("Table", "tree.png"),
+    POND("Pond", "tree.png"),
+    GNOME("Gnome", "tree.png"),
+    FOUNTAIN("Fountain", "tree.png");
 
     private final String categoryName;
     private final String categoryImage;

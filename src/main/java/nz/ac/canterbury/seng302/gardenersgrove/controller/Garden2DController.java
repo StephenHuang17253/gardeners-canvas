@@ -3,16 +3,14 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
@@ -38,6 +36,8 @@ public class Garden2DController {
 
     private final PlantService plantService;
 
+    private final DecorationService decorationService;
+
     private final GridItemLocationService gridItemLocationService;
 
     private static final int COUNT_PER_PAGE = 6;
@@ -46,14 +46,18 @@ public class Garden2DController {
 
     @Autowired
     public Garden2DController(GardenService gardenService, SecurityService securityService,
-            GridItemLocationService gridItemLocationService, PlantService plantService) {
+                              GridItemLocationService gridItemLocationService, PlantService plantService, DecorationService decorationService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.gridItemLocationService = gridItemLocationService;
         this.plantService = plantService;
+        this.decorationService = decorationService;
 
     }
 
+    /**
+     * Returns the 2D Garden Page where the user can edit the layout of their garden.
+     */
     @GetMapping("/2D-garden/{gardenId}")
     public String getGarden2DPage(@PathVariable Long gardenId,
             @RequestParam(defaultValue = "1") int page,
@@ -88,21 +92,36 @@ public class Garden2DController {
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
 
-        List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
+        List<GridItemLocation> gridLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
         List<DisplayableItem> displayableItems = new ArrayList<>();
 
-        for (GridItemLocation plantLocation : plantLocations) {
-            if (plantLocation.getItemType() == GridItemType.PLANT) {
-                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getObjectId());
+        for (GridItemLocation gridLocation : gridLocations) {
+            if (gridLocation.getItemType() == GridItemType.PLANT) {
+                Optional<Plant> optionalPlant = plantService.getById(gridLocation.getObjectId());
                 if (optionalPlant.isPresent()) {
                     Plant currentPlant = optionalPlant.get();
-                    displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
-                            plantLocation.getYCoordinate(),
+                    displayableItems.add(new DisplayableItem(gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId(),
+                            gridLocation.getObjectId(),
+                            gridLocation.getItemType(),
                             currentPlant.getPlantCategory().getCategoryImage()));
+                }
+            }
+            if (gridLocation.getItemType() == GridItemType.DECORATION) {
+                Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+                if (optionalDecoration.isPresent()) {
+                    Decoration currentDecoration = optionalDecoration.get();
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
+                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
+                            currentDecoration.getDecorationCategory().toString(),
+                            currentDecoration.getId(),
+                            gridLocation.getItemType(),
+                            currentDecoration.getDecorationCategory().getCategoryImage()));
                 }
             }
         }
