@@ -10,6 +10,7 @@ const deletePlantButton = document.getElementById("deletePlant");
 const saveGardenForm = document.getElementById("saveGardenForm");
 
 const idListInput = document.getElementById("idList");
+const typeListInput = document.getElementById("typeList");
 const xCoordListInput = document.getElementById("xCoordList");
 const yCoordListInput = document.getElementById("yCoordList");
 
@@ -657,8 +658,9 @@ const handleGardenFormSubmit = (event) => {
     const yCoordList = [];
 
     layer.find("Image").forEach(node => {
+        console.log(node.attrs.type)
         idList.push(node.id());
-        typeList.push(node.type)
+        typeList.push(node.attrs.type);
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
         const { i, j } = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
@@ -666,7 +668,7 @@ const handleGardenFormSubmit = (event) => {
     });
 
     idListInput.value = JSON.stringify(idList);
-    typeList.value = JSON.stringify(typeList);
+    typeListInput.value = JSON.stringify(typeList);
     xCoordListInput.value = JSON.stringify(xCoordList);
     yCoordListInput.value = JSON.stringify(yCoordList);
     event.target.submit();

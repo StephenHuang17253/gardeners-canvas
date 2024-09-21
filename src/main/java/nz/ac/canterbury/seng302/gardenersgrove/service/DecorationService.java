@@ -7,6 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +48,7 @@ public class DecorationService {
     /**
      * Retrieves all decorations belonging to a particular category
      *
-     * @param decorationCategory the category used in the query
+     * @param decorationCategory    the category used in the query
      * @return a list of decorations belonging to that category
      */
     public List<Decoration> getDecorationsByCategory(DecorationCategory decorationCategory) {
@@ -55,15 +56,37 @@ public class DecorationService {
     }
 
     /**
+     * Retrieves all decoration objects belonging to a particular garden.
+     *
+     * @param garden the garden the decoration belongs to
+     * @return list of decoration objects belonging to that garden.
+     */
+    public List<Decoration> getDecorationsByGarden(Garden garden) {
+        return decorationRepository.findDecorationsByGardenIs(garden);
+    }
+
+    /**
      * Retrieves all decoration objects belonging to a particular category and garden.
      *
-     * @param garden        the garden the decoration belongs to
-     * @param decorationCategory the category the decoration belongs to
+     * @param garden                the garden the decoration belongs to
+     * @param decorationCategory    the category the decoration belongs to
      * @return list of decoration objects belonging to that garden and category.
      */
     public List<Decoration> getDecorationsByGardenAndCategory(Garden garden, DecorationCategory decorationCategory) {
         return decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden, decorationCategory);
     }
 
-
+    /**
+     * Saves a new decoration to the repository
+     *
+     * @param decoration the Decoration to persist
+     * @return the Decoration being persisted
+     */
+    public Decoration addDecoration(Decoration decoration) {
+        boolean notAlreadyAdded = this.getDecorationsByGardenAndCategory(decoration.getGarden(), decoration.getDecorationCategory()).isEmpty();
+        if (!notAlreadyAdded) {
+            throw new IllegalArgumentException("Decoration already in garden");
+        }
+        return decorationRepository.save(decoration);
+    }
 }

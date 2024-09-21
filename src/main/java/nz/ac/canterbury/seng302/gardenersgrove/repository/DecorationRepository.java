@@ -33,6 +33,15 @@ public interface DecorationRepository extends CrudRepository<Decoration, Long> {
     List<Decoration> findDecorationsByDecorationCategoryIs(DecorationCategory decorationCategory);
 
     /**
+     * Find all decoration objects belonging to a particular garden.
+     *
+     * @param garden the garden used in query
+     * @return list of decoration objects belonging to that garden.
+     */
+    List<Decoration> findDecorationsByGardenIs(Garden garden);
+
+
+    /**
      * Find all decoration objects belonging to a particular decoration category and garden.
      *
      * @param garden                the garden the decoration belongs to

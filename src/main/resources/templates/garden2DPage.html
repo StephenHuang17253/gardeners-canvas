@@ -113,6 +113,7 @@
             <form class="d-none" th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm"
                 method="post">
                 <input type="hidden" id="idList" name="idList" th:value="''" />
+                <input type="hidden" id="typeList" name="typeList" th:value="''" />
                 <input type="hidden" id="xCoordList" name="xCoordList" th:value="''" />
                 <input type="hidden" id="yCoordList" name="yCoordList" th:value="''" />
             </form>

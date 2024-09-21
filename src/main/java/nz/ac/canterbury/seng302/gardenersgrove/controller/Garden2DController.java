@@ -167,10 +167,10 @@ public class Garden2DController {
 
     /**
      * Endpoint to save the locations of elements on a 2D garden grid.
-     * NOTE: CURRENTLY ASSUMES ALL ELEMENTS ARE PLANTS
      *
      * @param gardenId   id of the garden whose grid has to be saved
      * @param idList     ids of all elements on the grid
+     * @param typeList   gridItemType of all elements on the grid
      * @param xCoordList x coordinates of all elements on the grid
      * @param yCoordList y coordinates of all elements on the grid
      * @param response   http response to use to return error
@@ -180,6 +180,7 @@ public class Garden2DController {
     @PostMapping("/2D-garden/{gardenId}/save")
     public String save2DGarden(@PathVariable Long gardenId,
             @RequestParam(value = "idList", required = false) String idList,
+            @RequestParam(value = "typeList", required = false) String typeList,
             @RequestParam(value = "xCoordList", required = false) String xCoordList,
             @RequestParam(value = "yCoordList", required = false) String yCoordList,
             HttpServletResponse response,
@@ -209,11 +210,14 @@ public class Garden2DController {
         // converting json input to arrays
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> idListAsList = new ArrayList<>();
+        List<String> typeListAsList = new ArrayList<>();
         List<Double> xCoordListAsList = new ArrayList<>();
         List<Double> yCoordListAsList = new ArrayList<>();
 
         try {
             idListAsList = objectMapper.readValue(idList, new TypeReference<>() {
+            });
+            typeListAsList = objectMapper.readValue(typeList, new TypeReference<>() {
             });
             xCoordListAsList = objectMapper.readValue(xCoordList, new TypeReference<>() {
             });
@@ -223,7 +227,8 @@ public class Garden2DController {
             logger.error(e.getMessage());
         }
 
-        if (idListAsList.size() != xCoordListAsList.size() || idListAsList.size() != yCoordListAsList.size()) {
+        if (idListAsList.size() != xCoordListAsList.size() || idListAsList.size() != yCoordListAsList.size()
+        || idListAsList.size() != typeListAsList.size()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("errorTitle", "400 Bad Request");
             model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
@@ -234,8 +239,7 @@ public class Garden2DController {
         // updating the repository
         deleteOldGridLocationItems(garden);
         for (int i = 0; i < idListAsList.size(); i++) {
-            // all items on grid are plants at the moment
-            updateGardenGrid(GridItemType.PLANT, Long.parseLong(idListAsList.get(i)),
+            updateGardenGrid(GridItemType.valueOf(typeListAsList.get(i)), Long.parseLong(idListAsList.get(i)),
                     xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
         }
         return "redirect:/2D-garden/{gardenId}";
