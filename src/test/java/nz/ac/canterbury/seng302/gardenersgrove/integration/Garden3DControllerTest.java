@@ -169,6 +169,18 @@ class Garden3DControllerTest {
                 .andExpect(status().isOk());
     }
 
+    void get3DGardenLayout_oneDecoration_return200AndDecoration() {
+
+    }
+
+    void get3DGardenLayout_multipleDecorations_return200AndDecorations() {
+
+    }
+
+    void get3DGardenLayout_duplicateDecorationsWithDifferentLocations_return200AndDuplicates() {
+
+    }
+
     @Test
     @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
     void gardenHasAPlantWithALocation_WhenCallMade_LocationForPlantIsReturned() throws Exception {
