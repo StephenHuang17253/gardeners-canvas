@@ -14,6 +14,7 @@ const xCoordListInput = document.getElementById("xCoordList");
 const yCoordListInput = document.getElementById("yCoordList");
 
 const plantItems = document.querySelectorAll("[name='plant-item']");
+const decorationItems = document.querySelectorAll("[name='decoration-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
 
 const pagination = document.getElementById("pagination");
@@ -22,7 +23,6 @@ const previousPage = document.getElementById("previousPage");
 const currentPage = document.getElementById("currentPage");
 const nextPage = document.getElementById("nextPage");
 const lastPage = document.getElementById("lastPage");
-
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
@@ -37,7 +37,7 @@ const OFFSET_X = (STAGE_WIDTH - GRID_WIDTH) / 2;
 const OFFSET_Y = (STAGE_HEIGHT - GRID_HEIGHT) / 2;
 
 const INVALID_LOCATION = "Please place on the grid";
-const NO_PLANT_SELECTED = "Please select a plant to delete";
+const NO_ITEM_SELECTED = "Please select an item to delete";
 const OCCUPIED_DESTINATION = "Space is already occupied";
 const FULL_GRID = "No more space left on the garden"
 const ERROR_MESSAGE_DURATION = 3000;
@@ -48,9 +48,10 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
-let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
+let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, originalDecorationCounts, layer,
     tooltipLayer, prevSelectPlantPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
+
 
 // Helpers
 
@@ -80,35 +81,34 @@ const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
 }
 
 /**
- * Checks if the location is valid on the grid
- * @param {number} x - x-coordinate of the plant
- * @param {number} y - y-coordinate of the plant
+ * Checks if the grid coordinates i and j are valid on the grid
+ * @param {number} i - grid x-coordinate (column index)
+ * @param {number} j - grid y-coordinate (row index)
  * @returns {boolean} - True if the location is valid, false otherwise
  */
-const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y >= OFFSET_Y && y < OFFSET_Y + GRID_HEIGHT;
+const validLocation = (i, j) => i >= 0 && i < GRID_COLUMNS && j >= 0 && j < GRID_ROWS;
 
 /**
  * Checks if destination on grid is empty
- * @param {Number} x - x-coordinate of the plant on grid
- * @param {Number} y - y-coordinate of the plant on grid
+ * @param {Number} i - grid x-coordinate
+ * @param {Number} j - grid y-coordinate
  * @param plantId - id of plant being moved
  * @param gridLocationUniqueId
  * @returns {Boolean} - True if the destination is empty, false otherwise
  */
-const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
+const emptyDestination = (i, j, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
-        if (i === x && j === y) {
-            if (node.id() !== plantId) {
-                return false;
-            } else if (node.attrs.uniqueGridId !== gridLocationUniqueId) {
+        const nodeGridCoords = convertToGridCoordinates(node.x(), node.y());
+        if (nodeGridCoords.i === i && nodeGridCoords.j === j) {
+            if (node.id() !== plantId || node.attrs.uniqueGridId !== gridLocationUniqueId) {
                 return false;
             }
         }
     }
-    return true
-}
+    return true;
+};
+
 
 /**
  * Creates a tooltip object for displaying plant names and categories
@@ -159,98 +159,109 @@ const createToolTip = () => {
 };
 
 /**
- * Updates a plant's placed & remaining counters when the saved layout loads.
+ * Updates an item's placed & remaining counters when the saved layout loads.
  *
- * @param {number} plantId id of the plant whose counters are being updated
+ * @param {number} itemId id of the item whose counters are being updated
+ * @param {string} itemType type of the item ('plant' or 'decoration')
  */
-const updateCountersOnLoad = (plantId) => {
-    const plantItem = document.querySelector(`[name="plant-item"][data-plant-id="${plantId}"]`);
+const updateCountersOnLoad = (itemId, itemType) => {
+    let itemElement;
+    if (itemType === 'plant') {
+        itemElement = document.querySelector(`[name="plant-item"][data-plant-id="${itemId}"]`);
+    } else if (itemType === 'decoration') {
+        itemElement = document.querySelector(`[name="decoration-item"][data-decoration-id="${itemId}"]`);
+    }
 
-    const count = parseInt(plantItem.getAttribute("data-plant-count"));
-    const placedCount = originalPlantCounts[plantId] - count;
+    const countAttr = itemType === 'plant' ? 'data-plant-count' : 'data-decoration-count';
+    const originalCounts = itemType === 'plant' ? originalPlantCounts : originalDecorationCounts;
 
-    const placedElement = plantItem.querySelector("#placed");
-    const remainingElement = plantItem.querySelector("#remaining");
+    const count = parseInt(itemElement.getAttribute(countAttr));
+    const placedCount = originalCounts[itemId] - count;
+
+    const placedElement = itemElement.querySelector(".placed");
+    const remainingElement = itemElement.querySelector(".remaining");
 
     if (placedElement && remainingElement) {
         placedElement.textContent = `Placed: ${placedCount + 1}`;
         remainingElement.textContent = `Remaining: ${count - 1}`;
     }
 
-    plantItem.setAttribute("data-plant-count", count - 1);
+    itemElement.setAttribute(countAttr, count - 1);
 };
 
 /**
- * Creates a new plant and adds it to the stage produced by konva
+ * Creates a new item (plant or decoration) and adds it to the stage produced by Konva
  *
- * @param {string} imageSrc - The image source of the plant
- * @param {number} x - The x-coordinate of the plant
- * @param {number} y - The y-coordinate of the plant
- * @param {number} plantId - The id of the plant
- * @param {string} plantName - The name of the plant
- * @param {string} category - The category of the plant
- * @param {(onLoad?: () => void) => void} onload - The function to call when the plant is loaded can be undefined
+ * @param {string} imageSrc - The image source of the item
+ * @param {number} x - The x-coordinate of the item
+ * @param {number} y - The y-coordinate of the item
+ * @param {number} itemId - The id of the item
+ * @param {string} itemName - The name of the item
+ * @param {string} category - The category of the item
+ * @param {string} itemType - The type of the item ('plant' or 'decoration')
+ * @param {(onLoad?: () => void) => void} onload - The function to call when the item is loaded
  */
-const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = undefined) => {
-    const plantImage = new Image();
-    plantImage.src = imageSrc;
+const createItem = (imageSrc, x, y, itemId, itemName, category, itemType, onload = undefined) => {
+    const itemImage = new Image();
+    itemImage.src = imageSrc;
 
-    plantImage.onload = () => {
+    itemImage.onload = () => {
 
         const [tooltip, setToolTipText] = createToolTip();
 
-        const plant = new Konva.Image({
+        const item = new Konva.Image({
             x: x,
             y: y,
-            image: plantImage,
+            image: itemImage,
             width: GRID_SIZE,
             height: GRID_SIZE,
-            name: plantName,
-            id: plantId.toString(),
+            name: itemName,
+            id: itemId.toString(),
             draggable: true,
             uniqueGridId: uniqueGridItemIDNo.pop(),
+            itemType: itemType,
         });
 
-        plant.on("dragstart", () => {
-            prevSelectPlantPosition = { x: plant.x(), y: plant.y() };
+        item.on("dragstart", () => {
+            prevSelectPlantPosition = { x: item.x(), y: item.y() };
         })
 
-        plant.on("dragmove", () => {
+        item.on("dragmove", () => {
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plant.x(), plant.y());
+            const { i, j } = convertToGridCoordinates(item.x(), item.y());
             let { x, y } = convertToKonvaCoordinates(i, j);
 
-            // Ensure the plant is within the grid
+            // Ensure the item is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
             if (y < OFFSET_Y) y = OFFSET_Y;
-            if (x >= OFFSET_X + GRID_WIDTH) x = OFFSET_X + GRID_WIDTH - GRID_SIZE;
+            if (x >= OFFSET_X + GRID_WIDTH) x = OFFSET_X + GRID_SIZE;
             if (y >= OFFSET_Y + GRID_HEIGHT) y = OFFSET_Y + GRID_HEIGHT - GRID_SIZE;
 
-            plant.position({
+            item.position({
                 x: x,
                 y: y
             });
 
-            // Highlight the plant when dragging
-            plant.stroke("blue");
-            plant.strokeWidth(4);
+            // Highlight the item when dragging
+            item.stroke("blue");
+            item.strokeWidth(4);
         });
 
-        plant.on("dragend", () => {
-            // Unhighlight the plant when dragging ends
+        item.on("dragend", () => {
+            // Unhighlight the item when dragging ends
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plant.x(), plant.y());
+            const { i, j } = convertToGridCoordinates(item.x(), item.y());
 
-            //ensure destination is empty
-            if (!emptyDestination(i, j, plant.id(), plant.attrs.uniqueGridId)) {
+            // Ensure destination is empty
+            if (!validLocation(i, j) || !emptyDestination(i, j, item.id(), item.attrs.uniqueGridId)) {
                 showErrorMessage(OCCUPIED_DESTINATION);
-                plant.position(prevSelectPlantPosition);
+                item.position(prevSelectPlantPosition);
             }
-            plant.stroke(null);
-            plant.strokeWidth(0);
+            item.stroke(null);
+            item.strokeWidth(0);
         });
 
-        plant.on("click", () => {
+        item.on("click", () => {
             if (selectedPaletteItem) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 tooltip.hide();
@@ -269,30 +280,31 @@ const createPlant = (imageSrc, x, y, plantId, plantName, category, onload = unde
             deselectPaletteItem();
             deselectGridItem();
 
-            selectedGridItem = plant;
-            plant.stroke("blue");
-            plant.strokeWidth(4);
+            selectedGridItem = item;
+            item.stroke("blue");
+            item.strokeWidth(4);
         });
 
-        plant.on('mousemove', () => {
+        item.on('mousemove', () => {
             const mousePos = stage.getPointerPosition();
             tooltip.position({
                 x: mousePos.x + 10,
                 y: mousePos.y + 10,
             });
-            setToolTipText(plantName + "\n" + category);
+            setToolTipText(itemName + "\n" + category);
             tooltip.show()
         });
 
-        plant.on('mouseout', () => {
+        item.on('mouseout', () => {
             tooltip.hide();
         });
 
-        layer.add(plant);
+        layer.add(item);
 
         if (onload) onload();
     };
 };
+
 
 /**
  * Displays an error message for a short period of time
@@ -335,44 +347,47 @@ const dataURLtoBlob = (dataURL) => {
 };
 
 /**
- * Updates the displayed plant count in the HTML
+ * Updates the displayed item count in the HTML
  *
- * @param {HTMLElement} plantItem - The plant item element
+ * @param {HTMLElement} itemElement - The item element
  * @param {number} count - The new count
  */
-const updatePlantCountDisplay = (plantItem, count) => {
-    const plantId = plantItem.getAttribute("data-plant-id");
-    const originalCount = originalPlantCounts[plantId];
+const updateItemCountDisplay = (itemElement, count) => {
+    const itemId = itemElement.getAttribute("data-plant-id") || itemElement.getAttribute("data-decoration-id");
+    const itemType = itemElement.getAttribute("name") === 'plant-item' ? 'plant' : 'decoration';
 
-    const totalElement = plantItem.querySelector("#total");
-    const placedElement = plantItem.querySelector("#placed");
-    const remainingElement = plantItem.querySelector("#remaining");
+    const originalCounts = itemType === 'plant' ? originalPlantCounts : originalDecorationCounts;
 
-    const plantName = plantItem.getAttribute("data-plant-name");
+    const totalElement = itemElement.querySelector(".total");
+    const placedElement = itemElement.querySelector(".placed");
+    const remainingElement = itemElement.querySelector(".remaining");
+
+    const itemName = itemElement.getAttribute("data-plant-name") || itemElement.getAttribute("data-decoration-type");
 
     if (totalElement) {
-        totalElement.textContent = `${plantName} (x${originalCount})`;
+        totalElement.textContent = `${itemName} (x${originalCounts[itemId]})`;
     }
 
-    if (placedElement) {
-        placedElement.textContent = `Placed: ${originalCount - count}`;
-    }
-
-    if (remainingElement) {
+    if (placedElement && remainingElement) {
+        placedElement.textContent = `Placed: ${originalCounts[itemId] - count}`;
         remainingElement.textContent = `Remaining: ${count}`;
     }
 };
 
 /**
- * Resets the plant count to its original value
+ * Resets the item count to its original value
  *
- * @param {HTMLElement} plantItem - The plant item element
+ * @param {HTMLElement} itemElement - The item element
  */
-const resetPlantCount = (plantItem) => {
-    const plantId = plantItem.getAttribute("data-plant-id");
-    const originalCount = originalPlantCounts[plantId];
-    plantItem.setAttribute("data-plant-count", originalCount);
-    updatePlantCountDisplay(plantItem, originalCount);
+const resetItemCount = (itemElement) => {
+    const itemId = itemElement.getAttribute("data-plant-id") || itemElement.getAttribute("data-decoration-id");
+    const itemType = itemElement.getAttribute("name") === 'plant-item' ? 'plant' : 'decoration';
+
+    const originalCount = itemType === 'plant' ? originalPlantCounts[itemId] : originalDecorationCounts[itemId];
+    const countAttr = itemType === 'plant' ? 'data-plant-count' : 'data-decoration-count';
+
+    itemElement.setAttribute(countAttr, originalCount);
+    updateItemCountDisplay(itemElement, originalCount);
 };
 
 /**
@@ -422,7 +437,7 @@ downloader = new Downloader(link);
 
 // maps plant id to the original count
 originalPlantCounts = {};
-
+originalDecorationCounts = {};
 selectedPaletteItemInfo = null;
 selectedPaletteItem = null;
 selectedGridItem = null;
@@ -459,27 +474,28 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
 
 
 /**
- * Loads the persisted plants from a saved layout onto the grid.
+ * Loads the persisted items from a saved layout onto the grid.
  */
 gridItemLocations.forEach(item => {
     const x_coord = parseInt(item.getAttribute("data-grid-x"));
     const y_coord = parseInt(item.getAttribute("data-grid-y"));
-    const plantId = item.getAttribute("data-grid-objectid");
-    const plantName = item.getAttribute("data-grid-name");
+    const itemId = item.getAttribute("data-grid-objectid");
+    const itemName = item.getAttribute("data-grid-name");
     const category = item.getAttribute("data-grid-category");
+    const itemType = item.getAttribute("data-grid-itemType");
 
-    let plantSrc = item.getAttribute("data-grid-image");
+    let itemSrc = item.getAttribute("data-grid-image");
     if (instance !== "") {
-        plantSrc = `/${instance}` + plantSrc;
+        itemSrc = `/${instance}` + itemSrc;
     }
     const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
-    const onloadCallback = () => updateCountersOnLoad(plantId);
-    createPlant(plantSrc, x, y, plantId, plantName, category, onloadCallback);
+    const onloadCallback = () => updateCountersOnLoad(itemId, itemType);
+    createItem(itemSrc, x, y, itemId, itemName, category, itemType, onloadCallback);
 });
 
 /**
- * Initialise plant counts and event listeners for clicking on plant items
+ * Initialize plant and decoration counts and event listeners for clicking on palette items
  */
 plantItems.forEach((item, i) => {
 
@@ -512,7 +528,6 @@ plantItems.forEach((item, i) => {
 
         selectedPaletteItem = item;
 
-
         let plantImage = item.getAttribute("data-category-image")
 
         if (instance === "test/" || instance === "prod/") {
@@ -524,20 +539,64 @@ plantItems.forEach((item, i) => {
             image: plantImage,
             id: item.getAttribute("data-plant-id"),
             count: currentCount,
-            category: category
+            category: category,
+            itemType: 'plant'
         };
     };
 
     item.addEventListener("click", handlePlantItemClick);
 });
 
+
+decorationItems.forEach((item, i) => {
+
+    const decorationId = item.getAttribute("data-decoration-id");
+    originalDecorationCounts[decorationId] = parseInt(item.getAttribute("data-decoration-count"));
+
+    /**
+     * Handles the clicking of a decoration item in the palette
+     */
+    const handleDecorationItemClick = () => {
+        let nodes = layer.find("Image");
+        const currentCount = parseInt(item.getAttribute("data-decoration-count"));
+        const category = item.getAttribute("data-decoration-type");
+
+        deselectPaletteItem();
+        deselectGridItem();
+
+        if (nodes.length >= GRID_COLUMNS * GRID_ROWS) {
+            showErrorMessage(FULL_GRID);
+            return;
+        }
+
+        if (currentCount < 1) return;
+
+        item.style.border = "3px solid blue";
+
+        selectedPaletteItem = item;
+
+        let decorationImage = item.getAttribute("data-category-image");
+
+        if (instance === "test/" || instance === "prod/") {
+            decorationImage = `/${instance}` + decorationImage;
+        }
+
+        selectedPaletteItemInfo = {
+            name: item.querySelector(".total").textContent,
+            image: decorationImage,
+            id: item.getAttribute("data-decoration-id"),
+            count: currentCount,
+            category: category,
+            itemType: 'decoration'
+        };
+    };
+
+    item.addEventListener("click", handleDecorationItemClick);
+});
+
+
 // Event Handlers
 
-/**
- * Handles the clicking of the stage
- *
- * @param {Event} event
- */
 const handleStageClick = (event) => {
 
     if (!(event.target === stage || event.target.name() === "grid-cell")) return;
@@ -545,38 +604,44 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
+
+    if (!validLocation(i, j)) {
+        showErrorMessage(INVALID_LOCATION);
+        return;
+    }
+
     const { x, y } = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
 
-        if (!validLocation(x, y)) {
-            showErrorMessage(INVALID_LOCATION);
-            return;
-        }
+        createItem(
+            selectedPaletteItemInfo.image,
+            x,
+            y,
+            selectedPaletteItemInfo.id,
+            selectedPaletteItemInfo.name,
+            selectedPaletteItemInfo.category,
+            selectedPaletteItemInfo.itemType
+        );
 
-        createPlant(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
-        selectedPaletteItemInfo.count -= 1
+        selectedPaletteItemInfo.count -= 1;
 
-        selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
-        updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+        const countAttr = selectedPaletteItemInfo.itemType === 'plant' ? 'data-plant-count' : 'data-decoration-count';
+        selectedPaletteItem.setAttribute(countAttr, selectedPaletteItemInfo.count);
+        updateItemCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
 
     } else if (selectedGridItem) {
 
-        if (validLocation(x, y)) {
-            selectedGridItem.position({
-                x: x,
-                y: y
-            });
-        } else {
-            showErrorMessage(INVALID_LOCATION);
-        }
+        selectedGridItem.position({
+            x: x,
+            y: y
+        });
 
         deselectGridItem();
     }
 
     deselectPaletteItem();
 };
-
 
 /**
  * Clears all items from the grid and resets the plant counts
@@ -609,35 +674,43 @@ const handleExport = async (fileExtension) => {
 };
 
 /**
- * Handles the deletion of a plant from the garden
+ * Handles the deletion of an item from the garden
  */
 const handleDeleteButtonClick = () => {
     if (!selectedGridItem) {
-        showErrorMessage(NO_PLANT_SELECTED);
+        showErrorMessage(NO_ITEM_SELECTED);
         return;
     }
 
-    const gridX = selectedGridItem.attrs.x;
-    const gridY = selectedGridItem.attrs.y;
+    const itemType = selectedGridItem.attrs.itemType;
 
-    const { i, j } = convertToGridCoordinates(gridX, gridY);
+    let paletteItem = null;
+    if (itemType === 'plant') {
+        plantItems.forEach(item => {
+            if (item.getAttribute("data-plant-id") === selectedGridItem.attrs.id) {
+                paletteItem = item;
+            }
+        });
+    } else if (itemType === 'decoration') {
+        decorationItems.forEach(item => {
+            if (item.getAttribute("data-decoration-id") === selectedGridItem.attrs.id) {
+                paletteItem = item;
+            }
+        });
+    }
 
-    let plantItem = null;
-    plantItems.forEach(item => {
-        if (item.getAttribute("data-plant-id") === selectedGridItem.attrs.id) {
-            plantItem = item;
-        }
-    });
+    const countAttr = itemType === 'plant' ? "data-plant-count" : "data-decoration-count";
 
-    const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
-    plantItem.setAttribute("data-plant-count", updatedCount);
+    const updatedCount = parseInt(paletteItem.getAttribute(countAttr)) + 1;
+    paletteItem.setAttribute(countAttr, updatedCount);
     uniqueGridItemIDNo.push(selectedGridItem.attrs.uniqueGridId);
 
-    updatePlantCountDisplay(plantItem, updatedCount);
+    updateItemCountDisplay(paletteItem, updatedCount);
 
     selectedGridItem.destroy();
     selectedGridItem = null;
 };
+
 
 /**
  * Handles the saving of the garden layout
