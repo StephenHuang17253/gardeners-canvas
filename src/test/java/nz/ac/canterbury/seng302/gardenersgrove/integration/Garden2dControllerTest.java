@@ -1,18 +1,15 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import net.minidev.json.JSONArray;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.DecorationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
@@ -68,6 +65,12 @@ class Garden2dControllerTest {
 
     @Autowired
     private GridItemLocationRepository gridItemLocationRepository;
+
+    @Autowired
+    private DecorationService decorationService;
+
+    @Autowired
+    private DecorationRepository decorationRepository;
 
     private List<Garden> gardenList = new ArrayList<>();
     private List<Plant> plantList = new ArrayList<>();
@@ -165,6 +168,37 @@ class Garden2dControllerTest {
         Assertions.assertEquals(garden.getGardenSize(), gardenDetailModel.getGardenSize());
         Assertions.assertEquals(expectedPlants.size(), plants.size());
         Assertions.assertEquals(garden.getIsPublic(), gardenDetailModel.isGardenIsPublic());
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void Get2DGarden_WithPlantAndDecoration_Return200() throws Exception {
+        gridItemLocationRepository.deleteAll();
+        Garden garden = gardenList.get(0);
+        Long gardenId = garden.getGardenId();
+
+        // Prepare GridItemLocations to have plant and also a decoration
+        Plant testPlant = plantService.addPlant("Test Plant", 1, "", LocalDate.now(), gardenId, PlantCategory.CLIMBER);
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT, garden, 0, 0));
+
+        Decoration decoration = decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration.getId(), GridItemType.DECORATION, garden, 6, 6));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
+        List<DisplayableItem> displayableItems = (List<DisplayableItem>) modelMap.getAttribute("displayableItemsList");
+        Assertions.assertNotNull(modelMap);
+
+        GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+
+        // Assert that we have both a plant and a decoration in the displayable items
+        Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
+        Assertions.assertEquals(2, displayableItems.size());
+        Assertions.assertEquals(testPlant.getPlantName(), displayableItems.get(0).getName());
+        Assertions.assertEquals(decoration.getDecorationCategory().getCategoryName(), displayableItems.get(1).getName());
     }
 
     @Test
