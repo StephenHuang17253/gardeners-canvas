@@ -43,8 +43,16 @@ public class Decoration {
         return id;
     }
 
+    public void setId(Long newId) {
+        this.id = newId;
+    }
+
     public Garden getGarden() {
         return garden;
+    }
+
+    public void setGarden(Garden newGarden) {
+        this.garden = newGarden;
     }
 
     public DecorationCategory getDecorationCategory() {
