@@ -26,12 +26,12 @@ public interface GardenTileRepository extends CrudRepository<GardenTile, Long> {
     Optional<GardenTile> findByTileId(long id);
 
     /**
-     * Finds a GardenTile object by Garden
+     * Finds the GardenTile objects belonging to a particular Garden
      *
-     * @param garden the Garden the grid belongs to
+     * @param garden the Garden the tiles are associated with
      * @return none or a list of GardenTile objects
      */
-    List<GardenTile> findGardenTileByGardenIs(Garden garden);
+    List<GardenTile> findGardenTilesByGardenIs(Garden garden);
 
     /**
      * Find all GardenItemLocation objects in repo

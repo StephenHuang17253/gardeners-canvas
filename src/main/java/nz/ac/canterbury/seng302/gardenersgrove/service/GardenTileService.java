@@ -45,6 +45,14 @@ public class GardenTileService {
     }
 
     /**
+     * Retrieves all garden tiles associated with a particular garden.
+     * @return list of garden tiles in that garden
+     */
+    public List<GardenTile> getGardenTilesByGarden(Garden garden) {
+        return gardenTileRepository.findGardenTilesByGardenIs(garden);
+    }
+
+    /**
      * Retrieves a garden tile by its garden and coordinates
      * @param garden the garden the tile belongs to
      * @param xCoord the x coordinate of the tile
