@@ -23,7 +23,7 @@ public interface GardenTileRepository extends CrudRepository<GardenTile, Long> {
      * @param id the GardenTile's id
      * @return none or a GardenTile object
      */
-    Optional<GardenTile> findById(long id);
+    Optional<GardenTile> findByTileId(long id);
 
     /**
      * Finds a GardenTile object by Garden
