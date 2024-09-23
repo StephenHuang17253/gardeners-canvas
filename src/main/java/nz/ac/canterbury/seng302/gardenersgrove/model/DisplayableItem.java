@@ -1,5 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.model;
 
+import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
+
 /**
  * class of objects hat can be passed to the three js javascript to indicate
  * what plants or decorations are
@@ -16,7 +18,10 @@ public class DisplayableItem {
 
     private final Long objectId;
 
+    private final GridItemType type;
+
     private final String categoryImage;
+
     private static final String ROOT_PATH = "/images/2d-plant-categories/";
 
     /**
@@ -27,12 +32,13 @@ public class DisplayableItem {
      * @param name        name of represented object e.g plant name
      * @param category    category of item
      */
-    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId, String categoryImage) {
+    public DisplayableItem(int xCoordinate, int yCoordinate, String name, String category, long objectId, GridItemType type, String categoryImage) {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.name = name;
         this.category = category;
         this.objectId = objectId;
+        this.type = type;
         this.categoryImage = ROOT_PATH + categoryImage;
     }
 
@@ -54,6 +60,10 @@ public class DisplayableItem {
 
     public Long getObjectId() {
         return objectId;
+    }
+
+    public GridItemType getType() {
+        return type;
     }
 
     public String getCategoryImage() {
