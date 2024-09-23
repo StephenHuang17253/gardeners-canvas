@@ -44,7 +44,7 @@ class DecorationServiceUnitTest {
         decorationService = new DecorationService(decorationRepository);
 
         testUser1 = Mockito.spy(new User("Lysander", "au Lune", "lysander@DecorationServiceUnitTest.com",
-                LocalDate.of(2003,5,2)));
+                LocalDate.of(2003, 5, 2)));
         garden = Mockito.spy(new Garden("Lune Gardens",
                 "The Gardens of House Lune",
                 "Luna, Sol",
@@ -98,7 +98,7 @@ class DecorationServiceUnitTest {
         List<Decoration> allDecorations = decorationService.getDecorations();
 
         Assertions.assertEquals(2, allDecorations.size());
-        Assertions.assertEquals(decoration1, allDecorations.getFirst());
+        Assertions.assertEquals(decoration1, allDecorations.get(0));
     }
 
     @Test
@@ -120,8 +120,8 @@ class DecorationServiceUnitTest {
 
         List<Decoration> foundDecorations = decorationService.getDecorationsByCategory(DecorationCategory.FOUNTAIN);
 
-        Assertions.assertEquals(1,foundDecorations.size());
-        Assertions.assertEquals(decoration1, foundDecorations.getFirst());
+        Assertions.assertEquals(1, foundDecorations.size());
+        Assertions.assertEquals(decoration1, foundDecorations.get(0));
     }
 
     @Test
@@ -173,8 +173,8 @@ class DecorationServiceUnitTest {
 
         List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.FOUNTAIN);
 
-        Assertions.assertEquals(1,foundDecorations.size());
-        Assertions.assertEquals(decoration1, foundDecorations.getFirst());
+        Assertions.assertEquals(1, foundDecorations.size());
+        Assertions.assertEquals(decoration1, foundDecorations.get(0));
     }
 
     @Test
