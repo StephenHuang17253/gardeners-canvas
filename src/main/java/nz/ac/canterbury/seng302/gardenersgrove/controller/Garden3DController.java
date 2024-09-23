@@ -1,11 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
@@ -31,7 +28,7 @@ public class Garden3DController {
     Logger logger = LoggerFactory.getLogger(Garden3DController.class);
 
     private final GardenService gardenService;
-
+    private final DecorationService decorationService;
     private final GridItemLocationService gridItemLocationService;
     private final SecurityService securityService;
     private final FriendshipService friendshipService;
@@ -40,19 +37,20 @@ public class Garden3DController {
 
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
-            FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
-            PlantService plantService) {
+                              FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
+                              PlantService plantService, DecorationService decorationService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.plantService = plantService;
+        this.decorationService = decorationService;
     }
 
     @GetMapping("/3D-garden/{gardenId}")
     public String getGarden3DPage(@PathVariable Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+                                  HttpServletResponse response,
+                                  Model model) {
         logger.info("GET /3D-garden/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -90,7 +88,7 @@ public class Garden3DController {
     @ResponseBody
     @GetMapping("/3D-garden-layout/{gardenId}")
     public List<DisplayableItem> get3DGardenLayout(@PathVariable Long gardenId,
-            HttpServletResponse response) {
+                                                   HttpServletResponse response) {
         logger.info("GET /3D-garden-layout/{}", gardenId);
 
         List<DisplayableItem> displayableItems = new ArrayList<>();
@@ -112,30 +110,41 @@ public class Garden3DController {
             return displayableItems;
         }
 
-        List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
+        List<GridItemLocation> gridItemLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        for (GridItemLocation plantLocation : plantLocations) {
-            if (plantLocation.getItemType() == GridItemType.PLANT) {
-                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getObjectId());
+        for (GridItemLocation gridLocation : gridItemLocations) {
+            if (gridLocation.getItemType() == GridItemType.PLANT) {
+                Optional<Plant> optionalPlant = plantService.getById(gridLocation.getObjectId());
                 if (optionalPlant.isPresent()) {
                     Plant currentPlant = optionalPlant.get();
-                    displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
-                            plantLocation.getYCoordinate(),
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId(),
-                            plantLocation.getItemType(),
+                            gridLocation.getObjectId(),
+                            gridLocation.getItemType(),
                             currentPlant.getPlantCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}", gridLocation.getId());
                 }
-                else {
-                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}",plantLocation.getId());
+            } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
+                Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+                if (optionalDecoration.isPresent()) {
+                    Decoration currentDecoration = optionalDecoration.get();
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
+                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
+                            currentDecoration.getDecorationCategory().toString(),
+                            currentDecoration.getId(),
+                            gridLocation.getItemType(),
+                            currentDecoration.getDecorationCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}", gridLocation.getId());
                 }
-            }
-            else {
-                logger.warn("Not yet implemented adding decoration to grid {}",plantLocation.getId());
             }
         }
-
         return displayableItems;
     }
 

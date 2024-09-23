@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { createTileGrid } from './tiles.js';
-import { OrbitControls } from './OrbitControls.js';
-import { Loader } from './Loader.js';
-import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from './Exporter.js';
-import { Downloader } from '../Downloader.js';
+import {createTileGrid} from './tiles.js';
+import {OrbitControls} from './OrbitControls.js';
+import {Loader} from './Loader.js';
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import {Exporter} from './Exporter.js';
+import {Downloader} from '../Downloader.js';
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -14,10 +14,7 @@ const modelMap = {
     "Creeper": ["creeper.glb", 0.5],
     "Climber": ["climber.glb", 5],
     "Flower": ["flower.glb", 10],
-    "Pot Plant": ["potplant.glb", 5]
-};
-
-const decoMap = {
+    "Pot Plant": ["potplant.glb", 5],
     "Rock": ["deco/rock.glb", 2],
     "Pond": ["deco/pond.glb", 2],
     "Gnome": ["deco/gnome.glb", 7],
@@ -97,11 +94,11 @@ const addLight = () => {
 };
 
 /** Add model to scene
-* 
-* @param {Object} model - The model to be added to the scene.
-* @param {Object} position - The position at which the model will be placed in the scene.
-* @param {number} [scaleFactor=1] - The scale factor to be applied to the model. Default value is 1.
-*/
+ *
+ * @param {Object} model - The model to be added to the scene.
+ * @param {Object} position - The position at which the model will be placed in the scene.
+ * @param {number} [scaleFactor=1] - The scale factor to be applied to the model. Default value is 1.
+ */
 const addModelToScene = (model, position, scaleFactor = 1) => {
     model.position.copy(position);
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -122,12 +119,12 @@ loader.loadBackground(
 
 const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
-const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
+const {grid} = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 scene.add(grid);
 
 /**
  * Adds a plant or decoration object to the scene.
- * 
+ *
  * @param {Object} plantOrDecoration - The plant or decoration object to be added.
  * @returns {Promise<void>} - A promise that resolves when the object is added to the scene.
  */
@@ -137,7 +134,7 @@ const addObjectToScene = async (plantOrDecoration) => {
     const position = new THREE.Vector3(x, 0, z);
 
     const category = plantOrDecoration.category;
-
+    
     const loadedModel = await loader.loadModel(modelMap[category][0], category);
 
     console.log(category, modelMap[category]);
@@ -202,7 +199,7 @@ const animate = () => {
 
 renderer.setAnimationLoop(animate);
 
-/** 
+/**
  * Event Handlers
  */
 
