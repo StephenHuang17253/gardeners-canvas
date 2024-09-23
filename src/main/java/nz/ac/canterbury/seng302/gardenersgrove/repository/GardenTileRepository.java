@@ -48,7 +48,7 @@ public interface GardenTileRepository extends CrudRepository<GardenTile, Long> {
      * @param ycoord the y coordinate used in the query
      * @return the tile which belongs to that garden, at the given coordinates.
      */
-    Optional<GardenTile> findGardenTileByGardeAndXCoordinateAndYCoordinate(Garden garden, int xcoord, int ycoord);
+    Optional<GardenTile> findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(Garden garden, int xcoord, int ycoord);
 
 
 }
