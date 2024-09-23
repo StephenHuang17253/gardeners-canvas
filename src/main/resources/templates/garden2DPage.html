@@ -56,6 +56,10 @@
                                 <a class="nav-link text-white fs-5 active" role="tab" data-bs-toggle="tab" href="#plantTabContent" id="plant-tab"
                                 style="background-color:transparent">Plants</a>
                             </li>
+                            <li class="nav-item nav-underline ">
+                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab" href="#decorationsTabContent" id="decorations-tab"
+                                   style="background-color:transparent">Decorations</a>
+                            </li>
                             <li class="nav-item nav-underline">
                                 <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab" href="#textureTabContent" id="textures-tab"
                                    style="background-color:transparent">Textures</a>
@@ -91,14 +95,20 @@
                                     th:data-grid-name="${displayableItem.getName()}"
                                     th:data-grid-category="${displayableItem.getCategory()}"
                                     th:data-grid-objectid="${displayableItem.getObjectId()}"
+                                    th:data-grid-type="${displayableItem.getType()}"
                                     th:data-grid-image="${displayableItem.getCategoryImage()}">
                                 </div>
                             </div>
                     </div>
 
+                    <div id="decorationsTabContent" class="tab-pane">
+                        Icons for Decorations will go here
+                    </div>
+
                     <div id="textureTabContent" class="tab-pane">
                         Icons for Textures will go here
                     </div>
+
                     </div>
 
 
@@ -112,6 +122,7 @@
             <form class="d-none" th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm"
                 method="post">
                 <input type="hidden" id="idList" name="idList" th:value="''" />
+                <input type="hidden" id="typeList" name="typeList" th:value="''" />
                 <input type="hidden" id="xCoordList" name="xCoordList" th:value="''" />
                 <input type="hidden" id="yCoordList" name="yCoordList" th:value="''" />
             </form>
