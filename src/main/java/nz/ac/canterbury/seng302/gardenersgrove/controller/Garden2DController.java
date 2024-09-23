@@ -101,7 +101,8 @@ public class Garden2DController {
                 Optional<Plant> optionalPlant = plantService.getById(gridLocation.getObjectId());
                 if (optionalPlant.isPresent()) {
                     Plant currentPlant = optionalPlant.get();
-                    displayableItems.add(new DisplayableItem(gridLocation.getXCoordinate(),
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
                             gridLocation.getYCoordinate(),
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
@@ -109,8 +110,7 @@ public class Garden2DController {
                             gridLocation.getItemType(),
                             currentPlant.getPlantCategory().getCategoryImage()));
                 }
-            }
-            if (gridLocation.getItemType() == GridItemType.DECORATION) {
+            } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
                 Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
                 if (optionalDecoration.isPresent()) {
                     Decoration currentDecoration = optionalDecoration.get();
@@ -124,6 +124,7 @@ public class Garden2DController {
                             currentDecoration.getDecorationCategory().getCategoryImage()));
                 }
             }
+
         }
 
         model.addAttribute("isOwner", true);
