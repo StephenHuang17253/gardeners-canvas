@@ -16,6 +16,8 @@ const yCoordListInput = document.getElementById("yCoordList");
 
 const plantItems = document.querySelectorAll("[name='plant-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
+const decorationItems = document.querySelectorAll("[name='decoration-item']");
+
 
 const pagination = document.getElementById("pagination");
 const firstPage = document.getElementById("firstPage");
@@ -48,6 +50,8 @@ const instance = getInstance();
 const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
+
+let originalDecorationCounts = {};
 
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
     tooltipLayer, prevSelectPosition;
@@ -179,6 +183,23 @@ const updateCountersOnLoad = (plantId) => {
     }
 
     plantItem.setAttribute("data-plant-count", count - 1);
+};
+
+const updateDecorationCountersOnLoad = (decorationId) => {
+    const decorationItem = document.querySelector(`[name="decoration-item"][data-decoration-id="${decorationId}"]`);
+
+    const count = parseInt(decorationItem.getAttribute("data-decoration-count"));
+    const placedCount = originalDecorationCounts[decorationId] - count;
+
+    const placedElement = decorationItem.querySelector(".placed");
+    const remainingElement = decorationItem.querySelector(".remaining");
+
+    if (placedElement && remainingElement) {
+        placedElement.textContent = `Placed: ${placedCount + 1}`;
+        remainingElement.textContent = `Remaining: ${count - 1}`;
+    }
+
+    decorationItem.setAttribute("data-decoration-count", count - 1);
 };
 
 /**
@@ -343,18 +364,18 @@ const dataURLtoBlob = (dataURL) => {
  * @param {HTMLElement} plantItem - The plant item element
  * @param {number} count - The new count
  */
-const updatePlantCountDisplay = (plantItem, count) => {
-    const plantId = plantItem.getAttribute("data-plant-id");
-    const originalCount = originalPlantCounts[plantId];
+const updateItemCountDisplay = (itemElement, count, originalCounts, type) => {
+    const itemId = type === "PLANT" ? itemElement.getAttribute("data-plant-id") : itemElement.getAttribute("data-decoration-id");
+    const originalCount = originalCounts[itemId];
 
-    const totalElement = plantItem.querySelector("#total");
-    const placedElement = plantItem.querySelector("#placed");
-    const remainingElement = plantItem.querySelector("#remaining");
+    const totalElement = itemElement.querySelector(".total");
+    const placedElement = itemElement.querySelector(".placed");
+    const remainingElement = itemElement.querySelector(".remaining");
 
-    const plantName = plantItem.getAttribute("data-plant-name");
+    const itemName = itemElement.querySelector(".total").textContent.split(' (x')[0];
 
     if (totalElement) {
-        totalElement.textContent = `${plantName} (x${originalCount})`;
+        totalElement.textContent = `${itemName} (x${originalCount})`;
     }
 
     if (placedElement) {
@@ -365,6 +386,31 @@ const updatePlantCountDisplay = (plantItem, count) => {
         remainingElement.textContent = `Remaining: ${count}`;
     }
 };
+
+
+const updateDecorationCountDisplay = (decorationItem, count) => {
+    const decorationId = decorationItem.getAttribute("data-decoration-id");
+    const originalCount = originalDecorationCounts[decorationId];
+
+    const totalElement = decorationItem.querySelector(".total");
+    const placedElement = decorationItem.querySelector(".placed");
+    const remainingElement = decorationItem.querySelector(".remaining");
+
+    const decorationName = decorationItem.querySelector(".total").textContent.split(' (x')[0];
+
+    if (totalElement) {
+        totalElement.textContent = `${decorationName} (x${originalCount})`;
+    }
+
+    if (placedElement) {
+        placedElement.textContent = `Placed: ${originalCount - count}`;
+    }
+
+    if (remainingElement) {
+        remainingElement.textContent = `Remaining: ${count}`;
+    }
+};
+
 
 /**
  * Resets the plant count to its original value
@@ -426,6 +472,7 @@ downloader = new Downloader(link);
 // maps plant id to the original count
 originalPlantCounts = {};
 
+
 selectedPaletteItemInfo = null;
 selectedPaletteItem = null;
 selectedGridItem = null;
@@ -478,7 +525,13 @@ gridItemLocations.forEach(item => {
     }
     const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
 
-    const onloadCallback = () => updateCountersOnLoad(objectId);
+    const onloadCallback = () => {
+        if (itemType === "PLANT") {
+            updateCountersOnLoad(objectId);
+        } else if (itemType === "DECORATION") {
+            updateDecorationCountersOnLoad(objectId);
+        }
+    };
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
 });
 
@@ -536,6 +589,42 @@ plantItems.forEach((item, i) => {
     item.addEventListener("click", handlePlantItemClick);
 });
 
+decorationItems.forEach((item) => {
+    const decorationId = item.getAttribute("data-decoration-id");
+    originalDecorationCounts[decorationId] = parseInt(item.getAttribute("data-decoration-count"));
+
+    item.addEventListener("click", () => {
+        // Deselect any previously selected items
+        deselectPaletteItem();
+        deselectGridItem();
+
+        const currentCount = parseInt(item.getAttribute("data-decoration-count"));
+
+        if (currentCount < 1) return;
+
+        item.style.border = "3px solid blue";
+
+        selectedPaletteItem = item;
+
+        let decorationImage = item.getAttribute("data-category-image");
+
+        // Adjust the image path if necessary
+        if (instance !== "") {
+            decorationImage = `/${instance}` + decorationImage;
+        }
+
+        selectedPaletteItemInfo = {
+            name: item.querySelector(".total").textContent.split(' (x')[0],
+            image: decorationImage,
+            id: decorationId,
+            type: "DECORATION",
+            count: currentCount,
+            category: "Decoration",
+        };
+    });
+});
+
+
 // Event Handlers
 
 /**
@@ -544,7 +633,6 @@ plantItems.forEach((item, i) => {
  * @param {Event} event
  */
 const handleStageClick = (event) => {
-
     if (!(event.target === stage || event.target.name() === "grid-cell")) return;
 
     const mousePos = stage.getPointerPosition();
@@ -553,18 +641,30 @@ const handleStageClick = (event) => {
     const { x, y } = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
-
         if (!validLocation(x, y)) {
             showErrorMessage(INVALID_LOCATION);
             return;
         }
 
-        createPlantOrDecoration(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
-        selectedPaletteItemInfo.count -= 1
+        createPlantOrDecoration(
+            selectedPaletteItemInfo.image,
+            x,
+            y,
+            selectedPaletteItemInfo.id,
+            selectedPaletteItemInfo.type,
+            selectedPaletteItemInfo.name,
+            selectedPaletteItemInfo.category
+        );
 
-        selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
-        updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+        selectedPaletteItemInfo.count -= 1;
 
+        if (selectedPaletteItemInfo.type === "PLANT") {
+            selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
+            updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+        } else if (selectedPaletteItemInfo.type === "DECORATION") {
+            selectedPaletteItem.setAttribute("data-decoration-count", selectedPaletteItemInfo.count);
+            updateDecorationCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+        }
     } else if (selectedGridItem) {
 
         if (validLocation(x, y)) {
@@ -627,22 +727,23 @@ const handleDeleteButtonClick = () => {
 
     const { i, j } = convertToGridCoordinates(gridX, gridY);
 
-    let plantItem = null;
-    plantItems.forEach(item => {
-        if (item.getAttribute("data-plant-id") === selectedGridItem.attrs.id) {
-            plantItem = item;
-        }
-    });
+    if (selectedGridItem.attrs.type === "PLANT") {
+        let plantItem = document.querySelector(`[name='plant-item'][data-plant-id='${selectedGridItem.attrs.id}']`);
+        const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
+        plantItem.setAttribute("data-plant-count", updatedCount);
+        updatePlantCountDisplay(plantItem, updatedCount);
+    } else if (selectedGridItem.attrs.type === "DECORATION") {
+        let decorationItem = document.querySelector(`[name='decoration-item'][data-decoration-id='${selectedGridItem.attrs.id}']`);
+        const updatedCount = parseInt(decorationItem.getAttribute("data-decoration-count")) + 1;
+        decorationItem.setAttribute("data-decoration-count", updatedCount);
+        updateDecorationCountDisplay(decorationItem, updatedCount);
+    }
 
-    const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
-    plantItem.setAttribute("data-plant-count", updatedCount);
     uniqueGridItemIDNo.push(selectedGridItem.attrs.uniqueGridId);
-
-    updatePlantCountDisplay(plantItem, updatedCount);
-
     selectedGridItem.destroy();
     selectedGridItem = null;
 };
+
 
 /**
  * Handles the saving of the garden layout
@@ -657,11 +758,12 @@ const handleGardenFormSubmit = (event) => {
     const xCoordList = [];
     const yCoordList = [];
 
-    layer.find("Image").forEach(node => {
-        console.log(node.attrs.type)
+    layer.find("Image").forEach((node) => {
         idList.push(node.id());
-        typeList.push(node.attrs.type);
-        // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
+
+        const type = node.attrs.type.toUpperCase().trim();
+        typeList.push(type);
+        // Convert from Konva coords back to grid item coords
         const { i, j } = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
@@ -673,6 +775,8 @@ const handleGardenFormSubmit = (event) => {
     yCoordListInput.value = JSON.stringify(yCoordList);
     event.target.submit();
 };
+
+
 
 /**
  * Handle resizing the stage when the window is resized

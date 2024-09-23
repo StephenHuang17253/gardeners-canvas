@@ -62,6 +62,9 @@ public class U5006_Garden_decorations {
     public static GardenService gardenService;
 
     public static UserService userService;
+    public static DecorationService decorationService;
+    @Autowired
+    public DecorationRepository decorationRepository;
 
     @Before
     public void before_or_after_all() {
@@ -70,9 +73,10 @@ public class U5006_Garden_decorations {
         gridItemLocationService = new GridItemLocationService(gridItemLocationRepository);
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
+        decorationService = new DecorationService(decorationRepository);
 
         Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
-                gridItemLocationService, plantService);
+                gridItemLocationService, plantService, decorationService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
     @Then("As user {string} I see a palette window with a tab labelled for decorations")
