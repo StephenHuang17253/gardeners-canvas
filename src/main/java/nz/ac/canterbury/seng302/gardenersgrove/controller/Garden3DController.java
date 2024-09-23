@@ -124,6 +124,7 @@ public class Garden3DController {
                             currentPlant.getPlantName(),
                             currentPlant.getPlantCategory().toString(),
                             plantLocation.getObjectId(),
+                            plantLocation.getItemType(),
                             currentPlant.getPlantCategory().getCategoryImage()));
                 }
                 else {

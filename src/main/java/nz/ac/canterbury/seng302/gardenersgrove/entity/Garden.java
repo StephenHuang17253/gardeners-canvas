@@ -66,6 +66,10 @@ public class Garden {
     @JoinColumn(name = "garden_id")
     private List<Plant> plants = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "garden_id")
+    private List<Decoration> decorations = new ArrayList<>();
+
     @Column(nullable = false)
     private boolean isPublic;
 
