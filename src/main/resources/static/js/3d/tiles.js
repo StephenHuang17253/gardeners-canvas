@@ -1,4 +1,16 @@
 import * as THREE from 'three';
+import { Loader } from './Loader.js';
+
+const tileMap = {
+    "Default": ["grass-tileable.jpg", "texture"],   // Grass-Short
+    "Grass-Medium": ["tiles/grass_medium.glb", "model"],
+    "Grass-Long": ["tiles/grass_long.glb", "model"],
+    "StonePath": ["grass-tileable.jpg", "texture"],
+    "PebblePath": ["grass-tileable.jpg", "texture"],
+    "Concrete": ["grass-tileable.jpg", "texture"],
+    "Soil": ["grass-tileable.jpg", "texture"],
+    "Bark": ["grass-tileable.jpg", "texture"]
+};
 
 /**
  * Custom vertex shader for the tile material
@@ -82,13 +94,22 @@ const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMa
  * @param {number} size - The size of the tile.
  * @param {number} hueShift - The hue shift value.
  * @param {number} saturation - The saturation value.
+ * @param loader
  * @returns {THREE.Mesh} The created tile mesh.
  */
-const createTile = (texture, size, hueShift, saturation) => {
-    const geometry = new THREE.PlaneGeometry(size, size);
-    const material = createTileMaterial(texture, hueShift, saturation);
-    const tile = new THREE.Mesh(geometry, material);
-    tile.rotation.x = -Math.PI / 2; // Rotate to horizontal
+const createTile = async (texture, size, hueShift, saturation, loader) => {
+    const tileType = tileMap[texture][1];
+    let tile;
+    if (tileType === 'texture') {
+        const geometry = new THREE.PlaneGeometry(size, size);
+        const text = loader.loadTexture(tileMap[texture][0]);
+        const material = createTileMaterial(text, hueShift, saturation);
+        tile = new THREE.Mesh(geometry, material);
+        tile.rotation.x = -Math.PI / 2; // Rotate to horizontal
+    } else {
+        tile = await loader.loadModel(tileMap[texture][0], texture);
+        tile.scale.set(10, 10, 10);
+    }
     return tile;
 };
 
@@ -103,19 +124,19 @@ const createTile = (texture, size, hueShift, saturation) => {
  * @param {number} saturation - The saturation value for the tiles.
  * @returns {{THREE.Group, Array<THREE.Vector3>}} - Object with the grid to add to scene and an array of tile center positions.
  */
-const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
+const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturation, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
     const tileCenterpositions = [];
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-            const tile = createTile(texture, tileSize, hueShift, saturation);
+            const tile = await createTile(texture, tileSize, hueShift, saturation, loader);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    return { grid, tileCenterpositions };
+    return {grid, tileCenterpositions};
 };
 
 export { createTileGrid };

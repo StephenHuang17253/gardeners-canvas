@@ -120,9 +120,10 @@ loader.loadBackground(
     }
 );
 
-const grassTexture = loader.loadTexture('grass-tileable.jpg');
+// const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
-const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Default', 0.2, 1.56, loader);
+const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Grass-Long', 0.2, 1.56, loader);
 scene.add(grid);
 
 /**
