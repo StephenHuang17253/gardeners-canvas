@@ -3,13 +3,13 @@ import { Loader } from './Loader.js';
 
 const tileMap = {
     "Default": ["grass-tileable.jpg", "texture"],   // Grass-Short
-    "Grass-Medium": ["tiles/grass_medium.glb", "model"],
+    "GrassMedium": ["tiles/grass_medium.glb", "model"],
     "GrassLong": ["tiles/grass_long.glb", "model"],
     "StonePath": ["tiles/stone_path.glb", "model"],
     "PebblePath": ["tiles/pebble_path.glb", "model"],
     "Concrete": ["grass-tileable.jpg", "texture"],
     "Soil": ["grass-tileable.jpg", "texture"],
-    "Bark": ["grass-tileable.jpg", "texture"]
+    "Bark": ["bark-tileable.jpg", "texture"]
 };
 
 /**
@@ -17,8 +17,9 @@ const tileMap = {
  */
 const vertexShader = `
     varying vec2 vUv;
+    uniform vec2 uUvScale;
     void main() {
-        vUv = uv;
+        vUv = uv * uUvScale;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
 `;
@@ -74,14 +75,16 @@ const fragmentShader = `
  * @param {THREE.Texture} texture - The texture to be applied to the material.
  * @param {number} hueShift - The amount to adjust the hue.
  * @param {number} saturation - The amount to adjust the saturation.
+ * @param uvScale
  * @returns {THREE.ShaderMaterial} The created tile material.
  */
-const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMaterial({
+const createTileMaterial = (texture, hueShift, saturation, uvScale) => new THREE.ShaderMaterial({
     uniforms: {
         uTexture: { value: texture },
         uHue: { value: hueShift },
         uSaturation: { value: saturation },
-        uBaseColor: { value: new THREE.Color(0xffffff) }
+        uBaseColor: { value: new THREE.Color(0xffffff) },
+        uUvScale: { value: uvScale },
     },
     vertexShader: vertexShader,
     fragmentShader: fragmentShader
@@ -103,7 +106,13 @@ const createTile = async (texture, size, hueShift, saturation, loader) => {
     if (tileType === 'texture') {
         const geometry = new THREE.PlaneGeometry(size, size);
         const text = loader.loadTexture(tileMap[texture][0]);
-        const material = createTileMaterial(text, hueShift, saturation);
+        let uvScale;
+        if(texture === 'Bark'){
+            uvScale = new THREE.Vector2(0.25, 0.25);
+        }else{
+            uvScale = new THREE.Vector2(1, 1);
+        }
+        const material = createTileMaterial(text, hueShift, saturation, uvScale);
         tile = new THREE.Mesh(geometry, material);
         tile.rotation.x = -Math.PI / 2; // Rotate to horizontal
     } else {
