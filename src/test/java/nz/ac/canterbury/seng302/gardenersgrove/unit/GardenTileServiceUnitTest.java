@@ -1,14 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
 
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTileRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,7 +142,7 @@ class GardenTileServiceUnitTest {
 
     @Test
     void getGardenTileByGardenAndCoordinates_CorrectGardenCorrectCoords_ReturnTile() {
-        Mockito.when(gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(garden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden,3,3))
                 .thenReturn(Optional.ofNullable(tile1));
 
         Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden,3,3);
@@ -155,7 +153,7 @@ class GardenTileServiceUnitTest {
 
     @Test
     void getGardenTileByGardenAndCoordinates_CorrectGardenWrongCoords_TileNotFound() {
-        Mockito.when(gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(garden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden,3,3))
                 .thenReturn(Optional.empty());
 
         Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden,0,0);
@@ -167,7 +165,7 @@ class GardenTileServiceUnitTest {
     void getGardenTileByGardenAndCoordinates_WrongGardenCorrectCoords_TileNotFound() {
         Garden wrongGarden = new Garden();
 
-        Mockito.when(gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(wrongGarden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(wrongGarden,3,3))
                 .thenReturn(Optional.empty());
 
         Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden,3,3);
@@ -179,7 +177,7 @@ class GardenTileServiceUnitTest {
     void getGardenTileByGardenAndCoordinates_WrongGardenWrongCoords_TileNotFound() {
         Garden wrongGarden = new Garden();
 
-        Mockito.when(gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(wrongGarden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(wrongGarden,3,3))
                 .thenReturn(Optional.empty());
 
         Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden,0,0);
@@ -190,7 +188,7 @@ class GardenTileServiceUnitTest {
     @Test
     void persistGardenTile_NoOverlap_Success() {
 
-        Mockito.when(gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(garden, 6, 6))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 6, 6))
                 .thenReturn(Optional.empty());
 
         GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 6, 6);
@@ -200,8 +198,8 @@ class GardenTileServiceUnitTest {
         GardenTile persistedTile = gardenTileService.persistGardenTile(newGardenTile);
 
         Assertions.assertEquals(newGardenTile, persistedTile);
-        Assertions.assertEquals(newGardenTile.getxCoordinate(), persistedTile.getxCoordinate());
-        Assertions.assertEquals(newGardenTile.getyCoordinate(), persistedTile.getyCoordinate());
+        Assertions.assertEquals(newGardenTile.getXCoordinate(), persistedTile.getXCoordinate());
+        Assertions.assertEquals(newGardenTile.getYCoordinate(), persistedTile.getYCoordinate());
         Assertions.assertEquals(newGardenTile.getGarden(), persistedTile.getGarden());
     }
 
@@ -211,7 +209,7 @@ class GardenTileServiceUnitTest {
         GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 3, 3);
         newGardenTile.setTileId(999L);
 
-        Mockito.when(gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(garden, 3, 3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
                 .thenReturn(Optional.of(tile1));
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> gardenTileService.persistGardenTile(newGardenTile));
