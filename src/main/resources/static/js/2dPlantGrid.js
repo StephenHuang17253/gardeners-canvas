@@ -475,6 +475,8 @@ gridItemLocations.forEach(item => {
     const itemName = item.getAttribute("data-grid-name");
     const category = item.getAttribute("data-grid-category");
 
+    console.log(itemName)
+    console.log(objectId)
     let imageSrc = item.getAttribute("data-grid-image");
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;

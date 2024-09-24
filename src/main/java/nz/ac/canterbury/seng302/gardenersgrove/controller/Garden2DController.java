@@ -122,6 +122,8 @@ public class Garden2DController {
                             currentDecoration.getId(),
                             gridLocation.getItemType(),
                             currentDecoration.getDecorationCategory().getCategoryImage()));
+                } else {
+                    logger.info(decorationService.getDecorations().toString());
                 }
             }
 
@@ -236,7 +238,6 @@ public class Garden2DController {
                     "Something went wrong. We could not save the changes");
             return "error";
         }
-
         // updating the repository
         deleteOldGridLocationItems(garden);
         for (int i = 0; i < idListAsList.size(); i++) {
