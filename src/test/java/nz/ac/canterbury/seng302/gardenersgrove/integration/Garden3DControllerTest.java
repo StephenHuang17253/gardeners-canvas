@@ -1,24 +1,19 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import net.minidev.json.JSONArray;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +25,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,16 +59,24 @@ class Garden3DControllerTest {
     private FileService fileService;
 
     @Autowired
+    private DecorationService decorationService;
+
+    @Autowired
     private GridItemLocationService gridItemLocationService;
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private GridItemLocationRepository gridItemLocationRepository;
 
     private MvcResult mockMvcResult;
 
     private List<Garden> gardenList = new ArrayList<>();
 
     private static final Long MAX_LONG = 10000L;
+
+    private Garden garden;
 
     private static User user1;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
@@ -87,6 +93,7 @@ class Garden3DControllerTest {
     @BeforeAll
     void before_all() {
         User user;
+        gridItemLocationRepository.deleteAll();
         user = new User("John", "Doe", johnEmail, date);
         user1 = userService.addUser(user, "1es1P@ssword");
         user = new User("Jane", "Doe", janeEmail, date);
@@ -130,6 +137,15 @@ class Garden3DControllerTest {
                 "172.5796159",
                 user1));
         gardenList.add(garden2);
+
+        //adding decorations
+        garden = gardenList.get(0);
+        Decoration decoration1 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration1.getId(), GridItemType.DECORATION, garden, 6, 6));
+        Decoration decoration2 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, garden, 4, 4));
+
+
     }
 
     @Test
@@ -169,16 +185,73 @@ class Garden3DControllerTest {
                 .andExpect(status().isOk());
     }
 
-    void get3DGardenLayout_oneDecoration_return200AndDecoration() {
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void get3DGardenLayout_oneDecoration_return200AndDecoration() throws Exception {
+        // making call to endpoint
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //checking decoration is correct
+        JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
+        JsonNode item = jsonNode.get(1);
+        //should match decoration1 in before_all
+        assertEquals(item.get("xcoordinate").asInt(), 6);
+        assertEquals(item.get("ycoordinate").asInt(), 6);
+        assertEquals(item.get("category").asText(), "Gnome");
+        assertEquals(item.get("type").asText(), "DECORATION");
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void get3DGardenLayout_multipleDecorations_return200AndDecorations() throws Exception {
+        // making call to endpoint
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //checking decoration is correct
+        JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
+        //should match decoration1 in before_all
+        JsonNode item1 = jsonNode.get(1);
+        assertEquals(item1.get("xcoordinate").asInt(), 6);
+        assertEquals(item1.get("ycoordinate").asInt(), 6);
+        assertEquals(item1.get("category").asText(), "Gnome");
+        assertEquals(item1.get("type").asText(), "DECORATION");
+        //should match decoration2 in before_all
+        JsonNode item2 = jsonNode.get(2);
+        assertEquals(item2.get("xcoordinate").asInt(), 4);
+        assertEquals(item2.get("ycoordinate").asInt(), 4);
+        assertEquals(item2.get("category").asText(), "Pond");
+        assertEquals(item2.get("type").asText(), "DECORATION");
 
     }
 
-    void get3DGardenLayout_multipleDecorations_return200AndDecorations() {
-
-    }
-
-    void get3DGardenLayout_duplicateDecorationsWithDifferentLocations_return200AndDuplicates() {
-
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void get3DGardenLayout_duplicateDecorationsWithDifferentLocations_return200AndDuplicates() throws Exception {
+        Decoration decoration3 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration3.getId(), GridItemType.DECORATION, garden, 4, 5));
+        // making call to endpoint
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
+                .andExpect(status().isOk())
+                .andReturn();
+        //checking decoration is correct
+        JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
+        //should match decoration2 in before_all
+        JsonNode item1 = jsonNode.get(2);
+        assertEquals(item1.get("xcoordinate").asInt(), 4);
+        assertEquals(item1.get("ycoordinate").asInt(), 4);
+        assertEquals(item1.get("category").asText(), "Gnome");
+        assertEquals(item1.get("type").asText(), "DECORATION");
+        //should match decoration3
+        JsonNode item2 = jsonNode.get(3);
+        assertEquals(item2.get("xcoordinate").asInt(), 4);
+        assertEquals(item2.get("ycoordinate").asInt(), 5);
+        assertEquals(item2.get("category").asText(), "Pond");
+        assertEquals(item2.get("type").asText(), "DECORATION");
     }
 
     @Test
@@ -189,7 +262,6 @@ class Garden3DControllerTest {
         mockMvcResult = mockMvc
                 .perform(get("/3D-garden-layout/{gardenId}", gardenId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
                 .andReturn();
         JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
         JsonNode item = jsonNode.get(0);
