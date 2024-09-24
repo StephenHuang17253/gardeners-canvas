@@ -44,7 +44,7 @@ class DecorationServiceUnitTest {
         decorationService = new DecorationService(decorationRepository);
 
         testUser1 = Mockito.spy(new User("Lysander", "au Lune", "lysander@DecorationServiceUnitTest.com",
-                LocalDate.of(2003,5,2)));
+                LocalDate.of(2003, 5, 2)));
         garden = Mockito.spy(new Garden("Lune Gardens",
                 "The Gardens of House Lune",
                 "Luna, Sol",
@@ -98,7 +98,7 @@ class DecorationServiceUnitTest {
         List<Decoration> allDecorations = decorationService.getDecorations();
 
         Assertions.assertEquals(2, allDecorations.size());
-        Assertions.assertEquals(decoration1, allDecorations.getFirst());
+        Assertions.assertEquals(decoration1, allDecorations.get(0));
     }
 
     @Test
@@ -120,8 +120,8 @@ class DecorationServiceUnitTest {
 
         List<Decoration> foundDecorations = decorationService.getDecorationsByCategory(DecorationCategory.FOUNTAIN);
 
-        Assertions.assertEquals(1,foundDecorations.size());
-        Assertions.assertEquals(decoration1, foundDecorations.getFirst());
+        Assertions.assertEquals(1, foundDecorations.size());
+        Assertions.assertEquals(decoration1, foundDecorations.get(0));
     }
 
     @Test
@@ -134,7 +134,6 @@ class DecorationServiceUnitTest {
 
         Assertions.assertTrue(foundDecorations.isEmpty());
     }
-
 
     @Test
     void getDecorationsByGarden_CorrectGarden_ReturnDecorations() {
@@ -168,23 +167,27 @@ class DecorationServiceUnitTest {
     void getDecorationsByGardenAndCategory_CorrectGardenCorrectCategory_ReturnDecoration() {
         List<Decoration> decorations = Arrays.asList(decoration1);
 
-        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden, DecorationCategory.FOUNTAIN))
+        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden,
+                DecorationCategory.FOUNTAIN))
                 .thenReturn(decorations);
 
-        List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.FOUNTAIN);
+        List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(garden,
+                DecorationCategory.FOUNTAIN);
 
-        Assertions.assertEquals(1,foundDecorations.size());
-        Assertions.assertEquals(decoration1, foundDecorations.getFirst());
+        Assertions.assertEquals(1, foundDecorations.size());
+        Assertions.assertEquals(decoration1, foundDecorations.get(0));
     }
 
     @Test
     void getDecorationsByGardenAndCategory_CorrectGardenWrongCategory_ReturnEmptyList() {
         List<Decoration> decorations = new ArrayList<>();
 
-        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden, DecorationCategory.GNOME))
+        Mockito.when(
+                decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden, DecorationCategory.GNOME))
                 .thenReturn(decorations);
 
-        List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.GNOME);
+        List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(garden,
+                DecorationCategory.GNOME);
 
         Assertions.assertTrue(foundDecorations.isEmpty());
     }
@@ -195,17 +198,20 @@ class DecorationServiceUnitTest {
 
         Garden wrongGarden = new Garden();
 
-        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(wrongGarden, DecorationCategory.FOUNTAIN))
+        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(wrongGarden,
+                DecorationCategory.FOUNTAIN))
                 .thenReturn(decorations);
 
-        List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(wrongGarden, DecorationCategory.FOUNTAIN);
+        List<Decoration> foundDecorations = decorationService.getDecorationsByGardenAndCategory(wrongGarden,
+                DecorationCategory.FOUNTAIN);
 
         Assertions.assertTrue(foundDecorations.isEmpty());
     }
 
     @Test
     void addDecoration_NewDecoration_Success() {
-        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden, DecorationCategory.FOUNTAIN))
+        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden,
+                DecorationCategory.FOUNTAIN))
                 .thenReturn(Arrays.asList());
 
         Mockito.when(decorationRepository.save(decoration1)).thenReturn(decoration1);
@@ -219,10 +225,12 @@ class DecorationServiceUnitTest {
 
     @Test
     void testAddDecoration_AlreadyExists_ThrowException() {
-        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden, DecorationCategory.FOUNTAIN))
+        Mockito.when(decorationRepository.findDecorationsByGardenIsAndDecorationCategoryIs(garden,
+                DecorationCategory.FOUNTAIN))
                 .thenReturn(Arrays.asList(decoration1));
 
-        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> decorationService.addDecoration(decoration1));
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> decorationService.addDecoration(decoration1));
 
         Assertions.assertEquals("Decoration already in garden", thrown.getMessage());
     }

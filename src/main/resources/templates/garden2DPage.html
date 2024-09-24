@@ -24,7 +24,7 @@
                     </div>
                     <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
                         <button id="openClearModalButton" type="button" class="btn btn-warning text-light"
-                                data-bs-toggle="modal" data-bs-target="#confirmClearModal">
+                            data-bs-toggle="modal" data-bs-target="#confirmClearModal">
                             Clear All
                         </button>
                         <button type="button" id="deletePlant" class="btn btn-danger">
@@ -40,12 +40,12 @@
                                     <h1 class="modal-title fs-5">Are you sure you want to clear all?</h1>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button id="confirmClearAll" type="submit" class="btn btn-warning"
-                                            data-bs-dismiss="modal">Yes</button>
-                                    </div>
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button id="confirmClearAll" type="submit" class="btn btn-warning"
+                                        data-bs-dismiss="modal">Yes</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -53,16 +53,19 @@
                     <div class="container-fluid mt-3">
                         <ul class="nav nav-tabs nav-fill d-flex justify-content-center">
                             <li class="nav-item nav-underline ">
-                                <a class="nav-link text-white fs-5 active" role="tab" data-bs-toggle="tab" href="#plantTabContent" id="plant-tab"
-                                style="background-color:transparent">Plants</a>
+                                <a class="nav-link text-white fs-5 active" role="tab" data-bs-toggle="tab"
+                                    href="#plantTabContent" id="plant-tab"
+                                    style="background-color:transparent">Plants</a>
                             </li>
                             <li class="nav-item nav-underline ">
-                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab" href="#decorationsTabContent" id="decorations-tab"
-                                   style="background-color:transparent">Decorations</a>
+                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab"
+                                    href="#decorationsTabContent" id="decorations-tab"
+                                    style="background-color:transparent">Decorations</a>
                             </li>
                             <li class="nav-item nav-underline">
-                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab" href="#textureTabContent" id="textures-tab"
-                                   style="background-color:transparent">Textures</a>
+                                <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab"
+                                    href="#textureTabContent" id="textures-tab"
+                                    style="background-color:transparent">Textures</a>
                             </li>
                         </ul>
 
@@ -72,13 +75,14 @@
                             <div class="row">
                                 <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
                                     th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
-                                    th:data-plant-category="${plant.getCategory()}" th:data-plant-count="${plant.getCount()}"
-                                    th:data-plant-id="${plant.getId()}"
+                                    th:data-plant-category="${plant.getCategory()}"
+                                    th:data-plant-count="${plant.getCount()}" th:data-plant-id="${plant.getId()}"
                                     th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
                                     th:data-category-image="${plant.getCategoryImage()}">
                                     <div class="ratio ratio-1x1">
                                         <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
-                                            alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
+                                            alt="Plant"
+                                            class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                     </div>
                                     <p id="total" class="break-word mt-2 mb-0 text-decoration-underline"
                                         th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}">
@@ -99,15 +103,15 @@
                                     th:data-grid-image="${displayableItem.getCategoryImage()}">
                                 </div>
                             </div>
-                    </div>
+                        </div>
 
-                    <div id="decorationsTabContent" class="tab-pane">
-                        Icons for Decorations will go here
-                    </div>
+                        <div id="decorationsTabContent" class="tab-pane">
+                            Icons for Decorations will go here
+                        </div>
 
-                    <div id="textureTabContent" class="tab-pane">
-                        Icons for Textures will go here
-                    </div>
+                        <div id="textureTabContent" class="tab-pane">
+                            Icons for Textures will go here
+                        </div>
 
                     </div>
 
@@ -125,15 +129,18 @@
                 <input type="hidden" id="typeList" name="typeList" th:value="''" />
                 <input type="hidden" id="xCoordList" name="xCoordList" th:value="''" />
                 <input type="hidden" id="yCoordList" name="yCoordList" th:value="''" />
+                <input type="hidden" id="tileTextureList" name="tileTextureList" th:value="''" />
             </form>
         </div>
 
         <div class="d-flex flex-column flex-grow-1 overflow-hidden">
             <div class="bg-white p-2 position-relative">
-                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}" class="btn btn-success position-absolute top-0 start-0 m-2">
+                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}"
+                    class="btn btn-success position-absolute top-0 start-0 m-2">
                     View in 3D
                 </a>
-                <h1 class="break-word mb-0 text-center" id="title-2D-Grid" th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
+                <h1 class="break-word mb-0 text-center" id="title-2D-Grid"
+                    th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
             </div>
             <div id="container" class="flex-grow-1 overflow-auto"></div>
             <div class="dropdown position-absolute end-0 m-3">
