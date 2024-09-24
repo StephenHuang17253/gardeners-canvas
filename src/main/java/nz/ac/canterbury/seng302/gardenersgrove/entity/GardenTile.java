@@ -34,6 +34,30 @@ public class GardenTile {
     @JoinColumn(name = "garden_id")
     private Garden garden;
 
+    /**
+     * JPA required no-args constructor
+     */
+    protected GardenTile() {
+    }
+
+    /**
+     * Garden Tile constructor
+     * @param garden        the garden the tile belongs to
+     * @param tileType      the type of tile
+     * @param xCoordinate   the tile's x-coordinate on the grid
+     * @param yCoordinate   the tile's y-coordinate on the grid
+     */
+    public GardenTile(Garden garden,
+                      TileType tileType,
+                      int xCoordinate,
+                      int yCoordinate) {
+        this.garden = garden;
+        this.tileType = tileType;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
+    }
+
+
     public Long getTileId() {
         return tileId;
     }
