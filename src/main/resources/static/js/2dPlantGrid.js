@@ -1,4 +1,4 @@
-import { Downloader } from "./Downloader.js";
+import {Downloader} from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -26,7 +26,6 @@ const currentPage = document.getElementById("currentPage");
 const nextPage = document.getElementById("nextPage");
 const lastPage = document.getElementById("lastPage");
 
-
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
 const GRID_SIZE = Math.min(STAGE_WIDTH, STAGE_HEIGHT) / 8;
@@ -51,11 +50,10 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
-let originalDecorationCounts = {};
-
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
     tooltipLayer, prevSelectPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
+let preventUnload = false;
 
 // Helpers
 
@@ -69,7 +67,7 @@ let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 };
 
 /**
@@ -81,7 +79,7 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return { i: gridItemX, j: gridItemY };
+    return {i: gridItemX, j: gridItemY};
 }
 
 /**
@@ -103,7 +101,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if (i === x && j === y) {
             if (node.id() !== plantId) {
                 return false;
@@ -185,23 +183,6 @@ const updateCountersOnLoad = (plantId) => {
     plantItem.setAttribute("data-plant-count", count - 1);
 };
 
-const updateDecorationCountersOnLoad = (decorationId) => {
-    const decorationItem = document.querySelector(`[name="decoration-item"][data-decoration-id="${decorationId}"]`);
-
-    const count = parseInt(decorationItem.getAttribute("data-decoration-count"));
-    const placedCount = originalDecorationCounts[decorationId] - count;
-
-    const placedElement = decorationItem.querySelector(".placed");
-    const remainingElement = decorationItem.querySelector(".remaining");
-
-    if (placedElement && remainingElement) {
-        placedElement.textContent = `Placed: ${placedCount + 1}`;
-        remainingElement.textContent = `Remaining: ${count - 1}`;
-    }
-
-    decorationItem.setAttribute("data-decoration-count", count - 1);
-};
-
 /**
  * Creates a new plant or decoration and adds it to the stage produced by konva
  *
@@ -232,6 +213,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
             id: objectId.toString(),
             type: itemType,
             draggable: true,
+            itemCategory: category,
             uniqueGridId: uniqueGridItemIDNo.pop(),
         });
 
@@ -355,7 +337,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], { type: mimeType });
+    return new Blob([uint8Array], {type: mimeType});
 };
 
 /**
@@ -364,18 +346,18 @@ const dataURLtoBlob = (dataURL) => {
  * @param {HTMLElement} plantItem - The plant item element
  * @param {number} count - The new count
  */
-const updateItemCountDisplay = (itemElement, count, originalCounts, type) => {
-    const itemId = type === "PLANT" ? itemElement.getAttribute("data-plant-id") : itemElement.getAttribute("data-decoration-id");
-    const originalCount = originalCounts[itemId];
+const updatePlantCountDisplay = (plantItem, count) => {
+    const plantId = plantItem.getAttribute("data-plant-id");
+    const originalCount = originalPlantCounts[plantId];
 
-    const totalElement = itemElement.querySelector(".total");
-    const placedElement = itemElement.querySelector(".placed");
-    const remainingElement = itemElement.querySelector(".remaining");
+    const totalElement = plantItem.querySelector("#total");
+    const placedElement = plantItem.querySelector("#placed");
+    const remainingElement = plantItem.querySelector("#remaining");
 
-    const itemName = itemElement.querySelector(".total").textContent.split(' (x')[0];
+    const plantName = plantItem.getAttribute("data-plant-name");
 
     if (totalElement) {
-        totalElement.textContent = `${itemName} (x${originalCount})`;
+        totalElement.textContent = `${plantName} (x${originalCount})`;
     }
 
     if (placedElement) {
@@ -386,31 +368,6 @@ const updateItemCountDisplay = (itemElement, count, originalCounts, type) => {
         remainingElement.textContent = `Remaining: ${count}`;
     }
 };
-
-
-const updateDecorationCountDisplay = (decorationItem, count) => {
-    const decorationId = decorationItem.getAttribute("data-decoration-id");
-    const originalCount = originalDecorationCounts[decorationId];
-
-    const totalElement = decorationItem.querySelector(".total");
-    const placedElement = decorationItem.querySelector(".placed");
-    const remainingElement = decorationItem.querySelector(".remaining");
-
-    const decorationName = decorationItem.querySelector(".total").textContent.split(' (x')[0];
-
-    if (totalElement) {
-        totalElement.textContent = `${decorationName} (x${originalCount})`;
-    }
-
-    if (placedElement) {
-        placedElement.textContent = `Placed: ${originalCount - count}`;
-    }
-
-    if (remainingElement) {
-        remainingElement.textContent = `Remaining: ${count}`;
-    }
-};
-
 
 /**
  * Resets the plant count to its original value
@@ -472,7 +429,6 @@ downloader = new Downloader(link);
 // maps plant id to the original count
 originalPlantCounts = {};
 
-
 selectedPaletteItemInfo = null;
 selectedPaletteItem = null;
 selectedGridItem = null;
@@ -523,15 +479,9 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
-    const onloadCallback = () => {
-        if (itemType === "PLANT") {
-            updateCountersOnLoad(objectId);
-        } else if (itemType === "DECORATION") {
-            updateDecorationCountersOnLoad(objectId);
-        }
-    };
+    const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
 });
 
@@ -590,39 +540,29 @@ plantItems.forEach((item, i) => {
 });
 
 decorationItems.forEach((item) => {
-    const decorationId = item.getAttribute("data-decoration-id");
-    originalDecorationCounts[decorationId] = parseInt(item.getAttribute("data-decoration-count"));
-
-    item.addEventListener("click", () => {
-        // Deselect any previously selected items
+    item.addEventListener('click', () => {
         deselectPaletteItem();
         deselectGridItem();
 
-        const currentCount = parseInt(item.getAttribute("data-decoration-count"));
-
-        if (currentCount < 1) return;
-
-        item.style.border = "3px solid blue";
-
+        item.style.border = '3px solid blue';
         selectedPaletteItem = item;
 
-        let decorationImage = item.getAttribute("data-category-image");
+        let decorationImage = item.getAttribute('data-decoration-image');
 
-        // Adjust the image path if necessary
-        if (instance !== "") {
+        if (instance === 'test/' || instance === 'prod/') {
             decorationImage = `/${instance}` + decorationImage;
         }
 
         selectedPaletteItemInfo = {
-            name: item.querySelector(".total").textContent.split(' (x')[0],
+            name: item.getAttribute('data-decoration-type'),
             image: decorationImage,
-            id: decorationId,
-            type: "DECORATION",
-            count: currentCount,
-            category: "Decoration",
+            id: item.getAttribute('data-decoration-id'),
+            type: 'DECORATION',
+            category: 'Decoration'
         };
     });
 });
+
 
 
 // Event Handlers
@@ -633,38 +573,28 @@ decorationItems.forEach((item) => {
  * @param {Event} event
  */
 const handleStageClick = (event) => {
+
     if (!(event.target === stage || event.target.name() === "grid-cell")) return;
 
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
+
         if (!validLocation(x, y)) {
+            console.log("Here 1")
             showErrorMessage(INVALID_LOCATION);
             return;
         }
 
-        createPlantOrDecoration(
-            selectedPaletteItemInfo.image,
-            x,
-            y,
-            selectedPaletteItemInfo.id,
-            selectedPaletteItemInfo.type,
-            selectedPaletteItemInfo.name,
-            selectedPaletteItemInfo.category
-        );
+        createPlantOrDecoration(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
+        selectedPaletteItemInfo.count -= 1
 
-        selectedPaletteItemInfo.count -= 1;
+        selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
+        updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
 
-        if (selectedPaletteItemInfo.type === "PLANT") {
-            selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
-            updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
-        } else if (selectedPaletteItemInfo.type === "DECORATION") {
-            selectedPaletteItem.setAttribute("data-decoration-count", selectedPaletteItemInfo.count);
-            updateDecorationCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
-        }
     } else if (selectedGridItem) {
 
         if (validLocation(x, y)) {
@@ -673,6 +603,7 @@ const handleStageClick = (event) => {
                 y: y
             });
         } else {
+            console.log("Here 2")
             showErrorMessage(INVALID_LOCATION);
         }
 
@@ -725,25 +656,29 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const { i, j } = convertToGridCoordinates(gridX, gridY);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
-    if (selectedGridItem.attrs.type === "PLANT") {
-        let plantItem = document.querySelector(`[name='plant-item'][data-plant-id='${selectedGridItem.attrs.id}']`);
-        const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
-        plantItem.setAttribute("data-plant-count", updatedCount);
-        updatePlantCountDisplay(plantItem, updatedCount);
-    } else if (selectedGridItem.attrs.type === "DECORATION") {
-        let decorationItem = document.querySelector(`[name='decoration-item'][data-decoration-id='${selectedGridItem.attrs.id}']`);
-        const updatedCount = parseInt(decorationItem.getAttribute("data-decoration-count")) + 1;
-        decorationItem.setAttribute("data-decoration-count", updatedCount);
-        updateDecorationCountDisplay(decorationItem, updatedCount);
-    }
+    let plantItem = null;
+    plantItems.forEach(item => {
+        if (item.getAttribute("data-plant-id") === selectedGridItem.attrs.id) {
+            plantItem = item;
+        }
+    });
+    decorationItems.forEach(item => {
+        if (item.getAttribute("data-decoration-id") === selectedGridItem.attrs.id) {
+            plantItem = item;
+        }
+    })
 
+    const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
+    plantItem.setAttribute("data-plant-count", updatedCount);
     uniqueGridItemIDNo.push(selectedGridItem.attrs.uniqueGridId);
+
+    updatePlantCountDisplay(plantItem, updatedCount);
+
     selectedGridItem.destroy();
     selectedGridItem = null;
 };
-
 
 /**
  * Handles the saving of the garden layout
@@ -752,19 +687,18 @@ const handleDeleteButtonClick = () => {
  */
 const handleGardenFormSubmit = (event) => {
     event.preventDefault();
+    preventUnload = true;
 
     const idList = [];
     const typeList = [];
     const xCoordList = [];
     const yCoordList = [];
 
-    layer.find("Image").forEach((node) => {
+    layer.find("Image").forEach(node => {
         idList.push(node.id());
-
-        const type = node.attrs.type.toUpperCase().trim();
-        typeList.push(type);
-        // Convert from Konva coords back to grid item coords
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        typeList.push(node.attrs.type);
+        // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
     });
@@ -775,8 +709,6 @@ const handleGardenFormSubmit = (event) => {
     yCoordListInput.value = JSON.stringify(yCoordList);
     event.target.submit();
 };
-
-
 
 /**
  * Handle resizing the stage when the window is resized
@@ -802,12 +734,12 @@ const handleWindowClick = (event) => {
         deselectPaletteItem();
         return;
     }
-    console.log("machine gun");
-
     // check is spot clicked it plant
 
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
-    if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
+    const isWithinDecoration = !!event.target.closest("[name='decoration-item']");
+    console.log("Here 3")
+    if (!isWithinPlantItem && !isWithinDecoration) showErrorMessage(INVALID_LOCATION);
 
     if (!selectedPaletteItem.contains(event.target)) {
         deselectPaletteItem();
@@ -858,10 +790,84 @@ const handleLastPageClick = () => {
 };
 
 
+/**
+ * checks if 2D grid has been modified and has unsaved changes
+ * @returns {boolean} are there changes on the grid (true if there are, false if not)
+ */
+const hasUnsavedChanges = () => {
+    const originalGrid = Array.from(gridItemLocations).map(value => ({
+        x: value.getAttribute("data-grid-x"),
+        y: value.getAttribute("data-grid-y"),
+        id: value.getAttribute("data-grid-objectid").toString(),
+        name: value.getAttribute("data-grid-name"),
+        category: value.getAttribute("data-grid-category")
+    }));
+
+
+    const currentGrid = layer.find("Image").map(node => {
+        const {i: x, j: y} = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
+        return {
+            x: x.toString(),
+            y: y.toString(),
+            id: node.id(),  // This is fine, as `id` is a method
+            name: node.name(),
+            category: node.attrs.itemCategory
+        };
+    });
+
+    //ensure lists are sorted
+    currentGrid.sort((a, b) => {
+        return a.id.localeCompare(b.id) ||
+            a.name.localeCompare(b.name) ||
+            a.category.localeCompare(b.category) ||
+            a.x.localeCompare(b.x) ||
+            a.y.localeCompare(b.y)
+    });
+
+    originalGrid.sort((a, b) => {
+        return a.id.localeCompare(b.id) ||
+            a.name.localeCompare(b.name) ||
+            a.category.localeCompare(b.category) ||
+            a.x.localeCompare(b.x) ||
+            a.y.localeCompare(b.y)
+    });
+
+    // Compare the two arrays
+    if (originalGrid.length !== currentGrid.length) {
+        return true;
+    }
+
+    return originalGrid.some((original, index) => {
+        const current = currentGrid[index];
+        return (
+            original.x !== current.x ||
+            original.y !== current.y ||
+            original.id !== current.id ||
+            original.name !== current.name ||
+            original.category !== current.category
+        );
+    });
+}
+
+/**
+ * Handles exiting the page in any form
+ * Shows modal if there are unsaved changes
+ */
+const handlePageExit = (event) => {
+    if (hasUnsavedChanges() && !preventUnload) {
+        event.preventDefault();
+        event.returnValue = 'You have unsaved changes!';
+        return 'You have unsaved changes!';
+    }
+}
+
+
 // Event listeners
 
 window.addEventListener("click", handleWindowClick);
 window.addEventListener("resize", handleWindowResize);
+// before unload event found at https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+window.addEventListener("beforeunload", handlePageExit);
 
 stage.on("click", handleStageClick);
 

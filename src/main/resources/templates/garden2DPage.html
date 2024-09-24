@@ -89,16 +89,16 @@
                                 </div>
                             </div>
 
-                            <div th:each="displayableItem : ${displayableItemsList}">
-                                <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
-                                    th:data-grid-y="${displayableItem.getYCoordinate()}"
-                                    th:data-grid-name="${displayableItem.getName()}"
-                                    th:data-grid-category="${displayableItem.getCategory()}"
-                                    th:data-grid-objectid="${displayableItem.getObjectId()}"
-                                    th:data-grid-type="${displayableItem.getType()}"
-                                    th:data-grid-image="${displayableItem.getCategoryImage()}">
-                                </div>
-                            </div>
+<!--                            <div th:each="displayableItem : ${displayableItemsList}">-->
+<!--                                <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"-->
+<!--                                    th:data-grid-y="${displayableItem.getYCoordinate()}"-->
+<!--                                    th:data-grid-name="${displayableItem.getName()}"-->
+<!--                                    th:data-grid-category="${displayableItem.getCategory()}"-->
+<!--                                    th:data-grid-objectid="${displayableItem.getObjectId()}"-->
+<!--                                    th:data-grid-type="${displayableItem.getType()}"-->
+<!--                                    th:data-grid-image="${displayableItem.getCategoryImage()}">-->
+<!--                                </div>-->
+<!--                            </div>-->
                     </div>
 
                     <div id="decorationsTabContent" class="tab-pane">
@@ -107,7 +107,7 @@
                                 <div class="ratio ratio-1x1">
                                     <img src="/images/default_plant.png" alt="Rocks" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                 </div>
-                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Rocks (x1)</p>
+                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Rocks</p>
                                 <p class="category mb-0">Decoration</p>
                                 <p class="placed break-word my-0"></p>
                                 <p class="remaining break-word my-0"></p>
@@ -116,7 +116,7 @@
                                 <div class="ratio ratio-1x1">
                                     <img src="/images/default_plant.png" alt="Table" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                 </div>
-                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Table (x1)</p>
+                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Table</p>
                                 <p class="category mb-0">Decoration</p>
                                 <p class="placed break-word my-0"></p>
                                 <p class="remaining break-word my-0"></p>
@@ -125,7 +125,7 @@
                                 <div class="ratio ratio-1x1">
                                     <img src="/images/default_plant.png" alt="Pond" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                 </div>
-                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Pond (x1)</p>
+                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Pond</p>
                                 <p class="category mb-0">Decoration</p>
                                 <p class="placed break-word my-0"></p>
                                 <p class="remaining break-word my-0"></p>
@@ -143,10 +143,21 @@
                                 <div class="ratio ratio-1x1">
                                     <img src="/images/default_plant.png" alt="Fountains" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                 </div>
-                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Fountains (x1)</p>
+                                <p class="total break-word mt-2 mb-0 text-decoration-underline">Fountains</p>
                                 <p class="category mb-0">Decoration</p>
                                 <p class="placed break-word my-0"></p>
                                 <p class="remaining break-word my-0"></p>
+                            </div>
+                        </div>
+
+                        <div th:each="displayableItem : ${displayableItemsList}">
+                            <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                                 th:data-grid-y="${displayableItem.getYCoordinate()}"
+                                 th:data-grid-name="${displayableItem.getName()}"
+                                 th:data-grid-category="${displayableItem.getCategory()}"
+                                 th:data-grid-objectid="${displayableItem.getObjectId()}"
+                                 th:data-grid-type="${displayableItem.getType()}"
+                                 th:data-grid-image="${displayableItem.getCategoryImage()}">
                             </div>
                         </div>
                     </div>
