@@ -1,4 +1,4 @@
-import { Downloader } from "./Downloader.js";
+import {Downloader} from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -23,7 +23,6 @@ const previousPage = document.getElementById("previousPage");
 const currentPage = document.getElementById("currentPage");
 const nextPage = document.getElementById("nextPage");
 const lastPage = document.getElementById("lastPage");
-
 
 const STAGE_WIDTH = window.innerWidth * 0.8;
 const STAGE_HEIGHT = window.innerHeight * 0.9;
@@ -52,6 +51,7 @@ const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
     tooltipLayer, prevSelectPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
+let preventUnload = false;
 
 // Helpers
 
@@ -65,7 +65,7 @@ let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 };
 
 /**
@@ -77,7 +77,7 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return { i: gridItemX, j: gridItemY };
+    return {i: gridItemX, j: gridItemY};
 }
 
 /**
@@ -99,7 +99,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     let nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if (i === x && j === y) {
             if (node.id() !== plantId) {
                 return false;
@@ -211,6 +211,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
             id: objectId.toString(),
             type: itemType,
             draggable: true,
+            itemCategory: category,
             uniqueGridId: uniqueGridItemIDNo.pop(),
         });
 
@@ -334,7 +335,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], { type: mimeType });
+    return new Blob([uint8Array], {type: mimeType});
 };
 
 /**
@@ -476,7 +477,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
@@ -550,7 +551,7 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
 
@@ -625,7 +626,7 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const { i, j } = convertToGridCoordinates(gridX, gridY);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
     let plantItem = null;
     plantItems.forEach(item => {
@@ -651,6 +652,7 @@ const handleDeleteButtonClick = () => {
  */
 const handleGardenFormSubmit = (event) => {
     event.preventDefault();
+    preventUnload = true;
 
     const idList = [];
     const typeList = [];
@@ -658,11 +660,10 @@ const handleGardenFormSubmit = (event) => {
     const yCoordList = [];
 
     layer.find("Image").forEach(node => {
-        console.log(node.attrs.type)
         idList.push(node.id());
         typeList.push(node.attrs.type);
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
     });
@@ -698,8 +699,6 @@ const handleWindowClick = (event) => {
         deselectPaletteItem();
         return;
     }
-    console.log("machine gun");
-
     // check is spot clicked it plant
 
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
@@ -754,10 +753,84 @@ const handleLastPageClick = () => {
 };
 
 
+/**
+ * checks if 2D grid has been modified and has unsaved changes
+ * @returns {boolean} are there changes on the grid (true if there are, false if not)
+ */
+const hasUnsavedChanges = () => {
+    const originalGrid = Array.from(gridItemLocations).map(value => ({
+        x: value.getAttribute("data-grid-x"),
+        y: value.getAttribute("data-grid-y"),
+        id: value.getAttribute("data-grid-objectid").toString(),
+        name: value.getAttribute("data-grid-name"),
+        category: value.getAttribute("data-grid-category")
+    }));
+
+
+    const currentGrid = layer.find("Image").map(node => {
+        const {i: x, j: y} = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
+        return {
+            x: x.toString(),
+            y: y.toString(),
+            id: node.id(),  // This is fine, as `id` is a method
+            name: node.name(),
+            category: node.attrs.itemCategory
+        };
+    });
+
+    //ensure lists are sorted
+    currentGrid.sort((a, b) => {
+        return a.id.localeCompare(b.id) ||
+            a.name.localeCompare(b.name) ||
+            a.category.localeCompare(b.category) ||
+            a.x.localeCompare(b.x) ||
+            a.y.localeCompare(b.y)
+    });
+
+    originalGrid.sort((a, b) => {
+        return a.id.localeCompare(b.id) ||
+            a.name.localeCompare(b.name) ||
+            a.category.localeCompare(b.category) ||
+            a.x.localeCompare(b.x) ||
+            a.y.localeCompare(b.y)
+    });
+
+    // Compare the two arrays
+    if (originalGrid.length !== currentGrid.length) {
+        return true;
+    }
+
+    return originalGrid.some((original, index) => {
+        const current = currentGrid[index];
+        return (
+            original.x !== current.x ||
+            original.y !== current.y ||
+            original.id !== current.id ||
+            original.name !== current.name ||
+            original.category !== current.category
+        );
+    });
+}
+
+/**
+ * Handles exiting the page in any form
+ * Shows modal if there are unsaved changes
+ */
+const handlePageExit = (event) => {
+    if (hasUnsavedChanges() && !preventUnload) {
+        event.preventDefault();
+        event.returnValue = 'You have unsaved changes!';
+        return 'You have unsaved changes!';
+    }
+}
+
+
 // Event listeners
 
 window.addEventListener("click", handleWindowClick);
 window.addEventListener("resize", handleWindowResize);
+// before unload event found at https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+window.addEventListener("beforeunload", handlePageExit);
 
 stage.on("click", handleStageClick);
 
