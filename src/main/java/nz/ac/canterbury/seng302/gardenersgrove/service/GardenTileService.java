@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -64,18 +63,18 @@ public class GardenTileService {
     }
 
     /**
-     * Saves/updates a garden tile to the repository
+     * Saves a garden tile to the repository.
+     * In event of overlapping tiles, deletes the original tile and adds new tile in its place.
      * @param gardenTile the garden tile being persisted
      * @return the garden tile
      */
-    public GardenTile persistGardenTile(GardenTile gardenTile) {
+    public GardenTile addGardenTile(GardenTile gardenTile) {
         Optional<GardenTile> overlappingTile = getGardenTileByGardenAndCoordinates(gardenTile.getGarden(), gardenTile.getXCoordinate(), gardenTile.getYCoordinate());
 
-        if (overlappingTile.isEmpty() || Objects.equals(overlappingTile.get().getTileId(), gardenTile.getTileId())) {
-            return gardenTileRepository.save(gardenTile);
-        } else {
-            throw new IllegalArgumentException("Tile already exists at this location");
+        if (overlappingTile.isPresent()) {
+            deleteGardenTile(overlappingTile.get());
         }
+        return gardenTileRepository.save(gardenTile);
     }
 
     /**
