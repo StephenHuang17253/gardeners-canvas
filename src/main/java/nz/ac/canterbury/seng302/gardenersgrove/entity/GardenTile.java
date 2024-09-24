@@ -1,7 +1,6 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TagStatus;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
 
 /**
@@ -51,19 +50,19 @@ public class GardenTile {
         this.tileType = tileType;
     }
 
-    public int getxCoordinate() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
-    public void setxCoordinate(int xCoordinate) {
+    public void setXCoordinate(int xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getyCoordinate() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 
-    public void setyCoordinate(int yCoordinate) {
+    public void setYCoordinate(int yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
 

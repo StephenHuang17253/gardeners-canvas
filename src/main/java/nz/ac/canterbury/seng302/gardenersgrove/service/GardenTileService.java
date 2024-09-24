@@ -52,7 +52,7 @@ public class GardenTileService {
      * @return an optional containing the garden tile if it exists
      */
     public Optional<GardenTile> getGardenTileByGardenAndCoordinates(Garden garden, int xCoord, int yCoord) {
-        return gardenTileRepository.findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(garden, xCoord, yCoord);
+        return gardenTileRepository.findTileByGardenAndCoordinates(garden, xCoord, yCoord);
     }
 
     /**
@@ -61,7 +61,7 @@ public class GardenTileService {
      * @return the garden tile
      */
     public GardenTile persistGardenTile(GardenTile gardenTile) {
-        Optional<GardenTile> overlappingTile = getGardenTileByGardenAndCoordinates(gardenTile.getGarden(), gardenTile.getxCoordinate(), gardenTile.getyCoordinate());
+        Optional<GardenTile> overlappingTile = getGardenTileByGardenAndCoordinates(gardenTile.getGarden(), gardenTile.getXCoordinate(), gardenTile.getYCoordinate());
 
         if (overlappingTile.isEmpty() || Objects.equals(overlappingTile.get().getTileId(), gardenTile.getTileId())) {
             return gardenTileRepository.save(gardenTile);

@@ -2,9 +2,9 @@ package nz.ac.canterbury.seng302.gardenersgrove.repository;
 
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
-import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -44,11 +44,12 @@ public interface GardenTileRepository extends CrudRepository<GardenTile, Long> {
      * Finds a garden tile by garden and coordinates.
      *
      * @param garden the garden used in the query
-     * @param xcoord the x coordinate used in the query
-     * @param ycoord the y coordinate used in the query
+     * @param xCoordinate the x coordinate used in the query
+     * @param yCoordinate the y coordinate used in the query
      * @return the tile which belongs to that garden, at the given coordinates.
      */
-    Optional<GardenTile> findGardenTileByGardenIsAndXCoordinateIsAndYCoordinateIs(Garden garden, int xcoord, int ycoord);
+    @Query("SELECT gt FROM GardenTile gt WHERE gt.garden = :garden AND gt.xCoordinate = :xCoordinate AND gt.yCoordinate = :yCoordinate")
+    Optional<GardenTile> findTileByGardenAndCoordinates(@Param("garden") Garden garden, @Param("xCoordinate") int xCoordinate, @Param("yCoordinate") int yCoordinate);
 
 
 }
