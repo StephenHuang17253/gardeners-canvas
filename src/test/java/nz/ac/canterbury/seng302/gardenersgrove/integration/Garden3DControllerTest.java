@@ -138,7 +138,7 @@ class Garden3DControllerTest {
         gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration1.getId(), GridItemType.DECORATION, garden, 6, 6));
         Decoration decoration2 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
         gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, garden, 4, 4));
-
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, garden, 3, 5));
 
     }
 
@@ -224,9 +224,7 @@ class Garden3DControllerTest {
 
     @Test
     @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
-    void get3DGardenLayout_duplicateDecorationsWithDifferentLocations_return200AndDuplicates() throws Exception {
-        Decoration decoration3 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
-        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration3.getId(), GridItemType.DECORATION, garden, 4, 5));
+    void get3DGardenLayout_copyOfDecorationInDifferentLocations_return200AndDuplicates() throws Exception {
         // making call to endpoint
         mockMvcResult = mockMvc
                 .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
@@ -238,11 +236,11 @@ class Garden3DControllerTest {
         JsonNode item1 = jsonNode.get(2);
         assertEquals(item1.get("xcoordinate").asInt(), 4);
         assertEquals(item1.get("ycoordinate").asInt(), 4);
-        assertEquals(item1.get("category").asText(), "Gnome");
+        assertEquals(item1.get("category").asText(), "Pond");
         assertEquals(item1.get("type").asText(), "DECORATION");
-        //should match decoration3
+        //should match decoration2 with different coordinates
         JsonNode item2 = jsonNode.get(3);
-        assertEquals(item2.get("xcoordinate").asInt(), 4);
+        assertEquals(item2.get("xcoordinate").asInt(), 3);
         assertEquals(item2.get("ycoordinate").asInt(), 5);
         assertEquals(item2.get("category").asText(), "Pond");
         assertEquals(item2.get("type").asText(), "DECORATION");
