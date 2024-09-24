@@ -186,7 +186,7 @@ class GardenTileServiceUnitTest {
     }
 
     @Test
-    void persistGardenTile_NoOverlap_Success() {
+    void addGardenTile_NoOverlap_Success() {
 
         Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 6, 6))
                 .thenReturn(Optional.empty());
@@ -195,7 +195,7 @@ class GardenTileServiceUnitTest {
 
         Mockito.when(gardenTileRepository.save(newGardenTile)).thenReturn(newGardenTile);
 
-        GardenTile persistedTile = gardenTileService.persistGardenTile(newGardenTile);
+        GardenTile persistedTile = gardenTileService.addGardenTile(newGardenTile);
 
         Assertions.assertEquals(newGardenTile, persistedTile);
         Assertions.assertEquals(newGardenTile.getXCoordinate(), persistedTile.getXCoordinate());
@@ -204,17 +204,23 @@ class GardenTileServiceUnitTest {
     }
 
     @Test
-    void persistGardenTile_Overlap_ThrowException() {
-
+    void addGardenTile_Overlap_DeleteOverlapAddNew() {
         GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 3, 3);
         newGardenTile.setTileId(999L);
 
         Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
                 .thenReturn(Optional.of(tile1));
 
-        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> gardenTileService.persistGardenTile(newGardenTile));
+        gardenTileService.addGardenTile(newGardenTile);
 
-        Assertions.assertEquals("Tile already exists at this location", thrown.getMessage());
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
+                .thenReturn(Optional.of(newGardenTile));
+
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 3, 3);
+
+        Assertions.assertTrue(optionalTile.isPresent());
+        Assertions.assertEquals(newGardenTile.getTileId(),optionalTile.get().getTileId());
+        Assertions.assertEquals(newGardenTile.getTileType(),optionalTile.get().getTileType());
     }
 
 
