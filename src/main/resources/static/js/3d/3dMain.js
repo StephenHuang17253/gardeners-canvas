@@ -123,7 +123,9 @@ loader.loadBackground(
 // const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
 // const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Default', 0.2, 1.56, loader);
-const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Grass-Long', 0.2, 1.56, loader);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'GrassLong', 0.2, 1.56, loader);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'StonePath', 0.2, 1.56, loader);
+const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'PebblePath', 0.2, 1.56, loader);
 scene.add(grid);
 
 /**

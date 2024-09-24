@@ -4,9 +4,9 @@ import { Loader } from './Loader.js';
 const tileMap = {
     "Default": ["grass-tileable.jpg", "texture"],   // Grass-Short
     "Grass-Medium": ["tiles/grass_medium.glb", "model"],
-    "Grass-Long": ["tiles/grass_long.glb", "model"],
-    "StonePath": ["grass-tileable.jpg", "texture"],
-    "PebblePath": ["grass-tileable.jpg", "texture"],
+    "GrassLong": ["tiles/grass_long.glb", "model"],
+    "StonePath": ["tiles/stone_path.glb", "model"],
+    "PebblePath": ["tiles/pebble_path.glb", "model"],
     "Concrete": ["grass-tileable.jpg", "texture"],
     "Soil": ["grass-tileable.jpg", "texture"],
     "Bark": ["grass-tileable.jpg", "texture"]
