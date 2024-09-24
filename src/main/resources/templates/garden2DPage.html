@@ -106,7 +106,15 @@
                     </div>
 
                     <div id="textureTabContent" class="tab-pane">
-                        Icons for Textures will go here
+                        <div class="row">
+                            <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
+                                 th:each="tileTexture : ${tileTextures}" th:data-tile-name="${tileTexture.toString()}">
+                                <div class="ratio ratio-1x1">
+                                    <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
+                                         alt="Plant" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     </div>
