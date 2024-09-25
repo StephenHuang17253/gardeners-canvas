@@ -217,6 +217,7 @@ public class Garden2DController {
             @RequestParam(value = "typeList", required = false) String typeList,
             @RequestParam(value = "xCoordList", required = false) String xCoordList,
             @RequestParam(value = "yCoordList", required = false) String yCoordList,
+            @RequestParam(value = "tileTextureList", required = false) String tileTextureList,
             HttpServletResponse response,
             Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
