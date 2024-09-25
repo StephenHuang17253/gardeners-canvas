@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
@@ -20,6 +22,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,18 +41,20 @@ public class Garden3DController {
     private final GridItemLocationService gridItemLocationService;
     private final SecurityService securityService;
     private final FriendshipService friendshipService;
-
+    private final WeatherService weatherService;
     private final PlantService plantService;
 
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
             FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
+            WeatherService weatherService,
             PlantService plantService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.plantService = plantService;
+        this.weatherService = weatherService;
     }
 
     @GetMapping("/3D-garden/{gardenId}")
@@ -74,6 +82,21 @@ public class Garden3DController {
             return "403";
         }
 
+        WeatherResponseData weatherData = weatherService.getWeather(garden.getGardenLatitude(),
+                garden.getGardenLongitude());
+
+        String timezone = weatherData.getTimeZone();
+        Instant currentTime = Instant.now();
+        ZoneId zone = ZoneId.of(timezone);
+        ZonedDateTime zonedTime = currentTime.atZone(zone);
+        int hourAtLocation = zonedTime.getHour();
+
+        List<DailyWeather> weeksWeather = weatherData.getRetrievedWeatherData();
+        DailyWeather todaysWeather = weeksWeather.get(2);
+        String todaysWeatherType = todaysWeather.getDescription();
+
+        model.addAttribute("currentHour", hourAtLocation);
+        model.addAttribute("weather", todaysWeatherType);
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("isOwner", securityService.isOwner(garden.getOwner().getId()));
         return "garden3DPage";
@@ -126,13 +149,12 @@ public class Garden3DController {
                             plantLocation.getObjectId(),
                             plantLocation.getItemType(),
                             currentPlant.getPlantCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}",
+                            plantLocation.getId());
                 }
-                else {
-                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}",plantLocation.getId());
-                }
-            }
-            else {
-                logger.warn("Not yet implemented adding decoration to grid {}",plantLocation.getId());
+            } else {
+                logger.warn("Not yet implemented adding decoration to grid {}", plantLocation.getId());
             }
         }
 

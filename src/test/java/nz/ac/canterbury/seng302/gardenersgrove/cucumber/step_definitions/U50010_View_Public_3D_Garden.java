@@ -72,6 +72,9 @@ public class U50010_View_Public_3D_Garden {
     @Autowired
     public FriendshipRepository friendshipRepository;
 
+    @Autowired
+    public WeatherService weatherService;
+
     private Map<String, Object> model;
 
     @Before
@@ -82,9 +85,10 @@ public class U50010_View_Public_3D_Garden {
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
+        weatherService = new WeatherService();
 
         Garden3DController garden3DController = new Garden3DController(gardenService, securityService,
-                friendshipService, gridItemLocationService, plantService);
+                friendshipService, gridItemLocationService, weatherService, plantService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden3DController).build();
     }
 
