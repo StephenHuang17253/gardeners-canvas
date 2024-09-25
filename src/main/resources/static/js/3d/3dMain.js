@@ -25,9 +25,10 @@ const decoMap = {
     "Table": ["deco/table.glb", 4.5],
 };
 
-const weatherBackgroundMap = {
+const skyboxMap = {
     "Sunny": "sunny_skybox.exr",
     "Cloudy": "cloudy_skybox.exr",
+    "Overcast": "cloudy_skybox.exr",
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
@@ -63,6 +64,8 @@ const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
 const currentHour = document.getElementById("currentHour").value;
 const currentWeather = document.getElementById("weather").value;
+
+console.log(gardenId, gardenName, currentHour, currentWeather);
 
 let time = currentHour;
 let weather = currentWeather;
@@ -140,7 +143,7 @@ init();
 addLight();
 
 loader.loadBackground(
-    weatherBackgroundMap[weather],
+    skyboxMap[weather],
     texture => {
         scene.background = texture;
         scene.environment = texture;
