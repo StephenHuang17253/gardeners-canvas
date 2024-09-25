@@ -24,7 +24,7 @@
                     </div>
                     <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
                         <button id="openClearModalButton" type="button" class="btn btn-warning text-light"
-                            data-bs-toggle="modal" data-bs-target="#confirmClearModal">
+                                data-bs-toggle="modal" data-bs-target="#confirmClearModal">
                             Clear All
                         </button>
                         <button type="button" id="deletePlant" class="btn btn-danger">
@@ -103,23 +103,31 @@
                                     th:data-grid-image="${displayableItem.getCategoryImage()}">
                                 </div>
                             </div>
+                            <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
+                                </div>
+                            </div>
                         </div>
 
                         <div id="decorationsTabContent" class="tab-pane">
                             Icons for Decorations will go here
+                            <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
+                                </div>
+                            </div>
                         </div>
 
                         <div id="textureTabContent" class="tab-pane">
                             Icons for Textures will go here
+                            <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
+                                </div>
+                            </div>
                         </div>
 
                     </div>
 
 
-                </div>
-            </div>
-            <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
-                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
                 </div>
             </div>
 
