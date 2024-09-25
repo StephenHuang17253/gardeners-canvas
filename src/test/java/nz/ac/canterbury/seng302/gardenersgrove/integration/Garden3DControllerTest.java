@@ -30,12 +30,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.ui.Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -141,7 +142,6 @@ class Garden3DControllerTest {
             "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
             "  }\n" +
             "}\n";
-
 
     @BeforeAll
     void before_all() throws JsonProcessingException {
@@ -260,9 +260,11 @@ class Garden3DControllerTest {
                 .perform(get("/3D-garden/{gardenId}", gardenId))
                 .andExpect(status().isOk())
                 .andReturn();
-        Map<String, Object> model = mockMvcResult.getModelAndView().getModel();
+        ModelAndView modelAndView = mockMvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        Map<String, Object> model = modelAndView.getModel();
         Assertions.assertNotNull(model.get("currentHour"));
-        assertEquals("Overcast",model.get("weather"));
+        assertEquals("Overcast", model.get("weather"));
 
     }
 
@@ -276,7 +278,9 @@ class Garden3DControllerTest {
                 .perform(get("/3D-garden/{gardenId}", gardenId))
                 .andExpect(status().isOk())
                 .andReturn();
-        Map<String, Object> model = mockMvcResult.getModelAndView().getModel();
+        ModelAndView modelAndView = mockMvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        Map<String, Object> model = modelAndView.getModel();
         Assertions.assertNull(model.get("currentHour"));
         Assertions.assertNull(model.get("weather"));
     }

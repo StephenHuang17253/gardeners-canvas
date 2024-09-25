@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -99,7 +98,6 @@ public class Garden3DController {
             model.addAttribute("currentHour", hourAtLocation);
             model.addAttribute("weather", todaysWeatherType);
         }
-
 
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("isOwner", securityService.isOwner(garden.getOwner().getId()));
