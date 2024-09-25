@@ -14,7 +14,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 
 import org.slf4j.Logger;
@@ -260,8 +259,8 @@ public class Garden2DController {
         for (int i = 0; i < GRID_COLUMNS; i++) {
             for (int j = 0; j < GRID_ROWS; j++) {
                 String tileTextureString = tileTextureListAsList.get(i * GRID_COLUMNS + j);
-                TileType tileType = TileType.valueOf(tileTextureString);
-                GardenTile gardenTile = new GardenTile(garden, tileType, j, i);
+                TileTexture tileTexture = TileTexture.valueOf(tileTextureString);
+                GardenTile gardenTile = new GardenTile(garden, tileTexture, j, i);
                 gardenTileService.addGardenTile(gardenTile);
             }
         }

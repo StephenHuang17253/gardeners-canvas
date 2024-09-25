@@ -25,6 +25,4 @@ public enum TileTexture {
         return this.tileName;
     }
 
-
-
 }

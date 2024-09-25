@@ -1,7 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.entity;
 
 import jakarta.persistence.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 
 /**
  * Entity class of a tile in the garden
@@ -23,7 +23,7 @@ public class GardenTile {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "tile_type")
-    private TileType tileType = TileType.GRASS;
+    private TileTexture tileTexture = TileTexture.GRASS;
 
     @Column(name = "x_coord")
     private int xCoordinate;
@@ -43,16 +43,16 @@ public class GardenTile {
     /**
      * Garden Tile constructor
      * @param garden        the garden the tile belongs to
-     * @param tileType      the type of tile
+     * @param TileTexture      the type of tile
      * @param xCoordinate   the tile's x-coordinate on the grid
      * @param yCoordinate   the tile's y-coordinate on the grid
      */
     public GardenTile(Garden garden,
-                      TileType tileType,
+                      TileTexture TileTexture,
                       int xCoordinate,
                       int yCoordinate) {
         this.garden = garden;
-        this.tileType = tileType;
+        this.tileTexture = TileTexture;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
     }
@@ -66,12 +66,12 @@ public class GardenTile {
         this.tileId = tileId;
     }
 
-    public TileType getTileType() {
-        return tileType;
+    public TileTexture getTileTexture() {
+        return tileTexture;
     }
 
-    public void setTileType(TileType tileType) {
-        this.tileType = tileType;
+    public void setTileTexture(TileTexture tileTexture) {
+        this.tileTexture = tileTexture;
     }
 
     public int getXCoordinate() {
