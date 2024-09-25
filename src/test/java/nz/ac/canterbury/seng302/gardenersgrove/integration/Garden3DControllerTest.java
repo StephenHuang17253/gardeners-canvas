@@ -85,6 +85,7 @@ class Garden3DControllerTest {
 
     private Garden garden1;
     private Garden garden2;
+    private Garden garden3;
 
 
     private static User user1;
@@ -147,10 +148,26 @@ class Garden3DControllerTest {
                 user1));
         gardenList.add(garden2);
 
-        this.garden1 = gardenList.get(0);
+        Garden garden3 = gardenService.addGarden(new Garden(
+                "John's Other Other Garden",
+                "",
+                "114 Ilam Road",
+                "Ilam",
+                "Christchurch",
+                "8041",
+                "New Zealand",
+                10.0,
+                true,
+                "-43.5214643",
+                "172.5796159",
+                user1));
+        gardenList.add(garden3);
 
-        //adding decorations
+        this.garden1 = gardenList.get(0);
         this.garden2 = gardenList.get(1);
+        this.garden3 = gardenList.get(2);
+
+        //adding decorations to garden2
         Decoration decoration1 = decorationService.addDecoration(new Decoration(this.garden2, DecorationCategory.GNOME));
         gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration1.getId(), GridItemType.DECORATION, this.garden2, 6, 6));
         Decoration decoration2 = decorationService.addDecoration(new Decoration(this.garden2, DecorationCategory.POND));
@@ -194,6 +211,17 @@ class Garden3DControllerTest {
         mockMvc
                 .perform(get("/3D-garden/{gardenId}", gardenId))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void get3DGardenLayout_noPlantsAndNoDecorations_return200AndEmptyList() throws Exception {
+        // making call to endpoint
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden-layout/{gardenId}", garden3.getGardenId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0))
+                .andReturn();
     }
 
 
