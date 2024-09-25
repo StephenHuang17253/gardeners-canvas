@@ -474,9 +474,6 @@ gridItemLocations.forEach(item => {
     const itemType = item.getAttribute("data-grid-type");
     const itemName = item.getAttribute("data-grid-name");
     const category = item.getAttribute("data-grid-category");
-
-    console.log(itemName)
-    console.log(objectId)
     let imageSrc = item.getAttribute("data-grid-image");
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
@@ -587,7 +584,6 @@ const handleStageClick = (event) => {
     if (selectedPaletteItem) {
 
         if (!validLocation(x, y)) {
-            console.log("Here 1")
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -606,7 +602,6 @@ const handleStageClick = (event) => {
                 y: y
             });
         } else {
-            console.log("Here 2")
             showErrorMessage(INVALID_LOCATION);
         }
 
@@ -741,7 +736,6 @@ const handleWindowClick = (event) => {
 
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
     const isWithinDecoration = !!event.target.closest("[name='decoration-item']");
-    console.log("Here 3")
     if (!isWithinPlantItem && !isWithinDecoration) showErrorMessage(INVALID_LOCATION);
 
     if (!selectedPaletteItem.contains(event.target)) {
