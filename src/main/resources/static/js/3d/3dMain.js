@@ -25,6 +25,11 @@ const decoMap = {
     "Table": ["deco/table.glb", 4.5],
 };
 
+const weatherBackgroundMap = {
+    "Sunny": "sunny_skybox.exr",
+    "Cloudy": "cloudy_skybox.exr",
+};
+
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
 const container = document.getElementById("container");
@@ -56,11 +61,11 @@ const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
-const currentWeather = document.getElementById("weather").value;
 const currentHour = document.getElementById("currentHour").value;
+const currentWeather = document.getElementById("weather").value;
 
-let time = DEFAULT_TIME;
-let weather = DEFAULT_WEATHER;
+let time = currentHour;
+let weather = currentWeather;
 
 /**
  * Updates the time of day in the scene
@@ -135,7 +140,7 @@ init();
 addLight();
 
 loader.loadBackground(
-    "cloudy_skybox.exr",
+    weatherBackgroundMap[weather],
     texture => {
         scene.background = texture;
         scene.environment = texture;
