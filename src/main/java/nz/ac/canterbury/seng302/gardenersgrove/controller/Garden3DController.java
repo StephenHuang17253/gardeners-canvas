@@ -44,6 +44,16 @@ public class Garden3DController {
 
     private final PlantService plantService;
 
+    /**
+     * Gets services used in this controller
+     *
+     * @param gardenService           handles interactions with garden repository
+     * @param securityService         handles security
+     * @param friendshipService       handles interactions with friendship repository
+     * @param gridItemLocationService handles interactions with gridItemLocations repository
+     * @param plantService            handles interactions with plant repository
+     * @param decorationService       handles interactions with decoration repository
+     */
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
                               FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
@@ -56,6 +66,14 @@ public class Garden3DController {
         this.decorationService = decorationService;
     }
 
+    /**
+     * Returns page for viewing 3D garden
+     *
+     * @param gardenId id of garden to view
+     * @param response HttpServeletResponse for any errors (404, 403)
+     * @param model    model to contain html page inputs
+     * @return garden3Dpage html page
+     */
     @GetMapping("/3D-garden/{gardenId}")
     public String getGarden3DPage(@PathVariable Long gardenId,
                                   HttpServletResponse response,
@@ -91,7 +109,7 @@ public class Garden3DController {
      * Turns all gridItemLocations of a garden into a usable model for actual display on client side
      *
      * @param gridItemLocations all items in grid
-     * @return displayableItems gridItemLocations formatted such that they can be displayed
+     * @return displayableItems which are gridItemLocations formatted such that they can be displayed
      */
     private List<DisplayableItem> extractDisplayableItems(List<GridItemLocation> gridItemLocations) {
 
