@@ -7,7 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTileRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,10 +62,10 @@ class GardenTileServiceUnitTest {
         Mockito.when(testUser1.getId()).thenReturn(1L);
         Mockito.when(userService.getUserById(1L)).thenReturn(testUser1);
 
-        tile1 = new GardenTile(garden, TileType.STONE, 3, 3);
+        tile1 = new GardenTile(garden, TileTexture.STONE_PATH, 3, 3);
         tile1.setTileId(1L);
 
-        tile2 = new GardenTile(garden, TileType.CONCRETE, 3, 3);
+        tile2 = new GardenTile(garden, TileTexture.CONCRETE, 3, 3);
         tile2.setTileId(2L);
     }
 
@@ -191,7 +191,7 @@ class GardenTileServiceUnitTest {
         Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 6, 6))
                 .thenReturn(Optional.empty());
 
-        GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 6, 6);
+        GardenTile newGardenTile = new GardenTile(garden, TileTexture.STONE_PATH, 6, 6);
 
         Mockito.when(gardenTileRepository.save(newGardenTile)).thenReturn(newGardenTile);
 
@@ -205,7 +205,7 @@ class GardenTileServiceUnitTest {
 
     @Test
     void addGardenTile_Overlap_DeleteOverlapAddNew() {
-        GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 3, 3);
+        GardenTile newGardenTile = new GardenTile(garden, TileTexture.STONE_PATH, 3, 3);
         newGardenTile.setTileId(999L);
 
         Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
@@ -220,7 +220,7 @@ class GardenTileServiceUnitTest {
 
         Assertions.assertTrue(optionalTile.isPresent());
         Assertions.assertEquals(newGardenTile.getTileId(),optionalTile.get().getTileId());
-        Assertions.assertEquals(newGardenTile.getTileType(),optionalTile.get().getTileType());
+        Assertions.assertEquals(newGardenTile.getTileTexture(),optionalTile.get().getTileTexture());
     }
 
 
