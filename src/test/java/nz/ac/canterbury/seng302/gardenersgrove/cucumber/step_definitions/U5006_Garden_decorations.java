@@ -107,16 +107,10 @@ public class U5006_Garden_decorations {
     }
 
     @When("I As user {string} place a decoration on my grid and press save")
-    public void iAsUserPlaceADecorationOnMyGridAndPressSave(String email) {
+    public void iAsUserPlaceADecorationOnMyGridAndPressSave(String email) throws Exception {
+        gridItemLocationRepository.deleteAll();
         user = userService.getUserByEmail(email);
         garden = user.getGardens().get(0);
-        Decoration gnome = new Decoration(garden, DecorationCategory.GNOME);
-        decorationService.addDecoration(gnome);
-        Assertions.assertEquals(DecorationCategory.GNOME, decorationService.getDecorationsByGarden(garden).get(0).getDecorationCategory());
-    }
-
-    @Then("I see my placed decoration")
-    public void iSeeMyPlacedDecoration() throws Exception {
         Long gardenId = garden.getGardenId();
         Decoration decoration = decorationService.getDecorations().getFirst();
 
@@ -138,8 +132,12 @@ public class U5006_Garden_decorations {
                         .param("xCoordList", JSONArray.toJSONString(xCoordList))
                         .param("yCoordList", JSONArray.toJSONString(yCoordList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+    }
 
-
+    @Then("I see my placed decoration")
+    public void iSeeMyPlacedDecoration() throws Exception {
+        Decoration decoration = decorationService.getDecorations().getFirst();
+        Long gardenId = garden.getGardenId();
         Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository
                 .findGridItemLocationByObjectIdAndItemTypeAndGarden(decoration.getId(),
                         GridItemType.DECORATION,
