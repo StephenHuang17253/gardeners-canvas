@@ -166,4 +166,13 @@ const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturatio
     return {grid, tileCenterpositions};
 };
 
+const createTileGrid = async (rows, cols, tileSize, gardenTileTextureList) => {
+    const grid = new THREE.Group();
+    const offset = (rows - 1) * tileSize / 2;
+    const tileCenterpositions = [];
+    gardenTileTextureList.forEach(gardenTileTexture => {
+
+    })
+}
+
 export { createTileGrid };
