@@ -98,15 +98,11 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
  * @returns {Boolean} - True if the destination is empty, false otherwise
  */
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
-    let nodes = layer.find("Image").values();
+    const nodes = layer.find("Image").values();
     for (let node of nodes) {
         const { i, j } = convertToGridCoordinates(node.x(), node.y());
-        if (i === x && j === y) {
-            if (node.id() !== plantId) {
-                return false;
-            } else if (node.attrs.uniqueGridId !== gridLocationUniqueId) {
-                return false;
-            }
+        if ((i === x && j === y) && (node.id() !== plantId || node.attrs.uniqueGridId !== gridLocationUniqueId)) {
+            return false;
         }
     }
     return true
