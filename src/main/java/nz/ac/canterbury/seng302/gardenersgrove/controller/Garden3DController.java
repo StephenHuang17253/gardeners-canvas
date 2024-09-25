@@ -86,6 +86,56 @@ public class Garden3DController {
         return "garden3DPage";
     }
 
+
+    /**
+     * Turns all gridItemLocations of a garden into a usable model for actual display on client side
+     *
+     * @param gridItemLocations all items in grid
+     * @return displayableItems gridItemLocations formatted such that they can be displayed
+     */
+    private List<DisplayableItem> extractDisplayableItems(List<GridItemLocation> gridItemLocations) {
+
+        List<DisplayableItem> displayableItems = new ArrayList<>();
+
+        for (GridItemLocation gridLocation : gridItemLocations) {
+            if (gridLocation.getItemType() == GridItemType.PLANT) {
+                Optional<Plant> optionalPlant = plantService.getById(gridLocation.getObjectId());
+                if (optionalPlant.isPresent()) {
+                    Plant currentPlant = optionalPlant.get();
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
+                            currentPlant.getPlantName(),
+                            currentPlant.getPlantCategory().toString(),
+                            gridLocation.getObjectId(),
+                            gridLocation.getItemType(),
+                            currentPlant.getPlantCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Plant grid item could not be added to grid, missing item, id {}", gridLocation.getId());
+                }
+            } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
+                Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+                if (optionalDecoration.isPresent()) {
+                    Decoration currentDecoration = optionalDecoration.get();
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
+                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
+                            currentDecoration.getDecorationCategory().toString(),
+                            currentDecoration.getId(),
+                            gridLocation.getItemType(),
+                            currentDecoration.getDecorationCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Decoration grid item could not be added to grid, missing item, id {}", gridLocation.getId());
+                }
+            } else {
+                logger.warn("GridItemType is invalid. It is not DECORATION, nor PLANT");
+            }
+        }
+        return displayableItems;
+    }
+
+
     /**
      * returns a list of item locations as displayable items with coordinates and
      * names
@@ -121,39 +171,7 @@ public class Garden3DController {
 
         List<GridItemLocation> gridItemLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        for (GridItemLocation gridLocation : gridItemLocations) {
-            if (gridLocation.getItemType() == GridItemType.PLANT) {
-                Optional<Plant> optionalPlant = plantService.getById(gridLocation.getObjectId());
-                if (optionalPlant.isPresent()) {
-                    Plant currentPlant = optionalPlant.get();
-                    displayableItems.add(new DisplayableItem(
-                            gridLocation.getXCoordinate(),
-                            gridLocation.getYCoordinate(),
-                            currentPlant.getPlantName(),
-                            currentPlant.getPlantCategory().toString(),
-                            gridLocation.getObjectId(),
-                            gridLocation.getItemType(),
-                            currentPlant.getPlantCategory().getCategoryImage()));
-                } else {
-                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}", gridLocation.getId());
-                }
-            } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
-                Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
-                if (optionalDecoration.isPresent()) {
-                    Decoration currentDecoration = optionalDecoration.get();
-                    displayableItems.add(new DisplayableItem(
-                            gridLocation.getXCoordinate(),
-                            gridLocation.getYCoordinate(),
-                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
-                            currentDecoration.getDecorationCategory().toString(),
-                            currentDecoration.getId(),
-                            gridLocation.getItemType(),
-                            currentDecoration.getDecorationCategory().getCategoryImage()));
-                } else {
-                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}", gridLocation.getId());
-                }
-            }
-        }
+        displayableItems = extractDisplayableItems(gridItemLocations);
         return displayableItems;
     }
 
