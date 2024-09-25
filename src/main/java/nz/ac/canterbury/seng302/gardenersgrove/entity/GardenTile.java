@@ -7,16 +7,14 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
  * Entity class of a tile in the garden
  */
 @Entity
-@Table(name = "garden_tile",
-    indexes = {@Index(name="id_index", columnList = "tile_id"),
-                @Index(name="garden_and_locaton",columnList = "garden_id,x_coord,y_coord")})
+@Table(name = "garden_tile", indexes = { @Index(name = "id_index", columnList = "tile_id"),
+        @Index(name = "garden_and_locaton", columnList = "garden_id,x_coord,y_coord") })
 public class GardenTile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tile_id")
     private Long tileId;
-
 
     /**
      * The type of tile
@@ -42,21 +40,21 @@ public class GardenTile {
 
     /**
      * Garden Tile constructor
-     * @param garden        the garden the tile belongs to
-     * @param TileTexture      the type of tile
-     * @param xCoordinate   the tile's x-coordinate on the grid
-     * @param yCoordinate   the tile's y-coordinate on the grid
+     * 
+     * @param garden      the garden the tile belongs to
+     * @param TileTexture the type of tile
+     * @param xCoordinate the tile's x-coordinate on the grid
+     * @param yCoordinate the tile's y-coordinate on the grid
      */
     public GardenTile(Garden garden,
-                      TileTexture TileTexture,
-                      int xCoordinate,
-                      int yCoordinate) {
+            TileTexture tileTexture,
+            int xCoordinate,
+            int yCoordinate) {
         this.garden = garden;
-        this.tileTexture = TileTexture;
+        this.tileTexture = tileTexture;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
     }
-
 
     public Long getTileId() {
         return tileId;

@@ -1,6 +1,5 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -8,7 +7,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,6 @@ class GardenTileServiceIntegrationTest {
 
     Garden otherGarden;
 
-
     GardenTile tile1;
 
     GardenTile tile2;
@@ -74,9 +72,8 @@ class GardenTileServiceIntegrationTest {
         tokenRepository.deleteAll();
         userRepository.deleteAll();
 
-
         testUser1 = userService.addUser(new User("Alexandar", "au Arcos", "alexandar@DecorationServiceUnitTest.com",
-                LocalDate.of(2003,5,2)),"password");
+                LocalDate.of(2003, 5, 2)), "password");
         garden = gardenService.addGarden(new Garden("Arcos Gardens",
                 "The Gardens of House Arcos",
                 "Elysium, Mars, Sol",
@@ -103,14 +100,13 @@ class GardenTileServiceIntegrationTest {
                 "43",
                 testUser1));
 
-
-        tile1 = new GardenTile(garden, TileType.STONE, 3, 3);
+        tile1 = new GardenTile(garden, TileTexture.BARK, 3, 3);
         tile1.setTileId(1L);
 
-        tile2 = new GardenTile(garden, TileType.CONCRETE, 3, 2);
+        tile2 = new GardenTile(garden, TileTexture.CONCRETE, 3, 2);
         tile2.setTileId(2L);
 
-        tile3 = new GardenTile(otherGarden, TileType.GRASS, 1, 2);
+        tile3 = new GardenTile(otherGarden, TileTexture.GRASS, 1, 2);
         tile3.setTileId(3L);
     }
 
@@ -170,7 +166,7 @@ class GardenTileServiceIntegrationTest {
         gardenTileService.addGardenTile(tile1);
         gardenTileService.addGardenTile(tile2);
 
-        User wrongUser = userService.addUser(new User("John","Doe","x@y.z", LocalDate.now()),"asdasd");
+        User wrongUser = userService.addUser(new User("John", "Doe", "x@y.z", LocalDate.now()), "asdasd");
         Garden wrongGarden = gardenService.addGarden(new Garden("Arcos Gardens",
                 "The Gardens of House Arcos",
                 "Elysium, Mars, Sol",
@@ -196,7 +192,7 @@ class GardenTileServiceIntegrationTest {
         tile2 = gardenTileService.addGardenTile(tile2);
         tile3 = gardenTileService.addGardenTile(tile3);
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden,3,3);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 3, 3);
 
         Assertions.assertTrue(optionalTile.isPresent());
         Assertions.assertEquals(tile1.getTileId(), optionalTile.get().getTileId());
@@ -209,14 +205,14 @@ class GardenTileServiceIntegrationTest {
         gardenTileService.addGardenTile(tile2);
         gardenTileService.addGardenTile(tile3);
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden,0,0);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 0, 0);
 
         Assertions.assertTrue(optionalTile.isEmpty());
     }
 
     @Test
     void getGardenTileByGardenAndCoordinates_WrongGardenCorrectCoords_TileNotFound() {
-        User wrongUser = userService.addUser(new User("John","Doe","x@y.z", LocalDate.now()),"asdasd");
+        User wrongUser = userService.addUser(new User("John", "Doe", "x@y.z", LocalDate.now()), "asdasd");
         Garden wrongGarden = gardenService.addGarden(new Garden("Arcos Gardens",
                 "The Gardens of House Arcos",
                 "Elysium, Mars, Sol",
@@ -234,14 +230,14 @@ class GardenTileServiceIntegrationTest {
         gardenTileService.addGardenTile(tile2);
         gardenTileService.addGardenTile(tile3);
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden,3,3);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden, 3, 3);
 
         Assertions.assertTrue(optionalTile.isEmpty());
     }
 
     @Test
     void getGardenTileByGardenAndCoordinates_WrongGardenWrongCoords_TileNotFound() {
-        User wrongUser = userService.addUser(new User("John","Doe","x@y.z", LocalDate.now()),"asdasd");
+        User wrongUser = userService.addUser(new User("John", "Doe", "x@y.z", LocalDate.now()), "asdasd");
         Garden wrongGarden = gardenService.addGarden(new Garden("Arcos Gardens",
                 "The Gardens of House Arcos",
                 "Elysium, Mars, Sol",
@@ -259,7 +255,7 @@ class GardenTileServiceIntegrationTest {
         gardenTileService.addGardenTile(tile2);
         gardenTileService.addGardenTile(tile3);
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden,0,0);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden, 0, 0);
 
         Assertions.assertTrue(optionalTile.isEmpty());
     }
@@ -269,11 +265,9 @@ class GardenTileServiceIntegrationTest {
         gardenTileService.addGardenTile(tile1);
         gardenTileService.addGardenTile(tile2);
 
-        GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 6, 6);
+        GardenTile newGardenTile = new GardenTile(garden, TileTexture.BARK, 6, 6);
 
         GardenTile persistedTile = gardenTileService.addGardenTile(newGardenTile);
-
-
 
         Assertions.assertEquals(newGardenTile, persistedTile);
         Assertions.assertEquals(newGardenTile.getXCoordinate(), persistedTile.getXCoordinate());
@@ -286,19 +280,16 @@ class GardenTileServiceIntegrationTest {
         gardenTileService.addGardenTile(tile1);
         gardenTileService.addGardenTile(tile2);
 
-        GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 3, 3);
+        GardenTile newGardenTile = new GardenTile(garden, TileTexture.BARK, 3, 3);
         newGardenTile.setTileId(999L);
 
-
         gardenTileService.addGardenTile(newGardenTile);
-
 
         Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 3, 3);
 
         Assertions.assertTrue(optionalTile.isPresent());
-        Assertions.assertEquals(newGardenTile.getTileId(),optionalTile.get().getTileId());
-        Assertions.assertEquals(newGardenTile.getTileType(),optionalTile.get().getTileType());
+        Assertions.assertEquals(newGardenTile.getTileId(), optionalTile.get().getTileId());
+        Assertions.assertEquals(newGardenTile.getTileTexture(), optionalTile.get().getTileTexture());
     }
-
 
 }

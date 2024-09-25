@@ -1,13 +1,12 @@
 package nz.ac.canterbury.seng302.gardenersgrove.unit;
 
-
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTileRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.GardenTileService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TileType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ class GardenTileServiceUnitTest {
         gardenTileService = new GardenTileService(gardenTileRepository);
 
         testUser1 = Mockito.spy(new User("Alexandar", "au Arcos", "alexandar@DecorationServiceUnitTest.com",
-                LocalDate.of(2003,5,2)));
+                LocalDate.of(2003, 5, 2)));
         garden = Mockito.spy(new Garden("Arcos Gardens",
                 "The Gardens of House Arcos",
                 "Elysium, Mars, Sol",
@@ -62,10 +61,10 @@ class GardenTileServiceUnitTest {
         Mockito.when(testUser1.getId()).thenReturn(1L);
         Mockito.when(userService.getUserById(1L)).thenReturn(testUser1);
 
-        tile1 = new GardenTile(garden, TileType.STONE, 3, 3);
+        tile1 = new GardenTile(garden, TileTexture.BARK, 3, 3);
         tile1.setTileId(1L);
 
-        tile2 = new GardenTile(garden, TileType.CONCRETE, 3, 3);
+        tile2 = new GardenTile(garden, TileTexture.CONCRETE, 3, 3);
         tile2.setTileId(2L);
     }
 
@@ -142,10 +141,10 @@ class GardenTileServiceUnitTest {
 
     @Test
     void getGardenTileByGardenAndCoordinates_CorrectGardenCorrectCoords_ReturnTile() {
-        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
                 .thenReturn(Optional.ofNullable(tile1));
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden,3,3);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 3, 3);
 
         Assertions.assertTrue(optionalTile.isPresent());
         Assertions.assertEquals(tile1, optionalTile.get());
@@ -153,10 +152,10 @@ class GardenTileServiceUnitTest {
 
     @Test
     void getGardenTileByGardenAndCoordinates_CorrectGardenWrongCoords_TileNotFound() {
-        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
                 .thenReturn(Optional.empty());
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden,0,0);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 0, 0);
 
         Assertions.assertTrue(optionalTile.isEmpty());
     }
@@ -165,10 +164,10 @@ class GardenTileServiceUnitTest {
     void getGardenTileByGardenAndCoordinates_WrongGardenCorrectCoords_TileNotFound() {
         Garden wrongGarden = new Garden();
 
-        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(wrongGarden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(wrongGarden, 3, 3))
                 .thenReturn(Optional.empty());
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden,3,3);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden, 3, 3);
 
         Assertions.assertTrue(optionalTile.isEmpty());
     }
@@ -177,10 +176,10 @@ class GardenTileServiceUnitTest {
     void getGardenTileByGardenAndCoordinates_WrongGardenWrongCoords_TileNotFound() {
         Garden wrongGarden = new Garden();
 
-        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(wrongGarden,3,3))
+        Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(wrongGarden, 3, 3))
                 .thenReturn(Optional.empty());
 
-        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden,0,0);
+        Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(wrongGarden, 0, 0);
 
         Assertions.assertTrue(optionalTile.isEmpty());
     }
@@ -191,7 +190,7 @@ class GardenTileServiceUnitTest {
         Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 6, 6))
                 .thenReturn(Optional.empty());
 
-        GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 6, 6);
+        GardenTile newGardenTile = new GardenTile(garden, TileTexture.BARK, 6, 6);
 
         Mockito.when(gardenTileRepository.save(newGardenTile)).thenReturn(newGardenTile);
 
@@ -205,7 +204,7 @@ class GardenTileServiceUnitTest {
 
     @Test
     void addGardenTile_Overlap_DeleteOverlapAddNew() {
-        GardenTile newGardenTile = new GardenTile(garden, TileType.STONE, 3, 3);
+        GardenTile newGardenTile = new GardenTile(garden, TileTexture.BARK, 3, 3);
         newGardenTile.setTileId(999L);
 
         Mockito.when(gardenTileRepository.findTileByGardenAndCoordinates(garden, 3, 3))
@@ -219,10 +218,8 @@ class GardenTileServiceUnitTest {
         Optional<GardenTile> optionalTile = gardenTileService.getGardenTileByGardenAndCoordinates(garden, 3, 3);
 
         Assertions.assertTrue(optionalTile.isPresent());
-        Assertions.assertEquals(newGardenTile.getTileId(),optionalTile.get().getTileId());
-        Assertions.assertEquals(newGardenTile.getTileType(),optionalTile.get().getTileType());
+        Assertions.assertEquals(newGardenTile.getTileId(), optionalTile.get().getTileId());
+        Assertions.assertEquals(newGardenTile.getTileTexture(), optionalTile.get().getTileTexture());
     }
-
-
 
 }
