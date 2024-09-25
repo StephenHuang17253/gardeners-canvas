@@ -85,18 +85,22 @@ public class Garden3DController {
         WeatherResponseData weatherData = weatherService.getWeather(garden.getGardenLatitude(),
                 garden.getGardenLongitude());
 
-        String timezone = weatherData.getTimeZone();
-        Instant currentTime = Instant.now();
-        ZoneId zone = ZoneId.of(timezone);
-        ZonedDateTime zonedTime = currentTime.atZone(zone);
-        int hourAtLocation = zonedTime.getHour();
+        if (weatherData != null) {
+            String timezone = weatherData.getTimeZone();
+            Instant currentTime = Instant.now();
+            ZoneId zone = ZoneId.of(timezone);
+            ZonedDateTime zonedTime = currentTime.atZone(zone);
+            int hourAtLocation = zonedTime.getHour();
 
-        List<DailyWeather> weeksWeather = weatherData.getRetrievedWeatherData();
-        DailyWeather todaysWeather = weeksWeather.get(2);
-        String todaysWeatherType = todaysWeather.getDescription();
+            List<DailyWeather> weeksWeather = weatherData.getRetrievedWeatherData();
+            DailyWeather todaysWeather = weeksWeather.get(2);
+            String todaysWeatherType = todaysWeather.getDescription();
 
-        model.addAttribute("currentHour", hourAtLocation);
-        model.addAttribute("weather", todaysWeatherType);
+            model.addAttribute("currentHour", hourAtLocation);
+            model.addAttribute("weather", todaysWeatherType);
+        }
+
+
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("isOwner", securityService.isOwner(garden.getOwner().getId()));
         return "garden3DPage";
