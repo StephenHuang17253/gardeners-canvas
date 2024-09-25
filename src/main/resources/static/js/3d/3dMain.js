@@ -46,11 +46,19 @@ const TILE_SIZE = 10;
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
+const DEFAULT_TIME = 12;
+const DEFAULT_WEATHER = "Sunny";
+
 // link used to download files
 const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
+const currentWeather = document.getElementById("weather").value;
+const currentHour = document.getElementById("currentHour").value;
+
+let time = DEFAULT_TIME;
+let weather = DEFAULT_WEATHER;
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -210,9 +218,17 @@ const onMouseOut = () => {
     document.body.style.userSelect = "auto";
 };
 
+/** 
+* On track cycles input change, 
+* update the time variable to the current hour if the input is checked, 
+* otherwise set it to the default time
+*/
 const onTrackCyclesInputChange = () => {
-    const trackCycles = trackCyclesInput.checked;
-    console.log("Track Cycles: ", trackCycles);
+    if (trackCyclesInput.checked) {
+        time = currentHour;
+    } else {
+        time = DEFAULT_TIME;
+    }
 };
 
 console.log(scene.children);

@@ -75,9 +75,6 @@
         <div class="w-100 h-100" id="container"></div>
     </div>
 
-    <p th:text="${currentHour}"></p>
-    <p th:text="${weather}"></p>
-
     <footer class="text-center mt-4">
         <ul class="list-unstyled">
             <li>
@@ -112,6 +109,8 @@
 
     <input id="gardenId" type="hidden" th:value="${garden.getGardenId()}">
     <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}">
+    <input id="currentHour" type="hidden" th:value="${currentHour}">
+    <input id="weather" type="hidden" th:value="${weather}">
     <script type="module" th:src="@{/js/3d/3dMain.js}"></script>
 </body>
 
