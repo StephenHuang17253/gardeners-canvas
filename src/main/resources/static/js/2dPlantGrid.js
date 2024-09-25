@@ -560,7 +560,7 @@ decorationItems.forEach((item) => {
             image: decorationImage,
             id: item.getAttribute('data-decoration-id'),
             type: "DECORATION",
-            count: item.getAttribute('data-decoration-count'),
+            count: 999,
             category: 'Decoration'
         };
     });
