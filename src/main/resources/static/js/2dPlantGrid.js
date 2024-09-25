@@ -559,7 +559,8 @@ decorationItems.forEach((item) => {
             name: item.getAttribute('data-decoration-type'),
             image: decorationImage,
             id: item.getAttribute('data-decoration-id'),
-            type: 'DECORATION',
+            type: "DECORATION",
+            count: item.getAttribute('data-decoration-count'),
             category: 'Decoration'
         };
     });

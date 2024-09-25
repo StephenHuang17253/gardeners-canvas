@@ -11,6 +11,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import org.slf4j.Logger;
@@ -111,7 +112,16 @@ public class Garden2DController {
                             currentPlant.getPlantCategory().getCategoryImage()));
                 }
             } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
+
+//                Decoration decoration = new Decoration(garden, DecorationCategory.ROCK);
+//                decorationService.addDecoration(decoration);
+//                decorationRepository.save(decoration);
+//                decoration.setId(gridLocation.getObjectId());
+//
+//
                 Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+
+
                 if (optionalDecoration.isPresent()) {
                     Decoration currentDecoration = optionalDecoration.get();
                     displayableItems.add(new DisplayableItem(
@@ -241,6 +251,39 @@ public class Garden2DController {
         // updating the repository
         deleteOldGridLocationItems(garden);
         for (int i = 0; i < idListAsList.size(); i++) {
+
+            if (GridItemType.valueOf(typeListAsList.get(i)) == GridItemType.DECORATION) {
+                    switch (Integer.parseInt(idListAsList.get(i))) {
+                        case 1:
+                            if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK).isEmpty()) {
+                                decorationService.addDecoration(new Decoration(garden, DecorationCategory.ROCK));
+                            }
+                            break;
+                        case 2:
+                            if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.TABLE).isEmpty()) {
+                                decorationService.addDecoration(new Decoration(garden, DecorationCategory.TABLE));
+                            }
+                            break;
+                        case 3:
+                            if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.POND).isEmpty()) {
+                                decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
+                            }
+                            break;
+                        case 4:
+                            if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.GNOME).isEmpty()) {
+                                decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+                            }
+                            break;
+                        case 5:
+                            if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.FOUNTAIN).isEmpty()) {
+                                decorationService.addDecoration(new Decoration(garden, DecorationCategory.FOUNTAIN));
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+            }
+
             updateGardenGrid(GridItemType.valueOf(typeListAsList.get(i)), Long.parseLong(idListAsList.get(i)),
                     xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
         }
