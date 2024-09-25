@@ -99,7 +99,8 @@
                                  th:each="decoration : ${decorations}"
                                  th:data-decoration-type="${decoration.getCategory()}"
                                  th:data-decoration-image="${decoration.getCategoryImage()}"
-                                 th:data-decoration-id="${decoration.getId()}">
+                                 th:data-decoration-id="${decoration.getId()}"
+                                 th:data-grid-category="Decoration">
                                 <div class="ratio ratio-1x1">
                                     <img th:src="@{${decoration.getCategoryImage()}}" th:alt="${decoration.getCategory()}" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                 </div>
