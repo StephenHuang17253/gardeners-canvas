@@ -1,6 +1,8 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
@@ -14,6 +16,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
 import nz.ac.canterbury.seng302.gardenersgrove.service.DecorationService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
@@ -26,6 +29,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +47,7 @@ public class Garden3DController {
     private final GridItemLocationService gridItemLocationService;
     private final SecurityService securityService;
     private final FriendshipService friendshipService;
-
+    private final WeatherService weatherService;
     private final PlantService plantService;
 
     /**
@@ -51,18 +57,21 @@ public class Garden3DController {
      * @param securityService         handles security
      * @param friendshipService       handles interactions with friendship repository
      * @param gridItemLocationService handles interactions with gridItemLocations repository
+     * @param weatherService handles interaction with weather API and weather objects
      * @param plantService            handles interactions with plant repository
      * @param decorationService       handles interactions with decoration repository
      */
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
-                              FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
-                              PlantService plantService, DecorationService decorationService) {
+            FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
+            WeatherService weatherService,
+            PlantService plantService, DecorationService decorationService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.plantService = plantService;
+        this.weatherService = weatherService;
         this.decorationService = decorationService;
     }
 
@@ -97,6 +106,24 @@ public class Garden3DController {
             model.addAttribute("message",
                     "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
+        }
+
+        WeatherResponseData weatherData = weatherService.getWeather(garden.getGardenLatitude(),
+                garden.getGardenLongitude());
+
+        if (weatherData != null) {
+            String timezone = weatherData.getTimeZone();
+            Instant currentTime = Instant.now();
+            ZoneId zone = ZoneId.of(timezone);
+            ZonedDateTime zonedTime = currentTime.atZone(zone);
+            int hourAtLocation = zonedTime.getHour();
+
+            List<DailyWeather> weeksWeather = weatherData.getRetrievedWeatherData();
+            DailyWeather todaysWeather = weeksWeather.get(2);
+            String todaysWeatherType = todaysWeather.getDescription();
+
+            model.addAttribute("currentHour", hourAtLocation);
+            model.addAttribute("weather", todaysWeatherType);
         }
 
         model.addAttribute("garden", new GardenDetailModel(garden));

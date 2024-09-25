@@ -27,6 +27,10 @@
     font-weight: bold;
 }
 
+.unHighlightable {
+    user-select: none;
+}
+
 #homeImage {
     position: fixed;
     top: 0;
