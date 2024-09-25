@@ -83,7 +83,9 @@ class Garden3DControllerTest {
 
     private static final Long MAX_LONG = 10000L;
 
-    private Garden garden;
+    private Garden garden1;
+    private Garden garden2;
+
 
     private static User user1;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(Locale.ENGLISH);
@@ -145,13 +147,15 @@ class Garden3DControllerTest {
                 user1));
         gardenList.add(garden2);
 
+        this.garden1 = gardenList.get(0);
+
         //adding decorations
-        garden = gardenList.get(0);
-        Decoration decoration1 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
-        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration1.getId(), GridItemType.DECORATION, garden, 6, 6));
-        Decoration decoration2 = decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
-        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, garden, 4, 4));
-        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, garden, 3, 5));
+        this.garden2 = gardenList.get(1);
+        Decoration decoration1 = decorationService.addDecoration(new Decoration(this.garden2, DecorationCategory.GNOME));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration1.getId(), GridItemType.DECORATION, this.garden2, 6, 6));
+        Decoration decoration2 = decorationService.addDecoration(new Decoration(this.garden2, DecorationCategory.POND));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, this.garden2, 4, 4));
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration2.getId(), GridItemType.DECORATION, this.garden2, 3, 5));
 
     }
 
@@ -192,17 +196,33 @@ class Garden3DControllerTest {
                 .andExpect(status().isOk());
     }
 
+
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void get3DGardenLayout_noDecoration_return200AndNoDecorations() throws Exception {
+        // making call to endpoint
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden-layout/{gardenId}", garden1.getGardenId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+        //checking there is only a plant, no decorations
+        JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
+        JsonNode item = jsonNode.get(0);
+        assertEquals(item.get("type").asText(), "PLANT");
+    }
+
     @Test
     @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
     void get3DGardenLayout_oneDecoration_return200AndDecoration() throws Exception {
         // making call to endpoint
         mockMvcResult = mockMvc
-                .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
+                .perform(get("/3D-garden-layout/{gardenId}", garden2.getGardenId()))
                 .andExpect(status().isOk())
                 .andReturn();
         //checking decoration is correct
         JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
-        JsonNode item = jsonNode.get(1);
+        JsonNode item = jsonNode.get(0);
         //should match decoration1 in before_all
         assertEquals(item.get("xcoordinate").asInt(), 6);
         assertEquals(item.get("ycoordinate").asInt(), 6);
@@ -215,19 +235,19 @@ class Garden3DControllerTest {
     void get3DGardenLayout_multipleDecorations_return200AndDecorations() throws Exception {
         // making call to endpoint
         mockMvcResult = mockMvc
-                .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
+                .perform(get("/3D-garden-layout/{gardenId}", garden2.getGardenId()))
                 .andExpect(status().isOk())
                 .andReturn();
         //checking decoration is correct
         JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
         //should match decoration1 in before_all
-        JsonNode item1 = jsonNode.get(1);
+        JsonNode item1 = jsonNode.get(0);
         assertEquals(item1.get("xcoordinate").asInt(), 6);
         assertEquals(item1.get("ycoordinate").asInt(), 6);
         assertEquals(item1.get("category").asText(), "Gnome");
         assertEquals(item1.get("type").asText(), "DECORATION");
         //should match decoration2 in before_all
-        JsonNode item2 = jsonNode.get(2);
+        JsonNode item2 = jsonNode.get(1);
         assertEquals(item2.get("xcoordinate").asInt(), 4);
         assertEquals(item2.get("ycoordinate").asInt(), 4);
         assertEquals(item2.get("category").asText(), "Pond");
@@ -240,19 +260,19 @@ class Garden3DControllerTest {
     void get3DGardenLayout_copyOfDecorationInDifferentLocations_return200AndDuplicates() throws Exception {
         // making call to endpoint
         mockMvcResult = mockMvc
-                .perform(get("/3D-garden-layout/{gardenId}", garden.getGardenId()))
+                .perform(get("/3D-garden-layout/{gardenId}", garden2.getGardenId()))
                 .andExpect(status().isOk())
                 .andReturn();
         //checking decoration is correct
         JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
         //should match decoration2 in before_all
-        JsonNode item1 = jsonNode.get(2);
+        JsonNode item1 = jsonNode.get(1);
         assertEquals(item1.get("xcoordinate").asInt(), 4);
         assertEquals(item1.get("ycoordinate").asInt(), 4);
         assertEquals(item1.get("category").asText(), "Pond");
         assertEquals(item1.get("type").asText(), "DECORATION");
         //should match decoration2 with different coordinates
-        JsonNode item2 = jsonNode.get(3);
+        JsonNode item2 = jsonNode.get(2);
         assertEquals(item2.get("xcoordinate").asInt(), 3);
         assertEquals(item2.get("ycoordinate").asInt(), 5);
         assertEquals(item2.get("category").asText(), "Pond");
@@ -267,6 +287,7 @@ class Garden3DControllerTest {
         mockMvcResult = mockMvc
                 .perform(get("/3D-garden-layout/{gardenId}", gardenId))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
                 .andReturn();
         JsonNode jsonNode = objectMapper.readTree(mockMvcResult.getResponse().getContentAsString());
         JsonNode item = jsonNode.get(0);
