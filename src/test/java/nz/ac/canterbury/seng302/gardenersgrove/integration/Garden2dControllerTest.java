@@ -92,6 +92,8 @@ class Garden2dControllerTest {
 
     @BeforeAll
     void before_each() {
+        decorationRepository.deleteAll();
+        gridItemLocationRepository.deleteAll();
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         user1 = new User("John", "Doe", "jhonDoe@Garden2dControllerTest.com", date);
         user2 = new User("Jane", "Doe", "janeDoe@Garden2dControllerTest.com", date);
@@ -173,6 +175,7 @@ class Garden2dControllerTest {
     @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void Get2DGarden_WithPlantAndDecoration_Return200() throws Exception {
+        decorationRepository.deleteAll();
         gridItemLocationRepository.deleteAll();
         Garden garden = gardenList.get(0);
         Long gardenId = garden.getGardenId();
@@ -181,8 +184,8 @@ class Garden2dControllerTest {
         Plant testPlant = plantService.addPlant("Test Plant", 1, "", LocalDate.now(), gardenId, PlantCategory.CLIMBER);
         gridItemLocationService.addGridItemLocation(new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT, garden, 0, 0));
 
-        Decoration decoration = decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
-        gridItemLocationService.addGridItemLocation(new GridItemLocation(decoration.getId(), GridItemType.DECORATION, garden, 6, 6));
+        Decoration testDecoration = decorationService.getDecorationsByGarden(garden).get(0);
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(testDecoration.getId(), GridItemType.DECORATION, garden, 6, 6));
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -198,7 +201,7 @@ class Garden2dControllerTest {
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(2, displayableItems.size());
         Assertions.assertEquals(testPlant.getPlantName(), displayableItems.get(0).getName());
-        Assertions.assertEquals(decoration.getDecorationCategory().getCategoryName(), displayableItems.get(1).getName());
+        Assertions.assertEquals(testDecoration.getDecorationCategory().getCategoryName(), displayableItems.get(1).getName());
     }
 
     @Test
