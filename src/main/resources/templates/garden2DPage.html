@@ -119,12 +119,15 @@
 
                     <div id="textureTabContent" class="tab-pane">
                         <div class="row">
-                            <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
+                            <div class="col-6 p-3 text-left text-white" draggable="false" name="texture-item"
                                  th:each="tileTexture : ${tileTextures}" th:data-tile-name="${tileTexture.toString()}">
                                 <div class="ratio ratio-1x1">
-                                    <img th:src="@{${tileTexture.getImgFile() == null ? '/images/default_plant.png' : '/images/2d-tiles-textures/' + tileTexture.getImgFile()}}"
+                                    <img th:src="@{${tileTexture.getImgFile() == null ? '/images/2d-tile-textures' : '/images/2d-tile-textures/' + tileTexture.getImgFile()}}"
                                          alt="Tile" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100" >
                                 </div>
+                                <p id="texture-name" class="break-word mt-2 mb-0 text-decoration-underline"
+                                   th:text="${tileTexture.getTileName()}">
+                                </p>
                             </div>
                         </div>
                     </div>

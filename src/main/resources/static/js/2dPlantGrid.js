@@ -16,6 +16,7 @@ const yCoordListInput = document.getElementById("yCoordList");
 const tileTextureListInput = document.getElementById("tileTextureList");
 
 const plantItems = document.querySelectorAll("[name='plant-item']");
+const textureItems = document.querySelectorAll("[name='texture-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
 
 const pagination = document.getElementById("pagination");

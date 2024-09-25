@@ -2,18 +2,18 @@ package nz.ac.canterbury.seng302.gardenersgrove.util;
 
 public enum TileTexture {
 
-    SOIL("Soil", "soil-tileable.png"),
+    SOIL("Soil", "soil.png"),
 
-    GRASS("Grass", "grass-tileable.png"),
+    GRASS("Grass", "grass.png"),
 
 
-    BARK("Bark", "bark-tileable.png"),
+    BARK("Bark", "bark.png"),
 
-    STONE_PATH("Stone Path", "grass-tileable.png"),
+    STONE_PATH("Stone Path", "stonePath.png"),
 
-    PEBBLE_PATH("Pebble Path", "grass-tileable.png"),
+    PEBBLE_PATH("Pebble Path", "pebblePath.png"),
 
-    CONCRETE("Concrete", "grass-tileable.png");
+    CONCRETE("Concrete", "concrete.png");
 
     private final String tileName;
     private final String imgFile;
