@@ -22,7 +22,6 @@ public class WeatherResponseData {
     private JsonNode jsonDailyPrecipitationSum;
     private JsonNode jsonDates;
     private List<DailyWeather> retrievedWeatherData;
-    private int timeZoneOffset;
     private String timezone;
 
     /**
@@ -35,8 +34,6 @@ public class WeatherResponseData {
     public WeatherResponseData(JsonNode jsonWeatherData) {
         current = jsonWeatherData.get("current");
         daily = jsonWeatherData.get("daily");
-        String timeString = jsonWeatherData.get("utc_offset_seconds").asText();
-        timeZoneOffset = Integer.parseInt(timeString);
         timezone = jsonWeatherData.get("timezone").asText();
         setDailyWeather();
         convertToWeatherObjects();
@@ -45,10 +42,6 @@ public class WeatherResponseData {
 
     public List<DailyWeather> getRetrievedWeatherData() {
         return retrievedWeatherData;
-    }
-
-    public int getTimeZoneOffset() {
-        return timeZoneOffset;
     }
 
     public String getTimeZone() {
