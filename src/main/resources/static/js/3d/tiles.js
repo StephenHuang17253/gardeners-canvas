@@ -106,16 +106,16 @@ const createTile = (texture, size, hueShift, saturation) => {
 const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
-    const tileCenterpositions = [];
+    const tileCentrepositions = [];
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const tile = createTile(texture, tileSize, hueShift, saturation);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
-            tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
+            tileCentrepositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    return { grid, tileCenterpositions };
+    return { grid, tileCenterpositions: tileCentrepositions };
 };
 
 export { createTileGrid };

@@ -120,6 +120,16 @@ loader.loadBackground(
     }
 );
 
+/**
+ * Fetches 2D tile map data
+ * @returns {Promise<any>} - A promise that resolves with the fetched data
+ */
+const fetchTileMap = async (gardenId) => {
+    const instance = getInstance();
+    const response = await fetch(`/${instance}3D-tile-textures-grid/${gardenId}`)
+    return await response.json();
+}
+
 const grassTexture = loader.loadTexture('grass-tileable.jpg');
 
 const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);

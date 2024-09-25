@@ -67,10 +67,16 @@ public class U50010_View_Public_3D_Garden {
     public GridItemLocationService gridItemLocationService;
 
     @Autowired
+    public GardenTileService gardenTileService;
+
+    @Autowired
     public GridItemLocationRepository gridItemLocationRepository;
 
     @Autowired
     public FriendshipRepository friendshipRepository;
+
+    @Autowired
+    public GardenTileRepository gardenTileRepository;
 
     private Map<String, Object> model;
 
@@ -82,9 +88,10 @@ public class U50010_View_Public_3D_Garden {
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
+        gardenTileService = new GardenTileService(gardenTileRepository);
 
         Garden3DController garden3DController = new Garden3DController(gardenService, securityService,
-                friendshipService, gridItemLocationService, plantService);
+                friendshipService, gridItemLocationService, plantService, gardenTileService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden3DController).build();
     }
 
