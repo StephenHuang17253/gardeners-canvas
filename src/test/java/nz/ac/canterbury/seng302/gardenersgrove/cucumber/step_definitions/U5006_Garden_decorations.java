@@ -11,7 +11,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +134,7 @@ public class U5006_Garden_decorations {
     }
 
     @Then("I see my placed decoration")
-    public void iSeeMyPlacedDecoration() throws Exception {
+    public void iSeeMyPlacedDecoration() {
         Decoration decoration = decorationService.getDecorations().getFirst();
         Long gardenId = garden.getGardenId();
         Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository

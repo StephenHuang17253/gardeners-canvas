@@ -140,7 +140,7 @@ public class Garden2DController {
                             gridLocation.getXCoordinate(),
                             gridLocation.getYCoordinate(),
                             currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
-                            currentDecoration.getDecorationCategory().toString(),
+                            "Decoration",
                             currentDecoration.getId(),
                             gridLocation.getItemType(),
                             currentDecoration.getDecorationCategory().getCategoryImage()));
