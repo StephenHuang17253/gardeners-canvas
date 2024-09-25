@@ -1,21 +1,23 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,21 +25,25 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -79,13 +85,70 @@ class Garden3DControllerTest {
     private final int itemXCoord = 5;
     private final int itemYCoord = 5;
     private final String itemName = "test plant";
-    private final String itemModelName = "potplant.glb";
 
     private final String johnEmail = "johnDoe@Garden3dControllerTest.com";
     private final String janeEmail = "janeDoe@Garden3dControllerTest.com";
 
+    @MockBean
+    private WeatherService weatherService;
+
+    private WeatherResponseData weatherData;
+    private final String mockResponse = "{\n" +
+            "  \"latitude\": -43.5,\n" +
+            "  \"longitude\": 172.625,\n" +
+            "  \"generationtime_ms\": 0.07200241088867188,\n" +
+            "  \"utc_offset_seconds\": 0,\n" +
+            "  \"timezone\": \"GMT\",\n" +
+            "  \"timezone_abbreviation\": \"GMT\",\n" +
+            "  \"elevation\": 7.0,\n" +
+            "  \"current_units\": {\n" +
+            "    \"time\": \"iso8601\",\n" +
+            "    \"interval\": \"seconds\",\n" +
+            "    \"temperature_2m\": \"°C\",\n" +
+            "    \"relative_humidity_2m\": \"%\",\n" +
+            "    \"precipitation\": \"mm\",\n" +
+            "    \"weather_code\": \"wmo code\"\n" +
+            "  },\n" +
+            "  \"current\": {\n" +
+            "    \"time\": \"2024-05-21T06:15\",\n" +
+            "    \"interval\": 900,\n" +
+            "    \"temperature_2m\": 9.6,\n" +
+            "    \"relative_humidity_2m\": 92,\n" +
+            "    \"precipitation\": 0.00,\n" +
+            "    \"weather_code\": 3\n" +
+            "  },\n" +
+            "  \"daily_units\": {\n" +
+            "    \"time\": \"iso8601\",\n" +
+            "    \"weather_code\": \"wmo code\",\n" +
+            "    \"temperature_2m_max\": \"°C\",\n" +
+            "    \"temperature_2m_min\": \"°C\",\n" +
+            "    \"precipitation_sum\": \"mm\"\n" +
+            "  },\n" +
+            "  \"daily\": {\n" +
+            "    \"time\": [\n" +
+            "      \"2024-05-19\",\n" +
+            "      \"2024-05-20\",\n" +
+            "      \"2024-05-21\",\n" +
+            "      \"2024-05-22\",\n" +
+            "      \"2024-05-23\",\n" +
+            "      \"2024-05-24\",\n" +
+            "      \"2024-05-25\",\n" +
+            "      \"2024-05-26\",\n" +
+            "      \"2024-05-27\"\n" +
+            "    ],\n" +
+            "    \"weather_code\": [45, 63, 80, 80, 45, 45, 3, 3, 61],\n" +
+            "    \"temperature_2m_max\": [11.1, 12.3, 10.3, 11.1, 11.2, 11.0, 13.1, 9.7, 10.9],\n" +
+            "    \"temperature_2m_min\": [7.0, 8.2, 7.9, 7.8, 2.8, 3.5, 7.7, 2.5, 6.6],\n" +
+            "    \"precipitation_sum\": [0.00, 16.50, 1.00, 1.40, 0.00, 0.00, 0.00, 0.00, 4.20]\n" +
+            "  }\n" +
+            "}\n";
+
     @BeforeAll
-    void before_all() {
+    void before_all() throws JsonProcessingException {
+        weatherService = mock(WeatherService.class);
+        JsonNode jsonObject = objectMapper.readTree(mockResponse);
+        weatherData = new WeatherResponseData(jsonObject);
+
         User user;
         user = new User("John", "Doe", johnEmail, date);
         user1 = userService.addUser(user, "1es1P@ssword");
@@ -102,12 +165,13 @@ class Garden3DControllerTest {
                 "New Zealand",
                 10.0,
                 false,
-                "-43.5214643",
-                "172.5796159",
+                "51.5072",
+                "0.1276",
                 user1));
         gardenList.add(garden1);
 
-        Plant plant = plantService.addPlant("test plant", 1, "hello", null, garden1.getGardenId(), PlantCategory.POT_PLANT);
+        Plant plant = plantService.addPlant("test plant", 1, "hello", null, garden1.getGardenId(),
+                PlantCategory.POT_PLANT);
         GridItemLocation newLocation = new GridItemLocation(
                 plant.getPlantId(),
                 GridItemType.PLANT,
@@ -184,6 +248,41 @@ class Garden3DControllerTest {
         assertEquals(item.get("xcoordinate").asInt(), itemXCoord);
         assertEquals(item.get("ycoordinate").asInt(), itemYCoord);
         assertEquals(item.get("name").asText(), itemName);
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void gardenHasALocation_WhenCallMade_CurrentHourAndWeatherIsReturned() throws Exception {
+        when(weatherService.getWeather(anyString(), anyString())).thenReturn(weatherData);
+        Garden garden = gardenList.get(0);
+        Long gardenId = garden.getGardenId();
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden/{gardenId}", gardenId))
+                .andExpect(status().isOk())
+                .andReturn();
+        ModelAndView modelAndView = mockMvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        Map<String, Object> model = modelAndView.getModel();
+        Assertions.assertNotNull(model.get("currentHour"));
+        assertEquals("Overcast", model.get("weather"));
+
+    }
+
+    @Test
+    @WithMockUser(username = "johnDoe@Garden3dControllerTest.com")
+    void gardenDoesNotHaveALocation_WhenCallMade_NoCurrentHourOrWeatherIsReturned() throws Exception {
+        when(weatherService.getWeather(anyString(), anyString())).thenReturn(null);
+        Garden garden = gardenList.get(0);
+        Long gardenId = garden.getGardenId();
+        mockMvcResult = mockMvc
+                .perform(get("/3D-garden/{gardenId}", gardenId))
+                .andExpect(status().isOk())
+                .andReturn();
+        ModelAndView modelAndView = mockMvcResult.getModelAndView();
+        assertNotNull(modelAndView);
+        Map<String, Object> model = modelAndView.getModel();
+        Assertions.assertNull(model.get("currentHour"));
+        Assertions.assertNull(model.get("weather"));
     }
 
 }
