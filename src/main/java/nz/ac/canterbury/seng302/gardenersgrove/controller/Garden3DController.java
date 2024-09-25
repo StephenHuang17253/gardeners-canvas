@@ -1,10 +1,19 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.DecorationService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
