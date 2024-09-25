@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import { createTileGrid } from './tiles.js';
-import { OrbitControls } from './OrbitControls.js';
-import { Loader } from './Loader.js';
+import * as THREE from "three";
+import { createTileGrid } from "./tiles.js";
+import { OrbitControls } from "./OrbitControls.js";
+import { Loader } from "./Loader.js";
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from './Exporter.js';
-import { Downloader } from '../Downloader.js';
+import { Exporter } from "./Exporter.js";
+import { Downloader } from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -27,14 +27,16 @@ const decoMap = {
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
-const container = document.getElementById('container');
+const container = document.getElementById("container");
 
-const downloadGLTFButton = document.getElementById('download-gltf');
-const downloadOBJButton = document.getElementById('download-obj');
-const downloadJPGButton = document.getElementById('download-jpg');
+const downloadGLTFButton = document.getElementById("download-gltf");
+const downloadOBJButton = document.getElementById("download-obj");
+const downloadJPGButton = document.getElementById("download-jpg");
 
-const loadingDiv = document.getElementById('loading-div');
-const loadingImg = document.getElementById('loading-img');
+const trackCyclesInput = document.getElementById("trackCycles");
+
+const loadingDiv = document.getElementById("loading-div");
+const loadingImg = document.getElementById("loading-img");
 
 const FOV = 75;
 
@@ -45,7 +47,7 @@ const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 // link used to download files
-const link = document.createElement('a');
+const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
@@ -74,8 +76,8 @@ const init = () => {
     loader = new Loader();
 
     loader.setOnError(() => {
-        loadingImg.classList.add('d-none');
-        loadingDiv.innerText = 'There was an error loading your garden';
+        loadingImg.classList.add("d-none");
+        loadingDiv.innerText = "There was an error loading your garden";
     });
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -113,14 +115,14 @@ init();
 addLight();
 
 loader.loadBackground(
-    'skybox.exr',
+    "skybox.exr",
     texture => {
         scene.background = texture;
         scene.environment = texture;
     }
 );
 
-const grassTexture = loader.loadTexture('grass-tileable.jpg');
+const grassTexture = loader.loadTexture("grass-tileable.jpg");
 
 const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 scene.add(grid);
@@ -166,32 +168,6 @@ const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
 
-// const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
-// const pondModel = await loader.loadModel(decoMap['Pond'][0], 'Pond');
-// const gnomeModel = await loader.loadModel(decoMap['Gnome'][0], 'Gnome');
-// const fountainModel = await loader.loadModel(decoMap['Fountain'][0], 'Fountain');
-// const tableModel = await loader.loadModel(decoMap['Table'][0], 'Table');
-// addModelToScene(
-//     rockModel,
-//     new THREE.Vector3(10, 0, 0),
-//     decoMap['Rock'][1]);
-// addModelToScene(
-//     pondModel,
-//     new THREE.Vector3(0, 0, 0),
-//     decoMap['Pond'][1]);
-// addModelToScene(
-//     gnomeModel,
-//     new THREE.Vector3(-10, 0, 0),
-//     decoMap['Gnome'][1]);
-// addModelToScene(
-//     fountainModel,
-//     new THREE.Vector3(0, 0, 10),
-//     decoMap['Fountain'][1]);
-// addModelToScene(
-//     tableModel,
-//     new THREE.Vector3(0, 0, -10),
-//     decoMap['Table'][1]);
-
 /**
  * Renders the scene
  */
@@ -201,6 +177,11 @@ const animate = () => {
 };
 
 renderer.setAnimationLoop(animate);
+
+// Hide loading screen
+loadingImg.classList.add("d-none");
+loadingDiv.classList.add("fadeOut");
+loadingDiv.parentElement.removeChild(loadingDiv)
 
 /** 
  * Event Handlers
@@ -219,26 +200,27 @@ const onWindowResize = () => {
  * On mouse move event on the canvas prevent user selection
  */
 const onMouseMove = () => {
-    document.body.style.userSelect = 'none';
+    document.body.style.userSelect = "none";
 };
 
 /**
  * On mouse out event on the canvas allow user selection
  */
 const onMouseOut = () => {
-    document.body.style.userSelect = 'auto';
+    document.body.style.userSelect = "auto";
 };
 
-window.addEventListener('resize', onWindowResize);
-container.addEventListener('mousemove', onMouseMove);
-container.addEventListener('mouseout', onMouseOut);
-downloadGLTFButton.addEventListener('click', () => exporter.downloadGLTF(scene));
-downloadOBJButton.addEventListener('click', () => exporter.downloadOBJ(scene));
-downloadJPGButton.addEventListener('click', () => exporter.downloadJPG(renderer));
-
+const onTrackCyclesInputChange = () => {
+    const trackCycles = trackCyclesInput.checked;
+    console.log("Track Cycles: ", trackCycles);
+};
 
 console.log(scene.children);
 
-loadingImg.classList.add('d-none');
-loadingDiv.classList.add('fadeOut');
-setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
+window.addEventListener("resize", onWindowResize);
+container.addEventListener("mousemove", onMouseMove);
+container.addEventListener("mouseout", onMouseOut);
+downloadGLTFButton.addEventListener("click", () => exporter.downloadGLTF(scene));
+downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
+downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
+trackCyclesInput.addEventListener("change", onTrackCyclesInputChange);
