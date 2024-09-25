@@ -120,14 +120,8 @@ loader.loadBackground(
     }
 );
 
-// const grassTexture = loader.loadTexture('grass-tileable.jpg');
-
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Grass', 0.2, 1.56, loader);
 const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'StonePath', 0, 1, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'PebblePath', 0.2, 1.56, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Bark', 0, 1, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Soil', 0.055, 1.06, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Concrete', 0, 1, loader);
+
 scene.add(grid);
 
 /**
