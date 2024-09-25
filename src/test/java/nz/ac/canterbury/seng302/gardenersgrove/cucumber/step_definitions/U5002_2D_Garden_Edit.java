@@ -69,8 +69,16 @@ public class U5002_2D_Garden_Edit {
 
     @Autowired
     public GridItemLocationService gridItemLocationService;
+
     @Autowired
     public GridItemLocationRepository gridItemLocationRepository;
+
+    @Autowired
+    public GardenTileRepository gardenTileRepository;
+
+    @Autowired
+    public GardenTileService gardenTileService;
+
     private Map<String, Object> model;
 
     @Before
@@ -81,9 +89,10 @@ public class U5002_2D_Garden_Edit {
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
         decorationService = new DecorationService(decorationRepository);
+        gardenTileService = new GardenTileService(gardenTileRepository);
 
         Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
-                gridItemLocationService, plantService, decorationService);
+                gridItemLocationService, plantService, decorationService, gardenTileService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
 

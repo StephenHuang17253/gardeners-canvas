@@ -17,6 +17,7 @@ const FILE_EXTENSIONS = {
     GLTF: 'gtlf',
     GLB: 'glb',
 };
+
 /**
  * Exporter class to handle exporting scenes as GLTF, GLB, OBJ, and JPG files
  */
