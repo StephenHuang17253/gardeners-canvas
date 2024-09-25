@@ -1,12 +1,27 @@
 import * as THREE from 'three';
+import { Loader } from './Loader.js';
+
+const tileMap = {
+    "Grass": ["grass-tileable.jpg", "texture", null],   // Grass-Short
+    "StonePath": ["stone-tileable.jpg", "texture", "stone-normal.exl"],
+    "PebblePath": ["pebbles-tileable.jpg", "texture", null],
+    "Concrete": ["concrete-tileable.jpg", "texture", null],
+    "Soil": ["soil-tileable.jpg", "texture", null],
+    "Bark": ["bark-tileable.jpg", "texture", null]
+};
 
 /**
  * Custom vertex shader for the tile material
  */
 const vertexShader = `
     varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    uniform vec2 uUvScale;
     void main() {
-        vUv = uv;
+        vUv = uv * uUvScale;
+        vNormal = normalize(normalMatrix * normal);
+        vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
 `;
@@ -16,11 +31,14 @@ const vertexShader = `
  */
 const fragmentShader = `
     uniform sampler2D uTexture;
+    uniform sampler2D uNormalMap;
     uniform float uHue;
     uniform float uSaturation;
     uniform vec3 uBaseColor;
 
     varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vPosition;
 
     vec3 rgb2hsv(vec3 c) {
         vec4 K = vec4(0.0, -1.0/3.0, 2.0/3.0, -1.0);
@@ -40,7 +58,13 @@ const fragmentShader = `
     void main() {
         vec4 color = texture2D(uTexture, vUv);
         vec3 hsv = rgb2hsv(color.rgb);
-
+        
+        vec3 normalMap = texture2D(uNormalMap, vUv).xyz * 2.0 - 1.0; // Convert from [0,1] to [-1,1]
+        normalMap = normalize(normalMap) * 10.0;
+        if (length(normalMap) == 0.0) {
+            normalMap = vNormal;  // Use default surface normal if no normal map provided
+        }
+        
         // Adjust the hue and saturation
         hsv.x += uHue;  // Adjust hue
         hsv.y *= uSaturation; // Adjust saturation
@@ -62,14 +86,17 @@ const fragmentShader = `
  * @param {THREE.Texture} texture - The texture to be applied to the material.
  * @param {number} hueShift - The amount to adjust the hue.
  * @param {number} saturation - The amount to adjust the saturation.
+ * @param uvScale
  * @returns {THREE.ShaderMaterial} The created tile material.
  */
-const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMaterial({
+const createTileMaterial = (texture, hueShift, saturation, uvScale, normalMap) => new THREE.ShaderMaterial({
     uniforms: {
         uTexture: { value: texture },
+        uNormalMap: { value: normalMap },
         uHue: { value: hueShift },
         uSaturation: { value: saturation },
-        uBaseColor: { value: new THREE.Color(0xffffff) }
+        uBaseColor: { value: new THREE.Color(0xffffff) },
+        uUvScale: { value: uvScale },
     },
     vertexShader: vertexShader,
     fragmentShader: fragmentShader
@@ -82,13 +109,28 @@ const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMa
  * @param {number} size - The size of the tile.
  * @param {number} hueShift - The hue shift value.
  * @param {number} saturation - The saturation value.
+ * @param loader
  * @returns {THREE.Mesh} The created tile mesh.
  */
-const createTile = (texture, size, hueShift, saturation) => {
-    const geometry = new THREE.PlaneGeometry(size, size);
-    const material = createTileMaterial(texture, hueShift, saturation);
-    const tile = new THREE.Mesh(geometry, material);
-    tile.rotation.x = -Math.PI / 2; // Rotate to horizontal
+const createTile = async (texture, size, hueShift, saturation, loader, text, nM) => {
+    const tileType = tileMap[texture][1];
+    let tile;
+    if (tileType === 'texture') {
+        const geometry = new THREE.PlaneGeometry(size, size);
+        // const text = loader.loadTexture(tileMap[texture][0]);
+        let uvScale;
+        if(texture === 'Bark'){
+            uvScale = new THREE.Vector2(0.25, 0.25);
+        }else{
+            uvScale = new THREE.Vector2(1, 1);
+        }
+        const material = createTileMaterial(text, hueShift, saturation, uvScale, nM);
+        tile = new THREE.Mesh(geometry, material);
+        tile.rotation.x = -Math.PI / 2; // Rotate to horizontal
+    } else {
+        tile = await loader.loadModel(tileMap[texture][0], texture);
+        tile.scale.set(10, 10, 10);
+    }
     return tile;
 };
 
@@ -103,19 +145,25 @@ const createTile = (texture, size, hueShift, saturation) => {
  * @param {number} saturation - The saturation value for the tiles.
  * @returns {{THREE.Group, Array<THREE.Vector3>}} - Object with the grid to add to scene and an array of tile center positions.
  */
-const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
+const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturation, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
-    const tileCentrepositions = [];
+    const tileCenterpositions = [];
+    const text = loader.loadTexture(tileMap[texture][0]);
+    const normalMap = tileMap[texture][2];
+    let nM = null;
+    if (normalMap != null) {
+        nM = loader.loadTexture(normalMap);
+    }
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-            const tile = createTile(texture, tileSize, hueShift, saturation);
+            const tile = await createTile(texture, tileSize, hueShift, saturation, loader, text, nM);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
-            tileCentrepositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
+            tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    return { grid, tileCenterpositions: tileCentrepositions };
+    return {grid, tileCenterpositions};
 };
 
 export { createTileGrid };
