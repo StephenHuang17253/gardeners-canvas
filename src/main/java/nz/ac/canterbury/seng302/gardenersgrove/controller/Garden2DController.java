@@ -132,11 +132,8 @@ public class Garden2DController {
                             currentDecoration.getId(),
                             gridLocation.getItemType(),
                             currentDecoration.getDecorationCategory().getCategoryImage()));
-                } else {
-                    logger.info(decorationService.getDecorations().toString());
                 }
             }
-
         }
 
         model.addAttribute("isOwner", true);
@@ -257,26 +254,31 @@ public class Garden2DController {
                         case 1:
                             if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK).isEmpty()) {
                                 decorationService.addDecoration(new Decoration(garden, DecorationCategory.ROCK));
+                                model.addAttribute("Rock", DecorationCategory.ROCK);
                             }
                             break;
                         case 2:
                             if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.TABLE).isEmpty()) {
                                 decorationService.addDecoration(new Decoration(garden, DecorationCategory.TABLE));
+                                model.addAttribute("Table", DecorationCategory.TABLE);
                             }
                             break;
                         case 3:
                             if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.POND).isEmpty()) {
                                 decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
+                                model.addAttribute("Pond", DecorationCategory.POND);
                             }
                             break;
                         case 4:
                             if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.GNOME).isEmpty()) {
                                 decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+                                model.addAttribute("Gnome", DecorationCategory.GNOME);
                             }
                             break;
                         case 5:
                             if (decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.FOUNTAIN).isEmpty()) {
                                 decorationService.addDecoration(new Decoration(garden, DecorationCategory.FOUNTAIN));
+                                model.addAttribute("Fountain", DecorationCategory.FOUNTAIN);
                             }
                             break;
                         default:

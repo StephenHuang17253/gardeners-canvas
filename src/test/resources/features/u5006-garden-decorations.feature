@@ -8,3 +8,8 @@ Feature: As Liam, I want to be able to add decorations such as fountains and gno
     Scenario: AC1 - There are decorations on the palette window
       Given I as user "liam@email.com" is on my two-D garden page for "liam's Garden"
       Then As user "liam@email.com" I see a palette window with a tab labelled for decorations
+
+    Scenario: AC2 - I can place decorations and see them
+      Given I as user "liam@email.com" is on my two-D garden page for "liam's Garden"
+      When I As user "liam@email.com" place a decoration on my grid and press save
+      Then I see my placed decoration

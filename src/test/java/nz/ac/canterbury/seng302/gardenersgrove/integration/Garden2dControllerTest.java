@@ -394,6 +394,58 @@ class Garden2dControllerTest {
 
     }
 
+//    @Test
+//    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+//    void save2DGarden_twoDecorationAtSameLocation() throws Exception {
+//        gridItemLocationRepository.deleteAll();
+//        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+//                .getGardenId();
+//        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+//        Plant testPlant2 = gardenService.getGardenById(gardenId).get().getPlants().get(1);
+//        List<String> idList = new ArrayList<>();
+//        idList.add(testPlant.getPlantId().toString());
+//        idList.add(testPlant2.getPlantId().toString());
+//
+//        List<String> typeList = new ArrayList<>();
+//        typeList.add("DECORATION");
+//        typeList.add("DECORATION");
+//        List<Double> xCoordList = new ArrayList<>();
+//        xCoordList.add(2.0);
+//        xCoordList.add(2.0);
+//        List<Double> yCoordList = new ArrayList<>();
+//        yCoordList.add(2.0);
+//        yCoordList.add(2.0);
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
+//                        .param("idList", JSONArray.toJSONString(idList))
+//                        .param("typeList", JSONArray.toJSONString(typeList))
+//                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+//                        .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+//                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+//
+//        Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
+//        Assertions.assertEquals(2, gridItemLocationRepository.findAll().size());
+//
+//        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository
+//                .findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant.getPlantId(),
+//                        GridItemType.DECORATION,
+//                        gardenService.getGardenById(gardenId).get());
+//
+//        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+//        Assertions.assertEquals(2, gridItemAddedToRepository.get().getXCoordinate());
+//        Assertions.assertEquals(2, gridItemAddedToRepository.get().getYCoordinate());
+//
+//        Optional<GridItemLocation> gridItem2AddedToRepository = gridItemLocationRepository
+//                .findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant2.getPlantId(),
+//                        GridItemType.DECORATION,
+//                        gardenService.getGardenById(gardenId).get());
+//
+//        Assertions.assertTrue(gridItem2AddedToRepository.isPresent());
+//        Assertions.assertEquals(2, gridItem2AddedToRepository.get().getXCoordinate());
+//        Assertions.assertEquals(2, gridItem2AddedToRepository.get().getYCoordinate());
+//    }
+
+
     @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void save2DGarden_differentNumberOfItemsInEachList_return400() throws Exception {
