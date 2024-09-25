@@ -49,6 +49,8 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Sunny";
 
+const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
+
 // link used to download files
 const link = document.createElement("a");
 
@@ -61,13 +63,23 @@ let time = DEFAULT_TIME;
 let weather = DEFAULT_WEATHER;
 
 /**
+ * Updates the time of day in the scene
+ * 
+ * @param {number} newTime 
+ */
+const setTime = (newTime) => {
+    time = newTime;
+    // Update the time of day in the scene
+};
+
+/**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
  */
 const init = () => {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
-    camera.position.set(5, 5, 5);
+    camera.position.copy(INIT_CAMERA_POSITION);
     camera.lookAt(scene.position);
 
     renderer = new THREE.WebGLRenderer(
@@ -123,7 +135,7 @@ init();
 addLight();
 
 loader.loadBackground(
-    "skybox.exr",
+    "cloudy_skybox.exr",
     texture => {
         scene.background = texture;
         scene.environment = texture;
@@ -224,11 +236,8 @@ const onMouseOut = () => {
 * otherwise set it to the default time
 */
 const onTrackCyclesInputChange = () => {
-    if (trackCyclesInput.checked) {
-        time = currentHour;
-    } else {
-        time = DEFAULT_TIME;
-    }
+    const newTime = trackCyclesInput.checked ? currentHour : DEFAULT_TIME;
+    setTime(newTime);
 };
 
 console.log(scene.children);

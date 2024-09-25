@@ -190,6 +190,7 @@ class OrbitControls extends THREE.EventDispatcher {
                 8 * (1 - lastQuaternion.dot(this.camera.quaternion)) > EPS ||
                 lastTargetPosition.distanceToSquared(this.target) > EPS) {
                 lastPosition.copy(this.camera.position);
+                console.log(this.camera.position);
                 lastQuaternion.copy(this.camera.quaternion);
                 lastTargetPosition.copy(this.target);
                 this.dispatchEvent(_changeEvent);
