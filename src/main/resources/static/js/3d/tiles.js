@@ -97,7 +97,6 @@ const createTileGrid = (rows, cols, tileSize, tileMaterial, hueShift, saturation
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const tile = createTile(tileMaterial, tileSize, hueShift, saturation, texture, normalTexture);
-            console.log(tile);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));

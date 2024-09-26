@@ -24,8 +24,8 @@ const modelMap = {
 
 const skyboxMap = {
     "Sunny": "sunny_skybox.exr",
-    "Cloudy": "cloudy_skybox.exr",
     "Overcast": "cloudy_skybox.exr",
+    "Rainy": "cloudy_skybox.exr",
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
@@ -65,6 +65,8 @@ const currentWeather = document.getElementById("weather").value;
 
 let time = currentHour;
 let weather = currentWeather;
+
+console.log(weather);
 
 /**
  * Updates the time of day in the scene
