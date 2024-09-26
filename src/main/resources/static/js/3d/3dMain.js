@@ -26,6 +26,7 @@ const skyboxMap = {
     "Sunny": "sunny-day.exr",
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
+    "Default": "default.exr"
 };
 
 
@@ -52,7 +53,7 @@ const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 const DEFAULT_TIME = 12;
-const DEFAULT_WEATHER = "Sunny";
+const DEFAULT_WEATHER = "Default";
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -67,8 +68,6 @@ const currentWeather = document.getElementById("weather").value;
 
 let time = currentHour;
 let weather = currentWeather;
-
-console.log(weather);
 
 /**
  * Updates the time of day in the scene
@@ -143,6 +142,7 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
+    console.log(currentHour)
     changeSkybox();
 };
 
@@ -166,10 +166,14 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     scene.add(model);
 };
 
-
+/**
+ * Changes the skybox based on time of the day
+ */
 const changeSkybox = () => {
     if (gardenHour > 6 && gardenHour < 18) {
         setBackground(skyboxMap[weather]);
+    } else {
+        //set night backgrounds here
     }
 }
 
