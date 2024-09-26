@@ -11,7 +11,7 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,10 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,8 +70,17 @@ public class U5006_Garden_decorations {
 
     public static UserService userService;
     public static DecorationService decorationService;
+
+    @Autowired
+    public static GardenTileService tileService;
+
+    @Autowired
+    public GardenTileRepository gardenTileRepository;
+
     @Autowired
     public DecorationRepository decorationRepository;
+
+    private static final int numOfTiles = 49;
 
     @Before
     public void before_or_after_all() {
@@ -84,9 +90,11 @@ public class U5006_Garden_decorations {
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
         decorationService = new DecorationService(decorationRepository);
+        tileService = new GardenTileService(gardenTileRepository);
+
 
         Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
-                gridItemLocationService, plantService, decorationService);
+                gridItemLocationService, plantService, decorationService, tileService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
     @Then("As user {string} I see a palette window with a tab labelled for decorations")
@@ -111,7 +119,7 @@ public class U5006_Garden_decorations {
         user = userService.getUserByEmail(email);
         garden = user.getGardens().get(0);
         Long gardenId = garden.getGardenId();
-        Decoration decoration = decorationService.getDecorations().getFirst();
+        Decoration decoration = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK).get(0);
 
         List<String> idList = new ArrayList<>();
         idList.add(decoration.getId().toString());
@@ -125,22 +133,24 @@ public class U5006_Garden_decorations {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.0);
 
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
+
         mockMVC.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                         .param("idList", JSONArray.toJSONString(idList))
                         .param("typeList", JSONArray.toJSONString(typeList))
                         .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                        .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
     }
 
     @Then("I see my placed decoration")
     public void iSeeMyPlacedDecoration() {
-        Decoration decoration = decorationService.getDecorations().getFirst();
-        Long gardenId = garden.getGardenId();
-        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository
-                .findGridItemLocationByObjectIdAndItemTypeAndGarden(decoration.getId(),
-                        GridItemType.DECORATION,
-                        gardenService.getGardenById(gardenId).get());
-        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Decoration decoration = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK).get(0);
+        List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
+        Assertions.assertFalse(gridItems.isEmpty());
+        Assertions.assertEquals(gridItems.getLast().getObjectId(), decoration.getId());
     }
 }
