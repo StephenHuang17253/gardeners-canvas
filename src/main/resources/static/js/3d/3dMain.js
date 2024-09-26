@@ -39,7 +39,8 @@ const downloadGLTFButton = document.getElementById("download-gltf");
 const downloadOBJButton = document.getElementById("download-obj");
 const downloadJPGButton = document.getElementById("download-jpg");
 
-const trackCyclesInput = document.getElementById("trackCycles");
+const trackTimeInput = document.getElementById("trackTime");
+const trackWeatherInput = document.getElementById("trackWeather");
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -78,7 +79,29 @@ let weather = currentWeather;
 const setTime = (newTime) => {
     time = newTime;
     // Update the time of day in the scene
+    // Set moon or sun to the correct position 
 };
+
+/**
+ * Updates the weather in the scene
+ * 
+ * @param {String} newWeather 
+ */
+const setWeather = (newWeather) => {
+    weather = newWeather;
+    setBackground(skyboxMap[weather]);
+    // change clouds and rain to match the weather
+}
+
+const setBackground = (filename) => {
+    loader.loadBackground(
+        filename,
+        texture => {
+            scene.background = texture;
+            scene.environment = texture;
+        }
+    );
+}
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -142,13 +165,7 @@ init();
 
 addLight();
 
-loader.loadBackground(
-    skyboxMap[weather],
-    texture => {
-        scene.background = texture;
-        scene.environment = texture;
-    }
-);
+loadBackground(skyboxMap[weather]);
 
 const grassTexture = loader.loadTexture("grass-tileable.jpg");
 
@@ -239,13 +256,23 @@ const onMouseOut = () => {
 };
 
 /** 
-* On track cycles input change, 
+* On track time input change, 
 * update the time variable to the current hour if the input is checked, 
 * otherwise set it to the default time
 */
-const onTrackCyclesInputChange = () => {
-    const newTime = trackCyclesInput.checked ? currentHour : DEFAULT_TIME;
+const onTrackTimeInputChange = () => {
+    const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
+};
+
+/**
+ * On track weather input change,
+ * update the weather variable to the current weather if the input is checked,
+ * otherwise set it to the default weather
+ */
+const onTrackWeatherInputChange = () => {
+    const newWeather = trackWeatherInput.checked ? currentWeather : DEFAULT_WEATHER;
+    setWeather(newWeather);
 };
 
 console.log(scene.children);
@@ -256,4 +283,5 @@ container.addEventListener("mouseout", onMouseOut);
 downloadGLTFButton.addEventListener("click", () => exporter.downloadGLTF(scene));
 downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
 downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
-trackCyclesInput.addEventListener("change", onTrackCyclesInputChange);
+trackTimeInput.addEventListener("change", onTrackTimeInputChange);
+trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
