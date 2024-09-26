@@ -1,18 +1,14 @@
 package nz.ac.canterbury.seng302.gardenersgrove.integration;
 
 import net.minidev.json.JSONArray;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.UserService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
 import org.junit.jupiter.api.*;
@@ -28,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -69,8 +66,13 @@ class Garden2dControllerTest {
     @Autowired
     private GridItemLocationRepository gridItemLocationRepository;
 
+    @Autowired
+    private DecorationService decorationService;
+
     private List<Garden> gardenList = new ArrayList<>();
     private List<Plant> plantList = new ArrayList<>();
+
+    private static final int numOfTiles = 49;
 
     User mockUser = new User("John", "Test", "profile.user.test@ProfileController.com", LocalDate.now());
 
@@ -154,11 +156,14 @@ class Garden2dControllerTest {
                 .perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-        ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-        Assertions.assertNotNull(modelMap);
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
+        ModelMap modelMap = modelAndView.getModelMap();
 
         GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        Assertions.assertNotNull(gardenDetailModel);
         List<Plant> plants = (List<Plant>) modelMap.getAttribute("plants");
+        Assertions.assertNotNull(plants);
 
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
@@ -169,21 +174,60 @@ class Garden2dControllerTest {
 
     @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void Get2DGarden_WithPlantAndDecoration_Return200() throws Exception {
+        gridItemLocationRepository.deleteAll();
+        Garden garden = gardenList.get(0);
+        Long gardenId = garden.getGardenId();
+
+        // Prepare GridItemLocations to have plant and also a decoration
+        Plant testPlant = plantService.addPlant("Test Plant", 1, "", LocalDate.now(), gardenId, PlantCategory.CLIMBER);
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT, garden, 0, 0));
+
+        Decoration testDecoration = decorationService.getDecorationsByGarden(garden).get(0);
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(testDecoration.getId(), GridItemType.DECORATION, garden, 6, 6));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
+        ModelMap modelMap = modelAndView.getModelMap();
+
+        GardenDetailModel gardenDetailModel = (GardenDetailModel) modelMap.getAttribute("garden");
+        Assertions.assertNotNull(gardenDetailModel);
+        List<DisplayableItem> displayableItems = (List<DisplayableItem>) modelMap.getAttribute("displayableItemsList");
+        Assertions.assertNotNull(displayableItems);
+
+        Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
+        Assertions.assertEquals(2, displayableItems.size());
+        Assertions.assertEquals(testPlant.getPlantName(), displayableItems.get(0).getName());
+        Assertions.assertEquals(testDecoration.getDecorationCategory().getCategoryName(),
+                displayableItems.get(1).getName());
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void save2DGarden_emptyLists_returnRedirectAndDoNotChangePersistence() throws Exception {
         gridItemLocationRepository.deleteAll();
         Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
                 .getGardenId();
         List<String> idList = new ArrayList<>();
+        List<String> typeList = new ArrayList<>();
         List<Double> xCoordList = new ArrayList<>();
         List<Double> yCoordList = new ArrayList<>();
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
-
     }
 
     @Test
@@ -196,16 +240,23 @@ class Garden2dControllerTest {
         Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
@@ -217,7 +268,46 @@ class Garden2dControllerTest {
         Assertions.assertTrue(gridItemAddedToRepository.isPresent());
         Assertions.assertEquals(2, gridItemAddedToRepository.get().getXCoordinate());
         Assertions.assertEquals(3, gridItemAddedToRepository.get().getYCoordinate());
+    }
 
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_oneItemInEachListDecoration_returnRedirectAndChangePersistence() throws Exception {
+        // preparing parameters
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("DECORATION");
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
+
+        // making call to endpoint
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
+                .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
+                .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(1, gridItemLocationRepository.findAll().size());
+        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository
+                .findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant.getPlantId(),
+                        GridItemType.DECORATION,
+                        gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Assertions.assertEquals(2, gridItemAddedToRepository.get().getXCoordinate());
+        Assertions.assertEquals(3, gridItemAddedToRepository.get().getYCoordinate());
     }
 
     @Test
@@ -232,18 +322,26 @@ class Garden2dControllerTest {
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
         idList.add(testPlant2.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
+        typeList.add("PLANT");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         xCoordList.add(4.5);
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         yCoordList.add(5.5);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // check persistence is updated
@@ -268,6 +366,61 @@ class Garden2dControllerTest {
 
     @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_twoItemsInEachListOnePlantOneDecoration_returnRedirectAndChangePersistence()
+            throws Exception {
+        // preparing parameters
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        Plant testPlant2 = gardenService.getGardenById(gardenId).get().getPlants().get(1);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        idList.add(testPlant2.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
+        typeList.add("DECORATION");
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        xCoordList.add(4.5);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+        yCoordList.add(5.5);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
+
+        // making call to endpoint
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
+                .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
+                .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        // check persistence is updated
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(2, gridItemLocationRepository.findAll().size());
+        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository
+                .findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant.getPlantId(),
+                        GridItemType.PLANT,
+                        gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Assertions.assertEquals(2, gridItemAddedToRepository.get().getXCoordinate());
+        Assertions.assertEquals(3, gridItemAddedToRepository.get().getYCoordinate());
+        Optional<GridItemLocation> gridItem2AddedToRepository = gridItemLocationRepository
+                .findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant2.getPlantId(),
+                        GridItemType.DECORATION,
+                        gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItem2AddedToRepository.isPresent());
+        Assertions.assertEquals(4, gridItem2AddedToRepository.get().getXCoordinate());
+        Assertions.assertEquals(5, gridItem2AddedToRepository.get().getYCoordinate());
+
+    }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
     void save2DGarden_differentNumberOfItemsInEachList_return400() throws Exception {
         gridItemLocationRepository.deleteAll();
         Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
@@ -277,15 +430,23 @@ class Garden2dControllerTest {
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
         idList.add(testPlant2.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
+        typeList.add("DECORATION");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         List<Double> yCoordList = new ArrayList<>();
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
@@ -300,16 +461,24 @@ class Garden2dControllerTest {
         Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
+        typeList.add("DECORATION");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
@@ -320,13 +489,19 @@ class Garden2dControllerTest {
     void save2DGarden_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
         gridItemLocationRepository.deleteAll();
         List<String> idList = new ArrayList<>();
+        List<String> typeList = new ArrayList<>();
         List<Double> xCoordList = new ArrayList<>();
         List<Double> yCoordList = new ArrayList<>();
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
@@ -340,10 +515,15 @@ class Garden2dControllerTest {
         Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // adding initial grid item locations to repository
         GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
@@ -362,8 +542,10 @@ class Garden2dControllerTest {
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // checking grid item locations are updated
@@ -376,177 +558,62 @@ class Garden2dControllerTest {
         Assertions.assertTrue(gridItemAddedToRepository.isPresent());
         Assertions.assertEquals(2, gridItemAddedToRepository.get().getXCoordinate());
         Assertions.assertEquals(3, gridItemAddedToRepository.get().getYCoordinate());
-
-    }
-
-    @Test
-    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
-    void clear2DGarden_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/clear").with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test
     @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void clear2DGarden_invalidGardenID_return404() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/clear").with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
-        Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
-
-    }
-
-    @Test
-    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
-    void clear2DGarden_UserNotOwnerGardenExists_return403Forbidden() throws Exception {
-
+    void save2DGarden_updatePreexistingDecoration_returnRedirectAndChangePersistence() throws Exception {
+        // preparing parameters
         gridItemLocationRepository.deleteAll();
         Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
                 .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-        Plant testPlant = garden.getPlants().get(0);
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("DECORATION");
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
-        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 9, 8);
+        // adding initial grid item locations to repository
+        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(),
+                GridItemType.DECORATION,
+                gardenService.getGardenById(gardenId).get(), 9, 8);
         gridItemLocationService.addGridItemLocation(newGridItemLocation);
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(1, gridItemLocationRepository.findAll().size());
+        Optional<GridItemLocation> gridItemAddedToRepository = gridItemLocationRepository
+                .findGridItemLocationByObjectIdAndItemTypeAndGarden(testPlant.getPlantId(),
+                        GridItemType.DECORATION,
+                        gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Assertions.assertEquals(9, gridItemAddedToRepository.get().getXCoordinate());
+        Assertions.assertEquals(8, gridItemAddedToRepository.get().getYCoordinate());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-    }
+        // making call to endpoint
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
+                .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
+                .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void clear2DGarden_GardenHasItem_clearItem() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-        Plant testPlant = garden.getPlants().get(0);
-
-        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 9, 8);
-        gridItemLocationService.addGridItemLocation(newGridItemLocation);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void clear2DGarden_GardenHasNoItems_return302() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void clear2DGarden_GardenHasMultipleItems_clearAllItems() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-        Plant testPlant = garden.getPlants().get(0);
-
-        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 1, 1);
-        GridItemLocation newGridItemLocation2 = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 5, 5);
-        gridItemLocationService.addGridItemLocation(newGridItemLocation);
-        gridItemLocationService.addGridItemLocation(newGridItemLocation2);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/clear").with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
-
-    }
-
-    @Test
-    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
-    void deleteGridItem_UserNotAuthorizedAndGardenDoesNotExist_Return404() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + 99L + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void deleteGridItem_invalidGardenID_return404() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + 9L + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
-
-    }
-
-    @Test
-    @WithMockUser(username = "janeDoe@Garden2dControllerTest.com")
-    void deleteGridItem_UserNotOwnerGardenExists_return403Forbidden() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-        Plant testPlant = garden.getPlants().get(0);
-
-        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 1, 1);
-        gridItemLocationService.addGridItemLocation(newGridItemLocation);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void deleteGridItem_GardenHasItem_deleteItem() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-        Plant testPlant = garden.getPlants().get(0);
-
-        GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
-                garden, 1, 1);
-        gridItemLocationService.addGridItemLocation(newGridItemLocation);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
-    }
-
-    @Test
-    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
-    void deleteGridItem_GardenHasNoItems_return302() throws Exception {
-
-        gridItemLocationRepository.deleteAll();
-        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
-                .getGardenId();
-        Garden garden = gardenService.getGardenById(gardenId).get();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId + "/delete").with(csrf())
-                .param("x_coord_delete", String.valueOf(1))
-                .param("y_coord_delete", String.valueOf(1)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Assertions.assertTrue(gridItemLocationService.getGridItemLocationByGarden(garden).isEmpty());
+        // checking grid item locations are updated
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(1, gridItemLocationRepository.findAll().size());
+        gridItemAddedToRepository = gridItemLocationRepository
+                .findGridItemLocationByObjectIdAndItemTypeAndGarden(
+                        testPlant.getPlantId(), GridItemType.DECORATION,
+                        gardenService.getGardenById(gardenId).get());
+        Assertions.assertTrue(gridItemAddedToRepository.isPresent());
+        Assertions.assertEquals(2, gridItemAddedToRepository.get().getXCoordinate());
+        Assertions.assertEquals(3, gridItemAddedToRepository.get().getYCoordinate());
     }
 
     @Test
@@ -561,18 +628,26 @@ class Garden2dControllerTest {
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
         idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
+        typeList.add("PLANT");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         xCoordList.add(4.5);
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         yCoordList.add(5.5);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // check persistence is updated
@@ -584,7 +659,51 @@ class Garden2dControllerTest {
         Assertions.assertEquals(3, gridItemsAddedToRepository.get(0).getYCoordinate());
         Assertions.assertEquals(4, gridItemsAddedToRepository.get(1).getXCoordinate());
         Assertions.assertEquals(5, gridItemsAddedToRepository.get(1).getYCoordinate());
+    }
 
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    void save2DGarden_twoSameDecorationAtDifferentLocations_returnRedirectAndChangePersistence()
+            throws Exception {
+        // preparing parameters
+        gridItemLocationRepository.deleteAll();
+        Long gardenId = userService.getUserByEmail("jhonDoe@Garden2dControllerTest.com").getGardens().get(0)
+                .getGardenId();
+        Plant testPlant = gardenService.getGardenById(gardenId).get().getPlants().get(0);
+        List<String> idList = new ArrayList<>();
+        idList.add(testPlant.getPlantId().toString());
+        idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("DECORATION");
+        typeList.add("DECORATION");
+        List<Double> xCoordList = new ArrayList<>();
+        xCoordList.add(2.3);
+        xCoordList.add(4.5);
+        List<Double> yCoordList = new ArrayList<>();
+        yCoordList.add(3.3);
+        yCoordList.add(5.5);
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
+
+        // making call to endpoint
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
+                .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
+                .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
+
+        // check persistence is updated
+        Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
+        Assertions.assertEquals(2, gridItemLocationRepository.findAll().size());
+        List<GridItemLocation> gridItemsAddedToRepository = gridItemLocationRepository.findAll().stream()
+                .toList();
+        Assertions.assertEquals(2, gridItemsAddedToRepository.get(0).getXCoordinate());
+        Assertions.assertEquals(3, gridItemsAddedToRepository.get(0).getYCoordinate());
+        Assertions.assertEquals(4, gridItemsAddedToRepository.get(1).getXCoordinate());
+        Assertions.assertEquals(5, gridItemsAddedToRepository.get(1).getYCoordinate());
     }
 
     @Test
@@ -598,12 +717,19 @@ class Garden2dControllerTest {
         List<String> idList = new ArrayList<>();
         idList.add(testPlant.getPlantId().toString());
         idList.add(testPlant.getPlantId().toString());
+        List<String> typeList = new ArrayList<>();
+        typeList.add("PLANT");
+        typeList.add("PLANT");
         List<Double> xCoordList = new ArrayList<>();
         xCoordList.add(2.3);
         xCoordList.add(4.3);
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         yCoordList.add(5.3);
+
+        String[] grassArray = new String[numOfTiles];
+        Arrays.fill(grassArray, "GRASS");
+        List<String> tileTextureList = Arrays.asList(grassArray);
 
         // adding initial grid item locations to repository
         GridItemLocation newGridItemLocation = new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT,
@@ -622,8 +748,10 @@ class Garden2dControllerTest {
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
                 .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
                 .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList)))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // checking grid item locations are updated

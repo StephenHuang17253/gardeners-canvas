@@ -3,8 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden2DController;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden3DController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
@@ -21,10 +20,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class U5002_2D_Garden_Edit {
+public class U50010_View_Public_3D_Garden {
     public static MockMvc mockMVC;
 
     private MvcResult mvcResult;
@@ -44,9 +43,6 @@ public class U5002_2D_Garden_Edit {
     public PlantRepository plantRepository;
 
     @Autowired
-    public DecorationRepository decorationRepository;
-
-    @Autowired
     public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
@@ -62,10 +58,10 @@ public class U5002_2D_Garden_Edit {
     public PlantService plantService;
 
     @Autowired
-    public DecorationService decorationService;
+    public FileService fileService;
 
     @Autowired
-    public FileService fileService;
+    public FriendshipService friendshipService;
 
     @Autowired
     public GridItemLocationService gridItemLocationService;
@@ -74,48 +70,47 @@ public class U5002_2D_Garden_Edit {
     public GridItemLocationRepository gridItemLocationRepository;
 
     @Autowired
-    public GardenTileRepository gardenTileRepository;
+    public FriendshipRepository friendshipRepository;
 
     @Autowired
-    public GardenTileService gardenTileService;
+    public WeatherService weatherService;
 
     private Map<String, Object> model;
 
     @Before
-    public void before_or_after_all() {
+    public void beforeOrAfterAll() {
         gardenService = new GardenService(gardenRepository, userService);
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         gridItemLocationService = new GridItemLocationService(gridItemLocationRepository);
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
-        decorationService = new DecorationService(decorationRepository);
-        gardenTileService = new GardenTileService(gardenTileRepository);
+        friendshipService = new FriendshipService(friendshipRepository, userService);
+        weatherService = new WeatherService();
 
-        Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
-                gridItemLocationService, plantService, decorationService, gardenTileService);
-        mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
+        Garden3DController garden3DController = new Garden3DController(gardenService, securityService,
+                friendshipService, gridItemLocationService, weatherService, plantService);
+        mockMVC = MockMvcBuilders.standaloneSetup(garden3DController).build();
     }
 
-    @Given("I as user {string} is on my two-D garden page for {string}")
-    public void iAsUserIsOnMyDGardenPageFor(String email, String gardenName) throws Exception {
+    @Given("I try to navigate to {string}'s 3d garden {string}")
+    public void iTryToNavigateTo3DGarden(String email, String gardenName) throws Exception {
         user = userService.getUserByEmail(email);
         garden = user.getGardens().get(0);
+        assertEquals(gardenName, garden.getGardenName());
         mvcResult = mockMVC.perform(
                 MockMvcRequestBuilders
-                        .get("/2D-garden/{gardenId}", garden.getGardenId()))
-                .andExpect(status().isOk()).andReturn();
+                        .get("/3D-garden/{gardenId}", garden.getGardenId()))
+                .andReturn();
     }
 
-    @Then("I see a palette window containing all my plants with relevant information as well as a save garden and clear all button")
-    public void iSeeAPaletteWindowContainingAllMyPlantsWithRelevantInformationAsWellAsASaveGardenAndClearAllButton() {
+    @Then("I am able to view the 3D garden")
+    public void iAmAbleToViewThe3DGarden() {
+        assertEquals(200, mvcResult.getResponse().getStatus());
+
         ModelAndView modelAndView = mvcResult.getModelAndView();
         Assertions.assertNotNull(modelAndView);
         model = modelAndView.getModel();
 
-        // palette window page
-        Assertions.assertTrue(model.containsKey("displayableItemsList"));
-
-        // plants
-        Assertions.assertTrue(model.containsKey("plants"));
+        Assertions.assertTrue(model.containsKey("garden"));
     }
 }

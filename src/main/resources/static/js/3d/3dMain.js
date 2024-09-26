@@ -122,10 +122,10 @@ loader.loadBackground(
 
 const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Grass', 0.2, 1.56, loader);
 // const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'StonePath', 0, 0, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'PebblePath', 0.2, 1.56, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Bark', 0, 1, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Soil', 0.055, 1.06, loader);
-// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Concrete', 0, 1, loader);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'PebblePath', 0, 0, loader);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Bark', 0, 0, loader);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Soil', 0.055, 0.06, loader);
+// const { grid } = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Concrete', 0, 0, loader);
 scene.add(grid);
 
 /**
@@ -168,32 +168,6 @@ const addObjectToScene = async (plantOrDecoration) => {
 const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
-
-// const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
-// const pondModel = await loader.loadModel(decoMap['Pond'][0], 'Pond');
-// const gnomeModel = await loader.loadModel(decoMap['Gnome'][0], 'Gnome');
-// const fountainModel = await loader.loadModel(decoMap['Fountain'][0], 'Fountain');
-// const tableModel = await loader.loadModel(decoMap['Table'][0], 'Table');
-// addModelToScene(
-//     rockModel,
-//     new THREE.Vector3(10, 0, 0),
-//     decoMap['Rock'][1]);
-// addModelToScene(
-//     pondModel,
-//     new THREE.Vector3(0, 0, 0),
-//     decoMap['Pond'][1]);
-// addModelToScene(
-//     gnomeModel,
-//     new THREE.Vector3(-10, 0, 0),
-//     decoMap['Gnome'][1]);
-// addModelToScene(
-//     fountainModel,
-//     new THREE.Vector3(0, 0, 10),
-//     decoMap['Fountain'][1]);
-// addModelToScene(
-//     tableModel,
-//     new THREE.Vector3(0, 0, -10),
-//     decoMap['Table'][1]);
 
 /**
  * Renders the scene
