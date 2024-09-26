@@ -93,6 +93,11 @@ const setWeather = (newWeather) => {
     // change clouds and rain to match the weather
 }
 
+/**
+ * Sets the background of the scene
+ * 
+ * @param {string} filename 
+ */
 const setBackground = (filename) => {
     loader.loadBackground(
         filename,
