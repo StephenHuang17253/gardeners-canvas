@@ -165,7 +165,7 @@ init();
 
 addLight();
 
-loadBackground(skyboxMap[weather]);
+setBackground(skyboxMap[weather]);
 
 const grassTexture = loader.loadTexture("grass-tileable.jpg");
 
