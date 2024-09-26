@@ -46,6 +46,8 @@ const link = document.createElement('a');
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
+const gardenHour = document.getElementById("currentHour").value;
+const weather = document.getElementById("weather").value;
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -83,6 +85,7 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
+    changeSkybox();
 };
 
 /**
@@ -105,17 +108,32 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     scene.add(model);
 };
 
+
+const changeSkybox = () => {
+    if (gardenHour > 6 && gardenHour < 18) {
+        if (weather === "Sunny") {
+            loader.loadBackground(
+                'sunny-day.exr',
+                texture => {
+                    scene.background = texture;
+                    scene.environment = texture;
+                }
+            );
+        } else {
+            loader.loadBackground(
+                'cloudy-day.exr',
+                texture => {
+                    scene.background = texture;
+                    scene.environment = texture;
+                }
+            );
+        }
+    }
+}
+
 init();
 
 addLight();
-
-loader.loadBackground(
-    'skybox.exr',
-    texture => {
-        scene.background = texture;
-        scene.environment = texture;
-    }
-);
 
 const {grid} = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'StonePath', 0, 1, loader);
 
