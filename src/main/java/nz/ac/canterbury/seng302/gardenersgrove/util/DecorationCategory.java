@@ -14,17 +14,17 @@ public enum DecorationCategory {
 
     private final String categoryName;
     private final String categoryImage;
-    private DecorationCategory(String categoryName, String categoryImage)
-    {
+
+    private DecorationCategory(String categoryName, String categoryImage) {
         this.categoryName = categoryName;
         this.categoryImage = categoryImage;
     }
 
-    public String getCategoryName(){
+    public String getCategoryName() {
         return categoryName;
     }
 
-    public String getCategoryImage(){
+    public String getCategoryImage() {
         return categoryImage;
     }
 

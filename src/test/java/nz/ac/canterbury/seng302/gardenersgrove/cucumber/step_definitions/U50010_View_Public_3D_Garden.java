@@ -75,6 +75,12 @@ public class U50010_View_Public_3D_Garden {
     @Autowired
     public WeatherService weatherService;
 
+    @Autowired
+    public DecorationService decorationService;
+
+    @Autowired
+    public DecorationRepository decorationRepository;
+
     private Map<String, Object> model;
 
     @Before
@@ -87,8 +93,9 @@ public class U50010_View_Public_3D_Garden {
         friendshipService = new FriendshipService(friendshipRepository, userService);
         weatherService = new WeatherService();
 
+        decorationService = new DecorationService(decorationRepository);
         Garden3DController garden3DController = new Garden3DController(gardenService, securityService,
-                friendshipService, gridItemLocationService, weatherService, plantService);
+                friendshipService, gridItemLocationService, weatherService, plantService, decorationService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden3DController).build();
     }
 
@@ -98,8 +105,8 @@ public class U50010_View_Public_3D_Garden {
         garden = user.getGardens().get(0);
         assertEquals(gardenName, garden.getGardenName());
         mvcResult = mockMVC.perform(
-                MockMvcRequestBuilders
-                        .get("/3D-garden/{gardenId}", garden.getGardenId()))
+                        MockMvcRequestBuilders
+                                .get("/3D-garden/{gardenId}", garden.getGardenId()))
                 .andReturn();
     }
 
