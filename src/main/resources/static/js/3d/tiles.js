@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Loader } from './Loader.js';
 
 const tileMap = {
     "Grass": ["grass-tileable.jpg", "texture", null],   // Grass-Short
@@ -119,9 +118,9 @@ const createTile = async (texture, size, hueShift, saturation, loader, text, nM)
         const geometry = new THREE.PlaneGeometry(size, size);
         // const text = loader.loadTexture(tileMap[texture][0]);
         let uvScale;
-        if(texture === 'Bark'){
+        if (texture === 'Bark') {
             uvScale = new THREE.Vector2(0.25, 0.25);
-        }else{
+        } else {
             uvScale = new THREE.Vector2(1, 1);
         }
         const material = createTileMaterial(text, hueShift, saturation, uvScale, nM);
@@ -163,7 +162,7 @@ const createTileGrid = async (rows, cols, tileSize, texture, hueShift, saturatio
             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    return {grid, tileCenterpositions};
+    return { grid, tileCenterpositions };
 };
 
 export { createTileGrid };

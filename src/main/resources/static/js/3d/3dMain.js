@@ -66,8 +66,6 @@ const gardenName = document.getElementById("gardenName").value;
 const currentHour = document.getElementById("currentHour").value;
 const currentWeather = document.getElementById("weather").value;
 
-console.log(gardenId, gardenName, currentHour, currentWeather);
-
 let time = currentHour;
 let weather = currentWeather;
 
@@ -190,9 +188,6 @@ const addObjectToScene = async (plantOrDecoration) => {
     const category = plantOrDecoration.category;
 
     const loadedModel = await loader.loadModel(modelMap[category][0], category);
-
-    console.log(category, modelMap[category]);
-    console.log(loadedModel);
 
     if (category === "Creeper") {
         loadedModel.traverse((child) => {
