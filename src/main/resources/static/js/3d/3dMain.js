@@ -117,10 +117,10 @@ loader.loadBackground(
     }
 );
 
-const grassTexture = loader.loadTexture('grass-tileable.jpg');
+const {grid} = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'StonePath', 0, 1, loader);
 
-const {grid} = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
 scene.add(grid);
+
 
 /**
  * Adds a plant or decoration object to the scene.
