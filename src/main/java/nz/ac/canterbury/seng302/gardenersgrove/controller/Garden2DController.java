@@ -116,9 +116,6 @@ public class Garden2DController {
                 .map(Decoration2DModel::new)
                 .toList();
 
-        model.addAttribute("plants", plants);
-        model.addAttribute("decorations", decorations);
-        model.addAttribute("countPerPage", COUNT_PER_PAGE);
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
@@ -164,6 +161,10 @@ public class Garden2DController {
         model.addAttribute("displayableItemsList", displayableItems);
         model.addAttribute("plantsById", plantsById);
         model.addAttribute("tileTextures", TileTexture.values());
+        model.addAttribute("plants", plants);
+        model.addAttribute("decorations", decorations);
+        model.addAttribute("countPerPage", COUNT_PER_PAGE);
+
         return "garden2DPage";
     }
 
