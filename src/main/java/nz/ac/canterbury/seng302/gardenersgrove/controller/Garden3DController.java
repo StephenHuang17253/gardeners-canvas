@@ -6,10 +6,17 @@ import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
+import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.DecorationService;
+import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
@@ -36,30 +43,50 @@ public class Garden3DController {
     Logger logger = LoggerFactory.getLogger(Garden3DController.class);
 
     private final GardenService gardenService;
-
+    private final DecorationService decorationService;
     private final GridItemLocationService gridItemLocationService;
     private final SecurityService securityService;
     private final FriendshipService friendshipService;
     private final WeatherService weatherService;
     private final PlantService plantService;
 
+    /**
+     * Gets services used in this controller
+     *
+     * @param gardenService           handles interactions with garden repository
+     * @param securityService         handles security
+     * @param friendshipService       handles interactions with friendship repository
+     * @param gridItemLocationService handles interactions with gridItemLocations repository
+     * @param weatherService handles interaction with weather API and weather objects
+     * @param plantService            handles interactions with plant repository
+     * @param decorationService       handles interactions with decoration repository
+     */
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
             FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
             WeatherService weatherService,
-            PlantService plantService) {
+            PlantService plantService, DecorationService decorationService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
         this.friendshipService = friendshipService;
         this.plantService = plantService;
         this.weatherService = weatherService;
+        this.decorationService = decorationService;
     }
 
+    /**
+     * Returns page for viewing 3D garden
+     *
+     * @param gardenId id of garden to view
+     * @param response HttpServeletResponse for any errors (404, 403)
+     * @param model    model to contain html page inputs
+     * @return garden3Dpage html page
+     */
     @GetMapping("/3D-garden/{gardenId}")
     public String getGarden3DPage(@PathVariable Long gardenId,
-            HttpServletResponse response,
-            Model model) {
+                                  HttpServletResponse response,
+                                  Model model) {
         logger.info("GET /3D-garden/{}", gardenId);
 
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
@@ -104,6 +131,56 @@ public class Garden3DController {
         return "garden3DPage";
     }
 
+
+    /**
+     * Turns all gridItemLocations of a garden into a usable model for actual display on client side
+     *
+     * @param gridItemLocations all items in grid
+     * @return displayableItems which are gridItemLocations formatted such that they can be displayed
+     */
+    private List<DisplayableItem> extractDisplayableItems(List<GridItemLocation> gridItemLocations) {
+
+        List<DisplayableItem> displayableItems = new ArrayList<>();
+
+        for (GridItemLocation gridLocation : gridItemLocations) {
+            if (gridLocation.getItemType() == GridItemType.PLANT) {
+                Optional<Plant> optionalPlant = plantService.getById(gridLocation.getObjectId());
+                if (optionalPlant.isPresent()) {
+                    Plant currentPlant = optionalPlant.get();
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
+                            currentPlant.getPlantName(),
+                            currentPlant.getPlantCategory().toString(),
+                            gridLocation.getObjectId(),
+                            gridLocation.getItemType(),
+                            currentPlant.getPlantCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Plant grid item could not be added to grid, missing item, id {}", gridLocation.getId());
+                }
+            } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
+                Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+                if (optionalDecoration.isPresent()) {
+                    Decoration currentDecoration = optionalDecoration.get();
+                    displayableItems.add(new DisplayableItem(
+                            gridLocation.getXCoordinate(),
+                            gridLocation.getYCoordinate(),
+                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
+                            currentDecoration.getDecorationCategory().toString(),
+                            currentDecoration.getId(),
+                            gridLocation.getItemType(),
+                            currentDecoration.getDecorationCategory().getCategoryImage()));
+                } else {
+                    logger.warn("Decoration grid item could not be added to grid, missing item, id {}", gridLocation.getId());
+                }
+            } else {
+                logger.warn("GridItemType is invalid. It is not DECORATION, nor PLANT");
+            }
+        }
+        return displayableItems;
+    }
+
+
     /**
      * returns a list of item locations as displayable items with coordinates and
      * names
@@ -115,7 +192,7 @@ public class Garden3DController {
     @ResponseBody
     @GetMapping("/3D-garden-layout/{gardenId}")
     public List<DisplayableItem> get3DGardenLayout(@PathVariable Long gardenId,
-            HttpServletResponse response) {
+                                                   HttpServletResponse response) {
         logger.info("GET /3D-garden-layout/{}", gardenId);
 
         List<DisplayableItem> displayableItems = new ArrayList<>();
@@ -137,29 +214,9 @@ public class Garden3DController {
             return displayableItems;
         }
 
-        List<GridItemLocation> plantLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
+        List<GridItemLocation> gridItemLocations = gridItemLocationService.getGridItemLocationByGarden(garden);
 
-        for (GridItemLocation plantLocation : plantLocations) {
-            if (plantLocation.getItemType() == GridItemType.PLANT) {
-                Optional<Plant> optionalPlant = plantService.getById(plantLocation.getObjectId());
-                if (optionalPlant.isPresent()) {
-                    Plant currentPlant = optionalPlant.get();
-                    displayableItems.add(new DisplayableItem(plantLocation.getXCoordinate(),
-                            plantLocation.getYCoordinate(),
-                            currentPlant.getPlantName(),
-                            currentPlant.getPlantCategory().toString(),
-                            plantLocation.getObjectId(),
-                            plantLocation.getItemType(),
-                            currentPlant.getPlantCategory().getCategoryImage()));
-                } else {
-                    logger.warn("Plant/Decoration grid item could not be added to grid, missing item, id {}",
-                            plantLocation.getId());
-                }
-            } else {
-                logger.warn("Not yet implemented adding decoration to grid {}", plantLocation.getId());
-            }
-        }
-
+        displayableItems = extractDisplayableItems(gridItemLocations);
         return displayableItems;
     }
 
