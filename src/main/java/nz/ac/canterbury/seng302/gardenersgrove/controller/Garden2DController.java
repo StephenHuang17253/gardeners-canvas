@@ -5,14 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.model.Decoration2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,23 +45,31 @@ public class Garden2DController {
 
     private final GridItemLocationService gridItemLocationService;
 
+    private final GardenTileService gardenTileService;
+
     private static final int COUNT_PER_PAGE = 6;
 
     private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
 
+    private static final int GRID_COLUMNS = 7;
+
+    private static final int GRID_ROWS = 7;
+
     @Autowired
     public Garden2DController(GardenService gardenService, SecurityService securityService,
-                              GridItemLocationService gridItemLocationService, PlantService plantService, DecorationService decorationService) {
+            GridItemLocationService gridItemLocationService, PlantService plantService,
+            DecorationService decorationService, GardenTileService gardenTileService) {
         this.gardenService = gardenService;
         this.securityService = securityService;
         this.gridItemLocationService = gridItemLocationService;
         this.plantService = plantService;
         this.decorationService = decorationService;
-
+        this.gardenTileService = gardenTileService;
     }
 
     /**
-     * Returns the 2D Garden Page where the user can edit the layout of their garden.
+     * Returns the 2D Garden Page where the user can edit the layout of their
+     * garden.
      */
     @GetMapping("/2D-garden/{gardenId}")
     public String getGarden2DPage(@PathVariable Long gardenId,
@@ -86,8 +99,23 @@ public class Garden2DController {
                 .sorted(Comparator.comparing(Plant::getPlantName))
                 .map(Plant2DModel::new)
                 .toList();
-        model.addAttribute("plants", plants);
-        model.addAttribute("countPerPage", COUNT_PER_PAGE);
+
+
+        List<Decoration> checkDecorations = decorationService.getDecorationsByGarden(garden);
+
+        if (checkDecorations.isEmpty()) {
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.ROCK));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.TABLE));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.FOUNTAIN));
+        }
+
+        List<Decoration2DModel> decorations = decorationService.getDecorationsByGarden(garden).stream()
+                .sorted(Comparator.comparing(Decoration::getDecorationCategory))
+                .map(Decoration2DModel::new)
+                .toList();
+
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
@@ -111,26 +139,32 @@ public class Garden2DController {
                             currentPlant.getPlantCategory().getCategoryImage()));
                 }
             } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
+
                 Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+
                 if (optionalDecoration.isPresent()) {
                     Decoration currentDecoration = optionalDecoration.get();
                     displayableItems.add(new DisplayableItem(
                             gridLocation.getXCoordinate(),
                             gridLocation.getYCoordinate(),
                             currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
-                            currentDecoration.getDecorationCategory().toString(),
+                            "Decoration",
                             currentDecoration.getId(),
                             gridLocation.getItemType(),
                             currentDecoration.getDecorationCategory().getCategoryImage()));
                 }
             }
-
         }
 
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
         model.addAttribute("displayableItemsList", displayableItems);
         model.addAttribute("plantsById", plantsById);
+        model.addAttribute("tileTextures", TileTexture.values());
+        model.addAttribute("plants", plants);
+        model.addAttribute("decorations", decorations);
+        model.addAttribute("countPerPage", COUNT_PER_PAGE);
+
         return "garden2DPage";
     }
 
@@ -184,6 +218,7 @@ public class Garden2DController {
             @RequestParam(value = "typeList", required = false) String typeList,
             @RequestParam(value = "xCoordList", required = false) String xCoordList,
             @RequestParam(value = "yCoordList", required = false) String yCoordList,
+            @RequestParam(value = "tileTextureList", required = false) String tileTextureList,
             HttpServletResponse response,
             Model model) {
         logger.info("POST /2D-garden/{}/save", gardenId);
@@ -204,7 +239,7 @@ public class Garden2DController {
             return "403";
         }
 
-        if (idList == null || xCoordList == null || yCoordList == null) {
+        if (idList == null || xCoordList == null || yCoordList == null || tileTextureList == null) {
             return "redirect:/2D-garden/{gardenId}";
         }
 
@@ -214,6 +249,7 @@ public class Garden2DController {
         List<String> typeListAsList = new ArrayList<>();
         List<Double> xCoordListAsList = new ArrayList<>();
         List<Double> yCoordListAsList = new ArrayList<>();
+        List<String> tileTextureListAsList = new ArrayList<>();
 
         try {
             idListAsList = objectMapper.readValue(idList, new TypeReference<>() {
@@ -224,12 +260,16 @@ public class Garden2DController {
             });
             yCoordListAsList = objectMapper.readValue(yCoordList, new TypeReference<>() {
             });
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+            tileTextureListAsList = objectMapper.readValue(tileTextureList, new TypeReference<>() {
+            });
+        } catch (Exception error) {
+            logger.error("Could not read 2D layout {}", error.getMessage());
         }
 
-        if (idListAsList.size() != xCoordListAsList.size() || idListAsList.size() != yCoordListAsList.size()
-        || idListAsList.size() != typeListAsList.size()) {
+        if (idListAsList.size() != xCoordListAsList.size() ||
+                idListAsList.size() != yCoordListAsList.size() ||
+                idListAsList.size() != typeListAsList.size() ||
+                tileTextureListAsList.size() != GRID_COLUMNS * GRID_ROWS) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("errorTitle", "400 Bad Request");
             model.addAttribute(ERROR_MESSAGE_ATTRIBUTE,
@@ -237,9 +277,19 @@ public class Garden2DController {
             return "error";
         }
 
+        for (int i = 0; i < GRID_COLUMNS; i++) {
+            for (int j = 0; j < GRID_ROWS; j++) {
+                String tileTextureString = tileTextureListAsList.get(i * GRID_COLUMNS + j);
+                TileTexture tileTexture = TileTexture.valueOf(tileTextureString);
+                GardenTile gardenTile = new GardenTile(garden, tileTexture, j, i);
+                gardenTileService.addGardenTile(gardenTile);
+            }
+        }
+
         // updating the repository
         deleteOldGridLocationItems(garden);
         for (int i = 0; i < idListAsList.size(); i++) {
+
             updateGardenGrid(GridItemType.valueOf(typeListAsList.get(i)), Long.parseLong(idListAsList.get(i)),
                     xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
         }
