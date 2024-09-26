@@ -8,10 +8,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
+import nz.ac.canterbury.seng302.gardenersgrove.model.Decoration2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
+import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
@@ -97,7 +99,25 @@ public class Garden2DController {
                 .sorted(Comparator.comparing(Plant::getPlantName))
                 .map(Plant2DModel::new)
                 .toList();
+
+
+        List<Decoration> checkDecorations = decorationService.getDecorationsByGarden(garden);
+
+        if (checkDecorations.isEmpty()) {
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.ROCK));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.TABLE));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+            decorationService.addDecoration(new Decoration(garden, DecorationCategory.FOUNTAIN));
+        }
+
+        List<Decoration2DModel> decorations = decorationService.getDecorationsByGarden(garden).stream()
+                .sorted(Comparator.comparing(Decoration::getDecorationCategory))
+                .map(Decoration2DModel::new)
+                .toList();
+
         model.addAttribute("plants", plants);
+        model.addAttribute("decorations", decorations);
         model.addAttribute("countPerPage", COUNT_PER_PAGE);
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
@@ -122,21 +142,21 @@ public class Garden2DController {
                             currentPlant.getPlantCategory().getCategoryImage()));
                 }
             } else if (gridLocation.getItemType() == GridItemType.DECORATION) {
+
                 Optional<Decoration> optionalDecoration = decorationService.getById(gridLocation.getObjectId());
+
                 if (optionalDecoration.isPresent()) {
                     Decoration currentDecoration = optionalDecoration.get();
                     displayableItems.add(new DisplayableItem(
                             gridLocation.getXCoordinate(),
                             gridLocation.getYCoordinate(),
-                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item
-                                                                                         // name
-                            currentDecoration.getDecorationCategory().toString(),
+                            currentDecoration.getDecorationCategory().getCategoryName(), // using category name as item name
+                            "Decoration",
                             currentDecoration.getId(),
                             gridLocation.getItemType(),
                             currentDecoration.getDecorationCategory().getCategoryImage()));
                 }
             }
-
         }
 
         model.addAttribute("isOwner", true);
@@ -268,6 +288,7 @@ public class Garden2DController {
         // updating the repository
         deleteOldGridLocationItems(garden);
         for (int i = 0; i < idListAsList.size(); i++) {
+
             updateGardenGrid(GridItemType.valueOf(typeListAsList.get(i)), Long.parseLong(idListAsList.get(i)),
                     xCoordListAsList.get(i).intValue(), yCoordListAsList.get(i).intValue(), garden);
         }

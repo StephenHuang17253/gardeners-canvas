@@ -93,25 +93,40 @@
                                 </div>
                             </div>
 
-                            <div th:each="displayableItem : ${displayableItemsList}">
-                                <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
-                                    th:data-grid-y="${displayableItem.getYCoordinate()}"
-                                    th:data-grid-name="${displayableItem.getName()}"
-                                    th:data-grid-category="${displayableItem.getCategory()}"
-                                    th:data-grid-objectid="${displayableItem.getObjectId()}"
-                                    th:data-grid-type="${displayableItem.getType()}"
-                                    th:data-grid-image="${displayableItem.getCategoryImage()}">
+                    </div>
+
+                    <div id="decorationsTabContent" class="tab-pane">
+                        <div class="row">
+
+                            <div class="col-6 p-3 text-left text-white" draggable="true"
+                                 name="decoration-item"
+                                 th:each="decoration : ${decorations}"
+                                 th:data-decoration-type="${decoration.getCategory()}"
+                                 th:data-decoration-image="${decoration.getCategoryImage()}"
+                                 th:data-decoration-id="${decoration.getId()}"
+                                 th:data-grid-name="${decoration.getCategory().toString()}">
+                                <div class="ratio ratio-1x1">
+                                    <img th:src="@{${decoration.getCategoryImage()}}" th:alt="${decoration.getCategory()}" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
                                 </div>
+                                <p class="total break-word mt-2 mb-0 text-decoration-underline" th:text="${decoration.getCategory()}"> </p>
+                                <p class="category mb-0">Decoration</p>
+                                <p class="placed break-word my-0"></p>
+                                <p class="remaining break-word my-0"></p>
                             </div>
-                            <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
-                                <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
-                                </div>
-                            </div>
+
                         </div>
 
-                        <div id="decorationsTabContent" class="tab-pane">
-                            Icons for Decorations will go here
+                        <div th:each="displayableItem : ${displayableItemsList}">
+                            <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                                 th:data-grid-y="${displayableItem.getYCoordinate()}"
+                                 th:data-grid-name="${displayableItem.getName()}"
+                                 th:data-grid-category="${displayableItem.getCategory()}"
+                                 th:data-grid-objectid="${displayableItem.getObjectId()}"
+                                 th:data-grid-type="${displayableItem.getType()}"
+                                 th:data-grid-image="${displayableItem.getCategoryImage()}">
+                            </div>
                         </div>
+                    </div>
 
                     <div id="textureTabContent" class="tab-pane">
                         <div class="row">

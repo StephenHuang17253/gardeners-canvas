@@ -18,6 +18,8 @@ const tileTextureListInput = document.getElementById("tileTextureList");
 const plantItems = document.querySelectorAll("[name='plant-item']");
 const textureItems = document.querySelectorAll("[name='texture-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
+const decorationItems = document.querySelectorAll("[name='decoration-item']");
+
 
 const pagination = document.getElementById("pagination");
 const firstPage = document.getElementById("firstPage");
@@ -470,7 +472,6 @@ gridItemLocations.forEach(item => {
     const itemType = item.getAttribute("data-grid-type");
     const itemName = item.getAttribute("data-grid-name");
     const category = item.getAttribute("data-grid-category");
-
     let imageSrc = item.getAttribute("data-grid-image");
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
@@ -534,6 +535,33 @@ plantItems.forEach((item, i) => {
 
     item.addEventListener("click", handlePlantItemClick);
 });
+
+decorationItems.forEach((item) => {
+    item.addEventListener('click', () => {
+        deselectPaletteItem();
+        deselectGridItem();
+
+        item.style.border = '3px solid blue';
+        selectedPaletteItem = item;
+
+        let decorationImage = item.getAttribute('data-decoration-image');
+
+        if (instance === 'test/' || instance === 'prod/') {
+            decorationImage = `/${instance}` + decorationImage;
+        }
+
+        selectedPaletteItemInfo = {
+            name: item.getAttribute('data-decoration-type'),
+            image: decorationImage,
+            id: item.getAttribute('data-decoration-id'),
+            type: "DECORATION",
+            count: 999,
+            category: 'Decoration'
+        };
+    });
+});
+
+
 
 // Event Handlers
 
@@ -631,6 +659,11 @@ const handleDeleteButtonClick = () => {
             plantItem = item;
         }
     });
+    decorationItems.forEach(item => {
+        if (item.getAttribute("data-decoration-id") === selectedGridItem.attrs.id) {
+            plantItem = item;
+        }
+    })
 
     const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
     plantItem.setAttribute("data-plant-count", updatedCount);
@@ -705,7 +738,8 @@ const handleWindowClick = (event) => {
 
     // check if spot clicked is plant in the palette
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
-    if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
+    const isWithinDecoration = !!event.target.closest("[name='decoration-item']");
+    if (!isWithinPlantItem && !isWithinDecoration) showErrorMessage(INVALID_LOCATION);
 
     // if not clicking the same palette item, deselect it
     if (!selectedPaletteItem.contains(event.target)) {

@@ -180,15 +180,11 @@ class Garden2dControllerTest {
         Long gardenId = garden.getGardenId();
 
         // Prepare GridItemLocations to have plant and also a decoration
-        Plant testPlant = plantService.addPlant("Test Plant", 1, "", LocalDate.now(), gardenId,
-                PlantCategory.CLIMBER);
-        gridItemLocationService.addGridItemLocation(
-                new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT, garden, 0, 0));
+        Plant testPlant = plantService.addPlant("Test Plant", 1, "", LocalDate.now(), gardenId, PlantCategory.CLIMBER);
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(testPlant.getPlantId(), GridItemType.PLANT, garden, 0, 0));
 
-        Decoration decoration = decorationService
-                .addDecoration(new Decoration(garden, DecorationCategory.GNOME));
-        gridItemLocationService.addGridItemLocation(
-                new GridItemLocation(decoration.getId(), GridItemType.DECORATION, garden, 6, 6));
+        Decoration testDecoration = decorationService.getDecorationsByGarden(garden).get(0);
+        gridItemLocationService.addGridItemLocation(new GridItemLocation(testDecoration.getId(), GridItemType.DECORATION, garden, 6, 6));
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/2D-garden/" + gardenId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -206,7 +202,7 @@ class Garden2dControllerTest {
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(2, displayableItems.size());
         Assertions.assertEquals(testPlant.getPlantName(), displayableItems.get(0).getName());
-        Assertions.assertEquals(decoration.getDecorationCategory().getCategoryName(),
+        Assertions.assertEquals(testDecoration.getDecorationCategory().getCategoryName(),
                 displayableItems.get(1).getName());
     }
 
