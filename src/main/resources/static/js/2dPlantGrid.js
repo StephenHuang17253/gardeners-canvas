@@ -50,7 +50,7 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
-let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, layer,
+let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, textureLayer, gardenItemLayer,
     tooltipLayer, prevSelectPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 let preventUnload = false;
@@ -99,7 +99,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
  * @returns {Boolean} - True if the destination is empty, false otherwise
  */
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
-    const nodes = layer.find("Image").values();
+    const nodes = gardenItemLayer.find("Image").values();
     for (let node of nodes) {
         const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if ((i === x && j === y) && (node.id() !== plantId || node.attrs.uniqueGridId !== gridLocationUniqueId)) {
@@ -195,7 +195,7 @@ const createTextureOnGrid = (imageSrc, x, y, itemType, objectName) => {
             draggable: false,
         });
 
-        layer.add(texture);
+        textureLayer.add(texture);
         if (onload) onload();
     };
 }
@@ -275,11 +275,15 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
 
         plantOrDecoration.on("click", () => {
             if (selectedPaletteItem) {
-                showErrorMessage(OCCUPIED_DESTINATION);
-                tooltip.hide();
-                deselectPaletteItem();
-                deselectGridItem();
-                return;
+                if (selectedPaletteItemInfo.type === "TEXTURE") {
+                    return;
+                } else {
+                    showErrorMessage(OCCUPIED_DESTINATION);
+                    tooltip.hide();
+                    deselectPaletteItem();
+                    deselectGridItem();
+                    return;
+                }
             }
             if (selectedGridItem) {
                 showErrorMessage(OCCUPIED_DESTINATION);
@@ -311,7 +315,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
             tooltip.hide();
         });
 
-        layer.add(plantOrDecoration);
+        gardenItemLayer.add(plantOrDecoration);
 
         if (onload) onload();
     };
@@ -456,9 +460,11 @@ stage = new Konva.Stage({
     container: "container"
 });
 
-layer = new Konva.Layer();
+textureLayer = new Konva.Layer();
+gardenItemLayer = new Konva.Layer();
 tooltipLayer = new Konva.Layer();
-stage.add(layer);
+stage.add(textureLayer);
+stage.add(gardenItemLayer);
 stage.add(tooltipLayer);
 
 // Create grid
@@ -470,13 +476,14 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             y: konvaPos.y,
             width: GRID_SIZE,
             height: GRID_SIZE,
-            fill: '#76ad4c',
+            fill: 'transparent',
             stroke: "black",
             strokeWidth: 1,
             name: "grid-cell",
             listening: false,
         });
-        layer.add(rect);
+        textureLayer.add(rect);
+        gardenItemLayer.add(rect)
     }
 }
 
@@ -518,7 +525,7 @@ plantItems.forEach((item, i) => {
      * Handles the clicking of a plant item in the palette
      */
     const handlePlantItemClick = () => {
-        let nodes = layer.find("Image");
+        let nodes = gardenItemLayer.find("Image");
         const currentCount = parseInt(item.getAttribute("data-plant-count"));
         const category = item.getAttribute("data-plant-category");
 
@@ -569,7 +576,7 @@ textureItems.forEach((item, i) => {
      * Handles the clicking of a plant item in the palette
      */
     const handleTextureItemClick = () => {
-        let nodes = layer.find("Image");
+        let nodes = textureLayer.find("Image");
 
         deselectPaletteItem();
         deselectGridItem();
@@ -605,7 +612,12 @@ textureItems.forEach((item, i) => {
  */
 const handleStageClick = (event) => {
 
-    if (!(event.target === stage || event.target.name() === "grid-cell")) return;
+    console.log("Target: " + event.target === stage)
+    console.log("Name: " + event.target.name() === "grid-cell")
+    // if (!(event.target.name() === "grid-cell")) return;
+
+    console.log("TESTING")
+
 
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
@@ -631,6 +643,8 @@ const handleStageClick = (event) => {
 
     } else if (selectedGridItem) {
 
+        console.log("OOOPPSSS")
+
         if (validLocation(x, y)) {
             selectedGridItem.position({
                 x: x,
@@ -650,7 +664,7 @@ const handleStageClick = (event) => {
  * Clears all items from the grid and resets the plant counts
  */
 const handleClearAllButtonClick = () => {
-    layer.find("Image").forEach(node => node.destroy());
+    gardenItemLayer.find("Image").forEach(node => node.destroy());
 
     plantItems.forEach(item => {
         resetPlantCount(item);
@@ -721,13 +735,19 @@ const handleGardenFormSubmit = (event) => {
     const xCoordList = [];
     const yCoordList = [];
 
-    layer.find("Image").forEach(node => {
+    gardenItemLayer.find("Image").forEach(node => {
         idList.push(node.id());
         typeList.push(node.attrs.type);
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
         const {i, j} = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
+    });
+
+    // TODO textures are being stacked
+    textureLayer.find("Image").forEach(node => {
+        // Todo the first tile placed is not being registered when running through all
+        console.log(node.attrs.name);
     });
 
     // assuming this is a list of length GRID_ROWS x GRID_COLUMNS of texture values e.g. GRASS
@@ -837,7 +857,7 @@ const hasUnsavedChanges = () => {
     }));
 
 
-    const currentGrid = layer.find("Image").map(node => {
+    const currentGrid = gardenItemLayer.find("Image").map(node => {
         const {i: x, j: y} = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
         return {
             x: x.toString(),
