@@ -63,12 +63,14 @@ public class U5006_Garden_decorations {
 
     @Autowired
     public GridItemLocationService gridItemLocationService;
+
     @Autowired
     public GridItemLocationRepository gridItemLocationRepository;
 
     public static GardenService gardenService;
 
     public static UserService userService;
+
     public static DecorationService decorationService;
 
     @Autowired
@@ -80,7 +82,7 @@ public class U5006_Garden_decorations {
     @Autowired
     public DecorationRepository decorationRepository;
 
-    private static final int numOfTiles = 49;
+    private static final int NUM_OF_TILES = 49;
 
     @Before
     public void before_or_after_all() {
@@ -92,18 +94,18 @@ public class U5006_Garden_decorations {
         decorationService = new DecorationService(decorationRepository);
         tileService = new GardenTileService(gardenTileRepository);
 
-
         Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
                 gridItemLocationService, plantService, decorationService, tileService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
+
     @Then("As user {string} I see a palette window with a tab labelled for decorations")
     public void asUserISeeAPaletteWindowWithATabLabelledForDecorations(String email) throws Exception {
         user = userService.getUserByEmail(email);
         garden = user.getGardens().get(0);
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get("/2D-garden/{gardenId}", garden.getGardenId()))
+                MockMvcRequestBuilders
+                        .get("/2D-garden/{gardenId}", garden.getGardenId()))
                 .andExpect(status().isOk()).andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -119,7 +121,8 @@ public class U5006_Garden_decorations {
         user = userService.getUserByEmail(email);
         garden = user.getGardens().get(0);
         Long gardenId = garden.getGardenId();
-        Decoration decoration = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK).get(0);
+        Decoration decoration = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK)
+                .get(0);
 
         List<String> idList = new ArrayList<>();
         idList.add(decoration.getId().toString());
@@ -133,24 +136,25 @@ public class U5006_Garden_decorations {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.0);
 
-        String[] grassArray = new String[numOfTiles];
+        String[] grassArray = new String[NUM_OF_TILES];
         Arrays.fill(grassArray, "GRASS");
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMVC.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                        .param("idList", JSONArray.toJSONString(idList))
-                        .param("typeList", JSONArray.toJSONString(typeList))
-                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                .param("idList", JSONArray.toJSONString(idList))
+                .param("typeList", JSONArray.toJSONString(typeList))
+                .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
     }
 
     @Then("I see my placed decoration")
     public void iSeeMyPlacedDecoration() {
-        Decoration decoration = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK).get(0);
+        Decoration decoration = decorationService.getDecorationsByGardenAndCategory(garden, DecorationCategory.ROCK)
+                .get(0);
         List<GridItemLocation> gridItems = gridItemLocationService.getGridItemLocationByGarden(garden);
         Assertions.assertFalse(gridItems.isEmpty());
-        Assertions.assertEquals(gridItems.getLast().getObjectId(), decoration.getId());
+        Assertions.assertEquals(gridItems.get(gridItems.size() - 1).getObjectId(), decoration.getId());
     }
 }
