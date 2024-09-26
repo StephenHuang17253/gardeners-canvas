@@ -1,4 +1,4 @@
-import { Downloader } from "./Downloader.js";
+import {Downloader} from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -67,7 +67,7 @@ let preventUnload = false;
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 };
 
 /**
@@ -79,7 +79,7 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return { i: gridItemX, j: gridItemY };
+    return {i: gridItemX, j: gridItemY};
 }
 
 /**
@@ -101,7 +101,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     const nodes = layer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if ((i === x && j === y) && (node.id() !== plantId || node.attrs.uniqueGridId !== gridLocationUniqueId)) {
             return false;
         }
@@ -179,6 +179,27 @@ const updateCountersOnLoad = (plantId) => {
     plantItem.setAttribute("data-plant-count", count - 1);
 };
 
+
+const createTextureOnGrid = (imageSrc, x, y, itemType, objectName) => {
+    const gridItemImage = new Image();
+    gridItemImage.src = imageSrc;
+    gridItemImage.onload = () => {
+        const texture = new Konva.Image({
+            x: x,
+            y: y,
+            image: gridItemImage,
+            width: GRID_SIZE,
+            height: GRID_SIZE,
+            name: objectName,
+            type: itemType,
+            draggable: false,
+        });
+
+        layer.add(texture);
+        if (onload) onload();
+    };
+}
+
 /**
  * Creates a new plant or decoration and adds it to the stage produced by konva
  *
@@ -214,13 +235,13 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
         });
 
         plantOrDecoration.on("dragstart", () => {
-            prevSelectPosition = { x: plantOrDecoration.x(), y: plantOrDecoration.y() };
+            prevSelectPosition = {x: plantOrDecoration.x(), y: plantOrDecoration.y()};
         })
 
         plantOrDecoration.on("dragmove", () => {
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
-            let { x, y } = convertToKonvaCoordinates(i, j);
+            const {i, j} = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
+            let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant or decoration is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -241,7 +262,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
         plantOrDecoration.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
+            const {i, j} = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
 
             //ensure destination is empty
             if (!emptyDestination(i, j, plantOrDecoration.id(), plantOrDecoration.attrs.uniqueGridId)) {
@@ -333,7 +354,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], { type: mimeType });
+    return new Blob([uint8Array], {type: mimeType});
 };
 
 /**
@@ -475,7 +496,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
@@ -535,6 +556,46 @@ plantItems.forEach((item, i) => {
     item.addEventListener("click", handlePlantItemClick);
 });
 
+
+/**
+ * Initialise event listeners for clicking on textures
+ */
+textureItems.forEach((item, i) => {
+
+    const textureName = item.getAttribute("data-texture-name");
+    let textureImage = item.getAttribute("data-texture-image")
+
+    /**
+     * Handles the clicking of a plant item in the palette
+     */
+    const handleTextureItemClick = () => {
+        let nodes = layer.find("Image");
+
+        deselectPaletteItem();
+        deselectGridItem();
+
+        // if (nodes.length >= GRID_COLUMNS * GRID_ROWS) {
+        //     showErrorMessage(FULL_GRID);
+        //     return;
+        // }
+
+        item.style.border = "3px solid blue";
+        selectedPaletteItem = item;
+
+        if (instance === "test/" || instance === "prod/") {
+            textureImage = `/${instance}` + textureImage;
+        }
+        selectedPaletteItemInfo = {
+            name: textureName,
+            image: textureImage,
+            type: "TEXTURE",
+        };
+    };
+
+    item.addEventListener("click", handleTextureItemClick);
+});
+
+
 // Event Handlers
 
 /**
@@ -549,20 +610,24 @@ const handleStageClick = (event) => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
-
+        // Todo do not show error message when clicking on a texture on the palette window
         if (!validLocation(x, y)) {
             showErrorMessage(INVALID_LOCATION);
             return;
         }
+        if (selectedPaletteItemInfo.type !== "TEXTURE") {
+            createPlantOrDecoration(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
+            selectedPaletteItemInfo.count -= 1
 
-        createPlantOrDecoration(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
-        selectedPaletteItemInfo.count -= 1
+            selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
+            updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+        } else {
+            createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name);
+        }
 
-        selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
-        updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
 
     } else if (selectedGridItem) {
 
@@ -623,7 +688,7 @@ const handleDeleteButtonClick = () => {
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
 
-    const { i, j } = convertToGridCoordinates(gridX, gridY);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
     let plantItem = null;
     plantItems.forEach(item => {
@@ -660,7 +725,7 @@ const handleGardenFormSubmit = (event) => {
         idList.push(node.id());
         typeList.push(node.attrs.type);
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
     });
@@ -705,6 +770,7 @@ const handleWindowClick = (event) => {
 
     // check if spot clicked is plant in the palette
     const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
+    // Todo where I think the error message is coming from when I click on a palette item
     if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
 
     // if not clicking the same palette item, deselect it
@@ -772,7 +838,7 @@ const hasUnsavedChanges = () => {
 
 
     const currentGrid = layer.find("Image").map(node => {
-        const { i: x, j: y } = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
+        const {i: x, j: y} = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
         return {
             x: x.toString(),
             y: y.toString(),
