@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 const tileMap = {
-    "Grass": ["grass-tileable.jpg", null],   // Grass-Short
+    "Grass": ["grass-tileable.jpg", null],
     "StonePath": ["stone-tileable.jpg", "stone-normal.jpg"],
     "PebblePath": ["pebbles-tileable.jpg", null],
     "Concrete": ["concrete-tileable.jpg", "concrete-normal.jpg"],
@@ -56,7 +56,7 @@ const createTileMaterial = (texture, hueShift, saturation, uvScale, normalTextur
  * @param {THREE.Texture} normalTexture - normal texture
  * @returns {THREE.Mesh} The created tile mesh.
  */
-const createTile = async (tileMaterial, size, hueShift, saturation, texture, normalTexture) => {
+const createTile = (tileMaterial, size, hueShift, saturation, texture, normalTexture) => {
 
     const geometry = new THREE.PlaneGeometry(size, size);
     let uvScale;
@@ -80,10 +80,10 @@ const createTile = async (tileMaterial, size, hueShift, saturation, texture, nor
  * @param {string} tileMaterial - The material to be used for the tile
  * @param {number} hueShift - The hue shift value for the tiles.
  * @param {number} saturation - The saturation value for the tiles.
- * @param loader - reference to loader instance
+ * @param {Loader} loader - reference to loader instance
  * @returns {THREE.Group} - Object with the grid to add to scene and an array of tile center positions.
  */
-const createTileGrid = async (rows, cols, tileSize, tileMaterial, hueShift, saturation, loader) => {
+const createTileGrid = (rows, cols, tileSize, tileMaterial, hueShift, saturation, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
     const tileCenterpositions = [];
@@ -93,9 +93,11 @@ const createTileGrid = async (rows, cols, tileSize, tileMaterial, hueShift, satu
     if (tileMap[tileMaterial][1] != null) {
         normalTexture = loader.loadTexture(tileMap[tileMaterial][2]);
     }
+
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-            const tile = createTile(tileMaterial, tileSize, hueShift, saturation, loader, texture, normalTexture);
+            const tile = createTile(tileMaterial, tileSize, hueShift, saturation, texture, normalTexture);
+            console.log(tile);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));

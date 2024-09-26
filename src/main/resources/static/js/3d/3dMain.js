@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import { createTileGrid } from './tiles.js';
-import { OrbitControls } from './OrbitControls.js';
-import { Loader } from './Loader.js';
+import * as THREE from "three";
+import { createTileGrid } from "./tiles.js";
+import { OrbitControls } from "./OrbitControls.js";
+import { Loader } from "./Loader.js";
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from './Exporter.js';
-import { Downloader } from '../Downloader.js';
+import { Exporter } from "./Exporter.js";
+import { Downloader } from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -167,12 +167,12 @@ addLight();
 
 setBackground(skyboxMap[weather]);
 
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Grass', 0.2, 1.56, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'StonePath', 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'PebblePath', 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Bark', 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Soil', 0.055, 0.06, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, 'Concrete', 0, 0, loader);
+const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
 scene.add(grid);
 
 
