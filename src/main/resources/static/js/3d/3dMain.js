@@ -147,7 +147,7 @@ const init = () => {
  * Adds a light to the scene
  */
 const addLight = () => {
-    light = new THREE.AmbientLight(0xffffff);
+    light = new THREE.AmbientLight(0xffffff, 0.00);
     scene.add(light);
 };
 
@@ -169,12 +169,8 @@ addLight();
 
 setBackground(skyboxMap[weather]);
 
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
+const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", loader);
+
 scene.add(grid);
 
 
