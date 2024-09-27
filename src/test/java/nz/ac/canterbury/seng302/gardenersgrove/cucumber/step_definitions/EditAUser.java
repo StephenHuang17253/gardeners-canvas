@@ -65,6 +65,12 @@ public class EditAUser {
 
     public UserService userService;
 
+    @Autowired
+    public DecorationRepository decorationRepository;
+
+    @Autowired
+    public GardenTileRepository gardenTileRepository;
+
     String firstName = "John";
     String lastName = "Doe";
     Boolean noLastName = false;
@@ -79,6 +85,8 @@ public class EditAUser {
         userService = new UserService(passwordEncoder, userRepository, homePageLayoutRepository);
         tokenRepository.deleteAll();
         friendshipRepository.deleteAll();
+        decorationRepository.deleteAll();
+        gardenTileRepository.deleteAll();
         gridItemLocationRepository.deleteAll();
         userRepository.deleteAll();
         userService.addUser(new User(firstName,

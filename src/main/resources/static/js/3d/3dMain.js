@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import { createTileGrid } from './tiles.js';
-import { OrbitControls } from './OrbitControls.js';
-import { Loader } from './Loader.js';
+import * as THREE from "three";
+import { createTileGrid } from "./tiles.js";
+import { OrbitControls } from "./OrbitControls.js";
+import { Loader } from "./Loader.js";
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from './Exporter.js';
-import { Downloader } from '../Downloader.js';
+import { Exporter } from "./Exporter.js";
+import { Downloader } from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -14,10 +14,7 @@ const modelMap = {
     "Creeper": ["creeper.glb", 0.5],
     "Climber": ["climber.glb", 5],
     "Flower": ["flower.glb", 10],
-    "Pot Plant": ["potplant.glb", 5]
-};
-
-const decoMap = {
+    "Pot Plant": ["potplant.glb", 5],
     "Rock": ["deco/rock.glb", 2],
     "Pond": ["deco/pond.glb", 2],
     "Gnome": ["deco/gnome.glb", 7],
@@ -25,16 +22,26 @@ const decoMap = {
     "Table": ["deco/table.glb", 4.5],
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, rain, rainGeo, rainCount = 3000;
+const skyboxMap = {
+    "Sunny": "sunny_skybox.exr",
+    "Overcast": "cloudy_skybox.exr",
+    "Rainy": "cloudy_skybox.exr",
+};
 
-const container = document.getElementById('container');
+let scene, camera, renderer, controls, loader, exporter, light, downloader, rain, rainGeo, rainCount = 3000;;
 
-const downloadGLTFButton = document.getElementById('download-gltf');
-const downloadOBJButton = document.getElementById('download-obj');
-const downloadJPGButton = document.getElementById('download-jpg');
 
-const loadingDiv = document.getElementById('loading-div');
-const loadingImg = document.getElementById('loading-img');
+const container = document.getElementById("container");
+
+const downloadGLTFButton = document.getElementById("download-gltf");
+const downloadOBJButton = document.getElementById("download-obj");
+const downloadJPGButton = document.getElementById("download-jpg");
+
+const trackTimeInput = document.getElementById("trackTime");
+const trackWeatherInput = document.getElementById("trackWeather");
+
+const loadingDiv = document.getElementById("loading-div");
+const loadingImg = document.getElementById("loading-img");
 
 const FOV = 75;
 
@@ -44,11 +51,60 @@ const TILE_SIZE = 10;
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
+const DEFAULT_TIME = 12;
+const DEFAULT_WEATHER = "Sunny";
+
+const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
+
 // link used to download files
-const link = document.createElement('a');
+const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
+const currentHour = document.getElementById("currentHour").value;
+const currentWeather = document.getElementById("weather").value;
+
+let time = currentHour;
+let weather = currentWeather;
+
+console.log(weather);
+
+/**
+ * Updates the time of day in the scene
+ *
+ * @param {number} newTime
+ */
+const setTime = (newTime) => {
+    time = newTime;
+    // Update the time of day in the scene
+    // Set moon or sun to the correct position
+};
+
+/**
+ * Updates the weather in the scene
+ *
+ * @param {String} newWeather
+ */
+const setWeather = (newWeather) => {
+    weather = newWeather;
+    setBackground(skyboxMap[weather]);
+    // change clouds and rain to match the weather
+}
+
+/**
+ * Sets the background of the scene
+ *
+ * @param {string} filename
+ */
+const setBackground = (filename) => {
+    loader.loadBackground(
+        filename,
+        texture => {
+            scene.background = texture;
+            scene.environment = texture;
+        }
+    );
+}
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -57,7 +113,7 @@ const init = () => {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
-    camera.position.set(5, 5, 5);
+    camera.position.copy(INIT_CAMERA_POSITION);
     camera.lookAt(scene.position);
 
     renderer = new THREE.WebGLRenderer(
@@ -74,8 +130,8 @@ const init = () => {
     loader = new Loader();
 
     loader.setOnError(() => {
-        loadingImg.classList.add('d-none');
-        loadingDiv.innerText = 'There was an error loading your garden';
+        loadingImg.classList.add("d-none");
+        loadingDiv.innerText = "There was an error loading your garden";
     });
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -121,11 +177,11 @@ const addLight = () => {
 };
 
 /** Add model to scene
-* 
-* @param {Object} model - The model to be added to the scene.
-* @param {Object} position - The position at which the model will be placed in the scene.
-* @param {number} [scaleFactor=1] - The scale factor to be applied to the model. Default value is 1.
-*/
+ *
+ * @param {Object} model - The model to be added to the scene.
+ * @param {Object} position - The position at which the model will be placed in the scene.
+ * @param {number} [scaleFactor=1] - The scale factor to be applied to the model. Default value is 1.
+ */
 const addModelToScene = (model, position, scaleFactor = 1) => {
     model.position.copy(position);
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -136,22 +192,20 @@ init();
 
 addLight();
 
-loader.loadBackground(
-    'skybox.exr',
-    texture => {
-        scene.background = texture;
-        scene.environment = texture;
-    }
-);
+setBackground(skyboxMap[weather]);
 
-const grassTexture = loader.loadTexture('grass-tileable.jpg');
-
-const { grid } = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, grassTexture, 0.2, 1.56);
+const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
+// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
 scene.add(grid);
+
 
 /**
  * Adds a plant or decoration object to the scene.
- * 
+ *
  * @param {Object} plantOrDecoration - The plant or decoration object to be added.
  * @returns {Promise<void>} - A promise that resolves when the object is added to the scene.
  */
@@ -163,9 +217,6 @@ const addObjectToScene = async (plantOrDecoration) => {
     const category = plantOrDecoration.category;
 
     const loadedModel = await loader.loadModel(modelMap[category][0], category);
-
-    console.log(category, modelMap[category]);
-    console.log(loadedModel);
 
     if (category === "Creeper") {
         loadedModel.traverse((child) => {
@@ -190,32 +241,6 @@ const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
 
-// const rockModel = await loader.loadModel(decoMap['Rock'][0], 'Rock');
-// const pondModel = await loader.loadModel(decoMap['Pond'][0], 'Pond');
-// const gnomeModel = await loader.loadModel(decoMap['Gnome'][0], 'Gnome');
-// const fountainModel = await loader.loadModel(decoMap['Fountain'][0], 'Fountain');
-// const tableModel = await loader.loadModel(decoMap['Table'][0], 'Table');
-// addModelToScene(
-//     rockModel,
-//     new THREE.Vector3(10, 0, 0),
-//     decoMap['Rock'][1]);
-// addModelToScene(
-//     pondModel,
-//     new THREE.Vector3(0, 0, 0),
-//     decoMap['Pond'][1]);
-// addModelToScene(
-//     gnomeModel,
-//     new THREE.Vector3(-10, 0, 0),
-//     decoMap['Gnome'][1]);
-// addModelToScene(
-//     fountainModel,
-//     new THREE.Vector3(0, 0, 10),
-//     decoMap['Fountain'][1]);
-// addModelToScene(
-//     tableModel,
-//     new THREE.Vector3(0, 0, -10),
-//     decoMap['Table'][1]);
-
 /**
  * Renders the scene
  */
@@ -237,7 +262,12 @@ const animate = () => {
 
 renderer.setAnimationLoop(animate);
 
-/** 
+// Hide loading screen
+loadingImg.classList.add("d-none");
+loadingDiv.classList.add("fadeOut");
+loadingDiv.parentElement.removeChild(loadingDiv)
+
+/**
  * Event Handlers
  */
 
@@ -254,26 +284,43 @@ const onWindowResize = () => {
  * On mouse move event on the canvas prevent user selection
  */
 const onMouseMove = () => {
-    document.body.style.userSelect = 'none';
+    document.body.style.userSelect = "none";
 };
 
 /**
  * On mouse out event on the canvas allow user selection
  */
 const onMouseOut = () => {
-    document.body.style.userSelect = 'auto';
+    document.body.style.userSelect = "auto";
 };
 
-window.addEventListener('resize', onWindowResize);
-container.addEventListener('mousemove', onMouseMove);
-container.addEventListener('mouseout', onMouseOut);
-downloadGLTFButton.addEventListener('click', () => exporter.downloadGLTF(scene));
-downloadOBJButton.addEventListener('click', () => exporter.downloadOBJ(scene));
-downloadJPGButton.addEventListener('click', () => exporter.downloadJPG(renderer));
+/**
+* On track time input change,
+* update the time variable to the current hour if the input is checked,
+* otherwise set it to the default time
+*/
+const onTrackTimeInputChange = () => {
+    const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
+    setTime(newTime);
+};
 
+/**
+ * On track weather input change,
+ * update the weather variable to the current weather if the input is checked,
+ * otherwise set it to the default weather
+ */
+const onTrackWeatherInputChange = () => {
+    const newWeather = trackWeatherInput.checked ? currentWeather : DEFAULT_WEATHER;
+    setWeather(newWeather);
+};
 
 console.log(scene.children);
 
-loadingImg.classList.add('d-none');
-loadingDiv.classList.add('fadeOut');
-setTimeout(() => loadingDiv.parentElement.removeChild(loadingDiv), 500);
+window.addEventListener("resize", onWindowResize);
+container.addEventListener("mousemove", onMouseMove);
+container.addEventListener("mouseout", onMouseOut);
+downloadGLTFButton.addEventListener("click", () => exporter.downloadGLTF(scene));
+downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
+downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
+trackTimeInput.addEventListener("change", onTrackTimeInputChange);
+trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
