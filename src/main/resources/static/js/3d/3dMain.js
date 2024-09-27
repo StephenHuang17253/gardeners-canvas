@@ -62,7 +62,6 @@ const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
-const gardenHour = document.getElementById("currentHour").value;
 const currentHour = document.getElementById("currentHour").value;
 const currentWeather = document.getElementById("weather").value;
 
@@ -170,7 +169,7 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
  * Changes the skybox based on time of the day
  */
 const changeSkybox = () => {
-    if (gardenHour > 6 && gardenHour < 18) {
+    if (currentHour > 6 && currentHour < 18) {
         setBackground(skyboxMap[weather]);
     } else {
         //set night backgrounds here
