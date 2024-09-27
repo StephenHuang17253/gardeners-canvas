@@ -20,6 +20,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
+    "Background": ["background.glb", 1]
 };
 
 const skyboxMap = {
@@ -46,6 +47,8 @@ const FOV = 75;
 
 const GRID_SIZE = 7;
 const TILE_SIZE = 10;
+
+const BG_SIZE = 110;
 
 const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
@@ -173,6 +176,20 @@ const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", loader)
 
 scene.add(grid);
 
+const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
+
+backgroundModel.traverse((child) => {
+    if (child.isMesh) {
+        child.material = createHueSaturationMaterial(
+            child.material.map,
+            0.2,
+            1.56,
+            1.5
+        );
+    }
+});
+
+addModelToScene(backgroundModel, new THREE.Vector3(0, 0, 0), modelMap["Background"][1]);
 
 /**
  * Adds a plant or decoration object to the scene.

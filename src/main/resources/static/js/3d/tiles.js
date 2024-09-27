@@ -145,4 +145,4 @@ const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
     return grid;
 };
 
-export { createTileGrid };
+export { createTile, createTileGrid };
