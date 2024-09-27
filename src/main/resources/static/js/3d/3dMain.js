@@ -146,21 +146,20 @@ const init = () => {
     const rainCount = 3000;
     const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop
 
-    for (let i = 0; i < rainCount; i++) {
+    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
         rainPositions.set([
-            Math.random() * 200 - 100,  // x
-            Math.random() * 100 - 25,  // y
-            Math.random() * 200 - 100   // z
+            Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
+            Math.random() * 75, // y spawns anywhere y: 0 to 75
+            Math.random() * 130 - 60   // z spawns anywhere z: -60 to 70
         ], i * 3);
     }
 
     rainGeo = new THREE.BufferGeometry();
     rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
-
     const rainMaterial = new THREE.PointsMaterial({
-        color: 0x0099cc,
-        size: 0.15,
-        transparent: false,
+        color: 0xaaaaaa, // color of the raindrops
+        size: 0.20, // size of the raindrops
+        transparent: false, // if raindrops are transparent
     });
 
 
@@ -253,7 +252,7 @@ const animate = () => {
         positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1; // Update y position
 
         if (positions[i * 3 + 1] < 0) {
-            positions[i * 3 + 1] = 100; // Reset to top
+            positions[i * 3 + 1] = 75; // If below tiles (y=0) Reset to top y postion
         }
     }
 
