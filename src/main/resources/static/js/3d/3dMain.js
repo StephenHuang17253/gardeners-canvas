@@ -28,8 +28,7 @@ const skyboxMap = {
     "Rainy": "cloudy_skybox.exr",
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, rain, rainGeo, rainCount = 3000;;
-
+let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount;
 
 const container = document.getElementById("container");
 
@@ -66,6 +65,7 @@ const currentWeather = document.getElementById("weather").value;
 
 let time = currentHour;
 let weather = currentWeather;
+let isRaining = weather === "Rainy";
 
 console.log(weather);
 
@@ -89,6 +89,11 @@ const setWeather = (newWeather) => {
     weather = newWeather;
     setBackground(skyboxMap[weather]);
     // change clouds and rain to match the weather
+    if (weather === "Rainy") {
+        isRaining = true;
+        rainCount = 3000;
+        startRain();
+    }
 }
 
 /**
@@ -105,6 +110,31 @@ const setBackground = (filename) => {
         }
     );
 }
+
+const startRain = () => {
+
+    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop
+
+    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
+        rainPositions.set([
+            Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
+            Math.random() * 75, // y spawns anywhere y: 0 to 75
+            Math.random() * 130 - 60   // z spawns anywhere z: -60 to 70
+        ], i * 3);
+    }
+
+    rainGeo = new THREE.BufferGeometry();
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+    const rainMaterial = new THREE.PointsMaterial({
+        color: 0xaaaaaa, // color of the raindrops
+        size: 0.20, // size of the raindrops
+        transparent: false, // if raindrops are transparent
+    });
+
+    const rain = new THREE.Points(rainGeo, rainMaterial);
+    scene.add(rain);
+
+};
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -142,29 +172,6 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
-
-    const rainCount = 3000;
-    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop
-
-    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
-        rainPositions.set([
-            Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
-            Math.random() * 75, // y spawns anywhere y: 0 to 75
-            Math.random() * 130 - 60   // z spawns anywhere z: -60 to 70
-        ], i * 3);
-    }
-
-    rainGeo = new THREE.BufferGeometry();
-    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
-    const rainMaterial = new THREE.PointsMaterial({
-        color: 0xaaaaaa, // color of the raindrops
-        size: 0.20, // size of the raindrops
-        transparent: false, // if raindrops are transparent
-    });
-
-
-    rain = new THREE.Points(rainGeo, rainMaterial);
-    scene.add(rain);
 };
 
 /**
@@ -192,6 +199,8 @@ init();
 addLight();
 
 setBackground(skyboxMap[weather]);
+
+setWeather(weather);
 
 const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
 // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
@@ -247,16 +256,17 @@ const animate = () => {
     light.position.copy(camera.position);
     renderer.render(scene, camera);
 
-    const positions = rainGeo.attributes.position.array;
-    for (let i = 0; i < rainCount; i++) {
-        positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1; // Update y position
+    if (isRaining === true) {
+        const positions = rainGeo.attributes.position.array;
+        for (let i = 0; i < rainCount; i++) {
+            positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1; // Update y position
 
-        if (positions[i * 3 + 1] < 0) {
-            positions[i * 3 + 1] = 75; // If below tiles (y=0) Reset to top y postion
+            if (positions[i * 3 + 1] < 0) {
+                positions[i * 3 + 1] = 75; // If below tiles (y=0) Reset to top y postion
+            }
         }
+        rainGeo.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
     }
-
-    rainGeo.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
 };
 
 renderer.setAnimationLoop(animate);
