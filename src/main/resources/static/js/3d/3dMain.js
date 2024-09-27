@@ -25,7 +25,7 @@ const decoMap = {
     "Table": ["deco/table.glb", 4.5],
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, rain, rainGeo, rainCount = 3000;
 
 const container = document.getElementById('container');
 
@@ -86,6 +86,30 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
+
+    const rainCount = 3000;
+    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop
+
+    for (let i = 0; i < rainCount; i++) {
+        rainPositions.set([
+            Math.random() * 200 - 100,  // x
+            Math.random() * 100 - 25,  // y
+            Math.random() * 200 - 100   // z
+        ], i * 3);
+    }
+
+    rainGeo = new THREE.BufferGeometry();
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+
+    const rainMaterial = new THREE.PointsMaterial({
+        color: 0x0099cc,
+        size: 0.15,
+        transparent: false,
+    });
+
+
+    rain = new THREE.Points(rainGeo, rainMaterial);
+    scene.add(rain);
 };
 
 /**
@@ -198,6 +222,17 @@ placedGardenObjects.forEach((element) => addObjectToScene(element));
 const animate = () => {
     light.position.copy(camera.position);
     renderer.render(scene, camera);
+
+    const positions = rainGeo.attributes.position.array;
+    for (let i = 0; i < rainCount; i++) {
+        positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1; // Update y position
+
+        if (positions[i * 3 + 1] < 0) {
+            positions[i * 3 + 1] = 100; // Reset to top
+        }
+    }
+
+    rainGeo.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
 };
 
 renderer.setAnimationLoop(animate);
