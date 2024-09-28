@@ -3,6 +3,8 @@ import {Downloader} from "./Downloader.js";
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
 const jpegDownloadButton = document.getElementById("download-jpeg");
+const paletteWindow = document.getElementById("palette-window");
+
 
 const errorElement = document.getElementById("error-message");
 const confirmClearAllButton = document.getElementById("confirmClearAll");
@@ -802,18 +804,13 @@ const handleWindowClick = (event) => {
         return;
     }
 
-    // check if spot clicked is plant in the palette
-    const isWithinPlantItem = !!event.target.closest("[name='plant-item']");
-    // Todo where I think the error message is coming from when I click on a palette item
-    if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
+    // check if spot clicked in the palette
+    if (!paletteWindow.contains(event.target)) {
+        showErrorMessage(INVALID_LOCATION);
+    }
 
     // Todo: can no longer click on plants on grid. This was fine before adding the layers in Emma's
     // if not clicking the same palette item, deselect it
-    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
-        deselectPaletteItem();
-    }
-
-    // if clicking palette item, deselect it
     if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
         deselectPaletteItem();
     }
