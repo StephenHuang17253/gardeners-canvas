@@ -86,7 +86,6 @@ const createTile = (tileMaterial, size, hueShift, saturation, texture, normalTex
 const createTileGrid = (rows, cols, tileSize, tileMaterial, hueShift, saturation, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
-    const tileCenterpositions = [];
     const texture = loader.loadTexture(tileMap[tileMaterial][0]);
 
     let normalTexture = null;
@@ -99,7 +98,6 @@ const createTileGrid = (rows, cols, tileSize, tileMaterial, hueShift, saturation
             const tile = createTile(tileMaterial, tileSize, hueShift, saturation, texture, normalTexture);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
-            tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
     return grid;
