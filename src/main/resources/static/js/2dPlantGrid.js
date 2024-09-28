@@ -20,6 +20,8 @@ const tileTextureListInput = document.getElementById("tileTextureList");
 const plantItems = document.querySelectorAll("[name='plant-item']");
 const textureItems = document.querySelectorAll("[name='texture-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
+const decorationItems = document.querySelectorAll("[name='decoration-item']");
+
 
 const pagination = document.getElementById("pagination");
 const firstPage = document.getElementById("firstPage");
@@ -458,11 +460,9 @@ const deselectGridItem = () => {
     }
 };
 
-
 // Initialisation
 
 const link = document.createElement("a");
-
 downloader = new Downloader(link);
 
 // maps plant id to the original count
@@ -505,7 +505,6 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
     }
 }
 
-
 /**
  * Loads the persisted grid items (plants & decorations) from a saved layout onto the grid.
  */
@@ -516,7 +515,6 @@ gridItemLocations.forEach(item => {
     const itemType = item.getAttribute("data-grid-type");
     const itemName = item.getAttribute("data-grid-name");
     const category = item.getAttribute("data-grid-category");
-
     let imageSrc = item.getAttribute("data-grid-image");
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
@@ -581,6 +579,30 @@ plantItems.forEach((item, i) => {
     item.addEventListener("click", handlePlantItemClick);
 });
 
+decorationItems.forEach((item) => {
+    item.addEventListener('click', () => {
+        deselectPaletteItem();
+        deselectGridItem();
+
+        item.style.border = '3px solid blue';
+        selectedPaletteItem = item;
+
+        let decorationImage = item.getAttribute('data-decoration-image');
+
+        if (instance === 'test/' || instance === 'prod/') {
+            decorationImage = `/${instance}` + decorationImage;
+        }
+
+        selectedPaletteItemInfo = {
+            name: item.getAttribute('data-decoration-type'),
+            image: decorationImage,
+            id: item.getAttribute('data-decoration-id'),
+            type: "DECORATION",
+            count: 999,
+            category: 'Decoration'
+        };
+    });
+});
 
 /**
  * Initialise event listeners for clicking on textures
@@ -612,7 +634,6 @@ textureItems.forEach((item, i) => {
 
     item.addEventListener("click", handleTextureItemClick);
 });
-
 
 // Event Handlers
 
@@ -648,8 +669,6 @@ const handleStageClick = (event) => {
             createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name);
             return;
         }
-
-
     } else if (selectedGridItem) {
 
         if (validLocation(x, y)) {
@@ -657,12 +676,10 @@ const handleStageClick = (event) => {
                 x: x,
                 y: y
             });
-
         } else {
             showErrorMessage(INVALID_LOCATION);
             deselectGridItem();
         }
-
     }
     deselectPaletteItem();
 };
@@ -705,10 +722,8 @@ const handleDeleteButtonClick = () => {
         showErrorMessage(NO_PLANT_SELECTED);
         return;
     }
-
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
-
     const {i, j} = convertToGridCoordinates(gridX, gridY);
 
     let plantItem = null;
@@ -717,6 +732,11 @@ const handleDeleteButtonClick = () => {
             plantItem = item;
         }
     });
+    decorationItems.forEach(item => {
+        if (item.getAttribute("data-decoration-id") === selectedGridItem.attrs.id) {
+            plantItem = item;
+        }
+    })
 
     const updatedCount = parseInt(plantItem.getAttribute("data-plant-count")) + 1;
     plantItem.setAttribute("data-plant-count", updatedCount);

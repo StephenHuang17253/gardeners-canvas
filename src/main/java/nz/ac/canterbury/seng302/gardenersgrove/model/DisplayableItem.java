@@ -22,7 +22,9 @@ public class DisplayableItem {
 
     private final String categoryImage;
 
-    private static final String ROOT_PATH = "/images/2d-plant-categories/";
+    private static final String ROOT_PATH_PLANT = "/images/2d-plant-categories/";
+
+    private static final String ROOT_PATH_DECO = "/images/decoration-icons/";
 
     /**
      * create a new Displayable object
@@ -39,7 +41,12 @@ public class DisplayableItem {
         this.category = category;
         this.objectId = objectId;
         this.type = type;
-        this.categoryImage = ROOT_PATH + categoryImage;
+        if (this.type == GridItemType.DECORATION) {
+            this.categoryImage = ROOT_PATH_DECO + categoryImage;
+        } else {
+            this.categoryImage = ROOT_PATH_PLANT + categoryImage;
+        }
+
     }
 
     public int getXCoordinate() {
