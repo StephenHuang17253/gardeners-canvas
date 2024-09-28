@@ -224,7 +224,7 @@ class Garden2dControllerTest {
         List<Double> xCoordList = new ArrayList<>();
         List<Double> yCoordList = new ArrayList<>();
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
@@ -254,7 +254,7 @@ class Garden2dControllerTest {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -294,7 +294,7 @@ class Garden2dControllerTest {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -339,7 +339,7 @@ class Garden2dControllerTest {
         yCoordList.add(3.3);
         yCoordList.add(5.5);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -394,7 +394,7 @@ class Garden2dControllerTest {
         yCoordList.add(3.3);
         yCoordList.add(5.5);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -444,7 +444,7 @@ class Garden2dControllerTest {
         xCoordList.add(2.3);
         List<Double> yCoordList = new ArrayList<>();
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -476,7 +476,7 @@ class Garden2dControllerTest {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -500,7 +500,7 @@ class Garden2dControllerTest {
         List<Double> xCoordList = new ArrayList<>();
         List<Double> yCoordList = new ArrayList<>();
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/save").with(csrf())
@@ -529,7 +529,7 @@ class Garden2dControllerTest {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // adding initial grid item locations to repository
@@ -584,7 +584,7 @@ class Garden2dControllerTest {
         List<Double> yCoordList = new ArrayList<>();
         yCoordList.add(3.3);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // adding initial grid item locations to repository
@@ -645,7 +645,7 @@ class Garden2dControllerTest {
         yCoordList.add(3.3);
         yCoordList.add(5.5);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -690,7 +690,7 @@ class Garden2dControllerTest {
         yCoordList.add(3.3);
         yCoordList.add(5.5);
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // making call to endpoint
@@ -735,7 +735,7 @@ class Garden2dControllerTest {
         yCoordList.add(5.3);
 
         String[] grassArray = new String[numOfTiles];
-        Arrays.fill(grassArray, "GRASS");
+        Arrays.fill(grassArray, "Grass"); // use tileName, not ENUM constant
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         // adding initial grid item locations to repository
