@@ -29,7 +29,9 @@ const skyboxMap = {
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount, rainSystem;
-let rainColor = 0xabc7cb, rainSize = 0.20, isTransparentRain = false; //default rain settings
+let rainSize = 0.20;
+
+
 
 const container = document.getElementById("container");
 
@@ -54,6 +56,8 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Sunny";
 
+const RAIN_COLOR = 0x78b8c2
+
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
 // link used to download files
@@ -64,11 +68,10 @@ const gardenName = document.getElementById("gardenName").value;
 const currentHour = document.getElementById("currentHour").value;
 const currentWeather = document.getElementById("weather").value;
 
+const rainDropSizeInput = document.getElementById("rainDropSize");
 let time = currentHour;
 let weather = currentWeather;
 let isRaining = weather === "Rainy";
-
-console.log(weather);
 
 /**
  * Updates the time of day in the scene
@@ -91,10 +94,9 @@ const setWeather = (newWeather) => {
     setBackground(skyboxMap[weather]);
     // change clouds and rain to match the weather
     if (weather === "Rainy") {
-        isRaining = true;
         rainCount = 3000;
         startRain();
-    } else if (isRaining === true && weather !== "Rainy") { // If rain currently exists but is not raining
+    } else if (isRaining) { // If rain currently exists but is not raining
         isRaining = false;
         stopRain(); //Deletes rain in rainSystem (Rain on existing scene)
     }
@@ -129,13 +131,13 @@ const startRain = () => {
     rainGeo = new THREE.BufferGeometry();
     rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
     const rainMaterial = new THREE.PointsMaterial({
-        color: rainColor, // color of the raindrops
+        color: RAIN_COLOR, // color of the raindrops
         size: rainSize, // size of the raindrops
-        transparent: isTransparentRain, // if raindrops are transparent
     });
 
     rainSystem = new THREE.Points(rainGeo, rainMaterial);
     scene.add(rainSystem);
+    isRaining = true;
 };
 
 const stopRain = () => {
@@ -335,6 +337,12 @@ const onTrackWeatherInputChange = () => {
     setWeather(newWeather);
 };
 
+const onRainDropSizeInputChange = () => {
+    rainSize = +rainDropSizeInput.value;
+    stopRain();
+    startRain();
+};
+
 console.log(scene.children);
 
 window.addEventListener("resize", onWindowResize);
@@ -345,3 +353,7 @@ downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
 downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
+
+if (rainDropSizeInput){
+    rainDropSizeInput.addEventListener("change", onRainDropSizeInputChange);
+}
