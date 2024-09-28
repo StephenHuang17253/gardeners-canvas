@@ -628,6 +628,9 @@ const handleStageClick = (event) => {
     if (selectedPaletteItem) {
         // Todo do not show error message when clicking on a texture on the palette window
         if (!validLocation(x, y)) {
+            if (selectedPaletteItemInfo.type === "TEXTURE") {
+                deselectPaletteItem();
+            }
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -797,6 +800,11 @@ const handleWindowClick = (event) => {
 
     // Todo: can no longer click on plants on grid. This was fine before adding the layers in Emma's
     // if not clicking the same palette item, deselect it
+    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
+        deselectPaletteItem();
+    }
+
+    // if clicking palette item, deselect it
     if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
         deselectPaletteItem();
     }
