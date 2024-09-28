@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
-import nz.ac.canterbury.seng302.gardenersgrove.model.Decoration2DModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
-import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
@@ -141,7 +138,10 @@ public class Garden2DController {
             }
         }
 
-        List<GardenTile> tiles = gardenTileService.getGardenTilesByGarden(garden);
+        List<Tile2DModel> tiles = gardenTileService.getGardenTilesByGarden(garden).stream()
+                .sorted(Comparator.comparing(GardenTile::getTileId))
+                .map(Tile2DModel::new)
+                .toList();
 
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));

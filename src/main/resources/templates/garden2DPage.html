@@ -158,7 +158,7 @@
             <div name="grid-tile"
                  th:data-tile-x="${tile.getXCoordinate()}"
                  th:data-tile-y="${tile.getYCoordinate()}"
-                 th:data-tile-image="${tile.tileTexture.getImgFile() == null ? '/images/2d-tile-textures' : '/images/2d-tile-textures/' + tile.tileTexture.getImgFile() }"
+                 th:data-tile-image="${tile.getTileImage()}"
                  th:data-tile-texture="${tile.getTileTexture().toString()}">
             </div>
         </div>
