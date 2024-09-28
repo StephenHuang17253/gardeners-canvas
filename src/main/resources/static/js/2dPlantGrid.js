@@ -54,6 +54,8 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
+const TEXTURE_TYPE = "TEXTURE"
+
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts,
     textureLayer, gardenItemLayer,
     tooltipLayer, prevSelectPosition;
@@ -295,7 +297,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
 
         plantOrDecoration.on("click", () => {
             if (selectedPaletteItem) {
-                if (selectedPaletteItemInfo.type === "TEXTURE") {
+                if (selectedPaletteItemInfo.type === TEXTURE_TYPE) {
                     return;
                 } else {
                     showErrorMessage(OCCUPIED_DESTINATION);
@@ -607,7 +609,7 @@ decorationItems.forEach((item) => {
 /**
  * Initialise event listeners for clicking on textures
  */
-textureItems.forEach((item, i) => {
+textureItems.forEach((item) => {
 
     const textureName = item.getAttribute("data-texture-name");
     let textureImage = item.getAttribute("data-texture-image")
@@ -628,7 +630,7 @@ textureItems.forEach((item, i) => {
         selectedPaletteItemInfo = {
             name: textureName,
             image: textureImage,
-            type: "TEXTURE",
+            type: TEXTURE_TYPE,
         };
     };
 
@@ -651,13 +653,13 @@ const handleStageClick = (event) => {
 
     if (selectedPaletteItem) {
         if (!validLocation(x, y)) {
-            if (selectedPaletteItemInfo.type === "TEXTURE") {
+            if (selectedPaletteItemInfo.type === TEXTURE_TYPE) {
                 deselectPaletteItem();
             }
             showErrorMessage(INVALID_LOCATION);
             return;
         }
-        if (selectedPaletteItemInfo.type !== "TEXTURE") {
+        if (selectedPaletteItemInfo.type !== TEXTURE_TYPE) {
             createPlantOrDecoration(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.id, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, selectedPaletteItemInfo.category)
             selectedPaletteItemInfo.count -= 1
 
@@ -820,7 +822,7 @@ const handleWindowClick = (event) => {
     }
 
     // if not clicking the same palette item, deselect it
-    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
+    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== TEXTURE_TYPE) {
         deselectPaletteItem();
     }
 };
