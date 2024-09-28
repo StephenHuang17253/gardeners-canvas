@@ -447,14 +447,10 @@ const deselectPaletteItem = () => {
     }
 };
 
-let deselctou = 0;
 /**
  * Deselects the highlighted grid item
  */
 const deselectGridItem = () => {
-    console.log("called this")
-    console.log(deselctou)
-    deselctou += 1;
     if (selectedGridItem) {
         selectedGridItem.stroke(null);
         selectedGridItem.strokeWidth(0);
@@ -627,13 +623,6 @@ textureItems.forEach((item, i) => {
  */
 const handleStageClick = (event) => {
 
-    console.log("Target: " + event.target === stage)
-    console.log("Name: " + event.target.name() === "grid-cell")
-    // if (!(event.target.name() === "grid-cell")) return;
-
-    console.log("TESTING")
-
-
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
@@ -662,8 +651,6 @@ const handleStageClick = (event) => {
 
 
     } else if (selectedGridItem) {
-
-        console.log("OOOPPSSS");
 
         if (validLocation(x, y)) {
             selectedGridItem.position({
@@ -812,7 +799,6 @@ const handleWindowClick = (event) => {
         showErrorMessage(INVALID_LOCATION);
     }
 
-    // Todo: can no longer click on plants on grid. This was fine before adding the layers in Emma's
     // if not clicking the same palette item, deselect it
     if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
         deselectPaletteItem();
