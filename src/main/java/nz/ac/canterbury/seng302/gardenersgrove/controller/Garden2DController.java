@@ -97,8 +97,6 @@ public class Garden2DController {
                 .map(Plant2DModel::new)
                 .toList();
 
-        List<Decoration> checkDecorations = decorationService.getDecorationsByGarden(garden);
-
         List<Decoration2DModel> decorations = decorationService.getDecorationsByGarden(garden).stream()
                 .sorted(Comparator.comparing(Decoration::getDecorationCategory))
                 .map(Decoration2DModel::new)

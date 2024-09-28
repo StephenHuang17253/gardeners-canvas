@@ -8,10 +8,12 @@ import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationReposi
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.PlantCategory;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +70,9 @@ class Garden2dControllerTest {
 
     @Autowired
     private DecorationService decorationService;
+
+    @Autowired
+    private GardenTileService gardenTileService;
 
     private List<Garden> gardenList = new ArrayList<>();
     private List<Plant> plantList = new ArrayList<>();
@@ -164,6 +169,8 @@ class Garden2dControllerTest {
         Assertions.assertNotNull(gardenDetailModel);
         List<Plant> plants = (List<Plant>) modelMap.getAttribute("plants");
         Assertions.assertNotNull(plants);
+        List<GardenTile> tiles = (List<GardenTile>) modelMap.getAttribute("tiles");
+        Assertions.assertNotNull(tiles);
 
         Assertions.assertEquals(garden.getGardenName(), gardenDetailModel.getGardenName());
         Assertions.assertEquals(garden.getGardenLocation(), gardenDetailModel.getGardenLocation());
