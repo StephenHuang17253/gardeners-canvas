@@ -75,6 +75,7 @@ let weather = currentWeather;
  */
 const setTime = (newTime) => {
     time = newTime;
+    changeSkybox(weather, time)
     // Update the time of day in the scene
     // Set moon or sun to the correct position
 };
@@ -86,7 +87,11 @@ const setTime = (newTime) => {
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
-    setBackground(skyboxMap[weather]);
+    if (weather === DEFAULT_WEATHER) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        changeSkybox(weather, time);
+    }
     // change clouds and rain to match the weather
 }
 
@@ -141,8 +146,7 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
-    console.log(currentHour)
-    changeSkybox();
+    changeSkybox(weather, time);
 };
 
 /**
@@ -168,10 +172,11 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
 /**
  * Changes the skybox based on time of the day
  */
-const changeSkybox = () => {
-    if (currentHour > 6 && currentHour < 18) {
+const changeSkybox = (weather, time) => {
+    if (time > 6 && time < 18) {
         setBackground(skyboxMap[weather]);
     } else {
+        setBackground("nightbox.exr")
         //set night backgrounds here
     }
 }
