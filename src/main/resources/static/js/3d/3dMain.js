@@ -60,8 +60,14 @@ const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
-const currentHour = document.getElementById("currentHour").value;
-const currentWeather = document.getElementById("weather").value;
+
+const currentHourInput = document.getElementById("currentHour");
+const currentWeatherInput = document.getElementById("weather");
+
+// Get the current time and weather from the input fields if they exist or use the default values
+// For if the garden does not have a location set
+const currentHour = currentHourInput ? currentHourInput.value : DEFAULT_TIME;
+const currentWeather = currentWeatherInput ? currentWeatherInput.value : DEFAULT_WEATHER;
 
 let time = currentHour;
 let weather = currentWeather;
