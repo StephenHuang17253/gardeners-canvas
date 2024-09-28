@@ -28,9 +28,7 @@ const skyboxMap = {
     "Rainy": "cloudy_skybox.exr",
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount;
-let rainSystem;
-
+let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount, rainSystem;
 const container = document.getElementById("container");
 
 const downloadGLTFButton = document.getElementById("download-gltf");
@@ -94,9 +92,9 @@ const setWeather = (newWeather) => {
         isRaining = true;
         rainCount = 3000;
         startRain();
-    } else if (isRaining === true && weather !== "Rainy") {
+    } else if (isRaining === true && weather !== "Rainy") { // If rain currently exists but is not raining
         isRaining = false;
-        stopRain();
+        stopRain(); //Deletes rain in rainSystem (Rain on existing scene)
     }
 }
 
