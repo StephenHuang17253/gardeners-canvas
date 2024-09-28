@@ -29,6 +29,7 @@ const skyboxMap = {
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount;
+let rainSystem;
 
 const container = document.getElementById("container");
 
@@ -93,6 +94,9 @@ const setWeather = (newWeather) => {
         isRaining = true;
         rainCount = 3000;
         startRain();
+    } else if (isRaining === true && weather !== "Rainy") {
+        isRaining = false;
+        stopRain();
     }
 }
 
@@ -112,7 +116,6 @@ const setBackground = (filename) => {
 }
 
 const startRain = () => {
-
     const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop
 
     for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
@@ -126,14 +129,23 @@ const startRain = () => {
     rainGeo = new THREE.BufferGeometry();
     rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
     const rainMaterial = new THREE.PointsMaterial({
-        color: 0xaaaaaa, // color of the raindrops
+        color: 0xabc7cb, // color of the raindrops
         size: 0.20, // size of the raindrops
         transparent: false, // if raindrops are transparent
     });
 
-    const rain = new THREE.Points(rainGeo, rainMaterial);
-    scene.add(rain);
+    rainSystem = new THREE.Points(rainGeo, rainMaterial);
+    scene.add(rainSystem);
+};
 
+const stopRain = () => {
+    if (rainSystem) {
+        scene.remove(rainSystem);
+        rainSystem.geometry.dispose();
+        rainSystem.material.dispose();
+        rainSystem = null;
+    }
+    isRaining = false;
 };
 
 /**
@@ -256,16 +268,16 @@ const animate = () => {
     light.position.copy(camera.position);
     renderer.render(scene, camera);
 
-    if (isRaining === true) {
-        const positions = rainGeo.attributes.position.array;
+    if (isRaining && rainSystem) {
+        const positions = rainSystem.geometry.attributes.position.array;
         for (let i = 0; i < rainCount; i++) {
-            positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1; // Update y position
+            positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1;  // Update y position
 
             if (positions[i * 3 + 1] < 0) {
                 positions[i * 3 + 1] = 75; // If below tiles (y=0) Reset to top y postion
             }
         }
-        rainGeo.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
+        rainSystem.geometry.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
     }
 };
 
