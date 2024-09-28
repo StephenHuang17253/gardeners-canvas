@@ -111,6 +111,21 @@ const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
 }
 
 /**
+ * Removes previous texture on grid box
+ * @param x x-coordinate in grid coordinate form
+ * @param y y-coordinate in grid coordinate form
+ */
+const destroyExistingTexture = (x, y) => {
+    const nodes = textureLayer.find("Image").values();
+    for (let node of nodes) {
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        if ((i === x && j === y)) {
+            node.destroy();
+        }
+    }
+}
+
+/**
  * Creates a tooltip object for displaying plant names and categories
  * @returns {Object} - The tooltip object, and a function to set the text of the tooltip
  */
@@ -577,15 +592,8 @@ textureItems.forEach((item, i) => {
      * Handles the clicking of a plant item in the palette
      */
     const handleTextureItemClick = () => {
-        let nodes = textureLayer.find("Image");
-
         deselectPaletteItem();
         deselectGridItem();
-
-        // if (nodes.length >= GRID_COLUMNS * GRID_ROWS) {
-        //     showErrorMessage(FULL_GRID);
-        //     return;
-        // }
 
         item.style.border = "3px solid blue";
         selectedPaletteItem = item;
@@ -641,6 +649,8 @@ const handleStageClick = (event) => {
             selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
             updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
         } else {
+            const {i: newGridX, j: newGridY} = convertToGridCoordinates(x, y);
+            destroyExistingTexture(newGridX, newGridY);
             createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name);
             return;
         }
@@ -749,7 +759,6 @@ const handleGardenFormSubmit = (event) => {
         yCoordList.push(j);
     });
 
-    // TODO textures are being stacked
     textureLayer.find("Image").forEach(node => {
         // Todo the first tile placed is not being registered when running through all
         console.log(node.attrs.name);
