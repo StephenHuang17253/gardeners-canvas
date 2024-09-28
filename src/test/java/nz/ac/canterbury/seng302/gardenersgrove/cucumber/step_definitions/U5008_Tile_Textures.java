@@ -1,21 +1,16 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.minidev.json.JSONArray;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden2DController;
-import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden3DController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.model.PlantSearchModel;
 import nz.ac.canterbury.seng302.gardenersgrove.model.Tile2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.Assert;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -94,7 +88,6 @@ public class U5008_Tile_Textures {
 
     private Map<String, Object> model;
 
-
     @Before
     public void beforeOrAfterAll() {
         gardenService = new GardenService(gardenRepository, userService);
@@ -118,10 +111,11 @@ public class U5008_Tile_Textures {
     }
 
     @When("I select a texture {string} and place it at {int}, {int} and click save")
-    public void i_select_a_texture_and_place_it_at_and_click_save(String newTextureName, Integer x, Integer y) throws Exception {
+    public void i_select_a_texture_and_place_it_at_and_click_save(String newTextureName, Integer x, Integer y)
+            throws Exception {
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get("/2D-garden/{gardenId}", garden.getGardenId()))
+                MockMvcRequestBuilders
+                        .get("/2D-garden/{gardenId}", garden.getGardenId()))
                 .andExpect(status().isOk()).andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -136,31 +130,32 @@ public class U5008_Tile_Textures {
         Arrays.fill(tiles, null);
         List<String> tilesList = Arrays.asList(tiles);
 
-        for (Tile2DModel tileModel: tileModels) {
+        for (Tile2DModel tileModel : tileModels) {
             String thisTileTextureName = tileModel.getTileTexture();
             if (tileModel.getXCoordinate() == x && tileModel.getYCoordinate() == y) {
                 thisTileTextureName = newTextureName;
             }
 
-            tilesList.set(tileModel.getYCoordinate()*7 + tileModel.getXCoordinate(), thisTileTextureName);
+            tilesList.set(tileModel.getYCoordinate() * 7 + tileModel.getXCoordinate(), thisTileTextureName);
         }
 
         List<Integer> emptyList = new ArrayList<>();
 
         mockMVC.perform(MockMvcRequestBuilders.post("/2D-garden/{gardenId}/save", garden.getGardenId())
-                        .with(csrf())
-                        .param("idList", JSONArray.toJSONString(emptyList))
-                        .param("typeList", JSONArray.toJSONString(emptyList))
-                        .param("xCoordList", JSONArray.toJSONString(emptyList))
-                        .param("yCoordList", JSONArray.toJSONString(emptyList))
-                        .param("tileTextureList", JSONArray.toJSONString(tilesList)))
+                .with(csrf())
+                .param("idList", JSONArray.toJSONString(emptyList))
+                .param("typeList", JSONArray.toJSONString(emptyList))
+                .param("xCoordList", JSONArray.toJSONString(emptyList))
+                .param("yCoordList", JSONArray.toJSONString(emptyList))
+                .param("tileTextureList", JSONArray.toJSONString(tilesList)))
                 .andExpect(status().is3xxRedirection());
     }
+
     @Then("my new texture {string}, is persisted at {int}, {int}")
     public void my_new_texture_is_persisted_at(String newTextureName, Integer x, Integer y) throws Exception {
         mvcResult = mockMVC.perform(
-                        MockMvcRequestBuilders
-                                .get("/2D-garden/{gardenId}", garden.getGardenId()))
+                MockMvcRequestBuilders
+                        .get("/2D-garden/{gardenId}", garden.getGardenId()))
                 .andExpect(status().isOk()).andReturn();
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
@@ -173,7 +168,7 @@ public class U5008_Tile_Textures {
 
         Tile2DModel tileModelAtXY = null;
 
-        for (Tile2DModel tileModel: tileModels) {
+        for (Tile2DModel tileModel : tileModels) {
             if (tileModel.getXCoordinate() == x && tileModel.getYCoordinate() == y) {
                 tileModelAtXY = tileModel;
             }
