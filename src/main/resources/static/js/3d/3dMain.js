@@ -29,6 +29,8 @@ const skyboxMap = {
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount, rainSystem;
+let rainColor = 0xabc7cb, rainSize = 0.20, isTransparentRain = false; //default rain settings
+
 const container = document.getElementById("container");
 
 const downloadGLTFButton = document.getElementById("download-gltf");
@@ -114,7 +116,7 @@ const setBackground = (filename) => {
 }
 
 const startRain = () => {
-    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop
+    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop. x,y,z
 
     for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
         rainPositions.set([
@@ -127,9 +129,9 @@ const startRain = () => {
     rainGeo = new THREE.BufferGeometry();
     rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
     const rainMaterial = new THREE.PointsMaterial({
-        color: 0xabc7cb, // color of the raindrops
-        size: 0.20, // size of the raindrops
-        transparent: false, // if raindrops are transparent
+        color: rainColor, // color of the raindrops
+        size: rainSize, // size of the raindrops
+        transparent: isTransparentRain, // if raindrops are transparent
     });
 
     rainSystem = new THREE.Points(rainGeo, rainMaterial);
