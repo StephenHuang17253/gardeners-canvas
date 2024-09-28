@@ -447,10 +447,14 @@ const deselectPaletteItem = () => {
     }
 };
 
+let deselctou = 0;
 /**
  * Deselects the highlighted grid item
  */
 const deselectGridItem = () => {
+    console.log("called this")
+    console.log(deselctou)
+    deselctou += 1;
     if (selectedGridItem) {
         selectedGridItem.stroke(null);
         selectedGridItem.strokeWidth(0);
@@ -636,7 +640,6 @@ const handleStageClick = (event) => {
     const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
-        // Todo do not show error message when clicking on a texture on the palette window
         if (!validLocation(x, y)) {
             if (selectedPaletteItemInfo.type === "TEXTURE") {
                 deselectPaletteItem();
@@ -660,20 +663,20 @@ const handleStageClick = (event) => {
 
     } else if (selectedGridItem) {
 
-        console.log("OOOPPSSS")
+        console.log("OOOPPSSS");
 
         if (validLocation(x, y)) {
             selectedGridItem.position({
                 x: x,
                 y: y
             });
+
         } else {
             showErrorMessage(INVALID_LOCATION);
+            deselectGridItem();
         }
 
-        deselectGridItem();
     }
-
     deselectPaletteItem();
 };
 
