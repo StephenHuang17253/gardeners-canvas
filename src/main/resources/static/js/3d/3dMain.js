@@ -23,10 +23,12 @@ const modelMap = {
 };
 
 const skyboxMap = {
-    "Sunny": "sunny_skybox.exr",
-    "Overcast": "cloudy_skybox.exr",
-    "Rainy": "cloudy_skybox.exr",
+    "Sunny": "sunny-day.exr",
+    "Overcast": "cloudy-day.exr",
+    "Rainy": "cloudy-day.exr",
+    "Default": "default.exr"
 };
+
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader;
 
@@ -51,7 +53,7 @@ const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 const DEFAULT_TIME = 12;
-const DEFAULT_WEATHER = "Sunny";
+const DEFAULT_WEATHER = "Default";
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -66,34 +68,37 @@ const currentWeather = document.getElementById("weather").value;
 let time = currentHour;
 let weather = currentWeather;
 
-console.log(weather);
-
 /**
  * Updates the time of day in the scene
- * 
- * @param {number} newTime 
+ *
+ * @param {number} newTime
  */
 const setTime = (newTime) => {
     time = newTime;
+    changeSkybox(weather, time)
     // Update the time of day in the scene
-    // Set moon or sun to the correct position 
+    // Set moon or sun to the correct position
 };
 
 /**
  * Updates the weather in the scene
- * 
- * @param {String} newWeather 
+ *
+ * @param {String} newWeather
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
-    setBackground(skyboxMap[weather]);
+    if (weather === DEFAULT_WEATHER) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        changeSkybox(weather, time);
+    }
     // change clouds and rain to match the weather
 }
 
 /**
  * Sets the background of the scene
- * 
- * @param {string} filename 
+ *
+ * @param {string} filename
  */
 const setBackground = (filename) => {
     loader.loadBackground(
@@ -141,6 +146,7 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
+    changeSkybox(weather, time);
 };
 
 /**
@@ -163,11 +169,21 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     scene.add(model);
 };
 
+/**
+ * Changes the skybox based on time of the day
+ */
+const changeSkybox = (weather, time) => {
+    if (time > 6 && time < 18) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        setBackground("nightbox.exr")
+        //set night backgrounds here
+    }
+}
+
 init();
 
 addLight();
-
-setBackground(skyboxMap[weather]);
 
 const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
 // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
@@ -258,9 +274,9 @@ const onMouseOut = () => {
     document.body.style.userSelect = "auto";
 };
 
-/** 
-* On track time input change, 
-* update the time variable to the current hour if the input is checked, 
+/**
+* On track time input change,
+* update the time variable to the current hour if the input is checked,
 * otherwise set it to the default time
 */
 const onTrackTimeInputChange = () => {
