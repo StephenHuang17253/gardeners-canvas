@@ -21,6 +21,7 @@ const plantItems = document.querySelectorAll("[name='plant-item']");
 const textureItems = document.querySelectorAll("[name='texture-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
 const decorationItems = document.querySelectorAll("[name='decoration-item']");
+const tileItems = document.querySelectorAll("[name='grid-tile']");
 
 
 const pagination = document.getElementById("pagination");
@@ -511,8 +512,8 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
  * Loads the persisted grid items (plants & decorations) from a saved layout onto the grid.
  */
 gridItemLocations.forEach(item => {
-    const x_coord = parseInt(item.getAttribute("data-grid-x"));
-    const y_coord = parseInt(item.getAttribute("data-grid-y"));
+    const xCoord = parseInt(item.getAttribute("data-grid-x"));
+    const yCoord = parseInt(item.getAttribute("data-grid-y"));
     const objectId = item.getAttribute("data-grid-objectid");
     const itemType = item.getAttribute("data-grid-type");
     const itemName = item.getAttribute("data-grid-name");
@@ -521,11 +522,14 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(xCoord, yCoord);
 
     const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
 });
+
+
+
 
 /**
  * Initialise plant counts and event listeners for clicking on plant items
@@ -635,6 +639,22 @@ textureItems.forEach((item) => {
     };
 
     item.addEventListener("click", handleTextureItemClick);
+});
+
+tileItems.forEach(item => {
+    const tileX = item.getAttribute("data-tile-x");
+    const tileY = item.getAttribute("data-tile-y");
+    const tileTexture = item.getAttribute("data-tile-texture");
+    const tileTextureImage = item.getAttribute("data-tile-image");
+
+    let imageSrc = tileTextureImage;
+    if (instance !== "") {
+        imageSrc = `/${instance}` + imageSrc;
+    }
+
+    const {x, y} = convertToKonvaCoordinates(tileX, tileY);
+
+    createTextureOnGrid(imageSrc, x, y, "TEXTURE", tileTexture);
 });
 
 // Event Handlers
