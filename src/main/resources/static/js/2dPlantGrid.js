@@ -773,13 +773,16 @@ const handleGardenFormSubmit = (event) => {
         yCoordList.push(j);
     });
 
+    // assuming this is a list of length GRID_ROWS x GRID_COLUMNS of texture values e.g. GRASS
+    const tileTextures = Array(GRID_ROWS * GRID_COLUMNS).fill(null);
+
     textureLayer.find("Image").forEach(node => {
-        // Todo the first tile placed is not being registered when running through all
-        console.log(node.attrs.name);
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
+        tileTextures[j * GRID_ROWS + i] = node.attrs.name;
     });
 
-    // assuming this is a list of length GRID_ROWS x GRID_COLUMNS of texture values e.g. GRASS
-    const tileTextures = Array(GRID_ROWS * GRID_COLUMNS).fill("GRASS");
+    console.log(tileTextures);
+
 
     idListInput.value = JSON.stringify(idList);
     typeListInput.value = JSON.stringify(typeList);
