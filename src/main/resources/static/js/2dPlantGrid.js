@@ -50,7 +50,8 @@ const gardenName = document.getElementById("gardenName").value;
 const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
-let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts, textureLayer, gardenItemLayer,
+let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts,
+    textureLayer, gardenItemLayer,
     tooltipLayer, prevSelectPosition;
 let uniqueGridItemIDNo = Array.from(Array(GRID_COLUMNS * GRID_ROWS).keys());
 let preventUnload = false;
@@ -638,6 +639,7 @@ const handleStageClick = (event) => {
             updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
         } else {
             createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name);
+            return;
         }
 
 
@@ -793,8 +795,9 @@ const handleWindowClick = (event) => {
     // Todo where I think the error message is coming from when I click on a palette item
     if (!isWithinPlantItem) showErrorMessage(INVALID_LOCATION);
 
+    // Todo: can no longer click on plants on grid. This was fine before adding the layers in Emma's
     // if not clicking the same palette item, deselect it
-    if (!selectedPaletteItem.contains(event.target)) {
+    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== "TEXTURE") {
         deselectPaletteItem();
     }
 };
