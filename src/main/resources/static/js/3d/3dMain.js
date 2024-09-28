@@ -189,7 +189,7 @@ addLight();
 
 setBackground(skyboxMap[weather]);
 
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", loader);
+const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
 
 scene.add(grid);
 
