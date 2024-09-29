@@ -178,7 +178,7 @@ const changeSkybox = (weather, time) => {
     // if (time > 6 && time < 18) {
     //     setBackground(skyboxMap[weather]);
     // } else {
-        setBackground("starmap_2020_4k.exr")
+    setBackground("new.exr")
     //     console.log(time)
     //     //set night backgrounds here
     // }
@@ -188,7 +188,7 @@ init();
 
 addLight();
 
-setBackground(skyboxMap[weather]);
+// setBackground(skyboxMap[weather]);
 
 const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
 
