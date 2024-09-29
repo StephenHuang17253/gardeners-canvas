@@ -4,6 +4,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden2DController;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
@@ -43,6 +44,9 @@ public class U5002_2D_Garden_Edit {
     public PlantRepository plantRepository;
 
     @Autowired
+    public DecorationRepository decorationRepository;
+
+    @Autowired
     public HomePageLayoutRepository homePageLayoutRepository;
 
     @Autowired
@@ -58,12 +62,23 @@ public class U5002_2D_Garden_Edit {
     public PlantService plantService;
 
     @Autowired
+    public DecorationService decorationService;
+
+    @Autowired
     public FileService fileService;
 
     @Autowired
     public GridItemLocationService gridItemLocationService;
+
     @Autowired
     public GridItemLocationRepository gridItemLocationRepository;
+
+    @Autowired
+    public GardenTileRepository gardenTileRepository;
+
+    @Autowired
+    public GardenTileService gardenTileService;
+
     private Map<String, Object> model;
 
     @Before
@@ -73,9 +88,11 @@ public class U5002_2D_Garden_Edit {
         gridItemLocationService = new GridItemLocationService(gridItemLocationRepository);
         fileService = new FileService();
         plantService = new PlantService(plantRepository, gardenService, fileService);
+        decorationService = new DecorationService(decorationRepository);
+        gardenTileService = new GardenTileService(gardenTileRepository);
 
         Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
-                gridItemLocationService, plantService);
+                gridItemLocationService, plantService, decorationService, gardenTileService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
 

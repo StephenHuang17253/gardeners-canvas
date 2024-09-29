@@ -1,12 +1,21 @@
 import * as THREE from 'three';
 
+const tileMap = {
+    "Grass": ["grass-tileable.jpg", 0.2, 1.56],
+    "StonePath": ["stone-tileable.jpg", 0, 1],
+    "PebblePath": ["pebbles-tileable.jpg", 0, 1],
+    "Concrete": ["concrete-tileable.jpg", 0, 1],
+    "Soil": ["soil-tileable.jpg", 0.055, 1.06],
+    "Bark": ["bark-tileable.jpg", 0, 1]
+};
 /**
  * Custom vertex shader for the tile material
  */
 const vertexShader = `
     varying vec2 vUv;
+    uniform vec2 uUvScale;
     void main() {
-        vUv = uv;
+        vUv = uv * uUvScale;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
 `;
@@ -62,14 +71,16 @@ const fragmentShader = `
  * @param {THREE.Texture} texture - The texture to be applied to the material.
  * @param {number} hueShift - The amount to adjust the hue.
  * @param {number} saturation - The amount to adjust the saturation.
+ * @param uvScale
  * @returns {THREE.ShaderMaterial} The created tile material.
  */
-const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMaterial({
+const createTileMaterial = (texture, hueShift, saturation, uvScale) => new THREE.ShaderMaterial({
     uniforms: {
         uTexture: { value: texture },
         uHue: { value: hueShift },
         uSaturation: { value: saturation },
-        uBaseColor: { value: new THREE.Color(0xffffff) }
+        uBaseColor: { value: new THREE.Color(0xffffff) },
+        uUvScale: { value: uvScale },
     },
     vertexShader: vertexShader,
     fragmentShader: fragmentShader
@@ -78,15 +89,28 @@ const createTileMaterial = (texture, hueShift, saturation) => new THREE.ShaderMa
 /**
  * Creates a tile mesh with the given texture, size, hue shift, and saturation.
  *
- * @param {string} texture - The texture of the tile.
+ * @param {string} tileMaterial - The tile material string
  * @param {number} size - The size of the tile.
  * @param {number} hueShift - The hue shift value.
  * @param {number} saturation - The saturation value.
+ * @param {THREE.Texture} texture - diffuse texture
+ * @param {THREE.Texture} normalTexture - normal texture
  * @returns {THREE.Mesh} The created tile mesh.
  */
-const createTile = (texture, size, hueShift, saturation) => {
+const createTile = (tileMaterial, size, texture) => {
+
+    const hueShift = tileMap[tileMaterial][1];
+    const saturation = tileMap[tileMaterial][2];
     const geometry = new THREE.PlaneGeometry(size, size);
-    const material = createTileMaterial(texture, hueShift, saturation);
+    let uvScale;
+    if (tileMaterial === "Bark") {
+        uvScale = new THREE.Vector2(0.25, 0.25);
+    } else if (tileMaterial === "PebblePath") {
+        uvScale = new THREE.Vector2(0.85, 0.85);
+    } else {
+        uvScale = new THREE.Vector2(1, 1);
+    }
+    const material = createTileMaterial(texture, hueShift, saturation, uvScale);
     const tile = new THREE.Mesh(geometry, material);
     tile.rotation.x = -Math.PI / 2; // Rotate to horizontal
     return tile;
@@ -94,28 +118,31 @@ const createTile = (texture, size, hueShift, saturation) => {
 
 /**
  * Creates a tile grid.
- * 
+ *
  * @param {number} rows - The number of rows in the grid.
  * @param {number} cols - The number of columns in the grid.
  * @param {number} tileSize - The size of each tile in the grid.
- * @param {THREE.Texture} texture - The texture to be applied to each tile.
+ * @param {string} tileMaterial - The material to be used for the tile
  * @param {number} hueShift - The hue shift value for the tiles.
  * @param {number} saturation - The saturation value for the tiles.
- * @returns {{THREE.Group, Array<THREE.Vector3>}} - Object with the grid to add to scene and an array of tile center positions.
+ * @param {Loader} loader - reference to loader instance
+ * @returns {THREE.Group} - Object with the grid to add to scene and an array of tile center positions.
  */
-const createTileGrid = (rows, cols, tileSize, texture, hueShift, saturation) => {
+const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
     const tileCenterpositions = [];
+    const texture = loader.loadTexture(tileMap[tileMaterial][0]);
+
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-            const tile = createTile(texture, tileSize, hueShift, saturation);
+            const tile = createTile(tileMaterial, tileSize, texture);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
-    return { grid, tileCenterpositions };
+    return grid;
 };
 
 export { createTileGrid };

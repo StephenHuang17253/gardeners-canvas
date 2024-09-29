@@ -22,6 +22,7 @@ public class WeatherResponseData {
     private JsonNode jsonDailyPrecipitationSum;
     private JsonNode jsonDates;
     private List<DailyWeather> retrievedWeatherData;
+    private String timezone;
 
     /**
      * Constructor for the weather reponse data class
@@ -33,6 +34,7 @@ public class WeatherResponseData {
     public WeatherResponseData(JsonNode jsonWeatherData) {
         current = jsonWeatherData.get("current");
         daily = jsonWeatherData.get("daily");
+        timezone = jsonWeatherData.get("timezone").asText();
         setDailyWeather();
         convertToWeatherObjects();
         improveCurrentWeatherForecast();
@@ -40,6 +42,10 @@ public class WeatherResponseData {
 
     public List<DailyWeather> getRetrievedWeatherData() {
         return retrievedWeatherData;
+    }
+
+    public String getTimeZone() {
+        return timezone;
     }
 
     /**
