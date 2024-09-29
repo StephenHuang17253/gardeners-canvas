@@ -30,7 +30,7 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     And I previously added a tag "Bad Language 2"
     And My Tag "Bad Language 2" contained profanity
     When I enter a valid tag "Bad Language 2"
-    Then The following error message is displayed "This tag does not meet the language standards for Gardener's Grove. A warning strike has been added to your account"
+    Then The following error message is displayed "This tag does not meet the language standards for Gardener's Canvas. A warning strike has been added to your account"
     And The tag is not added to the garden
     And The tag "Bad Language 2" is not shown in future autocomplete suggestions
 
@@ -50,6 +50,6 @@ Feature: U22 (Tag moderation) : As Kaia, I want to make sure that tags added to 
     And My Tag "Profane Tag" contained profanity
     And I as user "dom@email.com" currently have 0 strikes
     When I enter a valid tag "Profane Tag"
-    Then The following error message is displayed "This tag does not meet the language standards for Gardener's Grove. A warning strike has been added to your account"
+    Then The following error message is displayed "This tag does not meet the language standards for Gardener's Canvas. A warning strike has been added to your account"
     And The tag is not added to the garden
     And I "dom@email.com" get a strike

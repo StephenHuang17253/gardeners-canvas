@@ -1,8 +1,8 @@
-# SENG302 The Gardener's Grove
+# SENG302 The Gardener's Canvas
 
 Basic project using ```Gradle```, ```Spring Boot```, ```Thymeleaf```, and ```GitLab CI```.
 
-Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruits and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discussing various gardening topics.
+Gardener's Canvas is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruits and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discussing various gardening topics.
 
 #### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
 

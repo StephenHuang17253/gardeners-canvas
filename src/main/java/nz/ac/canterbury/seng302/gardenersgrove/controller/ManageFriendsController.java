@@ -242,7 +242,7 @@ public class ManageFriendsController {
             model.addAttribute("searchResults", friendModels);
         }
         if (friendModels == null || friendModels.isEmpty()) {
-            model.addAttribute("searchErrorText", "There is nobody with that name or email in Gardener's Grove");
+            model.addAttribute("searchErrorText", "There is nobody with that name or email in Gardener's Canvas");
             model.addAttribute("userSearch", searchInput);
 
         }
