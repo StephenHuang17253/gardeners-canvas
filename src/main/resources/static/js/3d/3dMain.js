@@ -176,9 +176,7 @@ const init = async () => {
     scene.add(light);
     updateSun();
 
-    // Todo uncomment following line and remove the line after that
-    //setTime(time);
-    setTime(2)
+    setTime(time);
 
     const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
     const placedGardenObjects = await response.json();
