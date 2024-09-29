@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,7 +157,7 @@ public class ManageFriendsController {
             activeTab = (String) inputFlashMap.get("activeTab");
         }
         if (inputFlashMap != null) {
-            model.addAttribute("errorMessage", inputFlashMap.get("errorMessage"));
+            model.addAttribute(Constants.ERROR_MESSAGE_ATTRIBUTE, inputFlashMap.get(Constants.ERROR_MESSAGE_ATTRIBUTE));
             model.addAttribute("goodMessage", false);
         }
 
@@ -168,7 +169,7 @@ public class ManageFriendsController {
         model.addAttribute("declinedFriends", declinedFriendModels);
         model.addAttribute("activeTab", activeTab);
 
-        return "manageFriendsPage";
+        return Constants.MANAGE_FRIENDS_PAGE_ATTRIBUTE;
     }
 
     /**
@@ -254,7 +255,7 @@ public class ManageFriendsController {
         model.addAttribute("isPotentialFriend", true);
         model.addAttribute("userSearch", searchInput);
         model.addAttribute("activeTab", "search");
-        return "manageFriendsPage";
+        return Constants.MANAGE_FRIENDS_PAGE_ATTRIBUTE;
     }
 
     /**
@@ -276,7 +277,7 @@ public class ManageFriendsController {
             friendshipService.addFriendship(currentUser, potentialFriend);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("searchErrorText", exception.getMessage());
-            return "manageFriendsPage";
+            return Constants.MANAGE_FRIENDS_PAGE_ATTRIBUTE;
         }
 
         redirectAttributes.addFlashAttribute("activeTab", activeTab);
@@ -347,7 +348,7 @@ public class ManageFriendsController {
 
         if (friendship != null) {
             if (!Objects.equals(friendship.getStatus(), FriendshipStatus.PENDING)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "This user has already declined this request");
+                redirectAttributes.addFlashAttribute(Constants.ERROR_MESSAGE_ATTRIBUTE, "This user has already declined this request");
             }
             friendshipService.deleteFriendship(friendship.getId());
             userInteractionService.removeUserInteraction(currentUser.getId(), friendId, ItemType.USER);

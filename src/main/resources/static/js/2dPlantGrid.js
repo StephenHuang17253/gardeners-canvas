@@ -75,7 +75,7 @@ let preventUnload = false;
 const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
     const konvaX = gridItemX * GRID_SIZE + OFFSET_X;
     const konvaY = gridItemY * GRID_SIZE + OFFSET_Y;
-    return { x: konvaX, y: konvaY };
+    return {x: konvaX, y: konvaY};
 };
 
 /**
@@ -87,7 +87,7 @@ const convertToKonvaCoordinates = (gridItemX, gridItemY) => {
 const convertToGridCoordinates = (konvaCoordX, konvaCoordY) => {
     const gridItemX = Math.round((konvaCoordX - OFFSET_X) / GRID_SIZE);
     const gridItemY = Math.round((konvaCoordY - OFFSET_Y) / GRID_SIZE);
-    return { i: gridItemX, j: gridItemY };
+    return {i: gridItemX, j: gridItemY};
 }
 
 /**
@@ -109,7 +109,7 @@ const validLocation = (x, y) => x >= OFFSET_X && x < OFFSET_X + GRID_WIDTH && y 
 const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
     const nodes = gardenItemLayer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if ((i === x && j === y) && (node.id() !== plantId || node.attrs.uniqueGridId !== gridLocationUniqueId)) {
             return false;
         }
@@ -125,7 +125,7 @@ const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
 const destroyExistingTexture = (x, y) => {
     const nodes = textureLayer.find("Image").values();
     for (let node of nodes) {
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         if ((i === x && j === y)) {
             node.destroy();
         }
@@ -258,13 +258,13 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
         });
 
         plantOrDecoration.on("dragstart", () => {
-            prevSelectPosition = { x: plantOrDecoration.x(), y: plantOrDecoration.y() };
+            prevSelectPosition = {x: plantOrDecoration.x(), y: plantOrDecoration.y()};
         })
 
         plantOrDecoration.on("dragmove", () => {
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
-            let { x, y } = convertToKonvaCoordinates(i, j);
+            const {i, j} = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
+            let {x, y} = convertToKonvaCoordinates(i, j);
 
             // Ensure the plant or decoration is within the grid
             if (x < OFFSET_X) x = OFFSET_X;
@@ -285,7 +285,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
         plantOrDecoration.on("dragend", () => {
             // Unhighlight the plant when dragging ends
             tooltip.hide();
-            const { i, j } = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
+            const {i, j} = convertToGridCoordinates(plantOrDecoration.x(), plantOrDecoration.y());
 
             //ensure destination is empty
             if (!emptyDestination(i, j, plantOrDecoration.id(), plantOrDecoration.attrs.uniqueGridId)) {
@@ -524,7 +524,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const { x, y } = convertToKonvaCoordinates(xCoord, yCoord);
+    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
 
     const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
@@ -672,7 +672,7 @@ const handleStageClick = () => {
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
     const j = Math.floor((mousePos.y - OFFSET_Y) / GRID_SIZE);
-    const { x, y } = convertToKonvaCoordinates(i, j);
+    const {x, y} = convertToKonvaCoordinates(i, j);
 
     if (selectedPaletteItem) {
         if (!validLocation(x, y)) {
@@ -688,6 +688,13 @@ const handleStageClick = () => {
 
             selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
             updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+
+            // deselects plant if the current count goes to 0
+            const currentCount = parseInt(selectedPaletteItem.getAttribute("data-plant-count"));
+            if (currentCount < 1) {
+                deselectPaletteItem();
+            }
+
         } else {
             const { i: newGridX, j: newGridY } = convertToGridCoordinates(x, y);
             createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, function () {
@@ -707,7 +714,6 @@ const handleStageClick = () => {
             deselectGridItem();
         }
     }
-    deselectPaletteItem();
 };
 
 /**
@@ -750,7 +756,7 @@ const handleDeleteButtonClick = () => {
     }
     const gridX = selectedGridItem.attrs.x;
     const gridY = selectedGridItem.attrs.y;
-    const { i, j } = convertToGridCoordinates(gridX, gridY);
+    const {i, j} = convertToGridCoordinates(gridX, gridY);
 
     let plantItem = null;
     plantItems.forEach(item => {
@@ -792,7 +798,7 @@ const handleGardenFormSubmit = (event) => {
         idList.push(node.id());
         typeList.push(node.attrs.type);
         // Convert from konva coords back to grid item coords (so x, y values range from 0-6)
-        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        const {i, j} = convertToGridCoordinates(node.x(), node.y());
         xCoordList.push(i);
         yCoordList.push(j);
     });
@@ -805,7 +811,6 @@ const handleGardenFormSubmit = (event) => {
         tileTextures[j * GRID_ROWS + i] = node.attrs.name;
     });
 
-    console.log(tileTextures);
 
 
     idListInput.value = JSON.stringify(idList);
@@ -840,7 +845,7 @@ const handleWindowClick = (event) => {
     // if clicking the pagination, deselect the palette item
     if (pagination.contains(event.target)) {
         deselectPaletteItem();
-        return;
+
     }
 
 };
@@ -888,9 +893,10 @@ const handleLastPageClick = () => {
     currentPage.textContent = Math.ceil(end / COUNT_PER_PAGE);
 };
 
+
 /**
  * checks if 2D grid has been modified and has unsaved changes
- * 
+ *
  * @returns {boolean} are there changes on the grid (true if there are, false if not)
  */
 const hasUnsavedChanges = () => {
@@ -904,7 +910,7 @@ const hasUnsavedChanges = () => {
 
 
     const currentGrid = gardenItemLayer.find("Image").map(node => {
-        const { i: x, j: y } = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
+        const {i: x, j: y} = convertToGridCoordinates(node.x(), node.y()); // Destructuring here
         return {
             x: x.toString(),
             y: y.toString(),
@@ -946,7 +952,7 @@ const hasUnsavedChanges = () => {
 /**
  * Handles exiting the page in any form
  * Shows modal if there are unsaved changes
- * 
+ *
  * @param {Event} event - The event object
  */
 const handlePageExit = (event) => {
