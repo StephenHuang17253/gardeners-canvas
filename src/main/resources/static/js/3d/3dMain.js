@@ -32,7 +32,8 @@ const skyboxMap = {
 };
 
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount, rainSystem;
+let rainSize = 0.20;
 
 const container = document.getElementById("container");
 
@@ -57,6 +58,8 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
+const RAIN_COLOR = 0x78b8c2
+
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
 // link used to download files
@@ -67,10 +70,10 @@ const gardenName = document.getElementById("gardenName").value;
 const currentHour = document.getElementById("currentHour").value;
 const currentWeather = document.getElementById("weather").value;
 
+const rainDropSizeInput = document.getElementById("rainDropSize");
 let time = currentHour;
 let weather = currentWeather;
-
-console.log(weather);
+let isRaining = weather === "Rainy";
 
 /**
  * Updates the time of day in the scene
@@ -97,6 +100,13 @@ const setWeather = (newWeather) => {
         changeSkybox(weather, time);
     }
     // change clouds and rain to match the weather
+    if (weather === "Rainy") {
+        rainCount = 3000;
+        startRain();
+    } else if (isRaining) { // If rain currently exists but is not raining
+        isRaining = false;
+        stopRain(); //Deletes rain in rainSystem (Rain on existing scene)
+    }
 }
 
 /**
@@ -113,6 +123,39 @@ const setBackground = (filename) => {
         }
     );
 }
+
+const startRain = () => {
+    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop. x,y,z
+
+    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
+        rainPositions.set([
+            Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
+            Math.random() * 75, // y spawns anywhere y: 0 to 75
+            Math.random() * 130 - 60   // z spawns anywhere z: -60 to 70
+        ], i * 3);
+    }
+
+    rainGeo = new THREE.BufferGeometry();
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+    const rainMaterial = new THREE.PointsMaterial({
+        color: RAIN_COLOR, // color of the raindrops
+        size: rainSize, // size of the raindrops
+    });
+
+    rainSystem = new THREE.Points(rainGeo, rainMaterial);
+    scene.add(rainSystem);
+    isRaining = true;
+};
+
+const stopRain = () => {
+    if (rainSystem) {
+        scene.remove(rainSystem);
+        rainSystem.geometry.dispose();
+        rainSystem.material.dispose();
+        rainSystem = null;
+    }
+    isRaining = false;
+};
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -194,6 +237,8 @@ addLight();
 
 // setBackground(skyboxMap[weather]);
 
+setWeather(weather);
+
 const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
 
 scene.add(grid);
@@ -243,6 +288,18 @@ placedGardenObjects.forEach((element) => addObjectToScene(element));
 const animate = () => {
     light.position.copy(camera.position);
     renderer.render(scene, camera);
+
+    if (isRaining && rainSystem) {
+        const positions = rainSystem.geometry.attributes.position.array;
+        for (let i = 0; i < rainCount; i++) {
+            positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1;  // Update y position
+
+            if (positions[i * 3 + 1] < 0) {
+                positions[i * 3 + 1] = 75; // If below tiles (y=0) Reset to top y postion
+            }
+        }
+        rainSystem.geometry.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
+    }
 };
 
 renderer.setAnimationLoop(animate);
@@ -299,6 +356,12 @@ const onTrackWeatherInputChange = () => {
     setWeather(newWeather);
 };
 
+const onRainDropSizeInputChange = () => {
+    rainSize = +rainDropSizeInput.value;
+    stopRain();
+    startRain();
+};
+
 console.log(scene.children);
 
 window.addEventListener("resize", onWindowResize);
@@ -309,3 +372,7 @@ downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
 downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
+
+if (rainDropSizeInput){
+    rainDropSizeInput.addEventListener("change", onRainDropSizeInputChange);
+}
