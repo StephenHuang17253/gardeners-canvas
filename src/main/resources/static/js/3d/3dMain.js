@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import {createTileGrid} from "./tiles.js";
-import {OrbitControls} from "./OrbitControls.js";
-import {Loader} from "./Loader.js";
-import {createHueSaturationMaterial} from "./hueSaturationShader.js";
-import {Exporter} from "./Exporter.js";
-import {Downloader} from "../Downloader.js";
-import {GUI} from "three/addons/libs/lil-gui.module.min.js";
+import { createTileGrid } from "./tiles.js";
+import { OrbitControls } from "./OrbitControls.js";
+import { Loader } from "./Loader.js";
+import { createHueSaturationMaterial } from "./hueSaturationShader.js";
+import { Exporter } from "./Exporter.js";
+import { Downloader } from "../Downloader.js";
+import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -21,15 +21,19 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
+    "Sun": ["sunObject.glb", 10]
 };
 
 const skyboxMap = {
-    "Sunny": "sunny_skybox.exr",
-    "Overcast": "cloudy_skybox.exr",
-    "Rainy": "cloudy_skybox.exr",
+    "Sunny": "sunny-day.exr",
+    "Overcast": "cloudy-day.exr",
+    "Rainy": "cloudy-day.exr",
+    "Default": "default.exr",
+    "Night": "nightbox.exr"
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, moonParameters;
+
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters;
 
 const container = document.getElementById("container");
 
@@ -39,6 +43,9 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+// avoids mismatch between toggle and system when user reloads page
+trackTimeInput.checked = true;
+trackWeatherInput.checked = true;
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -52,9 +59,10 @@ const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 const DEFAULT_TIME = 12;
-const DEFAULT_WEATHER = "Sunny";
+const DEFAULT_WEATHER = "Default";
 
 const MOON_ORBIT_RADIUS = 100;
+const SUN_ORBIT_RADIUS = 300;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -111,11 +119,10 @@ const init = async () => {
 
     exporter = new Exporter(gardenName, downloader);
 
-    addLight();
+    updateSkybox();
 
-    setBackground(skyboxMap[weather]);
 
-    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
+    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
@@ -148,6 +155,21 @@ const init = async () => {
     folderSky.add(moonParameters, 'azimuth', -180, 180, 0.1).onChange(updateMoon);
     folderSky.open();
 
+    sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
+
+    const sunPosition = new THREE.Vector3(0, 50, 0);
+    sun.position.copy(sunPosition);
+    sun.scale.set(modelMap["Sun"][1], modelMap["Sun"][1], modelMap["Sun"][1]);
+    scene.add(sun);
+
+    light = new THREE.HemisphereLight(0xfff5bf, 0xfff5bf, 0.6);
+    light.intensity = 5;
+    light.position.set(0, 50, 0);
+    scene.add(light);
+    updateSun();
+
+    setTime(time);
+
     const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
     const placedGardenObjects = await response.json();
     await placedGardenObjects.forEach(async (element) => await addObjectToScene(element));
@@ -170,7 +192,18 @@ const init = async () => {
 const setTime = (newTime) => {
     time = newTime;
     // Update the time of day in the scene
-    // Set moon or sun to the correct position 
+    // Set moon or sun to the correct position
+    if (time >= 6 && time < 18) {
+        sun.visible = true;
+        moon.visible = false;
+        updateSun();
+    } else {
+        sun.visible = false;
+        moon.visible = true;
+        updateMoon();
+    }
+    updateSkybox();
+
 };
 
 /**
@@ -201,8 +234,16 @@ const setMoonParameters = () => {
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
-    setBackground(skyboxMap[weather]);
+    updateSkybox();
     // change clouds and rain to match the weather
+}
+
+const updateSkybox = () => {
+    if (time >= 6 && time < 18) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        setBackground(skyboxMap["Night"]);
+    }
 };
 
 /**
@@ -220,15 +261,6 @@ const setBackground = (filename) => {
     );
 };
 
-
-/**
- * Adds a light to the scene
- */
-const addLight = () => {
-    light = new THREE.AmbientLight(0xffffff);
-    scene.add(light);
-};
-
 /**
  * Add model to scene
  *
@@ -241,7 +273,6 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
 };
-
 /**
  * Adds a plant or decoration object to the scene.
  *
@@ -280,7 +311,6 @@ const addObjectToScene = async (plantOrDecoration) => {
  * Renders the scene
  */
 const animate = () => {
-    light.position.copy(camera.position);
     renderer.render(scene, camera);
 };
 
@@ -295,6 +325,17 @@ const updateMoon = () => {
     moon.position.multiplyScalar(MOON_ORBIT_RADIUS);
 };
 
+/**
+ * Updates the movement of the sun based on the gardens time
+ */
+const updateSun = () => {
+    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 6)
+    const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12)
+    const sunPosition = new THREE.Vector3(0, sunY, sunZ);
+    sun.position.z = sunZ;
+    sun.position.y = sunY;
+    light.position.set(0, sunY, sunZ);
+}
 
 /**
  * Event Handlers
@@ -320,10 +361,10 @@ const onMouseMove = () => document.body.style.userSelect = "none";
 const onMouseOut = () => document.body.style.userSelect = "auto";
 
 /**
- * On track time input change,
- * update the time variable to the current hour if the input is checked,
- * otherwise set it to the default time
- */
+* On track time input change,
+* update the time variable to the current hour if the input is checked,
+* otherwise set it to the default time
+*/
 const onTrackTimeInputChange = () => {
     const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
@@ -350,4 +391,3 @@ downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer)
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
 
-console.log(scene.children);
