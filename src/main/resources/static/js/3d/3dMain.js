@@ -44,6 +44,7 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+const trackBackgroundInput = document.getElementById("toggleBackground");
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -197,13 +198,6 @@ const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
 
 scene.add(grid);
 
-
-const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
-addModelToScene(
-    backgroundModel,
-    new THREE.Vector3(0,0,0),
-    modelMap["Background"][1]);
-
 /**
  * Adds a plant or decoration object to the scene.
  *
@@ -241,6 +235,12 @@ const addObjectToScene = async (plantOrDecoration) => {
 const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
 const placedGardenObjects = await response.json();
 placedGardenObjects.forEach((element) => addObjectToScene(element));
+
+const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
+addModelToScene(
+    backgroundModel,
+    new THREE.Vector3(0,0,0),
+    modelMap["Background"][1]);
 
 /**
  * Renders the scene
@@ -304,6 +304,14 @@ const onTrackWeatherInputChange = () => {
     setWeather(newWeather);
 };
 
+/**
+ * On track background model input change,
+ * update the background model variable to display/hide the background model
+ */
+const onBackgroundModelInputChange = () => {
+    backgroundModel.visible = trackBackgroundInput.checked;
+};
+
 console.log(scene.children);
 
 window.addEventListener("resize", onWindowResize);
@@ -314,3 +322,4 @@ downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
 downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
+trackBackgroundInput.addEventListener("change", onBackgroundModelInputChange);
