@@ -4,210 +4,208 @@
 <head th:replace="~{fragments/header.html}"></head>
 
 <body style="height: 100vh">
-<div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
+    <div th:replace="~{fragments/navBar.html :: navBar('gardens')}" th:with="loggedIn=${loggedIn}"></div>
 
-<div class="d-flex">
-    <div class="bg-dark d-flex flex-column flex-shrink-0 p-3 text-white align-items-center h-100"
-         style="width: 20vw; min-height: 90vh;" id="palette-window">
-        <h1 class="fs-4 mb-3">Palette Window</h1>
+    <div class="d-flex">
+        <div class="bg-dark d-flex flex-column flex-shrink-0 p-3 text-white align-items-center h-100"
+            style="width: 20vw; min-height: 90vh;" id="palette-window">
+            <h1 class="fs-4 mb-3">Palette Window</h1>
 
-        <div class="container">
+            <div class="container">
 
-            <div class="row">
-                <div class="d-flex flex-row gap-2 flex-wrap justify-content-center mb-2">
-                    <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn btn-secondary d-block">
-                        Cancel
-                    </a>
-                    <button id=" saveGarden" type="submit" class="btn btn-success" form="saveGardenForm">
-                        Save Garden
-                    </button>
-                </div>
-                <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
-                    <button id="openClearModalButton" type="button" class="btn btn-warning text-light"
+                <div class="row">
+                    <div class="d-flex flex-row gap-2 flex-wrap justify-content-center mb-2">
+                        <a th:href="@{/my-gardens/__${garden.getGardenId()}__}" class="btn btn-secondary d-block">
+                            Cancel
+                        </a>
+                        <button id=" saveGarden" type="submit" class="btn btn-success" form="saveGardenForm">
+                            Save Garden
+                        </button>
+                    </div>
+                    <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                        <button id="openClearModalButton" type="button" class="btn btn-warning text-light"
                             data-bs-toggle="modal" data-bs-target="#confirmClearModal">
-                        Clear All
-                    </button>
-                    <button type="button" id="deletePlant" class="btn btn-danger">
-                        Remove Selected Plant
-                    </button>
-                </div>
+                            Clear All
+                        </button>
+                        <button type="button" id="deletePlant" class="btn btn-danger">
+                            Remove Selected Plant
+                        </button>
+                    </div>
 
 
-                <div class="modal fade text-black" id="confirmClearModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5">Are you sure you want to clear all?</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-footer justify-content-center">
-                                <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cancel
-                                </button>
-                                <button id="confirmClearAll" type="submit" class="btn btn-warning"
+                    <div class="modal fade text-black" id="confirmClearModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5">Are you sure you want to clear all?</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                                    </button>
+                                    <button id="confirmClearAll" type="submit" class="btn btn-warning"
                                         data-bs-dismiss="modal">Yes
-                                </button>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="nav nav-tabs nav-fill d-flex justify-content-center mt-3">
+                        <li class="nav-item nav-underline ">
+                            <a class="nav-link text-white fs-5 active" role="tab" data-bs-toggle="tab"
+                                href="#plantTabContent" id="plant-tab" style="background-color:transparent">Plants</a>
+                        </li>
+                        <li class="nav-item nav-underline ">
+                            <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab"
+                                href="#decorationsTabContent" id="decorations-tab"
+                                style="background-color:transparent">Decorations</a>
+                        </li>
+                        <li class="nav-item nav-underline">
+                            <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab"
+                                href="#textureTabContent" id="textures-tab"
+                                style="background-color:transparent">Textures</a>
+                        </li>
+                    </ul>
+
+
+
+                    <div class="tab-content">
+                        <div id="plantTabContent" class="tab-pane active">
+                            <div class="row">
+                                <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
+                                    th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
+                                    th:data-plant-category="${plant.getCategory()}"
+                                    th:data-plant-count="${plant.getCount()}" th:data-plant-id="${plant.getId()}"
+                                    th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
+                                    th:data-category-image="${plant.getCategoryImage()}">
+                                    <div class="ratio ratio-1x1">
+                                        <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
+                                            alt="Plant"
+                                            class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
+                                    </div>
+                                    <p id="total" class="break-word mt-2 mb-0 text-decoration-underline"
+                                        th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}">
+                                    </p>
+                                    <p id="category" class="mb-0" th:text="${plant.getCategory()}"></p>
+                                    <p id="placed" class="break-word my-0 "></p>
+                                    <p id="remaining" class="break-word my-0"></p>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
+                                <div th:replace="~{fragments/plant2DPaginationNav.html}"
+                                    th:with="countPerPage=${countPerPage}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="decorationsTabContent" class="tab-pane">
+                            <div class="row">
+                                <div class="col-6 p-3 text-left text-white" draggable="true" name="decoration-item"
+                                    th:each="decoration : ${decorations}"
+                                    th:data-decoration-type="${decoration.getCategory()}"
+                                    th:data-decoration-image="${decoration.getCategoryImage()}"
+                                    th:data-decoration-id="${decoration.getId()}"
+                                    th:data-grid-name="${decoration.getCategory().toString()}">
+                                    <div class="ratio ratio-1x1">
+                                        <img th:src="@{${decoration.getCategoryImage()}}"
+                                            th:alt="${decoration.getCategory()}"
+                                            class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
+                                    </div>
+                                    <p class="total break-word mt-2 mb-0 text-decoration-underline"
+                                        th:text="${decoration.getCategory()}"> </p>
+                                    <p class="category mb-0">Decoration</p>
+                                    <p class="placed break-word my-0"></p>
+                                    <p class="remaining break-word my-0"></p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div id="textureTabContent" class="tab-pane">
+                            <div class="row">
+                                <div class="col-6 p-3 text-left text-white" draggable="false" name="texture-item"
+                                    th:each="tileTexture : ${tileTextures}"
+                                    th:data-texture-name="${tileTexture.toString()}"
+                                    th:data-texture-image="${tileTexture.getImgFile() == null ? '/images/2d-tile-textures' : '/images/2d-tile-textures/' + tileTexture.getImgFile()}">
+                                    <div class="ratio ratio-1x1">
+                                        <img th:src="@{${tileTexture.getImgFile() == null ? '/images/2d-tile-textures' : '/images/2d-tile-textures/' + tileTexture.getImgFile()}}"
+                                            alt="Tile"
+                                            class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
+                                    </div>
+                                    <p id="texture-name" class="break-word mt-2 mb-0 text-decoration-underline"
+                                        th:text="${tileTexture.getTileName()}">
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <ul class="nav nav-tabs nav-fill d-flex justify-content-center mt-3">
-                    <li class="nav-item nav-underline ">
-                        <a class="nav-link text-white fs-5 active" role="tab" data-bs-toggle="tab"
-                           href="#plantTabContent" id="plant-tab"
-                           style="background-color:transparent">Plants</a>
+            <div class="d-none" th:each="displayableItem : ${displayableItemsList}">
+                <div name="grid-item-location" th:data-grid-x="${displayableItem.getXCoordinate()}"
+                    th:data-grid-y="${displayableItem.getYCoordinate()}"
+                    th:data-grid-name="${displayableItem.getName()}"
+                    th:data-grid-category="${displayableItem.getCategory()}"
+                    th:data-grid-objectid="${displayableItem.getObjectId()}"
+                    th:data-grid-type="${displayableItem.getType()}"
+                    th:data-grid-image="${displayableItem.getCategoryImage()}">
+                </div>
+            </div>
+
+            <div class="d-none" th:each="tile : ${tiles}">
+                <div name="grid-tile" th:data-tile-x="${tile.getXCoordinate()}"
+                    th:data-tile-y="${tile.getYCoordinate()}" th:data-tile-image="${tile.getTileImage()}"
+                    th:data-tile-texture="${tile.getTileTexture().toString()}">
+                </div>
+            </div>
+
+
+            <form class="d-none" th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm"
+                method="post">
+                <input type="hidden" id="idList" name="idList" th:value="''" />
+                <input type="hidden" id="typeList" name="typeList" th:value="''" />
+                <input type="hidden" id="xCoordList" name="xCoordList" th:value="''" />
+                <input type="hidden" id="yCoordList" name="yCoordList" th:value="''" />
+                <input type="hidden" id="tileTextureList" name="tileTextureList" th:value="''" />
+            </form>
+        </div>
+
+        <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+            <div class="bg-white p-2 position-relative">
+                <a th:href="@{/3D-garden/__${garden.getGardenId()}__}"
+                    class="btn btn-success position-absolute top-0 start-0 m-2">
+                    View in 3D
+                </a>
+                <h1 class="break-word mb-0 text-center" id="title-2D-Grid"
+                    th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
+            </div>
+            <div id="container" class="flex-grow-1 overflow-auto"></div>
+            <div class="dropdown position-absolute end-0 m-3">
+                <button class="btn btn-success dropdown-toggle" id="export-dropdown" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Export Layout
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" id="download-jpeg">JPEG</button>
                     </li>
-                    <li class="nav-item nav-underline ">
-                        <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab"
-                           href="#decorationsTabContent" id="decorations-tab"
-                           style="background-color:transparent">Decorations</a>
+                    <li>
+                        <button class="dropdown-item" id="download-jpg">JPG</button>
                     </li>
-                    <li class="nav-item nav-underline">
-                        <a class="nav-link text-white fs-5" role="tab" data-bs-toggle="tab"
-                           href="#textureTabContent" id="textures-tab"
-                           style="background-color:transparent">Textures</a>
+                    <li>
+                        <button class="dropdown-item" id="download-png">PNG</button>
                     </li>
                 </ul>
-
-
-
-                <div class="tab-content">
-                    <div id="plantTabContent" class="tab-pane active">
-                        <div class="row">
-                            <div class="col-6 p-3 text-left d-none text-white" draggable="false" name="plant-item"
-                                th:each="plant : ${plants}" th:data-plant-name="${plant.getName()}"
-                                th:data-plant-category="${plant.getCategory()}"
-                                th:data-plant-count="${plant.getCount()}" th:data-plant-id="${plant.getId()}"
-                                th:data-plant-image="${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}"
-                                th:data-category-image="${plant.getCategoryImage()}">
-                                <div class="ratio ratio-1x1">
-                                    <img th:src="@{${plant.getImg() == null ? '/images/default_plant.png' : '/files/users/' + plant.getImg()}}"
-                                        alt="Plant"
-                                        class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
-                                </div>
-                                <p id="total" class="break-word mt-2 mb-0 text-decoration-underline"
-                                    th:text="${plant.getCount() > 0} ? ${plant.getName()} + ' (x' + ${plant.getCount()} + ')' : ${plant.getName()}">
-                                </p>
-                                <p id="category" class="mb-0" th:text="${plant.getCategory()}"></p>
-                                <p id="placed" class="break-word my-0 "></p>
-                                <p id="remaining" class="break-word my-0"></p>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row gap-2 flex-wrap justify-content-center">
-                            <div th:replace="~{fragments/plant2DPaginationNav.html}" th:with="countPerPage=${countPerPage}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="decorationsTabContent" class="tab-pane">
-                        <div class="row">
-                            <div class="col-6 p-3 text-left text-white" draggable="true"
-                                 name="decoration-item"
-                                 th:each="decoration : ${decorations}"
-                                 th:data-decoration-type="${decoration.getCategory()}"
-                                 th:data-decoration-image="${decoration.getCategoryImage()}"
-                                 th:data-decoration-id="${decoration.getId()}"
-                                 th:data-grid-name="${decoration.getCategory().toString()}">
-                                <div class="ratio ratio-1x1">
-                                    <img th:src="@{${decoration.getCategoryImage()}}" th:alt="${decoration.getCategory()}" class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
-                                </div>
-                                <p class="total break-word mt-2 mb-0 text-decoration-underline" th:text="${decoration.getCategory()}"> </p>
-                                <p class="category mb-0">Decoration</p>
-                                <p class="placed break-word my-0"></p>
-                                <p class="remaining break-word my-0"></p>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div id="textureTabContent" class="tab-pane">
-                        <div class="row">
-                            <div class="col-6 p-3 text-left text-white" draggable="false" name="texture-item"
-                                 th:each="tileTexture : ${tileTextures}"
-                                 th:data-texture-name="${tileTexture.toString()}"
-                                 th:data-texture-image="${tileTexture.getImgFile() == null ? '/images/2d-tile-textures' : '/images/2d-tile-textures/' + tileTexture.getImgFile()}">
-                                <div class="ratio ratio-1x1">
-                                    <img th:src="@{${tileTexture.getImgFile() == null ? '/images/2d-tile-textures' : '/images/2d-tile-textures/' + tileTexture.getImgFile()}}"
-                                         alt="Tile"
-                                         class="img-fluid rounded-circle w-100 h-100 object-fit-cover mw-100">
-                                </div>
-                                <p id="texture-name" class="break-word mt-2 mb-0 text-decoration-underline"
-                                   th:text="${tileTexture.getTileName()}">
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
-
-        <div class="d-none" th:each="displayableItem : ${displayableItemsList}">
-            <div name="grid-item-location"
-                 th:data-grid-x="${displayableItem.getXCoordinate()}"
-                 th:data-grid-y="${displayableItem.getYCoordinate()}"
-                 th:data-grid-name="${displayableItem.getName()}"
-                 th:data-grid-category="${displayableItem.getCategory()}"
-                 th:data-grid-objectid="${displayableItem.getObjectId()}"
-                 th:data-grid-type="${displayableItem.getType()}"
-                 th:data-grid-image="${displayableItem.getCategoryImage()}">
-            </div>
-        </div>
-
-        <div class="d-none" th:each="tile : ${tiles}">
-            <div name="grid-tile"
-                 th:data-tile-x="${tile.getXCoordinate()}"
-                 th:data-tile-y="${tile.getYCoordinate()}"
-                 th:data-tile-image="${tile.getTileImage()}"
-                 th:data-tile-texture="${tile.getTileTexture().toString()}">
-            </div>
-        </div>
-
-
-        <form class="d-none" th:action="@{/2D-garden/__${garden.getGardenId()}__/save}" id="saveGardenForm"
-              method="post">
-            <input type="hidden" id="idList" name="idList" th:value="''"/>
-            <input type="hidden" id="typeList" name="typeList" th:value="''"/>
-            <input type="hidden" id="xCoordList" name="xCoordList" th:value="''"/>
-            <input type="hidden" id="yCoordList" name="yCoordList" th:value="''"/>
-            <input type="hidden" id="tileTextureList" name="tileTextureList" th:value="''"/>
-        </form>
-    </div>
-
-    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
-        <div class="bg-white p-2 position-relative">
-            <a th:href="@{/3D-garden/__${garden.getGardenId()}__}"
-               class="btn btn-success position-absolute top-0 start-0 m-2">
-                View in 3D
-            </a>
-            <h1 class="break-word mb-0 text-center" id="title-2D-Grid"
-                th:text="'2D View for ' + ${garden.getGardenName()}">Garden Name</h1>
-        </div>
-        <div id="container" class="flex-grow-1 overflow-auto"></div>
-        <div class="dropdown position-absolute end-0 m-3">
-            <button class="btn btn-success dropdown-toggle" id="export-dropdown" type="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                Export Layout
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <button class="dropdown-item" id="download-jpeg">JPEG</button>
-                </li>
-                <li>
-                    <button class="dropdown-item" id="download-jpg">JPG</button>
-                </li>
-                <li>
-                    <button class="dropdown-item" id="download-png">PNG</button>
-                </li>
-            </ul>
         </div>
     </div>
-</div>
-<div id="error-message" class="alert alert-warning py-2 px-3 m-2 position-fixed bottom-0 end-0 d-none font-bold"
-     role="alert"></div>
-<input id="gardenId" type="hidden" th:value="${garden.getGardenId()}"/>
-<input id="gardenName" type="hidden" th:value="${garden.getGardenName()}"/>
-<script type="module" th:src="@{/js/2dPlantGrid.js}"></script>
+    <div id="error-message" class="alert alert-warning py-2 px-3 m-2 position-fixed bottom-0 end-0 d-none font-bold"
+        role="alert"></div>
+    <input id="gardenId" type="hidden" th:value="${garden.getGardenId()}" />
+    <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}" />
+    <script type="module" th:src="@{/js/2dPlantGrid.js}"></script>
 </body>
 
 </html>
