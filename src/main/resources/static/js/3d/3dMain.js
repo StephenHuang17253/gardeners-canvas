@@ -145,9 +145,8 @@ const init = async () => {
     };
 
     updateMoon();
-    addLight();
 
-    addLight();
+    // addLight();
 
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 
@@ -159,7 +158,7 @@ const init = async () => {
 
 
 
-    light = new THREE.HemisphereLight(0x0000ff, 0x00ff00, 0.6);
+    light = new THREE.HemisphereLight(0x0000ff, 0xffff00, 0.6);
     light.intensity = 5;
     light.position.set(0, 50, 0);
     scene.add(light);
@@ -227,13 +226,13 @@ const setBackground = (filename) => {
     );
 };
 
-/**
- * Adds a light to the scene
- */
-const addLight = () => {
-    light = new THREE.AmbientLight(0xffffff, 0.00);
-    scene.add(light);
-};
+// /**
+//  * Adds a light to the scene
+//  */
+// const addLight = () => {
+//     light = new THREE.AmbientLight(0xffffff, 0.00);
+//     scene.add(light);
+// };
 
 /**
  * Add model to scene
@@ -298,7 +297,6 @@ const addObjectToScene = async (plantOrDecoration) => {
  * Renders the scene
  */
 const animate = () => {
-    light.position.copy(camera.position);
     renderer.render(scene, camera);
 };
 
