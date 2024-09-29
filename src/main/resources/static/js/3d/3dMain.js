@@ -200,10 +200,12 @@ const init = async () => {
     updateSun()
 
 
-    light = new THREE.PointLight( 0xff0000, 1, 100 );
+
+    light = new THREE.HemisphereLight( 0x0000ff, 0x00ff00, 0.6 );
     light.intensity = 5;
     light.position.set(0,50,0);
     scene.add( light );
+    updateSun()
 
     const gui = new GUI();
     const folderSky = gui.addFolder('Sky');
@@ -362,10 +364,11 @@ const updateMoon = () => {
 
 const updateSun = () => {
     const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (currentHour - 12) / 6)
-    const sunX = (SUN_ORBIT_RADIUS / 6) * (currentHour - 12)
-    const sunPosition = new THREE.Vector3(sunX, sunY, 0);
-    sun.position.x = sunX;
+    const sunZ = (SUN_ORBIT_RADIUS / 6) * (currentHour - 12)
+    const sunPosition = new THREE.Vector3(0, sunY, sunZ);
+    sun.position.z = sunZ;
     sun.position.y = sunY;
+    light.position.set(0,sunY,sunZ);
     console.log("current time: " + currentHour);
 }
 
