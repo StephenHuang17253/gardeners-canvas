@@ -843,6 +843,8 @@ const handleWindowClick = (event) => {
         return;
     }
 
+};
+
 /**
  * Handle clicking the first page button
  */
