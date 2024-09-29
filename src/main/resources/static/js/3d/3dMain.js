@@ -62,7 +62,7 @@ const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
 const MOON_ORBIT_RADIUS = 100;
-const SUN_ORBIT_RADIUS = 500;
+const SUN_ORBIT_RADIUS = 1500;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -337,7 +337,7 @@ const updateMoon = () => {
  * Updates the movement of the sun based on the gardens time
  */
 const updateSun = () => {
-    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 6)
+    const sunY = (SUN_ORBIT_RADIUS/3) - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 18)
     const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12)
     const sunPosition = new THREE.Vector3(0, sunY, sunZ);
     sun.position.z = sunZ;
