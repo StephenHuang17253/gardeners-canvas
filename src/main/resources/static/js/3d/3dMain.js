@@ -28,7 +28,8 @@ const skyboxMap = {
     "Sunny": "sunny-day.exr",
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
-    "Default": "default.exr"
+    "Default": "default.exr",
+    "Night": "nightbox.exr"
 };
 
 
@@ -114,11 +115,12 @@ const init = async () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
-    changeSkybox(weather, time);
 
-    setBackground(skyboxMap[weather]);
+    updateSkybox();
 
-    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
+    console.log(loader)
+
+    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
@@ -146,29 +148,20 @@ const init = async () => {
 
     updateMoon();
 
-    // addLight();
-
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 
     const sunPosition = new THREE.Vector3(0, 50, 0);
     sun.position.copy(sunPosition);
     sun.scale.set(modelMap["Sun"][1], modelMap["Sun"][1], modelMap["Sun"][1]);
     scene.add(sun);
-    updateSun()
 
-
-
-    light = new THREE.HemisphereLight(0x0000ff, 0xffff00, 0.6);
+    light = new THREE.HemisphereLight(0xfff5bf, 0xfff5bf, 0.6);
     light.intensity = 5;
     light.position.set(0, 50, 0);
     scene.add(light);
-    updateSun()
+    updateSun();
 
-    const gui = new GUI();
-    const folderSky = gui.addFolder('Sky');
-    folderSky.add(moonParameters, 'elevation', 0, 90, 0.1).onChange(updateMoon);
-    folderSky.add(moonParameters, 'azimuth', -180, 180, 0.1).onChange(updateMoon);
-    folderSky.open();
+    setTime(time);
 
     const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
     const placedGardenObjects = await response.json();
@@ -191,9 +184,16 @@ const init = async () => {
  */
 const setTime = (newTime) => {
     time = newTime;
-    changeSkybox(weather, time)
     // Update the time of day in the scene
     // Set moon or sun to the correct position
+    if (time >= 6 && time < 18) {
+        sun.visible = true;
+        moon.visible = false;
+    } else {
+        sun.visible = false;
+        moon.visible = true;
+    }
+    updateSkybox();
 };
 
 /**
@@ -203,13 +203,17 @@ const setTime = (newTime) => {
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
-    if (weather === DEFAULT_WEATHER) {
-        setBackground(skyboxMap[weather]);
-    } else {
-        changeSkybox(weather, time);
-    }
+    updateSkybox();
     // change clouds and rain to match the weather
 }
+
+const updateSkybox = () => {
+    if (time >= 6 && time < 18) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        setBackground(skyboxMap["Night"]);
+    }
+};
 
 /**
  * Sets the background of the scene
@@ -226,14 +230,6 @@ const setBackground = (filename) => {
     );
 };
 
-// /**
-//  * Adds a light to the scene
-//  */
-// const addLight = () => {
-//     light = new THREE.AmbientLight(0xffffff, 0.00);
-//     scene.add(light);
-// };
-
 /**
  * Add model to scene
  *
@@ -246,19 +242,6 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
 };
-
-/**
- * Changes the skybox based on time of the day
- */
-const changeSkybox = (weather, time) => {
-    if (time > 6 && time < 18) {
-        setBackground(skyboxMap[weather]);
-    } else {
-        setBackground("nightbox.exr")
-        //set night backgrounds here
-    }
-};
-
 /**
  * Adds a plant or decoration object to the scene.
  *

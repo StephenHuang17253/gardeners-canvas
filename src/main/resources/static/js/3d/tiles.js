@@ -131,7 +131,9 @@ const createTile = (tileMaterial, size, texture) => {
 const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
+    console.log(loader);
     const texture = loader.loadTexture(tileMap[tileMaterial][0]);
+
 
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
