@@ -1,7 +1,7 @@
-import * as THREE from "three";
-import { createTileGrid } from "./tiles.js";
-import { OrbitControls } from "./OrbitControls.js";
-import { Loader } from "./Loader.js";
+import * as THREE from 'three';
+import { createTileGrid } from './tiles.js';
+import { OrbitControls } from './OrbitControls.js';
+import { Loader } from './Loader.js';
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from "./Exporter.js";
 import { Downloader } from "../Downloader.js";
@@ -15,6 +15,10 @@ const modelMap = {
     "Climber": ["climber.glb", 5],
     "Flower": ["flower.glb", 10],
     "Pot Plant": ["potplant.glb", 5],
+    "Background": ["background.glb", 100],
+};
+
+const decoMap = {
     "Rock": ["deco/rock.glb", 2],
     "Pond": ["deco/pond.glb", 2],
     "Gnome": ["deco/gnome.glb", 7],
@@ -193,6 +197,12 @@ const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
 
 scene.add(grid);
 
+
+const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
+addModelToScene(
+    backgroundModel,
+    new THREE.Vector3(0,0,0),
+    modelMap["Background"][1]);
 
 /**
  * Adds a plant or decoration object to the scene.
