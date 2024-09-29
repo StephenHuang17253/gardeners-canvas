@@ -5,6 +5,7 @@ import { Loader } from "./Loader.js";
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from "./Exporter.js";
 import { Downloader } from "../Downloader.js";
+import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -28,7 +29,7 @@ const skyboxMap = {
     "Rainy": "cloudy_skybox.exr",
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, moonParameters;
 
 const container = document.getElementById("container");
 
@@ -53,6 +54,8 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Sunny";
 
+const MOON_ORBIT_RADIUS = 100;
+
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
 // link used to download files
@@ -60,13 +63,105 @@ const link = document.createElement("a");
 
 const gardenId = document.getElementById("gardenId").value;
 const gardenName = document.getElementById("gardenName").value;
-const currentHour = document.getElementById("currentHour").value;
-const currentWeather = document.getElementById("weather").value;
+
+const currentHourInput = document.getElementById("currentHour");
+const currentWeatherInput = document.getElementById("weather");
+
+// Get the current time and weather from the input fields if they exist or use the default values
+// For if the garden does not have a location set
+const currentHour = currentHourInput.value !== "" ? currentHourInput.value : DEFAULT_TIME;
+const currentWeather = currentWeatherInput.value !== "" ? currentWeatherInput.value : DEFAULT_WEATHER;
 
 let time = currentHour;
 let weather = currentWeather;
 
-console.log(weather);
+/**
+ * Initialises threejs components, e.g. scene, camera, renderer, controls
+ */
+const init = async () => {
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
+    camera.position.copy(INIT_CAMERA_POSITION);
+    camera.lookAt(scene.position);
+
+    renderer = new THREE.WebGLRenderer(
+        {
+            antialias: true,
+            preserveDrawingBuffer: true,
+        }
+    );
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+    renderer.setAnimationLoop(animate);
+
+    loader = new Loader();
+    loader.setOnError(() => {
+        loadingImg.classList.add("d-none");
+        loadingDiv.innerText = "There was an error loading your garden";
+    });
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.minRadius = MIN_CAMERA_DIST;
+    controls.maxRadius = MAX_CAMERA_DIST;
+
+    downloader = new Downloader(link);
+
+    exporter = new Exporter(gardenName, downloader);
+
+    addLight();
+
+    setBackground(skyboxMap[weather]);
+
+    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
+    scene.add(grid);
+
+    const texture = loader.loadTexture("moon.jpg");
+
+    const material = new THREE.MeshPhongMaterial(
+        {
+            color: 0xffffff,
+            map: texture,
+        }
+    );
+
+    const geometry = new THREE.SphereGeometry(2, 60, 60);
+    moon = new THREE.Mesh(geometry, material);
+    scene.add(moon);
+
+    moonParameters = {
+        elevation: 2,
+        azimuth: 180
+    };
+
+    updateMoon();
+
+    const gui = new GUI();
+    const folderSky = gui.addFolder('Sky');
+    folderSky.add(moonParameters, 'elevation', 0, 90, 0.1).onChange(updateMoon);
+    folderSky.add(moonParameters, 'azimuth', -180, 180, 0.1).onChange(updateMoon);
+    folderSky.open();
+
+    const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
+    const placedGardenObjects = await response.json();
+    await placedGardenObjects.forEach(async (element) => await addObjectToScene(element));
+
+    // Hide loading screen
+    loadingImg.classList.add("d-none");
+    loadingDiv.classList.add("fadeOut");
+    loadingDiv.parentElement.removeChild(loadingDiv);
+};
+
+/**
+ * Helper Methods
+ */
 
 /**
  * Updates the time of day in the scene
@@ -88,7 +183,7 @@ const setWeather = (newWeather) => {
     weather = newWeather;
     setBackground(skyboxMap[weather]);
     // change clouds and rain to match the weather
-}
+};
 
 /**
  * Sets the background of the scene
@@ -103,45 +198,8 @@ const setBackground = (filename) => {
             scene.environment = texture;
         }
     );
-}
-
-/**
- * Initialises threejs components, e.g. scene, camera, renderer, controls
- */
-const init = () => {
-    scene = new THREE.Scene();
-
-    camera = new THREE.PerspectiveCamera(FOV, container.clientWidth / container.clientHeight);
-    camera.position.copy(INIT_CAMERA_POSITION);
-    camera.lookAt(scene.position);
-
-    renderer = new THREE.WebGLRenderer(
-        {
-            antialias: true,
-            preserveDrawingBuffer: true,
-        }
-    );
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
-    window.createImageBitmap = undefined;
-
-    loader = new Loader();
-
-    loader.setOnError(() => {
-        loadingImg.classList.add("d-none");
-        loadingDiv.innerText = "There was an error loading your garden";
-    });
-
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.maxPolarAngle = Math.PI / 2;
-    controls.minRadius = MIN_CAMERA_DIST;
-    controls.maxRadius = MAX_CAMERA_DIST;
-
-    downloader = new Downloader(link);
-
-    exporter = new Exporter(gardenName, downloader);
 };
+
 
 /**
  * Adds a light to the scene
@@ -151,7 +209,8 @@ const addLight = () => {
     scene.add(light);
 };
 
-/** Add model to scene
+/** 
+ * Add model to scene
  *
  * @param {Object} model - The model to be added to the scene.
  * @param {Object} position - The position at which the model will be placed in the scene.
@@ -162,21 +221,6 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
 };
-
-init();
-
-addLight();
-
-setBackground(skyboxMap[weather]);
-
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
-scene.add(grid);
-
 
 /**
  * Adds a plant or decoration object to the scene.
@@ -212,10 +256,6 @@ const addObjectToScene = async (plantOrDecoration) => {
         modelMap[category][1]);
 };
 
-const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
-const placedGardenObjects = await response.json();
-placedGardenObjects.forEach((element) => addObjectToScene(element));
-
 /**
  * Renders the scene
  */
@@ -224,12 +264,17 @@ const animate = () => {
     renderer.render(scene, camera);
 };
 
-renderer.setAnimationLoop(animate);
+/**
+ * Updates the position of the moon in the scene based on the moonParameters
+ */
+const updateMoon = () => {
+    const phi = THREE.MathUtils.degToRad(90 - moonParameters.elevation);
+    const theta = THREE.MathUtils.degToRad(moonParameters.azimuth);
 
-// Hide loading screen
-loadingImg.classList.add("d-none");
-loadingDiv.classList.add("fadeOut");
-loadingDiv.parentElement.removeChild(loadingDiv)
+    moon.position.setFromSphericalCoords(1, phi, theta);
+    moon.position.multiplyScalar(MOON_ORBIT_RADIUS);
+};
+
 
 /**
  * Event Handlers
@@ -247,16 +292,12 @@ const onWindowResize = () => {
 /**
  * On mouse move event on the canvas prevent user selection
  */
-const onMouseMove = () => {
-    document.body.style.userSelect = "none";
-};
+const onMouseMove = () => document.body.style.userSelect = "none";
 
 /**
  * On mouse out event on the canvas allow user selection
  */
-const onMouseOut = () => {
-    document.body.style.userSelect = "auto";
-};
+const onMouseOut = () => document.body.style.userSelect = "auto";
 
 /** 
 * On track time input change, 
@@ -278,7 +319,7 @@ const onTrackWeatherInputChange = () => {
     setWeather(newWeather);
 };
 
-console.log(scene.children);
+init();
 
 window.addEventListener("resize", onWindowResize);
 container.addEventListener("mousemove", onMouseMove);
@@ -288,3 +329,5 @@ downloadOBJButton.addEventListener("click", () => exporter.downloadOBJ(scene));
 downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer));
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
+
+console.log(scene.children);
