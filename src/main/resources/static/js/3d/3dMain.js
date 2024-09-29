@@ -175,12 +175,13 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
  * Changes the skybox based on time of the day
  */
 const changeSkybox = (weather, time) => {
-    if (time > 6 && time < 18) {
-        setBackground(skyboxMap[weather]);
-    } else {
-        setBackground("nightbox.exr")
-        //set night backgrounds here
-    }
+    // if (time > 6 && time < 18) {
+    //     setBackground(skyboxMap[weather]);
+    // } else {
+        setBackground("starmap_2020_4k.exr")
+    //     console.log(time)
+    //     //set night backgrounds here
+    // }
 }
 
 init();
