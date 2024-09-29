@@ -66,6 +66,14 @@ const SUN_ORBIT_RADIUS = 300;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
+const MAX_ELEVATION = 55;
+const MIN_ELEVATION = 10;
+const MAX_AZIMUTH = 90;
+const MIN_AZIMUTH = -90;
+const HALF_MOON_JOURNEY = 6;
+const MORNING_START = 6;
+const NIGHT_START = 18;
+
 // link used to download files
 const link = document.createElement("a");
 
@@ -193,7 +201,7 @@ const setTime = (newTime) => {
     time = newTime;
     // Update the time of day in the scene
     // Set moon or sun to the correct position
-    if (time >= 6 && time < 18) {
+    if (time >= MORNING_START && time < NIGHT_START) {
         sun.visible = true;
         moon.visible = false;
         updateSun();
@@ -210,17 +218,16 @@ const setTime = (newTime) => {
  * Sets moon parameters based on current time.
  */
 const setMoonParameters = () => {
-    const isBeforeMorning = time < 6;
+    const isBeforeMorningAndAfterMidnight = time < MORNING_START;
     let newElevation;
     let newAzimuth;
-    if (isBeforeMorning) {
-        newElevation = Math.round(55 - time * ((55 - 10) / 6));
-        newAzimuth = Math.round(time * -90 / 6);
+    if (isBeforeMorningAndAfterMidnight) {
+        newElevation = Math.round(MAX_ELEVATION - time * ((MAX_ELEVATION - MIN_ELEVATION) / HALF_MOON_JOURNEY));
+        newAzimuth = Math.round(time * MIN_AZIMUTH / HALF_MOON_JOURNEY);
     } else {
-        newElevation = Math.round(10 + 55 / 6 * (time - 17));
-        newAzimuth = Math.round((time - 17) * (90 / 6));
+        newElevation = Math.round(MIN_ELEVATION + MAX_ELEVATION / HALF_MOON_JOURNEY * (time - (NIGHT_START - 1)));
+        newAzimuth = Math.round((time - (NIGHT_START - 1)) * (MAX_AZIMUTH / HALF_MOON_JOURNEY));
     }
-
     moonParameters = {
         elevation: newElevation,
         azimuth: newAzimuth
