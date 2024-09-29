@@ -21,7 +21,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
-    "Sun": ["sunObject.glb", 1]
+    "Sun": ["sunObject.glb", 10]
 };
 
 const skyboxMap = {
@@ -43,6 +43,9 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+// avoids mismatch between toggle and system when user reloads page
+trackTimeInput.checked = true;
+trackWeatherInput.checked = true;
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -59,7 +62,7 @@ const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
 const MOON_ORBIT_RADIUS = 100;
-const SUN_ORBIT_RADIUS = 80;
+const SUN_ORBIT_RADIUS = 300;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -118,7 +121,6 @@ const init = async () => {
 
     updateSkybox();
 
-    console.log(loader)
 
     const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
@@ -189,11 +191,14 @@ const setTime = (newTime) => {
     if (time >= 6 && time < 18) {
         sun.visible = true;
         moon.visible = false;
+        updateSun();
     } else {
         sun.visible = false;
         moon.visible = true;
+        updateMoon();
     }
     updateSkybox();
+
 };
 
 /**
@@ -294,14 +299,16 @@ const updateMoon = () => {
     moon.position.multiplyScalar(MOON_ORBIT_RADIUS);
 };
 
+/**
+ * Updates the movement of the sun based on the gardens time
+ */
 const updateSun = () => {
-    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (currentHour - 12) / 6)
-    const sunZ = (SUN_ORBIT_RADIUS / 6) * (currentHour - 12)
+    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 6)
+    const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12)
     const sunPosition = new THREE.Vector3(0, sunY, sunZ);
     sun.position.z = sunZ;
     sun.position.y = sunY;
     light.position.set(0, sunY, sunZ);
-    console.log("current time: " + currentHour);
 }
 
 /**
@@ -358,4 +365,3 @@ downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer)
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
 
-console.log(scene.children);
