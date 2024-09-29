@@ -524,7 +524,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(xCoord, yCoord);
 
     const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
