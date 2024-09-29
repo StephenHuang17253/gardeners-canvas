@@ -555,9 +555,7 @@ plantItems.forEach((item, i) => {
             return;
         }
 
-        if (currentCount < 1) {
-            return;
-        }
+        if (currentCount < 1) return;
 
         item.style.border = "3px solid blue";
 
