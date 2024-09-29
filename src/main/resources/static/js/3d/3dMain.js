@@ -21,6 +21,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
+    "Sun": ["sunObject.glb",1]
 };
 
 const skyboxMap = {
@@ -29,7 +30,7 @@ const skyboxMap = {
     "Rainy": "cloudy_skybox.exr",
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, moonParameters;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters;
 
 const container = document.getElementById("container");
 
@@ -55,6 +56,7 @@ const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Sunny";
 
 const MOON_ORBIT_RADIUS = 100;
+const SUN_ORBIT_RADIUS = 80;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -111,8 +113,6 @@ const init = async () => {
 
     exporter = new Exporter(gardenName, downloader);
 
-    addLight();
-
     setBackground(skyboxMap[weather]);
 
     const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
@@ -142,6 +142,21 @@ const init = async () => {
     };
 
     updateMoon();
+    addLight();
+
+    sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
+
+    const sunPosition = new THREE.Vector3(0, 50, 0);
+    sun.position.copy(sunPosition);
+    sun.scale.set(modelMap["Sun"][1], modelMap["Sun"][1], modelMap["Sun"][1]);
+    scene.add(sun);
+    updateSun()
+
+
+    light = new THREE.PointLight( 0xff0000, 1, 100 );
+    light.intensity = 5;
+    light.position.set(0,50,0);
+    scene.add( light );
 
     const gui = new GUI();
     const folderSky = gui.addFolder('Sky');
@@ -275,6 +290,14 @@ const updateMoon = () => {
     moon.position.multiplyScalar(MOON_ORBIT_RADIUS);
 };
 
+const updateSun = () => {
+    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (currentHour - 12) / 6)
+    const sunX = (SUN_ORBIT_RADIUS / 6) * (currentHour - 12)
+    const sunPosition = new THREE.Vector3(sunX, sunY, 0);
+    sun.position.x = sunX;
+    sun.position.y = sunY;
+    console.log("current time: " + currentHour);
+}
 
 /**
  * Event Handlers
