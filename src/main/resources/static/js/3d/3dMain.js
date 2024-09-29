@@ -21,7 +21,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
-    "Sun": ["sunObject.glb",1]
+    "Sun": ["sunObject.glb", 1]
 };
 
 const skyboxMap = {
@@ -78,50 +78,6 @@ const currentWeather = currentWeatherInput.value !== "" ? currentWeatherInput.va
 
 let time = currentHour;
 let weather = currentWeather;
-
-console.log(weather);
-
-/**
- * Updates the time of day in the scene
- *
- * @param {number} newTime
- */
-const setTime = (newTime) => {
-    time = newTime;
-    changeSkybox(weather, time)
-    // Update the time of day in the scene
-    // Set moon or sun to the correct position
-};
-
-/**
- * Updates the weather in the scene
- *
- * @param {String} newWeather
- */
-const setWeather = (newWeather) => {
-    weather = newWeather;
-    if (weather === DEFAULT_WEATHER) {
-        setBackground(skyboxMap[weather]);
-    } else {
-        changeSkybox(weather, time);
-    }
-    // change clouds and rain to match the weather
-}
-
-/**
- * Sets the background of the scene
- *
- * @param {string} filename
- */
-const setBackground = (filename) => {
-    loader.loadBackground(
-        filename,
-        texture => {
-            scene.background = texture;
-            scene.environment = texture;
-        }
-    );
-}
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -191,6 +147,8 @@ const init = async () => {
     updateMoon();
     addLight();
 
+    addLight();
+
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 
     const sunPosition = new THREE.Vector3(0, 50, 0);
@@ -201,10 +159,10 @@ const init = async () => {
 
 
 
-    light = new THREE.HemisphereLight( 0x0000ff, 0x00ff00, 0.6 );
+    light = new THREE.HemisphereLight(0x0000ff, 0x00ff00, 0.6);
     light.intensity = 5;
-    light.position.set(0,50,0);
-    scene.add( light );
+    light.position.set(0, 50, 0);
+    scene.add(light);
     updateSun()
 
     const gui = new GUI();
@@ -234,6 +192,7 @@ const init = async () => {
  */
 const setTime = (newTime) => {
     time = newTime;
+    changeSkybox(weather, time)
     // Update the time of day in the scene
     // Set moon or sun to the correct position
 };
@@ -245,9 +204,13 @@ const setTime = (newTime) => {
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
-    setBackground(skyboxMap[weather]);
+    if (weather === DEFAULT_WEATHER) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        changeSkybox(weather, time);
+    }
     // change clouds and rain to match the weather
-};
+}
 
 /**
  * Sets the background of the scene
@@ -263,7 +226,6 @@ const setBackground = (filename) => {
         }
     );
 };
-
 
 /**
  * Adds a light to the scene
@@ -296,18 +258,7 @@ const changeSkybox = (weather, time) => {
         setBackground("nightbox.exr")
         //set night backgrounds here
     }
-}
-
-init();
-
-addLight();
-
-setBackground(skyboxMap[weather]);
-
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
-
-scene.add(grid);
-
+};
 
 /**
  * Adds a plant or decoration object to the scene.
@@ -368,7 +319,7 @@ const updateSun = () => {
     const sunPosition = new THREE.Vector3(0, sunY, sunZ);
     sun.position.z = sunZ;
     sun.position.y = sunY;
-    light.position.set(0,sunY,sunZ);
+    light.position.set(0, sunY, sunZ);
     console.log("current time: " + currentHour);
 }
 
