@@ -26,7 +26,9 @@ const skyboxMap = {
     "Sunny": "sunny-day.exr",
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
-    "Default": "default.exr"
+    "Default": "default.exr",
+    "Clear Night": "nightbox.exr",
+    "Overcast Night": "overcast_nightbox.exr"
 };
 
 
@@ -175,13 +177,15 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
  * Changes the skybox based on time of the day
  */
 const changeSkybox = (weather, time) => {
-    // if (time > 6 && time < 18) {
-    //     setBackground(skyboxMap[weather]);
-    // } else {
-    setBackground("new.exr")
-    //     console.log(time)
-    //     //set night backgrounds here
-    // }
+    if (time > 6 && time < 18) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        if (weather === "Rainy" || weather === "Overcast") {
+            setBackground(skyboxMap["Overcast Night"])
+        } else {
+            setBackground(skyboxMap["Clear Night"])
+        }
+    }
 }
 
 init();
