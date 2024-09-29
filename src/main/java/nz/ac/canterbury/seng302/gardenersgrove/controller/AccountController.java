@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
@@ -121,12 +122,12 @@ public class AccountController {
      * @return registration form
      */
     @GetMapping("/register")
-    public String registrationForm(@RequestParam(name = "firstName", defaultValue = "") String firstName,
-            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+    public String registrationForm(@RequestParam(name = Constants.FIRST_NAME_ATTRIBUTE, defaultValue = "") String firstName,
+            @RequestParam(name = Constants.LAST_NAME_ATTRIBUTE, required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
-            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-            @RequestParam(name = "password", defaultValue = "") String password,
+            @RequestParam(name = Constants.DATE_OF_BIRTH_ATTRIBUTE, required = false) LocalDate dateOfBirth,
+            @RequestParam(name = Constants.EMAIL_ATTRIBUTE, defaultValue = "") String emailAddress,
+            @RequestParam(name = Constants.PASSWORD_ATTRIBUTE, defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword, Model model) {
         logger.info("GET /register");
 
@@ -134,12 +135,12 @@ public class AccountController {
             return "redirect:/home";
         }
 
-        model.addAttribute("firstName", firstName);
-        model.addAttribute("lastName", lastName);
+        model.addAttribute(Constants.FIRST_NAME_ATTRIBUTE, firstName);
+        model.addAttribute(Constants.LAST_NAME_ATTRIBUTE, lastName);
         model.addAttribute("noLastName", noLastName);
-        model.addAttribute("dateOfBirth", dateOfBirth);
-        model.addAttribute("emailAddress", emailAddress);
-        model.addAttribute("password", password);
+        model.addAttribute(Constants.DATE_OF_BIRTH_ATTRIBUTE, dateOfBirth);
+        model.addAttribute(Constants.EMAIL_ATTRIBUTE, emailAddress);
+        model.addAttribute(Constants.PASSWORD_ATTRIBUTE, password);
         model.addAttribute("repeatPassword", repeatPassword);
         return "registrationPage";
     }
@@ -162,12 +163,12 @@ public class AccountController {
      */
     @PostMapping("/register")
     public String submitRegistrationForm(HttpServletRequest request,
-            @RequestParam(name = "firstName", defaultValue = "") String firstName,
-            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+            @RequestParam(name = Constants.FIRST_NAME_ATTRIBUTE, defaultValue = "") String firstName,
+            @RequestParam(name = Constants.LAST_NAME_ATTRIBUTE, required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
-            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-            @RequestParam(name = "password", defaultValue = "") String password,
+            @RequestParam(name = Constants.DATE_OF_BIRTH_ATTRIBUTE, required = false) LocalDate dateOfBirth,
+            @RequestParam(name = Constants.EMAIL_ATTRIBUTE, defaultValue = "") String emailAddress,
+            @RequestParam(name = Constants.PASSWORD_ATTRIBUTE, defaultValue = "") String password,
             @RequestParam(name = "repeatPassword", defaultValue = "") String repeatPassword,
             Model model) {
         logger.info("POST /register");
@@ -175,18 +176,18 @@ public class AccountController {
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
 
-        validationMap.put("firstName", InputValidator.validateName(firstName));
+        validationMap.put(Constants.FIRST_NAME_ATTRIBUTE, InputValidator.validateName(firstName));
 
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         if (noLastName) {
             lastNameValidation = ValidationResult.OK;
             lastName = "";
         }
-        validationMap.put("lastName", lastNameValidation);
+        validationMap.put(Constants.LAST_NAME_ATTRIBUTE, lastNameValidation);
 
         removeIfExpired(emailAddress);
 
-        validationMap.put("emailAddress", InputValidator.validateUniqueEmail(emailAddress));
+        validationMap.put(Constants.EMAIL_ATTRIBUTE, InputValidator.validateUniqueEmail(emailAddress));
 
         ValidationResult dateOfBirthValidation;
         if (dateOfBirth == null) {
@@ -195,7 +196,7 @@ public class AccountController {
             String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
-        validationMap.put("dateOfBirth", dateOfBirthValidation);
+        validationMap.put(Constants.DATE_OF_BIRTH_ATTRIBUTE, dateOfBirthValidation);
 
         List<String> otherFields = new ArrayList<>();
         otherFields.add(firstName);
@@ -206,7 +207,7 @@ public class AccountController {
             otherFields.add(dateOfBirth.toString());
         }
         otherFields.add(emailAddress);
-        validationMap.put("password", InputValidator.validatePassword(password, otherFields));
+        validationMap.put(Constants.PASSWORD_ATTRIBUTE, InputValidator.validatePassword(password, otherFields));
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -215,9 +216,9 @@ public class AccountController {
 
                 String error = entry.getValue().toString();
 
-                if (entry.getKey().equals("firstName")) {
+                if (entry.getKey().equals(Constants.FIRST_NAME_ATTRIBUTE)) {
                     error = "First name " + error;
-                } else if (entry.getKey().equals("lastName")) {
+                } else if (entry.getKey().equals(Constants.LAST_NAME_ATTRIBUTE)) {
                     error = "Last name " + error;
                 }
 
@@ -232,10 +233,10 @@ public class AccountController {
         }
 
         if (!valid) {
-            model.addAttribute("firstName", firstName);
-            model.addAttribute("lastName", lastName);
-            model.addAttribute("emailAddress", emailAddress);
-            model.addAttribute("dateOfBirth", dateOfBirth);
+            model.addAttribute(Constants.FIRST_NAME_ATTRIBUTE, firstName);
+            model.addAttribute(Constants.LAST_NAME_ATTRIBUTE, lastName);
+            model.addAttribute(Constants.EMAIL_ATTRIBUTE, emailAddress);
+            model.addAttribute(Constants.DATE_OF_BIRTH_ATTRIBUTE, dateOfBirth);
             model.addAttribute("noLastName", noLastName);
             return "registrationPage";
         }
@@ -269,11 +270,11 @@ public class AccountController {
 
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
-            model.addAttribute("message", inputFlashMap.get("message"));
-            model.addAttribute("goodMessage", inputFlashMap.get("goodMessage"));
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE, inputFlashMap.get(Constants.MESSAGE_ATTRIBUTE));
+            model.addAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, inputFlashMap.get(Constants.GOOD_MESSAGE_ATTRIBUTE));
         }
 
-        model.addAttribute("emailAddress", emailAddress);
+        model.addAttribute(Constants.EMAIL_ATTRIBUTE, emailAddress);
 
         return "verificationPage";
     }
@@ -290,15 +291,15 @@ public class AccountController {
      */
     @PostMapping("/verify")
     public String postVerify(@RequestParam(name = "tokenString") String tokenString,
-            @RequestParam(name = "emailAddress") String emailAddress, Model model,
+            @RequestParam(name = Constants.EMAIL_ATTRIBUTE) String emailAddress, Model model,
             RedirectAttributes redirectAttributes) {
         logger.info("POST /verify");
 
         Token token = tokenService.getTokenByTokenString(tokenString);
 
         if (token == null || token.isExpired() || !token.getUser().getEmailAddress().equals(emailAddress)) {
-            redirectAttributes.addFlashAttribute("message", "Signup code invalid");
-            redirectAttributes.addFlashAttribute("goodMessage", false);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE, "Signup code invalid");
+            redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
             return "redirect:/verify/" + emailAddress;
         }
 
@@ -306,8 +307,8 @@ public class AccountController {
         userService.verifyUser(user);
         tokenService.deleteToken(token);
 
-        redirectAttributes.addFlashAttribute("message", "Your account has been activated, please log in");
-        redirectAttributes.addFlashAttribute("goodMessage", true);
+        redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE, "Your account has been activated, please log in");
+        redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, true);
         return "redirect:/login";
     }
 
@@ -318,8 +319,8 @@ public class AccountController {
      */
     @GetMapping("/login")
     public String loginPage(
-            @RequestParam(name = "emailAddress", defaultValue = "") String emailAddress,
-            @RequestParam(name = "password", defaultValue = "") String password, Model model,
+            @RequestParam(name = Constants.EMAIL_ATTRIBUTE, defaultValue = "") String emailAddress,
+            @RequestParam(name = Constants.PASSWORD_ATTRIBUTE, defaultValue = "") String password, Model model,
             HttpServletRequest request) {
         logger.info("GET /login");
 
@@ -331,16 +332,16 @@ public class AccountController {
         // Used for displaying messages after a redirect e.g. from the verify page
         Map<String, ?> inputFlashMap = RequestContextUtils.getInputFlashMap(request);
         if (inputFlashMap != null) {
-            model.addAttribute("message", inputFlashMap.get("message"));
-            model.addAttribute("goodMessage", inputFlashMap.get("goodMessage"));
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE, inputFlashMap.get(Constants.MESSAGE_ATTRIBUTE));
+            model.addAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, inputFlashMap.get(Constants.GOOD_MESSAGE_ATTRIBUTE));
         }
 
         model.addAttribute("validEmail", true);
         model.addAttribute("validLogin", true);
-        model.addAttribute("emailAddress", emailAddress);
-        model.addAttribute("password", password);
+        model.addAttribute(Constants.EMAIL_ATTRIBUTE, emailAddress);
+        model.addAttribute(Constants.PASSWORD_ATTRIBUTE, password);
 
-        return "loginPage";
+        return Constants.LOGIN_PAGE_ATTRIBUTE;
     }
 
     /**
@@ -358,19 +359,19 @@ public class AccountController {
 
         ValidationResult validEmail = InputValidator.validateEmail(emailAddress);
 
-        model.addAttribute("emailAddress", emailAddress);
-        model.addAttribute("password", password);
+        model.addAttribute(Constants.EMAIL_ATTRIBUTE, emailAddress);
+        model.addAttribute(Constants.PASSWORD_ATTRIBUTE, password);
 
         if (!validEmail.valid()) {
             model.addAttribute("emailAddressError", validEmail);
-            return "loginPage";
+            return Constants.LOGIN_PAGE_ATTRIBUTE;
         }
 
         User user = userService.getUserByEmailAndPassword(emailAddress, password);
 
         if (user == null) {
             model.addAttribute("loginError", "The email address is unknown, or the password is invalid");
-            return "loginPage";
+            return Constants.LOGIN_PAGE_ATTRIBUTE;
         }
 
         if (!user.isVerified()) {
@@ -381,9 +382,9 @@ public class AccountController {
             int banTimeLeft = user.daysUntilUnban();
             String message = "Your account is blocked for " + banTimeLeft + " day" + (banTimeLeft == 1 ? "" : "s")
                     + " due to inappropriate conduct";
-            model.addAttribute("goodMessage", false);
-            model.addAttribute("message", message);
-            return "loginPage";
+            model.addAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE, message);
+            return Constants.LOGIN_PAGE_ATTRIBUTE;
         }
 
         setSecurityContext(emailAddress, password, request.getSession());
@@ -392,7 +393,7 @@ public class AccountController {
         for (Garden garden : gardens) {
             gardenNavModels.add(new GardenNavModel(garden.getGardenId(), garden.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenNavModels);
+        session.setAttribute(Constants.USER_GARDENS_ATTRIBUTE, gardenNavModels);
 
         return "redirect:/home";
 
