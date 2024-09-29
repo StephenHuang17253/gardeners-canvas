@@ -55,7 +55,6 @@ const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
 const TEXTURE_TYPE = "TEXTURE"
-const PLANT_TYPE = "PLANT"
 
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts,
     textureLayer, gardenItemLayer,
@@ -557,7 +556,6 @@ plantItems.forEach((item, i) => {
         }
 
         if (currentCount < 1) {
-            deselectPaletteItem();
             return;
         }
 
