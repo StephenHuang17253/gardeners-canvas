@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,7 +190,7 @@ public class ProfileController {
         String userName = user.getFirstName() + " " + user.getLastName();
 
         String filename = user.getProfilePictureFilename();
-        model.addAttribute("profilePicture", filename);
+        model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, filename);
         model.addAttribute("userName", userName);
 
         String formattedDateOfBirth = "";
@@ -198,8 +199,8 @@ public class ProfileController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             formattedDateOfBirth = dateOfBirth.format(formatter);
         }
-        model.addAttribute("dateOfBirth", formattedDateOfBirth);
-        model.addAttribute("emailAddress", user.getEmailAddress());
+        model.addAttribute(Constants.DATE_OF_BIRTH_ATTRIBUTE, formattedDateOfBirth);
+        model.addAttribute(Constants.EMAIL_ATTRIBUTE, user.getEmailAddress());
 
         return "profilePage";
     }
@@ -226,9 +227,9 @@ public class ProfileController {
             String userName = user.getFirstName() + " " + user.getLastName();
             String filename = user.getProfilePictureFilename();
             model.addAttribute("userName", userName);
-            model.addAttribute("dateOfBirth", user.getDateOfBirth());
-            model.addAttribute("emailAddress", user.getEmailAddress());
-            model.addAttribute("profilePicture", filename);
+            model.addAttribute(Constants.DATE_OF_BIRTH_ATTRIBUTE, user.getDateOfBirth());
+            model.addAttribute(Constants.EMAIL_ATTRIBUTE, user.getEmailAddress());
+            model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, filename);
             model.addAttribute("profilePictureError", profilePictureValidation);
             return "profilePage";
         }
@@ -249,16 +250,16 @@ public class ProfileController {
 
         User user = securityService.getCurrentUser();
 
-        model.addAttribute("firstName", user.getFirstName());
-        model.addAttribute("lastName", user.getLastName());
-        model.addAttribute("emailAddress", user.getEmailAddress());
-        model.addAttribute("dateOfBirth", user.getDateOfBirth());
+        model.addAttribute(Constants.FIRST_NAME_ATTRIBUTE, user.getFirstName());
+        model.addAttribute(Constants.LAST_NAME_ATTRIBUTE, user.getLastName());
+        model.addAttribute(Constants.EMAIL_ATTRIBUTE, user.getEmailAddress());
+        model.addAttribute(Constants.DATE_OF_BIRTH_ATTRIBUTE, user.getDateOfBirth());
 
         boolean noLastName = user.getLastName().isEmpty();
         model.addAttribute("noLastName", noLastName);
 
         String filename = user.getProfilePictureFilename();
-        model.addAttribute("profilePicture", filename);
+        model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, filename);
 
         return "editProfilePage";
     }
@@ -279,11 +280,11 @@ public class ProfileController {
      */
     @PostMapping("/profile/edit")
     public String editProfile(HttpServletRequest request,
-            @RequestParam(name = "firstName") String firstName,
-            @RequestParam(name = "lastName", required = false, defaultValue = "") String lastName,
+            @RequestParam(name = Constants.FIRST_NAME_ATTRIBUTE) String firstName,
+            @RequestParam(name = Constants.LAST_NAME_ATTRIBUTE, required = false, defaultValue = "") String lastName,
             @RequestParam(name = "noLastName", required = false, defaultValue = "false") boolean noLastName,
-            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
-            @RequestParam(name = "emailAddress") String emailAddress,
+            @RequestParam(name = Constants.DATE_OF_BIRTH_ATTRIBUTE, required = false) LocalDate dateOfBirth,
+            @RequestParam(name = Constants.EMAIL_ATTRIBUTE) String emailAddress,
             @RequestParam(name = "profilePictureInput", required = false) MultipartFile profilePicture,
             Model model) {
         logger.info("GET /profile/edit");
@@ -293,18 +294,18 @@ public class ProfileController {
         // Create a map of validation results for each input
         Map<String, ValidationResult> validationMap = new HashMap<>();
 
-        validationMap.put("firstName", InputValidator.validateName(firstName));
+        validationMap.put(Constants.FIRST_NAME_ATTRIBUTE, InputValidator.validateName(firstName));
         ValidationResult lastNameValidation = InputValidator.validateName(lastName);
         if (noLastName) {
             lastNameValidation = ValidationResult.OK;
             lastName = "";
         }
-        validationMap.put("lastName", lastNameValidation);
+        validationMap.put(Constants.LAST_NAME_ATTRIBUTE, lastNameValidation);
         ValidationResult emailAddressValidation = InputValidator.validateUniqueEmail(emailAddress);
         if (emailAddress.equals(user.getEmailAddress())) {
             emailAddressValidation = ValidationResult.OK;
         }
-        validationMap.put("emailAddress", emailAddressValidation);
+        validationMap.put(Constants.EMAIL_ATTRIBUTE, emailAddressValidation);
         ValidationResult dateOfBirthValidation;
         if (dateOfBirth == null) {
             dateOfBirthValidation = ValidationResult.OK;
@@ -312,13 +313,13 @@ public class ProfileController {
             String dateString = dateOfBirth.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             dateOfBirthValidation = InputValidator.validateDOB(dateString);
         }
-        validationMap.put("dateOfBirth", dateOfBirthValidation);
+        validationMap.put(Constants.DATE_OF_BIRTH_ATTRIBUTE, dateOfBirthValidation);
 
         ValidationResult profilePictureValidation = FileValidator.validateImage(profilePicture, 10, FileType.IMAGES);
         if (profilePicture.isEmpty()) {
             profilePictureValidation = ValidationResult.OK;
         }
-        validationMap.put("profilePicture", profilePictureValidation);
+        validationMap.put(Constants.PROFILE_PICTURE_ATTRIBUTE, profilePictureValidation);
 
         // Check that all inputs are valid
         boolean valid = true;
@@ -328,11 +329,11 @@ public class ProfileController {
                 String error = entry.getValue().toString();
 
                 error = switch (entry.getKey()) {
-                    case "firstName" ->
+                    case Constants.FIRST_NAME_ATTRIBUTE ->
                         "First name " + error;
-                    case "lastName" ->
+                    case Constants.LAST_NAME_ATTRIBUTE ->
                         "Last name " + error;
-                    case "emailAddress" ->
+                    case Constants.EMAIL_ATTRIBUTE ->
                         error;
                     default ->
                         entry.getValue().toString();
@@ -345,13 +346,13 @@ public class ProfileController {
 
         // If any input is invalid, return to the edit form
         if (!valid) {
-            model.addAttribute("firstName", firstName);
-            model.addAttribute("lastName", lastName);
-            model.addAttribute("emailAddress", emailAddress);
-            model.addAttribute("dateOfBirth", dateOfBirth);
+            model.addAttribute(Constants.FIRST_NAME_ATTRIBUTE, firstName);
+            model.addAttribute(Constants.LAST_NAME_ATTRIBUTE, lastName);
+            model.addAttribute(Constants.EMAIL_ATTRIBUTE, emailAddress);
+            model.addAttribute(Constants.DATE_OF_BIRTH_ATTRIBUTE, dateOfBirth);
             model.addAttribute("noLastName", noLastName);
             String filename = user.getProfilePictureFilename();
-            model.addAttribute("profilePicture", filename);
+            model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, filename);
             return "editProfilePage";
         }
 

@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenNavModel;
@@ -31,7 +32,7 @@ import java.util.concurrent.Semaphore;
  * Controller for creating a new Garden using a form page
  */
 @Controller
-@SessionAttributes("userGardens")
+@SessionAttributes(Constants.USER_GARDENS_ATTRIBUTE)
 public class GardenFormController {
 
     Logger logger = LoggerFactory.getLogger(GardenFormController.class);
@@ -145,26 +146,26 @@ public class GardenFormController {
      * @return thymeleaf createNewGardenPage
      */
     @GetMapping("/create-new-garden")
-    public String newGardenForm(@RequestParam(name = "gardenName", required = false) String gardenName,
-            @RequestParam(name = "streetAddress", required = false) String streetAddress,
-            @RequestParam(name = "gardenDescription", required = false) String gardenDescription,
-            @RequestParam(name = "suburb", required = false) String suburb,
+    public String newGardenForm(@RequestParam(name = Constants.GARDEN_NAME_ATTRIBUTE, required = false) String gardenName,
+            @RequestParam(name = Constants.STREET_ADDRESS_ATTRIBUTE, required = false) String streetAddress,
+            @RequestParam(name = Constants.GARDEN_DESCRIPTION_ATTRIBUTE, required = false) String gardenDescription,
+            @RequestParam(name = Constants.SUBURB_ATTRIBUTE, required = false) String suburb,
             @RequestParam(name = "city", required = false) String city,
-            @RequestParam(name = "country", required = false) String country,
-            @RequestParam(name = "postcode", required = false) String postcode,
-            @RequestParam(name = "gardenSize", required = false) String gardenSize,
-            @RequestParam(name = "longitude", required = false) String longitude,
-            @RequestParam(name = "latitude", required = false) String latitude,
+            @RequestParam(name = Constants.COUNTRY_ATTRIBUTE, required = false) String country,
+            @RequestParam(name = Constants.POSTCODE_ATTRIBUTE, required = false) String postcode,
+            @RequestParam(name = Constants.GARDEN_SIZE_ATTRIBUTE, required = false) String gardenSize,
+            @RequestParam(name = Constants.LONGITUDE_ATTRIBUTE, required = false) String longitude,
+            @RequestParam(name = Constants.LATITUDE_ATTRIBUTE, required = false) String latitude,
             Model model) {
 
-        model.addAttribute("gardenName", gardenName);
-        model.addAttribute("gardenDescription", gardenDescription);
-        model.addAttribute("streetAddress", streetAddress);
-        model.addAttribute("suburb", suburb);
+        model.addAttribute(Constants.GARDEN_NAME_ATTRIBUTE, gardenName);
+        model.addAttribute(Constants.GARDEN_DESCRIPTION_ATTRIBUTE, gardenDescription);
+        model.addAttribute(Constants.STREET_ADDRESS_ATTRIBUTE, streetAddress);
+        model.addAttribute(Constants.SUBURB_ATTRIBUTE, suburb);
         model.addAttribute("city", city);
-        model.addAttribute("country", country);
-        model.addAttribute("postcode", postcode);
-        model.addAttribute("gardenSize", gardenSize);
+        model.addAttribute(Constants.COUNTRY_ATTRIBUTE, country);
+        model.addAttribute(Constants.POSTCODE_ATTRIBUTE, postcode);
+        model.addAttribute(Constants.GARDEN_SIZE_ATTRIBUTE, gardenSize);
 
         logger.info("GET /create-new-garden");
         return "createNewGardenPage";
@@ -194,16 +195,16 @@ public class GardenFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/create-new-garden")
-    public String submitNewGardenForm(@RequestParam(name = "gardenName") String gardenName,
-            @RequestParam(name = "gardenDescription") String gardenDescription,
-            @RequestParam(name = "streetAddress") String streetAddress,
-            @RequestParam(name = "suburb") String suburb,
+    public String submitNewGardenForm(@RequestParam(name = Constants.GARDEN_NAME_ATTRIBUTE) String gardenName,
+            @RequestParam(name = Constants.GARDEN_DESCRIPTION_ATTRIBUTE) String gardenDescription,
+            @RequestParam(name = Constants.STREET_ADDRESS_ATTRIBUTE) String streetAddress,
+            @RequestParam(name = Constants.SUBURB_ATTRIBUTE) String suburb,
             @RequestParam(name = "city") String city,
-            @RequestParam(name = "country") String country,
-            @RequestParam(name = "postcode") String postcode,
-            @RequestParam(name = "gardenSize") String gardenSize,
-            @RequestParam(name = "longitude") String longitude,
-            @RequestParam(name = "latitude") String latitude,
+            @RequestParam(name = Constants.COUNTRY_ATTRIBUTE) String country,
+            @RequestParam(name = Constants.POSTCODE_ATTRIBUTE) String postcode,
+            @RequestParam(name = Constants.GARDEN_SIZE_ATTRIBUTE) String gardenSize,
+            @RequestParam(name = Constants.LONGITUDE_ATTRIBUTE) String longitude,
+            @RequestParam(name = Constants.LATITUDE_ATTRIBUTE) String latitude,
             HttpSession session,
             Model model,
             RedirectAttributes redirectAttributes) throws IOException, InterruptedException {
@@ -229,16 +230,16 @@ public class GardenFormController {
             gardenSize = null;
         }
 
-        model.addAttribute("gardenName", gardenName);
-        model.addAttribute("gardenDescription", gardenDescription);
-        model.addAttribute("streetAddress", streetAddress);
-        model.addAttribute("suburb", suburb);
+        model.addAttribute(Constants.GARDEN_NAME_ATTRIBUTE, gardenName);
+        model.addAttribute(Constants.GARDEN_DESCRIPTION_ATTRIBUTE, gardenDescription);
+        model.addAttribute(Constants.STREET_ADDRESS_ATTRIBUTE, streetAddress);
+        model.addAttribute(Constants.SUBURB_ATTRIBUTE, suburb);
         model.addAttribute("city", city);
-        model.addAttribute("country", country);
-        model.addAttribute("postcode", postcode);
-        model.addAttribute("gardenSize", gardenSize);
-        model.addAttribute("latitude", latitude);
-        model.addAttribute("longitude", longitude);
+        model.addAttribute(Constants.COUNTRY_ATTRIBUTE, country);
+        model.addAttribute(Constants.POSTCODE_ATTRIBUTE, postcode);
+        model.addAttribute(Constants.GARDEN_SIZE_ATTRIBUTE, gardenSize);
+        model.addAttribute(Constants.LATITUDE_ATTRIBUTE, latitude);
+        model.addAttribute(Constants.LONGITUDE_ATTRIBUTE, longitude);
 
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid() ||
                 !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
@@ -266,8 +267,8 @@ public class GardenFormController {
         for (Garden g : gardens) {
             gardenModels.add(new GardenNavModel(g.getGardenId(), g.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenModels);
-        model.addAttribute("userGardens", session.getAttribute("userGardens"));
+        session.setAttribute(Constants.USER_GARDENS_ATTRIBUTE, gardenModels);
+        model.addAttribute(Constants.USER_GARDENS_ATTRIBUTE, session.getAttribute(Constants.USER_GARDENS_ATTRIBUTE));
 
         findingGardenCoordinates(garden);
 
@@ -311,20 +312,20 @@ public class GardenFormController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return "403";
         }
-        model.addAttribute("gardenName", garden.getGardenName());
-        model.addAttribute("gardenDescription", garden.getGardenDescription());
-        model.addAttribute("streetAddress", garden.getGardenAddress());
-        model.addAttribute("suburb", garden.getGardenSuburb());
+        model.addAttribute(Constants.GARDEN_NAME_ATTRIBUTE, garden.getGardenName());
+        model.addAttribute(Constants.GARDEN_DESCRIPTION_ATTRIBUTE, garden.getGardenDescription());
+        model.addAttribute(Constants.STREET_ADDRESS_ATTRIBUTE, garden.getGardenAddress());
+        model.addAttribute(Constants.SUBURB_ATTRIBUTE, garden.getGardenSuburb());
         model.addAttribute("city", garden.getGardenCity());
-        model.addAttribute("postcode", garden.getGardenPostcode());
-        model.addAttribute("country", garden.getGardenCountry());
-        model.addAttribute("latitude", garden.getGardenLatitude());
-        model.addAttribute("longitude", garden.getGardenLongitude());
+        model.addAttribute(Constants.POSTCODE_ATTRIBUTE, garden.getGardenPostcode());
+        model.addAttribute(Constants.COUNTRY_ATTRIBUTE, garden.getGardenCountry());
+        model.addAttribute(Constants.LATITUDE_ATTRIBUTE, garden.getGardenLatitude());
+        model.addAttribute(Constants.LONGITUDE_ATTRIBUTE, garden.getGardenLongitude());
         double gardenSize = garden.getGardenSize();
         if (gardenSize == 0.0) {
-            model.addAttribute("gardenSize", "");
+            model.addAttribute(Constants.GARDEN_SIZE_ATTRIBUTE, "");
         } else {
-            model.addAttribute("gardenSize", gardenSize);
+            model.addAttribute(Constants.GARDEN_SIZE_ATTRIBUTE, gardenSize);
         }
         return "editGardenPage";
     }
@@ -354,16 +355,16 @@ public class GardenFormController {
      * @return thymeleaf landingPage
      */
     @PostMapping("/my-gardens/{gardenId}/edit")
-    public String submitEditedGardenForm(@RequestParam(name = "gardenName") String gardenName,
-            @RequestParam(name = "gardenDescription") String gardenDescription,
-            @RequestParam(name = "streetAddress") String streetAddress,
-            @RequestParam(name = "suburb") String suburb,
+    public String submitEditedGardenForm(@RequestParam(name = Constants.GARDEN_NAME_ATTRIBUTE) String gardenName,
+            @RequestParam(name = Constants.GARDEN_DESCRIPTION_ATTRIBUTE) String gardenDescription,
+            @RequestParam(name = Constants.STREET_ADDRESS_ATTRIBUTE) String streetAddress,
+            @RequestParam(name = Constants.SUBURB_ATTRIBUTE) String suburb,
             @RequestParam(name = "city") String city,
-            @RequestParam(name = "country") String country,
-            @RequestParam(name = "postcode") String postcode,
-            @RequestParam(name = "gardenSize") String gardenSize,
-            @RequestParam(name = "longitude") String longitude,
-            @RequestParam(name = "latitude") String latitude,
+            @RequestParam(name = Constants.COUNTRY_ATTRIBUTE) String country,
+            @RequestParam(name = Constants.POSTCODE_ATTRIBUTE) String postcode,
+            @RequestParam(name = Constants.GARDEN_SIZE_ATTRIBUTE) String gardenSize,
+            @RequestParam(name = Constants.LONGITUDE_ATTRIBUTE) String longitude,
+            @RequestParam(name = Constants.LATITUDE_ATTRIBUTE) String latitude,
             @PathVariable Long gardenId, HttpSession session,
             HttpServletResponse response,
             Model model) throws IOException, InterruptedException {
@@ -401,16 +402,16 @@ public class GardenFormController {
         if (!gardenNameResult.valid() || !streetAddressResult.valid() || !suburbResult.valid() || !cityResult.valid()
                 || !countryResult.valid() || !postcodeResult.valid() || !gardenSizeResult.valid()
                 || !gardenDescriptionResult.valid()) {
-            model.addAttribute("gardenName", gardenName);
-            model.addAttribute("gardenDescription", gardenDescription);
-            model.addAttribute("streetAddress", streetAddress);
-            model.addAttribute("suburb", suburb);
+            model.addAttribute(Constants.GARDEN_NAME_ATTRIBUTE, gardenName);
+            model.addAttribute(Constants.GARDEN_DESCRIPTION_ATTRIBUTE, gardenDescription);
+            model.addAttribute(Constants.STREET_ADDRESS_ATTRIBUTE, streetAddress);
+            model.addAttribute(Constants.SUBURB_ATTRIBUTE, suburb);
             model.addAttribute("city", city);
-            model.addAttribute("country", country);
-            model.addAttribute("postcode", postcode);
-            model.addAttribute("gardenSize", gardenSize);
-            model.addAttribute("latitude", latitude);
-            model.addAttribute("longitude", longitude);
+            model.addAttribute(Constants.COUNTRY_ATTRIBUTE, country);
+            model.addAttribute(Constants.POSTCODE_ATTRIBUTE, postcode);
+            model.addAttribute(Constants.GARDEN_SIZE_ATTRIBUTE, gardenSize);
+            model.addAttribute(Constants.LATITUDE_ATTRIBUTE, latitude);
+            model.addAttribute(Constants.LONGITUDE_ATTRIBUTE, longitude);
             return "editGardenPage";
         }
         Double doubleGardenSize;
@@ -435,8 +436,8 @@ public class GardenFormController {
         for (Garden g : gardens) {
             gardenModels.add(new GardenNavModel(g.getGardenId(), g.getGardenName()));
         }
-        session.setAttribute("userGardens", gardenModels);
-        model.addAttribute("userGardens", session.getAttribute("userGardens"));
+        session.setAttribute(Constants.USER_GARDENS_ATTRIBUTE, gardenModels);
+        model.addAttribute(Constants.USER_GARDENS_ATTRIBUTE, session.getAttribute(Constants.USER_GARDENS_ATTRIBUTE));
 
         return "redirect:/my-gardens/{gardenId}";
     }
