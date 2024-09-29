@@ -147,16 +147,16 @@ const init = async () => {
         }
     );
 
+    // initializing moon
     const geometry = new THREE.SphereGeometry(2, 60, 60);
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
 
+    // Todo remove following 9 lines and related imports
     moonParameters = {
         elevation: 2,
         azimuth: 180
     };
-    setMoonParameters();
-    updateMoon();
     const gui = new GUI();
     const folderSky = gui.addFolder('Sky');
     folderSky.add(moonParameters, 'elevation', 0, 90, 0.1).onChange(updateMoon);
@@ -176,7 +176,9 @@ const init = async () => {
     scene.add(light);
     updateSun();
 
-    setTime(time);
+    // Todo uncomment following line and remove the line after that
+    //setTime(time);
+    setTime(2)
 
     const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
     const placedGardenObjects = await response.json();
@@ -325,6 +327,7 @@ const animate = () => {
  * Updates the position of the moon in the scene based on the moonParameters
  */
 const updateMoon = () => {
+    setMoonParameters();
     const phi = THREE.MathUtils.degToRad(90 - moonParameters.elevation);
     const theta = THREE.MathUtils.degToRad(moonParameters.azimuth);
 
@@ -368,10 +371,10 @@ const onMouseMove = () => document.body.style.userSelect = "none";
 const onMouseOut = () => document.body.style.userSelect = "auto";
 
 /**
-* On track time input change,
-* update the time variable to the current hour if the input is checked,
-* otherwise set it to the default time
-*/
+ * On track time input change,
+ * update the time variable to the current hour if the input is checked,
+ * otherwise set it to the default time
+ */
 const onTrackTimeInputChange = () => {
     const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
