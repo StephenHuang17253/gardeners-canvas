@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import { createTileGrid } from "./tiles.js";
-import { OrbitControls } from "./OrbitControls.js";
-import { Loader } from "./Loader.js";
-import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from "./Exporter.js";
-import { Downloader } from "../Downloader.js";
-import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+import {createTileGrid} from "./tiles.js";
+import {OrbitControls} from "./OrbitControls.js";
+import {Loader} from "./Loader.js";
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import {Exporter} from "./Exporter.js";
+import {Downloader} from "../Downloader.js";
+import {GUI} from "three/addons/libs/lil-gui.module.min.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -140,9 +140,8 @@ const init = async () => {
         elevation: 2,
         azimuth: 180
     };
-
+    setMoonParameters();
     updateMoon();
-
     const gui = new GUI();
     const folderSky = gui.addFolder('Sky');
     folderSky.add(moonParameters, 'elevation', 0, 90, 0.1).onChange(updateMoon);
@@ -165,8 +164,8 @@ const init = async () => {
 
 /**
  * Updates the time of day in the scene
- * 
- * @param {number} newTime 
+ *
+ * @param {number} newTime
  */
 const setTime = (newTime) => {
     time = newTime;
@@ -175,9 +174,30 @@ const setTime = (newTime) => {
 };
 
 /**
+ * Sets moon parameters based on current time.
+ */
+const setMoonParameters = () => {
+    const isBeforeMorning = time < 6;
+    let newElevation;
+    let newAzimuth;
+    if (isBeforeMorning) {
+        newElevation = Math.round(55 - time * ((55 - 10) / 6));
+        newAzimuth = Math.round(time * -90 / 6);
+    } else {
+        newElevation = Math.round(10 + 55 / 6 * (time - 17));
+        newAzimuth = Math.round((time - 17) * (90 / 6));
+    }
+
+    moonParameters = {
+        elevation: newElevation,
+        azimuth: newAzimuth
+    };
+}
+
+/**
  * Updates the weather in the scene
- * 
- * @param {String} newWeather 
+ *
+ * @param {String} newWeather
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
@@ -187,8 +207,8 @@ const setWeather = (newWeather) => {
 
 /**
  * Sets the background of the scene
- * 
- * @param {string} filename 
+ *
+ * @param {string} filename
  */
 const setBackground = (filename) => {
     loader.loadBackground(
@@ -209,7 +229,7 @@ const addLight = () => {
     scene.add(light);
 };
 
-/** 
+/**
  * Add model to scene
  *
  * @param {Object} model - The model to be added to the scene.
@@ -299,11 +319,11 @@ const onMouseMove = () => document.body.style.userSelect = "none";
  */
 const onMouseOut = () => document.body.style.userSelect = "auto";
 
-/** 
-* On track time input change, 
-* update the time variable to the current hour if the input is checked, 
-* otherwise set it to the default time
-*/
+/**
+ * On track time input change,
+ * update the time variable to the current hour if the input is checked,
+ * otherwise set it to the default time
+ */
 const onTrackTimeInputChange = () => {
     const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
