@@ -235,7 +235,7 @@ init();
 
 addLight();
 
-// setBackground(skyboxMap[weather]);
+setBackground(skyboxMap[weather]);
 
 setWeather(weather);
 
@@ -361,8 +361,6 @@ const onRainDropSizeInputChange = () => {
     stopRain();
     startRain();
 };
-
-console.log(scene.children);
 
 window.addEventListener("resize", onWindowResize);
 container.addEventListener("mousemove", onMouseMove);
