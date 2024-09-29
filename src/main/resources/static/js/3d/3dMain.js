@@ -23,15 +23,15 @@ const modelMap = {
 };
 
 const skyboxMap = {
-    "Sunny": "sunny_skybox.exr",
-    "Overcast": "cloudy_skybox.exr",
-    "Rainy": "cloudy_skybox.exr",
+    "Sunny": "sunny-day.exr",
+    "Overcast": "cloudy-day.exr",
+    "Rainy": "cloudy-day.exr",
+    "Default": "default.exr"
 };
+
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, rainGeo, rainCount, rainSystem;
 let rainSize = 0.20;
-
-
 
 const container = document.getElementById("container");
 
@@ -54,7 +54,7 @@ const MIN_CAMERA_DIST = TILE_SIZE / 2;
 const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 
 const DEFAULT_TIME = 12;
-const DEFAULT_WEATHER = "Sunny";
+const DEFAULT_WEATHER = "Default";
 
 const RAIN_COLOR = 0x78b8c2
 
@@ -80,6 +80,7 @@ let isRaining = weather === "Rainy";
  */
 const setTime = (newTime) => {
     time = newTime;
+    changeSkybox(weather, time)
     // Update the time of day in the scene
     // Set moon or sun to the correct position
 };
@@ -91,7 +92,11 @@ const setTime = (newTime) => {
  */
 const setWeather = (newWeather) => {
     weather = newWeather;
-    setBackground(skyboxMap[weather]);
+    if (weather === DEFAULT_WEATHER) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        changeSkybox(weather, time);
+    }
     // change clouds and rain to match the weather
     if (weather === "Rainy") {
         rainCount = 3000;
@@ -186,13 +191,14 @@ const init = () => {
     downloader = new Downloader(link);
 
     exporter = new Exporter(gardenName, downloader);
+    changeSkybox(weather, time);
 };
 
 /**
  * Adds a light to the scene
  */
 const addLight = () => {
-    light = new THREE.AmbientLight(0xffffff);
+    light = new THREE.AmbientLight(0xffffff, 0.00);
     scene.add(light);
 };
 
@@ -208,6 +214,18 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     scene.add(model);
 };
 
+/**
+ * Changes the skybox based on time of the day
+ */
+const changeSkybox = (weather, time) => {
+    if (time > 6 && time < 18) {
+        setBackground(skyboxMap[weather]);
+    } else {
+        setBackground("nightbox.exr")
+        //set night backgrounds here
+    }
+}
+
 init();
 
 addLight();
@@ -216,12 +234,8 @@ setBackground(skyboxMap[weather]);
 
 setWeather(weather);
 
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", 0.2, 1.56, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
-// const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
+const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
+
 scene.add(grid);
 
 
