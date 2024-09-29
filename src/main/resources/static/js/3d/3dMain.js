@@ -1,11 +1,10 @@
 import * as THREE from "three";
-import { createTileGrid } from "./tiles.js";
-import { OrbitControls } from "./OrbitControls.js";
-import { Loader } from "./Loader.js";
-import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from "./Exporter.js";
-import { Downloader } from "../Downloader.js";
-import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+import {createTileGrid} from "./tiles.js";
+import {OrbitControls} from "./OrbitControls.js";
+import {Loader} from "./Loader.js";
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import {Exporter} from "./Exporter.js";
+import {Downloader} from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -151,17 +150,6 @@ const init = async () => {
     const geometry = new THREE.SphereGeometry(2, 60, 60);
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
-
-    // Todo remove following 9 lines and related imports
-    moonParameters = {
-        elevation: 2,
-        azimuth: 180
-    };
-    const gui = new GUI();
-    const folderSky = gui.addFolder('Sky');
-    folderSky.add(moonParameters, 'elevation', 0, 90, 0.1).onChange(updateMoon);
-    folderSky.add(moonParameters, 'azimuth', -180, 180, 0.1).onChange(updateMoon);
-    folderSky.open();
 
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 

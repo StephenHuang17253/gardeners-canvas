@@ -1,6 +1,7 @@
 package nz.ac.canterbury.seng302.gardenersgrove.controller;
 
 import jakarta.mail.MessagingException;
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Token;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.service.EmailService;
@@ -79,8 +80,8 @@ public class ResetPasswordController {
         if (!emailValidation.valid()) {
             model.addAttribute("emailError", emailValidation);
         } else {
-            model.addAttribute("message", "An email was sent to the address if it was recognised");
-            model.addAttribute("goodMessage", true);
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE, "An email was sent to the address if it was recognised");
+            model.addAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, true);
             if (isRegistered) {
                 User currentUser = userService.getUserByEmail(emailAddress);
                 Token token = new Token(currentUser, null);
@@ -114,12 +115,12 @@ public class ResetPasswordController {
             if (token != null) {
                 tokenService.deleteToken(token);
             }
-            redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
-            redirectAttributes.addFlashAttribute("goodMessage", false);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE, "Reset password link has expired");
+            redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
             return "redirect:/login";
         }
 
-        return "resetPasswordPage";
+        return Constants.RESET_PASSWORD_PAGE_ATTRIBUTE;
     }
 
     /**
@@ -147,8 +148,8 @@ public class ResetPasswordController {
             if (token != null) {
                 tokenService.deleteToken(token);
             }
-            redirectAttributes.addFlashAttribute("message", "Reset password link has expired");
-            redirectAttributes.addFlashAttribute("goodMessage", false);
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE, "Reset password link has expired");
+            redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
             return "redirect:/login";
         }
         User user = token.getUser();
@@ -174,10 +175,10 @@ public class ResetPasswordController {
 
         if (!passwordValidation.valid()) {
             model.addAttribute("passwordError", passwordValidation);
-            return "resetPasswordPage";
+            return Constants.RESET_PASSWORD_PAGE_ATTRIBUTE;
         } else if (!Objects.equals(password, retypePassword)) {
             model.addAttribute("passwordError", "The passwords do not match");
-            return "resetPasswordPage";
+            return Constants.RESET_PASSWORD_PAGE_ATTRIBUTE;
         } else {
             User currentUser = token.getUser();
             userService.updatePassword(currentUser.getId(), password);
