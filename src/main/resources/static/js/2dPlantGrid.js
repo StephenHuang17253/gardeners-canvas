@@ -690,8 +690,9 @@ const handleStageClick = () => {
             updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
         } else {
             const { i: newGridX, j: newGridY } = convertToGridCoordinates(x, y);
-            destroyExistingTexture(newGridX, newGridY);
-            createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name);
+            createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, function () {
+                destroyExistingTexture(newGridX, newGridY);
+            });
             return;
         }
     } else if (selectedGridItem) {

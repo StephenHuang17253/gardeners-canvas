@@ -4,6 +4,7 @@ import net.minidev.json.JSONArray;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.Tile2DModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GridItemLocationRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.HomePageLayoutRepository;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.UserRepository;
@@ -33,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -228,11 +230,11 @@ class Garden2dControllerTest {
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
     }
@@ -259,11 +261,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
@@ -299,11 +301,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         Assertions.assertFalse(gridItemLocationRepository.findAll().isEmpty());
@@ -344,11 +346,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // check persistence is updated
@@ -399,11 +401,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // check persistence is updated
@@ -449,11 +451,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
@@ -481,11 +483,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 9L + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError()).andReturn();
         Assertions.assertTrue(gridItemLocationRepository.findAll().isEmpty());
 
@@ -504,11 +506,11 @@ class Garden2dControllerTest {
         List<String> tileTextureList = Arrays.asList(grassArray);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + 99L + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 
@@ -548,11 +550,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // checking grid item locations are updated
@@ -604,11 +606,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // checking grid item locations are updated
@@ -650,11 +652,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // check persistence is updated
@@ -695,11 +697,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // check persistence is updated
@@ -754,11 +756,11 @@ class Garden2dControllerTest {
 
         // making call to endpoint
         mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/" + gardenId + "/save").with(csrf())
-                .param("idList", JSONArray.toJSONString(idList))
-                .param("typeList", JSONArray.toJSONString(typeList))
-                .param("xCoordList", JSONArray.toJSONString(xCoordList))
-                .param("yCoordList", JSONArray.toJSONString(yCoordList))
-                .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
+                        .param("idList", JSONArray.toJSONString(idList))
+                        .param("typeList", JSONArray.toJSONString(typeList))
+                        .param("xCoordList", JSONArray.toJSONString(xCoordList))
+                        .param("yCoordList", JSONArray.toJSONString(yCoordList))
+                        .param("tileTextureList", JSONArray.toJSONString(tileTextureList)))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andReturn();
 
         // checking grid item locations are updated
@@ -771,5 +773,79 @@ class Garden2dControllerTest {
         Assertions.assertEquals(4, gridItemsAddedToRepository.get(1).getXCoordinate());
         Assertions.assertEquals(5, gridItemsAddedToRepository.get(1).getYCoordinate());
     }
+
+    @Test
+    @WithMockUser(username = "jhonDoe@Garden2dControllerTest.com")
+    public void save2DGarden_placeBarkTiles_saveBarkTiles() throws Exception {
+        Garden garden = gardenList.get(0);
+
+        MvcResult mvcResult = mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get("/2D-garden/{gardenId}", garden.getGardenId()))
+                .andExpect(status().isOk()).andReturn();
+
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
+        Map<String, Object> model = modelAndView.getModel();
+
+        List<Tile2DModel> tileModels = (List<Tile2DModel>) model.get("tiles");
+
+        Assertions.assertEquals(49, tileModels.size());
+
+        String[] tiles = new String[49];
+        Arrays.fill(tiles, null);
+        List<String> tilesList = Arrays.asList(tiles);
+
+        String newTextureName = "Bark";
+        int xCoord = 6;
+        int yCoord = 6;
+
+        for (Tile2DModel tileModel : tileModels) {
+            String thisTileTextureName = tileModel.getTileTexture();
+            if (tileModel.getXCoordinate() == xCoord && tileModel.getYCoordinate() == yCoord) {
+                thisTileTextureName = newTextureName;
+            }
+
+            tilesList.set(tileModel.getYCoordinate() * 7 + tileModel.getXCoordinate(), thisTileTextureName);
+        }
+
+        List<Integer> emptyList = new ArrayList<>();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/2D-garden/{gardenId}/save", garden.getGardenId())
+                        .with(csrf())
+                        .param("idList", JSONArray.toJSONString(emptyList))
+                        .param("typeList", JSONArray.toJSONString(emptyList))
+                        .param("xCoordList", JSONArray.toJSONString(emptyList))
+                        .param("yCoordList", JSONArray.toJSONString(emptyList))
+                        .param("tileTextureList", JSONArray.toJSONString(tilesList)))
+                .andExpect(status().is3xxRedirection()).andReturn();
+
+        mvcResult = mockMvc.perform(
+                        MockMvcRequestBuilders
+                                .get("/2D-garden/{gardenId}", garden.getGardenId()))
+                .andExpect(status().isOk()).andReturn();
+
+        modelAndView = mvcResult.getModelAndView();
+        Assertions.assertNotNull(modelAndView);
+        model = modelAndView.getModel();
+
+        tileModels = (List<Tile2DModel>) model.get("tiles");
+
+        Assertions.assertEquals(49, tileModels.size());
+
+        Tile2DModel tileModelAtXY = null;
+
+        for (Tile2DModel tileModel : tileModels) {
+            if (tileModel.getXCoordinate() == xCoord && tileModel.getYCoordinate() == yCoord) {
+                tileModelAtXY = tileModel;
+            }
+        }
+
+        Assertions.assertNotNull(tileModelAtXY);
+
+        Assertions.assertEquals(newTextureName, tileModelAtXY.getTileTexture());
+
+    }
+
 
 }
