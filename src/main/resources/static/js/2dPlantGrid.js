@@ -843,15 +843,15 @@ const handleWindowClick = (event) => {
         return;
     }
 
-    // check if spot clicked in the palette
-    if (!paletteWindow.contains(event.target)) {
-        showErrorMessage(INVALID_LOCATION);
-    }
-
-    // if not clicking the same palette item, deselect it
-    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== TEXTURE_TYPE) {
-        deselectPaletteItem();
-    }
+    // // check if spot clicked in the palette
+    // if (!paletteWindow.contains(event.target)) {
+    //     showErrorMessage(INVALID_LOCATION);
+    // }
+    //
+    // // if not clicking the same palette item, deselect it
+    // if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== TEXTURE_TYPE) {
+    //     deselectPaletteItem();
+    // }
 };
 
 /**
