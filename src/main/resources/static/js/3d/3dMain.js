@@ -21,7 +21,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
-    "Sun": ["sunObject.glb", 10]
+    "Sun": ["sunObject.glb", 20]
 };
 
 const skyboxMap = {
@@ -62,7 +62,7 @@ const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
 const MOON_ORBIT_RADIUS = 100;
-const SUN_ORBIT_RADIUS = 300;
+const SUN_ORBIT_RADIUS = 500;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -165,13 +165,13 @@ const init = async () => {
 
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 
-    const sunPosition = new THREE.Vector3(0, 50, 0);
+    const sunPosition = new THREE.Vector3(SUN_ORBIT_RADIUS, SUN_ORBIT_RADIUS, 0);
     sun.position.copy(sunPosition);
     sun.scale.set(modelMap["Sun"][1], modelMap["Sun"][1], modelMap["Sun"][1]);
     scene.add(sun);
 
-    light = new THREE.HemisphereLight(0xfff5bf, 0xfff5bf, 0.6);
-    light.intensity = 5;
+    light = new THREE.PointLight( 0xff0000, 1, 100 );
+    light.intensity = 10;
     light.position.set(0, 50, 0);
     scene.add(light);
     updateSun();
@@ -342,7 +342,8 @@ const updateSun = () => {
     const sunPosition = new THREE.Vector3(0, sunY, sunZ);
     sun.position.z = sunZ;
     sun.position.y = sunY;
-    light.position.set(0, sunY, sunZ);
+    sun.position.x = sunZ * 3;
+    light.position.set((sunZ * 3) -30, sunY, sunZ);
 }
 
 /**
