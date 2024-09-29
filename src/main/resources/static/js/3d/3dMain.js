@@ -325,13 +325,15 @@ const updateMoon = () => {
  * Updates the movement of the sun based on the gardens time
  */
 const updateSun = () => {
-    const sunY = (SUN_ORBIT_RADIUS/3) - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 18)
-    const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12)
-    const sunPosition = new THREE.Vector3(0, sunY, sunZ);
+    console.log("time is " + time);
+    console.log("orbit radius " + SUN_ORBIT_RADIUS)
+    const sunY = (SUN_ORBIT_RADIUS/2) - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 12);
+    const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12);
     sun.position.z = sunZ;
     sun.position.y = sunY;
-    sun.position.x = sunZ * 3;
+    sun.position.x = SUN_ORBIT_RADIUS;
     light.position.set((sunZ * 3) -30, sunY, sunZ);
+    console.log("sun position" + sun.position.x + " " + sun.position.y + " " + sun.position.z)
 }
 
 /**
