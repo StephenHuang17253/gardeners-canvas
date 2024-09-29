@@ -55,6 +55,7 @@ const gardenId = document.getElementById("gardenId").value;
 const COUNT_PER_PAGE = document.getElementById("countPerPage").value;
 
 const TEXTURE_TYPE = "TEXTURE"
+const PLANT_TYPE = "PLANT"
 
 let selectedPaletteItemInfo, selectedPaletteItem, selectedGridItem, stage, downloader, originalPlantCounts,
     textureLayer, gardenItemLayer,
@@ -555,7 +556,10 @@ plantItems.forEach((item, i) => {
             return;
         }
 
-        if (currentCount < 1) return;
+        if (currentCount < 1) {
+            deselectPaletteItem();
+            return;
+        }
 
         item.style.border = "3px solid blue";
 
@@ -653,9 +657,8 @@ const handleStageClick = (event) => {
 
     if (selectedPaletteItem) {
         if (!validLocation(x, y)) {
-            if (selectedPaletteItemInfo.type === TEXTURE_TYPE) {
-                deselectPaletteItem();
-            }
+            deselectPaletteItem();
+
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -665,6 +668,13 @@ const handleStageClick = (event) => {
 
             selectedPaletteItem.setAttribute("data-plant-count", selectedPaletteItemInfo.count);
             updatePlantCountDisplay(selectedPaletteItem, selectedPaletteItemInfo.count);
+
+            // deselects plant if the current count goes to 0
+            const currentCount = parseInt(selectedPaletteItem.getAttribute("data-plant-count"));
+            if (currentCount < 1) {
+                deselectPaletteItem();
+            }
+
         } else {
             const {i: newGridX, j: newGridY} = convertToGridCoordinates(x, y);
             destroyExistingTexture(newGridX, newGridY);
@@ -683,7 +693,6 @@ const handleStageClick = (event) => {
             deselectGridItem();
         }
     }
-    deselectPaletteItem();
 };
 
 /**
@@ -812,17 +821,6 @@ const handleWindowClick = (event) => {
 
     // if clicking the pagination, deselect the palette item
     if (pagination.contains(event.target)) {
-        deselectPaletteItem();
-        return;
-    }
-
-    // check if spot clicked in the palette
-    if (!paletteWindow.contains(event.target)) {
-        showErrorMessage(INVALID_LOCATION);
-    }
-
-    // if not clicking the same palette item, deselect it
-    if (!selectedPaletteItem.contains(event.target) && selectedPaletteItemInfo.type !== TEXTURE_TYPE) {
         deselectPaletteItem();
     }
 };
