@@ -620,6 +620,10 @@ textureItems.forEach((item) => {
     const textureName = item.getAttribute("data-texture-name");
     let textureImage = item.getAttribute("data-texture-image")
 
+    if (instance === "test/" || instance === "prod/") {
+        textureImage = `/${instance}` + textureImage;
+
+    }
     /**
      * Handles the clicking of a texture item in the palette
      */
@@ -630,9 +634,6 @@ textureItems.forEach((item) => {
         item.style.border = "3px solid blue";
         selectedPaletteItem = item;
 
-        if (instance === "test/" || instance === "prod/") {
-            textureImage = `/${instance}` + textureImage;
-        }
         selectedPaletteItemInfo = {
             name: textureName,
             image: textureImage,
@@ -676,7 +677,12 @@ const handleStageClick = () => {
 
     if (selectedPaletteItem) {
         if (!validLocation(x, y)) {
-            deselectPaletteItem();
+            if (selectedPaletteItemInfo.type === TEXTURE_TYPE) {
+                deselectPaletteItem();
+            } else {
+                deselectPaletteItem();
+            }
+
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -808,8 +814,6 @@ const handleGardenFormSubmit = (event) => {
         const { i, j } = convertToGridCoordinates(node.x(), node.y());
         tileTextures[j * GRID_ROWS + i] = node.attrs.name;
     });
-
-
 
     idListInput.value = JSON.stringify(idList);
     typeListInput.value = JSON.stringify(typeList);

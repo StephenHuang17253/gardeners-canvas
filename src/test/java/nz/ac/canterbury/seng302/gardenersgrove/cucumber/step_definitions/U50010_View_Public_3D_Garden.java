@@ -67,10 +67,16 @@ public class U50010_View_Public_3D_Garden {
     public GridItemLocationService gridItemLocationService;
 
     @Autowired
+    public GardenTileService gardenTileService;
+
+    @Autowired
     public GridItemLocationRepository gridItemLocationRepository;
 
     @Autowired
     public FriendshipRepository friendshipRepository;
+
+    @Autowired
+    public GardenTileRepository gardenTileRepository;
 
     @Autowired
     public WeatherService weatherService;
@@ -92,10 +98,11 @@ public class U50010_View_Public_3D_Garden {
         plantService = new PlantService(plantRepository, gardenService, fileService);
         friendshipService = new FriendshipService(friendshipRepository, userService);
         weatherService = new WeatherService();
+        gardenTileService = new GardenTileService(gardenTileRepository);
 
         decorationService = new DecorationService(decorationRepository);
         Garden3DController garden3DController = new Garden3DController(gardenService, securityService,
-                friendshipService, gridItemLocationService, weatherService, plantService, decorationService);
+                friendshipService, gridItemLocationService, weatherService, plantService, decorationService,gardenTileService);
         mockMVC = MockMvcBuilders.standaloneSetup(garden3DController).build();
     }
 

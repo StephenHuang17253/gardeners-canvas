@@ -29,7 +29,8 @@ const skyboxMap = {
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
     "Default": "default.exr",
-    "Night": "nightbox.exr"
+    "Clear Night": "nightbox.exr",
+    "Overcast Night": "overcast_nightbox.exr"
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters,rainSystem,rainGeo,rainCount;
@@ -135,12 +136,9 @@ const init = async () => {
 
     updateSkybox();
 
-    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", loader);
+    const tileMapResponse = await fetch(`/${getInstance()}3D-tile-textures-grid/${gardenId}`)
+    const tileMapTextures = await tileMapResponse.json();
+    const grid = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, tileMapTextures, loader);
     scene.add(grid);
 
     const texture = loader.loadTexture("moon.jpg");
@@ -305,7 +303,11 @@ const updateSkybox = () => {
     if (isDayTime()) {
         setBackground(skyboxMap[weather]);
     } else {
-        setBackground(skyboxMap["Night"]);
+        if (weather === "Rainy" || weather === "Overcast") {
+            setBackground(skyboxMap["Overcast Night"])
+        } else {
+            setBackground(skyboxMap["Clear Night"])
+        }
     }
 };
 
@@ -416,7 +418,6 @@ const updateSun = () => {
     sun.position.y = sunY;
     sun.position.x = SUN_ORBIT_RADIUS;
     light.position.set(SUN_ORBIT_RADIUS - 30, sunY, sunZ);
-    console.log("sun position" + sun.position.x + " " + sun.position.y + " " + sun.position.z);
 };
 
 /**
