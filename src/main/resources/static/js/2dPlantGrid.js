@@ -653,7 +653,11 @@ const handleStageClick = (event) => {
 
     if (selectedPaletteItem) {
         if (!validLocation(x, y)) {
-            deselectPaletteItem();
+            if (selectedPaletteItemInfo.type === TEXTURE_TYPE) {
+                deselectPaletteItem();
+            } else {
+                deselectPaletteItem();
+            }
 
             showErrorMessage(INVALID_LOCATION);
             return;
