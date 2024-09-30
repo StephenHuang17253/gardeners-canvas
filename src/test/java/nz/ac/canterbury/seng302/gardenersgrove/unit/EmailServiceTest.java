@@ -108,7 +108,7 @@ class EmailServiceTest {
         emailService.sendResetPasswordEmail(mockToken);
 
         verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"),
-                eq("Link to Reset Password to Gardener's Grove!"),
+                eq("Link to Reset Password to Gardener's Canvas!"),
                 eq("generalEmail"), captor.capture());
 
         Context capturedContex = captor.getValue();
@@ -147,7 +147,7 @@ class EmailServiceTest {
         Context capturedContex = captor.getValue();
 
         assertEquals("Test User", capturedContex.getVariable("username"));
-        assertEquals("This email is to confirm that your Gardener's Grove account's password has been updated",
+        assertEquals("This email is to confirm that your Gardener's Canvas account's password has been updated",
                 capturedContex.getVariable("mainBody"));
     }
 
@@ -174,7 +174,7 @@ class EmailServiceTest {
         emailService.sendRegistrationEmail(mockToken);
 
         verify(emailService, times(1)).sendHTMLEmail(eq("recipient@test.com"),
-                eq("Welcome to Gardener's Grove!"),
+                eq("Welcome to Gardener's Canvas!"),
                 eq("registrationEmail"), captor.capture());
 
         Context capturedContex = captor.getValue();

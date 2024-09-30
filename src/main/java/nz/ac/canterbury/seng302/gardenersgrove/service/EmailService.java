@@ -152,7 +152,7 @@ public class EmailService {
      * @throws MessagingException
      */
     public void sendRegistrationEmail(Token token) throws MessagingException {
-        String subject = "Welcome to Gardener's Grove!";
+        String subject = "Welcome to Gardener's Canvas!";
         String template = "registrationEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
@@ -176,7 +176,7 @@ public class EmailService {
      */
     public void sendResetPasswordEmail(Token token) throws MessagingException {
         logger.info("Sending reset password email to {}", token.getUser().getEmailAddress());
-        String subject = "Link to Reset Password to Gardener's Grove!";
+        String subject = "Link to Reset Password to Gardener's Canvas!";
         String template = "generalEmail";
 
         String username = token.getUser().getFirstName() + " " + token.getUser().getLastName();
@@ -212,7 +212,7 @@ public class EmailService {
         String template = "generalEmail";
 
         String username = currentUser.getFirstName() + " " + currentUser.getLastName();
-        String mainBody = "This email is to confirm that your Gardener's Grove account's password has been updated";
+        String mainBody = "This email is to confirm that your Gardener's Canvas account's password has been updated";
 
         Context context = new Context();
         context.setVariable(USERNAME_FIELD, username);
@@ -231,7 +231,7 @@ public class EmailService {
         String subject = "Account Warning";
         String template = "generalEmail";
         String mainBody = """
-                Due to your Gardener's Grove account recently submitting a tag that breaches our language standard,
+                Due to your Gardener's Canvas account recently submitting a tag that breaches our language standard,
                 your account has received its fifth consecutive strike.
                 This is your final warning, if you add another inappropriate tag your account will be banned for 7 days.""";
 
