@@ -1,4 +1,4 @@
-Feature: U18 (Cancel friend request): As Liam, I want to cancel friends on Gardener's Grove so that we can manage my
+Feature: U18 (Cancel friend request): As Liam, I want to cancel friends on Gardener's Canvas so that we can manage my
   friends list with people I trust.
 
   Background:

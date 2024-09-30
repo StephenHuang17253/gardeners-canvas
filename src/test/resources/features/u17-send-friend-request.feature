@@ -1,4 +1,4 @@
-Feature: U17 (Send friend request): As Liam, I want to connect with my friends on Gardener's Grove
+Feature: U17 (Send friend request): As Liam, I want to connect with my friends on Gardener's Canvas
   so that we can build a community on the app.
 
   Background:
@@ -64,14 +64,14 @@ Feature: U17 (Send friend request): As Liam, I want to connect with my friends o
       | "Andy" | ""    | "andy@gmail.com" | "andy@gmail.com" |
 
   Scenario Outline: AC6 - Given I am on the manage friends page and I have opened the search bar, when I enter a search
-  string and I press the search button and there are no perfect matches, then I see a message saying "There is nobody with that name or email in Gardener's Grove".
+  string and I press the search button and there are no perfect matches, then I see a message saying "There is nobody with that name or email in Gardener's Canvas".
 
     Given I as user "liam@email.com" am logged in with "TestPassword10!"
     And A user with first name <fname>, last name <lname>, and email <email> exists
     When I am on the 'Manage Friends' page
     And I enter in <input>
     And I hit the search button
-    Then I can see the error "There is nobody with that name or email in Gardener's Grove"
+    Then I can see the error "There is nobody with that name or email in Gardener's Canvas"
     Examples:
       | fname  | lname | email            | input              |
       | "Amy"  | "Doe" | "doe@gmail.com"  | "Andy"             |

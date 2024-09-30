@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import nz.ac.canterbury.seng302.gardenersgrove.component.Constants;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
@@ -63,7 +64,6 @@ public class GardensController {
      * @param weatherService   service to perform weather api calls
      * @param objectMapper     used for JSON conversion
      * @param gardenTagService service to access tag repository
-     * @param userService      service to access user repository
      */
     @Autowired
     public GardensController(GardenService gardenService, SecurityService securityService, PlantService plantService,
@@ -109,16 +109,16 @@ public class GardensController {
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, gardens.size());
 
         model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
-        model.addAttribute("currentPage", page);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
+        model.addAttribute(Constants.CURRENT_PAGE_ATTRIBUTE, page);
+        model.addAttribute(Constants.LAST_PAGE_ATTRIBUTE, totalPages);
+        model.addAttribute(Constants.START_INDEX_ATTRIBUTE, startIndex + 1);
+        model.addAttribute(Constants.END_INDEX_ATTRIBUTE, endIndex);
         model.addAttribute("totalGardens", gardens.size());
         model.addAttribute("filter", filter);
         model.addAttribute("publicGardensCount", publicGardensCount);
         model.addAttribute("privateGardensCount", privateGardensCount);
-        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
-        model.addAttribute("profilePicture", user.getProfilePictureFilename());
+        model.addAttribute(Constants.USER_NAME_ATTRIBUTE, user.getFirstName() + " " + user.getLastName());
+        model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, user.getProfilePictureFilename());
 
         return "myGardensPage";
     }
@@ -156,16 +156,16 @@ public class GardensController {
         WeatherModel yesterdayWeather = weatherList.get(1);
         WeatherModel currentWeather = weatherList.get(2);
         if (currentWeather.getDescription().equals("Rainy")) {
-            model.addAttribute("message", "Outdoor plants don't need any water today");
-            model.addAttribute("goodMessage", true);
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE, "Outdoor plants don't need any water today");
+            model.addAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, true);
         }
 
-        if (Objects.equals(beforeYesterdayWeather.getDescription(), "Sunny")
-                && Objects.equals(yesterdayWeather.getDescription(), "Sunny")
-                && Objects.equals(currentWeather.getDescription(), "Sunny")) {
-            model.addAttribute("message",
+        if (Objects.equals(beforeYesterdayWeather.getDescription(), Constants.SUNNY_ATTRIBUTE)
+                && Objects.equals(yesterdayWeather.getDescription(), Constants.SUNNY_ATTRIBUTE)
+                && Objects.equals(currentWeather.getDescription(), Constants.SUNNY_ATTRIBUTE)) {
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE,
                     "There hasn't been any rain recently, make sure to water your plants if they need it");
-            model.addAttribute("goodMessage", false);
+            model.addAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
             gardenService.changeGardenNeedsWatering(garden.getGardenId(), true);
         } else {
             gardenService.changeGardenNeedsWatering(garden.getGardenId(), false);
@@ -177,10 +177,10 @@ public class GardensController {
         int startIndex = (page - 1) * COUNT_PER_PAGE;
         int endIndex = Math.min(startIndex + COUNT_PER_PAGE, listLength);
 
-        model.addAttribute("currentPage", page);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
+        model.addAttribute(Constants.CURRENT_PAGE_ATTRIBUTE, page);
+        model.addAttribute(Constants.LAST_PAGE_ATTRIBUTE, totalPages);
+        model.addAttribute(Constants.START_INDEX_ATTRIBUTE, startIndex + 1);
+        model.addAttribute(Constants.END_INDEX_ATTRIBUTE, endIndex);
         model.addAttribute("plants", plants.subList(startIndex, endIndex));
         model.addAttribute("plantCount", plants.size());
     }
@@ -213,7 +213,7 @@ public class GardensController {
 
         if (!securityService.isOwner(garden.getOwner().getId())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            model.addAttribute("message",
+            model.addAttribute(Constants.MESSAGE_ATTRIBUTE,
                     "This isn't your patch of soil. No peeking at the neighbor's garden without an invite!");
             return "403";
         }
@@ -278,22 +278,22 @@ public class GardensController {
         model.addAttribute("weatherList", weatherList);
         model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
         model.addAttribute("currentTime", formattedTime);
-        model.addAttribute("profilePicture", user.getProfilePictureFilename());
-        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+        model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, user.getProfilePictureFilename());
+        model.addAttribute(Constants.USER_NAME_ATTRIBUTE, user.getFirstName() + " " + user.getLastName());
         model.addAttribute("plantPictureError", plantPictureError);
 
         // Used for displaying messages after a redirect e.g. from the verify page
         if (inputFlashMap != null) {
-            model.addAttribute("openModal", inputFlashMap.get("openModal"));
-            model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+            model.addAttribute(Constants.OPEN_MODAL_ATTRIBUTE, inputFlashMap.get(Constants.OPEN_MODAL_ATTRIBUTE));
+            model.addAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE, inputFlashMap.get(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE));
 
             // The below If statements check if the status of a pending tag has
             // been updated and adjust error messages acrodingly if thats the case
-            if (inputFlashMap.get("pendingTagName") == null) {
-                model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+            if (inputFlashMap.get(Constants.PENDING_TAG_NAME_ATTRIBUTE) == null) {
+                model.addAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE, inputFlashMap.get(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE));
             } else {
                 Optional<GardenTag> pendingTag = gardenTagService
-                        .getByName(inputFlashMap.get("pendingTagName").toString());
+                        .getByName(inputFlashMap.get(Constants.PENDING_TAG_NAME_ATTRIBUTE).toString());
 
                 if (pendingTag.isPresent()) {
                     if (pendingTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
@@ -301,28 +301,28 @@ public class GardensController {
                         // this tag.
                         int userStrikes = securityService.getCurrentUser().getStrikes() + 1;
                         logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), userStrikes);
-                        model.addAttribute("tagErrorText", "This tag does not meet the language " +
-                                "standards for Gardener's Grove. A warning strike has been added to your account");
+                        model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "This tag does not meet the language " +
+                                "standards for Gardener's Canvas. A warning strike has been added to your account");
                         if (userStrikes == 5) {
-                            model.addAttribute("tagErrorText",
+                            model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE,
                                     "You have added an inappropriate tag for the fifth time." +
                                             " You have been sent a warning email. " +
                                             "If you add another inappropriate tag, you will be banned for a week.");
                         } else if (userStrikes == 6) {
-                            redirectAttributes.addFlashAttribute("message",
+                            redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE,
                                     "Your account is blocked for 7 days due to inappropriate conduct");
-                            redirectAttributes.addFlashAttribute("goodMessage", false);
+                            redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
                             request.logout();
                             return "redirect:/login";
                         }
-                        model.addAttribute("tagMessageText", "");
+                        model.addAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE, "");
                     } else if (pendingTag.get().getTagStatus() == TagStatus.APPROPRIATE) {
-                        model.addAttribute("tagMessageText", "");
+                        model.addAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE, "");
                     } else {
-                        model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+                        model.addAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE, inputFlashMap.get(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE));
                     }
                 } else {
-                    model.addAttribute("tagMessageText", inputFlashMap.get("tagMessageText"));
+                    model.addAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE, inputFlashMap.get(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE));
                 }
             }
         }
@@ -344,9 +344,9 @@ public class GardensController {
         model.addAttribute("pendingTags", pendingTags);
 
         if (garden.getOwner().isBanned()) {
-            redirectAttributes.addFlashAttribute("message",
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE,
                     "Your account is blocked for 7 days due to inappropriate conduct");
-            redirectAttributes.addFlashAttribute("goodMessage", false);
+            redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
             request.logout();
             return "redirect:/login";
         }
@@ -424,15 +424,15 @@ public class GardensController {
         String formattedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
         handlePagniation(page, plants.size(), garden.getPlants(), model);
 
-        model.addAttribute("openModal", "true");
+        model.addAttribute(Constants.OPEN_MODAL_ATTRIBUTE, "true");
         model.addAttribute("tagText", tag);
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(garden));
         model.addAttribute("weatherList", weatherList);
         model.addAttribute("gradientClass", "g" + LocalTime.now().getHour());
         model.addAttribute("currentTime", formattedTime);
-        model.addAttribute("profilePicture", user.getProfilePictureFilename());
-        model.addAttribute("userName", user.getFirstName() + " " + user.getLastName());
+        model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, user.getProfilePictureFilename());
+        model.addAttribute(Constants.USER_NAME_ATTRIBUTE, user.getFirstName() + " " + user.getLastName());
 
         List<GardenTagRelation> tagRelationsList = gardenTagService.getGardenTagRelationByGarden(garden);
 
@@ -513,26 +513,26 @@ public class GardensController {
                 newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE)) {
 
             if (gardenAlreadyHasThisTag) {
-                model.addAttribute("tagErrorText", "This tag has already been added to the garden.");
+                model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "This tag has already been added to the garden.");
             } else if (!tagResult.valid()) {
-                model.addAttribute("tagErrorText", tagResult);
+                model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, tagResult);
             }
             if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.INAPPROPRIATE) {
                 int userStrikes = securityService.handleStrikeUser(garden.getOwner());
                 logger.info("{} has received a strike", garden.getOwner().getFirstName());
                 logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), garden.getOwner().getStrikes());
-                model.addAttribute("tagErrorText", "This tag does not meet the language " +
-                        "standards for Gardener's Grove. A warning strike has been added to your account");
+                model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "This tag does not meet the language " +
+                        "standards for Gardener's Canvas. A warning strike has been added to your account");
                 if (userStrikes == 5) {
-                    model.addAttribute("tagErrorText", "You have added an inappropriate tag for the fifth time." +
+                    model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "You have added an inappropriate tag for the fifth time." +
                             " You have been sent a warning email. " +
                             "If you add another inappropriate tag, you will be banned for a week.");
                 }
 
                 if (garden.getOwner().isBanned()) {
-                    redirectAttributes.addFlashAttribute("message",
+                    redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE,
                             "Your account is blocked for 7 days due to inappropriate conduct");
-                    redirectAttributes.addFlashAttribute("goodMessage", false);
+                    redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
                     request.logout();
                     return "redirect:/login";
                 }
@@ -545,9 +545,9 @@ public class GardensController {
             }
 
             if (garden.getOwner().isBanned()) {
-                redirectAttributes.addFlashAttribute("message",
+                redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE,
                         "Your account is blocked for 7 days due to inappropriate conduct");
-                redirectAttributes.addFlashAttribute("goodMessage", false);
+                redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
                 request.logout();
                 return "redirect:/login";
             }
@@ -555,19 +555,19 @@ public class GardensController {
         }
 
         if (newTag.isPresent() && newTag.get().getTagStatus() == TagStatus.PENDING) {
-            redirectAttributes.addFlashAttribute("tagMessageText",
+            redirectAttributes.addFlashAttribute(Constants.TAG_MESSAGE_TEXT_ATTRIBUTE,
                     String.format("Your tag \"%s\" is currently being checked for profanity. " +
                             "If it follows the language standards for our app, it will be added to your garden.", tag));
-            redirectAttributes.addFlashAttribute("pendingTagName", tag);
+            redirectAttributes.addFlashAttribute(Constants.PENDING_TAG_NAME_ATTRIBUTE, tag);
         }
 
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addFlashAttribute("openModal", "true");
+        redirectAttributes.addFlashAttribute(Constants.OPEN_MODAL_ATTRIBUTE, "true");
 
         if (garden.getOwner().isBanned()) {
-            redirectAttributes.addFlashAttribute("message",
+            redirectAttributes.addFlashAttribute(Constants.MESSAGE_ATTRIBUTE,
                     "Your account is blocked for 7 days due to inappropriate conduct");
-            redirectAttributes.addFlashAttribute("goodMessage", false);
+            redirectAttributes.addFlashAttribute(Constants.GOOD_MESSAGE_ATTRIBUTE, false);
             request.logout();
             return "redirect:/login";
         }
@@ -672,15 +672,15 @@ public class GardensController {
 
         model.addAttribute("friendId", userId);
         model.addAttribute("myGardens", gardens.subList(startIndex, endIndex));
-        model.addAttribute("currentPage", page);
-        model.addAttribute("lastPage", totalPages);
-        model.addAttribute("startIndex", startIndex + 1);
-        model.addAttribute("endIndex", endIndex);
+        model.addAttribute(Constants.CURRENT_PAGE_ATTRIBUTE, page);
+        model.addAttribute(Constants.LAST_PAGE_ATTRIBUTE, totalPages);
+        model.addAttribute(Constants.START_INDEX_ATTRIBUTE, startIndex + 1);
+        model.addAttribute(Constants.END_INDEX_ATTRIBUTE, endIndex);
         model.addAttribute("totalGardens", gardens.size());
         model.addAttribute("gardensCount", gardensCount);
-        model.addAttribute("userName", friend.getFirstName() + " " + friend.getLastName());
+        model.addAttribute(Constants.USER_NAME_ATTRIBUTE, friend.getFirstName() + " " + friend.getLastName());
         model.addAttribute("firstName", friend.getFirstName());
-        model.addAttribute("profilePicture", friend.getProfilePictureFilename());
+        model.addAttribute(Constants.PROFILE_PICTURE_ATTRIBUTE, friend.getProfilePictureFilename());
 
         return "gardensPage";
     }
