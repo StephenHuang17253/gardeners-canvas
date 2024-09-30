@@ -31,7 +31,7 @@ const skyboxMap = {
     "Night": "nightbox.exr"
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters,rainSystem,rainGeo,rainCount;
 
 let rainSize = 0.20;
 
