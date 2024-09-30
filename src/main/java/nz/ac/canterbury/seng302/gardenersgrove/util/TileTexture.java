@@ -6,7 +6,6 @@ public enum TileTexture {
 
     GRASS("Grass", "grass.png"),
 
-
     BARK("Bark", "bark.png"),
 
     STONE_PATH("Stone Path", "stonePath.png"),
@@ -33,6 +32,15 @@ public enum TileTexture {
 
     public String getImgFile() {
         return imgFile;
+    }
+
+    public static TileTexture getTileTextureByName(String tileName) {
+        for (TileTexture tile : values()) {
+            if (tile.tileName.equals(tileName)) {
+                return tile;
+            }
+        }
+        return null;
     }
 }
 
