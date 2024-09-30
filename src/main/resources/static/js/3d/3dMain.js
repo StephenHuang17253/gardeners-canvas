@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import { createTileGrid } from "./tiles.js";
-import { OrbitControls } from "./OrbitControls.js";
-import { Loader } from "./Loader.js";
-import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from "./Exporter.js";
-import { Downloader } from "../Downloader.js";
+import {createTileGrid} from "./tiles.js";
+import {OrbitControls} from "./OrbitControls.js";
+import {Loader} from "./Loader.js";
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import {Exporter} from "./Exporter.js";
+import {Downloader} from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -72,7 +72,7 @@ const SUN_ORBIT_RADIUS = 1500;
 const RAIN_COLOR = 0x78b8c2;
 const RAIN_COUNT = 3000;
 
-const MAX_ELEVATION = 35;
+const MAX_ELEVATION = 25;
 const MIN_ELEVATION = 10;
 const MAX_AZIMUTH = 90;
 const MIN_AZIMUTH = -90;
