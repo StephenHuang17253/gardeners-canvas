@@ -2,18 +2,17 @@ package nz.ac.canterbury.seng302.gardenersgrove.util;
 
 public enum TileTexture {
 
-    SOIL("Soil", "soil-tileable.png"),
+    SOIL("Soil", "soil.png"),
 
-    GRASS("Grass", "grass-tileable.png"),
+    GRASS("Grass", "grass.png"),
 
+    BARK("Bark", "bark.png"),
 
-    BARK("Bark", "bark-tileable.png"),
+    STONE_PATH("Stone Path", "stonePath.png"),
 
-    STONE_PATH("Stone Path", "grass-tileable.png"),
+    PEBBLE_PATH("Pebble Path", "pebblePath.png"),
 
-    PEBBLE_PATH("Pebble Path", "grass-tileable.png"),
-
-    CONCRETE("Concrete", "grass-tileable.png");
+    CONCRETE("Concrete", "concrete.png");
 
     private final String tileName;
     private final String imgFile;
@@ -33,6 +32,15 @@ public enum TileTexture {
 
     public String getImgFile() {
         return imgFile;
+    }
+
+    public static TileTexture getTileTextureByName(String tileName) {
+        for (TileTexture tile : values()) {
+            if (tile.tileName.equals(tileName)) {
+                return tile;
+            }
+        }
+        return null;
     }
 }
 

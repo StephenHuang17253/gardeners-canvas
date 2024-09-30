@@ -51,6 +51,30 @@
             </ul>
         </div>
 
+        <div class="position-absolute top-0 start-0 m-3">
+            <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#settings"
+                aria-expanded="false" aria-controls="settings">
+                Settings </button>
+            <div class="collapse" id="settings">
+                <div class="card card-body">
+                    <div class="form-check form-switch unHighlightable">
+                        <input class="form-check-input" type="checkbox" role="switch" id="trackTime" checked
+                            aria-checked="true">
+                        <label class="form-check-label" for="trackTime">Show Current Time</label>
+                    </div>
+                    <div class="form-check form-switch unHighlightable">
+                        <input class="form-check-input" type="checkbox" role="switch" id="trackWeather" checked
+                            aria-checked="true">
+                        <label class="form-check-label" for="trackWeather">Show Current Weather</label>
+                    </div>
+                    <div th:if ="${weather=='Rainy'}">
+                        <label for="rainDropSize" class="form-label">Rain Drop Size</label>
+                        <input type="range" class="form-range" min="0.1" max="0.5" step="0.1" id="rainDropSize">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="loading-div"
             class="position-absolute w-100 h-100 bg-success d-flex align-items-center justify-content-center">
             <img id="loading-img" th:src="@{/images/loading.gif}" alt="Loading">
@@ -83,8 +107,7 @@
                 - Downloaded from Sketchfab
             </li>
             <li>
-                <a href="https://sketchfab.com/3d-models/fountain-300ff8f626fe44e2a9dafc665cea81c5"
-                   target="_blank">
+                <a href="https://sketchfab.com/3d-models/fountain-300ff8f626fe44e2a9dafc665cea81c5" target="_blank">
                     Fountain by Andrii Kryshtop
                 </a>
                 - Downloaded from Sketchfab
@@ -94,6 +117,8 @@
 
     <input id="gardenId" type="hidden" th:value="${garden.getGardenId()}">
     <input id="gardenName" type="hidden" th:value="${garden.getGardenName()}">
+    <input id="currentHour" type="hidden" th:value="${currentHour}">
+    <input id="weather" type="hidden" th:value="${weather}"></input>
     <script type="module" th:src="@{/js/3d/3dMain.js}"></script>
 </body>
 

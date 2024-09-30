@@ -3,6 +3,7 @@ package nz.ac.canterbury.seng302.gardenersgrove.service;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.GardenTileRepository;
+import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,10 @@ import java.util.Optional;
  */
 @Service
 public class GardenTileService {
+
+    private static final int GRID_COLUMNS = 7;
+
+    private static final int GRID_ROWS = 7;
 
     private final GardenTileRepository gardenTileRepository;
 
@@ -45,9 +50,19 @@ public class GardenTileService {
 
     /**
      * Retrieves all garden tiles associated with a particular garden.
+     * Initialises garden tiles for a garden if it has none. Default texture: GRASS.
      * @return list of garden tiles in that garden
      */
     public List<GardenTile> getGardenTilesByGarden(Garden garden) {
+        List<GardenTile> gardenTiles = gardenTileRepository.findGardenTilesByGardenIs(garden);
+        if (gardenTiles.isEmpty()) {
+            for (int i = 0; i < GRID_COLUMNS; i++) {
+                for (int j = 0; j < GRID_ROWS; j++) {
+                    GardenTile gardenTile = new GardenTile(garden, TileTexture.GRASS, j, i);
+                    this.addGardenTile(gardenTile);
+                }
+            }
+        }
         return gardenTileRepository.findGardenTilesByGardenIs(garden);
     }
 

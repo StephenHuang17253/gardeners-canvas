@@ -17,13 +17,12 @@ public class GardenTile {
     @Column(name = "tile_id")
     private Long tileId;
 
-
     /**
      * The type of tile
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "tile_type")
-    private TileTexture tileTexture = TileTexture.GRASS;
+    private TileTexture tileTexture;
 
     @Column(name = "x_coord")
     private int xCoordinate;
@@ -43,16 +42,16 @@ public class GardenTile {
     /**
      * Garden Tile constructor
      * @param garden        the garden the tile belongs to
-     * @param TileTexture      the type of tile
+     * @param tileTexture      the type of tile
      * @param xCoordinate   the tile's x-coordinate on the grid
      * @param yCoordinate   the tile's y-coordinate on the grid
      */
     public GardenTile(Garden garden,
-                      TileTexture TileTexture,
+                      TileTexture tileTexture,
                       int xCoordinate,
                       int yCoordinate) {
         this.garden = garden;
-        this.tileTexture = TileTexture;
+        this.tileTexture = tileTexture;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
     }
