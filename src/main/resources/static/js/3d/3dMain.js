@@ -155,13 +155,6 @@ const init = async () => {
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
 
-    moonParameters = {
-        elevation: 2,
-        azimuth: 180
-    };
-
-    updateMoon();
-
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 
     const sunPosition = new THREE.Vector3(0, 50, 0);
@@ -258,6 +251,7 @@ const setTime = (newTime) => {
     } else {
         sun.visible = false;
         moon.visible = true;
+        setMoonParameters();
         updateMoon();
     }
 
