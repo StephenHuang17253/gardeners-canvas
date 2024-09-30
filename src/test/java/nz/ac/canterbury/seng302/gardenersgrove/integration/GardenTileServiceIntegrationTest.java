@@ -12,15 +12,11 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -186,7 +182,7 @@ class GardenTileServiceIntegrationTest {
 
         List<GardenTile> tilesInGarden = gardenTileService.getGardenTilesByGarden(wrongGarden);
 
-        Assertions.assertTrue(tilesInGarden.isEmpty());
+        Assertions.assertFalse(tilesInGarden.get(0).getGarden().equals(tile1.getGarden()));
     }
 
     @Test

@@ -17,13 +17,12 @@ public class GardenTile {
     @Column(name = "tile_id")
     private Long tileId;
 
-
     /**
      * The type of tile
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "tile_type")
-    private TileTexture tileTexture = TileTexture.GRASS;
+    private TileTexture tileTexture;
 
     @Column(name = "x_coord")
     private int xCoordinate;
