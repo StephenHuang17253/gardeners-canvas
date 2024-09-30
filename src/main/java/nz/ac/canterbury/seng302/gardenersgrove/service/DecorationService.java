@@ -7,7 +7,6 @@ import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +61,14 @@ public class DecorationService {
      * @return list of decoration objects belonging to that garden.
      */
     public List<Decoration> getDecorationsByGarden(Garden garden) {
+        List<Decoration> checkDecorations = decorationRepository.findDecorationsByGardenIs(garden);
+        if (checkDecorations.isEmpty()) {
+            this.addDecoration(new Decoration(garden, DecorationCategory.ROCK));
+            this.addDecoration(new Decoration(garden, DecorationCategory.TABLE));
+            this.addDecoration(new Decoration(garden, DecorationCategory.POND));
+            this.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
+            this.addDecoration(new Decoration(garden, DecorationCategory.FOUNTAIN));
+        }
         return decorationRepository.findDecorationsByGardenIs(garden);
     }
 
