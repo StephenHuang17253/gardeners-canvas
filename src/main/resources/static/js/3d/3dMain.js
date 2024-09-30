@@ -5,6 +5,12 @@ import { Loader } from "./Loader.js";
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from "./Exporter.js";
 import { Downloader } from "../Downloader.js";
+import { createTileGrid } from "./tiles.js";
+import { OrbitControls } from "./OrbitControls.js";
+import { Loader } from "./Loader.js";
+import { createHueSaturationMaterial } from "./hueSaturationShader.js";
+import { Exporter } from "./Exporter.js";
+import { Downloader } from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -20,7 +26,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
-    "Sun": ["sunObject.glb", 1]
+    "Sun": ["sunObject.glb", 20]
 };
 
 const skyboxMap = {
@@ -44,6 +50,9 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+// avoids mismatch between toggle and system when user reloads page
+trackTimeInput.checked = true;
+trackWeatherInput.checked = true;
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -60,11 +69,19 @@ const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
 const MOON_ORBIT_RADIUS = 100;
-const SUN_ORBIT_RADIUS = 80;
+const SUN_ORBIT_RADIUS = 1500;
 
 const RAIN_COLOR = 0x78b8c2;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
+
+const MAX_ELEVATION = 55;
+const MIN_ELEVATION = 10;
+const MAX_AZIMUTH = 90;
+const MIN_AZIMUTH = -90;
+const HALF_MOON_JOURNEY = 6;
+const MORNING_START = 6;
+const NIGHT_START = 18;
 
 // link used to download files
 const link = document.createElement("a");
@@ -123,6 +140,7 @@ const init = async () => {
 
     updateSkybox();
 
+
     const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", loader);
     // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", loader);
@@ -140,26 +158,20 @@ const init = async () => {
         }
     );
 
+    // initializing moon
     const geometry = new THREE.SphereGeometry(2, 60, 60);
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
 
-    moonParameters = {
-        elevation: 2,
-        azimuth: 180
-    };
-
-    updateMoon();
-
     sun = await loader.loadModel(modelMap["Sun"][0], "Sun");
 
-    const sunPosition = new THREE.Vector3(0, 50, 0);
+    const sunPosition = new THREE.Vector3(SUN_ORBIT_RADIUS, SUN_ORBIT_RADIUS, 0);
     sun.position.copy(sunPosition);
     sun.scale.set(modelMap["Sun"][1], modelMap["Sun"][1], modelMap["Sun"][1]);
     scene.add(sun);
 
-    light = new THREE.HemisphereLight(0xfff5bf, 0xfff5bf, 0.6);
-    light.intensity = 5;
+    light = new THREE.PointLight(0xff0000, 1, 100);
+    light.intensity = 10;
     light.position.set(0, 50, 0);
     scene.add(light);
     updateSun();
@@ -229,15 +241,38 @@ const setTime = (newTime) => {
     time = newTime;
     // Update the time of day in the scene
     // Set moon or sun to the correct position
-    if (time >= 6 && time < 18) {
+    if (time >= MORNING_START && time < NIGHT_START) {
         sun.visible = true;
         moon.visible = false;
+        updateSun();
     } else {
         sun.visible = false;
         moon.visible = true;
+        updateMoon();
     }
     updateSkybox();
+
 };
+
+/**
+ * Sets moon parameters based on current time.
+ */
+const setMoonParameters = () => {
+    const isBeforeMorningAndAfterMidnight = time < MORNING_START;
+    let newElevation;
+    let newAzimuth;
+    if (isBeforeMorningAndAfterMidnight) {
+        newElevation = Math.round(MAX_ELEVATION - time * ((MAX_ELEVATION - MIN_ELEVATION) / HALF_MOON_JOURNEY));
+        newAzimuth = Math.round(time * MIN_AZIMUTH / HALF_MOON_JOURNEY);
+    } else {
+        newElevation = Math.round(MIN_ELEVATION + MAX_ELEVATION / HALF_MOON_JOURNEY * (time - (NIGHT_START - 1)));
+        newAzimuth = Math.round((time - (NIGHT_START - 1)) * (MAX_AZIMUTH / HALF_MOON_JOURNEY));
+    }
+    moonParameters = {
+        elevation: newElevation,
+        azimuth: newAzimuth
+    };
+}
 
 /**
  * Updates the weather in the scene
@@ -338,6 +373,7 @@ const animate = () => {
  * Updates the position of the moon in the scene based on the moonParameters
  */
 const updateMoon = () => {
+    setMoonParameters();
     const phi = THREE.MathUtils.degToRad(90 - moonParameters.elevation);
     const theta = THREE.MathUtils.degToRad(moonParameters.azimuth);
 
@@ -345,14 +381,17 @@ const updateMoon = () => {
     moon.position.multiplyScalar(MOON_ORBIT_RADIUS);
 };
 
+/**
+ * Updates the movement of the sun based on the gardens time
+ */
 const updateSun = () => {
-    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (currentHour - 12) / 6)
-    const sunZ = (SUN_ORBIT_RADIUS / 6) * (currentHour - 12)
-    const sunPosition = new THREE.Vector3(0, sunY, sunZ);
+    const sunY = (SUN_ORBIT_RADIUS / 2) - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 12);
+    const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12);
     sun.position.z = sunZ;
     sun.position.y = sunY;
-    light.position.set(0, sunY, sunZ);
-    console.log("current time: " + currentHour);
+    sun.position.x = SUN_ORBIT_RADIUS;
+    light.position.set((sunZ * 3) - 30, sunY, sunZ);
+    console.log("sun position" + sun.position.x + " " + sun.position.y + " " + sun.position.z)
 }
 
 /**
@@ -379,10 +418,10 @@ const onMouseMove = () => document.body.style.userSelect = "none";
 const onMouseOut = () => document.body.style.userSelect = "auto";
 
 /**
-* On track time input change,
-* update the time variable to the current hour if the input is checked,
-* otherwise set it to the default time
-*/
+ * On track time input change,
+ * update the time variable to the current hour if the input is checked,
+ * otherwise set it to the default time
+ */
 const onTrackTimeInputChange = () => {
     const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
