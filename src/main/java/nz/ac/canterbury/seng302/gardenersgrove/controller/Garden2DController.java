@@ -3,27 +3,21 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GardenTile;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.model.Decoration2DModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
-import nz.ac.canterbury.seng302.gardenersgrove.model.Plant2DModel;
-import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
+import nz.ac.canterbury.seng302.gardenersgrove.model.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
-import nz.ac.canterbury.seng302.gardenersgrove.util.DecorationCategory;
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.ItemType;
 import nz.ac.canterbury.seng302.gardenersgrove.util.TileTexture;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -100,22 +94,10 @@ public class Garden2DController {
                 .map(Plant2DModel::new)
                 .toList();
 
-
-        List<Decoration> checkDecorations = decorationService.getDecorationsByGarden(garden);
-
-        if (checkDecorations.isEmpty()) {
-            decorationService.addDecoration(new Decoration(garden, DecorationCategory.ROCK));
-            decorationService.addDecoration(new Decoration(garden, DecorationCategory.TABLE));
-            decorationService.addDecoration(new Decoration(garden, DecorationCategory.POND));
-            decorationService.addDecoration(new Decoration(garden, DecorationCategory.GNOME));
-            decorationService.addDecoration(new Decoration(garden, DecorationCategory.FOUNTAIN));
-        }
-
         List<Decoration2DModel> decorations = decorationService.getDecorationsByGarden(garden).stream()
                 .sorted(Comparator.comparing(Decoration::getDecorationCategory))
                 .map(Decoration2DModel::new)
                 .toList();
-
 
         Map<Long, Plant> plantsById = garden.getPlants().stream()
                 .collect(Collectors.toMap(Plant::getPlantId, Function.identity()));
@@ -156,6 +138,11 @@ public class Garden2DController {
             }
         }
 
+        List<Tile2DModel> tiles = gardenTileService.getGardenTilesByGarden(garden).stream()
+                .sorted(Comparator.comparing(GardenTile::getTileId))
+                .map(Tile2DModel::new)
+                .toList();
+
         model.addAttribute("isOwner", true);
         model.addAttribute("garden", new GardenDetailModel(optionalGarden.get()));
         model.addAttribute("displayableItemsList", displayableItems);
@@ -163,6 +150,7 @@ public class Garden2DController {
         model.addAttribute("tileTextures", TileTexture.values());
         model.addAttribute("plants", plants);
         model.addAttribute("decorations", decorations);
+        model.addAttribute("tiles", tiles);
         model.addAttribute("countPerPage", COUNT_PER_PAGE);
 
         return "garden2DPage";
@@ -196,6 +184,23 @@ public class Garden2DController {
                 gridItemLocationService.removeGridItemLocation(gridItem);
             } catch (Exception exception) {
                 logger.error("Error removing grid item with id {}: {}", gridItem.getId(), exception.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Helper function to delete tiles of given garden.
+     *
+     * @param garden garden whose tiles have to be deleted
+     */
+    private void deleteOldGardenTiles(Garden garden) {
+        List<GardenTile> gardenTiles = gardenTileService.getGardenTilesByGarden(garden);
+
+        for (GardenTile tile : gardenTiles) {
+            try {
+                gardenTileService.deleteGardenTile(tile);
+            } catch (Exception exception) {
+                logger.error("Error removing grid item with id {}: {}", tile.getTileId(), exception.getMessage());
             }
         }
     }
@@ -277,10 +282,11 @@ public class Garden2DController {
             return "error";
         }
 
+        deleteOldGardenTiles(garden);
         for (int i = 0; i < GRID_COLUMNS; i++) {
             for (int j = 0; j < GRID_ROWS; j++) {
                 String tileTextureString = tileTextureListAsList.get(i * GRID_COLUMNS + j);
-                TileTexture tileTexture = TileTexture.valueOf(tileTextureString);
+                TileTexture tileTexture = TileTexture.getTileTextureByName(tileTextureString);
                 GardenTile gardenTile = new GardenTile(garden, tileTexture, j, i);
                 gardenTileService.addGardenTile(gardenTile);
             }
