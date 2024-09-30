@@ -64,6 +64,7 @@ For more information, check the user manual in the wiki.
 _*Thoose features require environment variables._
 
 #### User accounts
+_*Note that user accounts are only available on the local versio if you downlad the data.sql file from our wiki and place it in the projects resources folder before compiling the project._
 
 | Account Type | Email | Password | Gmail Password | Use: |
 |--------------|-------|----------|----------------|------|
