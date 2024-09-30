@@ -135,10 +135,7 @@ const init = async () => {
 
     const tileMapResponse = await fetch(`/${getInstance()}3D-tile-textures-grid/${gardenId}`)
     const tileMapTextures = await tileMapResponse.json();
-    console.log(tileMapTextures)
-
-    const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, tileMapTextures);
-
+    const grid = await createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, tileMapTextures, loader);
     scene.add(grid);
 
     const texture = loader.loadTexture("moon.jpg");
@@ -416,7 +413,6 @@ const updateSun = () => {
     sun.position.y = sunY;
     sun.position.x = SUN_ORBIT_RADIUS;
     light.position.set(SUN_ORBIT_RADIUS - 30, sunY, sunZ);
-    console.log("sun position" + sun.position.x + " " + sun.position.y + " " + sun.position.z);
 };
 
 /**

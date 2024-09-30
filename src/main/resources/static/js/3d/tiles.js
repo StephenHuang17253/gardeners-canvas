@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 
 const tileMap = {
-    "Grass": ["grass-tileable.jpg", 0.2, 1.56],
-    "StonePath": ["stone-tileable.jpg", 0, 1],
-    "PebblePath": ["pebbles-tileable.jpg", 0, 1],
-    "Concrete": ["concrete-tileable.jpg", 0, 1],
-    "Soil": ["soil-tileable.jpg", 0.055, 1.06],
-    "Bark": ["bark-tileable.jpg", 0, 1]
+    "GRASS": ["grass-tileable.jpg", 0.2, 1.56],
+    "STONE_PATH": ["stone-tileable.jpg", 0, 1],
+    "PEBBLE_PATH": ["pebbles-tileable.jpg", 0, 1],
+    "CONCRETE": ["concrete-tileable.jpg", 0, 1],
+    "SOIL": ["soil-tileable.jpg", 0.055, 1.06],
+    "BARK": ["bark-tileable.jpg", 0, 1]
 };
 /**
  * Custom vertex shader for the tile material
@@ -91,10 +91,7 @@ const createTileMaterial = (texture, hueShift, saturation, uvScale) => new THREE
  *
  * @param {string} tileMaterial - The tile material string
  * @param {number} size - The size of the tile.
- * @param {number} hueShift - The hue shift value.
- * @param {number} saturation - The saturation value.
  * @param {THREE.Texture} texture - diffuse texture
- * @param {THREE.Texture} normalTexture - normal texture
  * @returns {THREE.Mesh} The created tile mesh.
  */
 const createTile = (tileMaterial, size, texture) => {
@@ -103,9 +100,9 @@ const createTile = (tileMaterial, size, texture) => {
     const saturation = tileMap[tileMaterial][2];
     const geometry = new THREE.PlaneGeometry(size, size);
     let uvScale;
-    if (tileMaterial === "Bark") {
+    if (tileMaterial === "BARK") {
         uvScale = new THREE.Vector2(0.25, 0.25);
-    } else if (tileMaterial === "PebblePath") {
+    } else if (tileMaterial === "PEBBLE_PATH") {
         uvScale = new THREE.Vector2(0.85, 0.85);
     } else {
         uvScale = new THREE.Vector2(1, 1);
@@ -122,41 +119,18 @@ const createTile = (tileMaterial, size, texture) => {
  * @param {number} rows - The number of rows in the grid.
  * @param {number} cols - The number of columns in the grid.
  * @param {number} tileSize - The size of each tile in the grid.
- * @param {string} tileMaterial - The material to be used for the tile
- * @param {number} hueShift - The hue shift value for the tiles.
- * @param {number} saturation - The saturation value for the tiles.
+ * @param {Array.<Object>} gardenTileTextureList - The list of tiles from the garden.
  * @param {Loader} loader - reference to loader instance
  * @returns {THREE.Group} - Object with the grid to add to scene and an array of tile center positions.
  */
-// const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
-//     const grid = new THREE.Group();
-//     const offset = (rows - 1) * tileSize / 2;
-//     const tileCenterpositions = [];
-//     const texture = loader.loadTexture(tileMap[tileMaterial][0]);
-//
-//     for (let i = 0; i < rows; i++) {
-//         for (let j = 0; j < cols; j++) {
-//             const tile = createTile(tileMaterial, tileSize, texture);
-//             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
-//             grid.add(tile);
-//             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
-//         }
-//     }
-//     return grid;
-// };
-
-const createTileGrid = async (rows, cols, tileSize, gardenTileTextureList) => {
+const createTileGrid = async (rows, cols, tileSize, gardenTileTextureList, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
-    const tileCenterpositions = [];
     gardenTileTextureList.forEach(gardenTileTexture => {
-        console.log(gardenTileTexture.tileTexture.toString())
-        const tile = createTile(gardenTileTexture.tileTexture.toString(), tileSize, gardenTileTexture.tileTexture);
-        tile.position.set(gardenTileTexture.xCoordinate * tileSize - offset, 0, gardenTileTexture.yCoordinate * tileSize - offset);
+        const texture = loader.loadTexture(tileMap[gardenTileTexture.tileTexture][0]);
+        const tile = createTile(gardenTileTexture.tileTexture, tileSize, texture);
+        tile.position.set(gardenTileTexture.xcoordinate * tileSize - offset, 0, gardenTileTexture.ycoordinate * tileSize - offset);
         grid.add(tile);
-        tileCenterpositions.push(new THREE.Vector3(gardenTileTexture.x * tileSize - offset, 0, gardenTileTexture.y * tileSize - offset));
-
-
     })
     return grid;
 }
