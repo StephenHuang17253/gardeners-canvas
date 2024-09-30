@@ -131,15 +131,14 @@ const createTile = (tileMaterial, size, texture) => {
 const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
-    const tileCenterpositions = [];
     const texture = loader.loadTexture(tileMap[tileMaterial][0]);
+
 
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const tile = createTile(tileMaterial, tileSize, texture);
             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
             grid.add(tile);
-            tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
         }
     }
     return grid;
