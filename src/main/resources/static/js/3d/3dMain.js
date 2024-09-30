@@ -34,6 +34,7 @@ const skyboxMap = {
 let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters,rainSystem,rainGeo,rainCount;
 
 let rainSize = 0.20;
+rainCount = 3000;
 
 const container = document.getElementById("container");
 
@@ -179,6 +180,10 @@ const init = async () => {
     const response = await fetch(`/${getInstance()}3D-garden-layout/${gardenId}`);
     const placedGardenObjects = await response.json();
     await placedGardenObjects.forEach(async (element) => await addObjectToScene(element));
+
+    if (isRaining) {
+        startRain();
+    }
 
     // Hide loading screen
     loadingImg.classList.add("d-none");
@@ -375,6 +380,19 @@ const addObjectToScene = async (plantOrDecoration) => {
  */
 const animate = () => {
     renderer.render(scene, camera);
+
+    if (isRaining && rainSystem) {
+        const positions = rainSystem.geometry.attributes.position.array;
+        for (let i = 0; i < rainCount; i++) {
+            positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1;  // Update y position
+
+            if (positions[i * 3 + 1] < 0) {
+                positions[i * 3 + 1] = 75; // If below tiles (y=0) Reset to top y position
+            }
+        }
+        rainSystem.geometry.attributes.position.needsUpdate = true; // Mark the position attribute as needing an update
+    }
+
 };
 
 /**
