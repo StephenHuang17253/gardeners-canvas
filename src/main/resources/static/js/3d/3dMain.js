@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import { createTileGrid } from "./tiles.js";
-import { OrbitControls } from "./OrbitControls.js";
-import { Loader } from "./Loader.js";
-import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from "./Exporter.js";
-import { Downloader } from "../Downloader.js";
+import {createTileGrid} from "./tiles.js";
+import {OrbitControls} from "./OrbitControls.js";
+import {Loader} from "./Loader.js";
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import {Exporter} from "./Exporter.js";
+import {Downloader} from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -33,7 +33,8 @@ const skyboxMap = {
     "Overcast Night": "overcast_nightbox.exr"
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters, rainSystem, rainGeo, backgroundModel;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters, rainSystem,
+    rainGeo, backgroundModel;
 
 let rainSize = 0.20;
 const RAIN_COUNT = 3000;
@@ -66,12 +67,12 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
-const MOON_ORBIT_RADIUS = 100;
+const MOON_ORBIT_RADIUS = 1500;
 const SUN_ORBIT_RADIUS = 1500;
 
 const RAIN_COLOR = 0x78b8c2;
 
-const MAX_ELEVATION = 55;
+const MAX_ELEVATION = 35;
 const MIN_ELEVATION = 10;
 const MAX_AZIMUTH = 90;
 const MIN_AZIMUTH = -90;
@@ -153,7 +154,7 @@ const init = async () => {
     );
 
     // initializing moon
-    const geometry = new THREE.SphereGeometry(2, 60, 60);
+    const geometry = new THREE.SphereGeometry(16, 60, 60);
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
 
@@ -183,7 +184,7 @@ const init = async () => {
     backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
     addModelToScene(
         backgroundModel,
-        new THREE.Vector3(0,0,0),
+        new THREE.Vector3(0, 0, 0),
         modelMap["Background"][1]);
     backgroundModel.visible = false;
 
@@ -447,10 +448,10 @@ const onMouseMove = () => document.body.style.userSelect = "none";
 const onMouseOut = () => document.body.style.userSelect = "auto";
 
 /**
-* On track time input change,
-* update the time variable to the current hour if the input is checked,
-* otherwise set it to the default time
-*/
+ * On track time input change,
+ * update the time variable to the current hour if the input is checked,
+ * otherwise set it to the default time
+ */
 const onTrackTimeInputChange = () => {
     const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
