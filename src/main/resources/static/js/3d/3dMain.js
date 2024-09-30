@@ -20,7 +20,7 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
-    "Sun": ["sunObject.glb", 1]
+    "Sun": ["sunObject.glb", 20]
 };
 
 const skyboxMap = {
@@ -30,7 +30,6 @@ const skyboxMap = {
     "Default": "default.exr",
     "Night": "nightbox.exr"
 };
-
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters;
 
@@ -44,6 +43,8 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+trackTimeInput.checked = true;
+trackWeatherInput.checked = true;
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -60,9 +61,17 @@ const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
 const MOON_ORBIT_RADIUS = 100;
-const SUN_ORBIT_RADIUS = 80;
+const SUN_ORBIT_RADIUS = 1500;
 
 const RAIN_COLOR = 0x78b8c2;
+
+const MAX_ELEVATION = 55;
+const MIN_ELEVATION = 10;
+const MAX_AZIMUTH = 90;
+const MIN_AZIMUTH = -90;
+const HALF_MOON_JOURNEY = 6;
+const MORNING_START = 6;
+const NIGHT_START = 18;
 
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
@@ -140,6 +149,7 @@ const init = async () => {
         }
     );
 
+    // initializing moon
     const geometry = new THREE.SphereGeometry(2, 60, 60);
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
@@ -179,6 +189,13 @@ const init = async () => {
 /**
  * Helper Methods
  */
+
+/**
+ * Finds if is daytime or not
+ * 
+ * @returns {boolean} - true if is daytime else false
+ */
+const isDayTime = () => time >= MORNING_START && time < NIGHT_START;
 
 /**
  * Starts the rain in the scene
@@ -229,13 +246,16 @@ const setTime = (newTime) => {
     time = newTime;
     // Update the time of day in the scene
     // Set moon or sun to the correct position
-    if (time >= 6 && time < 18) {
+    if (isDayTime()) {
         sun.visible = true;
         moon.visible = false;
+        updateSun();
     } else {
         sun.visible = false;
         moon.visible = true;
+        updateMoon();
     }
+
     updateSkybox();
 };
 
@@ -255,11 +275,33 @@ const setWeather = (newWeather) => {
         isRaining = false;
         stopRain(); //Deletes rain in rainSystem (Rain on existing scene)
     }
+};
 
-}
+/**
+ * Sets moon parameters based on current time.
+ */
+const setMoonParameters = () => {
+    const isBeforeMorningAndAfterMidnight = time < MORNING_START;
+    let newElevation;
+    let newAzimuth;
+    if (isBeforeMorningAndAfterMidnight) {
+        newElevation = Math.round(MAX_ELEVATION - time * ((MAX_ELEVATION - MIN_ELEVATION) / HALF_MOON_JOURNEY));
+        newAzimuth = Math.round(time * MIN_AZIMUTH / HALF_MOON_JOURNEY);
+    } else {
+        newElevation = Math.round(MIN_ELEVATION + MAX_ELEVATION / HALF_MOON_JOURNEY * (time - (NIGHT_START - 1)));
+        newAzimuth = Math.round((time - (NIGHT_START - 1)) * (MAX_AZIMUTH / HALF_MOON_JOURNEY));
+    }
+    moonParameters = {
+        elevation: newElevation,
+        azimuth: newAzimuth
+    };
+};
 
+/**
+ * Updates the skybox based on the time and weather
+ */
 const updateSkybox = () => {
-    if (time >= 6 && time < 18) {
+    if (isDayTime()) {
         setBackground(skyboxMap[weather]);
     } else {
         setBackground(skyboxMap["Night"]);
@@ -293,6 +335,7 @@ const addModelToScene = (model, position, scaleFactor = 1) => {
     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
     scene.add(model);
 };
+
 /**
  * Adds a plant or decoration object to the scene.
  *
@@ -345,15 +388,18 @@ const updateMoon = () => {
     moon.position.multiplyScalar(MOON_ORBIT_RADIUS);
 };
 
+/**
+ * Updates the movement of the sun based on the gardens time
+ */
 const updateSun = () => {
-    const sunY = SUN_ORBIT_RADIUS - Math.abs(SUN_ORBIT_RADIUS * (currentHour - 12) / 6)
-    const sunZ = (SUN_ORBIT_RADIUS / 6) * (currentHour - 12)
-    const sunPosition = new THREE.Vector3(0, sunY, sunZ);
+    const sunY = (SUN_ORBIT_RADIUS / 3) - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 18);
+    const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12);
     sun.position.z = sunZ;
     sun.position.y = sunY;
-    light.position.set(0, sunY, sunZ);
-    console.log("current time: " + currentHour);
-}
+    sun.position.x = SUN_ORBIT_RADIUS;
+    light.position.set(SUN_ORBIT_RADIUS - 30, sunY, sunZ);
+    console.log("sun position" + sun.position.x + " " + sun.position.y + " " + sun.position.z);
+};
 
 /**
  * Event Handlers
