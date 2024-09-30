@@ -815,8 +815,6 @@ const handleGardenFormSubmit = (event) => {
         tileTextures[j * GRID_ROWS + i] = node.attrs.name;
     });
 
-
-
     idListInput.value = JSON.stringify(idList);
     typeListInput.value = JSON.stringify(typeList);
     xCoordListInput.value = JSON.stringify(xCoordList);

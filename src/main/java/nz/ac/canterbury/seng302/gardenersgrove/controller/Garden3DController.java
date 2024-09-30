@@ -3,20 +3,11 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
-import nz.ac.canterbury.seng302.gardenersgrove.service.FriendshipService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GardenService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.GridItemLocationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.SecurityService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.PlantService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.DecorationService;
-import nz.ac.canterbury.seng302.gardenersgrove.service.WeatherService;
+import nz.ac.canterbury.seng302.gardenersgrove.model.TileModel;
+import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
 import nz.ac.canterbury.seng302.gardenersgrove.util.GridItemType;
@@ -50,6 +41,8 @@ public class Garden3DController {
     private final WeatherService weatherService;
     private final PlantService plantService;
 
+    private final GardenTileService gardenTileService;
+
     /**
      * Gets services used in this controller
      *
@@ -63,9 +56,9 @@ public class Garden3DController {
      */
     @Autowired
     public Garden3DController(GardenService gardenService, SecurityService securityService,
-            FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
-            WeatherService weatherService,
-            PlantService plantService, DecorationService decorationService) {
+                              FriendshipService friendshipService, GridItemLocationService gridItemLocationService,
+                              WeatherService weatherService,
+                              PlantService plantService, DecorationService decorationService, GardenTileService gardenTileService) {
         this.gardenService = gardenService;
         this.gridItemLocationService = gridItemLocationService;
         this.securityService = securityService;
@@ -73,6 +66,7 @@ public class Garden3DController {
         this.plantService = plantService;
         this.weatherService = weatherService;
         this.decorationService = decorationService;
+        this.gardenTileService = gardenTileService;
     }
 
     /**
@@ -218,6 +212,32 @@ public class Garden3DController {
 
         displayableItems = extractDisplayableItems(gridItemLocations);
         return displayableItems;
+    }
+
+    @ResponseBody
+    @GetMapping("/3D-tile-textures-grid/{gardenId}")
+    public List<TileModel> getGardenTileGrid(@PathVariable Long gardenId,
+                                             HttpServletResponse response) {
+        logger.info("GET /3D-tile-textures-grid/{}", gardenId);
+        Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
+
+        if (optionalGarden.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return new ArrayList<>();
+        }
+
+        Garden garden = optionalGarden.get();
+        User currentUser = securityService.getCurrentUser();
+        User gardenOwner = garden.getOwner();
+
+        if (!(garden.getIsPublic() || Objects.equals(gardenOwner.getId(), currentUser.getId())
+                || friendshipService.checkFriendshipStatus(gardenOwner, currentUser) == FriendshipStatus.ACCEPTED)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return new ArrayList<>();
+        }
+
+        List<TileModel> textures = gardenTileService.getGardenTilesByGarden(garden).stream().map(tile -> new TileModel(tile.getTileTexture(), tile.getXCoordinate(), tile.getYCoordinate())).toList();
+        return textures;
     }
 
 }
