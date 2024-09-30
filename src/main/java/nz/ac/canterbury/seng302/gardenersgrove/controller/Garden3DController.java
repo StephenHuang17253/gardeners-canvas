@@ -3,13 +3,10 @@ package nz.ac.canterbury.seng302.gardenersgrove.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import nz.ac.canterbury.seng302.gardenersgrove.component.DailyWeather;
 import nz.ac.canterbury.seng302.gardenersgrove.component.WeatherResponseData;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.GridItemLocation;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Plant;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
-import nz.ac.canterbury.seng302.gardenersgrove.entity.Decoration;
+import nz.ac.canterbury.seng302.gardenersgrove.entity.*;
 import nz.ac.canterbury.seng302.gardenersgrove.model.DisplayableItem;
 import nz.ac.canterbury.seng302.gardenersgrove.model.GardenDetailModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.TileModel;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import nz.ac.canterbury.seng302.gardenersgrove.util.FriendshipStatus;
 
@@ -219,15 +216,14 @@ public class Garden3DController {
 
     @ResponseBody
     @GetMapping("/3D-tile-textures-grid/{gardenId}")
-    public List<GardenTile> getGardenTileGrid(@PathVariable Long gardenId,
-                                            HttpServletResponse response) {
-
-        List<GardenTile> gardenTiles = new ArrayList<>();
+    public List<TileModel> getGardenTileGrid(@PathVariable Long gardenId,
+                                             HttpServletResponse response) {
+        logger.info("GET /3D-tile-textures-grid/{}", gardenId);
         Optional<Garden> optionalGarden = gardenService.getGardenById(gardenId);
 
         if (optionalGarden.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return gardenTiles;
+            return new ArrayList<>();
         }
 
         Garden garden = optionalGarden.get();
@@ -237,10 +233,11 @@ public class Garden3DController {
         if (!(garden.getIsPublic() || Objects.equals(gardenOwner.getId(), currentUser.getId())
                 || friendshipService.checkFriendshipStatus(gardenOwner, currentUser) == FriendshipStatus.ACCEPTED)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return gardenTiles;
+            return new ArrayList<>();
         }
 
-        return gardenTileService.getGardenTilesByGarden(garden);
+        List<TileModel> textures = gardenTileService.getGardenTilesByGarden(garden).stream().map(tile -> new TileModel(tile.getTileTexture(), tile.getXCoordinate(), tile.getYCoordinate())).toList();
+        return textures;
     }
 
 }

@@ -128,30 +128,37 @@ const createTile = (tileMaterial, size, texture) => {
  * @param {Loader} loader - reference to loader instance
  * @returns {THREE.Group} - Object with the grid to add to scene and an array of tile center positions.
  */
-const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
-    const grid = new THREE.Group();
-    const offset = (rows - 1) * tileSize / 2;
-    const tileCenterpositions = [];
-    const texture = loader.loadTexture(tileMap[tileMaterial][0]);
-
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            const tile = createTile(tileMaterial, tileSize, texture);
-            tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
-            grid.add(tile);
-            tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
-        }
-    }
-    return grid;
-};
+// const createTileGrid = (rows, cols, tileSize, tileMaterial, loader) => {
+//     const grid = new THREE.Group();
+//     const offset = (rows - 1) * tileSize / 2;
+//     const tileCenterpositions = [];
+//     const texture = loader.loadTexture(tileMap[tileMaterial][0]);
+//
+//     for (let i = 0; i < rows; i++) {
+//         for (let j = 0; j < cols; j++) {
+//             const tile = createTile(tileMaterial, tileSize, texture);
+//             tile.position.set(i * tileSize - offset, 0, j * tileSize - offset);
+//             grid.add(tile);
+//             tileCenterpositions.push(new THREE.Vector3(i * tileSize - offset, 0, j * tileSize - offset));
+//         }
+//     }
+//     return grid;
+// };
 
 const createTileGrid = async (rows, cols, tileSize, gardenTileTextureList) => {
     const grid = new THREE.Group();
     const offset = (rows - 1) * tileSize / 2;
     const tileCenterpositions = [];
     gardenTileTextureList.forEach(gardenTileTexture => {
+        console.log(gardenTileTexture.tileTexture.toString())
+        const tile = createTile(gardenTileTexture.tileTexture.toString(), tileSize, gardenTileTexture.tileTexture);
+        tile.position.set(gardenTileTexture.xCoordinate * tileSize - offset, 0, gardenTileTexture.yCoordinate * tileSize - offset);
+        grid.add(tile);
+        tileCenterpositions.push(new THREE.Vector3(gardenTileTexture.x * tileSize - offset, 0, gardenTileTexture.y * tileSize - offset));
+
 
     })
+    return grid;
 }
 
 export { createTileGrid };

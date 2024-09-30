@@ -233,19 +233,20 @@ addLight();
 setBackground(skyboxMap[weather]);
 
 setWeather(weather);
+
+
+
+// const grassTexture = loader.loadTexture('grass-tileable.jpg');
+
 /**
  * Fetches 2D tile map data
  * @returns {Promise<any>} - A promise that resolves with the fetched data
  */
-const fetchTileMap = async (gardenId) => {
-    const instance = getInstance();
-    const response = await fetch(`/${instance}3D-tile-textures-grid/${gardenId}`)
-    return await response.json();
-}
+const tileMapResponse = await fetch(`/${getInstance()}3D-tile-textures-grid/${gardenId}`)
+const tileMapTextures = await tileMapResponse.json();
+console.log(tileMapTextures)
 
-// const grassTexture = loader.loadTexture('grass-tileable.jpg');
-
-const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
+const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, tileMapTextures);
 
 scene.add(grid);
 
