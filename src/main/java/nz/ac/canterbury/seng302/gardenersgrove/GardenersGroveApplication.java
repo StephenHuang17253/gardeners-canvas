@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import nz.ac.canterbury.seng302.gardenersgrove.service.FileService;
 
 /**
- * Gardener's Grove entry-point
+ * Gardener's Canvas entry-point
  * Note {@link SpringBootApplication} annotation
  */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
