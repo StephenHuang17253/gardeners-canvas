@@ -302,7 +302,7 @@ public class GardensController {
                         int userStrikes = securityService.getCurrentUser().getStrikes() + 1;
                         logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), userStrikes);
                         model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "This tag does not meet the language " +
-                                "standards for Gardener's Grove. A warning strike has been added to your account");
+                                "standards for Gardener's Canvas. A warning strike has been added to your account");
                         if (userStrikes == 5) {
                             model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE,
                                     "You have added an inappropriate tag for the fifth time." +
@@ -522,7 +522,7 @@ public class GardensController {
                 logger.info("{} has received a strike", garden.getOwner().getFirstName());
                 logger.info("{} now has {} strikes", garden.getOwner().getFirstName(), garden.getOwner().getStrikes());
                 model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "This tag does not meet the language " +
-                        "standards for Gardener's Grove. A warning strike has been added to your account");
+                        "standards for Gardener's Canvas. A warning strike has been added to your account");
                 if (userStrikes == 5) {
                     model.addAttribute(Constants.TAG_ERROR_TEXT_ATTRIBUTE, "You have added an inappropriate tag for the fifth time." +
                             " You have been sent a warning email. " +

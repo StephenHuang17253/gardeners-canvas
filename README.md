@@ -1,8 +1,22 @@
-# SENG302 The Gardener's Grove
+# SENG302 The Gardener's Canvas
 
 Basic project using ```Gradle```, ```Spring Boot```, ```Thymeleaf```, and ```GitLab CI```.
 
-Gardener's Grove is a one-stop-shop app for avid gardeners of all expertise levels. Users will be able to record and identify different fruits and vegetables. They will also be able to manage their gardens with weather reports and history of evolution. Interactions between users will involve sharing tips and tricks and discussing various gardening topics.
+Gardener’s Canvas is a garden-management app designed to make the life of
+gardeners easier. It provides the ability to catalogue different plants in their
+garden, find information on how to care for their plants, and see recent and
+upcoming weather data for their garden. Gardener’s Canvas also features a
+friends system, such that friends can view each other’s gardens. Furthermore,
+users are able to showcase their gardens to all other users by setting their
+gardens to be public to all.
+On top of this, our application allows for users to plan the layout of their garden
+using a 2D editor where they can arrange their plants & decorations, and
+customise their garden’s terrain texture (like grass, soil, stone path, concrete).
+Once a user has saved a 2D layout for their garden, they can view a 3D
+visualisation of it. In this 3D view, the user can control the camera and view
+their garden from the angles they choose. The 3D view can also depict the
+weather for that garden’s location. For example, if it’s raining in real life, it will
+rain in your 3D garden as well.
 
 #### Note: Currently, reset password emails from our application are being blocked by @uclive.ac.nz emails. This is likely due to them being filtered as spam. The emails are accepted by @gmail.com emails.
 
@@ -14,7 +28,7 @@ This project includes:
 - profile view
 - profile edit
 - add profile picture
-- verfiy email*
+- verify email*
 - update password*
 - create garden
 - garden view
@@ -28,11 +42,29 @@ This project includes:
 - managing friends (adding friends, pending, accepted, and declined invites)
 - publicise gardens* 
 - browsing public gardens
+- adding tags to gardens
+- tag moderation
+- account deactivation
+- browsing gardens by tags
+- main page
+- plant information wiki
+- importing plants
+- 2d garden viewing
+- 2d garden editing
+- 3d garden viewing
+- 3d garden camera movement
+- plant categories
+- garden decorations
+- garden tile texturing
+- exporting 2d and 3d garden layouts
+- viewing public 3d gardens
+- 3d garden weather
 
 For more information, check the user manual in the wiki.
 _*Thoose features require environment variables._
 
 #### User accounts
+_*Note that user accounts are only available on the local versio if you downlad the data.sql file from our wiki and place it in the projects resources folder before compiling the project._
 
 | Account Type | Email | Password | Gmail Password | Use: |
 |--------------|-------|----------|----------------|------|
