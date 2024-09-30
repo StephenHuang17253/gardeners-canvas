@@ -17,3 +17,17 @@ Background:
       | "Concrete"|4|4|
       | "Stone Path"|5|5|
       | "Pebble Path"|6|6|
+
+  Scenario Outline: AC2 Given I am viewing my garden in 3D, when I look at the ground, then it has the texture assigned in the 2D view.
+    Given I as user "Alexander@email.com" am on my 2D garden page for "Alexander's Garden"
+    When I select a texture <texture> and place it at <x>, <y> and click save
+    Then my new texture <texture> appears in 3D garden at <x>, <y>
+    Examples:
+      |texture|x|y|
+      | "Grass"|1|1|
+      | "Soil" |2|2|
+      | "Bark" |3|3|
+      | "Concrete"|4|4|
+      | "Stone Path"|5|5|
+      | "Pebble Path"|6|6|
+

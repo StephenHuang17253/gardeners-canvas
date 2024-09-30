@@ -1,14 +1,19 @@
 package nz.ac.canterbury.seng302.gardenersgrove.cucumber.step_definitions;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
+import io.cucumber.java.bs.A;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.minidev.json.JSONArray;
 import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden2DController;
+import nz.ac.canterbury.seng302.gardenersgrove.controller.Garden3DController;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.Garden;
 import nz.ac.canterbury.seng302.gardenersgrove.entity.User;
 import nz.ac.canterbury.seng302.gardenersgrove.model.Tile2DModel;
+import nz.ac.canterbury.seng302.gardenersgrove.model.TileModel;
 import nz.ac.canterbury.seng302.gardenersgrove.repository.*;
 import nz.ac.canterbury.seng302.gardenersgrove.service.*;
 import org.junit.jupiter.api.Assertions;
@@ -34,11 +39,16 @@ public class U5008_Tile_Textures {
 
     public static MockMvc mockMVC;
 
+    public static MockMvc mockMVC3D;
+
     private MvcResult mvcResult;
 
-    public static GardenService gardenService;
 
-    public static UserService userService;
+    @Autowired
+    public GardenService gardenService;
+
+    @Autowired
+    public UserService userService;
 
     private Garden garden;
 
@@ -86,6 +96,15 @@ public class U5008_Tile_Textures {
     @Autowired
     public GardenTileService gardenTileService;
 
+    @Autowired
+    public ObjectMapper objectMapper;
+
+    @Autowired
+    public FriendshipService friendshipService;
+
+    @Autowired
+    public WeatherService weatherService;
+
     private Map<String, Object> model;
 
     @Before
@@ -100,6 +119,10 @@ public class U5008_Tile_Textures {
 
         Garden2DController garden2DController = new Garden2DController(gardenService, securityService,
                 gridItemLocationService, plantService, decorationService, gardenTileService);
+
+        Garden3DController garden3DController = new Garden3DController(gardenService, securityService, friendshipService, gridItemLocationService, weatherService, plantService, decorationService, gardenTileService);
+
+        mockMVC3D = MockMvcBuilders.standaloneSetup(garden3DController).build();
         mockMVC = MockMvcBuilders.standaloneSetup(garden2DController).build();
     }
 
@@ -177,5 +200,32 @@ public class U5008_Tile_Textures {
         Assertions.assertNotNull(tileModelAtXY);
 
         Assertions.assertEquals(newTextureName, tileModelAtXY.getTileTexture());
+    }
+
+    @Then("my new texture {string} appears in 3D garden at {int}, {int}")
+    public void my_new_texture_appears_in_3D_garden(String newTextureName, Integer x, Integer y) throws  Exception {
+        mvcResult = mockMVC3D.perform(
+                        MockMvcRequestBuilders
+                                .get("/3D-tile-textures-grid/{gardenId}", garden.getGardenId()))
+                .andExpect(status().isOk()).andReturn();
+
+        JsonNode jsonNode = objectMapper.readTree(mvcResult.getResponse().getContentAsString());
+
+        List<TileModel> tileModels = objectMapper.treeToValue(jsonNode, List.class);
+
+        TileModel tileModelAtXY = null;
+
+        for (TileModel tileModel : tileModels) {
+            if (tileModel.getXCoordinate() == x && tileModel.getYCoordinate() == y) {
+                tileModelAtXY = tileModel;
+            }
+        }
+
+        Assertions.assertNotNull(tileModelAtXY);
+        Assertions.assertEquals(newTextureName,tileModelAtXY.getTileTexture().toString());
+
+
+
+
     }
 }
