@@ -5,7 +5,6 @@ import { Loader } from "./Loader.js";
 import { createHueSaturationMaterial } from "./hueSaturationShader.js";
 import { Exporter } from "./Exporter.js";
 import { Downloader } from "../Downloader.js";
-import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -35,6 +34,8 @@ const skyboxMap = {
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters;
 
+let rainSize = 0.20;
+
 const container = document.getElementById("container");
 
 const downloadGLTFButton = document.getElementById("download-gltf");
@@ -61,6 +62,8 @@ const DEFAULT_WEATHER = "Default";
 const MOON_ORBIT_RADIUS = 100;
 const SUN_ORBIT_RADIUS = 80;
 
+const RAIN_COLOR = 0x78b8c2;
+
 const INIT_CAMERA_POSITION = new THREE.Vector3(0, 45, 45);
 
 // link used to download files
@@ -71,6 +74,7 @@ const gardenName = document.getElementById("gardenName").value;
 
 const currentHourInput = document.getElementById("currentHour");
 const currentWeatherInput = document.getElementById("weather");
+const rainDropSizeInput = document.getElementById("rainDropSize");
 
 // Get the current time and weather from the input fields if they exist or use the default values
 // For if the garden does not have a location set
@@ -79,6 +83,7 @@ const currentWeather = currentWeatherInput.value !== "" ? currentWeatherInput.va
 
 let time = currentHour;
 let weather = currentWeather;
+let isRaining = weather === "Rainy";
 
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
@@ -118,14 +123,12 @@ const init = async () => {
 
     updateSkybox();
 
-    console.log(loader)
-
     const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Grass", loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", 0, 0, loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", 0, 0, loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", 0, 0, loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", 0.055, 0.06, loader);
-    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", 0, 0, loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "StonePath", loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "PebblePath", loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Bark", loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Soil", loader);
+    // const grid = createTileGrid(GRID_SIZE, GRID_SIZE, TILE_SIZE, "Concrete", loader);
     scene.add(grid);
 
     const texture = loader.loadTexture("moon.jpg");
@@ -178,6 +181,46 @@ const init = async () => {
  */
 
 /**
+ * Starts the rain in the scene
+ */
+const startRain = () => {
+    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop. x,y,z
+
+    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
+        rainPositions.set([
+            Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
+            Math.random() * 75, // y spawns anywhere y: 0 to 75
+            Math.random() * 130 - 60   // z spawns anywhere z: -60 to 70
+        ], i * 3);
+    }
+
+    rainGeo = new THREE.BufferGeometry();
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+    const rainMaterial = new THREE.PointsMaterial({
+        color: RAIN_COLOR, // color of the raindrops
+        size: rainSize, // size of the raindrops
+    });
+
+    rainSystem = new THREE.Points(rainGeo, rainMaterial);
+    scene.add(rainSystem);
+    isRaining = true;
+};
+
+/**
+ * Stops the rain in the scene
+ */
+const stopRain = () => {
+    if (rainSystem) {
+        scene.remove(rainSystem);
+        rainSystem.geometry.dispose();
+        rainSystem.material.dispose();
+        rainSystem = null;
+    }
+    isRaining = false;
+};
+
+
+/**
  * Updates the time of day in the scene
  *
  * @param {number} newTime
@@ -205,6 +248,14 @@ const setWeather = (newWeather) => {
     weather = newWeather;
     updateSkybox();
     // change clouds and rain to match the weather
+    if (weather === "Rainy") {
+        rainCount = 3000;
+        startRain();
+    } else if (isRaining) { // If rain currently exists but is not raining
+        isRaining = false;
+        stopRain(); //Deletes rain in rainSystem (Rain on existing scene)
+    }
+
 }
 
 const updateSkybox = () => {
@@ -347,6 +398,15 @@ const onTrackWeatherInputChange = () => {
     setWeather(newWeather);
 };
 
+/**
+ * On rain drop size input change, update the rain drop size
+ */
+const onRainDropSizeInputChange = () => {
+    rainSize = +rainDropSizeInput.value;
+    stopRain();
+    startRain();
+};
+
 init();
 
 window.addEventListener("resize", onWindowResize);
@@ -358,4 +418,6 @@ downloadJPGButton.addEventListener("click", () => exporter.downloadJPG(renderer)
 trackTimeInput.addEventListener("change", onTrackTimeInputChange);
 trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
 
-console.log(scene.children);
+if (rainDropSizeInput) {
+    rainDropSizeInput.addEventListener("change", onRainDropSizeInputChange);
+}
