@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import { createTileGrid } from "./tiles.js";
-import { OrbitControls } from "./OrbitControls.js";
-import { Loader } from "./Loader.js";
-import { createHueSaturationMaterial } from "./hueSaturationShader.js";
-import { Exporter } from "./Exporter.js";
-import { Downloader } from "../Downloader.js";
+import {createTileGrid} from "./tiles.js";
+import {OrbitControls} from "./OrbitControls.js";
+import {Loader} from "./Loader.js";
+import {createHueSaturationMaterial} from "./hueSaturationShader.js";
+import {Exporter} from "./Exporter.js";
+import {Downloader} from "../Downloader.js";
 
 const modelMap = {
     "Tree": ["tree.glb", 5],
@@ -20,22 +20,23 @@ const modelMap = {
     "Gnome": ["deco/gnome.glb", 7],
     "Fountain": ["deco/fountain.glb", 3],
     "Table": ["deco/table.glb", 4.5],
-    "Sun": ["sunObject.glb", 20]
+    "Sun": ["sunObject.glb", 20],
+    "Background": ["background.glb", 100],
 };
 
 const skyboxMap = {
     "Sunny": "sunny-day.exr",
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
-    "Default": "default.exr",
+    "Default": "sunny-day.exr",
     "Clear Night": "nightbox.exr",
     "Overcast Night": "overcast_nightbox.exr"
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters,rainSystem,rainGeo,rainCount;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters, rainSystem,
+    rainGeo, backgroundModel;
 
 let rainSize = 0.20;
-rainCount = 3000;
 
 const container = document.getElementById("container");
 
@@ -45,8 +46,11 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+const trackBackgroundInput = document.getElementById("toggleBackground");
 trackTimeInput.checked = true;
 trackWeatherInput.checked = true;
+trackBackgroundInput.checked = false;
+
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -62,12 +66,13 @@ const MAX_CAMERA_DIST = GRID_SIZE * TILE_SIZE;
 const DEFAULT_TIME = 12;
 const DEFAULT_WEATHER = "Default";
 
-const MOON_ORBIT_RADIUS = 100;
+const MOON_ORBIT_RADIUS = 1500;
 const SUN_ORBIT_RADIUS = 1500;
 
 const RAIN_COLOR = 0x78b8c2;
+const RAIN_COUNT = 3000;
 
-const MAX_ELEVATION = 55;
+const MAX_ELEVATION = 25;
 const MIN_ELEVATION = 10;
 const MAX_AZIMUTH = 90;
 const MIN_AZIMUTH = -90;
@@ -149,7 +154,7 @@ const init = async () => {
     );
 
     // initializing moon
-    const geometry = new THREE.SphereGeometry(2, 60, 60);
+    const geometry = new THREE.SphereGeometry(16, 60, 60);
     moon = new THREE.Mesh(geometry, material);
     scene.add(moon);
 
@@ -176,6 +181,13 @@ const init = async () => {
         startRain();
     }
 
+    backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
+    addModelToScene(
+        backgroundModel,
+        new THREE.Vector3(0, 0, 0),
+        modelMap["Background"][1]);
+    backgroundModel.visible = false;
+
     // Hide loading screen
     loadingImg.classList.add("d-none");
     loadingDiv.classList.add("fadeOut");
@@ -197,9 +209,9 @@ const isDayTime = () => time >= MORNING_START && time < NIGHT_START;
  * Starts the rain in the scene
  */
 const startRain = () => {
-    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop. x,y,z
+    const rainPositions = new Float32Array(RAIN_COUNT * 3); // 3 coordinates per rain drop. x,y,z
 
-    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
+    for (let i = 0; i < RAIN_COUNT; i++) { // Iterate through each raindrop
         rainPositions.set([
             Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
             Math.random() * 75, // y spawns anywhere y: 0 to 75
@@ -266,7 +278,6 @@ const setWeather = (newWeather) => {
     updateSkybox();
     // change clouds and rain to match the weather
     if (weather === "Rainy") {
-        rainCount = 3000;
         startRain();
     } else if (isRaining) { // If rain currently exists but is not raining
         isRaining = false;
@@ -370,7 +381,6 @@ const addObjectToScene = async (plantOrDecoration) => {
         position,
         modelMap[category][1]);
 };
-
 /**
  * Renders the scene
  */
@@ -379,7 +389,7 @@ const animate = () => {
 
     if (isRaining && rainSystem) {
         const positions = rainSystem.geometry.attributes.position.array;
-        for (let i = 0; i < rainCount; i++) {
+        for (let i = 0; i < RAIN_COUNT; i++) {
             positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1;  // Update y position
 
             if (positions[i * 3 + 1] < 0) {
@@ -438,10 +448,10 @@ const onMouseMove = () => document.body.style.userSelect = "none";
 const onMouseOut = () => document.body.style.userSelect = "auto";
 
 /**
-* On track time input change,
-* update the time variable to the current hour if the input is checked,
-* otherwise set it to the default time
-*/
+ * On track time input change,
+ * update the time variable to the current hour if the input is checked,
+ * otherwise set it to the default time
+ */
 const onTrackTimeInputChange = () => {
     const newTime = trackTimeInput.checked ? currentHour : DEFAULT_TIME;
     setTime(newTime);
@@ -467,6 +477,13 @@ const onRainDropSizeInputChange = () => {
 };
 
 init();
+/**
+ * On track background model input change,
+ * update the background model variable to display/hide the background model
+ */
+const onBackgroundModelInputChange = () => {
+    backgroundModel.visible = trackBackgroundInput.checked;
+};
 
 window.addEventListener("resize", onWindowResize);
 container.addEventListener("mousemove", onMouseMove);
@@ -480,3 +497,4 @@ trackWeatherInput.addEventListener("change", onTrackWeatherInputChange);
 if (rainDropSizeInput) {
     rainDropSizeInput.addEventListener("change", onRainDropSizeInputChange);
 }
+trackBackgroundInput.addEventListener("change", onBackgroundModelInputChange);
