@@ -620,6 +620,10 @@ textureItems.forEach((item) => {
     const textureName = item.getAttribute("data-texture-name");
     let textureImage = item.getAttribute("data-texture-image")
 
+    if (instance === "test/" || instance === "prod/") {
+        textureImage = `/${instance}` + textureImage;
+
+    }
     /**
      * Handles the clicking of a texture item in the palette
      */
@@ -630,9 +634,6 @@ textureItems.forEach((item) => {
         item.style.border = "3px solid blue";
         selectedPaletteItem = item;
 
-        if (instance === "test/" || instance === "prod/") {
-            textureImage = `/${instance}` + textureImage;
-        }
         selectedPaletteItemInfo = {
             name: textureName,
             image: textureImage,
