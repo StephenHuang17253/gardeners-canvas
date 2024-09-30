@@ -325,8 +325,6 @@ const updateMoon = () => {
  * Updates the movement of the sun based on the gardens time
  */
 const updateSun = () => {
-    console.log("time is " + time);
-    console.log("orbit radius " + SUN_ORBIT_RADIUS)
     const sunY = (SUN_ORBIT_RADIUS/2) - Math.abs(SUN_ORBIT_RADIUS * (time - 12) / 12);
     const sunZ = (SUN_ORBIT_RADIUS / 6) * (time - 12);
     sun.position.z = sunZ;
