@@ -1,4 +1,4 @@
-import {Downloader} from "./Downloader.js";
+import { Downloader } from "./Downloader.js";
 
 const jpgDownloadButton = document.getElementById("download-jpg");
 const pngDownloadButton = document.getElementById("download-png");
@@ -21,6 +21,7 @@ const plantItems = document.querySelectorAll("[name='plant-item']");
 const textureItems = document.querySelectorAll("[name='texture-item']");
 const gridItemLocations = document.querySelectorAll("[name='grid-item-location']");
 const decorationItems = document.querySelectorAll("[name='decoration-item']");
+const tileItems = document.querySelectorAll("[name='grid-tile']");
 
 
 const pagination = document.getElementById("pagination");
@@ -113,8 +114,8 @@ const emptyDestination = (x, y, plantId, gridLocationUniqueId) => {
             return false;
         }
     }
-    return true
-}
+    return true;
+};
 
 /**
  * Removes previous texture on grid box
@@ -129,7 +130,7 @@ const destroyExistingTexture = (x, y) => {
             node.destroy();
         }
     }
-}
+};
 
 /**
  * Creates a tooltip object for displaying plant names and categories
@@ -297,16 +298,17 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
 
         plantOrDecoration.on("click", () => {
             if (selectedPaletteItem) {
-                if (selectedPaletteItemInfo.type === TEXTURE_TYPE) {
-                    return;
-                } else {
+
+                if (selectedPaletteItemInfo.type !== TEXTURE_TYPE) {
                     showErrorMessage(OCCUPIED_DESTINATION);
                     tooltip.hide();
                     deselectPaletteItem();
                     deselectGridItem();
-                    return;
                 }
+
+                return;
             }
+
             if (selectedGridItem) {
                 showErrorMessage(OCCUPIED_DESTINATION);
                 tooltip.hide();
@@ -314,6 +316,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
                 deselectGridItem();
                 return;
             }
+
             tooltip.hide();
             deselectPaletteItem();
             deselectGridItem();
@@ -330,7 +333,7 @@ const createPlantOrDecoration = (imageSrc, x, y, objectId, itemType, objectName,
                 y: mousePos.y + 10,
             });
             setToolTipText(objectName + "\n" + category);
-            tooltip.show()
+            tooltip.show();
         });
 
         plantOrDecoration.on('mouseout', () => {
@@ -380,7 +383,7 @@ const dataURLtoBlob = (dataURL) => {
     }
 
     // Create a new Blob from the ArrayBuffer
-    return new Blob([uint8Array], {type: mimeType});
+    return new Blob([uint8Array], { type: mimeType });
 };
 
 /**
@@ -503,7 +506,7 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
             listening: false,
         });
         textureLayer.add(rect);
-        gardenItemLayer.add(rect)
+        gardenItemLayer.add(rect);
     }
 }
 
@@ -511,8 +514,8 @@ for (let i = 0; i < GRID_COLUMNS; i++) {
  * Loads the persisted grid items (plants & decorations) from a saved layout onto the grid.
  */
 gridItemLocations.forEach(item => {
-    const x_coord = parseInt(item.getAttribute("data-grid-x"));
-    const y_coord = parseInt(item.getAttribute("data-grid-y"));
+    const xCoord = parseInt(item.getAttribute("data-grid-x"));
+    const yCoord = parseInt(item.getAttribute("data-grid-y"));
     const objectId = item.getAttribute("data-grid-objectid");
     const itemType = item.getAttribute("data-grid-type");
     const itemName = item.getAttribute("data-grid-name");
@@ -521,7 +524,7 @@ gridItemLocations.forEach(item => {
     if (instance !== "") {
         imageSrc = `/${instance}` + imageSrc;
     }
-    const {x, y} = convertToKonvaCoordinates(x_coord, y_coord);
+    const {x, y} = convertToKonvaCoordinates(xCoord, yCoord);
 
     const onloadCallback = () => updateCountersOnLoad(objectId);
     createPlantOrDecoration(imageSrc, x, y, objectId, itemType, itemName, category, onloadCallback);
@@ -581,6 +584,9 @@ plantItems.forEach((item, i) => {
     item.addEventListener("click", handlePlantItemClick);
 });
 
+/**
+ * Initialise event listeners for clicking on decoration items
+ */
 decorationItems.forEach((item) => {
     item.addEventListener('click', () => {
         deselectPaletteItem();
@@ -615,7 +621,7 @@ textureItems.forEach((item) => {
     let textureImage = item.getAttribute("data-texture-image")
 
     /**
-     * Handles the clicking of a plant item in the palette
+     * Handles the clicking of a texture item in the palette
      */
     const handleTextureItemClick = () => {
         deselectPaletteItem();
@@ -637,14 +643,31 @@ textureItems.forEach((item) => {
     item.addEventListener("click", handleTextureItemClick);
 });
 
+/**
+ * Loads the persisted tile textures from a saved layout onto the grid.
+ */
+tileItems.forEach(item => {
+    const tileX = item.getAttribute("data-tile-x");
+    const tileY = item.getAttribute("data-tile-y");
+    const tileTexture = item.getAttribute("data-tile-texture");
+    const tileTextureImage = item.getAttribute("data-tile-image");
+
+    let imageSrc = tileTextureImage;
+    if (instance !== "") {
+        imageSrc = `/${instance}` + imageSrc;
+    }
+
+    const { x, y } = convertToKonvaCoordinates(tileX, tileY);
+
+    createTextureOnGrid(imageSrc, x, y, "TEXTURE", tileTexture);
+});
+
 // Event Handlers
 
 /**
  * Handles the clicking of the stage
- *
- * @param {Event} event
  */
-const handleStageClick = (event) => {
+const handleStageClick = () => {
 
     const mousePos = stage.getPointerPosition();
     const i = Math.floor((mousePos.x - OFFSET_X) / GRID_SIZE);
@@ -654,7 +677,6 @@ const handleStageClick = (event) => {
     if (selectedPaletteItem) {
         if (!validLocation(x, y)) {
             deselectPaletteItem();
-
             showErrorMessage(INVALID_LOCATION);
             return;
         }
@@ -672,9 +694,10 @@ const handleStageClick = (event) => {
             }
 
         } else {
-            const {i: newGridX, j: newGridY} = convertToGridCoordinates(x, y);
-            destroyExistingTexture(newGridX, newGridY);
-            createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name);
+            const { i: newGridX, j: newGridY } = convertToGridCoordinates(x, y);
+            createTextureOnGrid(selectedPaletteItemInfo.image, x, y, selectedPaletteItemInfo.type, selectedPaletteItemInfo.name, function () {
+                destroyExistingTexture(newGridX, newGridY);
+            });
             return;
         }
     } else if (selectedGridItem) {
@@ -778,13 +801,15 @@ const handleGardenFormSubmit = (event) => {
         yCoordList.push(j);
     });
 
+    // assuming this is a list of length GRID_ROWS x GRID_COLUMNS of texture values e.g. GRASS
+    const tileTextures = Array(GRID_ROWS * GRID_COLUMNS).fill(null);
+
     textureLayer.find("Image").forEach(node => {
-        // Todo the first tile placed is not being registered when running through all
-        console.log(node.attrs.name);
+        const { i, j } = convertToGridCoordinates(node.x(), node.y());
+        tileTextures[j * GRID_ROWS + i] = node.attrs.name;
     });
 
-    // assuming this is a list of length GRID_ROWS x GRID_COLUMNS of texture values e.g. GRASS
-    const tileTextures = Array(GRID_ROWS * GRID_COLUMNS).fill("GRASS");
+
 
     idListInput.value = JSON.stringify(idList);
     typeListInput.value = JSON.stringify(typeList);
@@ -818,7 +843,9 @@ const handleWindowClick = (event) => {
     // if clicking the pagination, deselect the palette item
     if (pagination.contains(event.target)) {
         deselectPaletteItem();
+
     }
+
 };
 
 /**
@@ -867,6 +894,7 @@ const handleLastPageClick = () => {
 
 /**
  * checks if 2D grid has been modified and has unsaved changes
+ *
  * @returns {boolean} are there changes on the grid (true if there are, false if not)
  */
 const hasUnsavedChanges = () => {
@@ -890,22 +918,17 @@ const hasUnsavedChanges = () => {
         };
     });
 
-    //ensure lists are sorted
-    currentGrid.sort((a, b) => {
-        return a.id.localeCompare(b.id) ||
-            a.name.localeCompare(b.name) ||
-            a.category.localeCompare(b.category) ||
-            a.x.localeCompare(b.x) ||
-            a.y.localeCompare(b.y)
-    });
+    // Sort method to ensure lists are sorted
+    const sortMethod = (a, b) => a.id.localeCompare(b.id) ||
+        a.name.localeCompare(b.name) ||
+        a.category.localeCompare(b.category) ||
+        a.x.localeCompare(b.x) ||
+        a.y.localeCompare(b.y);
 
-    originalGrid.sort((a, b) => {
-        return a.id.localeCompare(b.id) ||
-            a.name.localeCompare(b.name) ||
-            a.category.localeCompare(b.category) ||
-            a.x.localeCompare(b.x) ||
-            a.y.localeCompare(b.y)
-    });
+    //ensure lists are sorted in same order
+    currentGrid.sort(sortMethod);
+
+    originalGrid.sort(sortMethod);
 
     // Compare the two arrays
     if (originalGrid.length !== currentGrid.length) {
@@ -922,11 +945,13 @@ const hasUnsavedChanges = () => {
             original.category !== current.category
         );
     });
-}
+};
 
 /**
  * Handles exiting the page in any form
  * Shows modal if there are unsaved changes
+ *
+ * @param {Event} event - The event object
  */
 const handlePageExit = (event) => {
     if (hasUnsavedChanges() && !preventUnload) {
@@ -934,7 +959,7 @@ const handlePageExit = (event) => {
         event.returnValue = 'You have unsaved changes!';
         return 'You have unsaved changes!';
     }
-}
+};
 
 
 // Event listeners
