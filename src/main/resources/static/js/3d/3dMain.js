@@ -28,7 +28,8 @@ const skyboxMap = {
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
     "Default": "default.exr",
-    "Night": "nightbox.exr"
+    "Clear Night": "nightbox.exr",
+    "Overcast Night": "overcast_nightbox.exr"
 };
 
 let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters,rainSystem,rainGeo,rainCount;
@@ -190,7 +191,7 @@ const init = async () => {
 
 /**
  * Finds if is daytime or not
- * 
+ *
  * @returns {boolean} - true if is daytime else false
  */
 const isDayTime = () => time >= MORNING_START && time < NIGHT_START;
@@ -303,7 +304,11 @@ const updateSkybox = () => {
     if (isDayTime()) {
         setBackground(skyboxMap[weather]);
     } else {
-        setBackground(skyboxMap["Night"]);
+        if (weather === "Rainy" || weather === "Overcast") {
+            setBackground(skyboxMap["Overcast Night"])
+        } else {
+            setBackground(skyboxMap["Clear Night"])
+        }
     }
 };
 
