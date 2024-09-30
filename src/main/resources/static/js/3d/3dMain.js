@@ -28,15 +28,15 @@ const skyboxMap = {
     "Sunny": "sunny-day.exr",
     "Overcast": "cloudy-day.exr",
     "Rainy": "cloudy-day.exr",
-    "Default": "default.exr",
+    "Default": "sunny-day.exr",
     "Clear Night": "nightbox.exr",
     "Overcast Night": "overcast_nightbox.exr"
 };
 
-let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters,rainSystem,rainGeo,rainCount;
+let scene, camera, renderer, controls, loader, exporter, light, downloader, moon, sun, moonParameters, rainSystem, rainGeo, backgroundModel;
 
 let rainSize = 0.20;
-rainCount = 3000;
+const RAIN_COUNT = 3000;
 
 const container = document.getElementById("container");
 
@@ -46,9 +46,11 @@ const downloadJPGButton = document.getElementById("download-jpg");
 
 const trackTimeInput = document.getElementById("trackTime");
 const trackWeatherInput = document.getElementById("trackWeather");
+const trackBackgroundInput = document.getElementById("toggleBackground");
 trackTimeInput.checked = true;
 trackWeatherInput.checked = true;
-const trackBackgroundInput = document.getElementById("toggleBackground");
+trackBackgroundInput.checked = false;
+
 
 const loadingDiv = document.getElementById("loading-div");
 const loadingImg = document.getElementById("loading-img");
@@ -178,11 +180,12 @@ const init = async () => {
         startRain();
     }
 
-    const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
+    backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
     addModelToScene(
         backgroundModel,
         new THREE.Vector3(0,0,0),
         modelMap["Background"][1]);
+    backgroundModel.visible = false;
 
     // Hide loading screen
     loadingImg.classList.add("d-none");
@@ -205,9 +208,9 @@ const isDayTime = () => time >= MORNING_START && time < NIGHT_START;
  * Starts the rain in the scene
  */
 const startRain = () => {
-    const rainPositions = new Float32Array(rainCount * 3); // 3 coordinates per rain drop. x,y,z
+    const rainPositions = new Float32Array(RAIN_COUNT * 3); // 3 coordinates per rain drop. x,y,z
 
-    for (let i = 0; i < rainCount; i++) { // Iterate through each raindrop
+    for (let i = 0; i < RAIN_COUNT; i++) { // Iterate through each raindrop
         rainPositions.set([
             Math.random() * 130 - 60,  // x spawns anywhere x: -60 to 70
             Math.random() * 75, // y spawns anywhere y: 0 to 75
@@ -274,7 +277,6 @@ const setWeather = (newWeather) => {
     updateSkybox();
     // change clouds and rain to match the weather
     if (weather === "Rainy") {
-        rainCount = 3000;
         startRain();
     } else if (isRaining) { // If rain currently exists but is not raining
         isRaining = false;
@@ -386,7 +388,7 @@ const animate = () => {
 
     if (isRaining && rainSystem) {
         const positions = rainSystem.geometry.attributes.position.array;
-        for (let i = 0; i < rainCount; i++) {
+        for (let i = 0; i < RAIN_COUNT; i++) {
             positions[i * 3 + 1] -= 0.5 + Math.random() * 0.1;  // Update y position
 
             if (positions[i * 3 + 1] < 0) {
