@@ -178,6 +178,12 @@ const init = async () => {
         startRain();
     }
 
+    const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
+    addModelToScene(
+        backgroundModel,
+        new THREE.Vector3(0,0,0),
+        modelMap["Background"][1]);
+
     // Hide loading screen
     loadingImg.classList.add("d-none");
     loadingDiv.classList.add("fadeOut");
@@ -372,11 +378,6 @@ const addObjectToScene = async (plantOrDecoration) => {
         position,
         modelMap[category][1]);
 };
-const backgroundModel = await loader.loadModel(modelMap["Background"][0], "Background");
-addModelToScene(
-    backgroundModel,
-    new THREE.Vector3(0,0,0),
-    modelMap["Background"][1]);
 /**
  * Renders the scene
  */
