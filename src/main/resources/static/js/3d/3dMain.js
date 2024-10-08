@@ -101,6 +101,9 @@ let time = currentHour;
 let weather = currentWeather;
 let isRaining = weather === "Rainy";
 
+const ROTATION_SPEED = 0.005; // Speed of the camera rotation
+let angle = 0; // Initial angle for rotation
+
 /**
  * Initialises threejs components, e.g. scene, camera, renderer, controls
  */
@@ -385,7 +388,17 @@ const addObjectToScene = async (plantOrDecoration) => {
  * Renders the scene
  */
 const animate = () => {
+    angle += ROTATION_SPEED;
+
+    // Calculate the new camera position
+    const radius = INIT_CAMERA_POSITION.length(); // Distance from the origin
+    camera.position.x = radius * Math.sin(angle);
+    camera.position.z = radius * Math.cos(angle);
+    camera.position.y = 30;
+    camera.lookAt(scene.position); // Keep looking at the center of the scene
+
     renderer.render(scene, camera);
+
 
     if (isRaining && rainSystem) {
         const positions = rainSystem.geometry.attributes.position.array;
